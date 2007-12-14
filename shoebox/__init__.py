@@ -633,11 +633,26 @@ class Box:
             self.surface.finish()
         # but bitmap surfaces need us to tell them to save to a file
         elif ext == "png":
+            # write to file
             self.surface.write_to_png(self.targetfilename)
-            print self.targetfilename
         else:
             raise VectorboxError("VECTORBOX PANIC in finish()")
         
+    def snapshot(self,filename):
+        '''
+        Save a png file of current surface contents
+        without finishing the surface
+        (currently works only with PNG surfaces)
+        '''
+        ext = self.targetfilename[-3:]
+        # check if we're working on a PNG surface
+        if ext == "png":
+            # write to file
+            self.surface.write_to_png(filename)
+        else:
+            raise VectorboxError("snapshot() can only be called in PNG surfaces (current surface is " + str(ext))
+        
+    
     def run(self,filename):
         self.cairo.save()
         # get the file contents
