@@ -641,7 +641,7 @@ class Box:
     def run(self,filename):
         '''
         Executes the contents of a Nodebox/Shoebox script
-        to current surface's context.
+        in current surface's context.
         '''
         self.cairo.save()
         # get the file contents
@@ -665,7 +665,7 @@ class Box:
             print "Exception in user code:"
             print '-='*30
             traceback.print_exc(file=sys.stdout)
-            print '-='*60
+            print '-='*30
             sys.exit()
         else:
             # finish by restoring the Cairo context state
