@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 '''
-shoebox v0.1
-Copyright Ricardo Lafuente 2007
+shoebox console runner
+copyright ricardo lafuente 2007
+developed at the Piet Zwart Institute, Rotterdam
 
 Released under the terms of the GNU General Public
 License v3
-
-Developed at the Piet Zwart Institute, Rotterdam
 
 Code parts were taken from Nodebox (http://www.nodebox.net),
 Inkscape (http://www.inkscape.org), pyCairo 
@@ -21,9 +20,8 @@ import os
 import cairo
 
 import shoebox
-import util
+from shoebox import util
 
-# empty class for having our label on the exception
 class CodeRunnerError(Exception): pass
 
 # supported formats

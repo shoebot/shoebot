@@ -5,16 +5,10 @@
 # 
 # See copyright and license notice in
 # vectorbox.py
-# .
-# TODO 
-#
-# - include gradient and image fills (Cairo only)
 
 import cairo
 import util
 from data import *
-
-
 
 class Box:
     '''
@@ -163,41 +157,35 @@ class Box:
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None):
-        #print "  beginpath"
         self._path = BezierPath((x,y))
         self._path.closed = False
-        #print "so far so good"
+        ## FIXME: This ought to work:
         #if x != None and y != None:
-            ## This is not working
+            # This is not working
             #self._path.moveto(x,y)
 
     def moveto(self, x, y):
-        #print "  moveto"
         if self._path is None:
             raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
-        #print "  lineto"
         if self._path is None:
             raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
-        #print "  curveto"
         if self._path is None:
             raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def closepath(self):
-        #print "  closepath"
         if self._path is None:
             raise ShoeboxError, "No current path. Use beginpath() first."
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
-    # FIXME: put draw working properly
     def endpath(self, draw=True):
         if self._path is None:
             raise ShoeboxError, "No current path. Use beginpath() first."
@@ -210,16 +198,10 @@ class Box:
         self._path = None
         #self._path.closed = False
         #return p
-
-
-    #def drawpath(self, path):
-        #if isinstance(path, (list, tuple)):
-            #path = BezierPath(path)
         
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
             raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
-        
         self.cairo.save()
         for element in path.pathdata:
             if isinstance(element,basestring):
@@ -227,7 +209,7 @@ class Box:
             elif isinstance(element,PathElement):
                 cmd = element[0]
             else:
-                raise "WRONG PATH ELEMENT FED TO draw()"
+                raise ShoeboxError("drawpath(): Invalid path element (check command string)")
             if cmd == MOVETO:
                 x = element[1]
                 y = element[2]
@@ -247,9 +229,10 @@ class Box:
             elif cmd == CLOSE:
                 self.cairo.close_path()
             else:
-                raise "BOLLOCKS, PathElement() is broken"
-        # if has state attributes, set the context to those, saving before and replacing them afterwards
-        # with the old values
+                raise ShoeboxError("PathElement(): error parsing path element command")
+        ## TODO
+        # if path has state attributes, set the context to those, saving
+        # before and replacing them afterwards with the old values
         # else, use context
         self.fill_and_stroke()
         self.cairo.restore()
@@ -264,7 +247,6 @@ class Box:
         #path.inheritFromContext()
         return path
 
-
     def relmoveto(self, x, y):
         self.cairo.rel_move_to(x,y)
 
@@ -278,13 +260,15 @@ class Box:
         self.cairo.arc(centerx, centery, radius, angle1, angle2)
     
     def findpath(self, list, curvature=1.0): 
-        ''' Builds a path from a list of point coordinates. Curvature: 0=straight lines 1=smooth curves
+        ''' Builds a path from a list of point coordinates. 
+        Curvature: 0=straight lines 1=smooth curves
+        '''
+        raise NotImplementedError("findpath() isn't implemented yet (sorry)")
         #import bezier
         #path = bezier.findpath(points, curvature=curvature)
         #path.ctx = self
         #path.inheritFromContext()
         #return path
-        '''
         pass
     
     def beginclip(self, path):
@@ -296,7 +280,7 @@ class Box:
     # ----- -----
 
     def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
-        print "WARNING: transform() isn't implemented yet. Ignoring."
+        raise NotImplementedError("findpath() isn't implemented yet")
 
     def matrix(self, mtrx):
         '''
@@ -338,7 +322,7 @@ class Box:
     # ----- COLOR -----
     
     def outputmode(self):
-        print "WARNING: outputmode() is not implemented yet. Ignoring."
+        raise NotImplementedError("outputmode() isn't implemented yet")
     
     def colormode(self, mode=None, range=None):
         if mode is not None:
@@ -411,7 +395,7 @@ class Box:
         '''
         # TODO: Check for malformed requests (x,y,txt is a common mistake)
         if width is not None:
-            print "WARNING: Text width settings are not implemented yet. Ignoring."
+            raise NotImplementedError("text(): width settings aren't implemented yet")
         if outline is True:
             self.textpath(txt, x, y, width, height)
         else:
@@ -451,18 +435,16 @@ class Box:
     def lineheight(self, height=None):
         # default: 1.2
         # sets leading
-        print "WARNING: lineheight() is not implemented yet. Ignoring."
-        pass
+        raise NotImplementedError("lineheight() isn't implemented yet")
     
     def align(self, align="LEFT"):
         # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        print "WARNING: align() is not implemented yet. Ignoring."
-        pass
+        raise NotImplementedError("align() isn't implemented yet")
     
     # TODO: Set the framework to setup font options
     
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
-        pass
+        raise NotImplementedError("fontoptions() isn't implemented yet")
 
     # ----- IMAGE -----
 
@@ -481,8 +463,7 @@ class Box:
 
     def imagesize(self, path):
         # get an external image's size
-        print "WARNING: imagesize() is not implemented yet. Ignoring."
-        pass
+        raise NotImplementedError("imagesize() isn't implemented yet")
 
     # ----- UTILITY -----
 
@@ -498,7 +479,7 @@ class Box:
         #v = self.addvar(v)
 
     def addvar(self, v):
-        print "WARNING: addvar() is not implemented yet. Ignoring."
+        raise NotImplementedError("addvar() isn't implemented yet")
         #oldvar = self.findvar(v.name)
         #if oldvar is not None:
             #if oldvar.compliesTo(v):
@@ -507,7 +488,7 @@ class Box:
         #self._ns[v.name] = v.value
 
     def findvar(self, name):
-        print "WARNING: findvar() is not implemented yet. Ignoring."
+        raise NotImplementedError("findvar() isn't implemented yet")
         #for v in self._oldvars:
             #if v.name == name:
                 #return v
@@ -557,7 +538,7 @@ class Box:
                 yield (x*colSize,y*rowSize)
 
     def open(self):
-        print "WARNING: open() is not implemented yet. Ignoring."
+        raise NotImplementedError("open() isn't implemented yet")
 
     def files(self, path="*"):
         """Returns a list of files.
@@ -572,7 +553,7 @@ class Box:
         return glob(path)
 
     def autotext(self):
-        print "WARNING: Autotext is not implemented yet. Ignoring."
+        raise NotImplementedError("autotext() isn't implemented yet")
 
     def fill_and_stroke(self):
         '''
@@ -619,7 +600,7 @@ class Box:
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise ShoeboxError("VECTORBOX PANIC in finish()")
+            raise ShoeboxError("finish(): error reading extension (check code)")
         
     def snapshot(self,filename=None):
         '''
@@ -635,7 +616,7 @@ class Box:
             # write to file
             self.surface.write_to_png(filename)
         else:
-            raise ShoeboxError("snapshot() can only be called in PNG surfaces (current surface is " + str(ext))
+            raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
         
     
     def run(self,filename):
@@ -659,23 +640,17 @@ class Box:
             # do the Cairo magic
             exec source_or_code in self.namespace
         except:
-            # something went wrong; print verbose system output
+            # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
             import traceback, sys
             print "Exception in user code:"
-            print '-='*30
+            print '-='*20
             traceback.print_exc(file=sys.stdout)
-            print '-='*30
+            print '-='*20
             sys.exit()
         else:
             # finish by restoring the Cairo context state
             self.cairo.restore()
-        
-        
-        
-        
-        
-        
 
 class OptionsContainer:
     def __init__(self):
@@ -688,7 +663,6 @@ class OptionsContainer:
         self.fillcolor = (.7,.7,.7,1)
         self.strokecolor = (.2,.2,.2,1)
         self.strokewidth = 1.0
-
 
         # self.linecap
         # self.linejoin
