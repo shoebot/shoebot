@@ -45,7 +45,7 @@ class Box:
         elif isinstance(target, cairo.Surface):
             self.cairo = cairo.Context(target)
         else:
-            raise VectorboxError("Argument must be a file name or a Cairo surface")
+            raise ShoeboxError("Argument must be a file name or a Cairo surface")
         
         self.width = width
         self.height = height
@@ -174,25 +174,25 @@ class Box:
     def moveto(self, x, y):
         #print "  moveto"
         if self._path is None:
-            raise VectorboxError, "No current path. Use beginpath() first."
+            raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
         #print "  lineto"
         if self._path is None:
-            raise VectorboxError, "No current path. Use beginpath() first."
+            raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         #print "  curveto"
         if self._path is None:
-            raise VectorboxError, "No current path. Use beginpath() first."
+            raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def closepath(self):
         #print "  closepath"
         if self._path is None:
-            raise VectorboxError, "No current path. Use beginpath() first."
+            raise ShoeboxError, "No current path. Use beginpath() first."
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
@@ -200,7 +200,7 @@ class Box:
     # FIXME: put draw working properly
     def endpath(self, draw=True):
         if self._path is None:
-            raise VectorboxError, "No current path. Use beginpath() first."
+            raise ShoeboxError, "No current path. Use beginpath() first."
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -218,28 +218,23 @@ class Box:
         
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
-            raise VectorboxError, "drawpath(): Input is not a valid BezierPath object"
-        # include fill_and_stroke behaviour wrt stroke and fill
-        #print "beginning drawing"
+            raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
+        
         self.cairo.save()
         for element in path.pathdata:
             if isinstance(element,basestring):
                 cmd = element
-                print "!! element is string: " + element
             elif isinstance(element,PathElement):
                 cmd = element[0]
-                #print cmd
             else:
                 raise "WRONG PATH ELEMENT FED TO draw()"
             if cmd == MOVETO:
                 x = element[1]
                 y = element[2]
-                #print "MOVETO"
                 self.cairo.move_to(x, y)
             elif cmd == LINETO:
                 x = element[1]
                 y = element[2]
-                #print "LINETO"
                 self.cairo.line_to(x, y)
             elif cmd == CURVETO:
                 c1x = element[1]
@@ -250,7 +245,6 @@ class Box:
                 y = element[6]
                 self.cairo.curve_to(c1x, c1y, c2x, c2y, x, y)
             elif cmd == CLOSE:
-                #print "CLOSE"
                 self.cairo.close_path()
             else:
                 raise "BOLLOCKS, PathElement() is broken"
@@ -283,12 +277,6 @@ class Box:
     def arc(self,centerx, centery, radius, angle1, angle2):
         self.cairo.arc(centerx, centery, radius, angle1, angle2)
     
-    #def endpath(self, draw=True): # close the path and apply the fill and stroke
-        #self.cairo.close_path()
-        #if draw: 
-            #self.currentpath.draw(self)
-
-    
     def findpath(self, list, curvature=1.0): 
         ''' Builds a path from a list of point coordinates. Curvature: 0=straight lines 1=smooth curves
         #import bezier
@@ -308,7 +296,7 @@ class Box:
     # ----- -----
 
     def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
-        print "WARNING: transform() wasn't implemented yet. Ignoring."
+        print "WARNING: transform() isn't implemented yet. Ignoring."
 
     def matrix(self, mtrx):
         '''
@@ -376,7 +364,6 @@ class Box:
         return self.opt.fillcolor
     
     def nofill(self):
-        #global self.opt.fillapply
         self.opt.fillapply = False
     
     def stroke(self,*args):
@@ -386,7 +373,6 @@ class Box:
         return self.opt.strokecolor
     
     def nostroke(self):
-        #global self.opt.strokeapply
         self.opt.strokeapply = False
     
     def strokewidth(self, w=None):
@@ -396,7 +382,6 @@ class Box:
             return self.cairo.get_line_width
     
     def background(self,r,g,b,a=None):
-        # discard objects?
         if a is None:
             self.cairo.set_source_rgb(r,g,b)
             self.cairo.paint()
@@ -427,8 +412,8 @@ class Box:
         # TODO: Check for malformed requests (x,y,txt is a common mistake)
         if width is not None:
             print "WARNING: Text width settings are not implemented yet. Ignoring."
-        #if outline is True:
-            #textpath(txt, x, y, width, height)
+        if outline is True:
+            self.textpath(txt, x, y, width, height)
         else:
             self.cairo.move_to(x,y)
             self.cairo.show_text(txt)
@@ -502,9 +487,9 @@ class Box:
     # ----- UTILITY -----
 
     def size(self,w,h):
-        #xfactor = w / width
-        #yfactor = h / height
-        #self.scale(xfactor, yfactor)
+        self.width = w
+        self.height = h
+        # self.surface.scale*something*
         print "WARNING: size() isn't implemented yet (instead specify width and height arguments in the terminal). Ignoring."
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
@@ -559,9 +544,9 @@ class Box:
             for x, y in grid(10,10,12,12):
                 rect(x,y, 10,10)
     
-        Taken ipsis verbis from Nodebox
         """
-        
+        # Taken ipsis verbis from Nodebox
+
         rowRange = range(int(rows))
         colRange = range(int(cols))
         if (shuffled):
@@ -580,8 +565,9 @@ class Box:
         You can use wildcards to specify which files to pick, e.g.
             f = files('*.gif')
 
-        Taken ipsis verbis from Nodebox
         """
+
+        # Taken ipsis verbis from Nodebox
         from glob import glob
         return glob(path)
 
@@ -600,10 +586,7 @@ class Box:
 
         self.cairo.save()
         if self.opt.fillapply is True:
-            #print "setting source"
-            #print fillclr
             self.cairo.set_source_rgba(fillclr[0],fillclr[1],fillclr[2],fillclr[3])
-            #print "source set"
             if self.opt.strokeapply is True:
                 # if there's a stroke still to be applied, we need to call fill_preserve()
                 # which still leaves this path as active
@@ -620,7 +603,7 @@ class Box:
             self.cairo.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
             self.cairo.stroke()
         else:
-            print "WARNING: Fill and stroke: No operation done."
+            pass
         self.cairo.restore()
 
     def finish(self):
@@ -636,24 +619,30 @@ class Box:
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise VectorboxError("VECTORBOX PANIC in finish()")
+            raise ShoeboxError("VECTORBOX PANIC in finish()")
         
-    def snapshot(self,filename):
+    def snapshot(self,filename=None):
         '''
         Save a png file of current surface contents
         without finishing the surface
         (currently works only with PNG surfaces)
         '''
+        if filename is None:
+            raise ShoeboxError("snapshot() requires a filename argument")
         ext = self.targetfilename[-3:]
         # check if we're working on a PNG surface
         if ext == "png":
             # write to file
             self.surface.write_to_png(filename)
         else:
-            raise VectorboxError("snapshot() can only be called in PNG surfaces (current surface is " + str(ext))
+            raise ShoeboxError("snapshot() can only be called in PNG surfaces (current surface is " + str(ext))
         
     
     def run(self,filename):
+        '''
+        Executes the contents of a Nodebox/Shoebox script
+        to current surface's context.
+        '''
         self.cairo.save()
         # get the file contents
         file = open(filename, 'rU')
@@ -668,15 +657,16 @@ class Box:
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
             # do the Cairo magic
-            #exec source_or_code in self.namespace
             exec source_or_code in self.namespace
         except:
             # something went wrong; print verbose system output
             # maybe this is too verbose, but okay for now
-            import sys
-            print sys.exc_info()
-            exc_type, exc_value = sys.exc_info()[:2]
-            print >> sys.stderr, exc_type, exc_value
+            import traceback, sys
+            print "Exception in user code:"
+            print '-='*30
+            traceback.print_exc(file=sys.stdout)
+            print '-='*60
+            sys.exit()
         else:
             # finish by restoring the Cairo context state
             self.cairo.restore()
