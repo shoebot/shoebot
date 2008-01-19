@@ -38,7 +38,6 @@ class CodeRunner(object):
         Run shoebox code from infile and create an image as outputfile.
         Size settings are also defined here.
         '''
-
         self.width = width
         self.height = height
         self.inputfilename = infile
@@ -48,18 +47,14 @@ class CodeRunner(object):
         print
         print "Width: " + str(width)
         print "Height: " + str(height)
-
         # create a Cairo surface
         self.surface = util.surfacefromfilename(self.outputfilename,self.width,self.height)
-
         # create the drawing context
         self.vec = shoebox.Box(self.surface, self.width, self.height)
-
         # and run the code
         self.vec.cairo.save()
         self.runexternalscript()
         self.vec.cairo.restore()
-
         # now we need to know the file extension
         ext = self.outputfilename[-3:]
         # if it's a vector surface (svg et al), just wrap up and finish
@@ -122,7 +117,7 @@ def usage(err=""):
     if len(err) > 0:
         err = '\n\nError: ' + str(err)
     print """    shoebox console runner
-    
+
     Usage: python console.py <sourcefile> <imagefile> [<width> <height>]
     width and height are optional values; if not specified, the resulting
     image will be 1000x1000px (bitmap) or 1000x1000 points (vector).
@@ -131,13 +126,12 @@ def usage(err=""):
     Supported bitmap image extensions:  png
     """ + err
     sys.exit()
-    
+
 if __name__ == '__main__':
     verbose = True
     debug = False
     if sys.argv[1] == '-h':
         usage()
-
     runner = CodeRunner()
     infile = sys.argv[1]
     outfile = sys.argv[2]
@@ -150,6 +144,3 @@ if __name__ == '__main__':
     else:
         usage("Wrong number of arguments")
 
-    
-    
-    

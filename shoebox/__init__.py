@@ -498,12 +498,12 @@ class Box:
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
         import random
-        if v1 != None and v2 == None: # One value means 0 -> v1
+        if v1 != None and v2 == None:
             if isinstance(v1, float):
                 return random.random() * v1
             else:
                 return int(random.random() * v1)
-        elif v1 != None and v2 != None: # v1 -> v2
+        elif v1 != None and v2 != None:
             if isinstance(v1, float) or isinstance(v2, float):
                 start = min(v1, v2)
                 end = max(v1, v2)
@@ -639,6 +639,10 @@ class Box:
                 source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
             # do the Cairo magic
             exec source_or_code in self.namespace
+##          if self.namespace.has_key("setup"):
+##              self.fastRun(self.namespace["setup"])
+            
+            
         except:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
