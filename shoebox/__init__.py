@@ -279,7 +279,9 @@ class Box:
         self.cairo.arc(centerx, centery, radius, angle1, angle2)
     
     def findpath(self, list, curvature=1.0): 
-        ''' Builds a path from a list of point coordinates. 
+        ''' 
+        NOT IMPLEMENTED 
+        Builds a path from a list of point coordinates.
         Curvature: 0=straight lines 1=smooth curves
         '''
         raise NotImplementedError("findpath() isn't implemented yet (sorry)")
@@ -291,15 +293,24 @@ class Box:
         pass
     
     def beginclip(self, path):
+        '''
+        NOT IMPLEMENTED
+        '''        
         pass
     
     def endclip(self):
+        '''
+        NOT IMPLEMENTED
+        '''        
         pass
     
     # ----- -----
 
     def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
-        raise NotImplementedError("findpath() isn't implemented yet")
+        '''
+        NOT IMPLEMENTED
+        '''    
+        raise NotImplementedError("transform() isn't implemented yet")
 
     def matrix(self, mtrx):
         '''
@@ -341,6 +352,9 @@ class Box:
     # ----- COLOR -----
     
     def outputmode(self):
+        '''
+        NOT IMPLEMENTED
+        '''        
         raise NotImplementedError("outputmode() isn't implemented yet")
     
     def colormode(self, mode=None, range=None):
@@ -452,11 +466,17 @@ class Box:
         return textwidth, textheight
     
     def lineheight(self, height=None):
+        '''
+        NOT IMPLEMENTED
+        '''        
         # default: 1.2
         # sets leading
         raise NotImplementedError("lineheight() isn't implemented yet")
     
     def align(self, align="LEFT"):
+        '''
+        NOT IMPLEMENTED
+        '''        
         # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
         raise NotImplementedError("align() isn't implemented yet")
     
@@ -481,23 +501,35 @@ class Box:
         self.cairo.fill()
 
     def imagesize(self, path):
+        '''
+        NOT IMPLEMENTED
+        '''
         # get an external image's size
         raise NotImplementedError("imagesize() isn't implemented yet")
 
     # ----- UTILITY -----
 
     def size(self,w,h):
+        '''
+        NOT IMPLEMENTED
+        '''
         self.width = w
         self.height = h
         # self.surface.scale*something*
         print "WARNING: size() isn't implemented yet (instead specify width and height arguments in the terminal). Ignoring."
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
+        '''
+        NOT IMPLEMENTED
+        '''        
         print "WARNING: var() is not implemented yet. Ignoring."
         #v = Variable(name, type, default, min, max, value)
         #v = self.addvar(v)
 
     def addvar(self, v):
+        '''
+        NOT IMPLEMENTED
+        '''        
         raise NotImplementedError("addvar() isn't implemented yet")
         #oldvar = self.findvar(v.name)
         #if oldvar is not None:
@@ -507,6 +539,9 @@ class Box:
         #self._ns[v.name] = v.value
 
     def findvar(self, name):
+        '''
+        NOT IMPLEMENTED
+        '''        
         raise NotImplementedError("findvar() isn't implemented yet")
         #for v in self._oldvars:
             #if v.name == name:
@@ -557,6 +592,9 @@ class Box:
                 yield (x*colSize,y*rowSize)
 
     def open(self):
+        '''
+        NOT IMPLEMENTED
+        '''        
         raise NotImplementedError("open() isn't implemented yet")
 
     def files(self, path="*"):
@@ -572,6 +610,9 @@ class Box:
         return glob(path)
 
     def autotext(self):
+        '''
+        NOT IMPLEMENTED
+        '''        
         raise NotImplementedError("autotext() isn't implemented yet")
 
     def fill_and_stroke(self):
