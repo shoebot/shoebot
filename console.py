@@ -154,5 +154,5 @@ if __name__ == '__main__':
     elif len(sys.argv) == 3:
         runner.run(infile,outfile)
     else:
-        usage("Wrong number of arguments")
+        usage("Wrong arguments")
 

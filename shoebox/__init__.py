@@ -49,7 +49,7 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, target, width, height):
+    def __init__ (self, target, width=1000, height=1000):
         # if the target is a string, should be a filename
         if isinstance(target, basestring):
             self.targetfilename = target
