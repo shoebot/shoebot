@@ -1,0 +1,97 @@
+
+
+
+   Shoebox v0.1a
+   ricardo lafuente
+
+   ReadMe
+
+
+Description
+===========
+
+Shoebox is a port/re-write of Nodebox (http://www.nodebox.net), a Python-based,
+Mac-only graphics programming environment. Nodebox is awesome, but sadly it 
+relies heavily on OSX's graphics and interface libraries.
+
+
+Installing Shoebox
+==================
+
+For now, the only means of installing Shoebox is getting it from the source 
+repository. Shoebox uses Mercurial for version control. Mercurial is available
+on most major GNU/Linux distributions.
+
+Ubuntu/Debian: sudo apt-get install mercurial
+Gentoo: emerge mercurial
+
+Make a new directory for your Shoebox project(s), and then run the following 
+command in your terminal:
+
+hg clone http://hg.assembla.com/shoebox
+
+You should now see a new shoebox/ directory inside your project dir.
+
+
+
+Running Shoebox from the console
+================================
+It's probably appropriate to place your scripts inside the shoebox dir for now.
+(this is a makeshift solution until we have a proper package for Shoebox)
+
+Usage is rather straightforward:
+  
+  python console.py script.py outputfile <width> <height>
+
+- outputfile should have a valid extension (.svg, .ps, .pdf or .png), since
+  it will be autodetected by the script;
+- 'width' and 'height' are optional values; if not specified, the resulting
+  image will be 1000x1000px (bitmap output) or 1000x1000 points (vector
+  output).
+
+Try running the blocks_neat.py example in the shoebox/examples dir.
+
+Running Shoebox as a Python module
+==================================
+Shoebox can also be loaded as a module. For now, scripts taking advantage of
+this must be placed inside the shoebox dir.
+
+After including an import statement,
+
+  import shoebox
+
+a Box object needs to be created, and all further Nodebox commands can be 
+called on that instance.
+
+Box should be called with the output file name as an argument. Width and
+height can also be specified - otherwise it defaults to a 1000x1000 canvas.
+
+  box = Box("output.svg",100,100)
+  box.rect(10,10,100,100)
+
+When you're finished with drawing, just call
+
+  box.finish()
+
+and your output file should be created.
+
+Also, when using bitmap files, you can save snapshots of the current state
+of the Box instance like so:
+
+  box.snapshot("snap.png")
+
+Note that this doesn't work if your Box object was created with a vector
+format output.
+
+You can even call external Shoebox/Nodebox scripts from your Python script:
+
+  box.run("script.py")
+
+
+
+Contact
+=======
+The author can be reached at ricardo _at_ sollec _dot_ org
+
+
+
