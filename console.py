@@ -1,12 +1,25 @@
 #!/usr/bin/env python
 
 '''
-shoebox console runner
-copyright ricardo lafuente 2007
-developed at the Piet Zwart Institute, Rotterdam
+Shoebox console runner
 
-Released under the terms of the GNU General Public
-License v3
+Copyright 2007, 2008 Ricardo Lafuente 
+Developed at the Piet Zwart Institute, Rotterdam
+
+This file is part of Shoebox.
+
+Shoebox is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Shoebox is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
 
 Code parts were taken from Nodebox (http://www.nodebox.net),
 Inkscape (http://www.inkscape.org), pyCairo 
@@ -14,7 +27,6 @@ Inkscape (http://www.inkscape.org), pyCairo
 authors (credited in each module)
 '''
 
-#from math import pi
 import sys
 import os
 import cairo
@@ -35,8 +47,8 @@ class CodeRunner(object):
 
     def run(self, infile, outfile, width=1000, height=1000):
         '''
-        Run shoebox code from infile and create an image as outputfile.
-        Size settings are also defined here.
+        Run shoebox code from infile and create an image as outfile.
+        Canvas size settings are also defined here.
         '''
         self.width = width
         self.height = height
@@ -116,14 +128,14 @@ class CodeRunner(object):
 def usage(err=""):
     if len(err) > 0:
         err = '\n\nError: ' + str(err)
-    print """    shoebox console runner
+    print """Shoebox console runner
 
     Usage: python console.py <sourcefile> <imagefile> [<width> <height>]
     width and height are optional values; if not specified, the resulting
     image will be 1000x1000px (bitmap) or 1000x1000 points (vector).
 
     Supported vector image extensions: pdf, svg, ps
-    Supported bitmap image extensions:  png
+    Supported bitmap image extensions: png
     """ + err
     sys.exit()
 

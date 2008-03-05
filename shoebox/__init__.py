@@ -1,10 +1,30 @@
 #!/usr/bin/env python
 
-# Shoebox's graphics backend
-# Copyleft Ricardo Lafuente 2007
-# 
-# See copyright and license notice in
-# vectorbox.py
+'''
+Shoebox module
+
+Copyright 2007, 2008 Ricardo Lafuente 
+Developed at the Piet Zwart Institute, Rotterdam
+
+This file is part of Shoebox.
+
+Shoebox is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Shoebox is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
+
+This file uses code from Nodebox (http://www.nodebox.net).
+The relevant code parts are marked with a "Taken from Nodebox" note.
+
+'''
 
 import cairo
 import util
@@ -12,7 +32,9 @@ from data import *
 
 class Box:
     '''
-    GET A GOOD DESCRIPTION, DAMNIT
+    The Box class is an abstraction to hold a Cairo context and all
+    methods to access and manipulate it. The Nodebox language is
+    implemented here.
     '''
 
     inch = 72
@@ -27,15 +49,13 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    #M_PI = pi
-
     def __init__ (self, target, width, height):
         # if the target is a string, should be a filename
-
         if isinstance(target, basestring):
             self.targetfilename = target
             self.surface = util.surfacefromfilename(target,width,height)
             self.cairo = cairo.Context(self.surface)
+        # and if it's a surface, attach our Cairo context to it
         elif isinstance(target, cairo.Surface):
             self.cairo = cairo.Context(target)
         else:
@@ -54,7 +74,7 @@ class Box:
         '''
         Draws a rectangle with top left corner in (x,y)
         The roundness variable sets rounded corners.
-        Taken from Nodebox. (or was it? i gotta double-check)
+        Taken from Nodebox.
         '''
         if roundness == 0.0:
             self.cairo.rectangle(x, y, width, height)
@@ -76,7 +96,6 @@ class Box:
         '''
         Draws an ellipse starting from (x,y)
         '''
-        # TODO: document behaviour (center? corner?)
         from math import pi
         self.cairo.save()
         self.cairo.translate (x + width / 2., y + height / 2.);
@@ -591,7 +610,9 @@ class Box:
         '''
         I wrote this in a rush, sorry
         '''
+        # get the extension from the filename
         ext = self.targetfilename[-3:]
+        # if this is a vector file, wrap up and finish
         if ext in ("svg",".ps","pdf"):
             self.cairo.show_page()
             self.surface.finish()
@@ -600,7 +621,7 @@ class Box:
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise ShoeboxError("finish(): error reading extension (check code)")
+            raise ShoeboxError("finish(): invalid extension")
         
     def snapshot(self,filename=None):
         '''
@@ -702,8 +723,8 @@ class OptionsContainer:
 
 if __name__ == "__main__":
     print '''
-    Use console.py for commandline use.
     This file can only be used as a Python module.
+    Use console.py for commandline use.
     '''
     import sys
     sys.exit()
