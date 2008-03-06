@@ -4,10 +4,45 @@
 # RGB/HSL conversion functions
 # Borrowed from Inkscape (coloreffect.py)
 
+'''
+Shoebox utility functions
+
+Copyright 2007, 2008 Ricardo Lafuente 
+Developed at the Piet Zwart Institute, Rotterdam
+
+This file is part of Shoebox.
+
+Shoebox is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Shoebox is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
+
+This file uses code from Nodebox (http://www.nodebox.net).
+The relevant code parts are marked with a "Taken from Nodebox" note.
+
+
+Some code parts were taken from Inkscape and marked as such.
+Copyright (C) 2006 Jos Hirth, kaioa.com
+Subject to the terms of the GPLv2 or any later version.
+'''
+
+
+
 def rgb_to_hsl(r, g, b):
     '''
+    Taken from Inkscape.
     Copyright (C) 2006 Jos Hirth, kaioa.com
     Subject to the terms of the GPLv2 or any later version.
+    
+    Converts RGB values to the HSL colourspace.
     '''
     rgb_max = max (max (r, g), b)
     rgb_min = min (min (r, g), b)
@@ -39,8 +74,7 @@ def rgb_to_hsl(r, g, b):
 
 def hue_2_rgb (v1, v2, h):
     '''
-    Copyright (C) 2006 Jos Hirth, kaioa.com
-    Subject to the terms of the GPLv2 or any later version.
+    Taken from Inkscape.
     '''
     if h < 0:
         h += 6.0
@@ -56,8 +90,8 @@ def hue_2_rgb (v1, v2, h):
 
 def hsl_to_rgb (h, s, l):
     '''
-    Copyright (C) 2006 Jos Hirth, kaioa.com
-    Subject to the terms of the GPLv2 or any later version.
+    Taken from Inkscape
+    Convert HSL values to RGB
     '''
     rgb = [0, 0, 0]
     if s == 0:
@@ -75,12 +109,13 @@ def hsl_to_rgb (h, s, l):
         rgb[2] = hue_2_rgb (v1, v2, h*6 - 2.0)
     return rgb
 
-# Freetype font face loader
-# Taken from the Cairo cookbook
-# http://cairographics.org/freetypepython/
-
 _initialized = False
 def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):
+    '''
+    Freetype font face loader
+    Taken from the Cairo cookbook
+    http://cairographics.org/freetypepython/
+    '''
     import ctypes
     import cairo
     global _initialized
@@ -133,38 +168,41 @@ def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):
 
 
 def surfacefromfilename(outfile, width, height):
-        '''
-        Creates a Cairo surface according to the filename extension,
-        since Cairo requires the type of surface (svg, pdf, ps, png) to
-        be specified on creation.
-        TODO: change this to a generic function that also accepts
-        an outfile and width&height values as parameters.
-        And move it to util.py
-        '''
-        import cairo
-        # check across all possible formats and create the appropriate kind of surface
-        # and also be sure that Cairo was built with support for that
-        ext = outfile[-3:]
+    '''
+    Creates a Cairo surface according to the filename extension,
+    since Cairo requires the type of surface (svg, pdf, ps, png) to
+    be specified on creation.
+    
+    TODO: Move this function to main shoebox module?
+    '''
+    # convert to ints, cairo.ImageSurface is picky
+    width = int(width)
+    height = int(height)
+    
+    import cairo
+    # check across all possible formats and create the appropriate kind of surface
+    # and also be sure that Cairo was built with support for that
+    ext = outfile[-3:]
 
-        if ext == 'svg':
-            if not cairo.HAS_SVG_SURFACE:
-                    raise SystemExit ('cairo was not compiled with SVG support')
-            surface = cairo.SVGSurface(outfile, width, height)
+    if ext == 'svg':
+        if not cairo.HAS_SVG_SURFACE:
+                raise SystemExit ('cairo was not compiled with SVG support')
+        surface = cairo.SVGSurface(outfile, width, height)
 
-        elif ext == 'ps':
-            if not cairo.HAS_PS_SURFACE:
-                    raise SystemExit ('cairo was not compiled with PostScript support')
-            surface = cairo.PSSurface(outfile, width, height)
+    elif ext == 'ps':
+        if not cairo.HAS_PS_SURFACE:
+                raise SystemExit ('cairo was not compiled with PostScript support')
+        surface = cairo.PSSurface(outfile, width, height)
 
-        elif ext == 'pdf':
-            if not cairo.HAS_PDF_SURFACE:
-                    raise SystemExit ('cairo was not compiled with PDF support')
-            surface = cairo.PDFSurface(outfile, width, height)
+    elif ext == 'pdf':
+        if not cairo.HAS_PDF_SURFACE:
+                raise SystemExit ('cairo was not compiled with PDF support')
+        surface = cairo.PDFSurface(outfile, width, height)
 
-        elif ext == 'png':
-            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+    elif ext == 'png':
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
-        else:
-            raise NameError("%s is not a valid extension" % ext)
+    else:
+        raise NameError("%s is not a valid extension" % ext)
 
-        return surface
+    return surface

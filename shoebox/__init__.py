@@ -30,6 +30,8 @@ import cairo
 import util
 from data import *
 
+class ShoeboxError(Exception): pass
+
 class Box:
     '''
     The Box class is an abstraction to hold a Cairo context and all
@@ -61,8 +63,9 @@ class Box:
         else:
             raise ShoeboxError("Argument must be a file name or a Cairo surface")
         
-        self.width = width
-        self.height = height
+        self.WIDTH = int(width)
+        self.HEIGHT = int(height)
+        
         
         self.opt = OptionsContainer()
         self._path = None
@@ -81,6 +84,7 @@ class Box:
             self.fill_and_stroke()
         else:
             curve = min(width*roundness, height*roundness)
+            self.beginpath()
             self.moveto(x, y+curve)
             self.curveto(x, y, x, y, x+curve, y)
             self.lineto(x+width-curve, y)
@@ -119,32 +123,35 @@ class Box:
         Arrows can be two types: NORMAL or FORTYFIVE.
         Taken from Nodebox.
         '''
-        if type == NORMAL:
+        if type == self.NORMAL:
             head = width * .4
             tail = width * .2
-            moveto(x, y)
-            lineto(x-head, y+head)
-            lineto(x-head, y+tail)
-            lineto(x-width, y+tail)
-            lineto(x-width, y-tail)
-            lineto(x-head, y-tail)
-            lineto(x-head, y-head)
-            lineto(x, y)
-            endpath()
+            self.beginpath()
+            self.moveto(x, y)
+            self.lineto(x-head, y+head)
+            self.lineto(x-head, y+tail)
+            self.lineto(x-width, y+tail)
+            self.lineto(x-width, y-tail)
+            self.lineto(x-head, y-tail)
+            self.lineto(x-head, y-head)
+            self.lineto(x, y)
+            self.endpath()
             self.fill_and_stroke()
-        elif type == FORTYFIVE:
+        elif type == self.FORTYFIVE:
             head = .3
             tail = 1 + head
-            moveto(x, y)
-            lineto(x, y+width*(1-head))
-            lineto(x-width*head, y+width)
-            lineto(x-width*head, y+width*tail*.4)
-            lineto(x-width*tail*.6, y+width)
-            lineto(x-width, y+width*tail*.6)
-            lineto(x-width*tail*.4, y+width*head)
-            lineto(x-width, y+width*head)
-            lineto(x-width*(1-head), y)
-            lineto(x, y)
+            self.beginpath()
+            self.moveto(x, y)
+            self.lineto(x, y+width*(1-head))
+            self.lineto(x-width*head, y+width)
+            self.lineto(x-width*head, y+width*tail*.4)
+            self.lineto(x-width*tail*.6, y+width)
+            self.lineto(x-width, y+width*tail*.6)
+            self.lineto(x-width*tail*.4, y+width*head)
+            self.lineto(x-width, y+width*head)
+            self.lineto(x-width*(1-head), y)
+            self.lineto(x, y)
+            self.endpath()
             self.fill_and_stroke()
         else:
             raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
@@ -155,7 +162,8 @@ class Box:
         Taken from Nodebox.
         '''
         from math import sin, cos, pi
-        moveto(startx, starty + outer)
+        self.beginpath()
+        self.moveto(startx, starty + outer)
 
         for i in range(1, int(2 * points)):
             angle = i * pi / points
@@ -167,9 +175,9 @@ class Box:
                 radius = outer
             x = startx + radius * x
             y = starty + radius * y
-            lineto(x,y)
+            self.lineto(x,y)
 
-        endpath()
+        self.endpath()
         self.fill_and_stroke()
 
     # ----- PATH -----
@@ -184,8 +192,10 @@ class Box:
             #self._path.moveto(x,y)
 
     def moveto(self, x, y):
+        # trying to fix this
         if self._path is None:
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            self.beginpath()
+            #raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
@@ -222,7 +232,7 @@ class Box:
         if not isinstance(path, BezierPath):
             raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
         self.cairo.save()
-        for element in path.pathdata:
+        for element in path._pathdata:
             if isinstance(element,basestring):
                 cmd = element
             elif isinstance(element,PathElement):
@@ -513,9 +523,9 @@ class Box:
         '''
         NOT IMPLEMENTED
         '''
-        self.width = w
-        self.height = h
-        # self.surface.scale*something*
+        ##self.WIDTH = int(w)
+        ##self.HEIGHT = int(h)
+        ## self.surface.scale*something*
         print "WARNING: size() isn't implemented yet (instead specify width and height arguments in the terminal). Ignoring."
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
