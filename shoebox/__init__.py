@@ -34,7 +34,7 @@ class ShoeboxError(Exception): pass
 
 
 VERBOSE = False
-DEBUG = True
+DEBUG = False
 
 class Box:
     '''
@@ -765,8 +765,6 @@ class Box:
             exec source_or_code in self.namespace
 ##          if self.namespace.has_key("setup"):
 ##              self.fastRun(self.namespace["setup"])
-            
-            
         except:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
@@ -782,7 +780,7 @@ class Box:
 
 class OptionsContainer:
     def __init__(self):
-        self.outputmode = RGB
+        #self.outputmode = RGB
         self.colormode = RGB
         self.colorrange = 1.
 

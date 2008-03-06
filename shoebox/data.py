@@ -21,8 +21,7 @@ DEBUG = False
 #def _restore():
     #NSGraphicsContext.currentContext().restoreGraphicsState()
 
-class NodeBoxError(Exception): pass
-class VectorboxError(Exception): pass
+class ShoeboxError(Exception): pass
 
 class Point:
     '''
