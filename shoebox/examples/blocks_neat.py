@@ -1,4 +1,5 @@
-colormode(HSB,255)
+colormode(HSB)
+colorrange(255)
 
 rows = 9
 cols = 9
@@ -49,7 +50,7 @@ def block(x,y,z):
     # CONTOUR
     # now, we'll make a stroke around the faces
     # set the color
-    c = color(hue,40,20)
+    c = color(hue,40,80)
     # set the stroke
     stroke(c)
     # and unset fill

@@ -3,8 +3,6 @@ Shoebox data structures
 
 '''
 
-
-
 import util
 
 RGB = "rgb"
@@ -15,7 +13,7 @@ LINETO = "lineto"
 CURVETO = "curveto"
 CLOSE = "close"
 
-DEBUG = True
+DEBUG = False
 
 #def _save():
     #NSGraphicsContext.currentContext().saveGraphicsState()
@@ -119,7 +117,7 @@ class BezierPath:
         #try:
             #return self._pathdata.bounds()
         #except:
-            ## Path is empty -- no bounds
+            # Path is empty -- no bounds
             #return (0,0) , (0,0)
 
     #bounds = property(_get_bounds)
@@ -353,6 +351,8 @@ class Color(object):
 
     Shoebox's color() includes these arguments on the object constructor; they should be used in
     any other case where color() is not enough and a direct call to Color() is needed.
+    
+    This code is still very messy, recovering from a big bug hunt.
     '''
 
     def __init__(self, mode=RGB, crange=1, *args):
@@ -369,17 +369,6 @@ class Color(object):
         if len(args) == 1 and isinstance(args[0], tuple):
             if DEBUG: print "DEBUG(Color): got a tuple: " + str(args[0])
             clr = args[0]
-            
-            # check if we have a tuple inside a tuple (gah, bad hack)
-            ##if isinstance(clr[0], tuple):
-                ##print "DEBUG(Color): WARNING: got a tuple in a tuple, not good but going on"
-                ##if len(clr) == 1:
-                    ##if isinstance(clr[0], (int, float)):
-                        ##clr = (clr[0],clr[0],clr[0],1)
-                    ##elif isinstance(clr[0], tuple):
-                        ##clr = (clr[0][0],clr[0][1],clr[0][2],1)
-                ##else:
-                    ##print "BOLLOCKS BOLLOCKS BOLLOCKS"            
             if len(clr) == 3:
                 if DEBUG: print "DEBUG(Color): Got a 3 element tuple"
                 clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, 1)
@@ -388,10 +377,9 @@ class Color(object):
                 clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, clr[3])
             elif len(clr) == 1:
                 if isinstance(clr, tuple):
+                    if DEBUG: print "DEBUG(Color): Got a 1 element tuple"
                     clr = clr[0]
                     clr = (clr[0]/crange,clr[1]/crange,clr[2]/crange,1)
-                if DEBUG: print "DEBUG(Color): Got a 1 element tuple"
-                clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,1)
             elif len(clr) == 2:
                 if DEBUG: print "DEBUG(Color): Got a 2 element tuple"
                 clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,clr[1])
@@ -420,7 +408,6 @@ class Color(object):
             h, s, b = args
             r, g, b = util.hsl_to_rgb(float(h)/crange, float(s)/crange, float(b)/crange)
             clr = (r, g, b, 1)
-            print clr
         elif len(args) == 4 and mode == RGB: # RGB and alpha
             if DEBUG: print "DEBUG(Color): Got 4 args"
             r, g, b, a = args
@@ -431,7 +418,7 @@ class Color(object):
             r, g, b = util.hsl_to_rgb(h/crange, s/crange, b/crange)
             clr = (r, g, b, a/crange)
         else:
-            print "DEBUG(Color): WARNING: Couldn't parse input, defaulting to black"
+            if DEBUG: print "DEBUG(Color): WARNING: Couldn't parse input, defaulting to black"
             clr = (0,0,0,1)
         
         # debug device for warning when a colour is not inside expected values
@@ -440,16 +427,17 @@ class Color(object):
             if not (value >= 0 and value <= 1):
                 warn = True
         if warn and DEBUG:
-            print "WARNING(Color): Output color is not a float between 0 and 1"
-            print str(clr)
+            if DEBUG: print "WARNING(Color): Output color is not a float between 0 and 1"
+            if DEBUG: print str(clr)
         
         self.red = clr[0]
         self.green = clr[1]
         self.blue = clr[2]
         self.alpha = clr[3]
         
-        print "DEBUG(Color): Color set to (" + ', '.join((str(self.red), str(self.green), str(self.blue), str(self.alpha))) + ")"
-        print
+        if DEBUG: 
+            print "DEBUG(Color): Color set to (" + ', '.join((str(self.red), str(self.green), str(self.blue), str(self.alpha))) + ")"
+            print
         
         #print self.red, self.green, self.blue, self.alpha
 

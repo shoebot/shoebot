@@ -32,6 +32,10 @@ from data import *
 
 class ShoeboxError(Exception): pass
 
+
+VERBOSE = False
+DEBUG = True
+
 class Box:
     '''
     The Box class is an abstraction to hold a Cairo context and all
@@ -87,9 +91,10 @@ class Box:
         
         # take care of fill and stroke arguments
         if fill is not None or stroke is not None:
-            if fill is not None: self._fill = fill
-            if stroke is not None: self._stroke = stroke
-        
+            if fill is not None: 
+                self._fill = self.color(fill)
+            if stroke is not None: 
+                self._stroke = self.color(stroke)
         if roundness == 0.0:
             self.cairo.rectangle(x, y, width, height)
             self.fill_and_stroke()
@@ -394,36 +399,45 @@ class Box:
         return self.opt.colormode
     
     def color(self,*args):
-        if len(args) == 1:
+        if len(args) == 1 and isinstance(args[0],Color):
+            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
+            return Color(self.opt.colormode, self.opt.colorrange, args[0])
+        elif len(args) == 1 and isinstance(args,tuple):
+            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
+            return Color(self.opt.colormode, self.opt.colorrange, args[0])
+        elif len(args) == 1 and isinstance(args,int):
+            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
             return Color(self.opt.colormode, self.opt.colorrange, args)
         elif len(args) == 3:
             return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2])
         elif len(args) == 4:
             return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3]) 
-    
-    def colorrange(self, range):
-        if isinstance(range, int):
-            self.opt.colorrange = range
-            print "DEBUG(colorrange): Set to " + str(range)
         else:
-            raise ShoeboxError("Wrong value for colorrange() - it must be an int")
+            if DEBUG: print "DEBUG(color): args: " + str(args)
+            raise ShoeboxError("bug found")
+
+
+    def colorrange(self, range):
+        self.opt.colorrange = float(range)
+        if DEBUG: print "DEBUG(colorrange): Set to " + str(self.opt.colorrange)
             
-    
     def fill(self,*args):	# apply fill and define fill colour
+        if DEBUG: print "DEBUG(fill): args: " + str(args[0])
         self.opt.fillapply = True
         if isinstance(args[0], Color):
             self.opt.fillcolor = Color(self.opt.colormode,1,args[0])
         else:
-            self.opt.fillcolor = Color(self.opt.colormode,1,args[0])  
+            self.opt.fillcolor = self.color(args[0])  
         return self.opt.fillcolor
     
     def nofill(self):
         self.opt.fillapply = False
     
     def stroke(self,*args):
+        if DEBUG: print "DEBUG(stroke): args: " + str(args[0])
         self.opt.strokeapply = True
         if len(args) > 0:
-            self.opt.strokecolor = self.color(*args)
+            self.opt.strokecolor = self.color(args[0])
         return self.opt.strokecolor
     
     def nostroke(self):
@@ -516,7 +530,7 @@ class Box:
         NOT IMPLEMENTED
         '''        
         # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        raise NotImplementedError("align() isn't implemented yet")
+        raise NotImplementedError("align() isn't implemented in Shoebox yet")
     
     # TODO: Set the framework to setup font options
     
@@ -657,16 +671,18 @@ class Box:
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
         '''
-        print "DEBUG: Beginning fill_and_stroke()"
+        if DEBUG: print "DEBUG: Beginning fill_and_stroke()"
         # we need to give cairo values between 0-1
         # and for that we need to make a special request to Color()
         if self._fill is not None:
-            fillclr = Color(self.opt.colormode, 1, self._fill)
-        if self._stroke is not None:
-            strokeclr = Color(self.opt.colormode, 1, self._stroke)
+            fillclr = self._fill.get_rgba(1)
         else:
-            fillclr = Color(self.opt.colormode, 1, self.opt.fillcolor)
-            strokeclr = Color(self.opt.colormode, 1, self.opt.strokecolor)
+            fillclr = self.opt.fillcolor.get_rgba(1)
+        
+        if self._stroke is not None:
+            strokeclr = self._stroke.get_rgba(1)
+        else:
+            strokeclr = self.opt.strokecolor.get_rgba(1)
 
         self.cairo.save()
         if self.opt.fillapply is True:
@@ -689,6 +705,8 @@ class Box:
         else:
             pass
         self.cairo.restore()
+        if DEBUG: print "DEBUG: fill_and_stroke() done!"
+
 
     def finish(self):
         '''
@@ -737,6 +755,7 @@ class Box:
         # now run the code
         self.namespace = {}
         for name in dir(self):
+            # get all namespaces
             self.namespace[name] = getattr(self, name)
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
@@ -769,8 +788,8 @@ class OptionsContainer:
 
         self.fillapply = True
         self.strokeapply = False
-        self.fillcolor = (.7,.7,.7,1)
-        self.strokecolor = (.2,.2,.2,1)
+        self.fillcolor = Color(RGB,1,.7,.7,.7,1)
+        self.strokecolor = Color(RGB,1,.2,.2,.2,1)
         self.strokewidth = 1.0
 
         # self.linecap
