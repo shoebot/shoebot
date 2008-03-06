@@ -1,3 +1,10 @@
+'''
+Shoebox data structures
+
+'''
+
+
+
 import util
 
 RGB = "rgb"
@@ -8,6 +15,7 @@ LINETO = "lineto"
 CURVETO = "curveto"
 CLOSE = "close"
 
+DEBUG = True
 
 #def _save():
     #NSGraphicsContext.currentContext().saveGraphicsState()
@@ -343,56 +351,105 @@ class Color(object):
     Mode and range are mandatory arguments so we know how we need to parse
     the input and make sure output works.
 
-    Vectorbox's color() includes these arguments on the object constructor; they should be used in
+    Shoebox's color() includes these arguments on the object constructor; they should be used in
     any other case where color() is not enough and a direct call to Color() is needed.
     '''
 
-    def __init__(self, mode=RGB, crange=1., *args):
-        params = len(args)
-
+    def __init__(self, mode=RGB, crange=1, *args):
+        # check for proper input
         if not isinstance(mode, basestring):
-             print "ERROR: Color() was called with an invalid mode argument"
-        crange = float(crange)
-
-        # Decompose the arguments into tuples
-        # And store the RGB values in the 0-1 range
-        if params == 1 and isinstance(args[0], tuple):
-            args = args[0]
-            params = len(args)
-        if params == 1 and args[0] is None:
+            raise TypeError("ERROR: Color() was called with an invalid mode argument (" + str(mode) + ")")
+        
+        if DEBUG: 
+            print "-----------------------------------------"
+            print "DEBUG(Color): __init__ args: " + str(args)
+            print "DEBUG(Color): range: " + str(crange)
+            print "DEBUG(Color): mode: " + str(mode)
+        
+        if len(args) == 1 and isinstance(args[0], tuple):
+            if DEBUG: print "DEBUG(Color): got a tuple: " + str(args[0])
+            clr = args[0]
+            
+            # check if we have a tuple inside a tuple (gah, bad hack)
+            ##if isinstance(clr[0], tuple):
+                ##print "DEBUG(Color): WARNING: got a tuple in a tuple, not good but going on"
+                ##if len(clr) == 1:
+                    ##if isinstance(clr[0], (int, float)):
+                        ##clr = (clr[0],clr[0],clr[0],1)
+                    ##elif isinstance(clr[0], tuple):
+                        ##clr = (clr[0][0],clr[0][1],clr[0][2],1)
+                ##else:
+                    ##print "BOLLOCKS BOLLOCKS BOLLOCKS"            
+            if len(clr) == 3:
+                if DEBUG: print "DEBUG(Color): Got a 3 element tuple"
+                clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, 1)
+            elif len(clr) == 4:
+                if DEBUG: print "DEBUG(Color): Got a 4 element tuple"
+                clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, clr[3])
+            elif len(clr) == 1:
+                if isinstance(clr, tuple):
+                    clr = clr[0]
+                    clr = (clr[0]/crange,clr[1]/crange,clr[2]/crange,1)
+                if DEBUG: print "DEBUG(Color): Got a 1 element tuple"
+                clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,1)
+            elif len(clr) == 2:
+                if DEBUG: print "DEBUG(Color): Got a 2 element tuple"
+                clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,clr[1])
+            else:
+                raise ShoeboxError("Wrong colour tuple")
+        elif len(args) == 1 and args[0] is None:
+            if DEBUG: print "DEBUG(Color): Got nothing, defaulting to black"
             clr = (0,0,0,1)
-        elif params == 1 and isinstance(args[0], Color):
+        elif len(args) == 1 and isinstance(args[0], Color):
+            if DEBUG: print "DEBUG(Color): Got a Color object"
             clr = args[0].get_rgba(1)
-        elif params == 1: # Gray, no alpha
-            g, = args
+        elif len(args) == 1 and isinstance(args[0], (int,float)): # Gray, no alpha
+            if DEBUG: print "DEBUG(Color): got an int/float:" + str(args[0])
+            g = float(args[0])
             clr = (g/crange, g/crange, g/crange, 1)
-        elif params == 2: # Gray and alpha
+        elif len(args) == 2: # Gray and alpha
+            if DEBUG: print "DEBUG(Color): Got 2 args"
             g, a = args
-            clr = (g/crange, g/crange, g/crange, a/crange)
-        elif params == 3 and mode == RGB: # RGB, no alpha
-            r,g,b = args
+            clr = (g, g, g, a)
+        elif len(args) == 3 and mode == RGB: # RGB, no alpha
+            if DEBUG: print "DEBUG(Color): Got 3 args"
+            r, g, b = args
             clr = (r/crange, g/crange, b/crange, 1)
-        elif params == 3 and mode == HSB: # HSB, no alpha
+        elif len(args) == 3 and mode == HSB: # HSB, no alpha
+            if DEBUG: print "DEBUG(Color): Got 3 args (HSB):" + str(args)
             h, s, b = args
-            r, g, b = util.hsl_to_rgb(h/crange,s/crange,b/crange)
+            r, g, b = util.hsl_to_rgb(float(h)/crange, float(s)/crange, float(b)/crange)
             clr = (r, g, b, 1)
-            #print clr
-        elif params == 4 and mode == RGB: # RGB and alpha
+            print clr
+        elif len(args) == 4 and mode == RGB: # RGB and alpha
+            if DEBUG: print "DEBUG(Color): Got 4 args"
             r, g, b, a = args
-            clr = (r/crange, g/crange, b/crange, a/crange)
-        elif params == 4 and mode == HSB: # HSB and alpha
-            #args = self._normalizeList(args)
+            clr = (r/crange, g/crange, b/crange, a)
+        elif len(args) == 4 and mode == HSB: # HSB and alpha
+            if DEBUG: print "DEBUG(Color): Got 4 args (HSB)"
             h, s, b, a = args
-            r, g, b = util.hsl_to_rgb(h/crange,s/crange,b/crange)
+            r, g, b = util.hsl_to_rgb(h/crange, s/crange, b/crange)
             clr = (r, g, b, a/crange)
         else:
+            print "DEBUG(Color): WARNING: Couldn't parse input, defaulting to black"
             clr = (0,0,0,1)
+        
+        # debug device for warning when a colour is not inside expected values
+        warn = False
+        for value in clr:
+            if not (value >= 0 and value <= 1):
+                warn = True
+        if warn and DEBUG:
+            print "WARNING(Color): Output color is not a float between 0 and 1"
+            print str(clr)
         
         self.red = clr[0]
         self.green = clr[1]
         self.blue = clr[2]
         self.alpha = clr[3]
-        #print clr
+        
+        print "DEBUG(Color): Color set to (" + ', '.join((str(self.red), str(self.green), str(self.blue), str(self.alpha))) + ")"
+        print
         
         #print self.red, self.green, self.blue, self.alpha
 
@@ -421,7 +478,7 @@ class Color(object):
         #return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, self.red,
                 #self.green, self.blue, self.alpha)
         # Note: I'm not sure this is right coding practice -- ricardo
-        return tuple(self.get_rgba(1))
+        return str(self.get_rgba(1))
 
     def __str__(self):
         return str(self.get_rgba(1))

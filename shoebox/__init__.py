@@ -63,22 +63,33 @@ class Box:
         else:
             raise ShoeboxError("Argument must be a file name or a Cairo surface")
         
+        # set width and height constants
         self.WIDTH = int(width)
         self.HEIGHT = int(height)
-        
-        
+      
+        # create options object
         self.opt = OptionsContainer()
+        # init internal path container
         self._path = None
         self._autoclosepath = True
+        # init temp value holders
+        self._fill = None
+        self._stroke = None
         
     # ---- SHAPE -----
 
-    def rect(self, x, y, width, height, roundness=0.0):
+    def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
         '''
         Draws a rectangle with top left corner in (x,y)
         The roundness variable sets rounded corners.
-        Taken from Nodebox.
+        Taken from Nodebox and modified.
         '''
+        
+        # take care of fill and stroke arguments
+        if fill is not None or stroke is not None:
+            if fill is not None: self._fill = fill
+            if stroke is not None: self._stroke = stroke
+        
         if roundness == 0.0:
             self.cairo.rectangle(x, y, width, height)
             self.fill_and_stroke()
@@ -94,7 +105,10 @@ class Box:
             self.lineto(x+curve, y+height)
             self.curveto(x, y+height, x, y+height, x, y+height-curve)
             self.endpath()
-    
+
+        if fill is not None or stroke is not None:
+            self._fill = None
+            self._stroke = None
     
     def oval(self, x, y, width, height):
         '''
@@ -187,9 +201,9 @@ class Box:
         self._path = BezierPath((x,y))
         self._path.closed = False
         ## FIXME: This ought to work:
-        #if x != None and y != None:
+        if x is not None and y is not None:
             # This is not working
-            #self._path.moveto(x,y)
+            self._path.moveto(x,y)
 
     def moveto(self, x, y):
         # trying to fix this
@@ -376,18 +390,31 @@ class Box:
             else:
                 raise NameError, "Only RGB and HSB colormode is supported."
         if range is not None:
-            self.opt.colorrange = float(range)
+            self.opt.colorrange = range
         return self.opt.colormode
     
     def color(self,*args):
-        mode = self.opt.colormode
-        crange = self.opt.colorrange
-        return Color(mode, crange, args)
+        if len(args) == 1:
+            return Color(self.opt.colormode, self.opt.colorrange, args)
+        elif len(args) == 3:
+            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2])
+        elif len(args) == 4:
+            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3]) 
+    
+    def colorrange(self, range):
+        if isinstance(range, int):
+            self.opt.colorrange = range
+            print "DEBUG(colorrange): Set to " + str(range)
+        else:
+            raise ShoeboxError("Wrong value for colorrange() - it must be an int")
+            
     
     def fill(self,*args):	# apply fill and define fill colour
         self.opt.fillapply = True
-        if len(args) > 0:
-            self.opt.fillcolor = self.color(*args)
+        if isinstance(args[0], Color):
+            self.opt.fillcolor = Color(self.opt.colormode,1,args[0])
+        else:
+            self.opt.fillcolor = Color(self.opt.colormode,1,args[0])  
         return self.opt.fillcolor
     
     def nofill(self):
@@ -453,6 +480,7 @@ class Box:
         self.moveto(x,y)
         self.cairo.text_path(txt)
         self.fill_and_stroke()
+        return self._path
     
     def textwidth(self, txt, width=None):
         '''
@@ -629,11 +657,16 @@ class Box:
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
         '''
-
+        print "DEBUG: Beginning fill_and_stroke()"
         # we need to give cairo values between 0-1
         # and for that we need to make a special request to Color()
-        fillclr = Color(self.opt.colormode, 1, self.opt.fillcolor)
-        strokeclr = Color(self.opt.colormode, 1, self.opt.strokecolor)
+        if self._fill is not None:
+            fillclr = Color(self.opt.colormode, 1, self._fill)
+        if self._stroke is not None:
+            strokeclr = Color(self.opt.colormode, 1, self._stroke)
+        else:
+            fillclr = Color(self.opt.colormode, 1, self.opt.fillcolor)
+            strokeclr = Color(self.opt.colormode, 1, self.opt.strokecolor)
 
         self.cairo.save()
         if self.opt.fillapply is True:

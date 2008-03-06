@@ -96,14 +96,16 @@ class CodeRunner(object):
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
             # do the Cairo magic
-            #exec source_or_code in self.namespace
             exec source_or_code in self.namespace
         except:
             # something went wrong; print verbose system output
             # maybe this is too verbose, but okay for now
-            print sys.exc_info()
-            exc_type, exc_value = sys.exc_info()[:2]
-            print >> sys.stderr, exc_type, exc_value
+            import traceback, sys
+            print "Exception in user code:"
+            print '-='*20
+            traceback.print_exc(file=sys.stderr)
+            print '-='*20
+            sys.exit()
         else:
             # finish by restoring the Cairo context state
             self.vec.cairo.restore()
