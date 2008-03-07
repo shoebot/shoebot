@@ -28,7 +28,7 @@ Gentoo: emerge mercurial
 Make a new directory for your Shoebox project(s), and then run the following 
 command in your terminal:
 
-hg clone http://hg.assembla.com/shoebox
+  hg clone http://hg.assembla.com/shoebox
 
 You should now see a new shoebox/ directory inside your project dir.
 
@@ -40,13 +40,13 @@ It's probably appropriate to place your scripts inside the shoebox dir for now.
 (this is a makeshift solution until we have a proper package for Shoebox)
 
 Usage is rather straightforward:
-  
+
   python console.py script.py outputfile <width> <height>
 
-- outputfile should have a valid extension (.svg, .ps, .pdf or .png), since
+* outputfile should have a valid extension (.svg, .ps, .pdf or .png), since
   it will be autodetected by the script;
-- 'width' and 'height' are optional values; if not specified, the resulting
-  image will be 1000x1000px (bitmap output) or 1000x1000 points (vector
+* 'width' and 'height' are optional values; if not specified, the resulting
+  image will be 400x400 pixels (bitmap output) or 400x400 points (vector
   output).
 
 Try running the blocks_neat.py example in the shoebox/examples dir.
@@ -64,9 +64,9 @@ a Box object needs to be created, and all further Nodebox commands can be
 called on that instance.
 
 Box should be called with the output file name as an argument. Width and
-height can also be specified - otherwise it defaults to a 1000x1000 canvas.
+height can also be specified - otherwise it defaults to a 400x400 canvas.
 
-  box = Box("output.svg",100,100)
+  box = shoebox.Box("output.svg",100,100)
   box.rect(10,10,100,100)
 
 When you're finished with drawing, just call
@@ -86,7 +86,6 @@ format output.
 You can even call external Shoebox/Nodebox scripts from your Python script:
 
   box.run("script.py")
-
 
 
 Contact

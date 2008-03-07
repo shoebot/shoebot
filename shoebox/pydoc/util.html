@@ -1,0 +1,62 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module util</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>util</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/rlafuente/code/shoebox/shoebox/util.py">/home/rlafuente/code/shoebox/shoebox/util.py</a></font></td></tr></table>
+    <p><tt>Shoebox&nbsp;utility&nbsp;functions<br>
+&nbsp;<br>
+Copyright&nbsp;2007,&nbsp;2008&nbsp;Ricardo&nbsp;Lafuente&nbsp;<br>
+Developed&nbsp;at&nbsp;the&nbsp;Piet&nbsp;Zwart&nbsp;Institute,&nbsp;Rotterdam<br>
+&nbsp;<br>
+This&nbsp;file&nbsp;is&nbsp;part&nbsp;of&nbsp;Shoebox.<br>
+&nbsp;<br>
+Shoebox&nbsp;is&nbsp;free&nbsp;software:&nbsp;you&nbsp;can&nbsp;redistribute&nbsp;it&nbsp;and/or&nbsp;modify<br>
+it&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License&nbsp;as&nbsp;published&nbsp;by<br>
+the&nbsp;Free&nbsp;Software&nbsp;Foundation,&nbsp;either&nbsp;version&nbsp;3&nbsp;of&nbsp;the&nbsp;License,&nbsp;or<br>
+(at&nbsp;your&nbsp;option)&nbsp;any&nbsp;later&nbsp;version.<br>
+&nbsp;<br>
+Shoebox&nbsp;is&nbsp;distributed&nbsp;in&nbsp;the&nbsp;hope&nbsp;that&nbsp;it&nbsp;will&nbsp;be&nbsp;useful,<br>
+but&nbsp;WITHOUT&nbsp;ANY&nbsp;WARRANTY;&nbsp;without&nbsp;even&nbsp;the&nbsp;implied&nbsp;warranty&nbsp;of<br>
+MERCHANTABILITY&nbsp;or&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE.&nbsp;&nbsp;See&nbsp;the<br>
+GNU&nbsp;General&nbsp;Public&nbsp;License&nbsp;for&nbsp;more&nbsp;details.<br>
+&nbsp;<br>
+You&nbsp;should&nbsp;have&nbsp;received&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License<br>
+along&nbsp;with&nbsp;Shoebox.&nbsp;&nbsp;If&nbsp;not,&nbsp;see&nbsp;&lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.<br>
+&nbsp;<br>
+This&nbsp;file&nbsp;uses&nbsp;code&nbsp;from&nbsp;Nodebox&nbsp;(<a href="http://www.nodebox.net">http://www.nodebox.net</a>).<br>
+The&nbsp;relevant&nbsp;code&nbsp;parts&nbsp;are&nbsp;marked&nbsp;with&nbsp;a&nbsp;"Taken&nbsp;from&nbsp;Nodebox"&nbsp;note.<br>
+&nbsp;<br>
+Some&nbsp;code&nbsp;parts&nbsp;were&nbsp;taken&nbsp;from&nbsp;Inkscape&nbsp;and&nbsp;marked&nbsp;as&nbsp;such.<br>
+Copyright&nbsp;(C)&nbsp;2006&nbsp;Jos&nbsp;Hirth,&nbsp;kaioa.com<br>
+Subject&nbsp;to&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;GPLv2&nbsp;or&nbsp;any&nbsp;later&nbsp;version.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-create_cairo_font_face_for_file"><strong>create_cairo_font_face_for_file</strong></a>(filename, faceindex<font color="#909090">=0</font>, loadoptions<font color="#909090">=0</font>)</dt><dd><tt>Freetype&nbsp;font&nbsp;face&nbsp;loader<br>
+Taken&nbsp;from&nbsp;the&nbsp;Cairo&nbsp;cookbook<br>
+<a href="http://cairographics.org/freetypepython/">http://cairographics.org/freetypepython/</a></tt></dd></dl>
+ <dl><dt><a name="-hsl_to_rgb"><strong>hsl_to_rgb</strong></a>(h, s, l)</dt><dd><tt>Taken&nbsp;from&nbsp;Inkscape<br>
+Convert&nbsp;HSL&nbsp;values&nbsp;to&nbsp;RGB</tt></dd></dl>
+ <dl><dt><a name="-hue_2_rgb"><strong>hue_2_rgb</strong></a>(v1, v2, h)</dt><dd><tt>Taken&nbsp;from&nbsp;Inkscape.</tt></dd></dl>
+ <dl><dt><a name="-rgb_to_hsl"><strong>rgb_to_hsl</strong></a>(r, g, b)</dt><dd><tt>Taken&nbsp;from&nbsp;Inkscape.<br>
+Copyright&nbsp;(C)&nbsp;2006&nbsp;Jos&nbsp;Hirth,&nbsp;kaioa.com<br>
+Subject&nbsp;to&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;GPLv2&nbsp;or&nbsp;any&nbsp;later&nbsp;version.<br>
+&nbsp;<br>
+Converts&nbsp;RGB&nbsp;values&nbsp;to&nbsp;the&nbsp;HSL&nbsp;colourspace.</tt></dd></dl>
+ <dl><dt><a name="-surfacefromfilename"><strong>surfacefromfilename</strong></a>(outfile, width, height)</dt><dd><tt>Creates&nbsp;a&nbsp;Cairo&nbsp;surface&nbsp;according&nbsp;to&nbsp;the&nbsp;filename&nbsp;extension,<br>
+since&nbsp;Cairo&nbsp;requires&nbsp;the&nbsp;type&nbsp;of&nbsp;surface&nbsp;(svg,&nbsp;pdf,&nbsp;ps,&nbsp;png)&nbsp;to<br>
+be&nbsp;specified&nbsp;on&nbsp;creation.<br>
+&nbsp;<br>
+TODO:&nbsp;Move&nbsp;this&nbsp;function&nbsp;to&nbsp;main&nbsp;shoebox&nbsp;module?</tt></dd></dl>
+</td></tr></table>
+</body></html>
