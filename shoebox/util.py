@@ -28,13 +28,10 @@ along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
 This file uses code from Nodebox (http://www.nodebox.net).
 The relevant code parts are marked with a "Taken from Nodebox" note.
 
-
 Some code parts were taken from Inkscape and marked as such.
 Copyright (C) 2006 Jos Hirth, kaioa.com
 Subject to the terms of the GPLv2 or any later version.
 '''
-
-
 
 def rgb_to_hsl(r, g, b):
     '''

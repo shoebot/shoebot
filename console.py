@@ -22,7 +22,7 @@ def usage(err=""):
 
     Usage: python console.py <sourcefile> <imagefile> [<width> <height>]
     width and height are optional values; if not specified, the resulting
-    image will be 1000x1000px (bitmap) or 1000x1000 points (vector).
+    image will be 400x400 px (bitmap) or 400x400 points (vector).
 
     Supported vector image extensions: pdf, svg, ps
     Supported bitmap image extensions: png
@@ -37,15 +37,19 @@ if __name__ == '__main__':
  
     infile = sys.argv[1]
     outfile = sys.argv[2]
-    
+    # check number of args
+    # 5 args = width and height were specified
     if len(sys.argv) == 5:
         width = sys.argv[3]
         height = sys.argv[4]
         box = shoebox.Box(outfile,width,height)
         box.run(infile)
         box.finish()
+    # 3 args = defaul
     elif len(sys.argv) == 3:
-        box = shoebox.Box(outfile)
+        box = shoebox.Box(outfile,400,400)
+        box.run(infile)
+        box.finish()
     else:
         usage("Wrong arguments")
 

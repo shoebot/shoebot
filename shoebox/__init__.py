@@ -55,7 +55,7 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, target, width=1000, height=1000):
+    def __init__ (self, target, width=400, height=400):
         # if the target is a string, should be a filename
         if isinstance(target, basestring):
             self.targetfilename = target
@@ -296,15 +296,29 @@ class Box:
         return path
 
     def relmoveto(self, x, y):
+        '''
+        Calls Cairo's rel_move_to().
+        Move relatively to the last point.
+        '''
         self.cairo.rel_move_to(x,y)
-
     def rellineto(self, x,y):
+        '''
+        Calls Cairo's rel_line_to().
+        Draws a line relatively to the last point.
+        '''        
         self.cairo.rel_line_to(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
+        '''
+        Calls Cairo's rel_curve_to().
+        Draws a curve relatively to the last point.
+        '''           
         self.cairo.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
     
     def arc(self,centerx, centery, radius, angle1, angle2):
+        '''
+        Calls Cairo's arc() method.
+        '''
         self.cairo.arc(centerx, centery, radius, angle1, angle2)
     
     def findpath(self, list, curvature=1.0): 
@@ -346,7 +360,7 @@ class Box:
         Adds mtrx to the current transformation matrix
         '''
         # matrix = cairo.Matrix (xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0)
-        self.transform(mtrx)
+        self.cairo.transform(mtrx)
     
     def translate(self, x, y):
         '''
@@ -363,9 +377,9 @@ class Box:
         else:
             self.cairo.scale(x,y)
     
-    def skew(self, x, y=None):
-        self.transform(mtrx)
-        pass
+    def skew(self, x, y):
+        mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
+        self.cairo.transform(mtrx)
     
     def push(self):
         #self.push_group()
@@ -376,8 +390,8 @@ class Box:
         self.cairo.restore()
     
     def reset(self):
-        pass
-    
+        self.cairo.identity_matrix()
+
     # ----- COLOR -----
     
     def outputmode(self):
@@ -710,7 +724,8 @@ class Box:
 
     def finish(self):
         '''
-        I wrote this in a rush, sorry
+        Finishes the surface and writes it to the
+        output file.
         '''
         # get the extension from the filename
         ext = self.targetfilename[-3:]
@@ -790,36 +805,39 @@ class OptionsContainer:
         self.strokecolor = Color(RGB,1,.2,.2,.2,1)
         self.strokewidth = 1.0
 
-        # self.linecap
-        # self.linejoin
-        # self.fontweight
-        # self.fontslant
-        # self.hintmetrics
-        # self.hintstyle
-        # self.filter
-        # self.operator
-        # self.antialias
-        # self.fillrule
+        ## self.linecap
+        ## self.linejoin
+        ## self.fontweight
+        ## self.fontslant
+        ## self.hintmetrics
+        ## self.hintstyle
+        ## self.filter
+        ## self.operator
+        ## self.antialias
+        ## self.fillrule
 
-        #self._outputmode = RGB
-        #self._colormode = RGB
-        #self._colorrange = 1.0
-        #self._fillcolor = self.Color()
-        #self._strokecolor = None
-        #self._strokewidth = 1.0
-        #self.canvas.background = self.Color(1.0)
-        #self._path = None
-        #self._autoclosepath = True
-        #self._transform = Transform()
-        #self._transformmode = CENTER
-        #self._transformstack = []
-        #self._fontname = "Helvetica"
-        #self._fontsize = 24
-        #self._lineheight = 1.2
-        #self._align = LEFT
-        #self._noImagesHint = False
-        #self._oldvars = self._vars
+        ##self._outputmode = RGB
+        ##self._colormode = RGB
+        ##self._colorrange = 1.0
+        ##self._fillcolor = self.Color()
+        ##self._strokecolor = None
+        ##self._strokewidth = 1.0
+        ##self.canvas.background = self.Color(1.0)
+        ##self._path = None
+        ##self._autoclosepath = True
+        ##self._transform = Transform()
+        ##self._transformmode = CENTER
+        ##self._transformstack = []
+        ##self._fontname = "Helvetica"
+        ##self._fontsize = 24
+        ##self._lineheight = 1.2
+        ##self._align = LEFT
+        ##self._noImagesHint = False
+        ##self._oldvars = self._vars
         #self._vars = []
+
+##class GTKBox(Box):
+    ##pass
 
 
 if __name__ == "__main__":
