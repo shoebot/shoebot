@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
 
 This file uses code from Nodebox (http://www.nodebox.net).
-The relevant code parts are marked with a "Taken from Nodebox" note.
+The relevant code parts are marked with a "Taken from Nodebox" comment.
 
 '''
 
@@ -30,11 +30,10 @@ import cairo
 import util
 from data import *
 
-class ShoeboxError(Exception): pass
-
-
 VERBOSE = False
 DEBUG = False
+
+class ShoeboxError(Exception): pass
 
 class Box:
     '''
@@ -55,22 +54,8 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, target, width=400, height=400):
-        # if the target is a string, should be a filename
-        if isinstance(target, basestring):
-            self.targetfilename = target
-            self.surface = util.surfacefromfilename(target,width,height)
-            self.cairo = cairo.Context(self.surface)
-        # and if it's a surface, attach our Cairo context to it
-        elif isinstance(target, cairo.Surface):
-            self.cairo = cairo.Context(target)
-        else:
-            raise ShoeboxError("Argument must be a file name or a Cairo surface")
-        
-        # set width and height constants
-        self.WIDTH = int(width)
-        self.HEIGHT = int(height)
-      
+    def __init__ (self, target):
+        self.targetfilename = target
         # create options object
         self.opt = OptionsContainer()
         # init internal path container
@@ -80,11 +65,28 @@ class Box:
         self._fill = None
         self._stroke = None
         
+    def setsurface(self, width, height, target=None):
+        # if the target is a string, should be a filename
+        if not target:
+            raise ShoeboxError("setsurface(): No target specified!")
+        if isinstance(target, basestring):
+            self.targetfilename = target
+            self.surface = util.surfacefromfilename(target,width,height)
+            self.cairo = cairo.Context(self.surface)
+        # and if it's a surface, attach our Cairo context to it
+        elif isinstance(target, cairo.Surface):
+            self.cairo = cairo.Context(target)
+        # if it's a Cairo context, use it instead of making a new one
+        elif isinstance(target, cairo.Context):
+            self.cairo = target
+        else:
+            raise ShoeboxError("setsurface: Argument must be a file name or a Cairo surface")
+        
     # ---- SHAPE -----
 
     def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
-        '''
-        Draws a rectangle with top left corner in (x,y)
+        '''Draws a rectangle with top left corner at (x,y)
+
         The roundness variable sets rounded corners.
         Taken from Nodebox and modified.
         '''
@@ -95,9 +97,12 @@ class Box:
                 self._fill = self.color(fill)
             if stroke is not None: 
                 self._stroke = self.color(stroke)
+
+        # straight corners	
         if roundness == 0.0:
             self.cairo.rectangle(x, y, width, height)
             self.fill_and_stroke()
+        # rounded corners
         else:
             curve = min(width*roundness, height*roundness)
             self.beginpath()
@@ -111,15 +116,16 @@ class Box:
             self.curveto(x, y+height, x, y+height, x, y+height-curve)
             self.endpath()
 
+        # revert to previous fill/stroke values if arguments were specified
         if fill is not None or stroke is not None:
             self._fill = None
             self._stroke = None
     
     def oval(self, x, y, width, height):
-        '''
-        Draws an ellipse starting from (x,y)
+        '''Draws an ellipse starting from (x,y)
         '''
         from math import pi
+
         self.cairo.save()
         self.cairo.translate (x + width / 2., y + height / 2.);
         self.scale (width / 2., height / 2.);
@@ -128,8 +134,7 @@ class Box:
         self.cairo.restore()
     
     def line(self, x1, y1, x2, y2):
-        '''
-        Draws a line from (x1,y1) to (x2,y2)
+        '''Draws a line from (x1,y1) to (x2,y2)
         '''
         self.cairo.move_to(x1,y1)
         self.cairo.line_to(x2,y2)
@@ -137,8 +142,8 @@ class Box:
         # maybe use only a stroke?
     
     def arrow(self, x, y, width, type=NORMAL):
-        '''
-        Draws an arrow.
+        '''Draws an arrow.
+
         Arrows can be two types: NORMAL or FORTYFIVE.
         Taken from Nodebox.
         '''
@@ -176,8 +181,8 @@ class Box:
             raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
 
     def star(self, startx, starty, points=20, outer=100, inner=50):
-        '''
-        Draws a star.
+        '''Draws a star.
+
         Taken from Nodebox.
         '''
         from math import sin, cos, pi
@@ -203,18 +208,18 @@ class Box:
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None):
+        # create a BezierPath instance
         self._path = BezierPath((x,y))
         self._path.closed = False
-        ## FIXME: This ought to work:
+        
+        # if we have arguments, do a moveto too
         if x is not None and y is not None:
-            # This is not working
             self._path.moveto(x,y)
 
     def moveto(self, x, y):
-        # trying to fix this
         if self._path is None:
-            self.beginpath()
-            #raise ShoeboxError, "No current path. Use beginpath() first."
+            ## self.beginpath()
+            raise ShoeboxError, "No current path. Use beginpath() first."
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
@@ -240,12 +245,10 @@ class Box:
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
-        #p.inheritFromContext()
         if draw:
             self.drawpath(p)
         self._path = None
-        #self._path.closed = False
-        #return p
+        return p
         
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
@@ -279,9 +282,9 @@ class Box:
             else:
                 raise ShoeboxError("PathElement(): error parsing path element command")
         ## TODO
-        # if path has state attributes, set the context to those, saving
-        # before and replacing them afterwards with the old values
-        # else, use context
+        ## if path has state attributes, set the context to those, saving
+        ## before and replacing them afterwards with the old values
+        ## else, use context
         self.fill_and_stroke()
         self.cairo.restore()
 
@@ -289,6 +292,7 @@ class Box:
         self._autoclosepath = close
 
     def findpath(self, points, curvature=1.0):
+        ''' NOT IMPLEMENTED '''
         import bezier
         path = bezier.findpath(points, curvature=curvature)
         #path._ctx = self
@@ -296,35 +300,34 @@ class Box:
         return path
 
     def relmoveto(self, x, y):
-        '''
+        '''Move relatively to the last point.
+
         Calls Cairo's rel_move_to().
-        Move relatively to the last point.
         '''
         self.cairo.rel_move_to(x,y)
     def rellineto(self, x,y):
-        '''
+        '''Draws a line relatively to the last point.
+
         Calls Cairo's rel_line_to().
-        Draws a line relatively to the last point.
         '''        
         self.cairo.rel_line_to(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        '''
+        '''Draws a curve relatively to the last point.
+
         Calls Cairo's rel_curve_to().
-        Draws a curve relatively to the last point.
         '''           
         self.cairo.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
     
     def arc(self,centerx, centery, radius, angle1, angle2):
-        '''
+        '''Draws an arc.
+        
         Calls Cairo's arc() method.
         '''
         self.cairo.arc(centerx, centery, radius, angle1, angle2)
     
     def findpath(self, list, curvature=1.0): 
-        ''' 
-        NOT IMPLEMENTED 
-        Builds a path from a list of point coordinates.
+        ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
         Curvature: 0=straight lines 1=smooth curves
         '''
         raise NotImplementedError("findpath() isn't implemented yet (sorry)")
@@ -579,10 +582,9 @@ class Box:
         '''
         NOT IMPLEMENTED
         '''
-        ##self.WIDTH = int(w)
-        ##self.HEIGHT = int(h)
-        ## self.surface.scale*something*
-        print "WARNING: size() isn't implemented yet (instead specify width and height arguments in the terminal). Ignoring."
+        self.WIDTH = int(w)
+        self.HEIGHT = int(h)
+        self.setsurface(w, h, self.targetfilename)
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
         '''
@@ -756,13 +758,21 @@ class Box:
         else:
             raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
         
+    def setvars(self,*args):
+        if len(args) != 5:
+            raise ShoeboxError("I need 5 vars!")
+        self.width = args[0]
+        self.height = args[1]
+        self.linewidth = args[2]
+        self.lineheight = args[3]
+        self.serif = args[4]
     
     def run(self,filename):
         '''
         Executes the contents of a Nodebox/Shoebox script
         in current surface's context.
         '''
-        self.cairo.save()
+        ## self.cairo.save()
         # get the file contents
         file = open(filename, 'rU')
         source_or_code = file.read()
@@ -791,7 +801,8 @@ class Box:
             sys.exit()
         else:
             # finish by restoring the Cairo context state
-            self.cairo.restore()
+            ## self.cairo.restore()
+            pass
 
 class OptionsContainer:
     def __init__(self):

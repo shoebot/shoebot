@@ -45,9 +45,9 @@ if __name__ == '__main__':
         box = shoebox.Box(outfile,width,height)
         box.run(infile)
         box.finish()
-    # 3 args = defaul
+    # 3 args = default width/height
     elif len(sys.argv) == 3:
-        box = shoebox.Box(outfile,400,400)
+        box = shoebox.Box(outfile)
         box.run(infile)
         box.finish()
     else:
