@@ -759,6 +759,10 @@ class Box:
             raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
         
     def setvars(self,*args):
+        '''
+        Testing method for later implementation of internal
+        variable handling. Please don't mind this for now.
+        '''
         if len(args) != 5:
             raise ShoeboxError("I need 5 vars!")
         self.width = args[0]
