@@ -1,3 +1,5 @@
+from random import randint
+
 size(1000,1000)
 
 colormode(HSB)
@@ -17,7 +19,7 @@ def block(x,y,z):
     nostroke()
     
     # every building will have a random hue
-    from random import randint
+
     hue = randint(0,255)
     
     # LEFT FACE

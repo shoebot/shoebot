@@ -72,13 +72,13 @@ class Box:
         if isinstance(target, basestring):
             self.targetfilename = target
             self.surface = util.surfacefromfilename(target,width,height)
-            self.cairo = cairo.Context(self.surface)
+            self.context = cairo.Context(self.surface)
         # and if it's a surface, attach our Cairo context to it
         elif isinstance(target, cairo.Surface):
-            self.cairo = cairo.Context(target)
+            self.context = cairo.Context(target)
         # if it's a Cairo context, use it instead of making a new one
         elif isinstance(target, cairo.Context):
-            self.cairo = target
+            self.context = target
         else:
             raise ShoeboxError("setsurface: Argument must be a file name or a Cairo surface")
         
@@ -100,7 +100,7 @@ class Box:
 
         # straight corners	
         if roundness == 0.0:
-            self.cairo.rectangle(x, y, width, height)
+            self.context.rectangle(x, y, width, height)
             self.fill_and_stroke()
         # rounded corners
         else:
@@ -126,18 +126,18 @@ class Box:
         '''
         from math import pi
 
-        self.cairo.save()
-        self.cairo.translate (x + width / 2., y + height / 2.);
+        self.context.save()
+        self.context.translate (x + width / 2., y + height / 2.);
         self.scale (width / 2., height / 2.);
         self.arc (0., 0., 1., 0., 2 * pi);
         self.fill_and_stroke()
-        self.cairo.restore()
+        self.context.restore()
     
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)
         '''
-        self.cairo.move_to(x1,y1)
-        self.cairo.line_to(x2,y2)
+        self.context.move_to(x1,y1)
+        self.context.line_to(x2,y2)
         self.fill_and_stroke()
         # maybe use only a stroke?
     
@@ -253,7 +253,7 @@ class Box:
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
             raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
-        self.cairo.save()
+        self.context.save()
         for element in path._pathdata:
             if isinstance(element,basestring):
                 cmd = element
@@ -264,11 +264,11 @@ class Box:
             if cmd == MOVETO:
                 x = element[1]
                 y = element[2]
-                self.cairo.move_to(x, y)
+                self.context.move_to(x, y)
             elif cmd == LINETO:
                 x = element[1]
                 y = element[2]
-                self.cairo.line_to(x, y)
+                self.context.line_to(x, y)
             elif cmd == CURVETO:
                 c1x = element[1]
                 c1y = element[2]
@@ -276,9 +276,9 @@ class Box:
                 c2y = element[4]
                 x = element[5]
                 y = element[6]
-                self.cairo.curve_to(c1x, c1y, c2x, c2y, x, y)
+                self.context.curve_to(c1x, c1y, c2x, c2y, x, y)
             elif cmd == CLOSE:
-                self.cairo.close_path()
+                self.context.close_path()
             else:
                 raise ShoeboxError("PathElement(): error parsing path element command")
         ## TODO
@@ -286,7 +286,7 @@ class Box:
         ## before and replacing them afterwards with the old values
         ## else, use context
         self.fill_and_stroke()
-        self.cairo.restore()
+        self.context.restore()
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
@@ -304,27 +304,27 @@ class Box:
 
         Calls Cairo's rel_move_to().
         '''
-        self.cairo.rel_move_to(x,y)
+        self.context.rel_move_to(x,y)
     def rellineto(self, x,y):
         '''Draws a line relatively to the last point.
 
         Calls Cairo's rel_line_to().
         '''        
-        self.cairo.rel_line_to(x,y)
+        self.context.rel_line_to(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
 
         Calls Cairo's rel_curve_to().
         '''           
-        self.cairo.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
+        self.context.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
     
     def arc(self,centerx, centery, radius, angle1, angle2):
         '''Draws an arc.
         
         Calls Cairo's arc() method.
         '''
-        self.cairo.arc(centerx, centery, radius, angle1, angle2)
+        self.context.arc(centerx, centery, radius, angle1, angle2)
     
     def findpath(self, list, curvature=1.0): 
         ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
@@ -363,37 +363,37 @@ class Box:
         Adds mtrx to the current transformation matrix
         '''
         # matrix = cairo.Matrix (xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0)
-        self.cairo.transform(mtrx)
+        self.context.transform(mtrx)
     
     def translate(self, x, y):
         '''
         Shifts the origin point by (x,y)
         '''
-        self.cairo.translate(x, y)
+        self.context.translate(x, y)
     
     def rotate(self, radians=0):
-        self.cairo.rotate(radians)
+        self.context.rotate(radians)
     
     def scale(self, x=1, y=None):
         if y is None:
-            self.cairo.scale(x,x)
+            self.context.scale(x,x)
         else:
-            self.cairo.scale(x,y)
+            self.context.scale(x,y)
     
     def skew(self, x, y):
         mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
-        self.cairo.transform(mtrx)
+        self.context.transform(mtrx)
     
     def push(self):
         #self.push_group()
-        self.cairo.save()
+        self.context.save()
     
     def pop(self):
         #self.pop_group()
-        self.cairo.restore()
+        self.context.restore()
     
     def reset(self):
-        self.cairo.identity_matrix()
+        self.context.identity_matrix()
 
     # ----- COLOR -----
     
@@ -462,23 +462,23 @@ class Box:
     
     def strokewidth(self, w=None):
         if w is not None:
-            self.cairo.set_line_width(w)
+            self.context.set_line_width(w)
         else:
-            return self.cairo.get_line_width
+            return self.context.get_line_width
     
     def background(self,r,g,b,a=None):
         if a is None:
-            self.cairo.set_source_rgb(r,g,b)
-            self.cairo.paint()
+            self.context.set_source_rgb(r,g,b)
+            self.context.paint()
         else:
-            self.cairo.paint_with_alpha(a)
+            self.context.paint_with_alpha(a)
     
     # ----- TEXT-----
     
     def font(self, fontpath=None, fontsize=None):
         if fontpath is not None:
             face = util.create_cairo_font_face_for_file (fontpath, 0)
-            self.cairo.set_font_face(face)
+            self.context.set_font_face(face)
         else:
             self.get_font_face()
         if fontsize is not None:
@@ -486,9 +486,9 @@ class Box:
     
     def fontsize(self, fontsize=None):
         if fontsize is not None:
-            self.cairo.set_font_size(fontsize)
+            self.context.set_font_size(fontsize)
         else:
-            self.cairo.get_font_size()
+            self.context.get_font_size()
     
     def text(self, txt, x, y, width=None, height=1000000, outline=False):
         '''
@@ -500,8 +500,8 @@ class Box:
         if outline is True:
             self.textpath(txt, x, y, width, height)
         else:
-            self.cairo.move_to(x,y)
-            self.cairo.show_text(txt)
+            self.context.move_to(x,y)
+            self.context.show_text(txt)
         self.fill_and_stroke()
     
     def textpath(self, txt, x, y, width=None, height=1000000):
@@ -509,7 +509,7 @@ class Box:
         Draws an outlined path of the input text
         '''
         self.moveto(x,y)
-        self.cairo.text_path(txt)
+        self.context.text_path(txt)
         self.fill_and_stroke()
         return self._path
     
@@ -565,9 +565,9 @@ class Box:
         '''
         #width, height = im.size
         imagesurface = cairo.ImageSurface.create_from_png(path)
-        self.cairo.set_source_surface (imagesurface, x, y)
-        self.cairo.rectangle(x, y, width, height)
-        self.cairo.fill()
+        self.context.set_source_surface (imagesurface, x, y)
+        self.context.rectangle(x, y, width, height)
+        self.context.fill()
 
     def imagesize(self, path):
         '''
@@ -578,13 +578,13 @@ class Box:
 
     # ----- UTILITY -----
 
-    def size(self,w,h):
-        '''
-        NOT IMPLEMENTED
-        '''
-        self.WIDTH = int(w)
-        self.HEIGHT = int(h)
-        self.setsurface(w, h, self.targetfilename)
+    def size(self,w=None,h=None):
+        '''Sets the size of the canvas. Needs to be the first function call in a script.'''
+        if w and h:
+            self.WIDTH = int(w)
+            self.HEIGHT = int(h)
+            self.setsurface(w, h, self.targetfilename)
+        return (self.WIDTH, self.HEIGHT)
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
         '''
@@ -700,27 +700,27 @@ class Box:
         else:
             strokeclr = self.opt.strokecolor.get_rgba(1)
 
-        self.cairo.save()
+        self.context.save()
         if self.opt.fillapply is True:
-            self.cairo.set_source_rgba(fillclr[0],fillclr[1],fillclr[2],fillclr[3])
+            self.context.set_source_rgba(fillclr[0],fillclr[1],fillclr[2],fillclr[3])
             if self.opt.strokeapply is True:
                 # if there's a stroke still to be applied, we need to call fill_preserve()
                 # which still leaves this path as active
-                self.cairo.fill_preserve()
-                self.cairo.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
+                self.context.fill_preserve()
+                self.context.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
                 # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
                 # for further operations if needed)
-                self.cairo.stroke()
+                self.context.stroke()
             else:
                 # if there isn't a stroke, use plain fill() to close the path
-                self.cairo.fill()
+                self.context.fill()
         elif self.opt.strokeapply is True:
             # if there's no fill, apply stroke only
-            self.cairo.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
-            self.cairo.stroke()
+            self.context.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
+            self.context.stroke()
         else:
             pass
-        self.cairo.restore()
+        self.context.restore()
         if DEBUG: print "DEBUG: fill_and_stroke() done!"
 
 
@@ -733,7 +733,7 @@ class Box:
         ext = self.targetfilename[-3:]
         # if this is a vector file, wrap up and finish
         if ext in ("svg",".ps","pdf"):
-            self.cairo.show_page()
+            self.context.show_page()
             self.surface.finish()
         # but bitmap surfaces need us to tell them to save to a file
         elif ext == "png":
@@ -763,8 +763,9 @@ class Box:
         Testing method for later implementation of internal
         variable handling. Please don't mind this for now.
         '''
-        if len(args) != 5:
-            raise ShoeboxError("I need 5 vars!")
+        if not isinstance(args, dict):
+            raise TypeError('setvars needs a dict!')
+        
         self.width = args[0]
         self.height = args[1]
         self.linewidth = args[2]
@@ -776,7 +777,7 @@ class Box:
         Executes the contents of a Nodebox/Shoebox script
         in current surface's context.
         '''
-        ## self.cairo.save()
+        ## self.context.save()
         # get the file contents
         file = open(filename, 'rU')
         source_or_code = file.read()
@@ -805,7 +806,7 @@ class Box:
             sys.exit()
         else:
             # finish by restoring the Cairo context state
-            ## self.cairo.restore()
+            ## self.context.restore()
             pass
 
 class OptionsContainer:
@@ -849,7 +850,6 @@ class OptionsContainer:
         ##self._align = LEFT
         ##self._noImagesHint = False
         ##self._oldvars = self._vars
-        #self._vars = []
 
 ##class GTKBox(Box):
     ##pass
