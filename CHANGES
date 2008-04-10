@@ -1,0 +1,22 @@
+
+
+v0.2
+====
+
+* size() is properly implemented now
+  - while before we had a commandline option to set the target surface
+    dimensions, now Shoebox complies to the Nodebox/Processing model.
+  - this means that the dimensions should be specified as the first
+    instruction of your script, as in size(w,h) - otherwise Shoebox will
+    complain loudly.
+
+* Added an experimental GTK frontend
+  -  
+
+* Comment and docstring cleaning 
+  - a mission that's far from finished (o:
+
+* Added a run() method to the Box class
+  - still needs some tuning, as for now it runs the whole script with no
+    regard to setup() or draw() calls
+
