@@ -1,6 +1,5 @@
 '''
-Shoebox data structures
-
+Shoebox data structures for bezier path handling
 '''
 
 import util
@@ -14,12 +13,6 @@ CURVETO = "curveto"
 CLOSE = "close"
 
 DEBUG = False
-
-#def _save():
-    #NSGraphicsContext.currentContext().saveGraphicsState()
-
-#def _restore():
-    #NSGraphicsContext.currentContext().restoreGraphicsState()
 
 class ShoeboxError(Exception): pass
 
@@ -59,7 +52,7 @@ class BezierPath:
     Shoebox implementation of Nodebox's BezierPath wrapper.
     While Nodebox relies on Cocoa/QT for its data structures,
     this is more of an "agnostic" implementation that won't
-    require any deps to work with paths.
+    require any other back-ends to work with paths.
     """
     # we don't use these yet
     stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
@@ -68,12 +61,12 @@ class BezierPath:
     def __init__(self, path=None):
         self.segment_cache = None
         if path is None:
-            self._pathdata = []
+            self.data = []
         elif isinstance(path, (tuple,list)):
-            self._pathdata = []
+            self.data = []
             self.extend(path)
         elif isinstance(path, BezierPath):
-            self._pathdata = path._pathdata
+            self.data = path.data
             ##util._copy_attrs(path, self, self.stateAttributes)
         else:
             raise NodeBoxError, "Don't know what to do with %s." % path
@@ -81,7 +74,7 @@ class BezierPath:
 
     # testing string output
     #def __str__(self):
-        #return self._pathdata
+        #return self.data
 
     def copy(self):
         return self.__class__(self)
@@ -89,70 +82,32 @@ class BezierPath:
     ### Path methods ###
 
     def moveto(self, x, y):
-        self.segment_cache = None
         el = PathElement(MOVETO, x, y)
-        self._pathdata.append(el)
+        self.data.append(el)
 
     def lineto(self, x, y):
-        self.segment_cache = None
         el = PathElement(LINETO, x, y)
-        self._pathdata.append(el)
+        self.data.append(el)
 
     def curveto(self, c1x, c1y, c2x, c2y, x, y):
-        self.segment_cache = None
         el = PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
-        self._pathdata.append(el)
+        self.data.append(el)
 
     def closepath(self):
-        self.segment_cache = None
         el = PathElement(CLOSE)
-        self._pathdata.append(el)
+        self.data.append(el)
         self.closed = True
 
-    #def setlinewidth(self, width):
-        #self.linewidth = width
-
-    #def _get_bounds(self):
-        #try:
-            #return self._pathdata.bounds()
-        #except:
-            # Path is empty -- no bounds
-            #return (0,0) , (0,0)
-
-    #bounds = property(_get_bounds)
-
-    #def contains(self, x, y):
-        #return self._pathdata.containsPoint_((x,y))
-        
-    ### Basic shapes ###
-    
-    #def rect(self, x, y, width, height):
-        #self.segment_cache = None
-        #self._pathdata.appendBezierPathWithRect_( ((x, y), (width, height)) )
-
-
-
-    #def oval(self, x, y, width, height):
-        #self.segment_cache = None
-        #self._pathdata.appendBezierPathWithOvalInRect_( ((x, y), (width, height)) )
-        
-    #def line(self, x1, y1, x2, y2):
-        #self.segment_cache = None
-        #self._pathdata.moveToPoint_( (x1, y1) )
-        #self._pathdata.lineToPoint_( (x2, y2) )
-
-    ### List methods ###
-
     def __getitem__(self, index):
-        cmd, el = self._pathdata[index]
+        cmd, el = self.data[index]
         return PathElement(cmd, el)
 
     def __iter__(self):
-        for i in range(len(self._pathdata)):
-            yield self._pathdata[i]
+        for i in range(len(self.data)):
+            yield self.data[i]
 
     def __len__(self):
-        return len(self._pathdata)
+        return len(self.data)
 
     def extend(self, args):
         '''
@@ -160,10 +115,18 @@ class BezierPath:
         don't rely on it :o)
         '''
         self.segment_cache = None
+        
+        ## TODO
+        # Initial check, we should check for
+        # - points
+        # - tuples
+        # - list
+        # - PathElement
+        
         # check if we got [x,y] as an argument
         if isinstance(args, list) and len(args) == 2 and isinstanceargs[0]:
             # does the path have something?
-            if len(self._pathdata) == 0:
+            if len(self.data) == 0:
                 # if not, move to [x,y]
                 cmd = MOVETO
             else:
@@ -172,105 +135,31 @@ class BezierPath:
             # assign the elements to specific vars
             x = args[0]
             y = args[1]
-            self._pathdata.append(PathElement(cmd, x, y))
+            self.data.append(PathElement(cmd, x, y))
         
         elif isinstance(args,list):
-            
             for el in pathElements:
                 if isinstance(el, (list, tuple)):
                     x, y = el
-                    if len(self._pathdata) == 0:
+                    if len(self.data) == 0:
                         cmd = MOVETO
                     else:
                         cmd = LINETO
-                    self._pathdata.append(PathElement(cmd, x, y))
+                    self.data.append(PathElement(cmd, x, y))
                 elif isinstance(el, PathElement):
-                    self._pathdata.append(el)
+                    self.data.append(el)
                 else:
                     raise NodeBoxError, "Don't know how to handle %s" % el
 
     def append(self, el):
         '''
-        Wrapper method for hiding the _pathdata var
+        Wrapper method for hiding the data var
         from public access
         '''
         if isinstance(el, PathElement):
-            self._pathdata.append(el)
+            self.data.append(el)
         else:
-            raise "Wrong data passed to BezierPath.append()"
-        #self.segment_cache = None
-        #if el.cmd == MOVETO:
-            #self.moveto(el.x, el.y)
-        #elif el.cmd == LINETO:
-            #self.lineto(el.x, el.y)
-        #elif el.cmd == CURVETO:
-            #self.curveto(el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
-        #elif el.cmd == CLOSE:
-            #self.closepath()
-            
-    def _get_contours(self):
-        from nodebox.graphics import bezier
-        return bezier.contours(self)
-    contours = property(_get_contours)
-
-    ### Drawing methods ###
-
-    #def _get_transform(self):
-        #trans = self._transform.copy()
-        #if (self._transformmode == CENTER):
-            #(x, y), (w, h) = self.bounds
-            #deltax = x+w/2
-            #deltay = y+h/2
-            #t = Transform()
-            #t.translate(-deltax,-deltay)
-            #trans.prepend(t)
-            #t = Transform()
-            #t.translate(deltax,deltay)
-            #trans.append(t)
-        #return trans
-    #transform = property(_get_transform)
-
-    ### Mathematics ###
-
-    def segmentlengths(self, relative=False, n=10):
-        import bezier
-        if relative: # Use the opportunity to store the segment cache.
-            if self.segment_cache is None:
-                self.segment_cache = bezier.segment_lengths(self, relative=True, n=n)
-            return self.segment_cache
-        else:
-            return bezier.segment_lengths(self, relative=False, n=n)
-
-    def _get_length(self, segmented=False, n=10):
-        import bezier
-        return bezier.length(self, segmented=segmented, n=n)
-    length = property(_get_length)
-        
-    def point(self, t):
-        import bezier
-        return bezier.point(self, t)
-        
-    def points(self, amount=100):
-        import bezier
-        if len(self) == 0:
-            raise NodeBoxError, "The given path is empty"
-
-        # The delta value is divided by amount - 1, because we also want the last point (t=1.0)
-        # If I wouldn't use amount - 1, I fall one point short of the end.
-        # E.g. if amount = 4, I want point at t 0.0, 0.33, 0.66 and 1.0,
-        # if amount = 2, I want point at t 0.0 and t 1.0
-        try:
-            delta = 1.0/(amount-1)
-        except ZeroDivisionError:
-            delta = 1.0
-
-        for i in xrange(amount):
-            yield self.point(delta*i)
-            
-    def addpoint(self, t):
-        import bezier
-        self._pathdata = bezier.insert_point(self, t)._pathdata
-        self.segment_cache = None
+            raise TypeError("Wrong data passed to BezierPath.append()")
 
 class PathElement:
     '''

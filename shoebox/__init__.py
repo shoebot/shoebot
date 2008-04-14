@@ -64,6 +64,9 @@ class Box:
         # init temp value holders
         self._fill = None
         self._stroke = None
+        self.surface = None
+        
+        self.vars = {}
         
     def setsurface(self, width, height, target=None):
         # if the target is a string, should be a filename
@@ -254,7 +257,7 @@ class Box:
         if not isinstance(path, BezierPath):
             raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
         self.context.save()
-        for element in path._pathdata:
+        for element in path.data:
             if isinstance(element,basestring):
                 cmd = element
             elif isinstance(element,PathElement):
@@ -284,20 +287,16 @@ class Box:
         ## TODO
         ## if path has state attributes, set the context to those, saving
         ## before and replacing them afterwards with the old values
-        ## else, use context
+        ## else, just go on
+        # if path.stateattrs:
+        #     for attr in path.stateattrs:
+        #         self.context....
+        
         self.fill_and_stroke()
         self.context.restore()
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
-
-    def findpath(self, points, curvature=1.0):
-        ''' NOT IMPLEMENTED '''
-        import bezier
-        path = bezier.findpath(points, curvature=curvature)
-        #path._ctx = self
-        #path.inheritFromContext()
-        return path
 
     def relmoveto(self, x, y):
         '''Move relatively to the last point.
@@ -403,16 +402,21 @@ class Box:
         '''        
         raise NotImplementedError("outputmode() isn't implemented yet")
     
-    def colormode(self, mode=None, range=None):
+    def colormode(self, mode=None, crange=None):
+        '''Sets the current colormode (can be RGB or HSB) and eventually
+        the color range.
+        
+        If called without arguments, it returns the current colormode.
+        '''
         if mode is not None:
             if mode == "rgb":
                 self.opt.colormode = RGB
             elif mode == "hsb":
                 self.opt.colormode = HSB
             else:
-                raise NameError, "Only RGB and HSB colormode is supported."
+                raise NameError, "Only RGB and HSB colormodes are supported."
         if range is not None:
-            self.opt.colorrange = range
+            self.opt.colorrange = crange
         return self.opt.colormode
     
     def color(self,*args):
@@ -431,14 +435,16 @@ class Box:
             return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3]) 
         else:
             if DEBUG: print "DEBUG(color): args: " + str(args)
-            raise ShoeboxError("bug found")
+            raise ShoeboxError("color(): Invalid arguments")
 
 
-    def colorrange(self, range):
-        self.opt.colorrange = float(range)
+    def colorrange(self, crange):
+        self.opt.colorrange = float(crange)
         if DEBUG: print "DEBUG(colorrange): Set to " + str(self.opt.colorrange)
             
-    def fill(self,*args):	# apply fill and define fill colour
+    def fill(self,*args):
+        '''Sets a fill color, applying it to new paths.'''
+        
         if DEBUG: print "DEBUG(fill): args: " + str(args[0])
         self.opt.fillapply = True
         if isinstance(args[0], Color):
@@ -448,9 +454,11 @@ class Box:
         return self.opt.fillcolor
     
     def nofill(self):
+        ''' Stops applying fills to new paths.'''
         self.opt.fillapply = False
     
     def stroke(self,*args):
+        '''Sets a stroke color, applying it to new paths.'''
         if DEBUG: print "DEBUG(stroke): args: " + str(args[0])
         self.opt.strokeapply = True
         if len(args) > 0:
@@ -458,15 +466,18 @@ class Box:
         return self.opt.strokecolor
     
     def nostroke(self):
+        ''' Stops applying strokes to new paths.'''
         self.opt.strokeapply = False
     
     def strokewidth(self, w=None):
+        '''Sets the stroke width.'''
         if w is not None:
             self.context.set_line_width(w)
         else:
             return self.context.get_line_width
     
     def background(self,r,g,b,a=None):
+        '''Sets the background colour.'''
         if a is None:
             self.context.set_source_rgb(r,g,b)
             self.context.paint()
@@ -476,6 +487,10 @@ class Box:
     # ----- TEXT-----
     
     def font(self, fontpath=None, fontsize=None):
+        '''Set the font to be used with new text instances.
+        
+        Accepts TrueType and OpenType files. Depends on FreeType being
+        installed.'''
         if fontpath is not None:
             face = util.create_cairo_font_face_for_file (fontpath, 0)
             self.context.set_font_face(face)
@@ -492,9 +507,10 @@ class Box:
     
     def text(self, txt, x, y, width=None, height=1000000, outline=False):
         '''
-        Draws a string of text according to font settings
+        Draws a string of text according to current font settings.
         '''
         # TODO: Check for malformed requests (x,y,txt is a common mistake)
+        self.context.save()
         if width is not None:
             raise NotImplementedError("text(): width settings aren't implemented yet")
         if outline is True:
@@ -503,6 +519,7 @@ class Box:
             self.context.move_to(x,y)
             self.context.show_text(txt)
         self.fill_and_stroke()
+        self.context.restore()
     
     def textpath(self, txt, x, y, width=None, height=1000000):
         '''
@@ -511,23 +528,23 @@ class Box:
         self.moveto(x,y)
         self.context.text_path(txt)
         self.fill_and_stroke()
-        return self._path
+        # return self._path
     
     def textwidth(self, txt, width=None):
-        '''
-        Returns the width of a string of text according to the current font settings
+        '''Returns the width of a string of text according to the current 
+        font settings.
         '''
         return textmetrics(txt)[0]
     
     def textheight(self, txt, width=None):
-        '''
-        Returns the height of a string of text according to the current font settings
+        '''Returns the height of a string of text according to the current 
+        font settings.
         '''    
         return textmetrics(txt)[1]
     
     def textmetrics(self, txt, width=None):
-        ''' 
-        returns x-y extents as a tuple
+        '''Returns the width and height of a string of text as a tuple
+        (according to current font settings).
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
@@ -580,6 +597,8 @@ class Box:
 
     def size(self,w=None,h=None):
         '''Sets the size of the canvas. Needs to be the first function call in a script.'''
+        if self.surface:
+            raise ShoeboxError("size(): size() can only be called once in a script.")
         if w and h:
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
@@ -590,7 +609,7 @@ class Box:
         '''
         NOT IMPLEMENTED
         '''        
-        print "WARNING: var() is not implemented yet. Ignoring."
+        raise NotImplementedError("var() isn't implemented yet")
         #v = Variable(name, type, default, min, max, value)
         #v = self.addvar(v)
 
@@ -729,8 +748,14 @@ class Box:
         Finishes the surface and writes it to the
         output file.
         '''
+        
+        ##TODO
+        # Better extension checking
+        # ext = split(',')[-1]
+        # 
+        
         # get the extension from the filename
-        ext = self.targetfilename[-3:]
+        ext = self.targetfilename.split('.')[-1]
         # if this is a vector file, wrap up and finish
         if ext in ("svg",".ps","pdf"):
             self.context.show_page()
@@ -758,26 +783,24 @@ class Box:
         else:
             raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
         
-    def setvars(self,*args):
+    def setvars(self,args):
         '''
         Testing method for later implementation of internal
         variable handling. Please don't mind this for now.
         '''
         if not isinstance(args, dict):
             raise TypeError('setvars needs a dict!')
-        
-        self.width = args[0]
-        self.height = args[1]
-        self.linewidth = args[2]
-        self.lineheight = args[3]
-        self.serif = args[4]
+            
+        vardict = args
+        for key in vardict:
+            self.vars[key] = vardict[key]
     
     def run(self,filename):
         '''
         Executes the contents of a Nodebox/Shoebox script
         in current surface's context.
         '''
-        ## self.context.save()
+        
         # get the file contents
         file = open(filename, 'rU')
         source_or_code = file.read()
@@ -804,10 +827,6 @@ class Box:
             traceback.print_exc(file=sys.stdout)
             print '-='*20
             sys.exit()
-        else:
-            # finish by restoring the Cairo context state
-            ## self.context.restore()
-            pass
 
 class OptionsContainer:
     def __init__(self):
@@ -831,28 +850,6 @@ class OptionsContainer:
         ## self.operator
         ## self.antialias
         ## self.fillrule
-
-        ##self._outputmode = RGB
-        ##self._colormode = RGB
-        ##self._colorrange = 1.0
-        ##self._fillcolor = self.Color()
-        ##self._strokecolor = None
-        ##self._strokewidth = 1.0
-        ##self.canvas.background = self.Color(1.0)
-        ##self._path = None
-        ##self._autoclosepath = True
-        ##self._transform = Transform()
-        ##self._transformmode = CENTER
-        ##self._transformstack = []
-        ##self._fontname = "Helvetica"
-        ##self._fontsize = 24
-        ##self._lineheight = 1.2
-        ##self._align = LEFT
-        ##self._noImagesHint = False
-        ##self._oldvars = self._vars
-
-##class GTKBox(Box):
-    ##pass
 
 
 if __name__ == "__main__":
