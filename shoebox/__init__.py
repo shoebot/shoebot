@@ -29,9 +29,11 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 import cairo
 import util
 from data import *
+from pprint import pprint
 
 VERBOSE = False
 DEBUG = False
+EXTENSIONS = ('png','svg','ps','pdf')
 
 class ShoeboxError(Exception): pass
 
@@ -54,8 +56,8 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, target):
-        self.targetfilename = target
+    def __init__ (self, outputfilename = None):
+        self.targetfilename = outputfilename
         # create options object
         self.opt = OptionsContainer()
         # init internal path container
@@ -67,15 +69,20 @@ class Box:
         self.surface = None
         
         self.vars = {}
+        self.namespace = {}
         
-    def setsurface(self, width, height, target=None):
+    def setsurface(self, width=None, height=None, target=None):
+        '''Sets the surface on which the Box object will operate.
+        
+        Besides attaching surfaces, it can also create new ones based on an 
+        output filename; it also accepts a Cairo surface or context as an
+        argument, and attaches to them as expected.
+        '''
         # if the target is a string, should be a filename
         if not target:
             raise ShoeboxError("setsurface(): No target specified!")
         if isinstance(target, basestring):
-            self.targetfilename = target
-            self.surface = util.surfacefromfilename(target,width,height)
-            self.context = cairo.Context(self.surface)
+            self.makesurface(width, height, target)
         # and if it's a surface, attach our Cairo context to it
         elif isinstance(target, cairo.Surface):
             self.context = cairo.Context(target)
@@ -83,16 +90,24 @@ class Box:
         elif isinstance(target, cairo.Context):
             self.context = target
         else:
-            raise ShoeboxError("setsurface: Argument must be a file name or a Cairo surface")
-        
+            raise ShoeboxError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+    
+    def makesurface(self, width, height, filename):
+        if isinstance(filename, basestring) and filename.split(".")[-1] in EXTENSIONS:
+            self.targetfilename = filename
+            self.surface = util.surfacefromfilename(filename,width,height)
+            self.context = cairo.Context(self.surface)
+        else:
+            raise ShoeboxError("makesurface: Invalid extension")
+    
     # ---- SHAPE -----
 
     def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
         '''Draws a rectangle with top left corner at (x,y)
 
         The roundness variable sets rounded corners.
-        Taken from Nodebox and modified.
         '''
+        # taken from Nodebox and modified
         
         # take care of fill and stroke arguments
         if fill is not None or stroke is not None:
@@ -125,8 +140,7 @@ class Box:
             self._stroke = None
     
     def oval(self, x, y, width, height):
-        '''Draws an ellipse starting from (x,y)
-        '''
+        '''Draws an ellipse starting from (x,y)'''
         from math import pi
 
         self.context.save()
@@ -137,12 +151,11 @@ class Box:
         self.context.restore()
     
     def line(self, x1, y1, x2, y2):
-        '''Draws a line from (x1,y1) to (x2,y2)
-        '''
-        self.context.move_to(x1,y1)
-        self.context.line_to(x2,y2)
-        self.fill_and_stroke()
-        # maybe use only a stroke?
+        '''Draws a line from (x1,y1) to (x2,y2)'''
+        self.beginpath()
+        self.moveto(x1,y1)
+        self.lineto(x2,y2)
+        self.endpath()
     
     def arrow(self, x, y, width, type=NORMAL):
         '''Draws an arrow.
@@ -163,7 +176,7 @@ class Box:
             self.lineto(x-head, y-head)
             self.lineto(x, y)
             self.endpath()
-            self.fill_and_stroke()
+#            self.fill_and_stroke()
         elif type == self.FORTYFIVE:
             head = .3
             tail = 1 + head
@@ -179,7 +192,7 @@ class Box:
             self.lineto(x-width*(1-head), y)
             self.lineto(x, y)
             self.endpath()
-            self.fill_and_stroke()
+#            self.fill_and_stroke()
         else:
             raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
 
@@ -205,7 +218,7 @@ class Box:
             self.lineto(x,y)
 
         self.endpath()
-        self.fill_and_stroke()
+#        self.fill_and_stroke()
 
     # ----- PATH -----
     # Path functions taken from Nodebox and modified
@@ -258,27 +271,27 @@ class Box:
             raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
         self.context.save()
         for element in path.data:
-            if isinstance(element,basestring):
-                cmd = element
-            elif isinstance(element,PathElement):
+#            if isinstance(element,basestring):
+#                cmd = element
+            if isinstance(element,PathElement):
                 cmd = element[0]
             else:
-                raise ShoeboxError("drawpath(): Invalid path element (check command string)")
+                raise ShoeboxError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
             if cmd == MOVETO:
-                x = element[1]
-                y = element[2]
+                x = element.x
+                y = element.y
                 self.context.move_to(x, y)
             elif cmd == LINETO:
-                x = element[1]
-                y = element[2]
+                x = element.x
+                y = element.y
                 self.context.line_to(x, y)
             elif cmd == CURVETO:
-                c1x = element[1]
-                c1y = element[2]
-                c2x = element[3]
-                c2y = element[4]
-                x = element[5]
-                y = element[6]
+                c1x = element.c1x
+                c1y = element.c1y
+                c2x = element.c2x
+                c2y = element.c2y
+                x = element.x
+                y = element.y
                 self.context.curve_to(c1x, c1y, c2x, c2y, x, y)
             elif cmd == CLOSE:
                 self.context.close_path()
@@ -784,16 +797,17 @@ class Box:
             raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
         
     def setvars(self,args):
-        '''
-        Testing method for later implementation of internal
-        variable handling. Please don't mind this for now.
-        '''
+        '''Defines the variables that can be externally set.
+        
+        Accepts a dictionary with variable names assigned
+        to default values.
+        '''       
         if not isinstance(args, dict):
-            raise TypeError('setvars needs a dict!')
-            
+            raise ShoeboxError('setvars(): setvars needs a dict!')
         vardict = args
         for key in vardict:
-            self.vars[key] = vardict[key]
+            self.namespace[key] = vardict[key]
+#        pprint(self.__dict__)
     
     def run(self,filename):
         '''
@@ -801,23 +815,21 @@ class Box:
         in current surface's context.
         '''
         
-        # get the file contents
         file = open(filename, 'rU')
         source_or_code = file.read()
         file.close()
-        # now run the code
-        self.namespace = {}
+        
         for name in dir(self):
-            # get all namespaces
+            # get all stuff in the Box namespaces
             self.namespace[name] = getattr(self, name)
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
-            # do the Cairo magic
+            # do the magic
             exec source_or_code in self.namespace
-##          if self.namespace.has_key("setup"):
-##              self.fastRun(self.namespace["setup"])
+#            if self.namespace.has_key("setup"):
+#                self.namespace["setup"]()
         except:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
@@ -827,6 +839,19 @@ class Box:
             traceback.print_exc(file=sys.stdout)
             print '-='*20
             sys.exit()
+ 
+    def setup(self):
+        if self.namespace.has_key("setup"):
+            self.namespace["setup"]()
+        else:
+            raise ShoeboxError("setup: There's no setup() method in input script") 
+    
+    def draw(self):
+        if self.namespace.has_key("draw"):
+            self.namespace["draw"]()
+        else:
+            raise ShoeboxError("draw: There's no draw() method in input script")
+            
 
 class OptionsContainer:
     def __init__(self):

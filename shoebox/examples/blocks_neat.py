@@ -81,4 +81,3 @@ def setup():
         # draw it
         block(x,y,z)
 
-setup()
