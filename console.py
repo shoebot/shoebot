@@ -16,7 +16,8 @@ import re
 import shoebox
 
 #------------------------------------------------------
-
+# command-line option-parsing functions
+# taken from code by Ed Halley (http://halley.cc/code)
 
 def boolify(value):
     '''Take a friendly user input value, and turn it into True or False.'''
@@ -58,13 +59,21 @@ def getopt(arg, tail, opt, default):
         return float(value)
     return value
 
+usage_header = """Shoebox console runner
+
+    Usage: python console.py <inputscript> <outputfile> [options]
+    Accepted output extensions: svg, ps, pdf, png
+
+    """
+
 def usage(this, options):
     '''Super-lightweight implementation of command-line usage help.
     Does not have anything particularly wordy about the meanings of each
     option and inputfiles.
     '''
-    print 'usage:', this, '<options>', '<inputfiles>'
-    print 'options and (default) values:'
+    print usage_header
+#    print 'usage:', this, '<options>', '<inputfiles>'
+    print '    options and (default) values:'
     for option in options:
         print '\t--%-15s\t(%s)' % (option, repr(options[option]))
     sys.exit(1)
@@ -104,26 +113,8 @@ def getopts(argv, options):
 
 #------------------------------------------------------
 
-'''
-
-def usage(err=""):
-    if len(err) > 0:
-        err = '\n\nError: ' + str(err)
-    print """Shoebox console runner
-
-    Usage: python console.py <sourcefile> <imagefile> [<width> <height>]
-    width and height are optional values; if not specified, the resulting
-    image will be 400x400 px (bitmap) or 400x400 points (vector).
-
-    Supported vector image extensions: pdf, svg, ps
-    Supported bitmap image extensions: png
-    """ + err
-    sys.exit()
-'''
-
-# defaults
 default_inputscript = 'shoebox/examples/blocks_neat.py'
-default_gtk_inputscript = 'letter_h_obj.py'
+default_gtk_inputscript = 'letters.py'
 default_outputfile = 'output.png'
 
 if __name__ == '__main__':
@@ -147,13 +138,20 @@ if __name__ == '__main__':
         if options['socketserver']:
             print 'Socketserver is only available on GTK mode.'
             usage(this, options)
-        if options['inputscript'] == default_inputscript:
+        if not options['inputscript']:
             print 'No input script specified, defaulting to demo...'
-        if options['outputfile'] == default_outputfile:
+            options['inputscript'] = default_inputscript
+        if not options['outputfile']:
             print 'No output file specified, defaulting to output.png...'
+            options['outputfile'] = default_outputfile
         # start one-shot commandline processing
-        box = shoebox.Box(options['outputfile'])
+        box = shoebox.Box(outputfile = options['outputfile'])
         box.run(options['inputscript'])
+#        IMAGE OUTPUT NEEDS THIS LINE
+        if 'setup' in box.namespace:
+            box.setup()
+        if 'draw' in box.namespace:
+            box.draw()
         box.finish()
     else:
         # GTK frontend

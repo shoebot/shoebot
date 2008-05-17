@@ -56,8 +56,8 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, outputfilename = None):
-        self.targetfilename = outputfilename
+    def __init__ (self, outputfile = None):
+        self.targetfilename = outputfile
         # create options object
         self.opt = OptionsContainer()
         # init internal path container
@@ -66,6 +66,9 @@ class Box:
         # init temp value holders
         self._fill = None
         self._stroke = None
+#        if self.targetfilename:
+#            self.surfacetype = self.targetfilename.split('.')[-1]
+#        else:
         self.surface = None
         
         self.vars = {}
@@ -82,7 +85,7 @@ class Box:
         if not target:
             raise ShoeboxError("setsurface(): No target specified!")
         if isinstance(target, basestring):
-            self.makesurface(width, height, target)
+            self.makesurface(width, height, self.targetfilename)
         # and if it's a surface, attach our Cairo context to it
         elif isinstance(target, cairo.Surface):
             self.context = cairo.Context(target)
@@ -94,7 +97,6 @@ class Box:
     
     def makesurface(self, width, height, filename):
         if isinstance(filename, basestring) and filename.split(".")[-1] in EXTENSIONS:
-            self.targetfilename = filename
             self.surface = util.surfacefromfilename(filename,width,height)
             self.context = cairo.Context(self.surface)
         else:
@@ -401,6 +403,14 @@ class Box:
         self.context.save()
     
     def pop(self):
+        #self.pop_group()
+        self.context.restore()
+        
+    def save(self):
+        #self.push_group()
+        self.context.save()
+    
+    def restore(self):
         #self.pop_group()
         self.context.restore()
     
