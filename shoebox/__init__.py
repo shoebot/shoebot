@@ -838,8 +838,6 @@ class Box:
                 source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
             # do the magic
             exec source_or_code in self.namespace
-#            if self.namespace.has_key("setup"):
-#                self.namespace["setup"]()
         except:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
