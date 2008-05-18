@@ -1,3 +1,9 @@
+'''
+Basic primitives example
+
+Taken from the Nodebox test suite.
+'''
+
 size(300, 300)
 
 _total_w = 0

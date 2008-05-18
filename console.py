@@ -149,14 +149,14 @@ if __name__ == '__main__':
         box.run(options['inputscript'])
 #        IMAGE OUTPUT NEEDS THIS LINE
         if 'setup' in box.namespace:
-            box.setup()
+            box.namespace['setup']()
         if 'draw' in box.namespace:
-            box.draw()
+            box.namespace['draw']()
         box.finish()
     else:
         # GTK frontend
         import sys
-        import gtkui
+        from shoebox import gtkui
         if options['outputfile'] is not default_outputfile:
             print 'GTK mode does not take an output file argument.'
             usage(this, options)

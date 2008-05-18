@@ -39,9 +39,11 @@ class ShoeboxError(Exception): pass
 
 class Box:
     '''
-    The Box class is an abstraction to hold a Cairo context and all
-    methods to access and manipulate it. The Nodebox language is
-    implemented here.
+    The Box class is an abstraction to hold a Cairo surface, context and all
+    methods to access and manipulate it (the Nodebox language is
+    implemented here).
+    
+    
     '''
 
     inch = 72
@@ -227,6 +229,7 @@ class Box:
 
     def beginpath(self, x=None, y=None):
         # create a BezierPath instance
+        ## FIXME: This is fishy
         self._path = BezierPath((x,y))
         self._path.closed = False
         
@@ -473,7 +476,7 @@ class Box:
         if isinstance(args[0], Color):
             self.opt.fillcolor = Color(self.opt.colormode,1,args[0])
         else:
-            self.opt.fillcolor = self.color(args[0])  
+            self.opt.fillcolor = self.color(args)  
         return self.opt.fillcolor
     
     def nofill(self):
@@ -499,9 +502,12 @@ class Box:
         else:
             return self.context.get_line_width
     
-    def background(self,r,g,b,a=None):
+    def background(self,*args):
         '''Sets the background colour.'''
-        if a is None:
+        if DEBUG: print "DEBUG(background): args:" + str(args)
+        if len(args) > 0:
+            bgcolor = self.color(args)
+            r, g, b = bgcolor.get_rgb(1)
             self.context.set_source_rgb(r,g,b)
             self.context.paint()
         else:
@@ -533,25 +539,27 @@ class Box:
         Draws a string of text according to current font settings.
         '''
         # TODO: Check for malformed requests (x,y,txt is a common mistake)
-        self.context.save()
+        self.save()
         if width is not None:
-            raise NotImplementedError("text(): width settings aren't implemented yet")
+            pass
         if outline is True:
             self.textpath(txt, x, y, width, height)
         else:
             self.context.move_to(x,y)
             self.context.show_text(txt)
         self.fill_and_stroke()
-        self.context.restore()
+        self.restore()
     
-    def textpath(self, txt, x, y, width=None, height=1000000):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
         '''
         Draws an outlined path of the input text
         '''
-        self.moveto(x,y)
+        ## FIXME: This should be handled by BezierPath
+        self.save()
+        self.context.move_to(x,y)
         self.context.text_path(txt)
-        self.fill_and_stroke()
-        # return self._path
+        self.restore()
+#        return self._path
     
     def textwidth(self, txt, width=None):
         '''Returns the width of a string of text according to the current 
@@ -619,14 +627,19 @@ class Box:
     # ----- UTILITY -----
 
     def size(self,w=None,h=None):
-        '''Sets the size of the canvas. Needs to be the first function call in a script.'''
+        '''Sets the size of the canvas, and creates a Cairo surface and context. 
+        
+        Needs to be the first function call in a script.'''
         if self.surface:
             raise ShoeboxError("size(): size() can only be called once in a script.")
         if w and h:
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
+            # hack to get WIDTH and HEIGHT into the local namespace for running
+            self.namespace['WIDTH'] = self.WIDTH
+            self.namespace['HEIGHT'] = self.HEIGHT
             self.setsurface(w, h, self.targetfilename)
-        return (self.WIDTH, self.HEIGHT)
+#        return (self.WIDTH, self.HEIGHT)
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
         '''
@@ -718,7 +731,7 @@ class Box:
         # Taken ipsis verbis from Nodebox
         from glob import glob
         return glob(path)
-
+        
     def autotext(self):
         '''
         NOT IMPLEMENTED
@@ -848,18 +861,18 @@ class Box:
             print '-='*20
             sys.exit()
  
-    def setup(self):
-        if self.namespace.has_key("setup"):
-            self.namespace["setup"]()
-        else:
-            raise ShoeboxError("setup: There's no setup() method in input script") 
-    
-    def draw(self):
-        if self.namespace.has_key("draw"):
-            self.namespace["draw"]()
-        else:
-            raise ShoeboxError("draw: There's no draw() method in input script")
-            
+#    def setup(self):
+#        if self.namespace.has_key("setup"):
+#            self.namespace["setup"]()
+#        else:
+#            raise ShoeboxError("setup: There's no setup() method in input script") 
+#    
+#    def draw(self):
+#        if self.namespace.has_key("draw"):
+#            self.namespace["draw"]()
+#        else:
+#            raise ShoeboxError("draw: There's no draw() method in input script")
+#            
 
 class OptionsContainer:
     def __init__(self):

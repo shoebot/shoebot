@@ -16,7 +16,6 @@ class ShoeboxCanvas(gtk.DrawingArea):
         self.connect("expose_event", self.expose)
         
         self.infile = inputfilename
-        self.context = None
         self.box = shoebox.Box()
         self.box.run(self.infile)
     
@@ -29,10 +28,12 @@ class ShoeboxCanvas(gtk.DrawingArea):
         self.context.rectangle(event.area.x, event.area.y,
                             event.area.width, event.area.height)
         self.context.clip()
+        
         # attach box to context
         self.box.setsurface(target=self.context)
-        # run the input script
-        self.box.setup()
+        # run the input script              
+
+#        pprint(self.box.namespace['variables']) 
         self.draw()	
         return False
     
@@ -41,7 +42,9 @@ class ShoeboxCanvas(gtk.DrawingArea):
         self.queue_draw()
     
     def draw(self):
-        self.box.draw()
+        self.box.namespace['setup']()
+        self.box.namespace['draw']()
+        
 
 class MainWindow:
     def __init__(self,filename):
@@ -89,10 +92,12 @@ class MainWindow:
                 # is value in our variables list?
                 if var in self.canvas.box.namespace:
                     # set the box namespace to the new value
-                    
+                    print "VALUE CHANGED"
+                    print self.canvas.box.namespace[var]
                     ## HACKING HERE, commented doesn't work but would be desirable
 #                    self.canvas.box.namespace[var] = value.strip(';')
                     self.canvas.box.namespace[var] = float(value.strip(';'))
+                    print self.canvas.box.namespace[var]
                     # and redraw
                     self.canvas.redraw()
                 return True
