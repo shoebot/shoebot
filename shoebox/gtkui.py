@@ -11,16 +11,21 @@ import gobject, socket
 from pprint import pprint
 
 class ShoeboxCanvas(gtk.DrawingArea):
-    def __init__(self, inputfilename):
+    def __init__(self, mainwindow, inputfilename):
         super(ShoeboxCanvas, self).__init__()
         self.connect("expose_event", self.expose)
         
         self.infile = inputfilename
-        self.box = shoebox.Box()
+        self.box = shoebox.Box(gtkmode=True)
         self.box.run(self.infile)
-    
+        # set the window size to the one specified in the script
+#        self.set_size_request(self.box.namespace['WIDTH'], self.box.namespace['HEIGHT'])
+        self._width = self.box.namespace['WIDTH']
+        self._height = self.box.namespace['HEIGHT']
+        
+        
     def expose(self, widget, event):
-        '''Handle expose events.'''
+        '''Handle GTK expose events.'''
         # reset context
         self.context = None
         self.context = widget.window.cairo_create()
@@ -30,8 +35,8 @@ class ShoeboxCanvas(gtk.DrawingArea):
         self.context.clip()
         
         # attach box to context
-        self.box.setsurface(target=self.context)
-        # run the input script              
+        self.box.setsurface(target=self.context)  
+        self.box.namespace['setup']()            
 
 #        pprint(self.box.namespace['variables']) 
         self.draw()	
@@ -39,22 +44,23 @@ class ShoeboxCanvas(gtk.DrawingArea):
     
     def redraw(self,dummy='moo'):
         '''Handle redraws.'''
+        # dummy is in the arguments because GTK seems to require it, but works
+        # fine with any value, so we get away with this hack
         self.queue_draw()
     
     def draw(self):
-        self.box.namespace['setup']()
         self.box.namespace['draw']()
         
 
 class MainWindow:
     def __init__(self,filename):
-        self.canvas = ShoeboxCanvas(filename)
+        self.canvas = ShoeboxCanvas(self, filename)
 
     def run(self):
         '''Setup the main GTK window.'''
         window = gtk.Window()
         window.connect("destroy", gtk.main_quit)
-        self.canvas.set_size_request(1024, 768)
+        self.canvas.set_size_request(self.canvas._width, self.canvas._height)
         window.add(self.canvas)
         window.show_all()
         
@@ -85,19 +91,15 @@ class MainWindow:
             return False
         else:
             incoming = line.strip()
-            ## FIXME
-            # this statement is bottlenecking the whole thing
             if len(incoming.split()) == 2:
                 var, value = incoming.split()
                 # is value in our variables list?
                 if var in self.canvas.box.namespace:
                     # set the box namespace to the new value
-                    print "VALUE CHANGED"
-                    print self.canvas.box.namespace[var]
-                    ## HACKING HERE, commented doesn't work but would be desirable
-#                    self.canvas.box.namespace[var] = value.strip(';')
+
+                    ## TODO: we're forced to convert input to floats
+                    # self.canvas.box.namespace[var] = value.strip(';')
                     self.canvas.box.namespace[var] = float(value.strip(';'))
-                    print self.canvas.box.namespace[var]
                     # and redraw
                     self.canvas.redraw()
                 return True

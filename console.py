@@ -11,7 +11,7 @@ This file is part of Shoebox.
 
 import sys
 import os
-import re
+
 
 import shoebox
 
@@ -35,6 +35,7 @@ def getopt(arg, tail, opt, default):
         -o value / --option value  (returns value in same type as default)
     Pops values from tail (usually remainder of argv list) only if required.
     '''
+    import re
     value = None
     o = opt[0]
     opt = opt.lower()
@@ -113,7 +114,7 @@ def getopts(argv, options):
 
 #------------------------------------------------------
 
-default_inputscript = 'shoebox/examples/blocks_neat.py'
+default_inputscript = 'shoebox/examples/primitives.py'
 default_gtk_inputscript = 'letters.py'
 default_outputfile = 'output.png'
 
@@ -145,9 +146,13 @@ if __name__ == '__main__':
             print 'No output file specified, defaulting to output.png...'
             options['outputfile'] = default_outputfile
         # start one-shot commandline processing
+        # create a Box instance
         box = shoebox.Box(outputfile = options['outputfile'])
+        # run it, and then its setup and draw methods, if they're there
+        # (running setup() and draw() isn't always desirable, but for image
+        # output it helps to have the final image as a GTK canvas would 
+        # display it)
         box.run(options['inputscript'])
-#        IMAGE OUTPUT NEEDS THIS LINE
         if 'setup' in box.namespace:
             box.namespace['setup']()
         if 'draw' in box.namespace:

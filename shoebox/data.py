@@ -59,7 +59,6 @@ class BezierPath:
     #kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, path=None):
-        self.segment_cache = None
         if path is None:
             self.data = []
         elif isinstance(path, (tuple,list)):
@@ -239,9 +238,9 @@ class Color(object):
 
     Shoebox's color() includes these arguments on the object constructor; they should be used in
     any other case where color() is not enough and a direct call to Color() is needed.
-    
-    This code is still very messy, recovering from a big bug hunt.
     '''
+    
+    # This code is still very messy, recovering from a big bug hunt. But works!
 
     def __init__(self, mode=RGB, crange=1, *args):
         # check for proper input

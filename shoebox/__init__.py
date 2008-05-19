@@ -58,7 +58,7 @@ class Box:
     CENTER = "center"
     CORNER = "corner"
 
-    def __init__ (self, outputfile = None):
+    def __init__ (self, outputfile = None, gtkmode=False):
         self.targetfilename = outputfile
         # create options object
         self.opt = OptionsContainer()
@@ -72,6 +72,8 @@ class Box:
 #            self.surfacetype = self.targetfilename.split('.')[-1]
 #        else:
         self.surface = None
+        
+        self.gtkmode = gtkmode
         
         self.vars = {}
         self.namespace = {}
@@ -630,17 +632,29 @@ class Box:
         '''Sets the size of the canvas, and creates a Cairo surface and context. 
         
         Needs to be the first function call in a script.'''
+        
         if self.surface:
             raise ShoeboxError("size(): size() can only be called once in a script.")
-        if w and h:
+            
+        if not w or not h:
+            raise ShoeboxError("size(): width and height arguments missing")
+            
+        if self.gtkmode:
+            self.WIDTH = int(w)
+            self.HEIGHT = int(h)
+            self.namespace['WIDTH'] = self.WIDTH
+            self.namespace['HEIGHT'] = self.HEIGHT
+
+        else:
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
             # hack to get WIDTH and HEIGHT into the local namespace for running
             self.namespace['WIDTH'] = self.WIDTH
             self.namespace['HEIGHT'] = self.HEIGHT
             self.setsurface(w, h, self.targetfilename)
-#        return (self.WIDTH, self.HEIGHT)
+        # return (self.WIDTH, self.HEIGHT)
 
+            
     def var(self, name, type, default=None, min=0, max=100, value=None):
         '''
         NOT IMPLEMENTED
@@ -830,7 +844,6 @@ class Box:
         vardict = args
         for key in vardict:
             self.namespace[key] = vardict[key]
-#        pprint(self.__dict__)
     
     def run(self,filename):
         '''
