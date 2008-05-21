@@ -443,7 +443,7 @@ class Box:
                 self.opt.colormode = HSB
             else:
                 raise NameError, "Only RGB and HSB colormodes are supported."
-        if range is not None:
+        if crange is not None:
             self.opt.colorrange = crange
         return self.opt.colormode
     
