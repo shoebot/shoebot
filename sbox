@@ -114,7 +114,7 @@ def getopts(argv, options):
 
 #------------------------------------------------------
 
-default_inputscript = 'shoebox/examples/primitives.py'
+default_inputscript = '/usr/local/share/shoebox/share/examples/primitives.py'
 default_gtk_inputscript = 'letters.py'
 default_outputfile = 'output.png'
 

@@ -35,6 +35,10 @@ VERBOSE = False
 DEBUG = False
 EXTENSIONS = ('png','svg','ps','pdf')
 
+CENTER = "center"
+CORNER = "corner"
+CORNERS = "corners"
+
 class ShoeboxError(Exception): pass
 
 class Box:
@@ -55,9 +59,6 @@ class Box:
 
     NORMAL = "1"
     FORTYFIVE = "2"
-    CENTER = "center"
-    CORNER = "corner"
-    CORNERS = "corners"
 
     def __init__ (self, outputfile = None, gtkmode=False):
         self.targetfilename = outputfile
