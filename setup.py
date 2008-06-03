@@ -11,11 +11,11 @@ setup(name = "shoebox",
       url = "http://shoebox.sollec.org",
       packages = ["shoebox",
                   ],
-      data_files = [("share/examples", ["examples/primitives.py",
-                                        "examples/socketcontrol.pd",
-                                        "examples/socketcontrol.py",
-                                        "examples/socketcontrol2.py",
-                                        ])
+      data_files = [("examples", ["examples/primitives.py",
+                                  "examples/socketcontrol.pd",
+                                  "examples/socketcontrol.py",
+                                  "examples/socketcontrol2.py",
+                                  ])
                     ],
       scripts = ["sbox"],
       long_description = """
