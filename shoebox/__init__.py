@@ -155,7 +155,7 @@ class Box:
             self._stroke = None
             
     def rectmode(mode=None):
-        if mode is in (CORNER, CENTER, CORNERS):
+        if mode in (CORNER, CENTER, CORNERS):
             self.opt.rectmode = mode
         elif mode is None:
             return self.opt.rectmode
