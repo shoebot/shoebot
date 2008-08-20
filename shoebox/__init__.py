@@ -244,6 +244,17 @@ class Box:
         self.endpath()
 #        self.fill_and_stroke()
 
+    # ----- CLIPPING -----
+    
+    def beginclip(self,x,y,w,h):
+        self.save()
+        self.context.rectangle(x, y, w, h)
+        self.context.clip()
+    
+    def endclip(self):
+        self.restore()
+    
+
     # ----- PATH -----
     # Path functions taken from Nodebox and modified
 
@@ -373,18 +384,6 @@ class Box:
         #path.ctx = self
         #path.inheritFromContext()
         #return path
-        pass
-    
-    def beginclip(self, path):
-        '''
-        NOT IMPLEMENTED
-        '''        
-        pass
-    
-    def endclip(self):
-        '''
-        NOT IMPLEMENTED
-        '''        
         pass
     
     # ----- -----
