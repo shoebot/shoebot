@@ -35,6 +35,10 @@ VERBOSE = False
 DEBUG = False
 EXTENSIONS = ('png','svg','ps','pdf')
 
+CENTER = "center"
+CORNER = "corner"
+CORNERS = "corners"
+
 class ShoeboxError(Exception): pass
 
 class Box:
@@ -55,8 +59,6 @@ class Box:
 
     NORMAL = "1"
     FORTYFIVE = "2"
-    CENTER = "center"
-    CORNER = "corner"
 
     def __init__ (self, outputfile = None, gtkmode=False):
         self.targetfilename = outputfile
@@ -115,6 +117,14 @@ class Box:
         '''
         # taken from Nodebox and modified
         
+        if self.opt.rectmode == CORNERS:
+            width = width - x
+            height = height - y
+        elif self.opt.rectmode == CENTER:
+            raise NotImplementedError
+        elif self.opt.rectmode == CORNER:
+            pass
+        
         # take care of fill and stroke arguments
         if fill is not None or stroke is not None:
             if fill is not None: 
@@ -144,6 +154,14 @@ class Box:
         if fill is not None or stroke is not None:
             self._fill = None
             self._stroke = None
+            
+    def rectmode(mode=None):
+        if mode in (CORNER, CENTER, CORNERS):
+            self.opt.rectmode = mode
+        elif mode is None:
+            return self.opt.rectmode
+        else:
+            raise ShoeboxError("rectmode: invalid input")
     
     def oval(self, x, y, width, height):
         '''Draws an ellipse starting from (x,y)'''
@@ -403,14 +421,6 @@ class Box:
         mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
         self.context.transform(mtrx)
     
-    def push(self):
-        #self.push_group()
-        self.context.save()
-    
-    def pop(self):
-        #self.pop_group()
-        self.context.restore()
-        
     def save(self):
         #self.push_group()
         self.context.save()
@@ -523,7 +533,7 @@ class Box:
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
-            face = util.create_cairo_font_face_for_file (fontpath, 0)
+            face = util.create_cairo_font_face_for_file(fontpath, 0)
             self.context.set_font_face(face)
         else:
             self.get_font_face()
@@ -534,7 +544,7 @@ class Box:
         if fontsize is not None:
             self.context.set_font_size(fontsize)
         else:
-            self.context.get_font_size()
+            return self.context.get_font_size()
     
     def text(self, txt, x, y, width=None, height=1000000, outline=False):
         '''
@@ -549,7 +559,7 @@ class Box:
         else:
             self.context.move_to(x,y)
             self.context.show_text(txt)
-        self.fill_and_stroke()
+            self.fill_and_stroke()
         self.restore()
     
     def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
@@ -581,7 +591,7 @@ class Box:
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        x_bearing, y_bearing, textwidth, textheight, x_advance, y_advance = self.text_extents(txt)
+        x_bearing, y_bearing, textwidth, textheight, x_advance, y_advance = self.context.text_extents(txt)
         return textwidth, textheight
     
     def lineheight(self, height=None):
@@ -618,13 +628,6 @@ class Box:
         self.context.set_source_surface (imagesurface, x, y)
         self.context.rectangle(x, y, width, height)
         self.context.fill()
-
-    def imagesize(self, path):
-        '''
-        NOT IMPLEMENTED
-        '''
-        # get an external image's size
-        raise NotImplementedError("imagesize() isn't implemented yet")
 
     # ----- UTILITY -----
 
@@ -728,12 +731,6 @@ class Box:
             for x in colRange:
                 yield (x*colSize,y*rowSize)
 
-    def open(self):
-        '''
-        NOT IMPLEMENTED
-        '''        
-        raise NotImplementedError("open() isn't implemented yet")
-
     def files(self, path="*"):
         """Returns a list of files.
 
@@ -746,12 +743,6 @@ class Box:
         from glob import glob
         return glob(path)
         
-    def autotext(self):
-        '''
-        NOT IMPLEMENTED
-        '''        
-        raise NotImplementedError("autotext() isn't implemented yet")
-
     def fill_and_stroke(self):
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
@@ -898,6 +889,8 @@ class OptionsContainer:
         self.fillcolor = Color(RGB,1,.7,.7,.7,1)
         self.strokecolor = Color(RGB,1,.2,.2,.2,1)
         self.strokewidth = 1.0
+
+        self.rectmode = CORNER
 
         ## self.linecap
         ## self.linejoin

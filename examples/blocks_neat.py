@@ -69,6 +69,9 @@ def block(x,y,z):
     endpath()
 
 def setup():
+    pass
+
+def draw():
     # white background
     background(1,1,1)
     
@@ -81,4 +84,3 @@ def setup():
         # draw it
         block(x,y,z)
 
-setup()

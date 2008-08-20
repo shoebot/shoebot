@@ -1,0 +1,7 @@
+include README
+include setup.py
+include shoebox/__init__.py
+include shoebox/data.py
+include shoebox/gtkui.py
+include shoebox/util.py
+recursive-include examples *

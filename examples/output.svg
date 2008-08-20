@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200pt" height="200pt" viewBox="0 0 200 200" version="1.1">
+<g id="surface0">
+<rect x="0" y="0" width="200" height="200" style="fill: rgb(29.803922%,40%,20%); fill-opacity: 1; stroke: none;"/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(54.4406%,50.098378%,39.677047%); fill-opacity: 1;" d="M 50 180 L 30 170 L 30 150 L 50 160 Z M 50 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(36.293733%,33.398919%,26.451365%); fill-opacity: 1;" d="M 50 180 L 70 170 L 70 150 L 50 160 Z M 50 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(18.146867%,16.699459%,13.225682%); fill-opacity: 1;" d="M 50 160 L 70 150 L 50 140 L 30 150 Z M 50 160 "/>
+<path style="fill: none; stroke-width: 2; stroke-linecap: butt; stroke-linejoin: miter; stroke: rgb(9.073433%,8.34973%,6.612841%); stroke-opacity: 1;stroke-miterlimit: 10; " d="M 50 180 L 30 170 L 30 150 L 50 140 L 70 150 L 70 170 Z M 50 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(39.677047%,54.4406%,51.835267%); fill-opacity: 1;" d="M 100 180 L 80 170 L 80 150 L 100 160 Z M 100 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(26.451365%,36.293733%,34.556845%); fill-opacity: 1;" d="M 100 180 L 120 170 L 120 150 L 100 160 Z M 100 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(13.225682%,18.146867%,17.278422%); fill-opacity: 1;" d="M 100 160 L 120 150 L 100 140 L 80 150 Z M 100 160 "/>
+<path style="fill: none; stroke-width: 2; stroke-linecap: butt; stroke-linejoin: miter; stroke: rgb(6.612841%,9.073433%,8.639211%); stroke-opacity: 1;stroke-miterlimit: 10; " d="M 100 180 L 80 170 L 80 150 L 100 140 L 120 150 L 120 170 Z M 100 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(53.572156%,39.677047%,54.4406%); fill-opacity: 1;" d="M 150 180 L 130 170 L 130 150 L 150 160 Z M 150 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(35.71477%,26.451365%,36.293733%); fill-opacity: 1;" d="M 150 180 L 170 170 L 170 150 L 150 160 Z M 150 180 "/>
+<path style=" stroke:none;fill-rule: nonzero; fill: rgb(17.857385%,13.225682%,18.146867%); fill-opacity: 1;" d="M 150 160 L 170 150 L 150 140 L 130 150 Z M 150 160 "/>
+<path style="fill: none; stroke-width: 2; stroke-linecap: butt; stroke-linejoin: miter; stroke: rgb(8.928693%,6.612841%,9.073433%); stroke-opacity: 1;stroke-miterlimit: 10; " d="M 150 180 L 130 170 L 130 150 L 150 140 L 170 150 L 170 170 Z M 150 180 "/>
+</g>
+</svg>
