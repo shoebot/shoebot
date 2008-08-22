@@ -5,25 +5,25 @@
 # Borrowed from Inkscape (coloreffect.py)
 
 '''
-Shoebox utility functions
+Shoebot utility functions
 
-Copyright 2007, 2008 Ricardo Lafuente 
+Copyright 2007, 2008 Ricardo Lafuente
 Developed at the Piet Zwart Institute, Rotterdam
 
-This file is part of Shoebox.
+This file is part of Shoebot.
 
-Shoebox is free software: you can redistribute it and/or modify
+Shoebot is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Shoebox is distributed in the hope that it will be useful,
+Shoebot is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
+along with Shoebot.  If not, see <http://www.gnu.org/licenses/>.
 
 This file uses code from Nodebox (http://www.nodebox.net).
 The relevant code parts are marked with a "Taken from Nodebox" note.
@@ -38,7 +38,7 @@ def rgb_to_hsl(r, g, b):
     Taken from Inkscape.
     Copyright (C) 2006 Jos Hirth, kaioa.com
     Subject to the terms of the GPLv2 or any later version.
-    
+
     Converts RGB values to the HSL colourspace.
     '''
     rgb_max = max (max (r, g), b)
@@ -169,13 +169,13 @@ def surfacefromfilename(outfile, width, height):
     Creates a Cairo surface according to the filename extension,
     since Cairo requires the type of surface (svg, pdf, ps, png) to
     be specified on creation.
-    
-    TODO: Move this function to main shoebox module?
+
+    TODO: Move this function to main shoebot module?
     '''
     # convert to ints, cairo.ImageSurface is picky
     width = int(width)
     height = int(height)
-    
+
     import cairo
     # check across all possible formats and create the appropriate kind of surface
     # and also be sure that Cairo was built with support for that

@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
 '''
-Shoebox module
+Shoebot module
 
-Copyright 2007, 2008 Ricardo Lafuente 
+Copyright 2007, 2008 Ricardo Lafuente
 Developed at the Piet Zwart Institute, Rotterdam
 
-This file is part of Shoebox.
+This file is part of Shoebot.
 
-Shoebox is free software: you can redistribute it and/or modify
+Shoebot is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Shoebox is distributed in the hope that it will be useful,
+Shoebot is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Shoebox.  If not, see <http://www.gnu.org/licenses/>.
+along with Shoebot.  If not, see <http://www.gnu.org/licenses/>.
 
 This file uses code from Nodebox (http://www.nodebox.net).
 The relevant code parts are marked with a "Taken from Nodebox" comment.
@@ -29,7 +29,6 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 import cairo
 import util
 from data import *
-from pprint import pprint
 
 VERBOSE = False
 DEBUG = False
@@ -39,15 +38,15 @@ CENTER = "center"
 CORNER = "corner"
 CORNERS = "corners"
 
-class ShoeboxError(Exception): pass
+class ShoebotError(Exception): pass
 
 class Box:
     '''
     The Box class is an abstraction to hold a Cairo surface, context and all
     methods to access and manipulate it (the Nodebox language is
     implemented here).
-    
-    
+
+
     '''
 
     inch = 72
@@ -74,22 +73,22 @@ class Box:
 #            self.surfacetype = self.targetfilename.split('.')[-1]
 #        else:
         self.surface = None
-        
+
         self.gtkmode = gtkmode
-        
+
         self.vars = {}
         self.namespace = {}
-        
+
     def setsurface(self, width=None, height=None, target=None):
         '''Sets the surface on which the Box object will operate.
-        
-        Besides attaching surfaces, it can also create new ones based on an 
+
+        Besides attaching surfaces, it can also create new ones based on an
         output filename; it also accepts a Cairo surface or context as an
         argument, and attaches to them as expected.
         '''
         # if the target is a string, should be a filename
         if not target:
-            raise ShoeboxError("setsurface(): No target specified!")
+            raise ShoebotError("setsurface(): No target specified!")
         if isinstance(target, basestring):
             self.makesurface(width, height, self.targetfilename)
         # and if it's a surface, attach our Cairo context to it
@@ -99,15 +98,15 @@ class Box:
         elif isinstance(target, cairo.Context):
             self.context = target
         else:
-            raise ShoeboxError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
-    
+            raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+
     def makesurface(self, width, height, filename):
         if isinstance(filename, basestring) and filename.split(".")[-1] in EXTENSIONS:
             self.surface = util.surfacefromfilename(filename,width,height)
             self.context = cairo.Context(self.surface)
         else:
-            raise ShoeboxError("makesurface: Invalid extension")
-    
+            raise ShoebotError("makesurface: Invalid extension")
+
     # ---- SHAPE -----
 
     def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
@@ -116,7 +115,7 @@ class Box:
         The roundness variable sets rounded corners.
         '''
         # taken from Nodebox and modified
-        
+
         if self.opt.rectmode == CORNERS:
             width = width - x
             height = height - y
@@ -124,15 +123,15 @@ class Box:
             raise NotImplementedError
         elif self.opt.rectmode == CORNER:
             pass
-        
+
         # take care of fill and stroke arguments
         if fill is not None or stroke is not None:
-            if fill is not None: 
+            if fill is not None:
                 self._fill = self.color(fill)
-            if stroke is not None: 
+            if stroke is not None:
                 self._stroke = self.color(stroke)
 
-        # straight corners	
+        # straight corners
         if roundness == 0.0:
             self.context.rectangle(x, y, width, height)
             self.fill_and_stroke()
@@ -154,15 +153,15 @@ class Box:
         if fill is not None or stroke is not None:
             self._fill = None
             self._stroke = None
-            
+
     def rectmode(mode=None):
         if mode in (CORNER, CENTER, CORNERS):
             self.opt.rectmode = mode
         elif mode is None:
             return self.opt.rectmode
         else:
-            raise ShoeboxError("rectmode: invalid input")
-    
+            raise ShoebotError("rectmode: invalid input")
+
     def oval(self, x, y, width, height):
         '''Draws an ellipse starting from (x,y)'''
         from math import pi
@@ -173,14 +172,18 @@ class Box:
         self.arc (0., 0., 1., 0., 2 * pi);
         self.fill_and_stroke()
         self.context.restore()
-    
+
+    def circle(self, x, y, diameter):
+        self.oval(x, y, diameter, diameter)
+
+
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)'''
         self.beginpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
         self.endpath()
-    
+
     def arrow(self, x, y, width, type=NORMAL):
         '''Draws an arrow.
 
@@ -245,15 +248,15 @@ class Box:
 #        self.fill_and_stroke()
 
     # ----- CLIPPING -----
-    
+
     def beginclip(self,x,y,w,h):
         self.save()
         self.context.rectangle(x, y, w, h)
         self.context.clip()
-    
+
     def endclip(self):
         self.restore()
-    
+
 
     # ----- PATH -----
     # Path functions taken from Nodebox and modified
@@ -263,7 +266,7 @@ class Box:
         ## FIXME: This is fishy
         self._path = BezierPath((x,y))
         self._path.closed = False
-        
+
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
             self._path.moveto(x,y)
@@ -271,29 +274,29 @@ class Box:
     def moveto(self, x, y):
         if self._path is None:
             ## self.beginpath()
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            raise ShoebotError, "No current path. Use beginpath() first."
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            raise ShoebotError, "No current path. Use beginpath() first."
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            raise ShoebotError, "No current path. Use beginpath() first."
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def closepath(self):
         if self._path is None:
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            raise ShoebotError, "No current path. Use beginpath() first."
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoeboxError, "No current path. Use beginpath() first."
+            raise ShoebotError, "No current path. Use beginpath() first."
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -301,10 +304,10 @@ class Box:
             self.drawpath(p)
         self._path = None
         return p
-        
+
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
-            raise ShoeboxError, "drawpath(): Input is not a valid BezierPath object"
+            raise ShoebotError, "drawpath(): Input is not a valid BezierPath object"
         self.context.save()
         for element in path.data:
 #            if isinstance(element,basestring):
@@ -312,7 +315,7 @@ class Box:
             if isinstance(element,PathElement):
                 cmd = element[0]
             else:
-                raise ShoeboxError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
+                raise ShoebotError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
             if cmd == MOVETO:
                 x = element.x
                 y = element.y
@@ -332,7 +335,7 @@ class Box:
             elif cmd == CLOSE:
                 self.context.close_path()
             else:
-                raise ShoeboxError("PathElement(): error parsing path element command")
+                raise ShoebotError("PathElement(): error parsing path element command")
         ## TODO
         ## if path has state attributes, set the context to those, saving
         ## before and replacing them afterwards with the old values
@@ -340,7 +343,7 @@ class Box:
         # if path.stateattrs:
         #     for attr in path.stateattrs:
         #         self.context....
-        
+
         self.fill_and_stroke()
         self.context.restore()
 
@@ -357,24 +360,24 @@ class Box:
         '''Draws a line relatively to the last point.
 
         Calls Cairo's rel_line_to().
-        '''        
+        '''
         self.context.rel_line_to(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
 
         Calls Cairo's rel_curve_to().
-        '''           
+        '''
         self.context.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
-    
+
     def arc(self,centerx, centery, radius, angle1, angle2):
         '''Draws an arc.
-        
+
         Calls Cairo's arc() method.
         '''
         self.context.arc(centerx, centery, radius, angle1, angle2)
-    
-    def findpath(self, list, curvature=1.0): 
+
+    def findpath(self, list, curvature=1.0):
         ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
         Curvature: 0=straight lines 1=smooth curves
         '''
@@ -384,14 +387,13 @@ class Box:
         #path.ctx = self
         #path.inheritFromContext()
         #return path
-        pass
-    
+
     # ----- -----
 
     def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
         '''
         NOT IMPLEMENTED
-        '''    
+        '''
         raise NotImplementedError("transform() isn't implemented yet")
 
     def matrix(self, mtrx):
@@ -400,49 +402,49 @@ class Box:
         '''
         # matrix = cairo.Matrix (xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0)
         self.context.transform(mtrx)
-    
+
     def translate(self, x, y):
         '''
         Shifts the origin point by (x,y)
         '''
         self.context.translate(x, y)
-    
+
     def rotate(self, radians=0):
         self.context.rotate(radians)
-    
+
     def scale(self, x=1, y=None):
         if y is None:
             self.context.scale(x,x)
         else:
             self.context.scale(x,y)
-    
+
     def skew(self, x, y):
         mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
         self.context.transform(mtrx)
-    
+
     def save(self):
         #self.push_group()
         self.context.save()
-    
+
     def restore(self):
         #self.pop_group()
         self.context.restore()
-    
+
     def reset(self):
         self.context.identity_matrix()
 
     # ----- COLOR -----
-    
+
     def outputmode(self):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         raise NotImplementedError("outputmode() isn't implemented yet")
-    
+
     def colormode(self, mode=None, crange=None):
         '''Sets the current colormode (can be RGB or HSB) and eventually
         the color range.
-        
+
         If called without arguments, it returns the current colormode.
         '''
         if mode is not None:
@@ -455,7 +457,7 @@ class Box:
         if crange is not None:
             self.opt.colorrange = crange
         return self.opt.colormode
-    
+
     def color(self,*args):
         if len(args) == 1 and isinstance(args[0],Color):
             if DEBUG: print "DEBUG(color): arg: " + str(args[0])
@@ -469,31 +471,31 @@ class Box:
         elif len(args) == 3:
             return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2])
         elif len(args) == 4:
-            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3]) 
+            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3])
         else:
             if DEBUG: print "DEBUG(color): args: " + str(args)
-            raise ShoeboxError("color(): Invalid arguments")
+            raise ShoebotError("color(): Invalid arguments")
 
 
     def colorrange(self, crange):
         self.opt.colorrange = float(crange)
         if DEBUG: print "DEBUG(colorrange): Set to " + str(self.opt.colorrange)
-            
+
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-        
+
         if DEBUG: print "DEBUG(fill): args: " + str(args[0])
         self.opt.fillapply = True
         if isinstance(args[0], Color):
             self.opt.fillcolor = Color(self.opt.colormode,1,args[0])
         else:
-            self.opt.fillcolor = self.color(args)  
+            self.opt.fillcolor = self.color(args)
         return self.opt.fillcolor
-    
+
     def nofill(self):
         ''' Stops applying fills to new paths.'''
         self.opt.fillapply = False
-    
+
     def stroke(self,*args):
         '''Sets a stroke color, applying it to new paths.'''
         if DEBUG: print "DEBUG(stroke): args: " + str(args[0])
@@ -501,18 +503,18 @@ class Box:
         if len(args) > 0:
             self.opt.strokecolor = self.color(args[0])
         return self.opt.strokecolor
-    
+
     def nostroke(self):
         ''' Stops applying strokes to new paths.'''
         self.opt.strokeapply = False
-    
+
     def strokewidth(self, w=None):
         '''Sets the stroke width.'''
         if w is not None:
             self.context.set_line_width(w)
         else:
             return self.context.get_line_width
-    
+
     def background(self,*args):
         '''Sets the background colour.'''
         if DEBUG: print "DEBUG(background): args:" + str(args)
@@ -523,12 +525,12 @@ class Box:
             self.context.paint()
         else:
             self.context.paint_with_alpha(a)
-    
+
     # ----- TEXT-----
-    
+
     def font(self, fontpath=None, fontsize=None):
         '''Set the font to be used with new text instances.
-        
+
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
@@ -538,13 +540,13 @@ class Box:
             self.get_font_face()
         if fontsize is not None:
             self.fontsize(fontsize)
-    
+
     def fontsize(self, fontsize=None):
         if fontsize is not None:
             self.context.set_font_size(fontsize)
         else:
             return self.context.get_font_size()
-    
+
     def text(self, txt, x, y, width=None, height=1000000, outline=False):
         '''
         Draws a string of text according to current font settings.
@@ -560,7 +562,7 @@ class Box:
             self.context.show_text(txt)
             self.fill_and_stroke()
         self.restore()
-    
+
     def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
         '''
         Draws an outlined path of the input text
@@ -571,19 +573,19 @@ class Box:
         self.context.text_path(txt)
         self.restore()
 #        return self._path
-    
+
     def textwidth(self, txt, width=None):
-        '''Returns the width of a string of text according to the current 
+        '''Returns the width of a string of text according to the current
         font settings.
         '''
         return textmetrics(txt)[0]
-    
+
     def textheight(self, txt, width=None):
-        '''Returns the height of a string of text according to the current 
+        '''Returns the height of a string of text according to the current
         font settings.
-        '''    
+        '''
         return textmetrics(txt)[1]
-    
+
     def textmetrics(self, txt, width=None):
         '''Returns the width and height of a string of text as a tuple
         (according to current font settings).
@@ -592,24 +594,24 @@ class Box:
         # but maybe we could use the other data from cairo
         x_bearing, y_bearing, textwidth, textheight, x_advance, y_advance = self.context.text_extents(txt)
         return textwidth, textheight
-    
+
     def lineheight(self, height=None):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         # default: 1.2
         # sets leading
         raise NotImplementedError("lineheight() isn't implemented yet")
-    
+
     def align(self, align="LEFT"):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        raise NotImplementedError("align() isn't implemented in Shoebox yet")
-    
+        raise NotImplementedError("align() isn't implemented in Shoebot yet")
+
     # TODO: Set the framework to setup font options
-    
+
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
         raise NotImplementedError("fontoptions() isn't implemented yet")
 
@@ -617,7 +619,7 @@ class Box:
 
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
         '''
-        TODO: 
+        TODO:
         width and height ought to be for scaling, not clipping
         Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
         using PIL
@@ -631,16 +633,16 @@ class Box:
     # ----- UTILITY -----
 
     def size(self,w=None,h=None):
-        '''Sets the size of the canvas, and creates a Cairo surface and context. 
-        
+        '''Sets the size of the canvas, and creates a Cairo surface and context.
+
         Needs to be the first function call in a script.'''
-        
+
         if self.surface:
-            raise ShoeboxError("size(): size() can only be called once in a script.")
-            
+            raise ShoebotError("size(): size() can only be called once in a script.")
+
         if not w or not h:
-            raise ShoeboxError("size(): width and height arguments missing")
-            
+            raise ShoebotError("size(): width and height arguments missing")
+
         if self.gtkmode:
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
@@ -656,11 +658,11 @@ class Box:
             self.setsurface(w, h, self.targetfilename)
         # return (self.WIDTH, self.HEIGHT)
 
-            
+
     def var(self, name, type, default=None, min=0, max=100, value=None):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         raise NotImplementedError("var() isn't implemented yet")
         #v = Variable(name, type, default, min, max, value)
         #v = self.addvar(v)
@@ -668,7 +670,7 @@ class Box:
     def addvar(self, v):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         raise NotImplementedError("addvar() isn't implemented yet")
         #oldvar = self.findvar(v.name)
         #if oldvar is not None:
@@ -680,13 +682,13 @@ class Box:
     def findvar(self, name):
         '''
         NOT IMPLEMENTED
-        '''        
+        '''
         raise NotImplementedError("findvar() isn't implemented yet")
         #for v in self._oldvars:
             #if v.name == name:
                 #return v
         #return None
-        
+
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
@@ -707,17 +709,17 @@ class Box:
                 return int(start + random.random() * (end-start))
         else: # No values means 0.0 -> 1.0
             return random.random()
-    
+
     from random import choice
-    
+
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
         """
         Returns an iterator that contains coordinate tuples.
-        The grid can be used to quickly create grid-like structures. 
+        The grid can be used to quickly create grid-like structures.
         A common way to use them is:
             for x, y in grid(10,10,12,12):
                 rect(x,y, 10,10)
-    
+
         """
         # Taken ipsis verbis from Nodebox
 
@@ -741,7 +743,7 @@ class Box:
         # Taken ipsis verbis from Nodebox
         from glob import glob
         return glob(path)
-        
+
     def fill_and_stroke(self):
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
@@ -753,7 +755,7 @@ class Box:
             fillclr = self._fill.get_rgba(1)
         else:
             fillclr = self.opt.fillcolor.get_rgba(1)
-        
+
         if self._stroke is not None:
             strokeclr = self._stroke.get_rgba(1)
         else:
@@ -788,12 +790,12 @@ class Box:
         Finishes the surface and writes it to the
         output file.
         '''
-        
+
         ##TODO
         # Better extension checking
         # ext = split(',')[-1]
-        # 
-        
+        #
+
         # get the extension from the filename
         ext = self.targetfilename.split('.')[-1]
         # if this is a vector file, wrap up and finish
@@ -805,8 +807,8 @@ class Box:
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise ShoeboxError("finish(): invalid extension")
-        
+            raise ShoebotError("finish(): invalid extension")
+
     def snapshot(self,filename=None):
         '''
         Save a png file of current surface contents
@@ -814,37 +816,37 @@ class Box:
         (currently works only with PNG surfaces)
         '''
         if filename is None:
-            raise ShoeboxError("snapshot() requires a filename argument")
+            raise ShoebotError("snapshot() requires a filename argument")
         ext = self.targetfilename[-3:]
         # check if we're working on a PNG surface
         if ext == "png":
             # write to file
             self.surface.write_to_png(filename)
         else:
-            raise ShoeboxError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
-        
+            raise ShoebotError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
+
     def setvars(self,args):
         '''Defines the variables that can be externally set.
-        
+
         Accepts a dictionary with variable names assigned
         to default values.
-        '''       
+        '''
         if not isinstance(args, dict):
-            raise ShoeboxError('setvars(): setvars needs a dict!')
+            raise ShoebotError('setvars(): setvars needs a dict!')
         vardict = args
         for key in vardict:
             self.namespace[key] = vardict[key]
-    
+
     def run(self,filename):
         '''
-        Executes the contents of a Nodebox/Shoebox script
+        Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
         '''
-        
+
         file = open(filename, 'rU')
         source_or_code = file.read()
         file.close()
-        
+
         for name in dir(self):
             # get all stuff in the Box namespaces
             self.namespace[name] = getattr(self, name)
@@ -863,19 +865,19 @@ class Box:
             traceback.print_exc(file=sys.stdout)
             print '-='*20
             sys.exit()
- 
+
 #    def setup(self):
 #        if self.namespace.has_key("setup"):
 #            self.namespace["setup"]()
 #        else:
-#            raise ShoeboxError("setup: There's no setup() method in input script") 
-#    
+#            raise ShoebotError("setup: There's no setup() method in input script")
+#
 #    def draw(self):
 #        if self.namespace.has_key("draw"):
 #            self.namespace["draw"]()
 #        else:
-#            raise ShoeboxError("draw: There's no draw() method in input script")
-#            
+#            raise ShoebotError("draw: There's no draw() method in input script")
+#
 
 class OptionsContainer:
     def __init__(self):

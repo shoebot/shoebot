@@ -1,29 +1,29 @@
 '''
-Experimental GTK front-end for Shoebox
+Experimental GTK front-end for Shoebot
 
 - implements the gobject-based socket server from
   http://roscidus.com/desktop/node/413
 '''
 
 import sys, gtk, random, StringIO
-import shoebox
+import shoebot
 import gobject, socket
 from pprint import pprint
 
-class ShoeboxCanvas(gtk.DrawingArea):
+class ShoebotCanvas(gtk.DrawingArea):
     def __init__(self, mainwindow, inputfilename):
-        super(ShoeboxCanvas, self).__init__()
+        super(ShoebotCanvas, self).__init__()
         self.connect("expose_event", self.expose)
-        
+
         self.infile = inputfilename
-        self.box = shoebox.Box(gtkmode=True)
+        self.box = shoebot.Box(gtkmode=True)
         self.box.run(self.infile)
         # set the window size to the one specified in the script
 #        self.set_size_request(self.box.namespace['WIDTH'], self.box.namespace['HEIGHT'])
         self._width = self.box.namespace['WIDTH']
         self._height = self.box.namespace['HEIGHT']
-        
-        
+
+
     def expose(self, widget, event):
         '''Handle GTK expose events.'''
         # reset context
@@ -33,28 +33,28 @@ class ShoeboxCanvas(gtk.DrawingArea):
         self.context.rectangle(event.area.x, event.area.y,
                             event.area.width, event.area.height)
         self.context.clip()
-        
-        # attach box to context
-        self.box.setsurface(target=self.context)  
-        self.box.namespace['setup']()            
 
-#        pprint(self.box.namespace['variables']) 
-        self.draw()	
+        # attach box to context
+        self.box.setsurface(target=self.context)
+        self.box.namespace['setup']()
+
+#        pprint(self.box.namespace['variables'])
+        self.draw()
         return False
-    
+
     def redraw(self,dummy='moo'):
         '''Handle redraws.'''
         # dummy is in the arguments because GTK seems to require it, but works
         # fine with any value, so we get away with this hack
         self.queue_draw()
-    
+
     def draw(self):
         self.box.namespace['draw']()
-        
+
 
 class MainWindow:
     def __init__(self,filename):
-        self.canvas = ShoeboxCanvas(self, filename)
+        self.canvas = ShoebotCanvas(self, filename)
 
     def run(self):
         '''Setup the main GTK window.'''
@@ -63,7 +63,7 @@ class MainWindow:
         self.canvas.set_size_request(self.canvas._width, self.canvas._height)
         window.add(self.canvas)
         window.show_all()
-        
+
         gtk.main()
 
 # ---- SOCKET SERVER ----
@@ -75,14 +75,14 @@ class MainWindow:
         self.sock.listen(1)
         print "Listening..."
         gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
-     
+
     def listener(self, sock, *args):
         '''Asynchronous connection listener. Starts a handler for each connection.'''
         self.conn, self.addr = self.sock.accept()
         print "Connected"
         gobject.io_add_watch(self.conn, gobject.IO_IN, self.handler)
         return True
-     
+
     def handler(self, conn, *args):
         '''Asynchronous connection handler. Processes each line from the socket.'''
         line = self.conn.recv(4096)
@@ -105,7 +105,7 @@ class MainWindow:
                 return True
             else:
                 return True
-                
+
 # --------
 
 if __name__ == "__main__":

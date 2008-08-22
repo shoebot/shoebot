@@ -1,5 +1,5 @@
 '''
-Shoebox data structures for bezier path handling
+Shoebot data structures for bezier path handling
 '''
 
 import util
@@ -14,7 +14,7 @@ CLOSE = "close"
 
 DEBUG = False
 
-class ShoeboxError(Exception): pass
+class ShoebotError(Exception): pass
 
 class Point:
     '''
@@ -49,7 +49,7 @@ class Point:
 
 class BezierPath:
     """
-    Shoebox implementation of Nodebox's BezierPath wrapper.
+    Shoebot implementation of Nodebox's BezierPath wrapper.
     While Nodebox relies on Cocoa/QT for its data structures,
     this is more of an "agnostic" implementation that won't
     require any other back-ends to work with paths.
@@ -114,14 +114,14 @@ class BezierPath:
         don't rely on it :o)
         '''
         self.segment_cache = None
-        
+
         ## TODO
         # Initial check, we should check for
         # - points
         # - tuples
         # - list
         # - PathElement
-        
+
         # check if we got [x,y] as an argument
         if isinstance(args, list) and len(args) == 2 and isinstanceargs[0]:
             # does the path have something?
@@ -135,7 +135,7 @@ class BezierPath:
             x = args[0]
             y = args[1]
             self.data.append(PathElement(cmd, x, y))
-        
+
         elif isinstance(args,list):
             for el in pathElements:
                 if isinstance(el, (list, tuple)):
@@ -215,14 +215,14 @@ class PathElement:
             return "(CURVETO, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f)" % (self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)
         elif self.cmd == CLOSE:
             return "(CLOSE, 0.0, 0.0)"
-            
+
     def __eq__(self, other):
         if other is None: return False
         if self.cmd != other.cmd: return False
         return self.x == other.x and self.y == other.y \
             and self.c1x == other.c1x and self.c1y == other.c1y \
             and self.c1x == other.c1x and self.c1y == other.c1y
-        
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -236,23 +236,23 @@ class Color(object):
     Mode and range are mandatory arguments so we know how we need to parse
     the input and make sure output works.
 
-    Shoebox's color() includes these arguments on the object constructor; they should be used in
+    Shoebot's color() includes these arguments on the object constructor; they should be used in
     any other case where color() is not enough and a direct call to Color() is needed.
     '''
-    
+
     # This code is still very messy, recovering from a big bug hunt. But works!
 
     def __init__(self, mode=RGB, crange=1, *args):
         # check for proper input
         if not isinstance(mode, basestring):
             raise TypeError("ERROR: Color() was called with an invalid mode argument (" + str(mode) + ")")
-        
-        if DEBUG: 
+
+        if DEBUG:
             print "-----------------------------------------"
             print "DEBUG(Color): __init__ args: " + str(args)
             print "DEBUG(Color): range: " + str(crange)
             print "DEBUG(Color): mode: " + str(mode)
-        
+
         if len(args) == 1 and isinstance(args[0], tuple):
             if DEBUG: print "DEBUG(Color): got a tuple: " + str(args[0])
             clr = args[0]
@@ -271,7 +271,7 @@ class Color(object):
                 if DEBUG: print "DEBUG(Color): Got a 2 element tuple"
                 clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,clr[1])
             else:
-                raise ShoeboxError("Wrong colour tuple")
+                raise ShoebotError("Wrong colour tuple")
         elif len(args) == 1 and args[0] is None:
             if DEBUG: print "DEBUG(Color): Got nothing, defaulting to black"
             clr = (0,0,0,1)
@@ -307,7 +307,7 @@ class Color(object):
         else:
             if DEBUG: print "DEBUG(Color): WARNING: Couldn't parse input, defaulting to black"
             clr = (0,0,0,1)
-        
+
         # debug device for warning when a colour is not inside expected values
         warn = False
         for value in clr:
@@ -316,23 +316,23 @@ class Color(object):
         if warn and DEBUG:
             if DEBUG: print "WARNING(Color): Output color is not a float between 0 and 1"
             if DEBUG: print str(clr)
-        
+
         self.red = clr[0]
         self.green = clr[1]
         self.blue = clr[2]
         self.alpha = clr[3]
-        
-        if DEBUG: 
+
+        if DEBUG:
             print "DEBUG(Color): Color set to (" + ', '.join((str(self.red), str(self.green), str(self.blue), str(self.alpha))) + ")"
             print
-        
+
         #print self.red, self.green, self.blue, self.alpha
 
         clr_hsb = util.rgb_to_hsl(self.red, self.green, self.blue)
         self.hue = clr_hsb[0]
         self.saturation = clr_hsb[1]
         self.lightness = clr_hsb[2]
-        
+
     def get_rgb(self,colorrange):
         colorrange = float(colorrange)
         return (self.red*colorrange,self.green*colorrange,self.blue*colorrange)
@@ -357,7 +357,7 @@ class Color(object):
 
     def __str__(self):
         return str(self.get_rgba(1))
-    
+
     def __div__(self, other):
         value = float(other)
         return (self.red/value, self.green/value, self.blue/value, self.alpha/value)

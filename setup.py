@@ -2,14 +2,14 @@
 
 from distutils.core import setup
 
-setup(name = "shoebox",
+setup(name = "shoebot",
       version = "0.2",
-      description = "Shoebox - a Pythonic vector graphics scripting application",
+      description = "Shoebot - a Pythonic vector graphics scripting application",
       author = "ricardo lafuente",
       author_email = "r@sollec.org",
       license = 'GPL v3',
-      url = "http://shoebox.sollec.org",
-      packages = ["shoebox",
+      url = "http://shoebot.sollec.org",
+      packages = ["shoebot",
                   ],
       data_files = [("share/examples", ["examples/primitives.py",
                                         "examples/socketcontrol.pd",
@@ -19,8 +19,8 @@ setup(name = "shoebox",
                     ],
       scripts = ["sbox"],
       long_description = """
-Shoebox is a runtime for reading Nodebox source files. It
+Shoebot is a runtime for reading Nodebox source files. It
 implements Nodebox's domain-specific language through Cairo.
-"""          
-)    
-      
+"""
+)
+

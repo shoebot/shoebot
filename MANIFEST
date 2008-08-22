@@ -1,6 +1,6 @@
 README
 setup.py
-shoeBox
+sbot
 examples/blocks_neat.py
 examples/blocks_rep.py
 examples/primitives.py
@@ -8,8 +8,8 @@ examples/socketcontrol.pd
 examples/socketcontrol.py
 examples/socketcontrol2.py
 examples/text.py
-shoebox/__init__.py
-shoebox/data.py
-shoebox/gtkui.py
-shoebox/gtkvars.py
-shoebox/util.py
+shoebot/__init__.py
+shoebot/data.py
+shoebot/gtkui.py
+shoebot/gtkvars.py
+shoebot/util.py
