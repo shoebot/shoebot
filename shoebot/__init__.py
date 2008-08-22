@@ -693,7 +693,7 @@ class Box:
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
         import random
-        if v1 != None and v2 == None:
+        if v1 is not None and v2 is None:
             if isinstance(v1, float):
                 return random.random() * v1
             else:
@@ -853,17 +853,16 @@ class Box:
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + "\n\n", "<Untitled>", "exec")
+                source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
             # do the magic
             exec source_or_code in self.namespace
         except:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-            import traceback, sys
-            print "Exception in user code:"
-            print '-='*20
+            import traceback
+            import sys
+            print "Exception in Shoebot code:"
             traceback.print_exc(file=sys.stdout)
-            print '-='*20
             sys.exit()
 
 #    def setup(self):
