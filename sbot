@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
 '''
-Shoebox console runner
+Shoebot console runner
 
-Copyright 2007, 2008 Ricardo Lafuente 
+Copyright 2007, 2008 Ricardo Lafuente
 Developed at the Piet Zwart Institute, Rotterdam
 
-This file is part of Shoebox.
+This file is part of Shoebot.
 '''
 
 import sys
 import os
 
 
-import shoebox
+import shoebot
 
 #------------------------------------------------------
 # command-line option-parsing functions
@@ -60,7 +60,7 @@ def getopt(arg, tail, opt, default):
         return float(value)
     return value
 
-usage_header = """Shoebox console runner
+usage_header = """Shoebot console runner
 
     Usage: python console.py <inputscript> <outputfile> [options]
     Accepted output extensions: svg, ps, pdf, png
@@ -114,7 +114,7 @@ def getopts(argv, options):
 
 #------------------------------------------------------
 
-default_inputscript = '/usr/local/share/shoebox/share/examples/primitives.py'
+default_inputscript = '/usr/local/share/shoebot/share/examples/primitives.py'
 default_gtk_inputscript = 'letters.py'
 default_outputfile = 'output.png'
 
@@ -123,18 +123,18 @@ if __name__ == '__main__':
     # process CLI options
     options = { 'verbose': False,
                 'debug': False,
-                
+
                 'gtk': False,
                 'socketserver': False,
                 'inputscript': default_inputscript,
                 'outputfile': default_outputfile,
                 }
     this = sys.argv[0]
-    files = getopts(sys.argv, options)                
-    
+    files = getopts(sys.argv, options)
+
     if not options['gtk']:
         # Command line oneshot mode
-    
+
         # check for extraneous options
         if options['socketserver']:
             print 'Socketserver is only available on GTK mode.'
@@ -147,10 +147,10 @@ if __name__ == '__main__':
             options['outputfile'] = default_outputfile
         # start one-shot commandline processing
         # create a Box instance
-        box = shoebox.Box(outputfile = options['outputfile'])
+        box = shoebot.Box(outputfile = options['outputfile'])
         # run it, and then its setup and draw methods, if they're there
         # (running setup() and draw() isn't always desirable, but for image
-        # output it helps to have the final image as a GTK canvas would 
+        # output it helps to have the final image as a GTK canvas would
         # display it)
         box.run(options['inputscript'])
         if 'setup' in box.namespace:
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     else:
         # GTK frontend
         import sys
-        from shoebox import gtkui
+        from shoebot import gtkui
         if options['outputfile'] is not default_outputfile:
             print 'GTK mode does not take an output file argument.'
             usage(this, options)
@@ -173,5 +173,5 @@ if __name__ == '__main__':
         if options['socketserver']:
             win.server('',7777)
         win.run()
-        
+
 

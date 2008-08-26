@@ -8,3 +8,4 @@ dist/*
 *.pyo
 # backup files
 *.bak
+*~
