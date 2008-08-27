@@ -1,7 +1,7 @@
 include README
-include setup.py
-include shoebox/__init__.py
-include shoebox/data.py
-include shoebox/gtkui.py
-include shoebox/util.py
+include sbot
+include shoebot/__init__.py
+include shoebot/data.py
+include shoebot/gtkui.py
+include shoebot/util.py
 recursive-include examples *

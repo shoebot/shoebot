@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name = "shoebot",
       version = "0.2",
-      description = "Shoebot - a vector graphics scripting application",
+      description = "A vector graphics scripting application",
       author = "ricardo lafuente",
       author_email = "r@sollec.org",
       license = 'GPL v3',
@@ -19,8 +19,10 @@ setup(name = "shoebot",
                     ],
       scripts = ["sbot"],
       long_description = """
-Shoebot is a runtime for reading Nodebox source files. It
-implements Nodebox's domain-specific language through Cairo.
+Shoebot is a Python application for vector scripting.
+It implements some shortcuts around the intricacies of Cairo,
+and can also run external scripts and quickly generate image
+outputs, as well as operating in realtime in windowed (GTK) mode.
 """
 )
 
