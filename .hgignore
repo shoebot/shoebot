@@ -1,5 +1,8 @@
 syntax: glob
 
+# ignore apps for now
+apps/*
+
 # ignore build and dist output
 build/*
 dist/*
