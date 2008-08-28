@@ -45,8 +45,6 @@ class Box:
     The Box class is an abstraction to hold a Cairo surface, context and all
     methods to access and manipulate it (the Nodebox language is
     implemented here).
-
-
     '''
 
     inch = 72
@@ -72,10 +70,9 @@ class Box:
 #        if self.targetfilename:
 #            self.surfacetype = self.targetfilename.split('.')[-1]
 #        else:
+
         self.surface = None
-
         self.gtkmode = gtkmode
-
         self.vars = {}
         self.namespace = {}
 
@@ -157,6 +154,7 @@ class Box:
     def rectmode(mode=None):
         if mode in (CORNER, CENTER, CORNERS):
             self.opt.rectmode = mode
+            return self.opt.rectmode
         elif mode is None:
             return self.opt.rectmode
         else:
