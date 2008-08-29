@@ -52,21 +52,9 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.box.namespace['draw']()
 
 
-class MainWindow:
-    def __init__(self,filename):
-        self.canvas = ShoebotCanvas(self, filename)
 
-    def run(self):
-        '''Setup the main GTK window.'''
-        window = gtk.Window()
-        window.connect("destroy", gtk.main_quit)
-        self.canvas.set_size_request(self.canvas._width, self.canvas._height)
-        window.add(self.canvas)
-        window.show_all()
 
-        gtk.main()
-
-# ---- SOCKET SERVER ----
+class SocketServerMixin:
     def server(self, host, port):
         '''Initialize server and start listening.'''
         self.sock = socket.socket()
@@ -106,7 +94,21 @@ class MainWindow:
             else:
                 return True
 
-# --------
+
+class MainWindow(SocketServerMixin):
+    def __init__(self,filename):
+        self.canvas = ShoebotCanvas(self, filename)
+
+    def run(self):
+        '''Setup the main GTK window.'''
+        window = gtk.Window()
+        window.connect("destroy", gtk.main_quit)
+        self.canvas.set_size_request(self.canvas._width, self.canvas._height)
+        window.add(self.canvas)
+        window.show_all()
+
+        gtk.main()
+
 
 if __name__ == "__main__":
     import sys
