@@ -827,7 +827,9 @@ class Box:
         '''Defines the variables that can be externally set.
 
         Accepts a dictionary with variable names assigned
-        to default values.
+        to default values. If called more than once, it updates
+        already existing values and adds new keys to accomodate
+        new entries.
         '''
         if not isinstance(args, dict):
             raise ShoebotError('setvars(): setvars needs a dict!')
@@ -902,10 +904,11 @@ class OptionsContainer:
         ## self.fillrule
 
 
+
 if __name__ == "__main__":
     print '''
     This file can only be used as a Python module.
-    Use console.py for commandline use.
+    Use the 'sbot' script for commandline use.
     '''
     import sys
     sys.exit()
