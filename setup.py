@@ -12,10 +12,10 @@ setup(name = "shoebot",
       packages = ["shoebot",
                   ],
       data_files = [("share/shoebot/examples", ["examples/primitives.bot",
-                                        "examples/socketcontrol.pd",
+                                  "examples/socketcontrol.pd",
                                         "examples/socketcontrol.bot",
                                         "examples/socketcontrol2.bot",
-                                        ])
+                                  ])
                     ],
       scripts = ["sbot"],
       long_description = """
