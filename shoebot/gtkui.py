@@ -11,7 +11,7 @@ import gobject, socket
 from pprint import pprint
 
 class ShoebotCanvas(gtk.DrawingArea):
-    def __init__(self, mainwindow, inputfilename):
+    def __init__(self, mainwindow, inputfilename, box = None):
         super(ShoebotCanvas, self).__init__()
         self.connect("expose_event", self.expose)
 
@@ -19,10 +19,7 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.box = shoebot.Box(gtkmode=True)
         self.box.run(self.infile)
         # set the window size to the one specified in the script
-#        self.set_size_request(self.box.namespace['WIDTH'], self.box.namespace['HEIGHT'])
-        self._width = self.box.namespace['WIDTH']
-        self._height = self.box.namespace['HEIGHT']
-
+        self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
 
     def expose(self, widget, event):
         '''Handle GTK expose events.'''
@@ -103,7 +100,6 @@ class MainWindow(SocketServerMixin):
         '''Setup the main GTK window.'''
         window = gtk.Window()
         window.connect("destroy", gtk.main_quit)
-        self.canvas.set_size_request(self.canvas._width, self.canvas._height)
         window.add(self.canvas)
         window.show_all()
 
