@@ -34,13 +34,12 @@ Subject to the terms of the GPLv2 or any later version.
 '''
 
 def rgb_to_hsl(r, g, b):
-    '''
-    Taken from Inkscape.
-    Copyright (C) 2006 Jos Hirth, kaioa.com
-    Subject to the terms of the GPLv2 or any later version.
+    '''Converts RGB values to the HSL colourspace. '''
 
-    Converts RGB values to the HSL colourspace.
-    '''
+    # Taken from Inkscape.
+    # Copyright (C) 2006 Jos Hirth, kaioa.com
+    # Subject to the terms of the GPLv2 or any later version.
+
     rgb_max = max (max (r, g), b)
     rgb_min = min (min (r, g), b)
     delta = rgb_max - rgb_min
@@ -70,9 +69,12 @@ def rgb_to_hsl(r, g, b):
     return hsl
 
 def hue_2_rgb (v1, v2, h):
-    '''
-    Taken from Inkscape.
-    '''
+    '''Helper function for converting HSL to RGB '''
+
+    # Taken from Inkscape.
+    # Copyright (C) 2006 Jos Hirth, kaioa.com
+    # Subject to the terms of the GPLv2 or any later version.
+
     if h < 0:
         h += 6.0
     if h > 6:
@@ -86,10 +88,12 @@ def hue_2_rgb (v1, v2, h):
     return v1
 
 def hsl_to_rgb (h, s, l):
-    '''
-    Taken from Inkscape
-    Convert HSL values to RGB
-    '''
+    '''Converts HSL values to RGB.'''
+
+    # Taken from Inkscape.
+    # Copyright (C) 2006 Jos Hirth, kaioa.com
+    # Subject to the terms of the GPLv2 or any later version.
+
     rgb = [0, 0, 0]
     if s == 0:
         rgb[0] = l
@@ -108,11 +112,11 @@ def hsl_to_rgb (h, s, l):
 
 _initialized = False
 def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):
-    '''
-    Freetype font face loader
-    Taken from the Cairo cookbook
-    http://cairographics.org/freetypepython/
-    '''
+    '''Freetype font face loader'''
+
+    # Taken from the Cairo cookbook
+    # http://cairographics.org/freetypepython/
+
     import ctypes
     import cairo
     global _initialized
@@ -169,37 +173,36 @@ def surfacefromfilename(outfile, width, height):
     Creates a Cairo surface according to the filename extension,
     since Cairo requires the type of surface (svg, pdf, ps, png) to
     be specified on creation.
-
-    TODO: Move this function to main shoebot module?
     '''
     # convert to ints, cairo.ImageSurface is picky
     width = int(width)
     height = int(height)
 
-    import cairo
+    import cairo, os
+
     # check across all possible formats and create the appropriate kind of surface
     # and also be sure that Cairo was built with support for that
-    ext = outfile[-3:]
-
-    if ext == 'svg':
+    filename, ext = os.path.splitext(outfile)
+    if ext == '.svg':
         if not cairo.HAS_SVG_SURFACE:
                 raise SystemExit ('cairo was not compiled with SVG support')
         surface = cairo.SVGSurface(outfile, width, height)
 
-    elif ext == 'ps':
+    elif ext == '.ps':
         if not cairo.HAS_PS_SURFACE:
                 raise SystemExit ('cairo was not compiled with PostScript support')
         surface = cairo.PSSurface(outfile, width, height)
 
-    elif ext == 'pdf':
+    elif ext == '.pdf':
         if not cairo.HAS_PDF_SURFACE:
                 raise SystemExit ('cairo was not compiled with PDF support')
         surface = cairo.PDFSurface(outfile, width, height)
 
-    elif ext == 'png':
+    elif ext == '.png':
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
     else:
+        surface = None
         raise NameError("%s is not a valid extension" % ext)
 
     return surface
