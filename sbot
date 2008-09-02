@@ -9,16 +9,19 @@ Developed at the Piet Zwart Institute, Rotterdam
 This file is part of Shoebot.
 '''
 
-import sys
+import sys, os
 import shoebot
 
-DEFAULT_SCRIPT = '/usr/local/share/shoebot/share/examples/primitives.py'
-DEFAULT_WINDOW_SCRIPT = '/usr/local/share/shoebot/share/examples/socketcontrol2.py'
+DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
+DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
 DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
+OUTPUT_EXTENSIONS = ('png','svg','ps','pdf')
+
 def run_oneshot(script, file):
-    '''Run a Shoebot script and save output to an image file.'''
+    ''' Oneshot mode:
+    Run a Shoebot script and save output to an image file.'''
     # create a Box instance
     box = shoebot.Box(outputfile = file)
 
@@ -34,7 +37,8 @@ def run_oneshot(script, file):
     box.finish()
 
 def run_window(script, server=False, port=DEFAULT_SERVERPORT):
-    '''Run a Shoebot script in a GTK window.'''
+    ''' Windowed mode:
+    Run a Shoebot script in a GTK window.'''
     win = gtkui.MainWindow(script)
     if server:
         win.server('', port)
@@ -72,7 +76,7 @@ parser.add_option("-p",
 
 if __name__ == '__main__':
 
-    # get optparse arguments
+    # get optparse arguments and check for sanity
     (options, args) = parser.parse_args()
 
     if not args and not options.window:
@@ -90,6 +94,7 @@ if __name__ == '__main__':
 
     inputscript = args[0]
 
+    # all checked, make it happen
     if not options.window:
         # oneshot mode - output to file
         if not options.outputfile:
@@ -97,6 +102,11 @@ if __name__ == '__main__':
             outputfile = DEFAULT_OUTPUTFILE
         else:
             outputfile = options.outputfile
+            # is it a valid extension?
+            filename, extension = os.path.splitext(filename)
+            if not extension in OUTPUT_EXTENSIONS:
+                raise ShoebotError("Error: Invalid extension in output filename")
+
         run_oneshot(inputscript, outputfile)
     else:
         # windowed mode - run on a GTK window
@@ -106,4 +116,4 @@ if __name__ == '__main__':
             print
             parser.print_help()
             sys.exit()
-        run_window(inputscript, server = options.socketserver, port = options.serverport)
+        run_window(inputscript, server=options.socketserver, port=options.serverport)
