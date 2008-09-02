@@ -13,7 +13,7 @@ import sys
 import shoebot
 
 DEFAULT_SCRIPT = '/usr/local/share/shoebot/share/examples/primitives.py'
-DEFAULT_WINDOW_SCRIPT = 'letters.py'
+DEFAULT_WINDOW_SCRIPT = '/usr/local/share/shoebot/share/examples/socketcontrol2.py'
 DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
@@ -44,6 +44,11 @@ def run_window(script, server=False, port=DEFAULT_SERVERPORT):
 # use OptionParser to interpret commandline options
 from optparse import OptionParser
 parser = OptionParser("usage: %prog [options] inputfile.bot")
+parser.add_option("-o",
+                "--outputfile",
+                dest="outputfile",
+                help="run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)",
+                metavar="FILE")
 parser.add_option("-w",
                 "--window",
                 action="store_true",
@@ -63,11 +68,7 @@ parser.add_option("-p",
                 dest="serverport",
                 default=DEFAULT_SERVERPORT,
                 help="set socketserver port to listen for connections (default is 7777)")
-parser.add_option("-o",
-                "--outputfile",
-                dest="outputfile",
-                help="run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)",
-                metavar="FILE")
+
 
 if __name__ == '__main__':
 
