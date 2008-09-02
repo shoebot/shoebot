@@ -117,7 +117,8 @@ class Box:
             width = width - x
             height = height - y
         elif self.opt.rectmode == CENTER:
-            raise NotImplementedError
+            x = x - width / 2
+            y = y - height / 2
         elif self.opt.rectmode == CORNER:
             pass
 
