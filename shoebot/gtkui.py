@@ -61,7 +61,7 @@ class SocketServerMixin:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((host, port))
         self.sock.listen(1)
-        print "Listening..."
+        print "Listening on port %s..." % (port)
         gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
