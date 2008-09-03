@@ -92,9 +92,6 @@ if __name__ == '__main__':
 
     if len(args) > 1:
         error("Too many arguments!")
-        print
-        parser.print_help()
-        sys.exit()
 
     inputscript = args[0]
 

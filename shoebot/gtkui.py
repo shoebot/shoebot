@@ -11,13 +11,12 @@ import gobject, socket
 from pprint import pprint
 
 class ShoebotCanvas(gtk.DrawingArea):
-    def __init__(self, mainwindow, inputfilename, box = None):
+    def __init__(self, mainwindow, box = None):
         super(ShoebotCanvas, self).__init__()
         self.connect("expose_event", self.expose)
 
-        self.infile = inputfilename
-        self.box = shoebot.Box(gtkmode=True)
-        self.box.run(self.infile)
+        self.box = box
+        self.box.run()
         # set the window size to the one specified in the script
         self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
 
@@ -48,9 +47,7 @@ class ShoebotCanvas(gtk.DrawingArea):
     def draw(self):
         self.box.namespace['draw']()
 
-
-
-
+# additional functions for MainWindow
 class SocketServerMixin:
     def server(self, host, port):
         '''Initialize server and start listening.'''
@@ -58,7 +55,7 @@ class SocketServerMixin:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((host, port))
         self.sock.listen(1)
-        print "Listening on port %s..." % (port)
+        print "Listening on port %i..." % (port)
         gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
@@ -94,7 +91,8 @@ class SocketServerMixin:
 
 class MainWindow(SocketServerMixin):
     def __init__(self,filename):
-        self.canvas = ShoebotCanvas(self, filename)
+        box = shoebot.Box(gtkmode=True, inputfile = filename)
+        self.canvas = ShoebotCanvas(self, box)
 
     def run(self):
         '''Setup the main GTK window.'''
@@ -106,8 +104,8 @@ class MainWindow(SocketServerMixin):
         gtk.main()
 
 
-if __name__ == "__main__":
-    import sys
-    win = MainWindow('letter_h_obj.py')
-    win.server('',7777)
-    win.run()
+##if __name__ == "__main__":
+##    import sys
+##    win = MainWindow('letter_h_obj.py')
+##    win.server('',7777)
+##    win.run()

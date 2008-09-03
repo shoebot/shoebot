@@ -57,7 +57,9 @@ class Box:
     CORNER = "corner"
     CORNERS = "corners"
 
-    def __init__ (self, outputfile = None, gtkmode=False):
+    def __init__ (self, outputfile = None, gtkmode=False, inputfile = None):
+
+        self.inputfile = inputfile
         self.targetfilename = outputfile
         # create options object
         self.opt = OptionsContainer()
@@ -846,11 +848,16 @@ class Box:
         for key in vardict:
             self.namespace[key] = vardict[key]
 
-    def run(self,filename):
+    def run(self, filename=None):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
         '''
+
+        if not filename:
+            if not self.inputfile:
+                raise ShoebotError("run() needs an input file name (if none was specified when creating the Box instance)")
+            filename = self.inputfile
 
         file = open(filename, 'rU')
         source_or_code = file.read()
