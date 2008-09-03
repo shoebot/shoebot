@@ -14,7 +14,7 @@ def flow(w, h):
     global _total_w
     if _total_w + w*2 >= WIDTH:
         translate(-_total_w, h)
-        _total_w = 0 
+        _total_w = 0
     else:
         translate(w, 0)
         _total_w += w

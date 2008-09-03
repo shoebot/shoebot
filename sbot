@@ -103,7 +103,7 @@ if __name__ == '__main__':
         else:
             outputfile = options.outputfile
             # is it a valid extension?
-            filename, extension = os.path.splitext(filename)
+            filename, extension = os.path.splitext(outputfile)
             if not extension in OUTPUT_EXTENSIONS:
                 raise ShoebotError("Error: Invalid extension in output filename")
 
