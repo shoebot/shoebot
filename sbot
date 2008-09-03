@@ -17,7 +17,7 @@ DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
 DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
-OUTPUT_EXTENSIONS = ('png','svg','ps','pdf')
+OUTPUT_EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 def run_oneshot(script, file):
     ''' Oneshot mode:
@@ -73,6 +73,13 @@ parser.add_option("-p",
                 default=DEFAULT_SERVERPORT,
                 help="set socketserver port to listen for connections (default is 7777)")
 
+def error(message):
+    '''Prints an error message, the help message and quits'''
+    global parser
+    print "Error: " + message
+    print
+    parser.print_help()
+    sys.exit()
 
 if __name__ == '__main__':
 
@@ -80,14 +87,11 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     if not args and not options.window:
-        print "Error: Please specify an input script!"
-        print "(check /usr/share/shoebot/examples/ for example scripts)"
-        print
-        parser.print_help()
-        sys.exit()
+        error('''Please specify an input script!
+        (check /usr/share/shoebot/examples/ for example scripts)''')
 
     if len(args) > 1:
-        print "Error: Too many arguments!"
+        error("Too many arguments!")
         print
         parser.print_help()
         sys.exit()
@@ -105,15 +109,12 @@ if __name__ == '__main__':
             # is it a valid extension?
             filename, extension = os.path.splitext(outputfile)
             if not extension in OUTPUT_EXTENSIONS:
-                raise ShoebotError("Error: Invalid extension in output filename")
+                error("Invalid extension in output filename")
 
         run_oneshot(inputscript, outputfile)
     else:
         # windowed mode - run on a GTK window
         from shoebot import gtkui
         if options.outputfile:
-            print 'Error: Windowed mode does not take an output file argument.'
-            print
-            parser.print_help()
-            sys.exit()
+            error('Windowed mode does not take an output file argument.')
         run_window(inputscript, server=options.socketserver, port=options.serverport)
