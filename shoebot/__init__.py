@@ -722,13 +722,11 @@ class Box:
     from random import choice
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
-        """
-        Returns an iterator that contains coordinate tuples.
+        """Returns an iterator that contains coordinate tuples.
         The grid can be used to quickly create grid-like structures.
         A common way to use them is:
             for x, y in grid(10,10,12,12):
                 rect(x,y, 10,10)
-
         """
         # Taken ipsis verbis from Nodebox
 
@@ -743,12 +741,9 @@ class Box:
 
     def files(self, path="*"):
         """Returns a list of files.
-
         You can use wildcards to specify which files to pick, e.g.
             f = files('*.gif')
-
         """
-
         # Taken ipsis verbis from Nodebox
         from glob import glob
         return glob(path)

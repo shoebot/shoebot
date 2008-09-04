@@ -1,8 +1,8 @@
 '''
 Experimental GTK front-end for Shoebot
 
-- implements the gobject-based socket server from
-  http://roscidus.com/desktop/node/413
+implements the gobject-based socket server from
+http://roscidus.com/desktop/node/413
 '''
 
 import sys, gtk, random, StringIO
@@ -14,7 +14,7 @@ class ShoebotCanvas(gtk.DrawingArea):
     def __init__(self, mainwindow, box = None):
         super(ShoebotCanvas, self).__init__()
         self.connect("expose_event", self.expose)
-
+        # get the box object to display
         self.box = box
         self.box.run()
         # set the window size to the one specified in the script
