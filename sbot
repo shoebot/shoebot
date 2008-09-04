@@ -39,7 +39,7 @@ def run_oneshot(script, file):
 def run_window(script, server=False, port=DEFAULT_SERVERPORT):
     ''' Windowed mode:
     Run a Shoebot script in a GTK window.'''
-    win = gtkui.MainWindow(script)
+    win = gtkui.ShoebotWindow(script)
     if server:
         win.server('', port)
     win.run()

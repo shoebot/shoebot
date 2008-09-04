@@ -89,9 +89,9 @@ class SocketServerMixin:
                 return True
 
 
-class MainWindow(SocketServerMixin):
-    def __init__(self,filename):
-        box = shoebot.Box(gtkmode=True, inputfile = filename)
+class ShoebotWindow(SocketServerMixin):
+    def __init__(self, code=None):
+        box = shoebot.Box(gtkmode=True, inputscript=code)
         self.canvas = ShoebotCanvas(self, box)
 
     def run(self):

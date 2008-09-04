@@ -57,9 +57,9 @@ class Box:
     CORNER = "corner"
     CORNERS = "corners"
 
-    def __init__ (self, outputfile = None, gtkmode=False, inputfile = None):
+    def __init__ (self, outputfile = None, gtkmode=False, inputscript=None):
 
-        self.inputfile = inputfile
+        self.inputscript = inputscript
         self.targetfilename = outputfile
         # create options object
         self.opt = OptionsContainer()
@@ -69,9 +69,6 @@ class Box:
         # init temp value holders
         self._fill = None
         self._stroke = None
-#        if self.targetfilename:
-#            self.surfacetype = self.targetfilename.split('.')[-1]
-#        else:
 
         self.surface = None
         self.gtkmode = gtkmode
@@ -843,20 +840,30 @@ class Box:
         for key in vardict:
             self.namespace[key] = vardict[key]
 
-    def run(self, filename=None):
+    def run(self, inputcode=None):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
         '''
 
-        if not filename:
-            if not self.inputfile:
-                raise ShoebotError("run() needs an input file name (if none was specified when creating the Box instance)")
-            filename = self.inputfile
+        source_or_code = ""
 
-        file = open(filename, 'rU')
-        source_or_code = file.read()
-        file.close()
+        if not inputcode:
+        # no input? see if box was created with an input file name or string
+            if not self.inputscript:
+                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Box instance)")
+            inputcode = self.inputscript
+
+        import os
+        # is it a proper filename?
+        if os.path.exists(self.inputscript):
+            filename = self.inputfile
+            file = open(filename, 'rU')
+            source_or_code = file.read()
+            file.close()
+        else:
+            # if not, try parsing it as a code string
+            source_or_code = inputcode
 
         for name in dir(self):
             # get all stuff in the Box namespaces
