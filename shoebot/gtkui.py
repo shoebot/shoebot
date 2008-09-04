@@ -7,6 +7,7 @@ http://roscidus.com/desktop/node/413
 
 import sys, gtk, random, StringIO
 import shoebot
+import cairo
 import gobject, socket
 from pprint import pprint
 
@@ -16,12 +17,19 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.connect("expose_event", self.expose)
         # get the box object to display
         self.box = box
+
+        # make a dummy surface and context, otherwise scripts without draw()
+        # and/or setup() will bork badly
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
+        self.box.setsurface(target=surface)
         self.box.run()
+
         # set the window size to the one specified in the script
         self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
 
     def expose(self, widget, event):
         '''Handle GTK expose events.'''
+
         # reset context
         self.context = None
         self.context = widget.window.cairo_create()
@@ -32,10 +40,16 @@ class ShoebotCanvas(gtk.DrawingArea):
 
         # attach box to context
         self.box.setsurface(target=self.context)
-        self.box.namespace['setup']()
+        if 'setup' in self.box.namespace:
+            self.box.namespace['setup']()
+        if 'draw' in self.box.namespace:
+            self.draw()
 
-#        pprint(self.box.namespace['variables'])
-        self.draw()
+        # no setup() or draw() means we have to run the script on each step
+        if not 'setup' in self.box.namespace and not 'setup' in self.box.namespace:
+            self.box.run()
+
+##        self.draw()
         return False
 
     def redraw(self,dummy='moo'):
@@ -45,7 +59,8 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self):
-        self.box.namespace['draw']()
+        if 'draw' in self.box.namespace:
+            self.box.namespace['draw']()
 
 # additional functions for MainWindow
 class SocketServerMixin:
@@ -87,6 +102,8 @@ class SocketServerMixin:
                 return True
             else:
                 return True
+
+    def __del__(self):
 
 
 class ShoebotWindow(SocketServerMixin):
