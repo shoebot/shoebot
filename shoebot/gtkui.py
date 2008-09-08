@@ -103,10 +103,6 @@ class SocketServerMixin:
             else:
                 return True
 
-    def __del__(self):
-        if self.sock:
-            self.sock.close()
-
 
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777):
@@ -126,8 +122,7 @@ class ShoebotWindow(SocketServerMixin):
 
         gtk.main()
 
-    def do_quit(self, event):
-        print event
+    def do_quit(self, widget):
         if self.has_server:
             self.sock.close()
         gtk.main_quit()

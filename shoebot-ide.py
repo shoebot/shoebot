@@ -7,6 +7,8 @@ import sys, os, errno
 import gtk
 import pango
 
+from pygments.lexers import PythonLexer
+from pygments.styles.pastie import PastieStyle
 
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
@@ -232,124 +234,7 @@ class Buffer(gtk.TextBuffer):
         elif (event.type == gtk.gdk.KEY_PRESS or
               event.type == gtk.gdk.KEY_RELEASE):
             print "Key event at char %d tag `%s'\n" % (char_index, tag_name)
-
         return False
-
-    def init_tags(self):
-        colormap = TestText.colormap
-        color = colormap.alloc_color(0, 0, 0xffff)
-
-        # general font style
-        tag = self.create_tag("base",
-                                font='Inconsolata 10')
-        # tag.connect("event", self.tag_event_handler)
-
-        tag = self.create_tag("fg_blue",
-                                foreground_gdk=color,
-                                background='yellow',
-                                size_points=24.0)
-        tag.connect("event", self.tag_event_handler)
-
-        color = colormap.alloc_color(0xffff, 0, 0)
-        tag = self.create_tag("fg_red",
-                                rise= -4*Buffer.PANGO_SCALE,
-                                foreground_gdk=color)
-        tag.connect("event", self.tag_event_handler)
-
-        color = colormap.alloc_color(0, 0xffff, 0)
-        tag = self.create_tag("bg_green",
-                                background_gdk=color,
-                                size_points=10.0)
-        tag.connect("event", self.tag_event_handler)
-
-        tag = self.create_tag("strikethrough",
-                                strikethrough=True)
-        tag.connect("event", self.tag_event_handler)
-
-        tag = self.create_tag("underline",
-                                underline=pango.UNDERLINE_SINGLE)
-        tag.connect("event", self.tag_event_handler)
-
-        tag = self.create_tag("centered",
-                                justification=gtk.JUSTIFY_CENTER)
-
-        tag = self.create_tag("rtl_quote",
-                                wrap_mode=gtk.WRAP_WORD,
-                                direction=gtk.TEXT_DIR_RTL,
-                                indent=30,
-                                left_margin=20,
-                                right_margin=20)
-
-        tag = self.create_tag("negative_indent",
-                                indent=-25)
-
-    def fill_example_buffer(self):
-        tagtable = self.get_tag_table()
-        if not tagtable.lookup("fg_blue"):
-            self.init_tags()
-        iter = self.get_iter_at_offset(0)
-        anchor = self.create_child_anchor(iter)
-        self.set_data("anchor", anchor)
-
-        for i in range(100):
-            iter = self.get_iter_at_offset(0)
-            str = "%d Hello World! blah blah blah blah blah blah blah blah blah blah blah blah\nwoo woo woo woo woo woo woo woo woo woo woo woo woo woo woo\n" % i
-            self.insert(iter, str)
-
-            iter = self.get_iter_at_line_offset(0, 5)
-            self.insert(iter,
-                          "(Hello World!)\nfoo foo Hello this is some text we are using to text word wrap. It has punctuation! gee; blah - hmm, great.\nnew line with a significant quantity of text on it. This line really does contain some text. More text! More text! More text!\n"
-                          "German (Deutsch Süd) Grüß Gott Greek (Ελληνικά) Γειά σας Hebrew(שלום) Hebrew punctuation(\xd6\xbfש\xd6\xbb\xd6\xbc\xd6\xbb\xd6\xbfל\xd6\xbcו\xd6\xbc\xd6\xbb\xd6\xbb\xd6\xbfם\xd6\xbc\xd6\xbb\xd6\xbf) Japanese (日本語) Thai (สวัสดีครับ) Thai wrong spelling (คำต่อไปนื่สะกดผิด พัั้ัั่งโกะ)\n")
-
-            temp_mark = self.create_mark("tmp_mark", iter, True);
-
-            iter = self.get_iter_at_line_offset(0, 6)
-            iter2 = self.get_iter_at_line_offset(0, 13)
-            self.apply_tag_by_name("fg_blue", iter, iter2)
-
-            iter = self.get_iter_at_line_offset(1, 10)
-            iter2 = self.get_iter_at_line_offset(1, 16)
-            self.apply_tag_by_name("underline", iter, iter2)
-
-            iter = self.get_iter_at_line_offset(1, 14)
-            iter2 = self.get_iter_at_line_offset(1, 24)
-            self.apply_tag_by_name("strikethrough", iter, iter2)
-
-            iter = self.get_iter_at_line_offset(0, 9)
-            iter2 = self.get_iter_at_line_offset(0, 16)
-            self.apply_tag_by_name("bg_green", iter, iter2)
-
-            iter = self.get_iter_at_line_offset(4, 2)
-            iter2 = self.get_iter_at_line_offset(4, 10)
-            self.apply_tag_by_name("bg_green", iter, iter2)
-
-            iter = self.get_iter_at_line_offset(4, 8)
-            iter2 = self.get_iter_at_line_offset(4, 15)
-            self.apply_tag_by_name("fg_red", iter, iter2)
-
-            iter = self.get_iter_at_mark(temp_mark)
-            self.insert(iter, "Centered text!\n")
-
-            iter2 = self.get_iter_at_mark(temp_mark)
-            self.apply_tag_by_name("centered", iter2, iter)
-
-            self.move_mark(temp_mark, iter)
-            self.insert(iter, "Word wrapped, Right-to-left Quote\n")
-            self.insert(iter, "وقد بدأ ثلاث من أكثر المؤسسات تقدما في شبكة اكسيون برامجها كمنظمات لا تسعى للربح، ثم تحولت في السنوات الخمس الماضية إلى مؤسسات مالية منظمة، وباتت جزءا من النظام المالي في بلدانها، ولكنها تتخصص في خدمة قطاع المشروعات الصغيرة. وأحد أكثر هذه المؤسسات نجاحا هو »بانكوسول« في بوليفيا.\n")
-            iter2 = self.get_iter_at_mark(temp_mark)
-            self.apply_tag_by_name("rtl_quote", iter2, iter)
-
-            self.insert_with_tags(iter,
-                                    "Paragraph with negative indentation. blah blah blah blah blah. The quick brown fox jumped over the lazy dog.\n",
-                                    self.get_tag_table().lookup("negative_indent"))
-
-        print "%d lines %d chars\n" % (self.get_line_count(),
-                                       self.get_char_count())
-
-        # Move cursor to start
-        iter = self.get_iter_at_offset(0)
-        self.place_cursor(iter)
-        self.set_modified(False)
 
     def fill_file_buffer(self, filename):
         try:
@@ -369,15 +254,6 @@ class Buffer(gtk.TextBuffer):
         f.close()
         self.set_text(buf)
         self.set_modified(False)
-
-        # apply general text style
-
-        tagtable = self.get_tag_table()
-        if not tagtable.lookup("base"):
-            self.init_tags()
-
-        start, end = self.get_bounds()
-        self.apply_tag_by_name("base", start, end)
 
         return True
 
@@ -499,6 +375,7 @@ class View(gtk.Window):
             ( "/File/E_xit", "<control>Q" , self.do_exit, 0, None ),
             ( "/_Edit", None, None, 0, "<Branch>" ),
             ( "/Edit/Find...", None, self.do_search, 0, None ),
+            ( "/Edit/Apply syntax highlighting", None, self.do_colorize_syntax, 0, None ),
             ( "/_Settings", None, None, 0, "<Branch>" ),
             ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
             ( "/Settings/Wrap _Words", None, self.do_wrap_changed, gtk.WRAP_WORD, "/Settings/Wrap Off" ),
@@ -574,11 +451,11 @@ class View(gtk.Window):
 
         # Make sure border width works, no real reason to do this other
         # than testing
-        self.text_view.set_border_width(10)
+        # self.text_view.set_border_width(10)
 
         # Draw tab stops in the top and bottom windows.
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_TOP, 15)
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_BOTTOM, 15)
+        # self.text_view.set_border_window_size(gtk.TEXT_WINDOW_TOP, 15)
+        # self.text_view.set_border_window_size(gtk.TEXT_WINDOW_BOTTOM, 15)
 
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
@@ -586,8 +463,10 @@ class View(gtk.Window):
 
         # Draw line numbers in the side windows; we should really be
         # more scientific about what width we set them to.
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_RIGHT, 30)
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_LEFT, 30)
+        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_RIGHT, 0)
+        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_LEFT, 20)
+
+        self.text_view.modify_font(pango.FontDescription('Inconsolata 9'))
 
         self.text_view.connect("expose_event", self.line_numbers_expose)
 
@@ -642,6 +521,7 @@ class View(gtk.Window):
         else:
             buffer.filename = filename
             buffer.filename_set()
+            self.do_colorize_syntax()
             return True;
 
     def do_open(self, callback_action, widget):
@@ -656,7 +536,7 @@ class View(gtk.Window):
         TestText.active_window_stack.push(self)
         buffer = self.text_view.get_buffer()
         if not buffer.filename:
-            self.do_save_as(callback_data, callback_action)
+            self.do_save_as(None, callback_action)
         else:
             buffer.save_buffer()
             TestText.active_window_stack.pop()
@@ -674,13 +554,6 @@ class View(gtk.Window):
 
         gtk.main_quit()
         TestText.active_window_stack.pop()
-
-    def do_example(self, callback_action, widget):
-        new_view = self.get_empty_view()
-        buffer = new_view.text_view.get_buffer()
-        buffer.fill_example_buffer()
-
-        new_view.add_example_widgets()
 
     def do_insert_and_scroll(self, callback_action, widget):
         buffer = self.text_view.get_buffer()
@@ -700,48 +573,8 @@ class View(gtk.Window):
     def do_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
 
-    def do_direction_changed(self, callback_action, widget):
-        self.text_view.set_direction(callback_action)
-        self.text_view.queue_resize()
-
-    def do_spacing_changed(self, callback_action, widget):
-        if callback_action:
-            self.text_view.set_pixels_above_lines(23)
-            self.text_view.set_pixels_below_lines(21)
-            self.text_view.set_pixels_inside_wrap(9)
-        else:
-            self.text_view.set_pixels_above_lines(0)
-            self.text_view.set_pixels_below_lines(0)
-            self.text_view.set_pixels_inside_wrap(0)
-
-    def do_editable_changed(self, callback_action, widget):
-        self.text_view.set_editable(callback_action)
-
-    def do_cursor_visible_changed(self, callback_action, widget):
-        self.text_view.set_cursor_visible(callback_action)
-
     def do_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
-
-    def do_apply_editable(self, callback_action, widget):
-        buffer = self.text_view.get_buffer()
-        bounds = buffer.get_selection_bounds()
-        if bounds:
-            start, end = bounds
-            if callback_action:
-                buffer.remove_tag(buffer.not_editable_tag, start, end)
-            else:
-                buffer.apply_tag(buffer.not_editable_tag, start, end)
-
-    def do_apply_invisible(self, callback_action, widget):
-        buffer = self.text_view.get_buffer()
-        bounds = buffer.get_selection_bounds()
-        if bounds:
-            start, end = bounds
-            if callback_action:
-                buffer.remove_tag(buffer.invisible_tag, start, end)
-            else:
-                buffer.apply_tag(buffer.invisible_tag, start, end)
 
     def do_apply_tabs(self, callback_action, widget):
         buffer = self.text_view.get_buffer()
@@ -752,6 +585,64 @@ class View(gtk.Window):
                 buffer.remove_tag(buffer.custom_tabs_tag, start, end)
             else:
                 buffer.apply_tag(buffer.custom_tabs_tag, start, end)
+
+    def do_colorize_syntax(self, action=None, widget=None):
+        '''Apply syntax coloring via Pygments.'''
+
+        #  :copyright: 2007 by Armin Ronacher.
+        #  :license: GNU GPL.
+        #
+
+        # oldbuf = self.text_view.get_buffer()
+        buf = self.text_view.get_buffer()
+        # buf = Buffer()
+        styles = {}
+
+        buffer_is_saved = True
+
+        if buf.get_modified():
+            buffer_is_saved = False
+
+
+        # get the buffer text
+        start, end = buf.get_bounds()
+        codestring = buf.get_text(start, end)
+        SOURCE = codestring
+        STYLE = PastieStyle
+
+        # clear the buffer
+        buf.set_text("")
+
+        # and now insert the colorized text
+        for token, value in PythonLexer().get_tokens(SOURCE):
+            while not STYLE.styles_token(token) and token.parent:
+                token = token.parent
+            if token not in styles:
+                styles[token] = buf.create_tag()
+            start = buf.get_end_iter()
+            buf.insert_with_tags(start, value.encode('utf-8'), styles[token])
+
+        for token, tag in styles.iteritems():
+            style = STYLE.style_for_token(token)
+            if style['bgcolor']:
+                tag.set_property('background', '#' + style['bgcolor'])
+            if style['color']:
+                tag.set_property('foreground', '#' + style['color'])
+            if style['bold']:
+                tag.set_property('weight', pango.WEIGHT_BOLD)
+            if style['italic']:
+                tag.set_property('style', pango.STYLE_ITALIC)
+            if style['underline']:
+                tag.set_property('underline', pango.UNDERLINE_SINGLE)
+
+        # set modifier flag so that colorizing doesn't mess with
+        # modified state
+        if buffer_is_saved:
+            buf.set_modified(False)
+
+        self.text_view.set_buffer(buf)
+
+        return False
 
     def do_apply_colors(self, callback_action, widget):
         buffer = self.text_view.get_buffer()
