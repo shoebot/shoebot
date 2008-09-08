@@ -104,21 +104,33 @@ class SocketServerMixin:
                 return True
 
     def __del__(self):
+        if self.sock:
+            self.sock.close()
 
 
 class ShoebotWindow(SocketServerMixin):
-    def __init__(self, code=None):
+    def __init__(self, code=None, server=False, serverport=7777):
         box = shoebot.Box(gtkmode=True, inputscript=code)
         self.canvas = ShoebotCanvas(self, box)
+        self.has_server = server
+        self.serverport = serverport
 
     def run(self):
         '''Setup the main GTK window.'''
         window = gtk.Window()
-        window.connect("destroy", gtk.main_quit)
+        window.connect("destroy", self.do_quit)
         window.add(self.canvas)
+        if self.has_server:
+            self.server('', self.serverport)
         window.show_all()
 
         gtk.main()
+
+    def do_quit(self, event):
+        print event
+        if self.has_server:
+            self.sock.close()
+        gtk.main_quit()
 
 
 ##if __name__ == "__main__":

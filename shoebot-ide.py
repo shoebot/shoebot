@@ -1126,9 +1126,7 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
 
-        sbot_window = gtkui.ShoebotWindow(codestring)
-        if use_socketserver:
-            sbot_window.server('',7777)
+        sbot_window = gtkui.ShoebotWindow(codestring, use_socketserver, 7777)
         sbot_window.run()
 
 class Stack(list):
