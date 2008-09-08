@@ -857,10 +857,11 @@ class Box:
         import os
         # is it a proper filename?
         if os.path.exists(self.inputscript):
-            filename = self.inputfile
+            filename = self.inputscript
             file = open(filename, 'rU')
             source_or_code = file.read()
             file.close()
+
         else:
             # if not, try parsing it as a code string
             source_or_code = inputcode

@@ -46,7 +46,8 @@ class ShoebotCanvas(gtk.DrawingArea):
             self.draw()
 
         # no setup() or draw() means we have to run the script on each step
-        if not 'setup' in self.box.namespace and not 'setup' in self.box.namespace:
+        # FIXME: This actually makes static scripts run twice, not good.
+        if not 'setup' in self.box.namespace and not 'draw' in self.box.namespace:
             self.box.run()
 
 ##        self.draw()
