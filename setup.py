@@ -17,7 +17,7 @@ setup(name = "shoebot",
                                         "examples/socketcontrol2.bot",
                                         ])
                     ],
-      scripts = ["sbot"],
+      scripts = ["sbot", "shoebot-ide"],
       long_description = """
 Shoebot is a Python application for vector scripting.
 It implements some shortcuts around the intricacies of Cairo,
