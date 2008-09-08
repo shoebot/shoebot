@@ -32,11 +32,7 @@ from data import *
 
 VERBOSE = False
 DEBUG = False
-EXTENSIONS = ('png','svg','ps','pdf')
-
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
+EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 class ShoebotError(Exception): pass
 
@@ -57,7 +53,13 @@ class Box:
     NORMAL = "1"
     FORTYFIVE = "2"
 
-    def __init__ (self, outputfile = None, gtkmode=False):
+    CENTER = "center"
+    CORNER = "corner"
+    CORNERS = "corners"
+
+    def __init__ (self, outputfile = None, gtkmode=False, inputscript=None):
+
+        self.inputscript = inputscript
         self.targetfilename = outputfile
         # create options object
         self.opt = OptionsContainer()
@@ -67,14 +69,14 @@ class Box:
         # init temp value holders
         self._fill = None
         self._stroke = None
-#        if self.targetfilename:
-#            self.surfacetype = self.targetfilename.split('.')[-1]
-#        else:
 
         self.surface = None
         self.gtkmode = gtkmode
         self.vars = {}
         self.namespace = {}
+
+        self.WIDTH = None
+        self.HEIGHT = None
 
     def setsurface(self, width=None, height=None, target=None):
         '''Sets the surface on which the Box object will operate.
@@ -98,7 +100,12 @@ class Box:
             raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
 
     def makesurface(self, width, height, filename):
-        if isinstance(filename, basestring) and filename.split(".")[-1] in EXTENSIONS:
+        '''Checks argument sanity and makes an appropriate Cairo surface
+        from the given filename and width/height values.'''
+
+        import os
+        name, ext = os.path.splitext(filename)
+        if isinstance(filename, basestring) and ext in EXTENSIONS:
             self.surface = util.surfacefromfilename(filename,width,height)
             self.context = cairo.Context(self.surface)
         else:
@@ -113,12 +120,13 @@ class Box:
         '''
         # taken from Nodebox and modified
 
-        if self.opt.rectmode == CORNERS:
+        if self.opt.rectmode == self.CORNERS:
             width = width - x
             height = height - y
-        elif self.opt.rectmode == CENTER:
-            raise NotImplementedError
-        elif self.opt.rectmode == CORNER:
+        elif self.opt.rectmode == self.CENTER:
+            x = x - width / 2
+            y = y - height / 2
+        elif self.opt.rectmode == self.CORNER:
             pass
 
         # take care of fill and stroke arguments
@@ -151,8 +159,8 @@ class Box:
             self._fill = None
             self._stroke = None
 
-    def rectmode(mode=None):
-        if mode in (CORNER, CENTER, CORNERS):
+    def rectmode(self, mode=None):
+        if mode in (self.CORNER, self.CENTER, self.CORNERS):
             self.opt.rectmode = mode
             return self.opt.rectmode
         elif mode is None:
@@ -711,13 +719,11 @@ class Box:
     from random import choice
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
-        """
-        Returns an iterator that contains coordinate tuples.
+        """Returns an iterator that contains coordinate tuples.
         The grid can be used to quickly create grid-like structures.
         A common way to use them is:
             for x, y in grid(10,10,12,12):
                 rect(x,y, 10,10)
-
         """
         # Taken ipsis verbis from Nodebox
 
@@ -732,12 +738,9 @@ class Box:
 
     def files(self, path="*"):
         """Returns a list of files.
-
         You can use wildcards to specify which files to pick, e.g.
             f = files('*.gif')
-
         """
-
         # Taken ipsis verbis from Nodebox
         from glob import glob
         return glob(path)
@@ -837,15 +840,31 @@ class Box:
         for key in vardict:
             self.namespace[key] = vardict[key]
 
-    def run(self,filename):
+    def run(self, inputcode=None):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
         '''
 
-        file = open(filename, 'rU')
-        source_or_code = file.read()
-        file.close()
+        source_or_code = ""
+
+        if not inputcode:
+        # no input? see if box was created with an input file name or string
+            if not self.inputscript:
+                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Box instance)")
+            inputcode = self.inputscript
+
+        import os
+        # is it a proper filename?
+        if os.path.exists(self.inputscript):
+            filename = self.inputscript
+            file = open(filename, 'rU')
+            source_or_code = file.read()
+            file.close()
+
+        else:
+            # if not, try parsing it as a code string
+            source_or_code = inputcode
 
         for name in dir(self):
             # get all stuff in the Box namespaces
@@ -890,7 +909,7 @@ class OptionsContainer:
         self.strokecolor = Color(RGB,1,.2,.2,.2,1)
         self.strokewidth = 1.0
 
-        self.rectmode = CORNER
+        self.rectmode = 'corner'
 
         ## self.linecap
         ## self.linejoin

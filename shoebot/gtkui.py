@@ -1,31 +1,35 @@
 '''
 Experimental GTK front-end for Shoebot
 
-- implements the gobject-based socket server from
-  http://roscidus.com/desktop/node/413
+implements the gobject-based socket server from
+http://roscidus.com/desktop/node/413
 '''
 
 import sys, gtk, random, StringIO
 import shoebot
+import cairo
 import gobject, socket
 from pprint import pprint
 
 class ShoebotCanvas(gtk.DrawingArea):
-    def __init__(self, mainwindow, inputfilename):
+    def __init__(self, mainwindow, box = None):
         super(ShoebotCanvas, self).__init__()
         self.connect("expose_event", self.expose)
+        # get the box object to display
+        self.box = box
 
-        self.infile = inputfilename
-        self.box = shoebot.Box(gtkmode=True)
-        self.box.run(self.infile)
+        # make a dummy surface and context, otherwise scripts without draw()
+        # and/or setup() will bork badly
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
+        self.box.setsurface(target=surface)
+        self.box.run()
+
         # set the window size to the one specified in the script
-#        self.set_size_request(self.box.namespace['WIDTH'], self.box.namespace['HEIGHT'])
-        self._width = self.box.namespace['WIDTH']
-        self._height = self.box.namespace['HEIGHT']
-
+        self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
 
     def expose(self, widget, event):
         '''Handle GTK expose events.'''
+
         # reset context
         self.context = None
         self.context = widget.window.cairo_create()
@@ -36,10 +40,17 @@ class ShoebotCanvas(gtk.DrawingArea):
 
         # attach box to context
         self.box.setsurface(target=self.context)
-        self.box.namespace['setup']()
+        if 'setup' in self.box.namespace:
+            self.box.namespace['setup']()
+        if 'draw' in self.box.namespace:
+            self.draw()
 
-#        pprint(self.box.namespace['variables'])
-        self.draw()
+        # no setup() or draw() means we have to run the script on each step
+        # FIXME: This actually makes static scripts run twice, not good.
+        if not 'setup' in self.box.namespace and not 'draw' in self.box.namespace:
+            self.box.run()
+
+##        self.draw()
         return False
 
     def redraw(self,dummy='moo'):
@@ -49,11 +60,10 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self):
-        self.box.namespace['draw']()
+        if 'draw' in self.box.namespace:
+            self.box.namespace['draw']()
 
-
-
-
+# additional functions for MainWindow
 class SocketServerMixin:
     def server(self, host, port):
         '''Initialize server and start listening.'''
@@ -61,7 +71,7 @@ class SocketServerMixin:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((host, port))
         self.sock.listen(1)
-        print "Listening..."
+        print "Listening on port %i..." % (port)
         gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
@@ -95,23 +105,32 @@ class SocketServerMixin:
                 return True
 
 
-class MainWindow(SocketServerMixin):
-    def __init__(self,filename):
-        self.canvas = ShoebotCanvas(self, filename)
+class ShoebotWindow(SocketServerMixin):
+    def __init__(self, code=None, server=False, serverport=7777):
+        box = shoebot.Box(gtkmode=True, inputscript=code)
+        self.canvas = ShoebotCanvas(self, box)
+        self.has_server = server
+        self.serverport = serverport
 
     def run(self):
         '''Setup the main GTK window.'''
         window = gtk.Window()
-        window.connect("destroy", gtk.main_quit)
-        self.canvas.set_size_request(self.canvas._width, self.canvas._height)
+        window.connect("destroy", self.do_quit)
         window.add(self.canvas)
+        if self.has_server:
+            self.server('', self.serverport)
         window.show_all()
 
         gtk.main()
 
+    def do_quit(self, widget):
+        if self.has_server:
+            self.sock.close()
+        gtk.main_quit()
 
-if __name__ == "__main__":
-    import sys
-    win = MainWindow('letter_h_obj.py')
-    win.server('',7777)
-    win.run()
+
+##if __name__ == "__main__":
+##    import sys
+##    win = MainWindow('letter_h_obj.py')
+##    win.server('',7777)
+##    win.run()
