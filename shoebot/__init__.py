@@ -419,7 +419,13 @@ class Box:
         self.context.rotate(radians)
 
     def scale(self, x=1, y=None):
-        if y is None:
+        print "x: " + str(x)
+        print "y: " + str(y)
+
+        if x == 0 or y == 0:
+            print "Warning: Invalid matrix provided to scale(), values of 0 not allowed. Ignoring."
+            pass
+        elif y is None:
             self.context.scale(x,x)
         else:
             self.context.scale(x,y)
@@ -856,8 +862,8 @@ class Box:
 
         import os
         # is it a proper filename?
-        if os.path.exists(self.inputscript):
-            filename = self.inputscript
+        if os.path.exists(inputcode):
+            filename = inputcode
             file = open(filename, 'rU')
             source_or_code = file.read()
             file.close()

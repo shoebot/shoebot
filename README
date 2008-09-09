@@ -14,14 +14,26 @@ relies heavily on OSX's graphics and interface libraries.
 Installing Shoebot
 ------------------
 
+First thing is to install the appropriate dependencies. If this is your first
+time using Shoebot, you'll want to install all of them:
+
+Debian/Ubuntu:
+  sudo apt-get install python-cairo python-gtk2 python-gobject python-pygments
+
+Fedora:
+  yum install pycairo pycairo-devel pygtk2 pygtk2-devel pygobject2 \
+    pygobject2 pygobject2-devel
+
 For now, the only means of installing Shoebot is getting it from the source 
 repository. Shoebot uses Mercurial for version control. Mercurial is available
 on most major GNU/Linux distributions; fire up your terminal and type:
 
 Ubuntu/Debian: 
   sudo apt-get install mercurial
+
 Fedora: 
   yum install mercurial
+
 Gentoo: 
   emerge mercurial
 
@@ -41,6 +53,16 @@ install it proper:
 Running the Shoebot IDE
 -----------------------
 
+For your first taste of Shoebot, try running the Shoebot IDE by typing the
+following in your terminal:
+
+  shoebot-ide
+
+From there, try opening the primitives.bot example (in the examples/ dir under
+the dir where you downloaded the sources, or in /usr/share/shoebot/examples).
+After it's open, try running it (Run->Run script).
+You can now try tweaking the script values and running it again to see how
+each command behaves.
 
 Note: The Shoebot IDE is still in testing; please report all bugs or 
 inconsistencies you find at the Shoebot bugtracker.
@@ -62,6 +84,26 @@ done like so:
 The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
 
 You can find some example Shoebot scripts in /usr/share/shoebot/examples.
+
+Shoebot can also run in a window, which is useful for quick previews, as well
+as realtime manipulation of parameters. For this, just use the window flag:
+
+  sbot -w inputfile.bot
+
+For a list of extra options, type
+
+  sbot -h
+
+
+Further reading
+---------------
+
+The Shoebot website has quite a lot more information on what you can do with
+Shoebot, such as:
+
+  * running Shoebot as a Python module
+  * using the socketserver to have other programs control a Shoebot script
+  * using Shoebot to generate images via a CGI script
 
 
 Running Shoebot as a Python module
@@ -99,10 +141,6 @@ format output.
 You can even call external Shoebot/Nodebox scripts from your Python script:
 
   box.run("example.bot")
-
-Using the Shoebot socketserver
-------------------------------
-
 
 
 Links
