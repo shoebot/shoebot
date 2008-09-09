@@ -1,72 +1,85 @@
+Shoebot
+=======
 
-
-
-   Shoebox v0.1a
-   ricardo lafuente
-
-   ReadMe
+Ricardo Lafuente, 2008
 
 
 Description
-===========
+-----------
 
-Shoebox is a port/re-write of Nodebox (http://www.nodebox.net), a Python-based,
+Shoebot is a port/re-write of Nodebox (http://www.nodebox.net), a Python-based,
 Mac-only graphics programming environment. Nodebox is awesome, but sadly it 
 relies heavily on OSX's graphics and interface libraries.
 
+Installing Shoebot
+------------------
 
-Installing Shoebox
-==================
+For now, the only means of installing Shoebot is getting it from the source 
+repository. Shoebot uses Mercurial for version control. Mercurial is available
+on most major GNU/Linux distributions; fire up your terminal and type:
 
-For now, the only means of installing Shoebox is getting it from the source 
-repository. Shoebox uses Mercurial for version control. Mercurial is available
-on most major GNU/Linux distributions.
+Ubuntu/Debian: 
+  sudo apt-get install mercurial
+Fedora: 
+  yum install mercurial
+Gentoo: 
+  emerge mercurial
 
-Ubuntu/Debian: sudo apt-get install mercurial
-Gentoo: emerge mercurial
+Make a temporary directory to get the Shoebot source files, and then get
+the source itself.
 
-Make a new directory for your Shoebox project(s), and then run the following 
-command in your terminal:
+  mkdir shoebot-temp
+  cd shoebot-temp
+  hg clone https://code.goto10.org/hg/shoebot
 
-  hg clone http://hg.assembla.com/shoebox
+You should now see a new shoebot/ directory. The only remaining step is to
+install it proper:
 
-You should now see a new shoebox/ directory inside your project dir.
+  cd shoebot
+  sudo python setup.py install
+
+Running the Shoebot IDE
+-----------------------
 
 
+Note: The Shoebot IDE is still in testing; please report all bugs or 
+inconsistencies you find at the Shoebot bugtracker.
 
-Running Shoebox from the console
-================================
-It's probably appropriate to place your scripts inside the shoebox dir for now.
-(this is a makeshift solution until we have a proper package for Shoebox)
 
-Usage is rather straightforward:
+Running Shoebot from the console
+--------------------------------
 
-  python console.py script.py outputfile <width> <height>
+Using the Shoebot console runner is straightforward:
 
-* outputfile should have a valid extension (.svg, .ps, .pdf or .png), since
-  it will be autodetected by the script;
-* 'width' and 'height' are optional values; if not specified, the resulting
-  image will be 400x400 pixels (bitmap output) or 400x400 points (vector
-  output).
+  sbot inputfile.bot
 
-Try running the blocks_neat.py example in the shoebox/examples dir.
+This command will run the 'inputfile.bot' script, and create an output image
+file (output.png). You'll want to specify your own filename, which can be
+done like so:
 
-Running Shoebox as a Python module
-==================================
-Shoebox can also be loaded as a module. For now, scripts taking advantage of
-this must be placed inside the shoebox dir.
+  sbot inputfile.bot -o image.svg
+
+The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
+
+You can find some example Shoebot scripts in /usr/share/shoebot/examples.
+
+
+Running Shoebot as a Python module
+----------------------------------
+
+Shoebot can also be loaded as a module. For now, scripts taking advantage of
+this must be placed inside the shoebot dir.
 
 After including an import statement,
 
-  import shoebox
+  import shoebot
 
-a Box object needs to be created, and all further Nodebox commands can be 
+a Box object needs to be created, and all further drawing commands can be 
 called on that instance.
 
-Box should be called with the output file name as an argument. Width and
-height can also be specified - otherwise it defaults to a 400x400 canvas.
+The Box instance should be created with the output file name as an argument. 
 
-  box = shoebox.Box("output.svg",100,100)
+  box = shoebot.Box("output.svg")
   box.rect(10,10,100,100)
 
 When you're finished with drawing, just call
@@ -83,14 +96,41 @@ of the Box instance like so:
 Note that this doesn't work if your Box object was created with a vector
 format output.
 
-You can even call external Shoebox/Nodebox scripts from your Python script:
+You can even call external Shoebot/Nodebox scripts from your Python script:
 
-  box.run("script.py")
+  box.run("example.bot")
 
+Using the Shoebot socketserver
+------------------------------
+
+
+
+Links
+-----
+
+Source browser:		http://code.tinkerhouse.net/shoebot/hg
+Bug tracker:		http://code.tinkerhouse.net/shoebot/trac
+Mailing lists:          http://tinkerhouse.net/shoebot/lists
 
 Contact
-=======
+-------
+
 The author can be reached at ricardo _at_ sollec _dot_ org
 
+    Copyright (C) 2007, 2008  Ricardo Lafuente
+    Developed at the Piet Zwart Institute, Rotterdam
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
