@@ -36,10 +36,10 @@ def run_oneshot(script, file):
         box.namespace['draw']()
     box.finish()
 
-def run_window(script, server=False, port=DEFAULT_SERVERPORT):
+def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False):
     ''' Windowed mode:
     Run a Shoebot script in a GTK window.'''
-    win = gtkui.ShoebotWindow(script, server, port)
+    win = gtkui.ShoebotWindow(script, server, port, varwindow)
     win.run()
 
 
@@ -64,6 +64,12 @@ parser.add_option("-s",
                 dest="socketserver",
                 default=False,
                 help="run a socket server for external control (will run the script in windowed mode)")
+parser.add_option("-a",
+                "--variables",
+                action="store_true",
+                dest="varwindow",
+                default=False,
+                help="show a variable tweaking window (will run the script in windowed mode)")
 parser.add_option("-p",
                 "--serverport",
                 type="int",
@@ -112,4 +118,8 @@ if __name__ == '__main__':
         from shoebot import gtkui
         if options.outputfile:
             error('Windowed mode does not take an output file argument.')
-        run_window(inputscript, server=options.socketserver, port=options.serverport)
+
+        run_window(inputscript,
+                    server=options.socketserver,
+                    port=options.serverport,
+                    varwindow=options.varwindow)

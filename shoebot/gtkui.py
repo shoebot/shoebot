@@ -104,13 +104,64 @@ class SocketServerMixin:
             else:
                 return True
 
+class VarWindow:
+    def __init__(self, parent, box):
+        self.parent = parent
+
+        window = gtk.Window()
+        window.connect("destroy", self.do_quit)
+        vbox = gtk.VBox(homogeneous=True, spacing=20)
+
+        # set up sliders
+        variables = {}
+
+        for var in box.vars:
+            # did we set min and max bounds in addvar?
+            if var in box.var_bounds:
+                min = box.var_bounds[var][0]
+                max = box.var_bounds[var][1]
+            else:
+                min = 0.
+                max = 100.
+            value = box.vars[var]
+            # we need a 6-element tuple for GTK sliders
+            variables[var] = (value, min, max, .1, 2, 1)
+
+        for item in variables:
+            # create a slider for each var
+            sliderbox = gtk.HBox(homogeneous=False, spacing=0)
+            label = gtk.Label(item)
+            sliderbox.pack_start(label, False, True, 20)
+
+            adj = gtk.Adjustment(*variables[item])
+            adj.connect("value_changed", self.cb_set_var, item)
+            hscale = gtk.HScale(adj)
+            hscale.set_value_pos(gtk.POS_RIGHT)
+            sliderbox.pack_start(hscale, True, True, 0)
+            vbox.pack_end(sliderbox, True, True, 0)
+
+        window.add(vbox)
+        window.set_size_request(400,250)
+        window.show_all()
+        gtk.main()
+
+    def do_quit(self, widget):
+        gtk.main_quit()
+
+    def cb_set_var(self, adj, var):
+        ''' Called when a slider is adjusted. '''
+        # set the appropriate canvas var
+        self.parent.canvas.box.namespace[var] = float(adj.value)
+        # and redraw the canvas
+        self.parent.canvas.redraw()
 
 class ShoebotWindow(SocketServerMixin):
-    def __init__(self, code=None, server=False, serverport=7777):
-        box = shoebot.Box(gtkmode=True, inputscript=code)
-        self.canvas = ShoebotCanvas(self, box)
+    def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
+        self.box = shoebot.Box(gtkmode=True, inputscript=code)
+        self.canvas = ShoebotCanvas(self, self.box)
         self.has_server = server
         self.serverport = serverport
+        self.has_varwindow = varwindow
 
     def run(self):
         '''Setup the main GTK window.'''
@@ -120,6 +171,9 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_server:
             self.server('', self.serverport)
         window.show_all()
+
+        if self.has_varwindow:
+            VarWindow(self, self.box)
 
         gtk.main()
 

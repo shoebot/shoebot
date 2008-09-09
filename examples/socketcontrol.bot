@@ -22,30 +22,25 @@ size(200,200)
 #
 # NOTE that only floats are accepted for the moment
 
-variables = {
-    'one': 186.,
-    'two': 186.,
-    'three': 93.
-    }
-    
-# and pass them to shoebox
-setvars(variables)
-    
+addvar('one', 186., 0., 255.)
+addvar('two', 186., 0., 255.)
+addvar('three', 93., 0., 255.)
+
 def setup():
     # set the colour range to 255
     colorrange(255)
-      
+
 def draw():
     # khaki background
     background(76,102,51)
-    
+
     # use the outside variables to set the fill
     red = one
     green = two
     blue = three
-        
+
     fill(red, green, blue)
-    
+
     # draw the shape
     star(100, 100, 20, outer=25, inner=15)
 

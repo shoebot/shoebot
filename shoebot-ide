@@ -366,7 +366,6 @@ class View(gtk.Window):
         menu_items = [
             ( "/_File", None, None, 0, "<Branch>" ),
             ( "/File/_New", "<control>N", self.do_new, 0, None ),
-            # ( "/File/New _View", None, self.do_new_view, 0, None ),
             ( "/File/_Open", "<control>O", self.do_open, 0, None ),
             ( "/File/_Save", "<control>S", self.do_save, 0, None ),
             ( "/File/Save _As...", None, self.do_save_as, 0, None ),
@@ -413,7 +412,9 @@ class View(gtk.Window):
             # ( "/Test/A_dd focusable children", None, self.do_add_focus_children, 0, None ),
             ( "/_Run", None, None, 0, "<Branch>" ),
             ( "/Run/_Run script", "<control>R", self.run_script, False, None ),
-            ( "/Run/_Run script with socketserver", "<control><shift>R", self.run_script, True, None ),
+            ( "/Run/sep1", None, None, 0, "<Separator>" ),
+            ( "/Run/Run socket server", None, self.do_socketserver_changed, True, "<ToggleItem>"),
+            ( "/Run/Show variables window", None, self.do_varwindow_changed, True, "<ToggleItem>")
             ]
 
         if not buffer:
@@ -482,6 +483,10 @@ class View(gtk.Window):
 
         self.show_all()
 
+        # options toggle
+        self.use_varwindow = False
+        self.use_socketserver = False
+
     def delete_event_cb(self, window, event, data=None):
         TestText.active_window_stack.push(self)
         self.check_close_view()
@@ -507,9 +512,6 @@ class View(gtk.Window):
 
     def do_new(self, callback_action, widget):
         View()
-
-    def do_new_view(self, callback_action, widget):
-        View(self.text_view.get_buffer())
 
     def open_ok_func(self, filename):
         new_view = self.get_empty_view()
@@ -572,6 +574,12 @@ class View(gtk.Window):
 
     def do_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
+
+    def do_varwindow_changed(self, callback_action, widget):
+        self.use_varwindow = not self.use_varwindow
+
+    def do_socketserver_changed(self, callback_action, widget):
+        self.use_socketserver = not self.use_socketserver
 
     def do_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
@@ -674,10 +682,6 @@ class View(gtk.Window):
             start, end = bounds
             buffer.remove_all_tags(start, end)
 
-    def do_properties(self, callback_action, widget):
-        #create_prop_editor(view.text_view, 0)
-        pass
-
     def dialog_response_callback(self, dialog, response_id):
         if (response_id != RESPONSE_FORWARD and
             response_id != RESPONSE_BACKWARD):
@@ -712,125 +716,6 @@ class View(gtk.Window):
         search_text.grab_focus()
         dialog.show_all()
 
-    def movable_child_callback(self, child, event):
-        text_view = self.text_view
-        info = child.get_data("testtext-move-info")
-
-        if not info:
-            info = {}
-            info['start_x'] = -1
-            info['start_y'] = -1
-            info['button'] = -1
-            child.set_data("testtext-move-info", info)
-
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            if info['button'] < 0:
-                info['button'] = event.button
-                info['start_x'] = child.allocation.x
-                info['start_y'] = child.allocation.y
-                info['click_x'] = child.allocation.x + event.x
-                info['click_y'] = child.allocation.y + event.y
-        elif event.type == gtk.gdk.BUTTON_RELEASE:
-            if info['button'] < 0:
-                return False
-
-            if info['button'] == event.button:
-                info['button'] = -1;
-                # convert to window coords from event box coords
-                x = info['start_x'] + (event.x + child.allocation.x \
-                                       - info['click_x'])
-                y = info['start_y'] + (event.y + child.allocation.y \
-                                       - info['click_y'])
-                text_view.move_child(child, x, y)
-        elif gtk.gdk.MOTION_NOTIFY:
-            if info['button'] < 0:
-                return False
-            x, y = child.get_pointer() # ensure more events
-            # to window coords from event box coords
-            x += child.allocation.x
-            y += child.allocation.y
-            x = info['start_x'] + (x - info['click_x'])
-            y = info['start_y'] + (y - info['click_y'])
-            text_view.move_child(child, x, y)
-
-        return False
-
-    def add_movable_child(self, text_view, window):
-        label = gtk.Label("Drag me around")
-
-        event_box = gtk.EventBox()
-        event_box.add_events(gtk.gdk.BUTTON_PRESS_MASK |
-                             gtk.gdk.BUTTON_RELEASE_MASK |
-                             gtk.gdk.POINTER_MOTION_MASK |
-                             gtk.gdk.POINTER_MOTION_HINT_MASK)
-
-        color = TestText.colormap.alloc_color(0xffff, 0, 0)
-        event_box.modify_bg(gtk.STATE_NORMAL, color)
-        event_box.add(label)
-        event_box.show_all()
-
-        event_box.connect("event", self.movable_child_callback)
-
-        text_view.add_child_in_window(event_box, window, 0, 0)
-
-    def do_add_children(self, callback_action, widget):
-        text_view = self.text_view
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_WIDGET)
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_LEFT)
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_RIGHT)
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_TEXT)
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_TOP)
-        self.add_movable_child(text_view, gtk.TEXT_WINDOW_BOTTOM)
-
-    def do_add_focus_children(self, callback_action, widget):
-        text_view = self.text_view
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _A in widget.window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_WIDGET, 0, 200)
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _B in text.window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_TEXT, 50, 50)
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _T in top window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_TOP, 100, 0)
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _W in bottom window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_BOTTOM, 100, 0)
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _C in left window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_LEFT, 0, 50)
-
-        child = gtk.EventBox()
-        b = gtk.Button("Button _D in right window")
-        child.add(b)
-        text_view.add_child_in_window(child, gtk.TEXT_WINDOW_RIGHT, 0, 25)
-
-        buffer = text_view.get_buffer()
-        iter = buffer.get_start_iter()
-        anchor = buffer.create_child_anchor(iter)
-        child = gtk.Button("Button _E in buffer")
-        text_view.add_child_at_anchor(child, anchor)
-
-        anchor = buffer.create_child_anchor(iter)
-        child = gtk.Button("Button _F in buffer")
-        text_view.add_child_at_anchor(child, anchor)
-
-        anchor = buffer.create_child_anchor(iter)
-        child = gtk.Button("Button _G in buffer")
-        text_view.add_child_at_anchor(child, anchor)
-
-        # show all the buttons
-        text_view.show_all()
 
     def init_menus(self):
         text_view = self.text_view
@@ -884,15 +769,19 @@ class View(gtk.Window):
         # Redraw tab windows if the cursor moves
         # on the mapped widget (windows may not exist before realization...
 
-        text_view = self.text_view
-        if mark == buffer.get_insert():
-            tab_window = text_view.get_window(gtk.TEXT_WINDOW_TOP)
-            tab_window.invalidate_rect(None, False)
-            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
+        # I had to take this out because of pesky warnings
 
-            tab_window = text_view.get_window(gtk.TEXT_WINDOW_BOTTOM)
-            tab_window.invalidate_rect(None, False)
-            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
+        pass
+
+##        text_view = self.text_view
+##        if mark == buffer.get_insert():
+##            tab_window = text_view.get_window(gtk.TEXT_WINDOW_TOP)
+##            tab_window.invalidate_rect(None, False)
+##            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
+##
+##            tab_window = text_view.get_window(gtk.TEXT_WINDOW_BOTTOM)
+##            tab_window.invalidate_rect(None, False)
+##            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
 
     def tab_stops_expose(self, widget, event):
         #print self, widget, event
@@ -1009,7 +898,9 @@ class View(gtk.Window):
             self.text_view.add_child_at_anchor(widget, anchor)
             widget.show()
 
-    def run_script(self, use_socketserver, widget):
+
+
+    def run_script(self, callback_action, widget):
         from shoebot import gtkui
 
         # get the buffer contents
@@ -1017,7 +908,7 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
 
-        sbot_window = gtkui.ShoebotWindow(codestring, use_socketserver, 7777)
+        sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
         sbot_window.run()
 
 class Stack(list):

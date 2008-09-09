@@ -73,6 +73,7 @@ class Box:
         self.surface = None
         self.gtkmode = gtkmode
         self.vars = {}
+        self.var_bounds = {}
         self.namespace = {}
 
         self.WIDTH = None
@@ -700,17 +701,17 @@ class Box:
         #v = Variable(name, type, default, min, max, value)
         #v = self.addvar(v)
 
-    def addvar(self, v):
-        '''
-        NOT IMPLEMENTED
-        '''
-        raise NotImplementedError("addvar() isn't implemented yet")
-        #oldvar = self.findvar(v.name)
-        #if oldvar is not None:
-            #if oldvar.compliesTo(v):
-                #v.value = oldvar.value
-        #self._vars.append(v)
-        #self._ns[v.name] = v.value
+    def addvar(self, name, value, min=0., max=100.):
+        ''' Sets a new accessible variable.
+
+        Min and max values are used for the variable window UI.'''
+
+        # add it to the var dictionary for reference
+        self.vars[name] = float(value)
+        # put the min and max value in another dict
+        self.var_bounds[name] = (min, max)
+        # and append it to the namespace
+        self.namespace[name] = float(value)
 
     def findvar(self, name):
         '''
@@ -860,11 +861,14 @@ class Box:
         to default values. If called more than once, it updates
         already existing values and adds new keys to accomodate
         new entries.
+
+        Soon to be deprecated, use addvar() instead
         '''
         if not isinstance(args, dict):
             raise ShoebotError('setvars(): setvars needs a dict!')
         vardict = args
         for key in vardict:
+            self.vars[key] = vardict[key]
             self.namespace[key] = vardict[key]
 
     def run(self, inputcode=None):
