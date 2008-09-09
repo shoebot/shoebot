@@ -57,7 +57,7 @@ class Box:
     CORNER = "corner"
     CORNERS = "corners"
 
-    def __init__ (self, outputfile = None, gtkmode=False, inputscript=None):
+    def __init__ (self, inputscript=None, gtkmode=False, outputfile = None):
 
         self.inputscript = inputscript
         self.targetfilename = outputfile
