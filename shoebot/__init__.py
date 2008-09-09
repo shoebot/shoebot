@@ -427,15 +427,36 @@ class Box:
         else:
             self.context.scale(x,y)
 
-    def skew(self, x, y):
-        mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
-        self.context.transform(mtrx)
+    def skew(self, x=1, y=None):
+        if x in (-1,1):
+            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 1."
+            x = 0
+        if y in (-1,1):
+            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 1."
+            y = 0
+        elif y is None:
+            y = x
+            mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
+            self.context.transform(mtrx)
+        else:
+            mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
+            self.context.transform(mtrx)
+
+
 
     def save(self):
         #self.push_group()
         self.context.save()
 
     def restore(self):
+        #self.pop_group()
+        self.context.restore()
+
+    def push(self):
+        #self.push_group()
+        self.context.save()
+
+    def pop(self):
         #self.pop_group()
         self.context.restore()
 
@@ -476,7 +497,7 @@ class Box:
             return Color(self.opt.colormode, self.opt.colorrange, args[0])
         elif len(args) == 1 and isinstance(args,int):
             if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.colorrange, args)
+            return Color(self.opt.colormode, self.opt.colorrange, args, args, args)
         elif len(args) == 3:
             return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2])
         elif len(args) == 4:
@@ -528,7 +549,10 @@ class Box:
         '''Sets the background colour.'''
         if DEBUG: print "DEBUG(background): args:" + str(args)
         if len(args) > 0:
-            bgcolor = self.color(args)
+            if len(args) == 1:
+                bgcolor = self.color(args[0],args[0],args[0])
+            else:
+                bgcolor = self.color(args)
             r, g, b = bgcolor.get_rgb(1)
             self.context.set_source_rgb(r,g,b)
             self.context.paint()
