@@ -419,9 +419,6 @@ class Box:
         self.context.rotate(radians)
 
     def scale(self, x=1, y=None):
-        print "x: " + str(x)
-        print "y: " + str(y)
-
         if x == 0 or y == 0:
             print "Warning: Invalid matrix provided to scale(), values of 0 not allowed. Ignoring."
             pass
