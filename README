@@ -58,14 +58,14 @@ following in your terminal:
 
   shoebot-ide
 
-From there, try opening the primitives.bot example (in the examples/ dir under
+From there, open the primitives.bot example (in the examples/ dir under
 the dir where you downloaded the sources, or in /usr/share/shoebot/examples).
-After it's open, try running it (Run->Run script).
+After it's open, run it (Run->Run script).
 You can now try tweaking the script values and running it again to see how
 each command behaves.
 
-Note: The Shoebot IDE is still in testing; please report all bugs or 
-inconsistencies you find at the Shoebot bugtracker.
+Note: The Shoebot IDE is still in a testing phase and some things might break; 
+please report all bugs or inconsistencies you find at the Shoebot bugtracker.
 
 
 Running Shoebot from the console
