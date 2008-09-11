@@ -900,6 +900,11 @@ class Box:
         for name in dir(self):
             # get all stuff in the Box namespaces
             self.namespace[name] = getattr(self, name)
+
+        import data
+        for name in dir(data):
+            self.namespace[name] = getattr(data, name)
+
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
