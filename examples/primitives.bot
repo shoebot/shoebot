@@ -20,23 +20,23 @@ def flow(w, h):
         _total_w += w
 
 x, y = 10, 10
-print "drawing first rect"
+# first rect
 rect(x, y, 50, 50)
 flow(60, 60)
-print "drawing round rect"
+# drawing round rect
 rect(x, y, 50, 50, 0.6)
 flow(60, 60)
-print "drawing oval"
+# drawing oval
 oval(x, y, 50, 50)
 flow(60, 60)
-print "drawing star"
+# drawing star
 star(x+25, y+25, 20, outer=25, inner=15)
 flow(60, 60)
-print "drawing arrownormal"
+# drawing arrownormal
 arrow(x+50, y+25, 50)
 flow(60, 60)
-print "drawing arrowfortyfive"
+# drawing arrowfortyfive
 arrow(x+50, y, 50, type=FORTYFIVE)
 flow(60, 60)
-print "drawing oval"
+# drawing oval
 oval(x, y, 50, 50)
