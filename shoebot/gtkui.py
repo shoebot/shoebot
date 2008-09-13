@@ -128,17 +128,20 @@ class VarWindow:
             variables[var] = (value, min, max, .1, 2, 1)
 
         for item in variables:
-            # create a slider for each var
-            sliderbox = gtk.HBox(homogeneous=False, spacing=0)
-            label = gtk.Label(item)
-            sliderbox.pack_start(label, False, True, 20)
+            if not isinstance(item, float):
+                print "(VarWindow) Warning: Variable %s is not a float. Not appending to VarWindow"
+            else:
+                # create a slider for each var
+                sliderbox = gtk.HBox(homogeneous=False, spacing=0)
+                label = gtk.Label(item)
+                sliderbox.pack_start(label, False, True, 20)
 
-            adj = gtk.Adjustment(*variables[item])
-            adj.connect("value_changed", self.cb_set_var, item)
-            hscale = gtk.HScale(adj)
-            hscale.set_value_pos(gtk.POS_RIGHT)
-            sliderbox.pack_start(hscale, True, True, 0)
-            vbox.pack_end(sliderbox, True, True, 0)
+                adj = gtk.Adjustment(*variables[item])
+                adj.connect("value_changed", self.cb_set_var, item)
+                hscale = gtk.HScale(adj)
+                hscale.set_value_pos(gtk.POS_RIGHT)
+                sliderbox.pack_start(hscale, True, True, 0)
+                vbox.pack_end(sliderbox, True, True, 0)
 
         window.add(vbox)
         window.set_size_request(400,250)
