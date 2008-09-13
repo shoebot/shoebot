@@ -470,7 +470,7 @@ class View(gtk.Window):
         self.text_view.set_border_window_size(gtk.TEXT_WINDOW_RIGHT, 0)
         self.text_view.set_border_window_size(gtk.TEXT_WINDOW_LEFT, 20)
 
-        self.text_view.modify_font(pango.FontDescription('Inconsolata 9'))
+        self.text_view.modify_font(pango.FontDescription('Bitstream Vera Sans Mono 10'))
 
         self.text_view.connect("expose_event", self.line_numbers_expose)
 
