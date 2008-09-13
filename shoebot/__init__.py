@@ -430,10 +430,10 @@ class Box:
 
     def skew(self, x=1, y=None):
         if x in (-1,1):
-            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 1."
+            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 0."
             x = 0
         if y in (-1,1):
-            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 1."
+            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 0."
             y = 0
         elif y is None:
             y = x
