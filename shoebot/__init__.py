@@ -916,9 +916,17 @@ class Box:
             # maybe this is too verbose, but okay for now
             import traceback
             import sys
-            print "Exception in Shoebot code:"
-            traceback.print_exc(file=sys.stdout)
-            sys.exit()
+            
+            errmsg = traceback.format_exc()
+            
+#            print "Exception in Shoebot code:"
+#            traceback.print_exc(file=sys.stdout)
+            if not self.gtkmode:
+                sys.stderr.write(errmsg)
+                sys.exit()
+            else:
+                # if on gtkmode, print the error and don't break
+                sys.stderr.write(errmsg)
 
 #    def setup(self):
 #        if self.namespace.has_key("setup"):

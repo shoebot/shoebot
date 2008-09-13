@@ -10,6 +10,9 @@ import pango
 from pygments.lexers import PythonLexer
 from pygments.styles.pastie import PastieStyle
 
+# only necessary for ShoebotError
+import shoebot
+
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
@@ -769,7 +772,7 @@ class View(gtk.Window):
         # Redraw tab windows if the cursor moves
         # on the mapped widget (windows may not exist before realization...
 
-        # I had to take this out because of pesky warnings
+        # NOTE: I had to take this out because of pesky warnings -- ricardo
 
         pass
 
@@ -910,6 +913,8 @@ class View(gtk.Window):
 
         sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
         sbot_window.run()
+        
+        # TODO: have a try/except that shows an error window
 
 class Stack(list):
     def __init__(self):
