@@ -104,6 +104,11 @@ class SocketServerMixin:
             else:
                 return True
 
+NUMBER = 1
+TEXT = 2
+BOOLEAN = 3
+BUTTON = 4
+
 class VarWindow:
     def __init__(self, parent, box):
         self.parent = parent
@@ -113,48 +118,70 @@ class VarWindow:
         vbox = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
-        variables = {}
+        self.variables = []
 
-        for var in box.vars:
-            # did we set min and max bounds in addvar?
-            if var in box.var_bounds:
-                min = box.var_bounds[var][0]
-                max = box.var_bounds[var][1]
-            else:
-                min = 0.
-                max = 100.
-            value = box.vars[var]
-            # we need a 6-element tuple for GTK sliders
-            variables[var] = (value, min, max, .1, 2, 1)
-
-        for item in variables:
-            if not isinstance(item, float):
-                print "(VarWindow) Warning: Variable %s is not a float. Not appending to VarWindow"
-            else:
-                # create a slider for each var
-                sliderbox = gtk.HBox(homogeneous=False, spacing=0)
-                label = gtk.Label(item)
-                sliderbox.pack_start(label, False, True, 20)
-
-                adj = gtk.Adjustment(*variables[item])
-                adj.connect("value_changed", self.cb_set_var, item)
-                hscale = gtk.HScale(adj)
-                hscale.set_value_pos(gtk.POS_RIGHT)
-                sliderbox.pack_start(hscale, True, True, 0)
-                vbox.pack_end(sliderbox, True, True, 0)
+        for item in box.vars:
+            self.variables.append(item)
+            if item.type is NUMBER:
+                self.add_number(vbox, item)
+            elif item.type is TEXT:
+                self.add_text(vbox, item)
+            elif item.type is BOOLEAN:
+                self.add_boolean(vbox, item)
+            elif item.type is BUTTON:
+                self.add_button(vbox, item)
 
         window.add(vbox)
-        window.set_size_request(400,250)
+        window.set_size_request(400,35*len(self.variables))
         window.show_all()
         gtk.main()
+
+    def add_number(self, container, v):
+        # create a slider for each var
+        sliderbox = gtk.HBox(homogeneous=False, spacing=0)
+        label = gtk.Label(v.name)
+        sliderbox.pack_start(label, False, True, 20)
+
+        adj = gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
+        adj.connect("value_changed", self.cb_set_var, v)
+        hscale = gtk.HScale(adj)
+        hscale.set_value_pos(gtk.POS_RIGHT)
+        sliderbox.pack_start(hscale, True, True, 0)
+        container.pack_start(sliderbox, True, True, 0)
+
+    def add_text(self, container, v):
+        textcontainer = gtk.HBox(homogeneous=False, spacing=0)
+        label = gtk.Label(v.name)
+        textcontainer.pack_start(label, False, True, 20)
+
+        entry = gtk.Entry(max=0)
+        entry.set_text(v.value)
+        entry.connect("changed", self.cb_set_var, v)
+        textcontainer.pack_start(entry, True, True, 0)
+        container.pack_start(textcontainer, True, True, 0)
+
+    def add_boolean(self, v):
+        pass
+
+    def add_button(self, container, v):
+        buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
+        # in buttons, the varname is the function, so we use __name__
+        button = gtk.Button(label=v.name.__name__)
+        button.connect("clicked", self.parent.box.namespace[v.name], None)
+        buttoncontainer.pack_start(button, True, True, 0)
+        container.pack_start(buttoncontainer, True, True, 0)
+
 
     def do_quit(self, widget):
         gtk.main_quit()
 
-    def cb_set_var(self, adj, var):
+    def cb_set_var(self, widget, v):
         ''' Called when a slider is adjusted. '''
         # set the appropriate canvas var
-        self.parent.canvas.box.namespace[var] = float(adj.value)
+        if v.type is NUMBER:
+            self.parent.canvas.box.namespace[v.name] = widget.value
+        elif v.type is TEXT:
+            self.parent.canvas.box.namespace[v.name] = widget.get_text()
         # and redraw the canvas
         self.parent.canvas.redraw()
 

@@ -72,8 +72,8 @@ class Box:
 
         self.surface = None
         self.gtkmode = gtkmode
-        self.vars = {}
-        self.var_bounds = {}
+        self.vars = []
+        self._oldvars = self.vars
         self.namespace = {}
 
         self.WIDTH = None
@@ -694,35 +694,26 @@ class Box:
 
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
-        '''
-        NOT IMPLEMENTED
-        '''
-        raise NotImplementedError("var() isn't implemented yet")
-        #v = Variable(name, type, default, min, max, value)
-        #v = self.addvar(v)
+        v = Variable(name, type, default, min, max, value)
+        v = self.addvar(v)
 
-    def addvar(self, name, value, min=0., max=100.):
+    def addvar(self, v):
         ''' Sets a new accessible variable.
 
         Min and max values are used for the variable window UI.'''
 
-        # add it to the var dictionary for reference
-        self.vars[name] = float(value)
-        # put the min and max value in another dict
-        self.var_bounds[name] = (min, max)
-        # and append it to the namespace
-        self.namespace[name] = float(value)
+        oldvar = self.findvar(v.name)
+        if oldvar is not None:
+            if oldvar.compliesTo(v):
+                v.value = oldvar.value
+        self.vars.append(v)
+        self.namespace[v.name] = v.value
 
     def findvar(self, name):
-        '''
-        NOT IMPLEMENTED
-        '''
-        raise NotImplementedError("findvar() isn't implemented yet")
-        #for v in self._oldvars:
-            #if v.name == name:
-                #return v
-        #return None
-
+        for v in self._oldvars:
+            if v.name == name:
+                return v
+        return None
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
@@ -867,9 +858,8 @@ class Box:
         if not isinstance(args, dict):
             raise ShoebotError('setvars(): setvars needs a dict!')
         vardict = args
-        for key in vardict:
-            self.vars[key] = vardict[key]
-            self.namespace[key] = vardict[key]
+        for item in vardict:
+            self.var(item, NUMBER, vardict[item])
 
     def run(self, inputcode=None):
         '''
@@ -916,9 +906,9 @@ class Box:
             # maybe this is too verbose, but okay for now
             import traceback
             import sys
-            
+
             errmsg = traceback.format_exc()
-            
+
 #            print "Exception in Shoebot code:"
 #            traceback.print_exc(file=sys.stdout)
             if not self.gtkmode:
