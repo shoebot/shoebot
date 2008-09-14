@@ -892,10 +892,12 @@ class Box:
         source_or_code = ""
 
         if not inputcode:
-        # no input? see if box was created with an input file name or string
+        # no input? see if box has an input file name or string set
             if not self.inputscript:
                 raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Box instance)")
             inputcode = self.inputscript
+        else:
+            self.inputscript = inputcode
 
         import os
         # is it a proper filename?
@@ -904,7 +906,6 @@ class Box:
             file = open(filename, 'rU')
             source_or_code = file.read()
             file.close()
-
         else:
             # if not, try parsing it as a code string
             source_or_code = inputcode
