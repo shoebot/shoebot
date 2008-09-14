@@ -8,7 +8,7 @@ simplest example possible of external vars usage in Shoebox
 copyleft 2008 ricardo lafuente
 licensed under the GPLv3
 
-this file is part of Shoebox
+this file is part of Shoebot
 
 
 
@@ -24,26 +24,21 @@ size(200,200)
 #
 # NOTE that only floats are accepted for the moment
 
-variables = {
-    'one': 20.,
-    'two': 20.,
-    'three': 20.
-    }
-    
-# and pass them to shoebox
-setvars(variables)
-    
+# set our variables
+var('one',NUMBER, 20.,1.,50.)
+var('two',NUMBER, 20.,1.,50.)
+var('three',NUMBER, 20.,1.,50.)
 
-def block(x,y,z,hue): 
+def block(x,y,z,hue):
     '''
-    draw an isometric square prism; x,y are the coordinates of 
+    draw an isometric square prism; x,y are the coordinates of
     the BOTTOM-CENTER corner, z is the height
     '''
     #TODO : variables for width+depth instead of fixed value
-    
+
     # no strokes in the inside
     nostroke()
-    
+
     # LEFT FACE
     # first, set the color
     c = color(hue,40,120)
@@ -88,19 +83,19 @@ def block(x,y,z,hue):
     lineto(x, y-20-z)
     lineto(x+20, y-10-z)
     lineto(x+20, y-10)
-    endpath()    
+    endpath()
 
 def setup():
     # set the colour range to 255
     colorrange(255)
     colormode(HSB)
-      
+
 def draw():
     # khaki background
     background(76, 102, 51)
-    
+
     block(50, 180, one, hue=30)
     block(100, 180, two, hue=120)
     block(150, 180, three, hue=210)
-    
-    
+
+

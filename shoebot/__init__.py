@@ -810,19 +810,19 @@ class Box:
         Finishes the surface and writes it to the
         output file.
         '''
-
         # get the extension from the filename
-        f, ext = os.path.splitext(outfile)
+        import os
+        f, ext = os.path.splitext(self.targetfilename)
         # if this is a vector file, wrap up and finish
-        if ext in ("svg",".ps","pdf"):
+        if ext in (".svg",".ps",".pdf"):
             self.context.show_page()
             self.surface.finish()
         # but bitmap surfaces need us to tell them to save to a file
-        elif ext == "png":
+        elif ext == ".png":
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise ShoebotError("finish(): invalid extension")
+            raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
 
     def snapshot(self,filename=None, surface=None):
         '''Save the contents of current context into a file.
@@ -866,6 +866,26 @@ class Box:
             # write to file
             new_surface.write_to_png(filename)
         del new_surface
+
+    def export(self, filename=None):
+        '''Save the current windowed script into a file.'''
+
+        # create a Box instance using the current running script
+        box = Box(inputscript=self.inputscript, outputfile=filename)
+##        # clone our running box, along with variables
+##        box.namespace = self.namespace
+##        box.vars = self.vars
+        box.run()
+        # set its variables to the current ones
+        for v in self.vars:
+            box.namespace[v.name] = self.namespace[v.name]
+        if 'setup' in box.namespace:
+            box.namespace['setup']()
+        if 'draw' in box.namespace:
+            box.namespace['draw']()
+        box.finish()
+        print "Saved snapshot to %s" % filename
+        del box
 
     def setvars(self,args):
         '''Defines the variables that can be externally set.

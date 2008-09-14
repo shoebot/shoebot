@@ -88,7 +88,7 @@ class ShoebotCanvas(gtk.DrawingArea):
         ctx = self.window.cairo_create()
         surface = ctx.get_target()
 
-        self.box.snapshot(filename, surface)
+        self.box.export(filename)
 
 
 # additional functions for MainWindow
