@@ -811,13 +811,8 @@ class Box:
         output file.
         '''
 
-        ##TODO
-        # Better extension checking
-        # ext = split(',')[-1]
-        #
-
         # get the extension from the filename
-        ext = self.targetfilename.split('.')[-1]
+        f, ext = os.path.splitext(outfile)
         # if this is a vector file, wrap up and finish
         if ext in ("svg",".ps","pdf"):
             self.context.show_page()
@@ -829,21 +824,48 @@ class Box:
         else:
             raise ShoebotError("finish(): invalid extension")
 
-    def snapshot(self,filename=None):
+    def snapshot(self,filename=None, surface=None):
+        '''Save the contents of current context into a file.
+
+        There's two uses for this method:
+        - called from a script to create a output file
+        - called from the Shoebot window menu, which requires the source surface
+        to be specified in the arguments.
         '''
-        Save a png file of current surface contents
-        without finishing the surface
-        (currently works only with PNG surfaces)
-        '''
-        if filename is None:
-            raise ShoebotError("snapshot() requires a filename argument")
-        ext = self.targetfilename[-3:]
-        # check if we're working on a PNG surface
-        if ext == "png":
-            # write to file
-            self.surface.write_to_png(filename)
+
+        # make an appropriate surface from the filename
+        new_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+        # and a context for it
+        ctx = cairo.Context(new_surface)
+
+        # FIXME: This will probably break calls to snapshot() from a script
+        # which is running in a window. We need a way to signal when it's
+        # coming from a script, and when it's an internal menu call.
+        if self.gtkmode:
+            if not surface:
+                raise ShoebotError("snapshot(): source surface required on windowed mode")
+            else:
+                source_surface = surface
         else:
-            raise ShoebotError("snapshot() can only be called on PNG surfaces (current surface is " + str(ext))
+            source_surface = self.surface
+
+        # use the Box surface as a source
+        ctx.set_source_surface(source_surface, 0, 0)
+        ctx.paint()
+
+        # and finish it according to extension (see finish() above
+        # for explanation)
+        import os
+        f, ext = os.path.splitext(filename)
+
+        # no need to check for sanity since util.surfacefromfilename did that
+        if ext in ("svg",".ps","pdf"):
+            ctx.show_page()
+            new_surface.finish()
+        elif ext == "png":
+            # write to file
+            new_surface.write_to_png(filename)
+        del new_surface
 
     def setvars(self,args):
         '''Defines the variables that can be externally set.

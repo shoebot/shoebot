@@ -14,6 +14,7 @@ from pprint import pprint
 class ShoebotCanvas(gtk.DrawingArea):
     def __init__(self, mainwindow, box = None):
         super(ShoebotCanvas, self).__init__()
+        self.mainwindow = mainwindow
         self.connect("expose_event", self.expose)
         # get the box object to display
         self.box = box
@@ -26,6 +27,22 @@ class ShoebotCanvas(gtk.DrawingArea):
 
         # set the window size to the one specified in the script
         self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
+
+        # RIGHT CLICK HANDLING
+        self.menu = gtk.Menu()
+        self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
+
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+
+        self.connect('button_press_event', self.on_button_press)
+
+    def on_button_press(self, widget, event):
+        # check for right mouse clicks
+        if event.button == 3:
+            menu = self.mainwindow.uimanager.get_widget('/Save as')
+            menu.popup(None, None, None, event.button, event.time)
+            return True
+        return False
 
     def expose(self, widget, event):
         '''Handle GTK expose events.'''
@@ -62,6 +79,17 @@ class ShoebotCanvas(gtk.DrawingArea):
     def draw(self):
         if 'draw' in self.box.namespace:
             self.box.namespace['draw']()
+
+    def save_output(self, action):
+        '''Save the current image to a file.'''
+        extension = action.get_name()
+        filename = 'output.' + extension
+
+        ctx = self.window.cairo_create()
+        surface = ctx.get_target()
+
+        self.box.snapshot(filename, surface)
+
 
 # additional functions for MainWindow
 class SocketServerMixin:
@@ -198,6 +226,32 @@ class ShoebotWindow(SocketServerMixin):
         window = gtk.Window()
         window.connect("destroy", self.do_quit)
         window.add(self.canvas)
+
+        self.uimanager = gtk.UIManager()
+        accelgroup = self.uimanager.get_accel_group()
+        window.add_accel_group(accelgroup)
+
+        actiongroup = gtk.ActionGroup('Canvas')
+
+        actiongroup.add_actions([('Save as', None, '_Save as'),
+                                 ('svg', 'Save as SVG', 'Save as _SVG', None, None, self.canvas.save_output),
+                                 ('pdf', 'Save as PDF', 'Save as _PDF', None, None, self.canvas.save_output),
+                                 ('ps', 'Save as PS', 'Save as P_S', None, None, self.canvas.save_output),
+                                 ('png', 'Save as PNG', 'Save as P_NG', None, None, self.canvas.save_output),
+                                ])
+
+        menuxml = '''
+        <popup action="Save as">
+            <menuitem action="svg"/>
+            <menuitem action="ps"/>
+            <menuitem action="pdf"/>
+            <menuitem action="png"/>
+        </popup>
+        '''
+
+        self.uimanager.insert_action_group(actiongroup, 0)
+        self.uimanager.add_ui_from_string(menuxml)
+
         if self.has_server:
             self.server('', self.serverport)
         window.show_all()

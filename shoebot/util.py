@@ -182,7 +182,7 @@ def surfacefromfilename(outfile, width, height):
 
     # check across all possible formats and create the appropriate kind of surface
     # and also be sure that Cairo was built with support for that
-    filename, ext = os.path.splitext(outfile)
+    f, ext = os.path.splitext(outfile)
     if ext == '.svg':
         if not cairo.HAS_SVG_SURFACE:
                 raise SystemExit ('cairo was not compiled with SVG support')
