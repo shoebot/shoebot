@@ -223,21 +223,25 @@ class ShoebotWindow(SocketServerMixin):
 
     def run(self):
         '''Setup the main GTK window.'''
-        window = gtk.Window()
-        window.connect("destroy", self.do_quit)
-        window.add(self.canvas)
+
+        # TODO: Maybe shift this to __init__ to avoid leftovers on destroy?
+
+        self.window = gtk.Window()
+        self.window.connect("destroy", self.do_quit)
+        self.window.add(self.canvas)
 
         self.uimanager = gtk.UIManager()
         accelgroup = self.uimanager.get_accel_group()
-        window.add_accel_group(accelgroup)
+        self.window.add_accel_group(accelgroup)
 
         actiongroup = gtk.ActionGroup('Canvas')
 
         actiongroup.add_actions([('Save as', None, '_Save as'),
-                                 ('svg', 'Save as SVG', 'Save as _SVG', None, None, self.canvas.save_output),
-                                 ('pdf', 'Save as PDF', 'Save as _PDF', None, None, self.canvas.save_output),
-                                 ('ps', 'Save as PS', 'Save as P_S', None, None, self.canvas.save_output),
-                                 ('png', 'Save as PNG', 'Save as P_NG', None, None, self.canvas.save_output),
+                                 ('svg', 'Save as SVG', 'Save as _SVG', "<Control>1", None, self.canvas.save_output),
+                                 ('pdf', 'Save as PDF', 'Save as _PDF', "<Control>2", None, self.canvas.save_output),
+                                 ('ps', 'Save as PS', 'Save as P_S', "<Control>3", None, self.canvas.save_output),
+                                 ('png', 'Save as PNG', 'Save as P_NG', "<Control>4", None, self.canvas.save_output),
+                                 ('close', 'Close window', '_Close Window', "<Control>w", None, self.do_quit)
                                 ])
 
         menuxml = '''
@@ -246,6 +250,8 @@ class ShoebotWindow(SocketServerMixin):
             <menuitem action="ps"/>
             <menuitem action="pdf"/>
             <menuitem action="png"/>
+            <separator/>
+            <menuitem action="close"/>
         </popup>
         '''
 
@@ -254,7 +260,7 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.has_server:
             self.server('', self.serverport)
-        window.show_all()
+        self.window.show_all()
 
         if self.has_varwindow:
             VarWindow(self, self.box)
@@ -264,7 +270,8 @@ class ShoebotWindow(SocketServerMixin):
     def do_quit(self, widget):
         if self.has_server:
             self.sock.close()
-        gtk.main_quit()
+        self.window.destroy()
+        ## FIXME: This doesn't kill the instance :/
 
 
 ##if __name__ == "__main__":

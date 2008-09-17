@@ -559,6 +559,8 @@ class View(gtk.Window):
 
         gtk.main_quit()
         TestText.active_window_stack.pop()
+        import sys
+        sys.exit()
 
     def do_insert_and_scroll(self, callback_action, widget):
         buffer = self.text_view.get_buffer()
@@ -913,7 +915,7 @@ class View(gtk.Window):
 
         sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
         sbot_window.run()
-        
+
         # TODO: have a try/except that shows an error window
 
 class Stack(list):
