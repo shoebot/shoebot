@@ -914,7 +914,6 @@ class View(gtk.Window):
         codestring = buffer.get_text(start, end)
 
         sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
-        sbot_window.run()
 
         # TODO: have a try/except that shows an error window
 

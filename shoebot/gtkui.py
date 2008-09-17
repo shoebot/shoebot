@@ -221,11 +221,7 @@ class ShoebotWindow(SocketServerMixin):
         self.serverport = serverport
         self.has_varwindow = varwindow
 
-    def run(self):
-        '''Setup the main GTK window.'''
-
-        # TODO: Maybe shift this to __init__ to avoid leftovers on destroy?
-
+        # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
         self.window.add(self.canvas)
@@ -271,6 +267,7 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_server:
             self.sock.close()
         self.window.destroy()
+        gtk.main_quit()
         ## FIXME: This doesn't kill the instance :/
 
 

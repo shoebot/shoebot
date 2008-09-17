@@ -40,8 +40,6 @@ def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False):
     ''' Windowed mode:
     Run a Shoebot script in a GTK window.'''
     win = gtkui.ShoebotWindow(script, server, port, varwindow)
-    win.run()
-
 
 # use OptionParser to interpret commandline options
 from optparse import OptionParser
