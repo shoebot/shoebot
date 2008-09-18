@@ -224,6 +224,7 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
+        self.window.set_icon_from_file('/usr/share/shoebot/icon.png')
         self.window.add(self.canvas)
 
         self.uimanager = gtk.UIManager()

@@ -490,6 +490,9 @@ class View(gtk.Window):
         self.use_varwindow = False
         self.use_socketserver = False
 
+        #set icon
+        self.set_icon_from_file('/usr/share/shoebot/icon.png')
+
     def delete_event_cb(self, window, event, data=None):
         TestText.active_window_stack.push(self)
         self.check_close_view()
