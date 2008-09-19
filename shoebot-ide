@@ -6,6 +6,7 @@ pygtk.require('2.0')
 import sys, os, errno
 import gtk
 import pango
+import gtksourceview
 
 from pygments.lexers import PythonLexer
 from pygments.styles.pastie import PastieStyle
@@ -79,7 +80,7 @@ class FileSel(gtk.FileSelection):
         gtk.main()
         return self.result
 
-class Buffer(gtk.TextBuffer):
+class Buffer(gtksourceview.SourceBuffer):
     N_COLORS = 16
     PANGO_SCALE = 1024
 
@@ -377,42 +378,10 @@ class View(gtk.Window):
             ( "/File/E_xit", "<control>Q" , self.do_exit, 0, None ),
             ( "/_Edit", None, None, 0, "<Branch>" ),
             ( "/Edit/Find...", None, self.do_search, 0, None ),
-            ( "/Edit/Apply syntax highlighting", None, self.do_colorize_syntax, 0, None ),
             ( "/_Settings", None, None, 0, "<Branch>" ),
             ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
             ( "/Settings/Wrap _Words", None, self.do_wrap_changed, gtk.WRAP_WORD, "/Settings/Wrap Off" ),
             ( "/Settings/Wrap _Chars", None, self.do_wrap_changed, gtk.WRAP_CHAR, "/Settings/Wrap Off" ),
-            # ( "/Settings/sep1", None, None, 0, "<Separator>" ),
-            # ( "/Settings/Editable", None, self.do_editable_changed, True, "<RadioItem>" ),
-            # ( "/Settings/Not editable", None, self.do_editable_changed, False, "/Settings/Editable" ),
-            # ( "/Settings/sep1", None, None, 0, "<Separator>" ),
-            # ( "/Settings/Cursor visible", None, self.do_cursor_visible_changed, True, "<RadioItem>" ),
-            # ( "/Settings/Cursor not visible", None, self.do_cursor_visible_changed, False, "/Settings/Cursor visible" ),
-            # ( "/Settings/sep1", None, None, 0, "<Separator>" ),
-            # ( "/Settings/Left-to-Right", None, self.do_direction_changed, gtk.TEXT_DIR_LTR, "<RadioItem>" ),
-            # ( "/Settings/Right-to-Left", None, self.do_direction_changed, gtk.TEXT_DIR_RTL, "/Settings/Left-to-Right" ),
-            # ( "/Settings/sep1", None, None, 0, "<Separator>" ),
-            # ( "/Settings/Sane spacing", None, self.do_spacing_changed, False, "<RadioItem>" ),
-            # ( "/Settings/Funky spacing", None, self.do_spacing_changed, True, "/Settings/Sane spacing" ),
-            # ( "/Settings/sep1", None, None, 0, "<Separator>" ),
-            # ( "/Settings/Don't cycle color tags", None, self.do_color_cycle_changed, False, "<RadioItem>" ),
-            # ( "/Settings/Cycle colors", None, self.do_color_cycle_changed, True, "/Settings/Don't cycle color tags" ),
-            # ( "/_Attributes", None, None, 0, "<Branch>" ),
-            # ( "/Attributes/Editable", None, self.do_apply_editable, True, None ),
-            # ( "/Attributes/Not editable", None, self.do_apply_editable, False, None ),
-            # ( "/Attributes/Invisible", None, self.do_apply_invisible, False, None ),
-            # ( "/Attributes/Visible", None, self.do_apply_invisible, True, None ),
-            # ( "/Attributes/Custom tabs", None, self.do_apply_tabs, False, None ),
-            # ( "/Attributes/Default tabs", None, self.do_apply_tabs, True, None ),
-            # ( "/Attributes/Color cycles", None, self.do_apply_colors, True, None ),
-            # ( "/Attributes/No colors", None, self.do_apply_colors, False, None ),
-            # ( "/Attributes/Remove all tags", None, self.do_remove_tags, 0, None ),
-            # ( "/Attributes/Properties", None, self.do_properties, 0, None ),
-            # ( "/_Test", None, None, 0, "<Branch>" ),
-            # ( "/Test/_Example", None, self.do_example, 0, None ),
-            # ( "/Test/_Insert and scroll", None, self.do_insert_and_scroll, 0, None ),
-            # ( "/Test/_Add movable children", None, self.do_add_children, 0, None ),
-            # ( "/Test/A_dd focusable children", None, self.do_add_focus_children, 0, None ),
             ( "/_Run", None, None, 0, "<Branch>" ),
             ( "/Run/_Run script", "<control>R", self.run_script, False, None ),
             ( "/Run/sep1", None, None, 0, "<Separator>" ),
@@ -450,29 +419,15 @@ class View(gtk.Window):
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
-        self.text_view = gtk.TextView(buffer)
+        self.text_view = gtksourceview.SourceView(buffer)
         self.text_view.set_wrap_mode(gtk.WRAP_WORD)
-
-        # Make sure border width works, no real reason to do this other
-        # than testing
-        # self.text_view.set_border_width(10)
-
-        # Draw tab stops in the top and bottom windows.
-        # self.text_view.set_border_window_size(gtk.TEXT_WINDOW_TOP, 15)
-        # self.text_view.set_border_window_size(gtk.TEXT_WINDOW_BOTTOM, 15)
+        self.text_view.set_show_line_numbers(True)
 
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
 
-        # Draw line numbers in the side windows; we should really be
-        # more scientific about what width we set them to.
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_RIGHT, 0)
-        self.text_view.set_border_window_size(gtk.TEXT_WINDOW_LEFT, 20)
-
-        self.text_view.modify_font(pango.FontDescription('Bitstream Vera Sans Mono 10'))
-
-        self.text_view.connect("expose_event", self.line_numbers_expose)
+        self.text_view.modify_font(pango.FontDescription('Bitstream Vera Sans Mono 8'))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
@@ -482,16 +437,22 @@ class View(gtk.Window):
 
         self.set_view_title()
         self.init_menus()
-        self.add_example_widgets()
-
-        self.show_all()
 
         # options toggle
         self.use_varwindow = False
         self.use_socketserver = False
 
+        # setup syntax highlighting
+        manager = gtksourceview.SourceLanguagesManager()
+        language = manager.get_language_from_mime_type("text/x-python")
+        buffer.set_language(language)
+        buffer.set_highlight(True)
+
+
         #set icon
         self.set_icon_from_file('/usr/share/shoebot/icon.png')
+
+        self.show_all()
 
     def delete_event_cb(self, window, event, data=None):
         TestText.active_window_stack.push(self)
@@ -529,8 +490,7 @@ class View(gtk.Window):
         else:
             buffer.filename = filename
             buffer.filename_set()
-            self.do_colorize_syntax()
-            return True;
+            return True
 
     def do_open(self, callback_action, widget):
         FileSel().run(self, "Open File", None, self.open_ok_func)
@@ -601,64 +561,6 @@ class View(gtk.Window):
                 buffer.remove_tag(buffer.custom_tabs_tag, start, end)
             else:
                 buffer.apply_tag(buffer.custom_tabs_tag, start, end)
-
-    def do_colorize_syntax(self, action=None, widget=None):
-        '''Apply syntax coloring via Pygments.'''
-
-        #  :copyright: 2007 by Armin Ronacher.
-        #  :license: GNU GPL.
-        #
-
-        # oldbuf = self.text_view.get_buffer()
-        buf = self.text_view.get_buffer()
-        # buf = Buffer()
-        styles = {}
-
-        buffer_is_saved = True
-
-        if buf.get_modified():
-            buffer_is_saved = False
-
-
-        # get the buffer text
-        start, end = buf.get_bounds()
-        codestring = buf.get_text(start, end)
-        SOURCE = codestring
-        STYLE = PastieStyle
-
-        # clear the buffer
-        buf.set_text("")
-
-        # and now insert the colorized text
-        for token, value in PythonLexer().get_tokens(SOURCE):
-            while not STYLE.styles_token(token) and token.parent:
-                token = token.parent
-            if token not in styles:
-                styles[token] = buf.create_tag()
-            start = buf.get_end_iter()
-            buf.insert_with_tags(start, value.encode('utf-8'), styles[token])
-
-        for token, tag in styles.iteritems():
-            style = STYLE.style_for_token(token)
-            if style['bgcolor']:
-                tag.set_property('background', '#' + style['bgcolor'])
-            if style['color']:
-                tag.set_property('foreground', '#' + style['color'])
-            if style['bold']:
-                tag.set_property('weight', pango.WEIGHT_BOLD)
-            if style['italic']:
-                tag.set_property('style', pango.STYLE_ITALIC)
-            if style['underline']:
-                tag.set_property('underline', pango.UNDERLINE_SINGLE)
-
-        # set modifier flag so that colorizing doesn't mess with
-        # modified state
-        if buffer_is_saved:
-            buf.set_modified(False)
-
-        self.text_view.set_buffer(buf)
-
-        return False
 
     def do_apply_colors(self, callback_action, widget):
         buffer = self.text_view.get_buffer()
@@ -752,7 +654,7 @@ class View(gtk.Window):
     def close_view(self):
         TestText.views.remove(self)
         buffer = self.text_view.get_buffer()
-        buffer.unref()
+        # buffer.unref()
         buffer.disconnect(self.bhid)
         self.text_view.destroy()
         del self.text_view
@@ -774,22 +676,7 @@ class View(gtk.Window):
         self.set_title(title)
 
     def cursor_set_callback(self, buffer, location, mark):
-        # Redraw tab windows if the cursor moves
-        # on the mapped widget (windows may not exist before realization...
-
-        # NOTE: I had to take this out because of pesky warnings -- ricardo
-
         pass
-
-##        text_view = self.text_view
-##        if mark == buffer.get_insert():
-##            tab_window = text_view.get_window(gtk.TEXT_WINDOW_TOP)
-##            tab_window.invalidate_rect(None, False)
-##            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
-##
-##            tab_window = text_view.get_window(gtk.TEXT_WINDOW_BOTTOM)
-##            tab_window.invalidate_rect(None, False)
-##            #tab_window.invalidate_rect(tab_window.get_geometry()[:4], False)
 
     def tab_stops_expose(self, widget, event):
         #print self, widget, event
@@ -857,57 +744,6 @@ class View(gtk.Window):
 
         return count
 
-    def line_numbers_expose(self, widget, event, user_data=None):
-        text_view = widget
-
-        # See if this expose is on the line numbers window
-        left_win = text_view.get_window(gtk.TEXT_WINDOW_LEFT)
-        right_win = text_view.get_window(gtk.TEXT_WINDOW_RIGHT)
-
-        if event.window == left_win:
-            type = gtk.TEXT_WINDOW_LEFT
-            target = left_win
-        elif event.window == right_win:
-            type = gtk.TEXT_WINDOW_RIGHT
-            target = right_win
-        else:
-            return False
-
-        first_y = event.area.y
-        last_y = first_y + event.area.height
-
-        x, first_y = text_view.window_to_buffer_coords(type, 0, first_y)
-        x, last_y = text_view.window_to_buffer_coords(type, 0, last_y)
-
-        numbers = []
-        pixels = []
-        count = self.get_lines(first_y, last_y, pixels, numbers)
-
-        # Draw fully internationalized numbers!
-        layout = widget.create_pango_layout("")
-
-        for i in range(count):
-            x, pos = text_view.buffer_to_window_coords(type, 0, pixels[i])
-            str = "%d" % numbers[i]
-            layout.set_text(str)
-            widget.style.paint_layout(target, widget.state, False,
-                                      None, widget, None, 2, pos + 2, layout)
-
-        # don't stop emission, need to draw children
-        return False
-
-    def add_example_widgets(self):
-        buffer = self.text_view.get_buffer()
-
-        anchor = buffer.get_data("anchor")
-
-        if (anchor and not anchor.get_deleted()):
-            widget = gtk.Button("Foo")
-            self.text_view.add_child_at_anchor(widget, anchor)
-            widget.show()
-
-
-
     def run_script(self, callback_action, widget):
         from shoebot import gtkui
 
@@ -915,9 +751,20 @@ class View(gtk.Window):
         buffer = self.text_view.get_buffer()
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
+        try:
+            sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
+        except shoebot.ShoebotError, NameError:
+            import traceback
+            import sys
 
-        sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
-
+            errmsg = traceback.format_exc(limit=1)
+            err = "Error in Shoebot script:\n %s" % (errmsg)
+            dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+                                       gtk.MESSAGE_INFO,
+                                       gtk.BUTTONS_OK, err);
+            result = dialog.run()
+            dialog.destroy()
+            return False
         # TODO: have a try/except that shows an error window
 
 class Stack(list):

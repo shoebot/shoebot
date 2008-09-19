@@ -895,7 +895,7 @@ class Box:
         already existing values and adds new keys to accomodate
         new entries.
 
-        Soon to be deprecated, use addvar() instead
+        DEPRECATED, use addvar() instead
         '''
         if not isinstance(args, dict):
             raise ShoebotError('setvars(): setvars needs a dict!')
@@ -944,13 +944,13 @@ class Box:
                 source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
             # do the magic
             exec source_or_code in self.namespace
-        except:
+        except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
             import traceback
             import sys
 
-            errmsg = traceback.format_exc()
+            errmsg = traceback.format_exc(limit=1)
 
 #            print "Exception in Shoebot code:"
 #            traceback.print_exc(file=sys.stdout)
@@ -959,7 +959,7 @@ class Box:
                 sys.exit()
             else:
                 # if on gtkmode, print the error and don't break
-                sys.stderr.write(errmsg)
+                raise ShoebotError(errmsg)
 
 #    def setup(self):
 #        if self.namespace.has_key("setup"):
