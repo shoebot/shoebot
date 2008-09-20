@@ -377,6 +377,9 @@ class View(gtk.Window):
             ( "/File/_Close", "<control>W" , self.do_close, 0, None ),
             ( "/File/E_xit", "<control>Q" , self.do_exit, 0, None ),
             ( "/_Edit", None, None, 0, "<Branch>" ),
+            ( "/Edit/Undo", "<control>Z", self.do_undo, 0, None ),
+            ( "/Edit/Redo", "<control><shift>Z", self.do_redo, 0, None ),
+            ( "/Edit/sep1", None, None, 0, "<Separator>" ),
             ( "/Edit/Find...", None, self.do_search, 0, None ),
             ( "/_Settings", None, None, 0, "<Branch>" ),
             ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
@@ -422,6 +425,11 @@ class View(gtk.Window):
         self.text_view = gtksourceview.SourceView(buffer)
         self.text_view.set_wrap_mode(gtk.WRAP_WORD)
         self.text_view.set_show_line_numbers(True)
+        self.text_view.set_auto_indent(True)
+        self.text_view.set_insert_spaces_instead_of_tabs(True)
+        # FIXME: the following 2 lines don't have any effect :/
+        self.text_view.tab_width = 4
+        self.text_view.indent_width = 4
 
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
@@ -626,6 +634,15 @@ class View(gtk.Window):
         search_text.grab_focus()
         dialog.show_all()
 
+    def do_undo(self, callback_action, widget):
+        buffer = self.text_view.get_buffer()
+        if buffer.can_undo():
+            buffer.undo()
+
+    def do_redo(self, callback_action, widget):
+        buffer = self.text_view.get_buffer()
+        if buffer.can_redo():
+            buffer.redo()
 
     def init_menus(self):
         text_view = self.text_view
