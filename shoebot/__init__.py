@@ -71,6 +71,7 @@ class Box:
         self._stroke = None
 
         self.surface = None
+        
         self.gtkmode = gtkmode
         self.vars = []
         self._oldvars = self.vars
@@ -93,10 +94,12 @@ class Box:
             self.makesurface(width, height, self.targetfilename)
         # and if it's a surface, attach our Cairo context to it
         elif isinstance(target, cairo.Surface):
+            self.surface = target
             self.context = cairo.Context(target)
         # if it's a Cairo context, use it instead of making a new one
         elif isinstance(target, cairo.Context):
             self.context = target
+            self.surface = self.context.get_target()
         else:
             raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
 
@@ -671,13 +674,12 @@ class Box:
 
         Needs to be the first function call in a script.'''
 
-        if self.surface:
-            raise ShoebotError("size(): size() can only be called once in a script.")
-
         if not w or not h:
             raise ShoebotError("size(): width and height arguments missing")
 
         if self.gtkmode:
+            # in windowed mode we don't set the surface in the Box itself,
+            # the gtkui module takes care of doing that
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
             self.namespace['WIDTH'] = self.WIDTH
@@ -689,9 +691,12 @@ class Box:
             # hack to get WIDTH and HEIGHT into the local namespace for running
             self.namespace['WIDTH'] = self.WIDTH
             self.namespace['HEIGHT'] = self.HEIGHT
+            # make a new surface for us
             self.setsurface(w, h, self.targetfilename)
         # return (self.WIDTH, self.HEIGHT)
 
+
+    ### Variable code taken from Nodebox
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
         v = Variable(name, type, default, min, max, value)
@@ -806,10 +811,8 @@ class Box:
 
 
     def finish(self):
-        '''
-        Finishes the surface and writes it to the
-        output file.
-        '''
+        '''Finishes the surface and writes it to the output file.'''
+        
         # get the extension from the filename
         import os
         f, ext = os.path.splitext(self.targetfilename)
@@ -825,67 +828,66 @@ class Box:
             raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
 
     def snapshot(self,filename=None, surface=None):
-        '''Save the contents of current context into a file.
+        '''Save the contents of current surface into a file.
 
         There's two uses for this method:
         - called from a script to create a output file
         - called from the Shoebot window menu, which requires the source surface
         to be specified in the arguments.
+        
+        TODO: This has to be rewritten so that:
+        - if output is bitmap (PNG, GTK), then clone the current surface via 
+          Cairo
+        - if output is vector, doing the source paint in Cairo ends up in a
+          vector file with an embedded bitmap - not good. So we just create
+          another Box instance with the currently loaded script, copy the
+          current namespace and save its output in a file.
         '''
 
-        # make an appropriate surface from the filename
-        new_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
-        # and a context for it
-        ctx = cairo.Context(new_surface)
-
-        # FIXME: This will probably break calls to snapshot() from a script
-        # which is running in a window. We need a way to signal when it's
-        # coming from a script, and when it's an internal menu call.
-        if self.gtkmode:
-            if not surface:
-                raise ShoebotError("snapshot(): source surface required on windowed mode")
-            else:
-                source_surface = surface
-        else:
-            source_surface = self.surface
-
-        # use the Box surface as a source
-        ctx.set_source_surface(source_surface, 0, 0)
-        ctx.paint()
-
-        # and finish it according to extension (see finish() above
-        # for explanation)
+        # check output format from extension
         import os
         f, ext = os.path.splitext(filename)
-
-        # no need to check for sanity since util.surfacefromfilename did that
-        if ext in ("svg",".ps","pdf"):
-            ctx.show_page()
-            new_surface.finish()
-        elif ext == "png":
-            # write to file
-            new_surface.write_to_png(filename)
-        del new_surface
-
-    def export(self, filename=None):
-        '''Save the current windowed script into a file.'''
-
-        # create a Box instance using the current running script
-        box = Box(inputscript=self.inputscript, outputfile=filename)
-##        # clone our running box, along with variables
-##        box.namespace = self.namespace
-##        box.vars = self.vars
-        box.run()
-        # set its variables to the current ones
-        for v in self.vars:
-            box.namespace[v.name] = self.namespace[v.name]
-        if 'setup' in box.namespace:
-            box.namespace['setup']()
-        if 'draw' in box.namespace:
-            box.namespace['draw']()
-        box.finish()
-        print "Saved snapshot to %s" % filename
-        del box
+        
+        if ext == "png":
+            # bitmap snapshots can be done via Cairo
+            if isinstance(self.surface, cairo.ImageSurface):
+                # if current surface is a bitmap image surface, we can write the 
+                # file right away
+                self.surface.write_to_png(filename)
+            else:
+                # otherwise, we clone the contents of current surface onto
+                # a temporary one
+                temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+                ctx = cairo.Context(temp_surface)
+                ctx.set_source_surface(self.surface, 0, 0)
+                ctx.paint()                
+                temp_surface.write_to_png(filename)
+                del temp_surface      
+        
+        if ext in (".svg",".ps",".pdf"):
+            # vector snapshots are made with another temporary Box
+            
+            # create a Box instance using the current running script
+            box = Box(inputscript=self.inputscript, outputfile=filename)
+            box.run()
+            
+            # FIXME: This approach makes random values/values generated at
+            # start be re-calculated once a script runs again :/
+            #
+            # this will have to do until we have a proper Canvas class
+            # which would register all objects before passing it to the
+            # Cairo context
+            
+            # set its variables to the current ones
+            for v in self.vars:
+                box.namespace[v.name] = self.namespace[v.name]
+            if 'setup' in box.namespace:
+                box.namespace['setup']()
+            if 'draw' in box.namespace:
+                box.namespace['draw']()
+            box.finish()
+            print "Saved snapshot to %s" % filename
+            del box
 
     def setvars(self,args):
         '''Defines the variables that can be externally set.
@@ -930,11 +932,10 @@ class Box:
             # if not, try parsing it as a code string
             source_or_code = inputcode
 
+        import data
         for name in dir(self):
             # get all stuff in the Box namespaces
             self.namespace[name] = getattr(self, name)
-
-        import data
         for name in dir(data):
             self.namespace[name] = getattr(data, name)
 
@@ -949,7 +950,6 @@ class Box:
             # maybe this is too verbose, but okay for now
             import traceback
             import sys
-
             errmsg = traceback.format_exc(limit=1)
 
 #            print "Exception in Shoebot code:"

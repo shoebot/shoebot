@@ -82,14 +82,10 @@ class ShoebotCanvas(gtk.DrawingArea):
 
     def save_output(self, action):
         '''Save the current image to a file.'''
+        # action is the menu action pointing the extension to use
         extension = action.get_name()
         filename = 'output.' + extension
-
-        ctx = self.window.cairo_create()
-        surface = ctx.get_target()
-
-        self.box.export(filename)
-
+        self.box.snapshot(filename)
 
 # additional functions for MainWindow
 class SocketServerMixin:
@@ -189,6 +185,7 @@ class VarWindow:
         container.pack_start(textcontainer, True, True, 0)
 
     def add_boolean(self, v):
+        # TODO: Make the boolean interface
         pass
 
     def add_button(self, container, v):
@@ -206,7 +203,7 @@ class VarWindow:
     def cb_set_var(self, widget, v):
         ''' Called when a slider is adjusted. '''
         # set the appropriate canvas var
-        if v.type is NUMBER:
+        if v.type in (NUMBER, BOOLEAN):
             self.parent.canvas.box.namespace[v.name] = widget.value
         elif v.type is TEXT:
             self.parent.canvas.box.namespace[v.name] = widget.get_text()

@@ -33,7 +33,7 @@ class Point:
         elif len(args) == 0:
             self.x = self.y = 0.0
         else:
-            raise NodeBoxError, "Wrong initializer for Point object"
+            raise ShoebotError, "Wrong initializer for Point object"
 
     def __repr__(self):
         return (self.x, self.y)
@@ -73,7 +73,7 @@ class BezierPath:
             self.data = path.data
             ##util._copy_attrs(path, self, self.stateAttributes)
         else:
-            raise NodeBoxError, "Don't know what to do with %s." % path
+            raise ShoebotError, "Don't know what to do with %s." % path
         self.closed = False
 
     # testing string output
@@ -126,6 +126,9 @@ class BezierPath:
         # - tuples
         # - list
         # - PathElement
+        
+        # oh my, this just creates straight lines, no curves
+        # this needs to be rewritten
 
         # check if we got [x,y] as an argument
         if isinstance(args, list) and len(args) == 2 and isinstanceargs[0]:
@@ -143,7 +146,7 @@ class BezierPath:
 
         elif isinstance(args,list):
             for el in pathElements:
-                if isinstance(el, (list, tuple)):
+                if isinstance(el, (list, tuple, PathElement)):
                     x, y = el
                     if len(self.data) == 0:
                         cmd = MOVETO
@@ -153,7 +156,7 @@ class BezierPath:
                 elif isinstance(el, PathElement):
                     self.data.append(el)
                 else:
-                    raise NodeBoxError, "Don't know how to handle %s" % el
+                    raise ShoebotError, "Don't know how to handle %s" % el
 
     def append(self, el):
         '''
