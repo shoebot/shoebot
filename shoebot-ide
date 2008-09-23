@@ -430,7 +430,6 @@ class View(gtk.Window):
         # FIXME: the following 2 lines don't have any effect :/
         self.text_view.tab_width = 4
         self.text_view.indent_width = 4
-
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
@@ -693,6 +692,13 @@ class View(gtk.Window):
         self.set_title(title)
 
     def cursor_set_callback(self, buffer, location, mark):
+
+        # TODO: here should go the line syntax highlighter
+        # 1. get buffer
+        #      get modification state
+        # 2. get line contents
+        # 3. replace by pygmentised content
+        #      revert to modification state
         pass
 
     def tab_stops_expose(self, widget, event):

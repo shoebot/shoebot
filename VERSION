@@ -1,5 +1,5 @@
-name            Shoebox
-desc            vector scripting application
-version         0.2
-url             http://shoebox.sollec.org
-packager        rlafuente (r__at__sollec.org)
+name            Shoebot
+desc            vector graphics scripting application
+version         0.1
+url             http://tinkerhouse.net/shoebot
+packager        Ricardo Lafuente <r@sollec.org>

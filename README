@@ -7,48 +7,48 @@ Ricardo Lafuente, 2008
 Description
 -----------
 
-Shoebot is a port/re-write of Nodebox (http://www.nodebox.net), a Python-based,
-Mac-only graphics programming environment. Nodebox is awesome, but sadly it 
-relies heavily on OSX's graphics and interface libraries.
+Shoebot is a pure Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor GUI, and scripts can describe their own GUIs for controlling variables interactively. Being pure Python, it can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. It was directly inspired by DrawBot and Shoes. Thus, "Shoebot." 
 
 Installing Shoebot
 ------------------
 
-First thing is to install the appropriate dependencies. If this is your first
-time using Shoebot, you'll want to install all of them:
+First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:
 
 Debian/Ubuntu:
-  sudo apt-get install python-cairo python-gtk2 python-gobject python-pygments
+
+  sudo apt-get install python-cairo python-gtk2 \
+  python-gobject python-pygments
 
 Fedora:
-  yum install pycairo pycairo-devel pygtk2 pygtk2-devel pygobject2 \
-    pygobject2 pygobject2-devel
 
-For now, the only means of installing Shoebot is getting it from the source 
-repository. Shoebot uses Mercurial for version control. Mercurial is available
-on most major GNU/Linux distributions; fire up your terminal and type:
+  yum install pycairo pycairo-devel pygtk2 pygtk2-devel \
+  pygobject2 pygobject2 pygobject2-devel
 
-Ubuntu/Debian: 
+For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Mercurial for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
+
+Ubuntu/Debian:
+
   sudo apt-get install mercurial
 
-Fedora: 
+Fedora:
+
   yum install mercurial
 
-Gentoo: 
+Gentoo:
+
   emerge mercurial
 
-Make a temporary directory to get the Shoebot source files, and then get
-the source itself.
+Make a temporary directory to download all source files into, and then get the source itself.
 
-  mkdir shoebot-temp
-  cd shoebot-temp
+  mkdir ~/src
+  cd ~/src
   hg clone https://code.goto10.org/hg/shoebot
 
-You should now see a new shoebot/ directory. The only remaining step is to
-install it proper:
+You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
   cd shoebot
   sudo python setup.py install
+
 
 Running the Shoebot IDE
 -----------------------
@@ -98,8 +98,9 @@ For a list of extra options, type
 Further reading
 ---------------
 
-The Shoebot website has quite a lot more information on what you can do with
-Shoebot, such as:
+For a great intro to the Nodebox/Shoebot language, be sure to check the Nodebox tutorials at http://nodebox.net/code/index.php/Tutorial .
+
+The Shoebot website has quite a lot more information on what you can do with Shoebot, such as:
 
   * running Shoebot as a Python module
   * using the socketserver to have other programs control a Shoebot script
@@ -148,12 +149,14 @@ Links
 
 Source browser:		http://code.tinkerhouse.net/shoebot/hg
 Bug tracker:		http://code.tinkerhouse.net/shoebot/trac
-Mailing lists:          http://tinkerhouse.net/shoebot/lists
+Announcement blog:  http://identi.ca/shoebot
+Mailing lists:      http://tinkerhouse.net/shoebot/devel
+
 
 Contact
 -------
 
-The author can be reached at ricardo _at_ sollec _dot_ org
+The author can be reached at r _at_ sollec _dot_ org
 
     Copyright (C) 2007, 2008  Ricardo Lafuente
     Developed at the Piet Zwart Institute, Rotterdam
