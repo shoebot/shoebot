@@ -88,33 +88,23 @@ class Box:
         output filename; it also accepts a Cairo surface or context as an
         argument, and attaches to them as expected.
         '''
-        # if the target is a string, should be a filename
         if not target:
             raise ShoebotError("setsurface(): No target specified!")
         if isinstance(target, basestring):
-            self.makesurface(width, height, self.targetfilename)
-        # and if it's a surface, attach our Cairo context to it
+            # if the target is a string, should be a filename
+            filename = target
+            self.surface = util.surfacefromfilename(filename,width,height)
+            self.context = cairo.Context(self.surface)
         elif isinstance(target, cairo.Surface):
+            # and if it's a surface, attach our Cairo context to it
             self.surface = target
             self.context = cairo.Context(target)
-        # if it's a Cairo context, use it instead of making a new one
         elif isinstance(target, cairo.Context):
+            # if it's a Cairo context, use it instead of making a new one
             self.context = target
             self.surface = self.context.get_target()
         else:
             raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
-
-    def makesurface(self, width, height, filename):
-        '''Checks argument sanity and makes an appropriate Cairo surface
-        from the given filename and width/height values.'''
-
-        import os
-        name, ext = os.path.splitext(filename)
-        if isinstance(filename, basestring) and ext in EXTENSIONS:
-            self.surface = util.surfacefromfilename(filename,width,height)
-            self.context = cairo.Context(self.surface)
-        else:
-            raise ShoebotError("makesurface: Invalid extension")
             
     def get_context(self):
         return self.context
