@@ -72,7 +72,7 @@ class Box:
 
         self.context = None
         self.surface = None
-        
+
         self.gtkmode = gtkmode
         self.vars = []
         self._oldvars = self.vars
@@ -105,15 +105,15 @@ class Box:
             self.surface = self.context.get_target()
         else:
             raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
-            
+
     def get_context(self):
         return self.context
-    
+
     def get_surface(self):
         return self.surface
-    
 
-    # ---- SHAPE -----
+
+    #### Drawing
 
     def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
         '''Draws a rectangle with top left corner at (x,y)
@@ -255,16 +255,6 @@ class Box:
         self.endpath()
 #        self.fill_and_stroke()
 
-    # ----- CLIPPING -----
-
-    def beginclip(self,x,y,w,h):
-        self.save()
-        self.context.rectangle(x, y, w, h)
-        self.context.clip()
-
-    def endclip(self):
-        self.restore()
-
 
     # ----- PATH -----
     # Path functions taken from Nodebox and modified
@@ -396,7 +386,15 @@ class Box:
         #path.inheritFromContext()
         #return path
 
-    # ----- -----
+    #### Transform and utility
+
+    def beginclip(self,x,y,w,h):
+        self.save()
+        self.context.rectangle(x, y, w, h)
+        self.context.clip()
+
+    def endclip(self):
+        self.restore()
 
     def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
         '''
@@ -465,7 +463,7 @@ class Box:
     def reset(self):
         self.context.identity_matrix()
 
-    # ----- COLOR -----
+    #### Color
 
     def outputmode(self):
         '''
@@ -487,31 +485,31 @@ class Box:
             else:
                 raise NameError, "Only RGB and HSB colormodes are supported."
         if crange is not None:
-            self.opt.colorrange = crange
+            self.opt.color_range = crange
         return self.opt.colormode
 
     def color(self,*args):
         if len(args) == 1 and isinstance(args[0],Color):
             if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.colorrange, args[0])
+            return Color(self.opt.colormode, self.opt.color_range, args[0])
         elif len(args) == 1 and isinstance(args,tuple):
             if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.colorrange, args[0])
+            return Color(self.opt.colormode, self.opt.color_range, args[0])
         elif len(args) == 1 and isinstance(args,int):
             if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.colorrange, args, args, args)
+            return Color(self.opt.colormode, self.opt.color_range, args, args, args)
         elif len(args) == 3:
-            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2])
+            return Color(self.opt.colormode, self.opt.color_range, args[0], args[1], args[2])
         elif len(args) == 4:
-            return Color(self.opt.colormode, self.opt.colorrange, args[0], args[1], args[2], args[3])
+            return Color(self.opt.colormode, self.opt.color_range, args[0], args[1], args[2], args[3])
         else:
             if DEBUG: print "DEBUG(color): args: " + str(args)
             raise ShoebotError("color(): Invalid arguments")
 
 
-    def colorrange(self, crange):
-        self.opt.colorrange = float(crange)
-        if DEBUG: print "DEBUG(colorrange): Set to " + str(self.opt.colorrange)
+    def color_range(self, crange):
+        self.opt.color_range = float(crange)
+        if DEBUG: print "DEBUG(color_range): Set to " + str(self.opt.color_range)
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
@@ -561,7 +559,7 @@ class Box:
         else:
             self.context.paint_with_alpha(a)
 
-    # ----- TEXT-----
+    #### Text
 
     def font(self, fontpath=None, fontsize=None):
         '''Set the font to be used with new text instances.
@@ -693,17 +691,14 @@ class Box:
             self.setsurface(w, h, self.targetfilename)
         # return (self.WIDTH, self.HEIGHT)
 
-
-    ### Variable code taken from Nodebox
+    #### Variables
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
         v = Variable(name, type, default, min, max, value)
         v = self.addvar(v)
 
     def addvar(self, v):
-        ''' Sets a new accessible variable.
-
-        Min and max values are used for the variable window UI.'''
+        ''' Sets a new accessible variable.'''
 
         oldvar = self.findvar(v.name)
         if oldvar is not None:
@@ -717,6 +712,8 @@ class Box:
             if v.name == name:
                 return v
         return None
+
+    #### Utility
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
@@ -767,6 +764,70 @@ class Box:
         from glob import glob
         return glob(path)
 
+    def snapshot(self,filename=None, surface=None):
+        '''Save the contents of current surface into a file.
+
+        There's two uses for this method:
+        - called from a script to create a output file
+        - called from the Shoebot window menu, which requires the source surface
+        to be specified in the arguments.
+
+        TODO: This has to be rewritten so that:
+        - if output is bitmap (PNG, GTK), then clone the current surface via
+          Cairo
+        - if output is vector, doing the source paint in Cairo ends up in a
+          vector file with an embedded bitmap - not good. So we just create
+          another Box instance with the currently loaded script, copy the
+          current namespace and save its output in a file.
+        '''
+
+        # check output format from extension
+        import os
+        f, ext = os.path.splitext(filename)
+
+        if ext == "png":
+            # bitmap snapshots can be done via Cairo
+            if isinstance(self.surface, cairo.ImageSurface):
+                # if current surface is a bitmap image surface, we can write the
+                # file right away
+                self.surface.write_to_png(filename)
+            else:
+                # otherwise, we clone the contents of current surface onto
+                # a temporary one
+                temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+                ctx = cairo.Context(temp_surface)
+                ctx.set_source_surface(self.surface, 0, 0)
+                ctx.paint()
+                temp_surface.write_to_png(filename)
+                del temp_surface
+
+        if ext in (".svg",".ps",".pdf"):
+            # vector snapshots are made with another temporary Box
+
+            # create a Box instance using the current running script
+            box = Box(inputscript=self.inputscript, outputfile=filename)
+            box.run()
+
+            # FIXME: This approach makes random values/values generated at
+            # start be re-calculated once a script runs again :/
+            #
+            # this will have to do until we have a proper Canvas class
+            # which would register all objects before passing it to the
+            # Cairo context
+
+            # set its variables to the current ones
+            for v in self.vars:
+                box.namespace[v.name] = self.namespace[v.name]
+            if 'setup' in box.namespace:
+                box.namespace['setup']()
+            if 'draw' in box.namespace:
+                box.namespace['draw']()
+            box.finish()
+            print "Saved snapshot to %s" % filename
+            del box
+
+    #### Core functions
+
     def fill_and_stroke(self):
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
@@ -810,7 +871,7 @@ class Box:
 
     def finish(self):
         '''Finishes the surface and writes it to the output file.'''
-        
+
         # get the extension from the filename
         import os
         f, ext = os.path.splitext(self.targetfilename)
@@ -825,67 +886,7 @@ class Box:
         else:
             raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
 
-    def snapshot(self,filename=None, surface=None):
-        '''Save the contents of current surface into a file.
 
-        There's two uses for this method:
-        - called from a script to create a output file
-        - called from the Shoebot window menu, which requires the source surface
-        to be specified in the arguments.
-        
-        TODO: This has to be rewritten so that:
-        - if output is bitmap (PNG, GTK), then clone the current surface via 
-          Cairo
-        - if output is vector, doing the source paint in Cairo ends up in a
-          vector file with an embedded bitmap - not good. So we just create
-          another Box instance with the currently loaded script, copy the
-          current namespace and save its output in a file.
-        '''
-
-        # check output format from extension
-        import os
-        f, ext = os.path.splitext(filename)
-        
-        if ext == "png":
-            # bitmap snapshots can be done via Cairo
-            if isinstance(self.surface, cairo.ImageSurface):
-                # if current surface is a bitmap image surface, we can write the 
-                # file right away
-                self.surface.write_to_png(filename)
-            else:
-                # otherwise, we clone the contents of current surface onto
-                # a temporary one
-                temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
-                ctx = cairo.Context(temp_surface)
-                ctx.set_source_surface(self.surface, 0, 0)
-                ctx.paint()                
-                temp_surface.write_to_png(filename)
-                del temp_surface      
-        
-        if ext in (".svg",".ps",".pdf"):
-            # vector snapshots are made with another temporary Box
-            
-            # create a Box instance using the current running script
-            box = Box(inputscript=self.inputscript, outputfile=filename)
-            box.run()
-            
-            # FIXME: This approach makes random values/values generated at
-            # start be re-calculated once a script runs again :/
-            #
-            # this will have to do until we have a proper Canvas class
-            # which would register all objects before passing it to the
-            # Cairo context
-            
-            # set its variables to the current ones
-            for v in self.vars:
-                box.namespace[v.name] = self.namespace[v.name]
-            if 'setup' in box.namespace:
-                box.namespace['setup']()
-            if 'draw' in box.namespace:
-                box.namespace['draw']()
-            box.finish()
-            print "Saved snapshot to %s" % filename
-            del box
 
     def setvars(self,args):
         '''Defines the variables that can be externally set.
@@ -976,7 +977,7 @@ class OptionsContainer:
     def __init__(self):
         #self.outputmode = RGB
         self.colormode = RGB
-        self.colorrange = 1.
+        self.color_range = 1.
 
         self.fillapply = True
         self.strokeapply = False

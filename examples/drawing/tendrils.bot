@@ -1,3 +1,7 @@
+# Tendrils drawing example from nodebox.net
+# fetched at _____
+
+
 size(500, 500)
  
 from math import pi, sin, cos, radians

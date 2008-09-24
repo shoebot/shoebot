@@ -13,6 +13,8 @@ colormode(HSB)
 for x, y in grid(50,50,12,12):
     push()
     fill(0.3,random(),random(0.2,0.6),0.8)
-    skew(random(-50,50))
+    a = random(-50,50)
+    print a
+    skew(a)
     star(x+random(-5,5),y+random(-5,5),random(10),random(1,40),15)
     pop()
