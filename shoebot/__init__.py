@@ -70,6 +70,7 @@ class Box:
         self._fill = None
         self._stroke = None
 
+        self.context = None
         self.surface = None
         
         self.gtkmode = gtkmode
@@ -114,6 +115,13 @@ class Box:
             self.context = cairo.Context(self.surface)
         else:
             raise ShoebotError("makesurface: Invalid extension")
+            
+    def get_context(self):
+        return self.context
+    
+    def get_surface(self):
+        return self.surface
+    
 
     # ---- SHAPE -----
 

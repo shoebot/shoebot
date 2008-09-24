@@ -8,9 +8,6 @@ import gtk
 import pango
 import gtksourceview
 
-from pygments.lexers import PythonLexer
-from pygments.styles.pastie import PastieStyle
-
 # only necessary for ShoebotError
 import shoebot
 
