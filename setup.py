@@ -11,12 +11,7 @@ setup(name = "shoebot",
     license = 'GPL v3',
     url = "http://tinkerhouse.net/shoebot",
     packages = ["shoebot"],
-    data_files = [('share/shoebot', ['icon.png']),
-                    ("share/shoebot/examples", ["examples/primitives.bot", "examples/socketcontrol.pd", "examples/socketcontrol.bot", "examples/socketcontrol2.bot"]),
-                #    ("share/shoebot/examples",
-                #     [os.path.join(root, file_) for file_ in files])
-                #  for root, dirs, files in os.walk('examples')
-                    ],
+    data_files = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_) for file_ in files]) for root,dir,files in os.walk('examples')],
       scripts = ["sbot", "shoebot-ide"],
       long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
