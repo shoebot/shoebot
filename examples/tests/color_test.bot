@@ -1,0 +1,35 @@
+size (510,60)
+colormode(RGB)
+colorrange(255)
+
+grid_w = 2
+grid_h = 10
+
+c = 0
+
+for x, y in grid(255,6,grid_w,grid_h):
+    c = x / grid_w
+    step = y / grid_h
+
+    if step > 2:
+        colormode(HSB)
+
+    # RGB
+    if step == 0:
+        fill(c,0,0)
+    elif step == 1:
+        fill(0,c,0)
+    elif step == 2:
+        fill(0,0,c)
+    # HSB tests
+    elif step == 3:
+        fill(c,127,127)
+    elif step == 4:
+        fill(0,c,127)
+    elif step == 5:
+        fill(0,127,c)
+
+    rect(x,y,grid_w,grid_h)
+
+
+
