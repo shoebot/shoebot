@@ -333,7 +333,7 @@ class Box:
             elif cmd == CLOSE:
                 self.context.close_path()
             else:
-                raise ShoebotError("PathElement(): error parsing path element command")
+                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
         ## TODO
         ## if path has state attributes, set the context to those, saving
         ## before and replacing them afterwards with the old values

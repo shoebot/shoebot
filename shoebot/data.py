@@ -38,18 +38,13 @@ class Point:
 
     def __repr__(self):
         return (self.x, self.y)
-
     def __str__(self):
         return "Point(%.3f, %.3f)" % (self.x, self.y)
-
-    # i added this
     def __getitem__(self,key):
         return (float(self.x), float(self.y))[key]
-
     def __eq__(self, other):
         if other is None: return False
         return self.x == other.x and self.y == other.y
-
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -60,9 +55,6 @@ class BezierPath:
     this is more of an "agnostic" implementation that won't
     require any other back-ends to work with paths.
     """
-    # we don't use these yet
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
-    #kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, path=None):
         if path is None:
@@ -73,6 +65,11 @@ class BezierPath:
         elif isinstance(path, BezierPath):
             self.data = path.data
             ##util._copy_attrs(path, self, self.stateAttributes)
+        elif isinstance(path, basestring):
+            # SVG path goes here
+            # - check if SVG datastring is valid
+            # - parse it
+            pass
         else:
             raise ShoebotError, "Don't know what to do with %s." % path
         self.closed = False
@@ -87,30 +84,23 @@ class BezierPath:
     ### Path methods ###
 
     def moveto(self, x, y):
-        el = PathElement(MOVETO, x, y)
-        self.data.append(el)
+        self.data.append(PathElement(MOVETO, x, y))
 
     def lineto(self, x, y):
-        el = PathElement(LINETO, x, y)
-        self.data.append(el)
+        self.data.append(PathElement(LINETO, x, y))
 
     def curveto(self, c1x, c1y, c2x, c2y, x, y):
-        el = PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
-        self.data.append(el)
+        self.data.append(PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y))
 
     def closepath(self):
-        el = PathElement(CLOSE)
-        self.data.append(el)
+        self.data.append(PathElement(CLOSE))
         self.closed = True
 
     def __getitem__(self, index):
-        cmd, el = self.data[index]
-        return PathElement(cmd, el)
-
+        return self.data[index]
     def __iter__(self):
         for i in range(len(self.data)):
             yield self.data[i]
-
     def __len__(self):
         return len(self.data)
 
@@ -120,6 +110,8 @@ class BezierPath:
         don't rely on it :o)
         '''
         self.segment_cache = None
+
+        # parsepathdata()
 
         ## TODO
         # Initial check, we should check for
@@ -164,6 +156,7 @@ class BezierPath:
         Wrapper method for hiding the data var
         from public access
         '''
+        # parsepathdata()
         if isinstance(el, PathElement):
             self.data.append(el)
         else:
@@ -210,11 +203,8 @@ class PathElement:
         elif self.cmd == CURVETO:
             return (CURVETO, self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)[key]
         elif self.cmd == CLOSE:
-            # the extra coordinates are to avoid a one-element tuple, which doesn't
-            # play nice with BezierPath
-            return (CLOSE, 0.0, 0.0)[key]
+            return (CLOSE,)[key]
         return
-
     def __repr__(self):
         if self.cmd == MOVETO:
             return "(MOVETO, %.6f, %.6f)" % (self.x, self.y)
@@ -223,15 +213,13 @@ class PathElement:
         elif self.cmd == CURVETO:
             return "(CURVETO, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f)" % (self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)
         elif self.cmd == CLOSE:
-            return "(CLOSE, 0.0, 0.0)"
-
+            return "(CLOSE,)"
     def __eq__(self, other):
         if other is None: return False
         if self.cmd != other.cmd: return False
         return self.x == other.x and self.y == other.y \
             and self.c1x == other.c1x and self.c1y == other.c1y \
             and self.c1x == other.c1x and self.c1y == other.c1y
-
     def __ne__(self, other):
         return not self.__eq__(other)
 
