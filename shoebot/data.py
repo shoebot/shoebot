@@ -2,6 +2,7 @@
 Shoebot data structures for bezier path handling
 '''
 
+from __future__ import division
 import util
 
 RGB = "rgb"
@@ -126,7 +127,7 @@ class BezierPath:
         # - tuples
         # - list
         # - PathElement
-        
+
         # oh my, this just creates straight lines, no curves
         # this needs to be rewritten
 
@@ -240,148 +241,64 @@ class Color(object):
     Since we have no Cocoa, we have no way to use colour management for the moment.
     So we took another approach.
 
+    Attributes:
+    r, g, b (0-1)
+    hue, saturation, lightness (0-1)
+
     This stores color values as a list of 4 floats (RGBA) in a 0-1 range.
-    Mode and range are mandatory arguments so we know how we need to parse
-    the input and make sure output works.
+    Settings for color mode and range can be specified, and the input values
+    will be converted to 0-1 range and RGB mode.
+
+    A box instance can be passed to it, in which case, Color will read
+    the input values according to that Box's color mode and range settings.
+
 
     Shoebot's color() includes these arguments on the object constructor; they should be used in
     any other case where color() is not enough and a direct call to Color() is needed.
     '''
 
-    # This code is still very messy, recovering from a big bug hunt. But works!
-
-    def __init__(self, mode=RGB, crange=1, *args):
-        # check for proper input
-        if not isinstance(mode, basestring):
-            raise TypeError("ERROR: Color() was called with an invalid mode argument (" + str(mode) + ")")
-
-        if DEBUG:
-            print "-----------------------------------------"
-            print "DEBUG(Color): __init__ args: " + str(args)
-            print "DEBUG(Color): range: " + str(crange)
-            print "DEBUG(Color): mode: " + str(mode)
-
-        if len(args) == 1 and isinstance(args[0], tuple):
-            if DEBUG: print "DEBUG(Color): got a tuple: " + str(args[0])
-            clr = args[0]
-            if len(clr) == 3:
-                if DEBUG: print "DEBUG(Color): Got a 3 element tuple"
-                clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, 1)
-            elif len(clr) == 4:
-                if DEBUG: print "DEBUG(Color): Got a 4 element tuple"
-                clr = (clr[0]/crange, clr[1]/crange, clr[2]/crange, clr[3])
-            elif len(clr) == 1:
-                if isinstance(clr, tuple):
-                    if DEBUG: print "DEBUG(Color): Got a 1 element tuple"
-                    clr = clr[0]
-                    clr = (clr[0]/crange,clr[1]/crange,clr[2]/crange,1)
-            elif len(clr) == 2:
-                if DEBUG: print "DEBUG(Color): Got a 2 element tuple"
-                clr = (clr[0]/crange,clr[0]/crange,clr[0]/crange,clr[1])
-            else:
-                raise ShoebotError("Wrong colour tuple")
-        elif len(args) == 1 and args[0] is None:
-            if DEBUG: print "DEBUG(Color): Got nothing, defaulting to black"
-            clr = (0,0,0,1)
-        elif len(args) == 1 and isinstance(args[0], Color):
-            if DEBUG: print "DEBUG(Color): Got a Color object"
-            clr = args[0].get_rgba(1)
-        elif len(args) == 1 and isinstance(args[0], (int,float)): # Gray, no alpha
-            if DEBUG: print "DEBUG(Color): got an int/float:" + str(args[0])
-            g = float(args[0])
-            clr = (g/crange, g/crange, g/crange, 1)
-        elif len(args) == 2: # Gray and alpha
-            if DEBUG: print "DEBUG(Color): Got 2 args"
-            g, a = args
-            clr = (g, g, g, a)
-        elif len(args) == 3 and mode == RGB: # RGB, no alpha
-            if DEBUG: print "DEBUG(Color): Got 3 args"
-            r, g, b = args
-            clr = (r/crange, g/crange, b/crange, 1)
-        elif len(args) == 3 and mode == HSB: # HSB, no alpha
-            if DEBUG: print "DEBUG(Color): Got 3 args (HSB):" + str(args)
-            h, s, b = args
-            r, g, b = util.hsl_to_rgb(float(h)/crange, float(s)/crange, float(b)/crange)
-            clr = (r, g, b, 1)
-        elif len(args) == 4 and mode == RGB: # RGB and alpha
-            if DEBUG: print "DEBUG(Color): Got 4 args"
-            r, g, b, a = args
-            clr = (r/crange, g/crange, b/crange, a)
-        elif len(args) == 4 and mode == HSB: # HSB and alpha
-            if DEBUG: print "DEBUG(Color): Got 4 args (HSB)"
-            h, s, b, a = args
-            r, g, b = util.hsl_to_rgb(h/crange, s/crange, b/crange)
-            clr = (r, g, b, a/crange)
+    def __init__(self, v, color_range = 1, mode=RGB, box=None):
+        # if we got a box argument, use its values
+        if box:
+            self.color_range = box.opt.color_range
+            self.color_mode = box.opt.color_mode
         else:
-            if DEBUG: print "DEBUG(Color): WARNING: Couldn't parse input, defaulting to black"
-            clr = (0,0,0,1)
+            self.color_range = color_range
+            self.color_mode = mode
 
-        # debug device for warning when a colour is not inside expected values
-        warn = False
-        for value in clr:
-            if not (value >= 0 and value <= 1):
-                warn = True
-        if warn and DEBUG:
-            if DEBUG: print "WARNING(Color): Output color is not a float between 0 and 1"
-            if DEBUG: print str(clr)
+        if self.color_mode is RGB:
+            self.r, self.g, self.b, self.a = util.parse_color(v, self.color_range)
+        elif self.color_mode is HSB:
+            self.r, self.g, self.b, self.a = util.parse_hsb_color(v, self.color_range)
 
-        self.red = clr[0]
-        self.green = clr[1]
-        self.blue = clr[2]
-        self.alpha = clr[3]
-
-        if DEBUG:
-            print "DEBUG(Color): Color set to (" + ', '.join((str(self.red), str(self.green), str(self.blue), str(self.alpha))) + ")"
-            print
-
-        #print self.red, self.green, self.blue, self.alpha
+        # convenience attributes
+        self.red = self.r
+        self.green = self.g
+        self.blue = self.b
+        self.alpha = self.a
 
         clr_hsb = util.rgb_to_hsl(self.red, self.green, self.blue)
         self.hue = clr_hsb[0]
         self.saturation = clr_hsb[1]
         self.lightness = clr_hsb[2]
 
-    def get_rgb(self,colorrange):
-        colorrange = float(colorrange)
-        return (self.red*colorrange,self.green*colorrange,self.blue*colorrange)
-    def get_rgba(self,colorrange):
-        colorrange = float(colorrange)
-        return (self.red*colorrange,self.green*colorrange,self.blue*colorrange,self.alpha*colorrange)
-    def get_hsb(self,colorrange):
-        colorrange = float(colorrange)
-        return (self.hue*colorrange,self.saturation*colorrange,self.brightness*colorrange)
-    def get_hsba(self,colorrange):
-        colorrange = float(colorrange)
-        return (self.hue*colorrange,self.saturation*colorrange,self.brightness*colorrange,self.alpha*colorrange)
-
-    def __getitem__(self, key):
-        return tuple(self.get_rgba(1))[key]
-
+    def __getitem__(self, index):
+        return (self.r, self.g, self.b, self.a)[index]
     def __repr__(self):
-        #return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, self.red,
-                #self.green, self.blue, self.alpha)
-        # Note: I'm not sure this is right coding practice -- ricardo
-        return str(self.get_rgba(1))
-
-    def __str__(self):
-        return str(self.get_rgba(1))
-
+        return "(%f,%f,%f,%f)" % (self.r, self.g, self.b, self.a)
     def __div__(self, other):
         value = float(other)
         return (self.red/value, self.green/value, self.blue/value, self.alpha/value)
 
+    def blend(self,other,factor):
+        r = (self.r + other.r) / factor
+        g = (self.g + other.g) / factor
+        b = (self.b + other.b) / factor
+        a = (self.a + other.a) / factor
+        return Color(r,g,b,a)
     def copy(self):
         new = self.__class__()
         return new
-
-    ##def blend(self, otherColor, factor):
-        #"""Blend the color with otherColor with a factor; return the new color. Factor
-        #is a float between 0.0 and 1.0.
-        #"""
-        ##if hasattr(otherColor, "color"):
-            ##otherColor = otherColor._rgb
-        ##return self.__class__(color=self._rgb.blendedColorWithFraction_ofColor_(
-            ##factor, otherColor))
 
 class Variable(object):
     '''Taken from Nodebox'''
@@ -442,3 +359,51 @@ class Variable(object):
 
     def __repr__(self):
         return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
+
+
+
+
+def test_color():
+
+    # this test checks with a 4 decimal point precision
+
+    testvalues = {
+        128: (0.501961,0.501961,0.501961,1.000000),
+        (127,): (0.498039, 0.498039, 0.498039, 0.498039),
+        (127, 64): (0.498039, 0.498039, 0.498039, 0.250979),
+        (0, 127, 255): (0.0, 0.498039, 1.0, 1.0),
+        (0, 127, 255, 64): (0.0, 0.498039, 1.0, 0.250979),
+        '#0000FF': (0.000000,0.000000,1.000000,1.000000),
+        '0000FF': (0.000000,0.000000,1.000000,1.000000),
+        '#0000FFFF': (0.000000,0.000000,1.000000,1.000000),
+        '000000ff': (0.000000,0.000000,0.000000,1.000000),
+        }
+
+    passed = True
+    for value in testvalues:
+        result = Color(value, color_range = 255)
+        print "%s = %s (%s, %s)" % (str(value), str(result), str(result.color_range), str(result.color_mode))
+        equal = True
+        for index in range(0,4):
+            # check if difference is bigger than 0.0001, since floats
+            # are tricky things and behave a bit weird when comparing directly
+            if result[index] != 0. and testvalues[value][index] != 0.:
+                if not 0.9999 < result[index] / testvalues[value][index] < 1.0001:
+                    print result[index] / testvalues[value][index]
+                    equal = False
+        if not equal:
+            print "Test Error:"
+            print "  Value:      %s" % (str(value))
+            print "  Expected:   %s" % (str(testvalues[value]))
+            print "  Received:   %s" % (str(result))
+            passed = False
+    if passed:
+        print "All color tests passed!"
+
+if __name__ == '__main__':
+    test_color()
+
+
+
+
+

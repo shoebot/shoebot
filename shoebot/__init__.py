@@ -479,47 +479,28 @@ class Box:
         '''
         if mode is not None:
             if mode == "rgb":
-                self.opt.colormode = RGB
+                self.opt.color_mode = RGB
             elif mode == "hsb":
-                self.opt.colormode = HSB
+                self.opt.color_mode = HSB
             else:
                 raise NameError, "Only RGB and HSB colormodes are supported."
         if crange is not None:
             self.opt.color_range = crange
-        return self.opt.colormode
+        return self.opt.color_mode
 
     def color(self,*args):
-        if len(args) == 1 and isinstance(args[0],Color):
-            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.color_range, args[0])
-        elif len(args) == 1 and isinstance(args,tuple):
-            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.color_range, args[0])
-        elif len(args) == 1 and isinstance(args,int):
-            if DEBUG: print "DEBUG(color): arg: " + str(args[0])
-            return Color(self.opt.colormode, self.opt.color_range, args, args, args)
-        elif len(args) == 3:
-            return Color(self.opt.colormode, self.opt.color_range, args[0], args[1], args[2])
-        elif len(args) == 4:
-            return Color(self.opt.colormode, self.opt.color_range, args[0], args[1], args[2], args[3])
+        if isinstance(args[0], Color):
+            return Color(args[0], mode=RGB, color_range=1)
         else:
-            if DEBUG: print "DEBUG(color): args: " + str(args)
-            raise ShoebotError("color(): Invalid arguments")
+            return Color(args, box=self)
 
-
-    def color_range(self, crange):
+    def colorrange(self, crange):
         self.opt.color_range = float(crange)
-        if DEBUG: print "DEBUG(color_range): Set to " + str(self.opt.color_range)
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-
-        if DEBUG: print "DEBUG(fill): args: " + str(args[0])
         self.opt.fillapply = True
-        if isinstance(args[0], Color):
-            self.opt.fillcolor = Color(self.opt.colormode,1,args[0])
-        else:
-            self.opt.fillcolor = self.color(args)
+        self.opt.fillcolor = self.color(*args)
         return self.opt.fillcolor
 
     def nofill(self):
@@ -528,10 +509,8 @@ class Box:
 
     def stroke(self,*args):
         '''Sets a stroke color, applying it to new paths.'''
-        if DEBUG: print "DEBUG(stroke): args: " + str(args[0])
         self.opt.strokeapply = True
-        if len(args) > 0:
-            self.opt.strokecolor = self.color(args[0])
+        self.opt.strokecolor = self.color(*args)
         return self.opt.strokecolor
 
     def nostroke(self):
@@ -547,17 +526,10 @@ class Box:
 
     def background(self,*args):
         '''Sets the background colour.'''
-        if DEBUG: print "DEBUG(background): args:" + str(args)
-        if len(args) > 0:
-            if len(args) == 1:
-                bgcolor = self.color(args[0],args[0],args[0])
-            else:
-                bgcolor = self.color(args)
-            r, g, b = bgcolor.get_rgb(1)
-            self.context.set_source_rgb(r,g,b)
-            self.context.paint()
-        else:
-            self.context.paint_with_alpha(a)
+
+        bg = self.color(*args)
+        self.context.set_source_rgb(bg.r, bg.g, bg.b)
+        self.context.paint()
 
     #### Text
 
@@ -676,6 +648,8 @@ class Box:
         if self.gtkmode:
             # in windowed mode we don't set the surface in the Box itself,
             # the gtkui module takes care of doing that
+
+            # TODO: Parent widget as an argument?
             self.WIDTH = int(w)
             self.HEIGHT = int(h)
             self.namespace['WIDTH'] = self.WIDTH
@@ -772,16 +746,16 @@ class Box:
         - called from the Shoebot window menu, which requires the source surface
         to be specified in the arguments.
 
-        TODO: This has to be rewritten so that:
-        - if output is bitmap (PNG, GTK), then clone the current surface via
+        - if output is bitmap (PNG, GTK), then it clones current surface via
           Cairo
         - if output is vector, doing the source paint in Cairo ends up in a
           vector file with an embedded bitmap - not good. So we just create
           another Box instance with the currently loaded script, copy the
           current namespace and save its output in a file.
+
+        The shortcomings of this is that
         '''
 
-        # check output format from extension
         import os
         f, ext = os.path.splitext(filename)
 
@@ -836,14 +810,14 @@ class Box:
         # we need to give cairo values between 0-1
         # and for that we need to make a special request to Color()
         if self._fill is not None:
-            fillclr = self._fill.get_rgba(1)
+            fillclr = self._fill
         else:
-            fillclr = self.opt.fillcolor.get_rgba(1)
+            fillclr = self.opt.fillcolor
 
         if self._stroke is not None:
-            strokeclr = self._stroke.get_rgba(1)
+            strokeclr = self._stroke
         else:
-            strokeclr = self.opt.strokecolor.get_rgba(1)
+            strokeclr = self.opt.strokecolor
 
         self.context.save()
         if self.opt.fillapply is True:
@@ -866,8 +840,6 @@ class Box:
         else:
             pass
         self.context.restore()
-        if DEBUG: print "DEBUG: fill_and_stroke() done!"
-
 
     def finish(self):
         '''Finishes the surface and writes it to the output file.'''
@@ -976,13 +948,13 @@ class Box:
 class OptionsContainer:
     def __init__(self):
         #self.outputmode = RGB
-        self.colormode = RGB
+        self.color_mode = RGB
         self.color_range = 1.
 
         self.fillapply = True
         self.strokeapply = False
-        self.fillcolor = Color(RGB,1,.7,.7,.7,1)
-        self.strokecolor = Color(RGB,1,.2,.2,.2,1)
+        self.fillcolor = Color('#DDDDDD')
+        self.strokecolor = Color('#222222')
         self.strokewidth = 1.0
 
         self.rectmode = 'corner'

@@ -14,7 +14,7 @@ nofill()
 for i in range(50):
 
     # Set the stroke color to a random tint of orange
-    stroke((random(), random(0.31), 0))
+    stroke(random(), random(0.31), 0)
 
     # Set the stroke width
     strokewidth(random(0.02, 0.2))

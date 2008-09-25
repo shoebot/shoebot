@@ -16,6 +16,8 @@ this file is part of Shoebot
 
 size(200,200)
 
+colormode(HSB)
+
 # create the variables we want to use in the script
 # and that should be accessible from outside;
 #
@@ -93,7 +95,6 @@ def setup():
 def draw():
     # khaki background
     background(76, 102, 51)
-
     block(50, 180, one, hue=30)
     block(100, 180, two, hue=120)
     block(150, 180, three, hue=210)

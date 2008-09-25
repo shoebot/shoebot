@@ -33,6 +33,8 @@ Copyright (C) 2006 Jos Hirth, kaioa.com
 Subject to the terms of the GPLv2 or any later version.
 '''
 
+from __future__ import division
+
 def rgb_to_hsl(r, g, b):
     '''Converts RGB values to the HSL colourspace. '''
 
@@ -109,6 +111,89 @@ def hsl_to_rgb (h, s, l):
         rgb[1] = hue_2_rgb (v1, v2, h*6)
         rgb[2] = hue_2_rgb (v1, v2, h*6 - 2.0)
     return rgb
+
+def hex2dec(hexdata):
+    import string
+    return int(string.atoi(hexdata, 16))
+
+def dec2hex(number):
+    return "%X" % 256
+
+def parse_color(data, color_range=1):
+    '''Receives a colour definition and returns a (r,g,b,a) tuple.
+
+    Accepts:
+    - v
+    - (v)
+    - (v,a)
+    - (r,g,b)
+    - (r,g,b,a)
+    - #RRGGBB
+    - RRGGBB
+    - #RRGGBBAA
+    - RRGGBBAA
+
+    Returns a (red, green, blue, alpha) tuple, with values ranging from
+    0 to 1.
+
+    The 'color_range' parameter sets the colour color_range in which the
+    colour data values are specified.
+    '''
+    from data import Color
+    if isinstance(data, (int,float)):
+        red = green = blue = data / color_range
+        alpha = 1.
+
+    elif isinstance(data, Color):
+        red, green, blue, alpha = data
+
+    elif isinstance(data, (tuple,list)):
+        # normalise values according to the supplied colour range
+        # for this we make a list with the normalised data
+        color = []
+        for index in range(0,len(data)):
+            color.append(data[index] / color_range)
+
+        if len(color) == 1:
+            red = green = blue = alpha = color[0]
+        elif len(color) == 2:
+            red = green = blue = color[0]
+            alpha = color[1]
+        elif len(color) == 3:
+            red = color[0]
+            green = color[1]
+            blue = color[2]
+            alpha = 1.
+        elif len(color) == 4:
+            red = color[0]
+            green = color[1]
+            blue = color[2]
+            alpha = color[3]
+
+    elif isinstance(data, basestring):
+        # hexstring: remove hash character, if any
+        data = data.strip('#')
+        if len(data) == 6:
+            # RRGGBB
+            red = hex2dec(data[0:2]) / color_range
+            green = hex2dec(data[2:4]) / color_range
+            blue = hex2dec(data[4:6]) / color_range
+            alpha = 1.
+        elif len(data) == 8:
+            red = hex2dec(data[0:2]) / color_range
+            green = hex2dec(data[2:4]) / color_range
+            blue = hex2dec(data[4:6]) / color_range
+            alpha = hex2dec(data[6:8]) / color_range
+    return (red, green, blue, alpha)
+
+def parse_hsb_color(data, color_range=1):
+    hue, saturation, brightness, alpha = parse_color(data, color_range)
+    red, green, blue = hsl_to_rgb(hue, saturation, brightness)
+    return (red, green, blue, alpha)
+
+
+
+
 
 _initialized = False
 def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):
