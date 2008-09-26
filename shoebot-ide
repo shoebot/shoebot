@@ -14,6 +14,8 @@ import shoebot
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
+ICON_FILE = '/usr/share/shoebot/icon.png'
+
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
         return (v, v, v)
@@ -453,8 +455,11 @@ class View(gtk.Window):
         buffer.set_highlight(True)
 
 
-        #set icon
-        self.set_icon_from_file('/usr/share/shoebot/icon.png')
+        try:
+            self.set_icon_from_file(ICON_FILE)
+        except gobject.GError:
+            # icon not found = no icon
+            pass
 
         self.show_all()
 
