@@ -123,6 +123,7 @@ called on that instance.
 The Box instance should be created with the output file name as an argument. 
 
   box = shoebot.Box("output.svg")
+  box.size(400,400)
   box.rect(10,10,100,100)
 
 When you're finished with drawing, just call
@@ -131,18 +132,20 @@ When you're finished with drawing, just call
 
 and your output file should be created.
 
-Also, when using bitmap files, you can save snapshots of the current state
-of the Box instance like so:
+Also, you can save snapshots of the current state if the Box instance like so:
 
   box.snapshot("snap.png")
-
-Note that this doesn't work if your Box object was created with a vector
-format output.
 
 You can even call external Shoebot/Nodebox scripts from your Python script:
 
   box.run("example.bot")
 
+Known bugs
+----------
+* when using snapshot() or saving images from the GTK window interface
+  right-click menu, any random values in the script will be recalculated. This
+  cannot be avoided until we implement a proper Canvas for Shoebot, which will
+  probably take a while.
 
 Links
 -----
