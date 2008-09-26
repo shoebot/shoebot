@@ -1,0 +1,25 @@
+
+Some of the example files in this folder are taken from other projects.
+
+The files:
+
+drawing/appending_transforms.bot
+        covergen.bot
+        primitives.bot
+        tendrils.bot
+        ovals.bot
+        star_fun.bot
+
+grid/*
+math/*
+
+are taken from Nodebox (www.nodebox.net), and are available under an 
+MIT-style license. Nodebox is Copyright (c) Frederik de Bleser and Tom de 
+Smedt.
+
+The Nodebox examples were written by Frederik de Bleser (frederik@pandora.be)
+and Tom De Smedt (tomdesmedt@organisms.be).
+
+
+The file socketcontrol/random_shapes_sliders.bot is taken from DrawBot.
+
