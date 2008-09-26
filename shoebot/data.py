@@ -23,12 +23,15 @@ BOOLEAN = 3
 BUTTON = 4
 
 class ShoebotError(Exception): pass
+class NodeBoxError(ShoebotError): pass
 
 class Point:
     '''
     Taken from Nodebox and modified
     '''
     def __init__(self, *args):
+        if len(args) == 3:
+            self.x, self.y, self.z = args
         if len(args) == 2:
             self.x, self.y = args
         elif len(args) == 1:

@@ -57,6 +57,9 @@ class Box:
     CORNER = "corner"
     CORNERS = "corners"
 
+    DEFAULT_WIDTH = 200
+    DEFAULT_HEIGHT = 200
+
     def __init__ (self, inputscript=None, gtkmode=False, outputfile = None):
 
         self.inputscript = inputscript
@@ -78,8 +81,8 @@ class Box:
         self._oldvars = self.vars
         self.namespace = {}
 
-        self.WIDTH = None
-        self.HEIGHT = None
+        self.WIDTH = Box.DEFAULT_WIDTH
+        self.HEIGHT = Box.DEFAULT_HEIGHT
 
     def setsurface(self, width=None, height=None, target=None):
         '''Sets the surface on which the Box object will operate.
@@ -88,6 +91,12 @@ class Box:
         output filename; it also accepts a Cairo surface or context as an
         argument, and attaches to them as expected.
         '''
+
+        if not width:
+            width = self.WIDTH
+        if not height:
+            height = self.HEIGHT
+
         if not target:
             raise ShoebotError("setsurface(): No target specified!")
         if isinstance(target, basestring):
@@ -108,10 +117,8 @@ class Box:
 
     def get_context(self):
         return self.context
-
     def get_surface(self):
         return self.surface
-
 
     #### Drawing
 
@@ -308,12 +315,11 @@ class Box:
             raise ShoebotError, "drawpath(): Input is not a valid BezierPath object"
         self.context.save()
         for element in path.data:
-#            if isinstance(element,basestring):
-#                cmd = element
-            if isinstance(element,PathElement):
-                cmd = element[0]
-            else:
+            if not isinstance(element,PathElement):
                 raise ShoebotError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
+
+            cmd = element[0]
+
             if cmd == MOVETO:
                 x = element.x
                 y = element.y
@@ -542,7 +548,7 @@ class Box:
             face = util.create_cairo_font_face_for_file(fontpath, 0)
             self.context.set_font_face(face)
         else:
-            self.get_font_face()
+            self.context.get_font_face()
         if fontsize is not None:
             self.fontsize(fontsize)
 
@@ -635,36 +641,6 @@ class Box:
         self.context.rectangle(x, y, width, height)
         self.context.fill()
 
-    # ----- UTILITY -----
-
-    def size(self,w=None,h=None):
-        '''Sets the size of the canvas, and creates a Cairo surface and context.
-
-        Needs to be the first function call in a script.'''
-
-        if not w or not h:
-            raise ShoebotError("size(): width and height arguments missing")
-
-        if self.gtkmode:
-            # in windowed mode we don't set the surface in the Box itself,
-            # the gtkui module takes care of doing that
-
-            # TODO: Parent widget as an argument?
-            self.WIDTH = int(w)
-            self.HEIGHT = int(h)
-            self.namespace['WIDTH'] = self.WIDTH
-            self.namespace['HEIGHT'] = self.HEIGHT
-
-        else:
-            self.WIDTH = int(w)
-            self.HEIGHT = int(h)
-            # hack to get WIDTH and HEIGHT into the local namespace for running
-            self.namespace['WIDTH'] = self.WIDTH
-            self.namespace['HEIGHT'] = self.HEIGHT
-            # make a new surface for us
-            self.setsurface(w, h, self.targetfilename)
-        # return (self.WIDTH, self.HEIGHT)
-
     #### Variables
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
@@ -686,6 +662,22 @@ class Box:
             if v.name == name:
                 return v
         return None
+
+    def setvars(self,args):
+        '''Defines the variables that can be externally set.
+
+        Accepts a dictionary with variable names assigned
+        to default values. If called more than once, it updates
+        already existing values and adds new keys to accomodate
+        new entries.
+
+        DEPRECATED, use addvar() instead
+        '''
+        if not isinstance(args, dict):
+            raise ShoebotError('setvars(): setvars needs a dict!')
+        vardict = args
+        for item in vardict:
+            self.var(item, NUMBER, vardict[item])
 
     #### Utility
 
@@ -802,6 +794,35 @@ class Box:
 
     #### Core functions
 
+    def size(self,w=None,h=None):
+        '''Sets the size of the canvas, and creates a Cairo surface and context.
+
+        Needs to be the first function call in a script.'''
+
+        if not w:
+            w = self.WIDTH
+        if not h:
+            h = self.HEIGHT
+
+        if self.gtkmode:
+            # in windowed mode we don't set the surface in the Box itself,
+            # the gtkui module takes care of doing that
+            # TODO: Parent widget as an argument?
+            self.WIDTH = int(w)
+            self.HEIGHT = int(h)
+            self.namespace['WIDTH'] = self.WIDTH
+            self.namespace['HEIGHT'] = self.HEIGHT
+
+        else:
+            self.WIDTH = int(w)
+            self.HEIGHT = int(h)
+            # hack to get WIDTH and HEIGHT into the local namespace for running
+            self.namespace['WIDTH'] = self.WIDTH
+            self.namespace['HEIGHT'] = self.HEIGHT
+            # make a new surface for us
+            self.setsurface(w, h, self.targetfilename)
+        # return (self.WIDTH, self.HEIGHT)
+
     def fill_and_stroke(self):
         '''
         Apply fill and stroke settings, and apply the current path to the final surface.
@@ -857,24 +878,6 @@ class Box:
             self.surface.write_to_png(self.targetfilename)
         else:
             raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
-
-
-
-    def setvars(self,args):
-        '''Defines the variables that can be externally set.
-
-        Accepts a dictionary with variable names assigned
-        to default values. If called more than once, it updates
-        already existing values and adds new keys to accomodate
-        new entries.
-
-        DEPRECATED, use addvar() instead
-        '''
-        if not isinstance(args, dict):
-            raise ShoebotError('setvars(): setvars needs a dict!')
-        vardict = args
-        for item in vardict:
-            self.var(item, NUMBER, vardict[item])
 
     def run(self, inputcode=None):
         '''
