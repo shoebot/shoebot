@@ -10,7 +10,9 @@ HSB = "hsb"
 
 MOVETO = "moveto"
 LINETO = "lineto"
+RLINETO = "rlineto"
 CURVETO = "curveto"
+RCURVETO = "rcurveto"
 CLOSE = "close"
 
 DEBUG = False
@@ -170,38 +172,39 @@ class PathElement:
         self.cmd = cmd
         if cmd == MOVETO:
             assert len(args) == 2
-            self.x = args[0]
-            self.y = args[1]
-            self.c1x = self.c1y = None
-            self.c2x = self.c2y = None
+            self.x, self.y = args
+            self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == LINETO:
             assert len(args) == 2
-            self.x, self.y = args[0], args[1]
-            self.c1x = self.c1y = None
-            self.c2x = self.c2y = None
+            self.x, self.y = args
+            self.c1x = self.c1y = self.c2x = self.c2y = None
+        elif cmd == RLINETO:
+            assert len(args) == 2
+            self.x, self.y = args
+            self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == CURVETO:
             assert len(args) == 6
-            self.c1x,self.c1y = args[0], args[1]
-            self.c2x,self.c2y = args[2], args[3]
-            self.x, self.y = args[4], args[5]
+            self.c1x, self.c1y, self.c2x,self.c2y, self.x, self.y = args
+        elif cmd == RCURVETO:
+            assert len(args) == 6
+            self.c1x, self.c1y, self.c2x,self.c2y, self.x, self.y = args
         elif cmd == CLOSE:
             assert args is None or len(args) == 0
-            self.x = self.y = None
-            self.c1x = self.c1y = None
-            self.c2x = self.c2y = None
+            self.x = self.y = self.c1x = self.c1y = self.c2x = self.c2y = None
         else:
-            print "MALFORMED PATH ELEMENT"
-            self.x = self.y = None
-            self.ctrl1 = None
-            self.ctrl2 = None
+            raise ShoebotError('Wrong initialiser for PathElement (got "%s")' % (cmd))
 
     def __getitem__(self,key):
         if self.cmd == MOVETO:
             return (MOVETO, self.x, self.y)[key]
         elif self.cmd == LINETO:
             return (LINETO, self.x, self.y)[key]
+        elif self.cmd == RLINETO:
+            return (RLINETO, self.x, self.y)[key]
         elif self.cmd == CURVETO:
             return (CURVETO, self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)[key]
+        elif self.cmd == RCURVETO:
+            return (RCURVETO, self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)[key]
         elif self.cmd == CLOSE:
             return (CLOSE,)[key]
         return
@@ -210,8 +213,12 @@ class PathElement:
             return "(MOVETO, %.6f, %.6f)" % (self.x, self.y)
         elif self.cmd == LINETO:
             return "(LINETO, %.6f, %.6f)" % (self.x, self.y)
+        elif self.cmd == RLINETO:
+            return "(RLINETO, %.6f, %.6f)" % (self.x, self.y)
         elif self.cmd == CURVETO:
             return "(CURVETO, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f)" % (self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)
+        elif self.cmd == RCURVETO:
+            return "(RCURVETO, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f)" % (self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y)
         elif self.cmd == CLOSE:
             return "(CLOSE,)"
     def __eq__(self, other):
@@ -265,10 +272,7 @@ class Color(object):
         self.blue = self.b
         self.alpha = self.a
 
-        clr_hsb = util.rgb_to_hsl(self.red, self.green, self.blue)
-        self.hue = clr_hsb[0]
-        self.saturation = clr_hsb[1]
-        self.lightness = clr_hsb[2]
+        self.hue, self.saturation, self.lightness = util.rgb_to_hsl(self.r, self.g, self.b)
 
     def __getitem__(self, index):
         return (self.r, self.g, self.b, self.a)[index]
@@ -302,7 +306,7 @@ class Variable(object):
             self.max = max
         elif self.type == TEXT:
             if default is None:
-                self.default = "hello"
+                self.default = "bonjour"
             else:
                 self.default = default
         elif self.type == BOOLEAN:
@@ -370,7 +374,7 @@ def test_color():
     passed = True
     for value in testvalues:
         result = Color(value, color_range = 255)
-        print "%s = %s (%s, %s)" % (str(value), str(result), str(result.color_range), str(result.color_mode))
+        # print "%s = %s (%s, %s)" % (str(value), str(result), str(result.color_range), str(result.color_mode))
         equal = True
         for index in range(0,4):
             # check if difference is bigger than 0.0001, since floats
