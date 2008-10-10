@@ -408,7 +408,7 @@ class Box:
         '''
         raise NotImplementedError("transform() isn't implemented yet")
 
-    def matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
+    def apply_matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
         '''
         Adds mtrx to the current transformation matrix
         '''
@@ -423,25 +423,31 @@ class Box:
         Shifts the origin point by (x,y)
         '''
         # self.context.translate(x, y)
-        self.matrix(1,0,0,1,x,y)
+        self.apply_matrix(1,0,0,1,x,y)
 
-    def rotate(self, radians=0):
-        self.context.rotate(radians)
+    def rotate(self, degrees=0, radians=0):
+        from math import sin, cos
+        from math import radians as deg2rad
+        if degrees:
+            a = deg2rad(degrees)
+        else:
+            a = radians
+        # self.context.rotate(a)
+        print a
+        self.apply_matrix(cos(a), sin(a), -sin(a), cos(a), 0, 0)
 
     def scale(self, x=1, y=None):
         if x == 0 or y == 0:
             print "Scale parameters can't be 0. Ignoring"
-        elif y is None:
-            self.context.scale(x,x)
-        else:
-            self.context.scale(x,y)
+            return
+        y = x
+        # self.context.scale(x,y)
+        self.apply_matrix(x,0,0,y,0,0)
 
     def skew(self, x=1, y=None):
-        mtrx = cairo.Matrix(1,0,x,1,0,0)
-        self.context.transform(mtrx)
+        self.apply_matrix(1,0,x,1,0,0)
         if y:
-            mtrx = cairo.Matrix(1,y,0,1,0,0)
-            self.context.transform(mtrx)
+            self.apply_matrix(1,y,0,1,0,0)
 
     def save(self):
         #self.push_group()
