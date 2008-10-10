@@ -408,47 +408,40 @@ class Box:
         '''
         raise NotImplementedError("transform() isn't implemented yet")
 
-    def matrix(self, mtrx):
+    def matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
         '''
         Adds mtrx to the current transformation matrix
         '''
-        # matrix = cairo.Matrix (xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0)
-        self.context.transform(mtrx)
+        mtrx = cairo.Matrix(xx, yx, xy, yy, x0, y0)
+        try:
+            self.context.transform(mtrx)
+        except cairo.Error:
+            print "Invalid transformation matrix (%2f,%2f,%2f,%2f,%2f,%2f)" % (xx, yx, xy, yy, x0, y0)
 
     def translate(self, x, y):
         '''
         Shifts the origin point by (x,y)
         '''
-        self.context.translate(x, y)
+        # self.context.translate(x, y)
+        self.matrix(1,0,0,1,x,y)
 
     def rotate(self, radians=0):
         self.context.rotate(radians)
 
     def scale(self, x=1, y=None):
         if x == 0 or y == 0:
-            print "Warning: Invalid matrix provided to scale(), values of 0 not allowed. Ignoring."
-            pass
+            print "Scale parameters can't be 0. Ignoring"
         elif y is None:
             self.context.scale(x,x)
         else:
             self.context.scale(x,y)
 
     def skew(self, x=1, y=None):
-        if x in (-1,1):
-            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 0."
-            x = 0
-        if y in (-1,1):
-            print "Warning: Invalid value provided to scale(), values of -1, or -1 not allowed. Setting value to 0."
-            y = 0
-        elif y is None:
-            y = x
-            mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
+        mtrx = cairo.Matrix(1,0,x,1,0,0)
+        self.context.transform(mtrx)
+        if y:
+            mtrx = cairo.Matrix(1,y,0,1,0,0)
             self.context.transform(mtrx)
-        else:
-            mtrx = cairo.Matrix (xx=1.0, yx=y, xy=x, yy=1.0, x0=0.0, y0=0.0)
-            self.context.transform(mtrx)
-
-
 
     def save(self):
         #self.push_group()
