@@ -171,7 +171,7 @@ def parse_color(data, color_range=1):
             alpha = color[3]
 
     elif isinstance(data, basestring):
-        # hexstring: remove hash character, if any
+        # got a hexstring: first remove hash character, if any
         data = data.strip('#')
         if len(data) == 6:
             # RRGGBB
@@ -180,6 +180,7 @@ def parse_color(data, color_range=1):
             blue = hex2dec(data[4:6]) / color_range
             alpha = 1.
         elif len(data) == 8:
+            # RRGGBBAA
             red = hex2dec(data[0:2]) / color_range
             green = hex2dec(data[2:4]) / color_range
             blue = hex2dec(data[4:6]) / color_range

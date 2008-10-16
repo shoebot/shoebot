@@ -433,7 +433,6 @@ class Box:
         else:
             a = radians
         # self.context.rotate(a)
-        print a
         self.apply_matrix(cos(a), sin(a), -sin(a), cos(a), 0, 0)
 
     def scale(self, x=1, y=None):
