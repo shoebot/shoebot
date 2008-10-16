@@ -388,7 +388,7 @@ class View(gtk.Window):
             ( "/Edit/Undo", "<control>Z", self.do_undo, 0, None ),
             ( "/Edit/Redo", "<control><shift>Z", self.do_redo, 0, None ),
             ( "/Edit/sep1", None, None, 0, "<Separator>" ),
-            ( "/Edit/Find...", None, self.do_search, 0, None ),
+            ( "/Edit/Find...", "<control>F", self.do_search, 0, None ),
             ( "/_Settings", None, None, 0, "<Branch>" ),
             ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
             ( "/Settings/Wrap _Words", None, self.do_wrap_changed, gtk.WRAP_WORD, "/Settings/Wrap Off" ),
