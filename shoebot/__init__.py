@@ -60,21 +60,24 @@ class Box:
     DEFAULT_WIDTH = 200
     DEFAULT_HEIGHT = 200
 
-    def __init__ (self, inputscript=None, gtkmode=False, outputfile = None):
+    def __init__ (self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
 
         self.inputscript = inputscript
-        self.targetfilename = outputfile
-        # create options object
-        self.opt = OptionsContainer()
+        self.targetfilename = targetfilename
+
         # init internal path container
         self._path = None
         self._autoclosepath = True
-        # init temp value holders
-        self._fill = None
-        self._stroke = None
 
-        self.context = None
-        self.surface = None
+        self.color_range = 1
+        self.color_mode = RGB
+
+        self._fillcolor = self.Color(.2)
+        self._strokecolor = self.Color(.8)
+        self._strokewidth = 1.0
+
+        self._transform = Transform()
+        self._transformmode = 'corner'
 
         self.gtkmode = gtkmode
         self.vars = []
@@ -84,113 +87,70 @@ class Box:
         self.WIDTH = Box.DEFAULT_WIDTH
         self.HEIGHT = Box.DEFAULT_HEIGHT
 
-    def setsurface(self, width=None, height=None, target=None):
-        '''Sets the surface on which the Box object will operate.
-
-        Besides attaching surfaces, it can also create new ones based on an
-        output filename; it also accepts a Cairo surface or context as an
-        argument, and attaches to them as expected.
-        '''
-
-        if not width:
-            width = self.WIDTH
-        if not height:
-            height = self.HEIGHT
-
-        if not target:
-            raise ShoebotError("setsurface(): No target specified!")
-        if isinstance(target, basestring):
-            # if the target is a string, should be a filename
-            filename = target
-            self.surface = util.surfacefromfilename(filename,width,height)
-            self.context = cairo.Context(self.surface)
-        elif isinstance(target, cairo.Surface):
-            # and if it's a surface, attach our Cairo context to it
-            self.surface = target
-            self.context = cairo.Context(target)
-        elif isinstance(target, cairo.Context):
-            # if it's a Cairo context, use it instead of making a new one
-            self.context = target
-            self.surface = self.context.get_target()
+        if canvas:
+            self.canvas = canvas
         else:
-            raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+            self.canvas = CairoCanvas(self, self.targetfilename, self.WIDTH, self.HEIGHT, self.gtkmode)
 
-    def get_context(self):
-        return self.context
-    def get_surface(self):
-        return self.surface
+
+    #### Object
+
+    def _makeInstance(self, clazz, args, kwargs):
+        """Creates an instance of a class defined in this document.
+           This method sets the context of the object to the current context."""
+        inst = clazz(self, *args, **kwargs)
+        return inst
+    def BezierPath(self, *args, **kwargs):
+        return self._makeInstance(BezierPath, args, kwargs)
+    def ClippingPath(self, *args, **kwargs):
+        return self._makeInstance(ClippingPath, args, kwargs)
+    def Rect(self, *args, **kwargs):
+        return self._makeInstance(Rect, args, kwargs)
+    def Oval(self, *args, **kwargs):
+        return self._makeInstance(Oval, args, kwargs)
+    def Color(self, *args, **kwargs):
+        return self._makeInstance(Color, args, kwargs)
+    def Image(self, *args, **kwargs):
+        return self._makeInstance(Image, args, kwargs)
+    def Text(self, *args, **kwargs):
+        return self._makeInstance(Text, args, kwargs)
 
     #### Drawing
 
-    def rect(self, x, y, width, height, roundness=0.0, fill=None, stroke=None):
+    def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
         '''Draws a rectangle with top left corner at (x,y)
 
         The roundness variable sets rounded corners.
         '''
-        # taken from Nodebox and modified
-
-        if self.opt.rectmode == self.CORNERS:
-            width = width - x
-            height = height - y
-        elif self.opt.rectmode == self.CENTER:
-            x = x - width / 2
-            y = y - height / 2
-        elif self.opt.rectmode == self.CORNER:
-            pass
-
-        # take care of fill and stroke arguments
-        if fill is not None or stroke is not None:
-            if fill is not None:
-                self._fill = self.color(fill)
-            if stroke is not None:
-                self._stroke = self.color(stroke)
-
-        # straight corners
-        if roundness == 0.0:
-            self.context.rectangle(x, y, width, height)
-            self.fill_and_stroke()
-        # rounded corners
-        else:
-            curve = min(width*roundness, height*roundness)
-            self.beginpath()
-            self.moveto(x, y+curve)
-            self.curveto(x, y, x, y, x+curve, y)
-            self.lineto(x+width-curve, y)
-            self.curveto(x+width, y, x+width, y, x+width, y+curve)
-            self.lineto(x+width, y+height-curve)
-            self.curveto(x+width, y+height, x+width, y+height, x+width-curve, y+height)
-            self.lineto(x+curve, y+height)
-            self.curveto(x, y+height, x, y+height, x, y+height-curve)
-            self.endpath()
-
-        # revert to previous fill/stroke values if arguments were specified
-        if fill is not None or stroke is not None:
-            self._fill = None
-            self._stroke = None
+        r = self.BezierPath(**kwargs)
+        r.rect(x,y,width,height,roundness,self.rectmode)
+        #r.inheritFromContext(kwargs.keys())
+        if draw:
+            self.canvas.add(r)
+        return r
 
     def rectmode(self, mode=None):
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
-            self.opt.rectmode = mode
-            return self.opt.rectmode
+            self.rectmode = mode
+            return self.rectmode
         elif mode is None:
-            return self.opt.rectmode
+            return self.rectmode
         else:
             raise ShoebotError("rectmode: invalid input")
 
-    def oval(self, x, y, width, height):
+    def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y)'''
         from math import pi
 
-        self.context.save()
-        self.context.translate (x + width / 2., y + height / 2.);
-        self.scale (width / 2., height / 2.);
-        self.arc (0., 0., 1., 0., 2 * pi);
-        self.fill_and_stroke()
-        self.context.restore()
+        r = self.BezierPath(**kwargs)
+        r.ellipse(x,y,width,height)
+        # r.inheritFromContext(kwargs.keys())
+        if draw:
+            self.canvas.add(r)
+        return r
 
     def circle(self, x, y, diameter):
         self.oval(x, y, diameter, diameter)
-
 
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)'''
@@ -267,9 +227,9 @@ class Box:
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None):
-        # create a BezierPath instance
-        ## FIXME: This is fishy
-        self._path = BezierPath((x,y))
+        self._path = self.BezierPath()
+        if x and y:
+            self._path.moveto(x,y)
         self._path.closed = False
 
         # if we have arguments, do a moveto too
@@ -305,81 +265,36 @@ class Box:
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
+        # p.inheritFromContext()
         if draw:
-            self.drawpath(p)
-        self._path = None
+            self.canvas.add(p)
+            self._path = None
         return p
 
     def drawpath(self,path):
-        if not isinstance(path, BezierPath):
-            raise ShoebotError, "drawpath(): Input is not a valid BezierPath object"
-        self.context.save()
-        for element in path.data:
-            if not isinstance(element,PathElement):
-                raise ShoebotError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
-
-            cmd = element[0]
-
-            if cmd == MOVETO:
-                x = element.x
-                y = element.y
-                self.context.move_to(x, y)
-            elif cmd == LINETO:
-                x = element.x
-                y = element.y
-                self.context.line_to(x, y)
-            elif cmd == CURVETO:
-                c1x = element.c1x
-                c1y = element.c1y
-                c2x = element.c2x
-                c2y = element.c2y
-                x = element.x
-                y = element.y
-                self.context.curve_to(c1x, c1y, c2x, c2y, x, y)
-            elif cmd == CLOSE:
-                self.context.close_path()
-            else:
-                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
-        ## TODO
-        ## if path has state attributes, set the context to those, saving
-        ## before and replacing them afterwards with the old values
-        ## else, just go on
-        # if path.stateattrs:
-        #     for attr in path.stateattrs:
-        #         self.context....
-
-        self.fill_and_stroke()
-        self.context.restore()
+        self.canvas.add(path)
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
 
     def relmoveto(self, x, y):
-        '''Move relatively to the last point.
+        '''Move relatively to the last point.'''
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.relmoveto(x,y)
 
-        Calls Cairo's rel_move_to().
-        '''
-        self.context.rel_move_to(x,y)
-    def rellineto(self, x,y):
-        '''Draws a line relatively to the last point.
-
-        Calls Cairo's rel_line_to().
-        '''
-        self.context.rel_line_to(x,y)
+    def rellineto(self, x, y):
+        '''Draw a line using relative coordinates.'''
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.rellineto(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
-
-        Calls Cairo's rel_curve_to().
         '''
-        self.context.rel_curve_to(h1x, h1y, h2x, h2y, x, y)
-
-    def arc(self,centerx, centery, radius, angle1, angle2):
-        '''Draws an arc.
-
-        Calls Cairo's arc() method.
-        '''
-        self.context.arc(centerx, centery, radius, angle1, angle2)
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.relcurveto(x,y)
 
     def findpath(self, list, curvature=1.0):
         ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
@@ -408,65 +323,33 @@ class Box:
         '''
         raise NotImplementedError("transform() isn't implemented yet")
 
-    def apply_matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
-        '''
-        Adds mtrx to the current transformation matrix
-        '''
-        mtrx = cairo.Matrix(xx, yx, xy, yy, x0, y0)
-        try:
-            self.context.transform(mtrx)
-        except cairo.Error:
-            print "Invalid transformation matrix (%2f,%2f,%2f,%2f,%2f,%2f)" % (xx, yx, xy, yy, x0, y0)
-
     def translate(self, x, y):
-        '''
-        Shifts the origin point by (x,y)
-        '''
-        # self.context.translate(x, y)
-        self.apply_matrix(1,0,0,1,x,y)
-
+        t = Transform()
+        t.translate(x,y)
+        self._transform *= t
     def rotate(self, degrees=0, radians=0):
-        from math import sin, cos
-        from math import radians as deg2rad
-        if degrees:
-            a = deg2rad(degrees)
-        else:
-            a = radians
-        # self.context.rotate(a)
-        print a
-        self.apply_matrix(cos(a), sin(a), -sin(a), cos(a), 0, 0)
-
+        t = Transform()
+        t.rotate(degrees, radians)
+        self._transform *= t
     def scale(self, x=1, y=None):
-        if x == 0 or y == 0:
-            print "Scale parameters can't be 0. Ignoring"
-            return
-        y = x
-        # self.context.scale(x,y)
-        self.apply_matrix(x,0,0,y,0,0)
-
+        t = Transform()
+        t.scale(x,y)
+        self._transform *= t
     def skew(self, x=1, y=None):
-        self.apply_matrix(1,0,x,1,0,0)
-        if y:
-            self.apply_matrix(1,y,0,1,0,0)
-
-    def save(self):
-        #self.push_group()
-        self.context.save()
-
-    def restore(self):
-        #self.pop_group()
-        self.context.restore()
+        t = Transform()
+        t.skew(x,y)
+        self._transform *= t
 
     def push(self):
         #self.push_group()
-        self.context.save()
+        self.canvas.push()
 
     def pop(self):
         #self.pop_group()
-        self.context.restore()
+        self.canvas.pop()
 
-    def reset(self):
-        self.context.identity_matrix()
+##    def reset(self):
+##        self.canvas._context.identity_matrix()
 
     #### Color
 
@@ -476,6 +359,9 @@ class Box:
         '''
         raise NotImplementedError("outputmode() isn't implemented yet")
 
+    def color(self, *args):
+        return Color(self, *args)
+
     def colormode(self, mode=None, crange=None):
         '''Sets the current colormode (can be RGB or HSB) and eventually
         the color range.
@@ -484,57 +370,49 @@ class Box:
         '''
         if mode is not None:
             if mode == "rgb":
-                self.opt.color_mode = RGB
+                self.color_mode = RGB
             elif mode == "hsb":
-                self.opt.color_mode = HSB
+                self.color_mode = HSB
             else:
                 raise NameError, "Only RGB and HSB colormodes are supported."
         if crange is not None:
-            self.opt.color_range = crange
-        return self.opt.color_mode
-
-    def color(self,*args):
-        if isinstance(args[0], Color):
-            return Color(args[0], mode=RGB, color_range=1)
-        else:
-            return Color(args, box=self)
+            self.color_range = crange
+        return self.color_mode
 
     def colorrange(self, crange):
-        self.opt.color_range = float(crange)
+        self.color_range = float(crange)
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-        self.opt.fillapply = True
-        self.opt.fillcolor = self.color(*args)
-        return self.opt.fillcolor
+        self._fillcolor = self.color(args)
+        return self._fillcolor
 
     def nofill(self):
         ''' Stops applying fills to new paths.'''
-        self.opt.fillapply = False
+        self._fillcolor = None
 
     def stroke(self,*args):
         '''Sets a stroke color, applying it to new paths.'''
-        self.opt.strokeapply = True
-        self.opt.strokecolor = self.color(*args)
-        return self.opt.strokecolor
+        self._strokecolor = self.color(args)
+        return self._strokecolor
 
     def nostroke(self):
         ''' Stops applying strokes to new paths.'''
-        self.opt.strokeapply = False
+        self.canvas._strokecolor = None
 
     def strokewidth(self, w=None):
         '''Sets the stroke width.'''
         if w is not None:
-            self.context.set_line_width(w)
+            self._strokewidth = w
         else:
-            return self.context.get_line_width
+            return self._strokewidth
 
     def background(self,*args):
         '''Sets the background colour.'''
-
-        bg = self.color(*args)
-        self.context.set_source_rgb(bg.r, bg.g, bg.b)
-        self.context.paint()
+        r = self.BezierPath()
+        r.rect(0, 0, self.WIDTH, self.HEIGHT)
+        r.fill = self.color(*args)
+        self.canvas.add(r)
 
     #### Text
 
@@ -553,9 +431,9 @@ class Box:
 
     def fontsize(self, fontsize=None):
         if fontsize is not None:
-            self.context.set_font_size(fontsize)
+            self.canvas.font_size = fontsize
         else:
-            return self.context.get_font_size()
+            return self.canvas.font_size
 
     def text(self, txt, x, y, width=None, height=1000000, outline=False):
         '''
@@ -747,49 +625,10 @@ class Box:
         The shortcomings of this is that
         '''
 
-        import os
-        f, ext = os.path.splitext(filename)
-
-        if ext == "png":
-            # bitmap snapshots can be done via Cairo
-            if isinstance(self.surface, cairo.ImageSurface):
-                # if current surface is a bitmap image surface, we can write the
-                # file right away
-                self.surface.write_to_png(filename)
-            else:
-                # otherwise, we clone the contents of current surface onto
-                # a temporary one
-                temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
-                ctx = cairo.Context(temp_surface)
-                ctx.set_source_surface(self.surface, 0, 0)
-                ctx.paint()
-                temp_surface.write_to_png(filename)
-                del temp_surface
-
-        if ext in (".svg",".ps",".pdf"):
-            # vector snapshots are made with another temporary Box
-
-            # create a Box instance using the current running script
-            box = Box(inputscript=self.inputscript, outputfile=filename)
-            box.run()
-
-            # FIXME: This approach makes random values/values generated at
-            # start be re-calculated once a script runs again :/
-            #
-            # this will have to do until we have a proper Canvas class
-            # which would register all objects before passing it to the
-            # Cairo context
-
-            # set its variables to the current ones
-            for v in self.vars:
-                box.namespace[v.name] = self.namespace[v.name]
-            if 'setup' in box.namespace:
-                box.namespace['setup']()
-            if 'draw' in box.namespace:
-                box.namespace['draw']()
-            box.finish()
-            print "Saved snapshot to %s" % filename
-            del box
+        if filename:
+            self.canvas.output(filename)
+        elif surface:
+            self.canvas.output(surface)
 
     #### Core functions
 
@@ -819,64 +658,16 @@ class Box:
             self.namespace['WIDTH'] = self.WIDTH
             self.namespace['HEIGHT'] = self.HEIGHT
             # make a new surface for us
-            self.setsurface(w, h, self.targetfilename)
+            self.canvas.setsurface(self.targetfilename, w, h)
+
         # return (self.WIDTH, self.HEIGHT)
 
-    def fill_and_stroke(self):
-        '''
-        Apply fill and stroke settings, and apply the current path to the final surface.
-        '''
-        if DEBUG: print "DEBUG: Beginning fill_and_stroke()"
-        # we need to give cairo values between 0-1
-        # and for that we need to make a special request to Color()
-        if self._fill is not None:
-            fillclr = self._fill
-        else:
-            fillclr = self.opt.fillcolor
 
-        if self._stroke is not None:
-            strokeclr = self._stroke
-        else:
-            strokeclr = self.opt.strokecolor
-
-        self.context.save()
-        if self.opt.fillapply is True:
-            self.context.set_source_rgba(fillclr[0],fillclr[1],fillclr[2],fillclr[3])
-            if self.opt.strokeapply is True:
-                # if there's a stroke still to be applied, we need to call fill_preserve()
-                # which still leaves this path as active
-                self.context.fill_preserve()
-                self.context.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
-                # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
-                # for further operations if needed)
-                self.context.stroke()
-            else:
-                # if there isn't a stroke, use plain fill() to close the path
-                self.context.fill()
-        elif self.opt.strokeapply is True:
-            # if there's no fill, apply stroke only
-            self.context.set_source_rgba(strokeclr[0],strokeclr[1],strokeclr[2],strokeclr[3])
-            self.context.stroke()
-        else:
-            pass
-        self.context.restore()
 
     def finish(self):
         '''Finishes the surface and writes it to the output file.'''
-
-        # get the extension from the filename
-        import os
-        f, ext = os.path.splitext(self.targetfilename)
-        # if this is a vector file, wrap up and finish
-        if ext in (".svg",".ps",".pdf"):
-            self.context.show_page()
-            self.surface.finish()
-        # but bitmap surfaces need us to tell them to save to a file
-        elif ext == ".png":
-            # write to file
-            self.surface.write_to_png(self.targetfilename)
-        else:
-            raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
+        self.canvas.draw()
+        self.canvas.finish()
 
     def run(self, inputcode=None):
         '''
@@ -923,7 +714,7 @@ class Box:
             # maybe this is too verbose, but okay for now
             import traceback
             import sys
-            errmsg = traceback.format_exc(limit=1)
+            errmsg = traceback.format_exc()
 
 #            print "Exception in Shoebot code:"
 #            traceback.print_exc(file=sys.stdout)
@@ -947,32 +738,244 @@ class Box:
 #            raise ShoebotError("draw: There's no draw() method in input script")
 #
 
-class OptionsContainer:
-    def __init__(self):
-        #self.outputmode = RGB
-        self.color_mode = RGB
-        self.color_range = 1.
+class CairoCanvas:
+    '''
+    This class contains a Cairo context or surface, as well as methods to pass
+    drawing commands to it.
 
-        self.fillapply = True
-        self.strokeapply = False
-        self.fillcolor = Color('#DDDDDD')
-        self.strokecolor = Color('#222222')
-        self.strokewidth = 1.0
+    Its intended use is to get drawable objects from a Bot instance, store them
+    in a stack and draw them to the Cairo context when necessary.
+    '''
+    def __init__(self, bot, target=None, width=None, height=None, gtkmode=False):
 
-        self.rectmode = 'corner'
+        self._bot = bot
 
-        ## self.linecap
-        ## self.linejoin
-        ## self.fontweight
-        ## self.fontslant
-        ## self.hintmetrics
-        ## self.hintstyle
-        ## self.filter
-        ## self.operator
-        ## self.antialias
-        ## self.fillrule
+        self.stack = []
+        self.transform_stack = Stack()
+        if not gtkmode:
+            # image output mode, we need to make a surface
+            print target
+            self.setsurface(target, width, height)
+
+        self.font_size = 12
+
+        # self.outputmode = RGB
+        # self.linecap
+        # self.linejoin
+        # self.fontweight
+        # self.fontslant
+        # self.hintmetrics
+        # self.hintstyle
+        # self.filter
+        # self.operator
+        # self.antialias
+        # self.fillrule
+
+    def setsurface(self, target=None, width=None, height=None):
+        '''Sets the surface on which the Canvas object will operate.
+
+        Besides attaching surfaces, it can also create new ones based on an
+        output filename; it also accepts a Cairo surface or context as an
+        argument, and attaches to them as expected.
+        '''
+
+        if not target:
+            raise ShoebotError("setsurface(): No target specified!")
+        if isinstance(target, basestring):
+            # if the target is a string, should be a filename
+            filename = target
+            if not width:
+                width = self.WIDTH
+            if not height:
+                height = self.HEIGHT
+            self._surface = util.surfacefromfilename(filename,width,height)
+            self._context = cairo.Context(self._surface)
+        elif isinstance(target, cairo.Surface):
+            # and if it's a surface, attach our Cairo context to it
+            self._surface = target
+            self._context = cairo.Context(self._surface)
+        elif isinstance(target, cairo.Context):
+            # if it's a Cairo context, use it instead of making a new one
+            self._context = target
+            self._surface = self._context.get_target()
+        else:
+            raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+
+    def get_context(self):
+        return self._context
+    def get_surface(self):
+        return self._surface
+
+##    def _set_transform(self, matrix):
+##        self._transform._matrix = matrix
+##    def _get_transform(self):
+##        return self._transform
+##    transform = property(_get_transform, _set_transform)
+
+    def add(self, grob):
+        if not isinstance(grob, data.Grob):
+            raise ShoebotError("Canvas.add() - wrong argument: expecting a Grob, received %s" % (grob))
+
+        # set context values
+        if self._bot._fillcolor and not grob._fillcolor:
+            grob._fillcolor = self._bot._fillcolor
+        if self._bot._strokecolor and not grob._fillcolor:
+            grob._strokecolor = self._bot._strokecolor
+        if self._bot._strokewidth and not grob._strokewidth:
+            grob._strokewidth = self._bot._strokewidth
+        if self._bot._transform:
+            grob._transform *= self._bot._transform
+
+        self.stack.append(grob)
+
+    def draw(self, ctx=None):
+        if not ctx:
+            ctx = self._context
+        for item in self.stack:
+            if isinstance(item, Grob):
+                # check if item has its own attributes
+                # set context fill/stroke colors to the grob's
+                # set transform matrix
+                ctx.save()
+                ctx.set_matrix(item._transform._matrix)
+                self.drawpath(item)
+                ctx.restore()
+                # fill_and_stroke()
+
+    def drawpath(self,path):
+        '''Passes the path to a Cairo context.'''
+        if not isinstance(path, BezierPath):
+            raise ShoebotError("drawpath(): Expecting a BezierPath, got %s" % (path))
+
+        ctx = self._context
+
+        if path._strokewidth:
+            self._context.set_line_width(path._strokewidth)
+
+        for element in path.data:
+            cmd = element[0]
+            values = element[1:]
+
+            # apply cairo context commands
+            if cmd == MOVETO:
+                ctx.move_to(*values)
+            elif cmd == LINETO:
+                ctx.line_to(*values)
+            elif cmd == CURVETO:
+                ctx.curve_to(*values)
+            elif cmd == RLINETO:
+                ctx.rel_line_to(*values)
+            elif cmd == RCURVETO:
+                ctx.rel_curve_to(*values)
+            elif cmd == CLOSE:
+                ctx.close_path()
+            elif cmd == ELLIPSE:
+                from math import pi
+                x, y, w, h = values
+                ctx.save()
+                ctx.translate (x + w / 2., y + h / 2.)
+                ctx.scale (w / 2., h / 2.)
+                ctx.arc (0., 0., 1., 0., 2 * pi)
+                ctx.restore()
+            else:
+                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
+
+        if path._fillcolor:
+            self._context.set_source_rgba(*path._fillcolor)
+            if path._strokecolor:
+                # if there's a stroke still to be applied, we need to call fill_preserve()
+                # which still leaves this path as active
+                self._context.fill_preserve()
+                self._context.set_source_rgba(*path._strokecolor)
+                # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
+                # for further operations if needed)
+                self._context.stroke()
+            else:
+                # if there isn't a stroke, use plain fill() to close the path
+                self._context.fill()
+        elif path._strokecolor:
+            # if there's no fill, apply stroke only
+            self._context.set_source_rgba(*path._strokecolor)
+            self._context.stroke()
+        else:
+            pass
+
+    def push(self):
+        self.transform_stack.push(self._transform)
+
+    def pop(self):
+        self._transform = self.transform_stack.get()
+        self.transform_stack.pop()
+
+    def finish(self):
+        if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):
+            self._context.show_page()
+            self._surface.finish()
+        else:
+            self._context.write_to_png("DUMMYOUTPUT.png")
+
+    def clear(self):
+        self.stack = self.transform_stack = []
+
+    def output(self, target):
+        self.draw()
+        if isinstance(target, basestring): # filename
+            filename = target
+            import os
+            f, ext = os.path.splitext(filename)
+
+            if ext == ".png":
+                # bitmap snapshots can be done via Cairo
+                if isinstance(self._surface, cairo.ImageSurface):
+                    # if current surface is a bitmap image surface, we can write the
+                    # file right away
+                    self._surface.write_to_png(filename)
+                else:
+                    # otherwise, we clone the contents of current surface onto
+                    # a temporary one
+                    temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+                    ctx = cairo.Context(temp_surface)
+                    ctx.set_source_surface(self._surface, 0, 0)
+                    ctx.paint()
+                    temp_surface.write_to_png(filename)
+                    del temp_surface
+
+            if ext in (".svg",".ps",".pdf"):
+                # vector snapshots are made with another temporary Box
+
+                # create a Box instance using the current running script
+                box = Box(inputscript=self.inputscript, canvas=self)
+                box.run()
+
+                # set its variables to the current ones
+                for v in self.vars:
+                    box.namespace[v.name] = self.namespace[v.name]
+                if 'setup' in box.namespace:
+                    box.namespace['setup']()
+                if 'draw' in box.namespace:
+                    box.namespace['draw']()
+                box.finish()
+                del box
+            print "Saved snapshot to %s" % filename
+
+        elif isinstance(target, cairo.Context):
+            ctx = target
+            self.draw(ctx)
+        elif isinstance(target, cairo.Surface):
+            ctx = target.get_context()
+            self.draw(ctx)
 
 
+
+    def apply_matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
+        '''
+        Adds mtrx to the current transformation matrix
+        '''
+        mtrx = cairo.Matrix(xx, yx, xy, yy, x0, y0)
+        try:
+            self._context.transform(mtrx)
+        except cairo.Error:
+            print "Invalid transformation matrix (%2f,%2f,%2f,%2f,%2f,%2f)" % (xx, yx, xy, yy, x0, y0)
 
 if __name__ == "__main__":
     print '''

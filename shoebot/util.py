@@ -140,6 +140,13 @@ def parse_color(data, color_range=1):
     colour data values are specified.
     '''
     from data import Color
+
+    # unpack one-element tuples, they show up sometimes
+    if isinstance(data, (tuple,list)) and len(data) == 1:
+        data = data[0]
+
+    print data
+
     if isinstance(data, (int,float)):
         red = green = blue = data / color_range
         alpha = 1.

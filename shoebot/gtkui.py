@@ -7,6 +7,7 @@ http://roscidus.com/desktop/node/413
 
 import sys, gtk, random, StringIO
 import shoebot
+from data import Transform
 import cairo
 import gobject, socket
 from pprint import pprint
@@ -22,7 +23,7 @@ class ShoebotCanvas(gtk.DrawingArea):
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
-        self.box.setsurface(target=surface)
+        self.box.canvas.setsurface(target=surface)
         self.box.run()
 
         # set the window size to the one specified in the script
@@ -55,17 +56,23 @@ class ShoebotCanvas(gtk.DrawingArea):
                             event.area.width, event.area.height)
         self.context.clip()
 
+        # clear canvas contents
+        self.box.canvas.clear()
+        # reset transforms
+        self.box._transform = Transform()
         # attach box to context
-        self.box.setsurface(target=self.context)
+        self.box.canvas.setsurface(target=self.context)
         if 'setup' in self.box.namespace:
             self.box.namespace['setup']()
         if 'draw' in self.box.namespace:
             self.draw()
+        self.box.canvas.draw()
 
         # no setup() or draw() means we have to run the script on each step
         # FIXME: This actually makes static scripts run twice, not good.
         if not 'setup' in self.box.namespace and not 'draw' in self.box.namespace:
             self.box.run()
+            self.box.canvas.draw()
 
 ##        self.draw()
         return False
