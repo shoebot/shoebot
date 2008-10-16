@@ -337,9 +337,9 @@ class Buffer(gtksourceview.SourceBuffer):
                     return self.save_buffer()
                 return self.save_as_buffer()
             elif result == gtk.RESPONSE_CANCEL:
-                return True
-            else:
                 return False
+            else:
+                return True
         else:
             return True
 
