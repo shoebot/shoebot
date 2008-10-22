@@ -13,21 +13,21 @@ import gobject, socket
 from pprint import pprint
 
 class ShoebotCanvas(gtk.DrawingArea):
-    def __init__(self, mainwindow, box = None):
+    def __init__(self, mainwindow, bot = None):
         super(ShoebotCanvas, self).__init__()
         self.mainwindow = mainwindow
         self.connect("expose_event", self.expose)
-        # get the box object to display
-        self.box = box
+        # get the bot object to display
+        self.bot = bot
 
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
-        self.box.canvas.setsurface(target=surface)
-        self.box.run()
+        self.bot.canvas.setsurface(target=surface)
+        self.bot.run()
 
         # set the window size to the one specified in the script
-        self.set_size_request(self.box.WIDTH, self.box.HEIGHT)
+        self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
 
         # RIGHT CLICK HANDLING
         self.menu = gtk.Menu()
@@ -57,22 +57,22 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.context.clip()
 
         # clear canvas contents
-        self.box.canvas.clear()
+        self.bot.canvas.clear()
         # reset transforms
-        self.box._transform = Transform()
-        # attach box to context
-        self.box.canvas.setsurface(target=self.context)
-        if 'setup' in self.box.namespace:
-            self.box.namespace['setup']()
-        if 'draw' in self.box.namespace:
+        self.bot._transform = Transform()
+        # attach bot to context
+        self.bot.canvas.setsurface(target=self.context)
+        if 'setup' in self.bot.namespace:
+            self.bot.namespace['setup']()
+        if 'draw' in self.bot.namespace:
             self.draw()
-        self.box.canvas.draw()
+        self.bot.canvas.draw()
 
         # no setup() or draw() means we have to run the script on each step
         # FIXME: This actually makes static scripts run twice, not good.
-        if not 'setup' in self.box.namespace and not 'draw' in self.box.namespace:
-            self.box.run()
-            self.box.canvas.draw()
+        if not 'setup' in self.bot.namespace and not 'draw' in self.bot.namespace:
+            self.bot.run()
+            self.bot.canvas.draw()
 
 ##        self.draw()
         return False
@@ -84,15 +84,15 @@ class ShoebotCanvas(gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self):
-        if 'draw' in self.box.namespace:
-            self.box.namespace['draw']()
+        if 'draw' in self.bot.namespace:
+            self.bot.namespace['draw']()
 
     def save_output(self, action):
         '''Save the current image to a file.'''
         # action is the menu action pointing the extension to use
         extension = action.get_name()
         filename = 'output.' + extension
-        self.box.snapshot(filename)
+        self.bot.snapshot(filename)
 
 # additional functions for MainWindow
 class SocketServerMixin:
@@ -123,12 +123,12 @@ class SocketServerMixin:
             if len(incoming.split()) == 2:
                 var, value = incoming.split()
                 # is value in our variables list?
-                if var in self.canvas.box.namespace:
-                    # set the box namespace to the new value
+                if var in self.canvas.bot.namespace:
+                    # set the bot namespace to the new value
 
                     ## TODO: we're forced to convert input to floats
-                    # self.canvas.box.namespace[var] = value.strip(';')
-                    self.canvas.box.namespace[var] = float(value.strip(';'))
+                    # self.canvas.bot.namespace[var] = value.strip(';')
+                    self.canvas.bot.namespace[var] = float(value.strip(';'))
                     # and redraw
                     self.canvas.redraw()
                 return True
@@ -141,7 +141,7 @@ BOOLEAN = 3
 BUTTON = 4
 
 class VarWindow:
-    def __init__(self, parent, box):
+    def __init__(self, parent, bot):
         self.parent = parent
 
         window = gtk.Window()
@@ -151,7 +151,7 @@ class VarWindow:
         # set up sliders
         self.variables = []
 
-        for item in box.vars:
+        for item in bot.vars:
             self.variables.append(item)
             if item.type is NUMBER:
                 self.add_number(vbox, item)
@@ -199,7 +199,7 @@ class VarWindow:
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         # in buttons, the varname is the function, so we use __name__
         button = gtk.Button(label=v.name.__name__)
-        button.connect("clicked", self.parent.box.namespace[v.name], None)
+        button.connect("clicked", self.parent.bot.namespace[v.name], None)
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
 
@@ -211,16 +211,16 @@ class VarWindow:
         ''' Called when a slider is adjusted. '''
         # set the appropriate canvas var
         if v.type in (NUMBER, BOOLEAN):
-            self.parent.canvas.box.namespace[v.name] = widget.value
+            self.parent.canvas.bot.namespace[v.name] = widget.value
         elif v.type is TEXT:
-            self.parent.canvas.box.namespace[v.name] = widget.get_text()
+            self.parent.canvas.bot.namespace[v.name] = widget.get_text()
         # and redraw the canvas
         self.parent.canvas.redraw()
 
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
-        self.box = shoebot.Box(gtkmode=True, inputscript=code)
-        self.canvas = ShoebotCanvas(self, self.box)
+        self.bot = shoebot.Bot(gtkmode=True, inputscript=code)
+        self.canvas = ShoebotCanvas(self, self.bot)
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow
@@ -264,7 +264,7 @@ class ShoebotWindow(SocketServerMixin):
         self.window.show_all()
 
         if self.has_varwindow:
-            VarWindow(self, self.box)
+            VarWindow(self, self.bot)
 
         gtk.main()
 

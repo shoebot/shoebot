@@ -22,19 +22,19 @@ OUTPUT_EXTENSIONS = ('.png','.svg','.ps','.pdf')
 def run_oneshot(script, file):
     ''' Oneshot mode:
     Run a Shoebot script and save output to an image file.'''
-    # create a Box instance
-    box = shoebot.Box(outputfile = file)
+    # create a Bot instance
+    bot = shoebot.Bot(outputfile = file)
 
     # run it, and then its setup and draw methods, if they're there
     # (running setup() and draw() isn't always desirable, but for image
     # output it helps to have the final image as a GTK canvas would
     # display it)
-    box.run(script)
-    if 'setup' in box.namespace:
-        box.namespace['setup']()
-    if 'draw' in box.namespace:
-        box.namespace['draw']()
-    box.finish()
+    bot.run(script)
+    if 'setup' in bot.namespace:
+        bot.namespace['setup']()
+    if 'draw' in bot.namespace:
+        bot.namespace['draw']()
+    bot.finish()
 
 def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False):
     ''' Windowed mode:

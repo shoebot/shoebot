@@ -145,8 +145,6 @@ def parse_color(data, color_range=1):
     if isinstance(data, (tuple,list)) and len(data) == 1:
         data = data[0]
 
-    print data
-
     if isinstance(data, (int,float)):
         red = green = blue = data / color_range
         alpha = 1.

@@ -8,6 +8,7 @@ fill(186,186,93)
 
 _total_w = 0
 def flow(w, h):
+    # this is kind of a "word wrap" implementation
     global _total_w
     if _total_w + w*2 >= WIDTH:
         translate(-_total_w, h)
@@ -17,11 +18,12 @@ def flow(w, h):
         _total_w += w
 
 x, y = 10, 10
-# first rect
+# rect
 rect(x, y, 50, 50)
 flow(60, 60)
-# drawing round rect
-rect(x, y, 50, 50, 0.6)
+# round rect, notice how we specify a particular fill color for this
+# without affecting the others
+r = rect(x, y, 50, 50, 0.6, fill=(100,100,0))
 flow(60, 60)
 # drawing oval
 oval(x, y, 50, 50)

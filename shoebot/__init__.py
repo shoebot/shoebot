@@ -36,9 +36,9 @@ EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 class ShoebotError(Exception): pass
 
-class Box:
+class Bot:
     '''
-    The Box class is an abstraction to hold a Cairo surface, context and all
+    The Bot class is an abstraction to hold a Cairo surface, context and all
     methods to access and manipulate it (the Nodebox language is
     implemented here).
     '''
@@ -84,8 +84,8 @@ class Box:
         self._oldvars = self.vars
         self.namespace = {}
 
-        self.WIDTH = Box.DEFAULT_WIDTH
-        self.HEIGHT = Box.DEFAULT_HEIGHT
+        self.WIDTH = Bot.DEFAULT_WIDTH
+        self.HEIGHT = Bot.DEFAULT_HEIGHT
 
         if canvas:
             self.canvas = canvas
@@ -619,7 +619,7 @@ class Box:
           Cairo
         - if output is vector, doing the source paint in Cairo ends up in a
           vector file with an embedded bitmap - not good. So we just create
-          another Box instance with the currently loaded script, copy the
+          another Bot instance with the currently loaded script, copy the
           current namespace and save its output in a file.
 
         The shortcomings of this is that
@@ -643,7 +643,7 @@ class Box:
             h = self.HEIGHT
 
         if self.gtkmode:
-            # in windowed mode we don't set the surface in the Box itself,
+            # in windowed mode we don't set the surface in the Bot itself,
             # the gtkui module takes care of doing that
             # TODO: Parent widget as an argument?
             self.WIDTH = int(w)
@@ -680,7 +680,7 @@ class Box:
         if not inputcode:
         # no input? see if box has an input file name or string set
             if not self.inputscript:
-                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Box instance)")
+                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Bot instance)")
             inputcode = self.inputscript
         else:
             self.inputscript = inputcode
@@ -698,7 +698,7 @@ class Box:
 
         import data
         for name in dir(self):
-            # get all stuff in the Box namespaces
+            # get all stuff in the Bot namespaces
             self.namespace[name] = getattr(self, name)
         for name in dir(data):
             self.namespace[name] = getattr(data, name)
@@ -724,19 +724,6 @@ class Box:
             else:
                 # if on gtkmode, print the error and don't break
                 raise ShoebotError(errmsg)
-
-#    def setup(self):
-#        if self.namespace.has_key("setup"):
-#            self.namespace["setup"]()
-#        else:
-#            raise ShoebotError("setup: There's no setup() method in input script")
-#
-#    def draw(self):
-#        if self.namespace.has_key("draw"):
-#            self.namespace["draw"]()
-#        else:
-#            raise ShoebotError("draw: There's no draw() method in input script")
-#
 
 class CairoCanvas:
     '''
@@ -940,10 +927,10 @@ class CairoCanvas:
                     del temp_surface
 
             if ext in (".svg",".ps",".pdf"):
-                # vector snapshots are made with another temporary Box
+                # vector snapshots are made with another temporary Bot
 
-                # create a Box instance using the current running script
-                box = Box(inputscript=self.inputscript, canvas=self)
+                # create a Bot instance using the current running script
+                box = Bot(inputscript=self.inputscript, canvas=self)
                 box.run()
 
                 # set its variables to the current ones

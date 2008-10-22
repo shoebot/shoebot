@@ -8,20 +8,20 @@ colorrange(255)
 rows = 9
 cols = 9
 
-def block(x,y,z): 
+def block(x,y,z):
     '''
-    draw an isometric square prism; x,y are the coordinates of 
+    draw an isometric square prism; x,y are the coordinates of
     the BOTTOM-CENTER corner, z is the height
     '''
     #TODO : variables for width+depth instead of fixed value
-    
+
     # no strokes in the inside
     nostroke()
-    
+
     # every building will have a random hue
 
     hue = randint(0,255)
-    
+
     # LEFT FACE
     # first, set the color
     c = color(hue,40,120)
@@ -57,6 +57,7 @@ def block(x,y,z):
     c = color(hue,40,80)
     # set the stroke
     stroke(c)
+    print "done with stroke"
     # and unset fill
     nofill()
     # draw the path
@@ -74,7 +75,7 @@ def setup():
 def draw():
     # white background
     background(1,1,1)
-    
+
     # start from 100,100
     translate(100,100)
     # and draw the blocks
