@@ -559,7 +559,6 @@ class Transform():
             a = deg2rad(degrees)
         else:
             a = radians
-        print a
         self._matrix.rotate(a)
 
     def scale(self, x=1, y=None):

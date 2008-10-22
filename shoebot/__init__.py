@@ -754,7 +754,6 @@ class CairoCanvas:
         self.transform_stack = Stack()
         if not gtkmode:
             # image output mode, we need to make a surface
-            print target
             self.setsurface(target, width, height)
 
         self.font_size = 12
