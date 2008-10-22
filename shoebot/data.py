@@ -163,11 +163,11 @@ class ColorMixin(object):
 
     def __init__(self, **kwargs):
         try:
-            self._fillcolor = Color(self._bot, kwargs['_fillcolor'])
+            self._fillcolor = Color(self._bot, kwargs['fill'])
         except KeyError:
             self._fillcolor = None
         try:
-            self._strokecolor = Color(self._bot, kwargs['_strokecolor'])
+            self._strokecolor = Color(self._bot, kwargs['stroke'])
         except KeyError:
             self._strokecolor = None
         self._strokewidth = kwargs.get('strokewidth', 1.0)
