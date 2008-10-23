@@ -26,9 +26,9 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
+CENTER = 'center'
+CORNER = 'corner'
+CORNERS = 'corners'
 
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
@@ -147,7 +147,7 @@ class TransformMixin(object):
     def reset(self):
         self._transform = Transform()
     def rotate(self, degrees=0, radians=0):
-        self._transform.rotate(-degrees,-radians)
+        self._transform.rotate(degrees,radians)
     def translate(self, x=0, y=0):
         self._transform.translate(x,y)
     def scale(self, x=1, y=None):
@@ -208,6 +208,11 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
+        # inherit the Bot properties if applicable
+        self.bot = bot
+        if self.bot:
+            _copy_attrs(self.bot, self, self.stateAttributes)
+
         if path is None:
             self.data = []
         elif isinstance(path, (tuple,list)):
@@ -225,7 +230,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         self.closed = False
 
     def copy(self):
-        return self.__class__(self._ctx, self)
+        return self.__class__(self.bot, self)
 
     ### Path methods ###
 
@@ -288,36 +293,71 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
             raise TypeError("Wrong data passed to BezierPath.append(): %s" % el)
 
     def _get_bounds(self):
-        '''Returns the path's bounding box.'''
+        '''Returns the path's bounding box. Note that this doesn't
+        take transforms into account.'''
         # we don't have any direct way to calculate bbox from a path, but Cairo
         # does! So we make a new cairo context to calculate path bounds
-        tempsurface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
-        tempctx = cairo.Context(tempsurface)
-        tempcanvas = CairoCanvas(context=self.tempctx)
-        tempcanvas.drawpath(self)
-        # cairo.Context.path_extents() is only available in Cairo >= 1.6
-        # so we use the stroke extents method with a tiny line width, which
-        # rounds neatly to proper values
-        tempcanvas._context.set_line_width(0.00000001)
-        bbox = tempcanvas._context.stroke_extents()
-        del tempsurface, tempctx
+        from shoebot import CairoCanvas
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
+        ctx = cairo.Context(surface)
+        canvas = CairoCanvas(target=ctx)
+        p = self.copy()
+        ctx.transform(p._transform._matrix)
+
+
+        # pass path to temporary context
+        for element in p.data:
+            cmd = element[0]
+            values = element[1:]
+
+            # apply cairo context commands
+            if cmd == MOVETO:
+                ctx.move_to(*values)
+            elif cmd == LINETO:
+                ctx.line_to(*values)
+            elif cmd == CURVETO:
+                ctx.curve_to(*values)
+            elif cmd == RLINETO:
+                ctx.rel_line_to(*values)
+            elif cmd == RCURVETO:
+                ctx.rel_curve_to(*values)
+            elif cmd == CLOSE:
+                ctx.close_path()
+            elif cmd == ELLIPSE:
+                from math import pi
+                x, y, w, h = values
+                ctx.save()
+                ctx.translate (x + w / 2., y + h / 2.)
+                ctx.scale (w / 2., h / 2.)
+                ctx.arc (0., 0., 1., 0., 2 * pi)
+                ctx.restore()
+        # get boundaries
+        bbox = ctx.fill_extents()
+        # multiply them by the context transform matrix
+        x1,y1 = ctx.user_to_device(bbox[0], bbox[1])
+        x2,y2 = ctx.user_to_device(bbox[2], bbox[3])
+        bbox = (x1, y1, x2, y2)
+        del surface, ctx, canvas, p
         return bbox
     bounds = property(_get_bounds)
 
-    def _get_transform(self):
-        trans = self._transform.copy()
-        if (self._transformmode == CENTER):
-            (x, y, w, h) = self.bounds
-            deltax = x+w/2
-            deltay = y+h/2
-            t = Transform()
-            t.translate(-deltax,-deltay)
-            trans.prepend(t)
-            t = Transform()
-            t.translate(deltax,deltay)
-            trans.append(t)
-        return trans
-    transform = property(_get_transform)
+##    def _get_transform(self):
+##        trans = Transform(self._transform)
+##        if (self._transformmode == CENTER):
+##            print "Resolving center transform!"
+##            print "Original:   " + str(trans)
+##            (x, y, w, h) = self.bounds
+##            print self.bounds
+##            deltax = x+w/2
+##            deltay = y+h/2
+##
+##            newtrans = Transform()
+##            newtrans.translate(-deltax,-deltay)
+##            newtrans *= trans
+##            newtrans.translate(deltax,deltay)
+##            print "Converted:  " + str(newtrans)
+##        return newtrans
+##    transform = property(_get_transform)
 
 class PathElement:
     '''
@@ -407,12 +447,14 @@ class Color(object):
 
     def __init__(self, bot, *v):
 
-        if not v:
-            self.r, self.g, self.b, self.a = (0,0,0,1)
+        self.bot = bot
 
         # unpack one-element tuples, they show up sometimes
         if isinstance(v, (tuple,list)) and len(v) == 1:
             v = v[0]
+
+        if not v:
+            self.r, self.g, self.b, self.a = (0,0,0,1)
 
         if isinstance(v, Color):
             self.r, self.g, self.b, self.a = v
@@ -452,7 +494,7 @@ class Color(object):
         self.b = (self.b + other.b) / factor
         self.a = (self.a + other.a) / factor
     def copy(self):
-        new = self.__class__(self)
+        new = self.__class__(self.bot, self.data)
         return new
 
 class Variable(object):
@@ -524,31 +566,35 @@ class Transform():
 
     def __init__(self, transform=None):
         if transform is None:
-            transform = cairo.Matrix()
+            t = cairo.Matrix()
         elif isinstance(transform, Transform):
-            transform = transform._matrix
+            t = transform._matrix
         elif isinstance(transform, (list, tuple)):
             matrix = tuple(transform)
-            transform = cairo.Matrix(*matrix)
+            t = cairo.Matrix(*matrix)
         elif isinstance(transform, cairo.Matrix):
-            pass
+            t = transform
         else:
             raise NodeBoxError, "Don't know how to handle transform %s." % transform
-        self._matrix = transform
+        self._matrix = t
 
     def set(self, ctx):
         ctx.set_matrix(self._matrix)
     def concat(self, ctx):
         ctx.transform(self._matrix)
     def copy(self):
-        return Transform(self)
-##    def _get_matrix(self):
-##        return self._matrix
-##    def _set_matrix(self, value):
-##        if not type(value, cairo.Matrix):
-##            raise ShoebotError("Transform._set_matrix: Input must be a Cairo matrix")
-##        self._matrix = value
-##    matrix = property(_get_matrix, _set_matrix)
+        return self.__class__(self)
+
+    def _get_matrix(self):
+        return self._matrix
+    def _set_matrix(self, value):
+        if type(value, cairo.Matrix):
+            self._matrix = value
+        elif type(value, (tuple,list)) and len(value) == 6:
+            self._matrix = cairo.Matrix(*value)
+        else:
+            raise ShoebotError("Transform._set_matrix: Input must be a Cairo matrix or a 6-element tuple or list")
+    matrix = property(_get_matrix, _set_matrix)
 
     def translate(self, x, y):
         self._matrix.translate(x,y)
@@ -587,16 +633,14 @@ class Transform():
             return Transform(self._matrix * other)
 
     def append(self, other):
-        if isinstance(other, Transform):
-            other = other._matrix
-        self._matrix *= other
+        t = Transform(other)
+        self._matrix *= t._matrix
 
     def prepend(self, other):
-        if isinstance(other, Transform):
-            other = other._matrix
-        other = Transform(other)
-        other *= self._matrix
-        self._matrix = other
+        t = Transform(other)
+        t._matrix *= self._matrix
+        self._matrix = t._matrix
+
 
 class Stack(list):
     def __init__(self):

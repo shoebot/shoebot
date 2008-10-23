@@ -77,7 +77,8 @@ class Bot:
         self._strokewidth = 1.0
 
         self._transform = Transform()
-        self._transformmode = 'corner'
+        self._transformmode = CENTER
+        self.transform_stack = Stack()
 
         self.gtkmode = gtkmode
         self.vars = []
@@ -90,7 +91,11 @@ class Bot:
         if canvas:
             self.canvas = canvas
         else:
-            self.canvas = CairoCanvas(self, self.targetfilename, self.WIDTH, self.HEIGHT, self.gtkmode)
+            self.canvas = CairoCanvas(bot = self,
+                                      target = self.targetfilename,
+                                      width = self.WIDTH,
+                                      height = self.HEIGHT,
+                                      gtkmode = self.gtkmode)
 
 
     #### Object
@@ -309,19 +314,18 @@ class Bot:
 
     #### Transform and utility
 
-    def beginclip(self,x,y,w,h):
-        self.save()
-        self.context.rectangle(x, y, w, h)
-        self.context.clip()
+##    def beginclip(self,x,y,w,h):
+##        self.save()
+##        self.context.rectangle(x, y, w, h)
+##        self.context.clip()
+##
+##    def endclip(self):
+##        self.restore()
 
-    def endclip(self):
-        self.restore()
-
-    def transform(self, mode=CENTER): # Mode can be CENTER or CORNER
-        '''
-        NOT IMPLEMENTED
-        '''
-        raise NotImplementedError("transform() isn't implemented yet")
+    def transform(self, mode=None): # Mode can be CENTER or CORNER
+        if mode:
+            self._transformmode = mode
+        return self._transformmode
 
     def translate(self, x, y):
         t = Transform()
@@ -341,15 +345,14 @@ class Bot:
         self._transform *= t
 
     def push(self):
-        #self.push_group()
-        self.canvas.push()
+        self.transform_stack.push(self._transform)
 
     def pop(self):
-        #self.pop_group()
-        self.canvas.pop()
+        self._transform = self.transform_stack.get()
+        self.transform_stack.pop()
 
-##    def reset(self):
-##        self.canvas._context.identity_matrix()
+    def reset(self):
+        self._transform = Transform()
 
     #### Color
 
@@ -733,12 +736,13 @@ class CairoCanvas:
     Its intended use is to get drawable objects from a Bot instance, store them
     in a stack and draw them to the Cairo context when necessary.
     '''
-    def __init__(self, bot, target=None, width=None, height=None, gtkmode=False):
+    def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
 
-        self._bot = bot
+        if bot:
+            self._bot = bot
 
         self.stack = []
-        self.transform_stack = Stack()
+
         if not gtkmode:
             # image output mode, we need to make a surface
             self.setsurface(target, width, height)
@@ -792,48 +796,40 @@ class CairoCanvas:
     def get_surface(self):
         return self._surface
 
-##    def _set_transform(self, matrix):
-##        self._transform._matrix = matrix
-##    def _get_transform(self):
-##        return self._transform
-##    transform = property(_get_transform, _set_transform)
-
     def add(self, grob):
         if not isinstance(grob, data.Grob):
             raise ShoebotError("Canvas.add() - wrong argument: expecting a Grob, received %s" % (grob))
-
-        # set context values
-        if self._bot._fillcolor and not grob._fillcolor:
-            grob._fillcolor = self._bot._fillcolor
-        if self._bot._strokecolor and not grob._fillcolor:
-            grob._strokecolor = self._bot._strokecolor
-        if self._bot._strokewidth and not grob._strokewidth:
-            grob._strokewidth = self._bot._strokewidth
-        if self._bot._transform:
-            grob._transform *= self._bot._transform
-
         self.stack.append(grob)
 
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
         for item in self.stack:
-            if isinstance(item, Grob):
-                # check if item has its own attributes
-                # set context fill/stroke colors to the grob's
-                # set transform matrix
-                ctx.save()
-                ctx.set_matrix(item._transform._matrix)
+            ctx.identity_matrix()
+            ctx.save()
+            if item._transformmode == CENTER:
+                (x, y, w, h) = item.bounds
+                centerx = (x+w)/2
+                centery = (y+h)/2
+                print item.bounds
+                print centerx, centery
+                ctx.translate(-centerx, -centery)
+                ctx.transform(item._transform._matrix)
+##                ctx.translate(x, y)
                 self.drawpath(item)
-                ctx.restore()
-                # fill_and_stroke()
 
-    def drawpath(self,path):
+            else:
+                ctx.transform(item._transform._matrix)
+                self.drawpath(item)
+            ctx.restore()
+
+    def drawpath(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''
         if not isinstance(path, BezierPath):
             raise ShoebotError("drawpath(): Expecting a BezierPath, got %s" % (path))
 
-        ctx = self._context
+        if not ctx:
+            ctx = self._context
 
         if path._strokewidth:
             self._context.set_line_width(path._strokewidth)
@@ -885,13 +881,6 @@ class CairoCanvas:
             self._context.stroke()
         else:
             pass
-
-    def push(self):
-        self.transform_stack.push(self._transform)
-
-    def pop(self):
-        self._transform = self.transform_stack.get()
-        self.transform_stack.pop()
 
     def finish(self):
         if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):
