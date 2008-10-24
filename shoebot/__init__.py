@@ -808,14 +808,33 @@ class CairoCanvas:
             ctx.identity_matrix()
             ctx.save()
             if item._transformmode == CENTER:
-                (x, y, w, h) = item.bounds
-                centerx = (x+w)/2
-                centery = (y+h)/2
-                print item.bounds
-                print centerx, centery
-                ctx.translate(-centerx, -centery)
+                # get item bbox values
+                (x1, y1, x2, y2) = item.bounds
+                centerx = (x1+x2)/2
+                centery = (y1+y2)/2
+                print "Bbox:  " + str(item.bounds)
+
+                # determine absolute centerpoint coords
+                # (after transforms are applied)
+                m = m1 = cairo.Matrix()
+                m = item._transform.copy()._matrix
+##                m1.translate(-centerx, -centery)
+                m1.translate(0, 0)
+
+                m2 = m1 * m
+                x1c, y1c = m2.transform_point(x1, y1)
+                x2c, y2c = m2.transform_point(x2, y2)
+
+                print "Cbox:  " + str((x1c, y1c, x2c, y2c))
+                abscenterx = (x1c+x2c)/2
+                abscentery = (y1c+y2c)/2
+
+                print "Center:      " + str((centerx,centery))
+                print "Converted:   " + str((abscenterx,abscentery))
+                ctx.translate(centerx, centery)
+                ctx.translate(-abscenterx, -abscentery)
                 ctx.transform(item._transform._matrix)
-##                ctx.translate(x, y)
+##                ctx.translate(cx,cy)
                 self.drawpath(item)
 
             else:

@@ -302,7 +302,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         ctx = cairo.Context(surface)
         canvas = CairoCanvas(target=ctx)
         p = self.copy()
-        ctx.transform(p._transform._matrix)
+##        ctx.transform(p._transform._matrix)
 
 
         # pass path to temporary context
@@ -333,10 +333,6 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
                 ctx.restore()
         # get boundaries
         bbox = ctx.fill_extents()
-        # multiply them by the context transform matrix
-        x1,y1 = ctx.user_to_device(bbox[0], bbox[1])
-        x2,y2 = ctx.user_to_device(bbox[2], bbox[3])
-        bbox = (x1, y1, x2, y2)
         del surface, ctx, canvas, p
         return bbox
     bounds = property(_get_bounds)
@@ -597,15 +593,19 @@ class Transform():
     matrix = property(_get_matrix, _set_matrix)
 
     def translate(self, x, y):
-        self._matrix.translate(x,y)
+        m = cairo.Matrix()
+        m.translate(x,y)
+        self._matrix *= m
 
     def rotate(self, degrees=0, radians=0):
         from math import radians as deg2rad
-        if degrees:
-            a = deg2rad(degrees)
-        else:
+        if radians:
             a = radians
-        self._matrix.rotate(a)
+        else:
+            a = deg2rad(degrees)
+        m = cairo.Matrix()
+        m.rotate(a)
+        self._matrix *= m
 
     def scale(self, x=1, y=None):
         if x == 0 or y == 0:
@@ -613,7 +613,9 @@ class Transform():
             return
         if not y:
             y = x
-        self._matrix.scale(x,y)
+        m = cairo.Matrix()
+        m.scale(x,y)
+        self._matrix *= m
 
     def skew(self, x=1, y=None):
         self._matrix *= cairo.Matrix(1,0,x,1,0,0)
