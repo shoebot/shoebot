@@ -23,7 +23,7 @@ def run_oneshot(script, file):
     ''' Oneshot mode:
     Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
-    bot = shoebot.Bot(outputfile = file)
+    bot = shoebot.Bot(targetfilename = file)
 
     # run it, and then its setup and draw methods, if they're there
     # (running setup() and draw() isn't always desirable, but for image

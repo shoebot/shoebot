@@ -817,14 +817,12 @@ class CairoCanvas:
             ctx = self._context
         for item in self.stack:
             ctx.save()
-
             (x1,y1,x2,y2) = item.bounds
             deltax = (x1+x2)/2
             deltay = (y1+y2)/2
             m = item._transform.get_matrix_with_center(deltax,deltay)
             ctx.transform(m)
             self.drawpath(item)
-
             ctx.restore()
 
     def drawpath(self,path,ctx=None):
@@ -884,7 +882,7 @@ class CairoCanvas:
             self._context.set_source_rgba(*path._strokecolor)
             self._context.stroke()
         else:
-            pass
+            print "Warning: Canvas object had no fill or stroke values"
 
     def finish(self):
         if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):
@@ -894,7 +892,7 @@ class CairoCanvas:
             self._context.write_to_png("DUMMYOUTPUT.png")
 
     def clear(self):
-        self.stack = self.transform_stack = []
+        self.stack = []
 
     def output(self, target):
         self.draw()
@@ -943,18 +941,6 @@ class CairoCanvas:
         elif isinstance(target, cairo.Surface):
             ctx = target.get_context()
             self.draw(ctx)
-
-
-
-    def apply_matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
-        '''
-        Adds mtrx to the current transformation matrix
-        '''
-        mtrx = cairo.Matrix(xx, yx, xy, yy, x0, y0)
-        try:
-            self._context.transform(mtrx)
-        except cairo.Error:
-            print "Invalid transformation matrix (%2f,%2f,%2f,%2f,%2f,%2f)" % (xx, yx, xy, yy, x0, y0)
 
 if __name__ == "__main__":
     print '''

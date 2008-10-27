@@ -456,7 +456,7 @@ class Color(object):
         self.bot = bot
 
         # unpack one-element tuples, they show up sometimes
-        if isinstance(v, (tuple,list)) and len(v) == 1:
+        while isinstance(v, (tuple,list)) and len(v) == 1:
             v = v[0]
 
         if not v:

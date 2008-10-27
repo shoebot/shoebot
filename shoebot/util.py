@@ -119,7 +119,7 @@ def hex2dec(hexdata):
 def dec2hex(number):
     return "%X" % 256
 
-def parse_color(data, color_range=1):
+def parse_color(v, color_range=1):
     '''Receives a colour definition and returns a (r,g,b,a) tuple.
 
     Accepts:
@@ -136,28 +136,28 @@ def parse_color(data, color_range=1):
     Returns a (red, green, blue, alpha) tuple, with values ranging from
     0 to 1.
 
-    The 'color_range' parameter sets the colour color_range in which the
+    The 'color_range' parameter sets the colour range in which the
     colour data values are specified.
     '''
-    from data import Color
+    import data
 
     # unpack one-element tuples, they show up sometimes
-    if isinstance(data, (tuple,list)) and len(data) == 1:
-        data = data[0]
+    while isinstance(v, (tuple,list)) and len(v) == 1:
+        v = v[0]
 
-    if isinstance(data, (int,float)):
-        red = green = blue = data / color_range
+    if isinstance(v, (int,float)):
+        red = green = blue = v / color_range
         alpha = 1.
 
-    elif isinstance(data, Color):
-        red, green, blue, alpha = data
+    elif isinstance(v, data.Color):
+        red, green, blue, alpha = v
 
-    elif isinstance(data, (tuple,list)):
+    elif isinstance(v, (tuple,list)):
         # normalise values according to the supplied colour range
         # for this we make a list with the normalised data
         color = []
-        for index in range(0,len(data)):
-            color.append(data[index] / color_range)
+        for index in range(0,len(v)):
+            color.append(v[index] / color_range)
 
         if len(color) == 1:
             red = green = blue = alpha = color[0]
@@ -175,24 +175,24 @@ def parse_color(data, color_range=1):
             blue = color[2]
             alpha = color[3]
 
-    elif isinstance(data, basestring):
+    elif isinstance(v, basestring):
         # hexstring: remove hash character, if any
-        data = data.strip('#')
+        v = v.strip('#')
         if len(data) == 6:
             # RRGGBB
-            red = hex2dec(data[0:2]) / color_range
-            green = hex2dec(data[2:4]) / color_range
-            blue = hex2dec(data[4:6]) / color_range
+            red = hex2dec(v[0:2]) / color_range
+            green = hex2dec(v[2:4]) / color_range
+            blue = hex2dec(v[4:6]) / color_range
             alpha = 1.
-        elif len(data) == 8:
-            red = hex2dec(data[0:2]) / color_range
-            green = hex2dec(data[2:4]) / color_range
-            blue = hex2dec(data[4:6]) / color_range
-            alpha = hex2dec(data[6:8]) / color_range
+        elif len(v) == 8:
+            red = hex2dec(v[0:2]) / color_range
+            green = hex2dec(v[2:4]) / color_range
+            blue = hex2dec(v[4:6]) / color_range
+            alpha = hex2dec(v[6:8]) / color_range
     return (red, green, blue, alpha)
 
-def parse_hsb_color(data, color_range=1):
-    hue, saturation, brightness, alpha = parse_color(data, color_range)
+def parse_hsb_color(v, color_range=1):
+    hue, saturation, brightness, alpha = parse_color(v, color_range)
     red, green, blue = hsl_to_rgb(hue, saturation, brightness)
     return (red, green, blue, alpha)
 
