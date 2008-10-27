@@ -337,23 +337,33 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         return bbox
     bounds = property(_get_bounds)
 
-##    def _get_transform(self):
-##        trans = Transform(self._transform)
-##        if (self._transformmode == CENTER):
-##            print "Resolving center transform!"
-##            print "Original:   " + str(trans)
-##            (x, y, w, h) = self.bounds
-##            print self.bounds
-##            deltax = x+w/2
-##            deltay = y+h/2
-##
-##            newtrans = Transform()
-##            newtrans.translate(-deltax,-deltay)
-##            newtrans *= trans
-##            newtrans.translate(deltax,deltay)
-##            print "Converted:  " + str(newtrans)
-##        return newtrans
-##    transform = property(_get_transform)
+    def _get_center(self):
+        '''Returns the center point of the path, disregarding transforms.
+        '''
+        (x1,y1,x2,y2) = self.bounds
+        x = (x1 + x2) / 2
+        y = (y1 + y2) / 2
+        return (x,y)
+
+    def _get_abs_center(self):
+        '''Returns the centerpoint of the path, taking transforms into account.
+        '''
+        (rel_x, rel_y) = self._get_center()
+        m = self._transform.copy()._matrix
+        return m.transform_point(rel_x, rel_y)
+
+    def _get_transform(self):
+        trans = self._transform.copy()
+        if (self._transformmode == CENTER):
+            deltax, deltay = self._get_center()
+            t = Transform()
+            t.translate(-deltax,-deltay)
+            trans = t * trans
+            t = Transform()
+            t.translate(deltax,deltay)
+            trans *= t
+        return trans
+    transform = property(_get_transform)
 
 class PathElement:
     '''
@@ -552,104 +562,167 @@ class Variable(object):
     def __repr__(self):
         return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
 
-class Transform():
-    '''
-    Represents a transformation matrix.
+TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'cscale', 'crotate',
+              'cskew']
 
-    A cairo matrix is stored in _matrix. This class wraps it and adds some
-    stuff (like skewing and stack control).
+class Transform:
     '''
+    This class represents a stack of transformations. Supported operations are
+    translation, scaling, rotation and skewing.
 
+    '''
     def __init__(self, transform=None):
+        self.stack = []
         if transform is None:
-            t = cairo.Matrix()
+            pass
         elif isinstance(transform, Transform):
-            t = transform._matrix
+            self.append(transform)
         elif isinstance(transform, (list, tuple)):
             matrix = tuple(transform)
             t = cairo.Matrix(*matrix)
+            self.append(t)
         elif isinstance(transform, cairo.Matrix):
-            t = transform
+            self.append(transform)
         else:
-            raise NodeBoxError, "Don't know how to handle transform %s." % transform
-        self._matrix = t
-
-    def set(self, ctx):
-        ctx.set_matrix(self._matrix)
-    def concat(self, ctx):
-        ctx.transform(self._matrix)
-    def copy(self):
-        return self.__class__(self)
-
-    def _get_matrix(self):
-        return self._matrix
-    def _set_matrix(self, value):
-        if type(value, cairo.Matrix):
-            self._matrix = value
-        elif type(value, (tuple,list)) and len(value) == 6:
-            self._matrix = cairo.Matrix(*value)
-        else:
-            raise ShoebotError("Transform._set_matrix: Input must be a Cairo matrix or a 6-element tuple or list")
-    matrix = property(_get_matrix, _set_matrix)
+            raise ShoebotError, "Transform: Don't know how to handle transform %s." % transform
 
     def translate(self, x, y):
-        m = cairo.Matrix()
-        m.translate(x,y)
-        self._matrix *= m
+        t = ('translate', x, y)
+        self.stack.append(t)
+    def scale(self, x, y):
+        t = ('scale', x, y)
+        self.stack.append(t)
+    def rotate(self, a):
+        t = ('rotate', a)
+        self.stack.append(t)
+    def skew(self, x, y):
+        t = ('skew', x, y)
+        self.stack.append(t)
+    def cscale(self, x, y):
+        t = ('cscale', x, y)
+        self.stack.append(t)
+    def crotate(self, a):
+        t = ('crotate', a)
+        self.stack.append(t)
+    def cskew(self, x, y):
+        t = ('cskew', x, y)
+        self.stack.append(t)
 
-    def rotate(self, degrees=0, radians=0):
-        from math import radians as deg2rad
-        if radians:
-            a = radians
+    def append(self, t):
+        if isinstance(t, Transform):
+            for item in t.stack:
+                self.stack.append(item)
+        elif isinstance(t, cairo.Matrix):
+            self.stack.append(t)
         else:
-            a = deg2rad(degrees)
-        m = cairo.Matrix()
-        m.rotate(a)
-        self._matrix *= m
+            raise ShoebotError("Transform: Can only append Transforms or Cairo matrices (got %s)" % (t))
 
-    def scale(self, x=1, y=None):
-        if x == 0 or y == 0:
-            print "scale(): parameters can't be 0. Ignoring"
-            return
-        if not y:
-            y = x
-        m = cairo.Matrix()
-        m.scale(x,y)
-        self._matrix *= m
+    def prepend(self,t):
+        if isinstance(t, Transform):
+            newstack = []
+            for item in t.stack:
+                newstack.append(item)
+            for item in self.stack:
+                newstack.append(item)
+            self.stack = newstack
+        elif isinstance(t, cairo.Matrix):
+            self.stack.insert(0,t)
+        else:
+            raise ShoebotError("Transform: Can only append Transforms or Cairo matrices (got %s)" % (t))
 
-    def skew(self, x=1, y=None):
-        self._matrix *= cairo.Matrix(1,0,x,1,0,0)
-        if y:
-            self._matrix *= cairo.Matrix(1,y,0,1,0,0)
-
-    def __repr__(self):
-        return "<%s [%.3f %.3f %.3f %.3f %.3f %.3f]>" % ((self.__class__.__name__,)
-                 + tuple(self))
+    def copy(self):
+        return self.__class__(self)
     def __iter__(self):
-        for value in self._matrix:
+        for value in self.stack:
             yield value
-    def __mul__(self, other):
-        if isinstance(other, Transform):
-            return Transform(self._matrix * other._matrix)
-        elif isinstance(other, cairo.Matrix):
-            return Transform(self._matrix * other)
 
-    def append(self, other):
-        t = Transform(other)
-        self._matrix *= t._matrix
+    def get_matrix(self):
+        '''Returns this transform's matrix. Its centerpoint is presumed to be
+        (0,0), which is the Cairo default.'''
+        return self.get_matrix_with_center(0,0)
 
-    def prepend(self, other):
-        t = Transform(other)
-        t._matrix *= self._matrix
-        self._matrix = t._matrix
+    def get_matrix_with_center(self,x,y):
+        '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
+        m = cairo.Matrix()
 
+        centerx = x
+        centery = y
+
+        for trans in self.stack:
+            if isinstance(trans, cairo.Matrix):
+                # multiply matrix
+                m *= trans
+            elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
+                # parse transform command
+                cmd = trans[0]
+                args = trans[1:]
+                t = cairo.Matrix()
+
+                if cmd == 'translate':
+                    t.translate(args[0],args[1])
+                    m *= t
+                elif cmd == 'rotate':
+                    t.rotate(args[0])
+                    m *= t
+                elif cmd == 'scale':
+                    t.scale(args[0], args[1])
+                    m *= t
+                elif cmd == 'skew':
+                    x, y = args
+                    ## TODO: x and y should be the tangent of an angle
+                    t *= cairo.Matrix(1,0,x,1,0,0)
+                    t *= cairo.Matrix(1,y,0,1,0,0)
+                    m *= t
+                elif cmd == 'cscale':
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    x, y = args
+
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+
+                    m *= m1
+                    m *= cairo.Matrix(x,0,0,y,0,0)
+                    m *= m2
+                elif cmd == 'crotate':
+                    from math import sin, cos
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    a = args[0]
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    # transform centerpoint according to current matrix
+                    m *= m1
+                    m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                    m *= m2
+
+                elif cmd == 'cskew':
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    x,y = args
+
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    t *= m
+                    t *= m1
+                    t *= cairo.Matrix(1,0,x,1,0,0)
+                    t *= cairo.Matrix(1,y,0,1,0,0)
+                    t *= m2
+                    m = t
+        return m
 
 class Stack(list):
     def __init__(self):
         list.__init__(self)
 
     def push(self, item):
-        self.insert(-1, item)
+        self.insert(0, item)
 
     def pop(self):
         del self[0]

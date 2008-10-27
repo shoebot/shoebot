@@ -38,9 +38,8 @@ class ShoebotError(Exception): pass
 
 class Bot:
     '''
-    The Bot class is an abstraction to hold a Cairo surface, context and all
-    methods to access and manipulate it (the Nodebox language is
-    implemented here).
+    A Bot is an interface to receive user commands (through scripts or direct
+    calls) and pass them to a canvas for drawing.
     '''
 
     inch = 72
@@ -69,16 +68,16 @@ class Bot:
         self._path = None
         self._autoclosepath = True
 
-        self.color_range = 1
+        self.color_range = 1.
         self.color_mode = RGB
 
         self._fillcolor = self.Color(.2)
-        self._strokecolor = self.Color(.8)
+        self._strokecolor = None
         self._strokewidth = 1.0
 
         self._transform = Transform()
         self._transformmode = CENTER
-        self.transform_stack = Stack()
+        self.transform_stack = []
 
         self.gtkmode = gtkmode
         self.vars = []
@@ -328,28 +327,40 @@ class Bot:
         return self._transformmode
 
     def translate(self, x, y):
-        t = Transform()
-        t.translate(x,y)
-        self._transform *= t
+        self._transform.translate(x,y)
     def rotate(self, degrees=0, radians=0):
-        t = Transform()
-        t.rotate(degrees, radians)
-        self._transform *= t
+        from math import radians as deg2rad
+        if radians:
+            angle = radians
+        else:
+            angle = deg2rad(degrees)
+
+        if self._transformmode == CENTER:
+            # Nodebox's rotate direction is the opposite of Cairo's
+            self._transform.crotate(-angle)
+        else:
+            self._transform.rotate(-angle)
     def scale(self, x=1, y=None):
-        t = Transform()
-        t.scale(x,y)
-        self._transform *= t
-    def skew(self, x=1, y=None):
-        t = Transform()
-        t.skew(x,y)
-        self._transform *= t
+        if not y:
+            y = x
+        if self._transformmode == CENTER:
+            self._transform.cscale(x,y)
+        else:
+            self._transform.scale(x,y)
+
+    def skew(self, x=1, y=0):
+        if self._transformmode == CENTER:
+            self._transform.cskew(x,y)
+        else:
+            self._transform.skew(x,y)
+
+
 
     def push(self):
-        self.transform_stack.push(self._transform)
+        self.transform_stack.insert(0,self._transform.copy())
 
     def pop(self):
-        self._transform = self.transform_stack.get()
-        self.transform_stack.pop()
+        self._transform = self.transform_stack.pop()
 
     def reset(self):
         self._transform = Transform()
@@ -401,7 +412,7 @@ class Bot:
 
     def nostroke(self):
         ''' Stops applying strokes to new paths.'''
-        self.canvas._strokecolor = None
+        self._strokecolor = None
 
     def strokewidth(self, w=None):
         '''Sets the stroke width.'''
@@ -805,41 +816,15 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
         for item in self.stack:
-            ctx.identity_matrix()
             ctx.save()
-            if item._transformmode == CENTER:
-                # get item bbox values
-                (x1, y1, x2, y2) = item.bounds
-                centerx = (x1+x2)/2
-                centery = (y1+y2)/2
-                print "Bbox:  " + str(item.bounds)
 
-                # determine absolute centerpoint coords
-                # (after transforms are applied)
-                m = m1 = cairo.Matrix()
-                m = item._transform.copy()._matrix
-##                m1.translate(-centerx, -centery)
-                m1.translate(0, 0)
+            (x1,y1,x2,y2) = item.bounds
+            deltax = (x1+x2)/2
+            deltay = (y1+y2)/2
+            m = item._transform.get_matrix_with_center(deltax,deltay)
+            ctx.transform(m)
+            self.drawpath(item)
 
-                m2 = m1 * m
-                x1c, y1c = m2.transform_point(x1, y1)
-                x2c, y2c = m2.transform_point(x2, y2)
-
-                print "Cbox:  " + str((x1c, y1c, x2c, y2c))
-                abscenterx = (x1c+x2c)/2
-                abscentery = (y1c+y2c)/2
-
-                print "Center:      " + str((centerx,centery))
-                print "Converted:   " + str((abscenterx,abscentery))
-                ctx.translate(centerx, centery)
-                ctx.translate(-abscenterx, -abscentery)
-                ctx.transform(item._transform._matrix)
-##                ctx.translate(cx,cy)
-                self.drawpath(item)
-
-            else:
-                ctx.transform(item._transform._matrix)
-                self.drawpath(item)
             ctx.restore()
 
     def drawpath(self,path,ctx=None):
