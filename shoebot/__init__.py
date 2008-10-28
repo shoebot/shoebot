@@ -343,6 +343,11 @@ class Bot:
     def scale(self, x=1, y=None):
         if not y:
             y = x
+        if x == 0 or x == -1:
+            # Cairo borks on zero values
+            x = 1
+        if y == 0 or y == -1:
+            y = 1
         if self._transformmode == CENTER:
             self._transform.cscale(x,y)
         else:
@@ -817,11 +822,8 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
         for item in self.stack:
-##            print item._fillcolor
             ctx.save()
-            (x1,y1,x2,y2) = item.bounds
-            deltax = (x1+x2)/2
-            deltay = (y1+y2)/2
+            deltax, deltay = item.center
             m = item._transform.get_matrix_with_center(deltax,deltay)
             ctx.transform(m)
             self.drawpath(item)

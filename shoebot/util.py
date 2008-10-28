@@ -193,10 +193,11 @@ def parse_color(v, color_range=1):
     return (red, green, blue, alpha)
 
 def parse_hsb_color(v, color_range=1):
-    print "parseHSB in : %s (%s)" % (str(v), color_range)
+    if isinstance(v, basestring):
+        # hexstrings aren't hsb
+        return parse_color(v)
     hue, saturation, brightness, alpha = parse_color(v, color_range)
     red, green, blue = hsl_to_rgb(hue, saturation, brightness)
-    print "parseHSB out: %s" % (str((red, green, blue, alpha)))
     return (red, green, blue, alpha)
 
 

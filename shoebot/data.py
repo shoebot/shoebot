@@ -351,6 +351,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         return (x,y)
+    center = property(_get_center)
 
     def _get_abs_center(self):
         '''Returns the centerpoint of the path, taking transforms into account.
