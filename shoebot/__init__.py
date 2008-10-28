@@ -71,7 +71,7 @@ class Bot:
         self.color_range = 1.
         self.color_mode = RGB
 
-        self._fillcolor = self.Color(.2)
+        self._fillcolor = self.color(.2)
         self._strokecolor = None
         self._strokewidth = 1.0
 
@@ -374,7 +374,8 @@ class Bot:
         raise NotImplementedError("outputmode() isn't implemented yet")
 
     def color(self, *args):
-        return Color(self, *args)
+##        print "color(): %s, %i:     %s" % (self.color_mode, self.color_range, str(args))
+        return Color(self.color_mode, self.color_range, args)
 
     def colormode(self, mode=None, crange=None):
         '''Sets the current colormode (can be RGB or HSB) and eventually
@@ -398,7 +399,7 @@ class Bot:
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-        self._fillcolor = self.color(args)
+        self._fillcolor = self.color(*args)
         return self._fillcolor
 
     def nofill(self):
@@ -407,7 +408,7 @@ class Bot:
 
     def stroke(self,*args):
         '''Sets a stroke color, applying it to new paths.'''
-        self._strokecolor = self.color(args)
+        self._strokecolor = self.color(*args)
         return self._strokecolor
 
     def nostroke(self):
@@ -425,7 +426,7 @@ class Bot:
         '''Sets the background colour.'''
         r = self.BezierPath()
         r.rect(0, 0, self.WIDTH, self.HEIGHT)
-        r.fill = self.color(*args)
+        r.fill = self.color(args)
         self.canvas.add(r)
 
     #### Text
@@ -816,6 +817,7 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
         for item in self.stack:
+##            print item._fillcolor
             ctx.save()
             (x1,y1,x2,y2) = item.bounds
             deltax = (x1+x2)/2

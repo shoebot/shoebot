@@ -189,11 +189,14 @@ def parse_color(v, color_range=1):
             green = hex2dec(v[2:4]) / color_range
             blue = hex2dec(v[4:6]) / color_range
             alpha = hex2dec(v[6:8]) / color_range
+
     return (red, green, blue, alpha)
 
 def parse_hsb_color(v, color_range=1):
+    print "parseHSB in : %s (%s)" % (str(v), color_range)
     hue, saturation, brightness, alpha = parse_color(v, color_range)
     red, green, blue = hsl_to_rgb(hue, saturation, brightness)
+    print "parseHSB out: %s" % (str((red, green, blue, alpha)))
     return (red, green, blue, alpha)
 
 

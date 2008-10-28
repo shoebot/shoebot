@@ -163,25 +163,31 @@ class ColorMixin(object):
 
     def __init__(self, **kwargs):
         try:
-            self._fillcolor = Color(self._bot, kwargs['fill'])
+            self._fillcolor = Color('rgb', 1, kwargs['fill'])
         except KeyError:
-            self._fillcolor = None
+            if self.bot._fillcolor:
+                self._fillcolor = self.bot._fillcolor.copy()
+            else:
+                self._fillcolor = None
         try:
-            self._strokecolor = Color(self._bot, kwargs['stroke'])
+            self._strokecolor = Color('rgb', 1, kwargs['stroke'])
         except KeyError:
-            self._strokecolor = None
+            if self.bot._strokecolor:
+                self._strokecolor = self.bot._strokecolor.copy()
+            else:
+                self._strokecolor = None
         self._strokewidth = kwargs.get('strokewidth', 1.0)
 
     def _get_fill(self):
         return self._fillcolor
     def _set_fill(self, *args):
-        self._fillcolor = Color(self._bot, *args)
+        self._fillcolor = Color('rgb', 1, *args)
     fill = property(_get_fill, _set_fill)
 
     def _get_stroke(self):
         return self._strokecolor
     def _set_stroke(self, *args):
-        self._strokecolor = Color(self._bot, *args)
+        self._strokecolor = Color('rgb', 1, *args)
     stroke = property(_get_stroke, _set_stroke)
 
     def _get_strokewidth(self):
@@ -204,12 +210,13 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, bot, path=None, **kwargs):
-        super(BezierPath, self).__init__(bot)
+        self.bot = bot
+        super(BezierPath, self).__init__(self.bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
         # inherit the Bot properties if applicable
-        self.bot = bot
+
         if self.bot:
             _copy_attrs(self.bot, self, self.stateAttributes)
 
@@ -436,9 +443,6 @@ class Color(object):
 
     This stores color values as a list of 4 floats (RGBA) in a 0-1 range.
 
-    A Bot instance must be the first argument, and this will parse the value
-    according to the Bot's color mode and range settings.
-
     The value can come in the following flavours:
     - v
     - (v)
@@ -451,27 +455,25 @@ class Color(object):
     - RRGGBBAA
     '''
 
-    def __init__(self, bot, *v):
+    def __init__(self, mode='rgb', color_range=1, *v):
 
-        self.bot = bot
 
         # unpack one-element tuples, they show up sometimes
         while isinstance(v, (tuple,list)) and len(v) == 1:
             v = v[0]
 
         if not v:
+            raise ShoebotError("got Color() with no values!")
             self.r, self.g, self.b, self.a = (0,0,0,1)
 
         if isinstance(v, Color):
             self.r, self.g, self.b, self.a = v
 
-        # use the Bot's color mode and range values to parse the incoming
-        # data
         else:
-            if bot.color_mode is RGB:
-                self.r, self.g, self.b, self.a = util.parse_color(v, bot.color_range)
-            elif bot.color_mode is HSB:
-                self.r, self.g, self.b, self.a = util.parse_hsb_color(v, bot.color_range)
+            if mode is RGB:
+                self.r, self.g, self.b, self.a = util.parse_color(v, color_range)
+            elif mode is HSB:
+                self.r, self.g, self.b, self.a = util.parse_hsb_color(v, color_range)
 
         # convenience attributes
         self.red = self.r
@@ -500,7 +502,7 @@ class Color(object):
         self.b = (self.b + other.b) / factor
         self.a = (self.a + other.a) / factor
     def copy(self):
-        new = self.__class__(self.bot, self.data)
+        new = self.__class__('rgb',1,self.data)
         return new
 
 class Variable(object):
