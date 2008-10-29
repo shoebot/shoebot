@@ -52,6 +52,9 @@ class Bot:
     NORMAL = "1"
     FORTYFIVE = "2"
 
+    LEFT = 'left'
+    RIGHT = 'right'
+
     CENTER = "center"
     CORNER = "corner"
     CORNERS = "corners"
@@ -79,8 +82,10 @@ class Bot:
         self._transformmode = CENTER
         self.transform_stack = []
 
-        self._font = util.create_cairo_font_face_for_file("~/.fonts/notcouriersans.ttf")
+        self._fontfile = "/home/rlafuente/.fonts/notcouriersans.ttf"
         self._fontsize = 16
+        self._align = LEFT
+        self._lineheight = 1
 
         self.gtkmode = gtkmode
         self.vars = []
@@ -825,13 +830,20 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
         for item in self.stack:
-            ctx.save()
+            if isinstance(item, BezierPath):
+                ctx.save()
                 deltax, deltay = item.center
                 m = item._transform.get_matrix_with_center(deltax,deltay)
                 ctx.transform(m)
-            if isinstance(item, BezierPath):
                 self.drawpath(item)
             elif isinstance(item, Text):
+                ctx.save()
+                x,y = item.metrics[0:2]
+                deltax, deltay = item.center
+                ctx.translate(item.x,item.y)
+                m = item._transform.get_matrix_with_center(deltax,deltay)
+                ctx.transform(m)
+
                 self.drawtext(item)
             ctx.restore()
 
@@ -840,13 +852,30 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
 
-        ctx.set_font_face(txt.cairo_font)
-        ctx.set_font_size(txt._font_size)
+        ctx.set_font_face(txt._fontface)
+        ctx.set_font_size(txt._fontsize)
+        ctx.text_path(txt.text)
 
-        x,y = txt.metrics[0:2]
-        ctx.translate(x,y)
-        ctx.show_text(txt.text)
-        ctx.translate(-x,-y)
+
+        if txt._fillcolor:
+            self._context.set_source_rgba(*txt._fillcolor)
+            if txt._strokecolor:
+                # if there's a stroke still to be applied, we need to call fill_preserve()
+                # which still leaves this path as active
+                self._context.fill_preserve()
+                self._context.set_source_rgba(*txt._strokecolor)
+                # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
+                # for further operations if needed)
+                self._context.stroke()
+            else:
+                # if there isn't a stroke, use plain fill() to close the path
+                self._context.fill()
+        elif txt._strokecolor:
+            # if there's no fill, apply stroke only
+            self._context.set_source_rgba(*txt._strokecolor)
+            self._context.stroke()
+        else:
+            print "Warning: Canvas object had no fill or stroke values"
 
     def drawpath(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''
