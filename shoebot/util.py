@@ -137,7 +137,7 @@ def parse_color(v, color_range=1):
     0 to 1.
 
     The 'color_range' parameter sets the colour range in which the
-    colour data values are specified.
+    colour data values are specified (except in hexstrings).
     '''
     import data
 
@@ -180,28 +180,22 @@ def parse_color(v, color_range=1):
         v = v.strip('#')
         if len(data) == 6:
             # RRGGBB
-            red = hex2dec(v[0:2]) / color_range
-            green = hex2dec(v[2:4]) / color_range
-            blue = hex2dec(v[4:6]) / color_range
+            red = hex2dec(v[0:2]) / 255.
+            green = hex2dec(v[2:4]) / 255.
+            blue = hex2dec(v[4:6]) / 255.
             alpha = 1.
         elif len(v) == 8:
-            red = hex2dec(v[0:2]) / color_range
-            green = hex2dec(v[2:4]) / color_range
-            blue = hex2dec(v[4:6]) / color_range
-            alpha = hex2dec(v[6:8]) / color_range
+            red = hex2dec(v[0:2]) / 255.
+            green = hex2dec(v[2:4]) / 255.
+            blue = hex2dec(v[4:6]) / 255.
+            alpha = hex2dec(v[6:8]) / 255.
 
     return (red, green, blue, alpha)
 
 def parse_hsb_color(v, color_range=1):
-    print "parseHSB in : %s (%s)" % (str(v), color_range)
     hue, saturation, brightness, alpha = parse_color(v, color_range)
     red, green, blue = hsl_to_rgb(hue, saturation, brightness)
-    print "parseHSB out: %s" % (str((red, green, blue, alpha)))
     return (red, green, blue, alpha)
-
-
-
-
 
 _initialized = False
 def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):

@@ -79,6 +79,9 @@ class Bot:
         self._transformmode = CENTER
         self.transform_stack = []
 
+        self._font = util.create_cairo_font_face_for_file("~/.fonts/notcouriersans.ttf")
+        self._fontsize = 16
+
         self.gtkmode = gtkmode
         self.vars = []
         self._oldvars = self.vars
@@ -343,6 +346,11 @@ class Bot:
     def scale(self, x=1, y=None):
         if not y:
             y = x
+        if x == 0 or x == -1:
+            # Cairo borks on zero values
+            x = 1
+        if y == 0 or y == -1:
+            y = 1
         if self._transformmode == CENTER:
             self._transform.cscale(x,y)
         else:
@@ -374,7 +382,6 @@ class Bot:
         raise NotImplementedError("outputmode() isn't implemented yet")
 
     def color(self, *args):
-##        print "color(): %s, %i:     %s" % (self.color_mode, self.color_range, str(args))
         return Color(self.color_mode, self.color_range, args)
 
     def colormode(self, mode=None, crange=None):
@@ -438,33 +445,34 @@ class Bot:
         installed.'''
         if fontpath is not None:
             face = util.create_cairo_font_face_for_file(fontpath, 0)
-            self.context.set_font_face(face)
+            self._font = face
         else:
-            self.context.get_font_face()
+            return self._font
         if fontsize is not None:
-            self.fontsize(fontsize)
+            self._fontsize(fontsize)
 
     def fontsize(self, fontsize=None):
         if fontsize is not None:
-            self.canvas.font_size = fontsize
+            self._font_size = fontsize
         else:
             return self.canvas.font_size
 
-    def text(self, txt, x, y, width=None, height=1000000, outline=False):
+    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''
         Draws a string of text according to current font settings.
         '''
-        # TODO: Check for malformed requests (x,y,txt is a common mistake)
-        self.save()
-        if width is not None:
-            pass
-        if outline is True:
-            self.textpath(txt, x, y, width, height)
+
+        txt = self.Text(txt, x, y, width, height, **kwargs)
+
+        if outline:
+          path = txt.path
+          if draw:
+              self.canvas.add(path)
+          return path
         else:
-            self.context.move_to(x,y)
-            self.context.show_text(txt)
-            self.fill_and_stroke()
-        self.restore()
+          if draw:
+            self.canvas.add(txt)
+          return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
         '''
@@ -489,14 +497,14 @@ class Bot:
         '''
         return textmetrics(txt)[1]
 
-    def textmetrics(self, txt, width=None):
+    def textmetrics(self, txt, width=None, height=None, **kwargs):
         '''Returns the width and height of a string of text as a tuple
         (according to current font settings).
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        x_bearing, y_bearing, textwidth, textheight, x_advance, y_advance = self.context.text_extents(txt)
-        return textwidth, textheight
+        txt = self.Text(txt, 0, 0, width, height, **kwargs)
+        return txt.metrics
 
     def lineheight(self, height=None):
         '''
@@ -817,15 +825,28 @@ class CairoCanvas:
         if not ctx:
             ctx = self._context
         for item in self.stack:
-##            print item._fillcolor
             ctx.save()
-            (x1,y1,x2,y2) = item.bounds
-            deltax = (x1+x2)/2
-            deltay = (y1+y2)/2
-            m = item._transform.get_matrix_with_center(deltax,deltay)
-            ctx.transform(m)
-            self.drawpath(item)
+                deltax, deltay = item.center
+                m = item._transform.get_matrix_with_center(deltax,deltay)
+                ctx.transform(m)
+            if isinstance(item, BezierPath):
+                self.drawpath(item)
+            elif isinstance(item, Text):
+                self.drawtext(item)
             ctx.restore()
+
+
+    def drawtext(self,txt,ctx=None):
+        if not ctx:
+            ctx = self._context
+
+        ctx.set_font_face(txt.cairo_font)
+        ctx.set_font_size(txt._font_size)
+
+        x,y = txt.metrics[0:2]
+        ctx.translate(x,y)
+        ctx.show_text(txt.text)
+        ctx.translate(-x,-y)
 
     def drawpath(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''

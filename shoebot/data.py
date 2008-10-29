@@ -351,6 +351,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         return (x,y)
+    center = property(_get_center)
 
     def _get_abs_center(self):
         '''Returns the centerpoint of the path, taking transforms into account.
@@ -456,8 +457,6 @@ class Color(object):
     '''
 
     def __init__(self, mode='rgb', color_range=1, *v):
-
-
         # unpack one-element tuples, they show up sometimes
         while isinstance(v, (tuple,list)) and len(v) == 1:
             v = v[0]
@@ -503,6 +502,45 @@ class Color(object):
         self.a = (self.a + other.a) / factor
     def copy(self):
         new = self.__class__('rgb',1,self.data)
+        return new
+
+class Text:
+    stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
+    kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
+
+    def __init__(self, bot, text, x=0, y=0, width=None, height=None, **kwargs):
+        self._bot = bot
+        super(Text, self).__init__(self._bot)
+        TransformMixin.__init__(self)
+        ColorMixin.__init__(self, **kwargs)
+        self.text = unicode(text)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self._fontname = kwargs.get('font', "~/.fonts/notcouriersans.ttf")
+        self._fontsize = kwargs.get('fontsize', 24)
+        self._lineheight = max(kwargs.get('lineheight', 1.2), 0.01)
+        self._align = kwargs.get('align', LEFT)
+
+    def _get_cairo_font(self):
+        return util.create_cairo_font_face_for_file(fontpath, 0)
+    cairo_font = property(_get_cairo_font)
+
+    def _get_metrics(self):
+        surface = cairo.Surface(cairo.FORMAT_A8, 100, 100)
+        ctx = cairo.Context(surface)
+        face = util.create_cairo_font_face_for_file(self._fontfile, 0)
+        ctx.set_font_face(face)
+        e = ctx.text_extents(self.text)
+        return (e.xbearing, e.ybearing, e.width, e.height, e.x_advance, e.y_advance)
+    metrics = property(_get_metrics)
+
+    def copy(self):
+        new = self.__class__(self._bot, self.text)
+        _copy_attrs(self, new,
+            ('x', 'y', 'width', 'height', '_transform', '_transformmode',
+            '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
         return new
 
 class Variable(object):
