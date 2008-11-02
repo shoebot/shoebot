@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 
+# Shoebot setup script
+#
+# 'python setup.py install', or
+# 'python setup.py --help' for more options
+
 from distutils.core import setup
 import os
 
 # dir globbing approach taken from Mercurial's setup.py
-datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_) for file_ in files]) for root,dir,files in os.walk('examples')]
-datafiles.append(('share/shoebot', ['icon.png']))
+datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
+for file_ in files]) for root,dir,files in os.walk('examples')]
+datafiles.append(('share/shoebot', ['assets/icon.png']))
 
 setup(name = "shoebot",
     version = "0.1",
@@ -16,8 +22,8 @@ setup(name = "shoebot",
     url = "http://tinkerhouse.net/shoebot",
     packages = ["shoebot"],
     data_files = datafiles,
-      scripts = ["sbot", "shoebot-ide"],
-      long_description = """
+    scripts = ["sbot", "shoebot-ide"],
+    long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
  which describes a drawing process, and outputs a graphic in a common open
  standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor
