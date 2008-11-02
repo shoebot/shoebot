@@ -12,9 +12,9 @@ import cairo
 import gobject, socket
 from pprint import pprint
 
-class ShoebotCanvas(gtk.DrawingArea):
+class ShoebotDrawingArea(gtk.DrawingArea):
     def __init__(self, mainwindow, bot = None):
-        super(ShoebotCanvas, self).__init__()
+        super(ShoebotDrawingArea, self).__init__()
         self.mainwindow = mainwindow
         self.connect("expose_event", self.expose)
         # get the bot object to display
@@ -219,8 +219,8 @@ class VarWindow:
 
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
-        self.bot = shoebot.Bot(gtkmode=True, inputscript=code)
-        self.canvas = ShoebotCanvas(self, self.bot)
+        self.bot = shoebot.NodeBot(gtkmode=True, inputscript=code)
+        self.canvas = ShoebotDrawingArea(self, self.bot)
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow

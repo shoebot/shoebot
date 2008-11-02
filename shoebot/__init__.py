@@ -35,6 +35,7 @@ DEBUG = False
 EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 class ShoebotError(Exception): pass
+class ShoebotScriptError(Exception): pass
 
 class Bot:
     '''
@@ -45,19 +46,6 @@ class Bot:
     inch = 72
     cm = 28.3465
     mm = 2.8346
-
-    RGB = "rgb"
-    HSB = "hsb"
-
-    NORMAL = "1"
-    FORTYFIVE = "2"
-
-    LEFT = 'left'
-    RIGHT = 'right'
-
-    CENTER = "center"
-    CORNER = "corner"
-    CORNERS = "corners"
 
     DEFAULT_WIDTH = 200
     DEFAULT_HEIGHT = 200
@@ -127,425 +115,6 @@ class Bot:
     def Text(self, *args, **kwargs):
         return self._makeInstance(Text, args, kwargs)
 
-    #### Drawing
-
-    def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        '''Draws a rectangle with top left corner at (x,y)
-
-        The roundness variable sets rounded corners.
-        '''
-        r = self.BezierPath(**kwargs)
-        r.rect(x,y,width,height,roundness,self.rectmode)
-        #r.inheritFromContext(kwargs.keys())
-        if draw:
-            self.canvas.add(r)
-        return r
-
-    def rectmode(self, mode=None):
-        if mode in (self.CORNER, self.CENTER, self.CORNERS):
-            self.rectmode = mode
-            return self.rectmode
-        elif mode is None:
-            return self.rectmode
-        else:
-            raise ShoebotError("rectmode: invalid input")
-
-    def oval(self, x, y, width, height, draw=True, **kwargs):
-        '''Draws an ellipse starting from (x,y)'''
-        from math import pi
-
-        r = self.BezierPath(**kwargs)
-        r.ellipse(x,y,width,height)
-        # r.inheritFromContext(kwargs.keys())
-        if draw:
-            self.canvas.add(r)
-        return r
-
-    def circle(self, x, y, diameter):
-        self.oval(x, y, diameter, diameter)
-
-    def line(self, x1, y1, x2, y2):
-        '''Draws a line from (x1,y1) to (x2,y2)'''
-        self.beginpath()
-        self.moveto(x1,y1)
-        self.lineto(x2,y2)
-        self.endpath()
-
-    def arrow(self, x, y, width, type=NORMAL):
-        '''Draws an arrow.
-
-        Arrows can be two types: NORMAL or FORTYFIVE.
-        Taken from Nodebox.
-        '''
-        if type == self.NORMAL:
-            head = width * .4
-            tail = width * .2
-            self.beginpath()
-            self.moveto(x, y)
-            self.lineto(x-head, y+head)
-            self.lineto(x-head, y+tail)
-            self.lineto(x-width, y+tail)
-            self.lineto(x-width, y-tail)
-            self.lineto(x-head, y-tail)
-            self.lineto(x-head, y-head)
-            self.lineto(x, y)
-            self.endpath()
-#            self.fill_and_stroke()
-        elif type == self.FORTYFIVE:
-            head = .3
-            tail = 1 + head
-            self.beginpath()
-            self.moveto(x, y)
-            self.lineto(x, y+width*(1-head))
-            self.lineto(x-width*head, y+width)
-            self.lineto(x-width*head, y+width*tail*.4)
-            self.lineto(x-width*tail*.6, y+width)
-            self.lineto(x-width, y+width*tail*.6)
-            self.lineto(x-width*tail*.4, y+width*head)
-            self.lineto(x-width, y+width*head)
-            self.lineto(x-width*(1-head), y)
-            self.lineto(x, y)
-            self.endpath()
-#            self.fill_and_stroke()
-        else:
-            raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
-
-    def star(self, startx, starty, points=20, outer=100, inner=50):
-        '''Draws a star.
-
-        Taken from Nodebox.
-        '''
-        from math import sin, cos, pi
-        self.beginpath()
-        self.moveto(startx, starty + outer)
-
-        for i in range(1, int(2 * points)):
-            angle = i * pi / points
-            x = sin(angle)
-            y = cos(angle)
-            if i % 2:
-                radius = inner
-            else:
-                radius = outer
-            x = startx + radius * x
-            y = starty + radius * y
-            self.lineto(x,y)
-
-        self.endpath()
-#        self.fill_and_stroke()
-
-
-    # ----- PATH -----
-    # Path functions taken from Nodebox and modified
-
-    def beginpath(self, x=None, y=None):
-        self._path = self.BezierPath()
-        if x and y:
-            self._path.moveto(x,y)
-        self._path.closed = False
-
-        # if we have arguments, do a moveto too
-        if x is not None and y is not None:
-            self._path.moveto(x,y)
-
-    def moveto(self, x, y):
-        if self._path is None:
-            ## self.beginpath()
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.moveto(x,y)
-
-    def lineto(self, x, y):
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.lineto(x, y)
-
-    def curveto(self, x1, y1, x2, y2, x3, y3):
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.curveto(x1, y1, x2, y2, x3, y3)
-
-    def closepath(self):
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        if not self._path.closed:
-            self._path.closepath()
-            self._path.closed = True
-
-    def endpath(self, draw=True):
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        if self._autoclosepath:
-            self._path.closepath()
-        p = self._path
-        # p.inheritFromContext()
-        if draw:
-            self.canvas.add(p)
-            self._path = None
-        return p
-
-    def drawpath(self,path):
-        self.canvas.add(path)
-
-    def autoclosepath(self, close=True):
-        self._autoclosepath = close
-
-    def relmoveto(self, x, y):
-        '''Move relatively to the last point.'''
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.relmoveto(x,y)
-
-    def rellineto(self, x, y):
-        '''Draw a line using relative coordinates.'''
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.rellineto(x,y)
-
-    def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        '''Draws a curve relatively to the last point.
-        '''
-        if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
-        self._path.relcurveto(x,y)
-
-    def findpath(self, list, curvature=1.0):
-        ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
-        Curvature: 0=straight lines 1=smooth curves
-        '''
-        raise NotImplementedError("findpath() isn't implemented yet (sorry)")
-        #import bezier
-        #path = bezier.findpath(points, curvature=curvature)
-        #path.ctx = self
-        #path.inheritFromContext()
-        #return path
-
-    #### Transform and utility
-
-##    def beginclip(self,x,y,w,h):
-##        self.save()
-##        self.context.rectangle(x, y, w, h)
-##        self.context.clip()
-##
-##    def endclip(self):
-##        self.restore()
-
-    def transform(self, mode=None): # Mode can be CENTER or CORNER
-        if mode:
-            self._transformmode = mode
-        return self._transformmode
-
-    def translate(self, x, y):
-        self._transform.translate(x,y)
-    def rotate(self, degrees=0, radians=0):
-        from math import radians as deg2rad
-        if radians:
-            angle = radians
-        else:
-            angle = deg2rad(degrees)
-
-        if self._transformmode == CENTER:
-            # Nodebox's rotate direction is the opposite of Cairo's
-            self._transform.crotate(-angle)
-        else:
-            self._transform.rotate(-angle)
-    def scale(self, x=1, y=None):
-        if not y:
-            y = x
-        if x == 0 or x == -1:
-            # Cairo borks on zero values
-            x = 1
-        if y == 0 or y == -1:
-            y = 1
-        if self._transformmode == CENTER:
-            self._transform.cscale(x,y)
-        else:
-            self._transform.scale(x,y)
-
-    def skew(self, x=1, y=0):
-        if self._transformmode == CENTER:
-            self._transform.cskew(x,y)
-        else:
-            self._transform.skew(x,y)
-
-
-
-    def push(self):
-        self.transform_stack.insert(0,self._transform.copy())
-
-    def pop(self):
-        self._transform = self.transform_stack.pop()
-
-    def reset(self):
-        self._transform = Transform()
-
-    #### Color
-
-    def outputmode(self):
-        '''
-        NOT IMPLEMENTED
-        '''
-        raise NotImplementedError("outputmode() isn't implemented yet")
-
-    def color(self, *args):
-        return Color(self.color_mode, self.color_range, args)
-
-    def colormode(self, mode=None, crange=None):
-        '''Sets the current colormode (can be RGB or HSB) and eventually
-        the color range.
-
-        If called without arguments, it returns the current colormode.
-        '''
-        if mode is not None:
-            if mode == "rgb":
-                self.color_mode = RGB
-            elif mode == "hsb":
-                self.color_mode = HSB
-            else:
-                raise NameError, "Only RGB and HSB colormodes are supported."
-        if crange is not None:
-            self.color_range = crange
-        return self.color_mode
-
-    def colorrange(self, crange):
-        self.color_range = float(crange)
-
-    def fill(self,*args):
-        '''Sets a fill color, applying it to new paths.'''
-        self._fillcolor = self.color(*args)
-        return self._fillcolor
-
-    def nofill(self):
-        ''' Stops applying fills to new paths.'''
-        self._fillcolor = None
-
-    def stroke(self,*args):
-        '''Sets a stroke color, applying it to new paths.'''
-        self._strokecolor = self.color(*args)
-        return self._strokecolor
-
-    def nostroke(self):
-        ''' Stops applying strokes to new paths.'''
-        self._strokecolor = None
-
-    def strokewidth(self, w=None):
-        '''Sets the stroke width.'''
-        if w is not None:
-            self._strokewidth = w
-        else:
-            return self._strokewidth
-
-    def background(self,*args):
-        '''Sets the background colour.'''
-        r = self.BezierPath()
-        r.rect(0, 0, self.WIDTH, self.HEIGHT)
-        r.fill = self.color(args)
-        self.canvas.add(r)
-
-    #### Text
-
-    def font(self, fontpath=None, fontsize=None):
-        '''Set the font to be used with new text instances.
-
-        Accepts TrueType and OpenType files. Depends on FreeType being
-        installed.'''
-        if fontpath is not None:
-            face = util.create_cairo_font_face_for_file(fontpath, 0)
-            self._font = face
-        else:
-            return self._font
-        if fontsize is not None:
-            self._fontsize(fontsize)
-
-    def fontsize(self, fontsize=None):
-        if fontsize is not None:
-            self._font_size = fontsize
-        else:
-            return self.canvas.font_size
-
-    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
-        '''
-        Draws a string of text according to current font settings.
-        '''
-
-        txt = self.Text(txt, x, y, width, height, **kwargs)
-
-        if outline:
-          path = txt.path
-          if draw:
-              self.canvas.add(path)
-          return path
-        else:
-          if draw:
-            self.canvas.add(txt)
-          return txt
-
-    def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
-        '''
-        Draws an outlined path of the input text
-        '''
-        ## FIXME: This should be handled by BezierPath
-        self.save()
-        self.context.move_to(x,y)
-        self.context.text_path(txt)
-        self.restore()
-#        return self._path
-
-    def textwidth(self, txt, width=None):
-        '''Returns the width of a string of text according to the current
-        font settings.
-        '''
-        return textmetrics(txt)[0]
-
-    def textheight(self, txt, width=None):
-        '''Returns the height of a string of text according to the current
-        font settings.
-        '''
-        return textmetrics(txt)[1]
-
-    def textmetrics(self, txt, width=None, height=None, **kwargs):
-        '''Returns the width and height of a string of text as a tuple
-        (according to current font settings).
-        '''
-        # for now only returns width and height (as per Nodebox behaviour)
-        # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, **kwargs)
-        return txt.metrics
-
-    def lineheight(self, height=None):
-        '''
-        NOT IMPLEMENTED
-        '''
-        # default: 1.2
-        # sets leading
-        raise NotImplementedError("lineheight() isn't implemented yet")
-
-    def align(self, align="LEFT"):
-        '''
-        NOT IMPLEMENTED
-        '''
-        # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        raise NotImplementedError("align() isn't implemented in Shoebot yet")
-
-    # TODO: Set the framework to setup font options
-
-    def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
-        raise NotImplementedError("fontoptions() isn't implemented yet")
-
-    # ----- IMAGE -----
-
-    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
-        '''
-        TODO:
-        width and height ought to be for scaling, not clipping
-        Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
-        using PIL
-        '''
-        #width, height = im.size
-        imagesurface = cairo.ImageSurface.create_from_png(path)
-        self.context.set_source_surface (imagesurface, x, y)
-        self.context.rectangle(x, y, width, height)
-        self.context.fill()
-
     #### Variables
 
     def var(self, name, type, default=None, min=0, max=100, value=None):
@@ -585,6 +154,9 @@ class Bot:
             self.var(item, NUMBER, vardict[item])
 
     #### Utility
+
+    def color(self, *args):
+        return Color(self.color_mode, self.color_range, args)
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
@@ -753,7 +325,439 @@ class Bot:
                 # if on gtkmode, print the error and don't break
                 raise ShoebotError(errmsg)
 
-class CairoCanvas:
+
+class NodeBot(Bot):
+
+    RGB = "rgb"
+    HSB = "hsb"
+
+    NORMAL = "1"
+    FORTYFIVE = "2"
+
+    LEFT = 'left'
+    RIGHT = 'right'
+
+    CENTER = "center"
+    CORNER = "corner"
+    CORNERS = "corners"
+
+    def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
+        Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode)
+
+
+    #### Drawing
+
+    def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
+        '''Draws a rectangle with top left corner at (x,y)
+
+        The roundness variable sets rounded corners.
+        '''
+        r = self.BezierPath(**kwargs)
+        r.rect(x,y,width,height,roundness,self.rectmode)
+        #r.inheritFromContext(kwargs.keys())
+        if draw:
+            self.canvas.add(r)
+        return r
+
+    def rectmode(self, mode=None):
+        if mode in (self.CORNER, self.CENTER, self.CORNERS):
+            self.rectmode = mode
+            return self.rectmode
+        elif mode is None:
+            return self.rectmode
+        else:
+            raise ShoebotError("rectmode: invalid input")
+
+    def oval(self, x, y, width, height, draw=True, **kwargs):
+        '''Draws an ellipse starting from (x,y)'''
+        from math import pi
+
+        r = self.BezierPath(**kwargs)
+        r.ellipse(x,y,width,height)
+        # r.inheritFromContext(kwargs.keys())
+        if draw:
+            self.canvas.add(r)
+        return r
+
+    def circle(self, x, y, diameter):
+        self.oval(x, y, diameter, diameter)
+
+    def line(self, x1, y1, x2, y2):
+        '''Draws a line from (x1,y1) to (x2,y2)'''
+        self.beginpath()
+        self.moveto(x1,y1)
+        self.lineto(x2,y2)
+        self.endpath()
+
+    def arrow(self, x, y, width, type=NORMAL):
+        '''Draws an arrow.
+
+        Arrows can be two types: NORMAL or FORTYFIVE.
+        Taken from Nodebox.
+        '''
+        if type == self.NORMAL:
+            head = width * .4
+            tail = width * .2
+            self.beginpath()
+            self.moveto(x, y)
+            self.lineto(x-head, y+head)
+            self.lineto(x-head, y+tail)
+            self.lineto(x-width, y+tail)
+            self.lineto(x-width, y-tail)
+            self.lineto(x-head, y-tail)
+            self.lineto(x-head, y-head)
+            self.lineto(x, y)
+            self.endpath()
+#            self.fill_and_stroke()
+        elif type == self.FORTYFIVE:
+            head = .3
+            tail = 1 + head
+            self.beginpath()
+            self.moveto(x, y)
+            self.lineto(x, y+width*(1-head))
+            self.lineto(x-width*head, y+width)
+            self.lineto(x-width*head, y+width*tail*.4)
+            self.lineto(x-width*tail*.6, y+width)
+            self.lineto(x-width, y+width*tail*.6)
+            self.lineto(x-width*tail*.4, y+width*head)
+            self.lineto(x-width, y+width*head)
+            self.lineto(x-width*(1-head), y)
+            self.lineto(x, y)
+            self.endpath()
+#            self.fill_and_stroke()
+        else:
+            raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
+
+    def star(self, startx, starty, points=20, outer=100, inner=50):
+        '''Draws a star.
+
+        Taken from Nodebox.
+        '''
+        from math import sin, cos, pi
+        self.beginpath()
+        self.moveto(startx, starty + outer)
+
+        for i in range(1, int(2 * points)):
+            angle = i * pi / points
+            x = sin(angle)
+            y = cos(angle)
+            if i % 2:
+                radius = inner
+            else:
+                radius = outer
+            x = startx + radius * x
+            y = starty + radius * y
+            self.lineto(x,y)
+
+        self.endpath()
+
+    #### Path
+    # Path functions taken from Nodebox and modified
+
+    def beginpath(self, x=None, y=None):
+        self._path = self.BezierPath()
+        if x and y:
+            self._path.moveto(x,y)
+        self._path.closed = False
+
+        # if we have arguments, do a moveto too
+        if x is not None and y is not None:
+            self._path.moveto(x,y)
+
+    def moveto(self, x, y):
+        if self._path is None:
+            ## self.beginpath()
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.moveto(x,y)
+
+    def lineto(self, x, y):
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.lineto(x, y)
+
+    def curveto(self, x1, y1, x2, y2, x3, y3):
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.curveto(x1, y1, x2, y2, x3, y3)
+
+    def closepath(self):
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        if not self._path.closed:
+            self._path.closepath()
+            self._path.closed = True
+
+    def endpath(self, draw=True):
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        if self._autoclosepath:
+            self._path.closepath()
+        p = self._path
+        # p.inheritFromContext()
+        if draw:
+            self.canvas.add(p)
+            self._path = None
+        return p
+
+    def drawpath(self,path):
+        self.canvas.add(path)
+
+    def autoclosepath(self, close=True):
+        self._autoclosepath = close
+
+    def relmoveto(self, x, y):
+        '''Move relatively to the last point.'''
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.relmoveto(x,y)
+
+    def rellineto(self, x, y):
+        '''Draw a line using relative coordinates.'''
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.rellineto(x,y)
+
+    def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
+        '''Draws a curve relatively to the last point.
+        '''
+        if self._path is None:
+            raise ShoebotError, "No current path. Use beginpath() first."
+        self._path.relcurveto(x,y)
+
+    def findpath(self, list, curvature=1.0):
+        ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
+        Curvature: 0=straight lines 1=smooth curves
+        '''
+        raise NotImplementedError("findpath() isn't implemented yet (sorry)")
+        #import bezier
+        #path = bezier.findpath(points, curvature=curvature)
+        #path.ctx = self
+        #path.inheritFromContext()
+        #return path
+
+    #### Transform and utility
+
+##    def beginclip(self,x,y,w,h):
+##        self.save()
+##        self.context.rectangle(x, y, w, h)
+##        self.context.clip()
+##
+##    def endclip(self):
+##        self.restore()
+
+    def transform(self, mode=None): # Mode can be CENTER or CORNER
+        if mode:
+            self._transformmode = mode
+        return self._transformmode
+
+    def translate(self, x, y):
+        self._transform.translate(x,y)
+    def rotate(self, degrees=0, radians=0):
+        from math import radians as deg2rad
+        if radians:
+            angle = radians
+        else:
+            angle = deg2rad(degrees)
+
+        if self._transformmode == CENTER:
+            # Nodebox's rotate direction is the opposite of Cairo's
+            self._transform.crotate(-angle)
+        else:
+            self._transform.rotate(-angle)
+    def scale(self, x=1, y=None):
+        if not y:
+            y = x
+        if x == 0 or x == -1:
+            # Cairo borks on zero values
+            x = 1
+        if y == 0 or y == -1:
+            y = 1
+        if self._transformmode == CENTER:
+            self._transform.cscale(x,y)
+        else:
+            self._transform.scale(x,y)
+
+    def skew(self, x=1, y=0):
+        if self._transformmode == CENTER:
+            self._transform.cskew(x,y)
+        else:
+            self._transform.skew(x,y)
+
+    def push(self):
+        self.transform_stack.insert(0,self._transform.copy())
+
+    def pop(self):
+        self._transform = self.transform_stack.pop()
+
+    def reset(self):
+        self._transform = Transform()
+
+    #### Color
+
+    def outputmode(self):
+        '''
+        NOT IMPLEMENTED
+        '''
+        raise NotImplementedError("outputmode() isn't implemented yet")
+
+    def colormode(self, mode=None, crange=None):
+        '''Sets the current colormode (can be RGB or HSB) and eventually
+        the color range.
+
+        If called without arguments, it returns the current colormode.
+        '''
+        if mode is not None:
+            if mode == "rgb":
+                self.color_mode = RGB
+            elif mode == "hsb":
+                self.color_mode = HSB
+            else:
+                raise NameError, "Only RGB and HSB colormodes are supported."
+        if crange is not None:
+            self.color_range = crange
+        return self.color_mode
+
+    def colorrange(self, crange):
+        self.color_range = float(crange)
+
+    def fill(self,*args):
+        '''Sets a fill color, applying it to new paths.'''
+        self._fillcolor = self.color(*args)
+        return self._fillcolor
+
+    def nofill(self):
+        ''' Stop applying fills to new paths.'''
+        self._fillcolor = None
+
+    def stroke(self,*args):
+        '''Set a stroke color, applying it to new paths.'''
+        self._strokecolor = self.color(*args)
+        return self._strokecolor
+
+    def nostroke(self):
+        ''' Stop applying strokes to new paths.'''
+        self._strokecolor = None
+
+    def strokewidth(self, w=None):
+        '''Set the stroke width.'''
+        if w is not None:
+            self._strokewidth = w
+        else:
+            return self._strokewidth
+
+    def background(self,*args):
+        '''Set the background colour.'''
+        r = self.BezierPath()
+        r.rect(0, 0, self.WIDTH, self.HEIGHT)
+        r.fill = self.color(args)
+        self.canvas.add(r)
+
+    #### Text
+
+    def font(self, fontpath=None, fontsize=None):
+        '''Set the font to be used with new text instances.
+
+        Accepts TrueType and OpenType files. Depends on FreeType being
+        installed.'''
+        if fontpath is not None:
+            face = util.create_cairo_font_face_for_file(fontpath, 0)
+            self._font = face
+        else:
+            return self._font
+        if fontsize is not None:
+            self._fontsize(fontsize)
+
+    def fontsize(self, fontsize=None):
+        if fontsize is not None:
+            self._font_size = fontsize
+        else:
+            return self.canvas.font_size
+
+    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
+        '''
+        Draws a string of text according to current font settings.
+        '''
+        txt = self.Text(txt, x, y, width, height, **kwargs)
+        if outline:
+          path = txt.path
+          if draw:
+              self.canvas.add(path)
+          return path
+        else:
+          if draw:
+            self.canvas.add(txt)
+          return txt
+
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
+        '''
+        Draws an outlined path of the input text
+        '''
+        ## FIXME: This should be handled by BezierPath
+        self.save()
+        self.context.move_to(x,y)
+        self.context.text_path(txt)
+        self.restore()
+#        return self._path
+
+    def textwidth(self, txt, width=None):
+        '''Returns the width of a string of text according to the current
+        font settings.
+        '''
+        return textmetrics(txt)[0]
+
+    def textheight(self, txt, width=None):
+        '''Returns the height of a string of text according to the current
+        font settings.
+        '''
+        return textmetrics(txt)[1]
+
+    def textmetrics(self, txt, width=None, height=None, **kwargs):
+        '''Returns the width and height of a string of text as a tuple
+        (according to current font settings).
+        '''
+        # for now only returns width and height (as per Nodebox behaviour)
+        # but maybe we could use the other data from cairo
+        txt = self.Text(txt, 0, 0, width, height, **kwargs)
+        return txt.metrics
+
+    def lineheight(self, height=None):
+        '''
+        NOT IMPLEMENTED
+        '''
+        # default: 1.2
+        # sets leading
+        raise NotImplementedError("lineheight() isn't implemented yet")
+
+    def align(self, align="LEFT"):
+        '''
+        NOT IMPLEMENTED
+        '''
+        # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
+        raise NotImplementedError("align() isn't implemented in Shoebot yet")
+
+    # TODO: Set the framework to setup font options
+
+    def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
+        raise NotImplementedError("fontoptions() isn't implemented yet")
+
+    # ----- IMAGE -----
+
+    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
+        '''
+        TODO:
+        width and height ought to be for scaling, not clipping
+        Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
+        using PIL
+        '''
+        #width, height = im.size
+        imagesurface = cairo.ImageSurface.create_from_png(path)
+        self.context.set_source_surface (imagesurface, x, y)
+        self.context.rectangle(x, y, width, height)
+        self.context.fill()
+
+
+
+class Canvas:
     '''
     This class contains a Cairo context or surface, as well as methods to pass
     drawing commands to it.
@@ -766,14 +770,8 @@ class CairoCanvas:
         if bot:
             self._bot = bot
 
-        self.stack = []
-
-        if not gtkmode:
-            # image output mode, we need to make a surface
-            self.setsurface(target, width, height)
-
+        self.grobstack = []
         self.font_size = 12
-
         # self.outputmode = RGB
         # self.linecap
         # self.linejoin
@@ -785,6 +783,34 @@ class CairoCanvas:
         # self.operator
         # self.antialias
         # self.fillrule
+
+    def add(self, grob):
+        if not isinstance(grob, data.Grob):
+            raise ShoebotError("Canvas.add() - wrong argument: expecting a Grob, received %s" % (grob))
+        self.grobstack.append(grob)
+
+    def setsurface(self):
+        pass
+    def get_context(self):
+        return self._context
+    def get_surface(self):
+        return self._surface
+
+    def draw(self, ctx=None):
+        pass
+    def output(self, filename):
+        pass
+
+    def clear(self):
+        self.grobstack = []
+
+class CairoCanvas(Canvas):
+    def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
+        Canvas.__init__(self, bot, target, width, height, gtkmode)
+
+        if not gtkmode:
+            # image output mode, we need to make a surface
+            self.setsurface(target, width, height)
 
     def setsurface(self, target=None, width=None, height=None):
         '''Sets the surface on which the Canvas object will operate.
@@ -816,20 +842,10 @@ class CairoCanvas:
         else:
             raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
 
-    def get_context(self):
-        return self._context
-    def get_surface(self):
-        return self._surface
-
-    def add(self, grob):
-        if not isinstance(grob, data.Grob):
-            raise ShoebotError("Canvas.add() - wrong argument: expecting a Grob, received %s" % (grob))
-        self.stack.append(grob)
-
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
-        for item in self.stack:
+        for item in self.grobstack:
             if isinstance(item, BezierPath):
                 ctx.save()
                 deltax, deltay = item.center
@@ -855,7 +871,6 @@ class CairoCanvas:
         ctx.set_font_face(txt._fontface)
         ctx.set_font_size(txt._fontsize)
         ctx.text_path(txt.text)
-
 
         if txt._fillcolor:
             self._context.set_source_rgba(*txt._fillcolor)
@@ -943,9 +958,6 @@ class CairoCanvas:
         else:
             self._context.write_to_png("DUMMYOUTPUT.png")
 
-    def clear(self):
-        self.stack = []
-
     def output(self, target):
         self.draw()
         if isinstance(target, basestring): # filename
@@ -1001,4 +1013,6 @@ if __name__ == "__main__":
     '''
     import sys
     sys.exit()
+
+
 
