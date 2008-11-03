@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=shoebot-ide
+Comment=shoebot-ide
+TryExec=shoebot-ide
+Exec=shoebot-ide
+Icon=shoebot-ide
+Terminal=false
+Type=Application
+Categories=Development;

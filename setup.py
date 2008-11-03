@@ -12,6 +12,7 @@ import os
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('examples')]
 datafiles.append(('share/shoebot', ['assets/icon.png']))
+datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
 setup(name = "shoebot",
     version = "0.1",
