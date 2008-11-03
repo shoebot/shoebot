@@ -207,6 +207,9 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     While Nodebox relies on Cocoa/QT for its data structures,
     this is more of an "agnostic" implementation that won't
     require any other back-ends to do some simple work with paths.
+
+    (this last sentence is not so correct: we use a bit of Cairo
+    for getting path dimensions)
     """
 
     stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
@@ -341,6 +344,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
                 ctx.restore()
         # get boundaries
         bbox = ctx.fill_extents()
+        # is this line necessary? Or does python garbage collect this?
         del surface, ctx, canvas, p
         return bbox
     bounds = property(_get_bounds)

@@ -15,7 +15,7 @@ import shoebot
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
-ICON_FILE = '/usr/share/shoebot/icon.png'
+ICON_FILE = '/usr/share/pixmaps/shoebot-ide.png'
 
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
@@ -301,14 +301,14 @@ class Buffer(gtksourceview.SourceBuffer):
                   return gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
           else:
               # fall back to the default dialog
-              return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM 
+              return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
-        chooser = ShoebotFileChooserDialog('Save File', None, gtk.FILE_CHOOSER_ACTION_SAVE, 
+        chooser = ShoebotFileChooserDialog('Save File', None, gtk.FILE_CHOOSER_ACTION_SAVE,
             (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         chooser.set_do_overwrite_confirmation(True)
-                
+
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
 
 	if chooser.run() == gtk.RESPONSE_ACCEPT:
@@ -358,7 +358,7 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 		# set the working directory if available
 		if ShoebotFileChooserDialog.CWD is not None:
 			self.set_current_folder (ShoebotFileChooserDialog.CWD)
-	
+
 	def run (self):
 		response = super (ShoebotFileChooserDialog, self).run ()
 
@@ -511,7 +511,7 @@ class View(gtk.Window):
             return True
 
     def do_open(self, callback_action, widget):
-        chooser = ShoebotFileChooserDialog('Open File', None, gtk.FILE_CHOOSER_ACTION_OPEN, 
+        chooser = ShoebotFileChooserDialog('Open File', None, gtk.FILE_CHOOSER_ACTION_OPEN,
             (gtk.STOCK_OPEN, gtk.RESPONSE_ACCEPT,
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
 
