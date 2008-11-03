@@ -11,7 +11,7 @@ import os
 # dir globbing approach taken from Mercurial's setup.py
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('examples')]
-datafiles.append(('share/pixmaps', ['assets/icon.png']))
+datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
 datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
 setup(name = "shoebot",

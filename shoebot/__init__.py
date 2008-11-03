@@ -108,6 +108,8 @@ class Bot:
         return self._makeInstance(Rect, args, kwargs)
     def Oval(self, *args, **kwargs):
         return self._makeInstance(Oval, args, kwargs)
+    def Ellipse(self, *args, **kwargs):
+        return self._makeInstance(Ellipse, args, kwargs)
     def Color(self, *args, **kwargs):
         return self._makeInstance(Color, args, kwargs)
     def Image(self, *args, **kwargs):
@@ -369,9 +371,18 @@ class NodeBot(Bot):
             raise ShoebotError("rectmode: invalid input")
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
+        '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
+        from math import pi
+        r = self.BezierPath(**kwargs)
+        r.ellipse(x,y,width,height)
+        # r.inheritFromContext(kwargs.keys())
+        if draw:
+            self.canvas.add(r)
+        return r
+
+    def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y)'''
         from math import pi
-
         r = self.BezierPath(**kwargs)
         r.ellipse(x,y,width,height)
         # r.inheritFromContext(kwargs.keys())
@@ -380,7 +391,7 @@ class NodeBot(Bot):
         return r
 
     def circle(self, x, y, diameter):
-        self.oval(x, y, diameter, diameter)
+        self.ellipse(x, y, diameter, diameter)
 
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)'''
