@@ -176,7 +176,7 @@ def parse_color(v, color_range=1):
             alpha = color[3]
 
     elif isinstance(v, basestring):
-        # hexstring: remove hash character, if any
+        # got a hexstring: first remove hash character, if any
         v = v.strip('#')
         if len(data) == 6:
             # RRGGBB

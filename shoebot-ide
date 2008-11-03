@@ -4,6 +4,7 @@
 import pygtk
 pygtk.require('2.0')
 import sys, os, errno
+import gobject
 import gtk
 import pango
 import gtksourceview
@@ -53,31 +54,6 @@ def hue_to_color(hue):
     h, s, v = hsv_to_rgb (hue, 1.0, 1.0)
     return (h*65535, s*65535, v*65535)
 
-class FileSel(gtk.FileSelection):
-    def __init__(self):
-        gtk.FileSelection.__init__(self)
-        self.result = False
-
-    def ok_cb(self, button):
-        self.hide()
-        if self.ok_func(self.get_filename()):
-            self.destroy()
-            self.result = True
-        else:
-            self.show()
-
-    def run(self, parent, title, start_file, func):
-        if start_file:
-            self.set_filename(start_file)
-
-        self.ok_func = func
-        self.ok_button.connect("clicked", self.ok_cb)
-        self.cancel_button.connect("clicked", lambda x: self.destroy())
-        self.connect("destroy", lambda x: gtk.main_quit())
-        self.set_modal(True)
-        self.show()
-        gtk.main()
-        return self.result
 
 class Buffer(gtksourceview.SourceBuffer):
     N_COLORS = 16
@@ -315,32 +291,35 @@ class Buffer(gtksourceview.SourceBuffer):
 
         return result
 
-    def save_as_ok_func(self, filename):
-        old_filename = self.filename
-
-        if (not self.filename or filename != self.filename):
-            if os.path.exists(filename):
-                err = "Ovewrite existing file '%s'?"  % filename
-                view = TestText.active_window_stack.get()
-                dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                           gtk.MESSAGE_QUESTION,
-                                           gtk.BUTTONS_YES_NO, err);
-                result = dialog.run()
-                dialog.destroy()
-                if result != gtk.RESPONSE_YES:
-                    return False
-
-        self.filename = filename
-
-        if self.save_buffer():
-            self.filename_set()
-            return True
-        else:
-            self.filename = old_filename
-            return False
+    def confirm_overwrite_callback(self, chooser):
+      uri = chooser.get_uri()
+      if os.path.exists(self.filename):
+          if os.path.exists(self.filename):
+              if user_wants_to_replace_read_only_file (uri):
+                  return gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
+              else:
+                  return gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
+          else:
+              # fall back to the default dialog
+              return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM 
 
     def save_as_buffer(self):
-        return FileSel().run(self, "Save File", None, self.save_as_ok_func)
+        chooser = ShoebotFileChooserDialog('Save File', None, gtk.FILE_CHOOSER_ACTION_SAVE, 
+            (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
+             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        chooser.set_do_overwrite_confirmation(True)
+                
+        chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
+
+	if chooser.run() == gtk.RESPONSE_ACCEPT:
+            old_filename = self.filename
+            self.filename = chooser.get_filename()
+            if self.save_buffer():
+                self.filename = chooser.get_filename()
+                self.filename_set()
+            else:
+		self.filename = old_filename
+        chooser.destroy()
 
     def check_buffer_saved(self):
         if self.get_modified():
@@ -353,18 +332,48 @@ class Buffer(gtksourceview.SourceBuffer):
             dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
             result = dialog.run()
             dialog.destroy()
-            if result == gtk.RESPONSE_YES:
+            if result == gtk.RESPONSE_ACCEPT:
                 if self.filename:
                     return self.save_buffer()
                 return self.save_as_buffer()
-            elif result == gtk.RESPONSE_NO:
-                return True
-            else:
+            elif result == gtk.RESPONSE_CANCEL:
                 return False
+            else:
+                return True
         else:
             return True
 
+
+class ShoebotFileChooserDialog (gtk.FileChooserDialog):
+
+	CWD = None
+
+	def __init__ (self, *args, **kwargs):
+		super (ShoebotFileChooserDialog, self).__init__ (*args, **kwargs)
+
+		# set some defaults
+		self.set_default_response (gtk.RESPONSE_OK)
+		self.set_property ('do-overwrite-confirmation', True)
+
+		# set the working directory if available
+		if ShoebotFileChooserDialog.CWD is not None:
+			self.set_current_folder (ShoebotFileChooserDialog.CWD)
+	
+	def run (self):
+		response = super (ShoebotFileChooserDialog, self).run ()
+
+		# get the working directory if the user clicked accepted the action
+		if response == gtk.RESPONSE_ACCEPT:
+			ShoebotFileChooserDialog.CWD = self.get_current_folder ()
+
+		return response
+
+
+
+
 class View(gtk.Window):
+    gobject.type_register (ShoebotFileChooserDialog)
+
     def __init__(self, buffer=None):
         menu_items = [
             ( "/_File", None, None, 0, "<Branch>" ),
@@ -379,7 +388,7 @@ class View(gtk.Window):
             ( "/Edit/Undo", "<control>Z", self.do_undo, 0, None ),
             ( "/Edit/Redo", "<control><shift>Z", self.do_redo, 0, None ),
             ( "/Edit/sep1", None, None, 0, "<Separator>" ),
-            ( "/Edit/Find...", None, self.do_search, 0, None ),
+            ( "/Edit/Find...", "<control>F", self.do_search, 0, None ),
             ( "/_Settings", None, None, 0, "<Branch>" ),
             ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
             ( "/Settings/Wrap _Words", None, self.do_wrap_changed, gtk.WRAP_WORD, "/Settings/Wrap Off" ),
@@ -502,7 +511,14 @@ class View(gtk.Window):
             return True
 
     def do_open(self, callback_action, widget):
-        FileSel().run(self, "Open File", None, self.open_ok_func)
+        chooser = ShoebotFileChooserDialog('Open File', None, gtk.FILE_CHOOSER_ACTION_OPEN, 
+            (gtk.STOCK_OPEN, gtk.RESPONSE_ACCEPT,
+             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+
+        if chooser.run() == gtk.RESPONSE_ACCEPT:
+            self.open_ok_func(chooser.get_filename())
+        chooser.destroy()
+
 
     def do_save_as(self, callback_action, widget):
         TestText.active_window_stack.push(self)
