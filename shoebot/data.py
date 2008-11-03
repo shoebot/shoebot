@@ -243,7 +243,10 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         self.closed = False
 
     def copy(self):
-        return self.__class__(self._bot, self)
+        #return self.__class__(self._bot, self)
+	p = self.__class__(self._bot, self)
+	_copy_attrs(self._bot, p, self.stateAttributes)
+	return p
 
     ### Path methods ###
 

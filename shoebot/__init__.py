@@ -50,7 +50,7 @@ class Bot:
     DEFAULT_WIDTH = 200
     DEFAULT_HEIGHT = 200
 
-    def __init__ (self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
+    def __init__ (self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns=None):
 
         self.inputscript = inputscript
         self.targetfilename = targetfilename
@@ -91,7 +91,10 @@ class Bot:
                                       width = self.WIDTH,
                                       height = self.HEIGHT,
                                       gtkmode = self.gtkmode)
-
+	# from nodebox	
+	if ns is None:
+            ns = {}
+        self._ns = ns
 
     #### Object
 
@@ -231,6 +234,14 @@ class Bot:
             self.canvas.output(filename)
         elif surface:
             self.canvas.output(surface)
+
+    # from Nodebox, a function to import Nodebox libraries
+    def ximport(self, libName):
+        lib = __import__(libName)
+        self._ns[libName] = lib
+        lib._ctx = self
+        return lib
+
 
     #### Core functions
 

@@ -1,0 +1,11 @@
+stroke(1,1,1)
+beginpath(10, 10)
+lineto(40, 10)
+p = endpath(draw=False)
+   
+for i in range(5):        
+        translate(0,10)
+        
+        drawpath(p.copy())
+
+        

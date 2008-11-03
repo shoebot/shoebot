@@ -1,0 +1,6 @@
+database = ximport("database")
+book = database.create("book")
+book.create_table("pages", ["title", "text", "image", "pagenumber"])
+
+book.close()
+db = database.connect("book")
