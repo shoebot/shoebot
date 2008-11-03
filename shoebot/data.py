@@ -462,8 +462,8 @@ class Color(object):
         while isinstance(v, (tuple,list)) and len(v) == 1:
             v = v[0]
 
-        if not v:
-            raise ShoebotError("got Color() with no values!")
+        if isinstance(v,type(None)):
+            raise ShoebotError("got Color() with value None!")
             self.r, self.g, self.b, self.a = (0,0,0,1)
 
         if isinstance(v, Color):
@@ -835,7 +835,8 @@ def lexPath(d):
 		#TODO: create new exception
 		raise Exception, 'Invalid path data!'
 '''
-While I am less pleased with my parsing function, I think it works. And that is important. There will be time for improvement later.
+While I am less pleased with my parsing function, I think it works. And that
+is important. There will be time for improvement later.
 '''
 
 '''
