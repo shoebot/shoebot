@@ -12,8 +12,8 @@ for path in paths:
         # Use copies of the paths
         # that adhere to the transformations 
         # (translate, scale, rotate) we defined.
-        scale(random())
-        drawpath(path.copy())
+        
+        drawpath(path)
 
         
     
