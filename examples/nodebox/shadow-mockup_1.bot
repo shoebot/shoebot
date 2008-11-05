@@ -32,7 +32,7 @@ for path in paths:
         push()
         translate(dx,dy)
         if path.fill:
-          fill(0.2*path.fill.r,0.2*path.fill.g,0.2*path.fill.b,s_alpha*path.fill.alpha)
+          fill(0.5*path.fill.r,0.5*path.fill.g,0.5*path.fill.b,s_alpha*path.fill.alpha)
         if path.stroke:
           stroke(0.2*path.stroke.r,0.2*path.stroke.g,0.2*path.stroke.b,s_alpha*path.stroke.alpha)
           strokewidth(path.strokewidth)

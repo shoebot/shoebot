@@ -6,19 +6,18 @@ svg = ximport("svg")
 # a list of the shapes in the SVG file.
 paths = svg.parse(open("svg/circles.svg").read())
 
-
-
+background(color(1,1,1))
+#nofill()
 for path in paths:
         # Use copies of the paths
         # that adhere to the transformations 
         # (translate, scale, rotate) we defined.
-
-
-
-
-        
-        drawpath(path)
-
+        #scale(random(0.1,1))
+        strokewidth(path.strokewidth)
+        #strokewidth(random(0.5,25))
+        stroke(random(),random(),random(),random())
+        fill(random(),random(),random(),random())
+        drawpath(path.copy())
 
         
     
