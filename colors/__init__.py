@@ -461,17 +461,15 @@ class Color(BaseColor):
                     r, g, b, a = v
                 self.name = args[0]
             
-            _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, _ctx.color(r, g, b, a), mode='rgb', color_range=1.0)
-            
+            _ctx.colormode(RGB, 1.0)            
+            BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=1.0)
 
         # One color object parameter.
         elif len(args) == 1 \
         and isinstance(args[0], BaseColor):
            
             _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, _ctx.color(args[0].r, args[0].g, args[0].b, args[0].a), mode='rgb', color_range=1.0)
-            
+            BaseColor.__init__(self, args[0].r, args[0].g, args[0].b, args[0].a, mode='rgb', color_range=1.0)
 
         # Lab color values.
         elif kwargs.has_key("mode") \
@@ -484,8 +482,7 @@ class Color(BaseColor):
                 r, g, b = lab_to_rgb(*args)
             		
             _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, _ctx.color(r,g,b,1), mode='rgb', color_range=1.0)
-
+            BaseColor.__init__(self, r,g,b,1, mode='rgb', color_range=1.0)
         	
   
         # RGB, HSB or CMYK color values.
@@ -514,8 +511,7 @@ class Color(BaseColor):
                     r, g, b, a = (args)
 		
 	    _ctx.colormode(RGB, ra)
-            BaseColor.__init__(self, _ctx.color(r,g,b,a), mode='rgb', color_range=ra)
-
+            BaseColor.__init__(self, r,g,b,a, mode='rgb', color_range=ra)
             
         
         if kwargs.has_key("name") and kwargs["name"] != "":
