@@ -892,8 +892,18 @@ class Transform:
                     t.translate(args[0],args[1])
                     m *= t
                 elif cmd == 'rotate':
-                    t.rotate(args[0])
-                    m *= t
+                    from math import sin, cos
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(0,0)
+                    a = args[0]
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    # transform centerpoint according to current matrix
+                    m *= m1
+                    m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                    m *= m2
                 elif cmd == 'scale':
                     t.scale(args[0], args[1])
                     m *= t
