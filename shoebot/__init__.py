@@ -70,7 +70,7 @@ class Bot:
         self._transformmode = CENTER
         self.transform_stack = []
 
-        self._fontfile = "/home/rlafuente/.fonts/notcouriersans.ttf"
+        self._fontfile = "assets/notcouriersans.ttf"
         self._fontsize = 16
         self._align = LEFT
         self._lineheight = 1
@@ -161,7 +161,8 @@ class Bot:
     #### Utility
 
     def color(self, *args):
-        return Color(self.color_mode, self.color_range, args)
+        #return Color(self.color_mode, self.color_range, *args)
+        return Color(mode=self.color_mode, color_range=self.color_range, *args)
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
@@ -672,7 +673,7 @@ class NodeBot(Bot):
         '''Set the background colour.'''
         r = self.BezierPath()
         r.rect(0, 0, self.WIDTH, self.HEIGHT)
-        r.fill = self.color(args)
+	r.fill = self.color(*args)        
         self.canvas.add(r)
 
     #### Text

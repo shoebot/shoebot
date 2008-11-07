@@ -1,0 +1,21 @@
+colormode(HSB)
+colorrange(255)
+size(300,300)
+clr0 = color(.7*255,.2*255,.4*255)
+background(clr0)
+
+f=rect(100,100,50,50)
+clr1 = color(random(255),random(255),random(255))
+f.fill = clr1
+
+clr=color(0*255,0.5*255,0.7*255,random(255))
+print "red: ",clr1.r, " - ", "green: ",clr1.g, " - ", "blue: ",clr1.b
+print "hue: ",clr1.h, " - ", "saturation: ",clr1.s, " - ", "bright: ",clr1.brightness
+#print "c: ",clr1.c, "-", "m: ",clr1.m, "-", "y: ",clr1.y, "-", "k: ",clr1.k
+
+print "red: ",clr.r, " - ", "green: ",clr.g, " - ", "blue: ",clr.b
+print "hue: ",clr.h, " - ", "saturation: ",clr.s, " - ", "bright: ",clr.brightness
+#print "c: ",clr.c, "-", "m: ",clr.m, "-", "y: ",clr.y, "-", "k: ",clr.k
+
+fill(clr)
+f1=rect(150,150,50,50)

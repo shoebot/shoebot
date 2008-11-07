@@ -166,14 +166,14 @@ class ColorMixin(object):
 
     def __init__(self, **kwargs):
         try:
-            self._fillcolor = Color('rgb', 1, kwargs['fill'])
+            self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
         except KeyError:
             if self._bot._fillcolor:
                 self._fillcolor = self._bot._fillcolor.copy()
             else:
                 self._fillcolor = None
         try:
-            self._strokecolor = Color('rgb', 1, kwargs['stroke'])
+            self._strokecolor = Color(kwargs['stroke'], mode='rgb', color_range=1)
         except KeyError:
             if self._bot._strokecolor:
                 self._strokecolor = self._bot._strokecolor.copy()
@@ -184,13 +184,13 @@ class ColorMixin(object):
     def _get_fill(self):
         return self._fillcolor
     def _set_fill(self, *args):
-        self._fillcolor = Color('rgb', 1, *args)
+        self._fillcolor = Color(mode='rgb', color_range=1, *args)
     fill = property(_get_fill, _set_fill)
 
     def _get_stroke(self):
         return self._strokecolor
     def _set_stroke(self, *args):
-        self._strokecolor = Color('rgb', 1, *args)
+        self._strokecolor = Color(mode='rgb', color_range=1, *args)
     stroke = property(_get_stroke, _set_stroke)
 
     def _get_strokewidth(self):
@@ -440,9 +440,11 @@ class PathElement:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
 class Color(object):
+    
     '''
-    Taken from Nodebox and modified.
+    Taken from Nodebox colors library and modified.
     Since we have no Cocoa, we have no way to use colour management for the moment.
     So we took another approach.
 
@@ -462,55 +464,202 @@ class Color(object):
     - RRGGBB
     - #RRGGBBAA
     - RRGGBBAA
+    
+    The CMYK parts have been commented out, as it may slow down code execution
+    and at this point is quite useless, left it in place for a possible future implementation
     '''
 
-    def __init__(self, mode='rgb', color_range=1, *v):
-        # unpack one-element tuples, they show up sometimes
-        while isinstance(v, (tuple,list)) and len(v) == 1:
-            v = v[0]
+    def __init__(self, *a, **kwargs):
+        
+        # Values are supplied as a tuple.
+        if len(a) == 1 and isinstance(a[0], tuple):
+            a = a[0]
+            
+        # No values or None, transparent black.
+        if len(a) == 0 or (len(a) == 1 and a[0] == None):
+            raise ShoebotError("got Color() with value None!")         
+            self.r, self.g, self.b, self.a = 0, 0, 0, 0
+            
+        # One value, another color object.
+        elif len(a) == 1 and isinstance(a[0], Color):
+            self.r, self.g, self.b, self.a = a[0].r, a[0].g, a[0].b, a[0].a
+            
+        # One value, a hexadecimal string.
+        elif len(a) == 1 and isinstance(a[0], str):
+            r, g, b, a = util.hex2rgb(a[0])
+            self.r, self.g, self.b, self.a = r, g, b, a
+            
+        # One value, grayscale.
+        elif len(a) == 1:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1
+            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, 1
+            
+        # Two values, grayscale and alpha.
+        elif len(a) == 2:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1
+            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, a[1]/ra
+            
+        # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
+        # depending on the mode parameter.
+        elif len(a) >= 3:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1            
+            alpha, mode = 1, "rgb" 
+            if len(a) > 3: alpha = a[-1]/ra
+	    
+            if kwargs.has_key("mode"): 
+                mode = kwargs["mode"].lower()
+            if mode == "rgb":                
+                self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
+            elif mode == "hsb":                
+                self.h, self.s, self.brightness, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha                
+            #elif mode == "cmyk":
+                #if len(a) == 4: alpha = 1
+                #self.a = alpha
+                #self.c, self.m, self.y, self.k = a[0], a[1], a[2], a[3]
+	    
 
-        if isinstance(v,type(None)):
-            raise ShoebotError("got Color() with value None!")
-            self.r, self.g, self.b, self.a = (0,0,0,1)
-
-        if isinstance(v, Color):
-            self.r, self.g, self.b, self.a = v
-
-        else:
-            if mode is RGB:
-                self.r, self.g, self.b, self.a = util.parse_color(v, color_range)
-            elif mode is HSB:
-                self.r, self.g, self.b, self.a = util.parse_hsb_color(v, color_range)
-
-        # convenience attributes
+        # Added this
         self.red = self.r
         self.green = self.g
         self.blue = self.b
         self.alpha = self.a
 
         self.data = [self.r, self.g, self.b, self.a]
+        #end added
 
-        self.hue, self.saturation, self.lightness = util.rgb_to_hsl(self.r, self.g, self.b)
 
+
+    def __repr__(self):
+        return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, 
+            self.red, self.green, self.blue, self.alpha)
+
+    def copy(self):
+	return tuple(self.data)
+        
+    def _update_rgb(self, r, g, b):
+        self.__dict__["__r"] = r
+        self.__dict__["__g"] = g
+        self.__dict__["__b"] = b
+    
+    #def _update_cmyk(self, c, m, y, k):
+        #self.__dict__["__c"] = c
+        #self.__dict__["__m"] = m
+        #self.__dict__["__y"] = y
+        #self.__dict__["__k"] = k
+        
+    def _update_hsb(self, h, s, b):
+        self.__dict__["__h"] = h
+        self.__dict__["__s"] = s
+        self.__dict__["__brightness"] = b
+    
+    def _hasattrs(self, list):
+        for a in list:
+            if not self.__dict__.has_key(a):
+                return False
+        return True
+    
+    #added
     def __getitem__(self, index):
         return (self.r, self.g, self.b, self.a)[index]
+        
+
     def __iter__(self):
         for i in range(len(self.data)):
-            yield self.data[i]
-    def __repr__(self):
-        return "(%f,%f,%f,%f)" % (self.r, self.g, self.b, self.a)
+           yield self.data[i]
+
     def __div__(self, other):
         value = float(other)
-        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)
+        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)    
+    #end added
 
-    def blend(self,other,factor):
-        self.r = (self.r + other.r) / factor
-        self.g = (self.g + other.g) / factor
-        self.b = (self.b + other.b) / factor
-        self.a = (self.a + other.a) / factor
-    def copy(self):
-        new = self.__class__('rgb',1,self.data)
-        return new
+
+    def __setattr__(self, a, v):
+        
+        if a in ["a", "alpha"]:
+            self.__dict__["__"+a[0]] = max(0, min(v, 1))
+        
+        # RGB changes, update CMYK and HSB accordingly.
+        elif a in ["r", "g", "b", "red", "green", "blue"]:
+            self.__dict__["__"+a[0]] = max(0, min(v, 1))
+            if self._hasattrs(("__r", "__g", "__b")):
+                r, g, b = (
+                    self.__dict__["__r"], 
+                    self.__dict__["__g"], 
+                    self.__dict__["__b"]
+                )
+                #self._update_cmyk(*util.rgb2cmyk(r, g, b))
+                self._update_hsb(*util.rgb2hsb(r, g, b))
+        
+        # HSB changes, update RGB and CMYK accordingly.
+        elif a in ["h", "s", "hue", "saturation", "brightness"]:
+            if a != "brightness": a = a[0]
+            if a == "h": v = min(v, 0.99999999)
+            self.__dict__["__"+a] = max(0, min(v, 1))
+            if self._hasattrs(("__h", "__s", "__brightness")):
+                r, g, b = util.hsb2rgb(
+                    self.__dict__["__h"], 
+                    self.__dict__["__s"], 
+                    self.__dict__["__brightness"]
+                )
+                self._update_rgb(r, g, b)
+                #self._update_cmyk(*util.rgb2cmyk(r, g, b))
+        
+        # CMYK changes, update RGB and HSB accordingly.
+        #elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
+            #if a != "black": a = a[0]
+            #self.__dict__["__"+a] = max(0, min(v, 1))
+            #if self._hasattrs(("__c", "__m", "__y", "__k")):
+                #r, g, b = util.cmyk2rgb(
+                    #self.__dict__["__c"], 
+                    #self.__dict__["__m"], 
+                    #self.__dict__["__y"], 
+                    #self.__dict__["__k"]
+                #)
+                #self._update_rgb(r, g, b)
+                #self._update_hsb(*util.rgb2hsb(r, g, b))
+                
+        else:
+            self.__dict__[a] = v
+
+    def __getattr__(self, a):
+        
+        """ Available properties:
+        r, g, b, a or red, green, blue, alpha
+        c, m, y, k or cyan, magenta, yellow, black,
+        h, s or hue, saturation, brightness
+        
+        """
+        
+        if self.__dict__.has_key(a):
+            return a
+        #elif a == "black":
+            #return self.__dict__["__k"]        
+        elif a == "brightness":
+            return self.__dict__["__brightness"]
+        #CMYK
+        #elif a in ["a", "alpha",
+                   #"r", "g", "b", "red", "green", "blue",
+                   #"h", "s", "hue", "saturation",
+                   #"c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+        #NO-CMYK 
+        elif a in ["a", "alpha",
+                   "r", "g", "b", "red", "green", "blue",
+                   "h", "s", "hue", "saturation"]:
+            return self.__dict__["__"+a[0]]
+        
+        raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
+
+
+
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
@@ -530,7 +679,7 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.y = y
         self.width = width
         self.height = height
-        self._fontfile = kwargs.get('font', "/home/rlafuente/.fonts/notcouriersans.ttf")
+        self._fontfile = kwargs.get('font', "assets/notcouriersans.ttf")
         self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
         self._fontsize = kwargs.get('fontsize', 24)
         self._lineheight = max(kwargs.get('lineheight', 1.2), 0.01)

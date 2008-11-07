@@ -1,0 +1,25 @@
+colors = ximport("colors")
+
+size(550, 300)
+background(0.1,0,0.05)
+#colormode(HSB)
+#colors.shadow()
+for i in range(3000):
+    x = random(WIDTH)
+    y = random(HEIGHT)
+    r = random(10,30)
+    #different shader settings give different faked light effects
+    d = colors.shader(x, y, 550, 300, angle=150)
+    #d = colors.shader(x, y, 275, 300, radius=200, angle=90, spread=180)
+    # HSB is brighter and opaque in the centre of the light.
+    p = oval(x, y, r, r, draw=False)
+    
+    push()
+    translate(3,3)
+    fill(0.1,0.1,0.1,0.4*d)
+    drawpath(p.copy())
+    pop()
+    
+    fill(0.6+d*0.1, 0.15, 0.15+0.8*d, 0.8*d)
+    drawpath(p.copy())
+    #oval(x, y, r, r)
