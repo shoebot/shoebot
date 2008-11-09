@@ -874,7 +874,7 @@ class Transform:
     def get_matrix_with_center(self,x,y):
         '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
         m = cairo.Matrix()
-
+        rotang = 0
         centerx = x
         centery = y
 
@@ -889,7 +889,10 @@ class Transform:
                 t = cairo.Matrix()
 
                 if cmd == 'translate':
-                    t.translate(args[0],args[1])
+                    from math import sin, cos
+                    xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
+                    yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
+                    t.translate(xt,yt)
                     m *= t
                 elif cmd == 'rotate':
                     from math import sin, cos
@@ -904,6 +907,7 @@ class Transform:
                     m *= m1
                     m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
                     m *= m2
+                    rotang += a
                 elif cmd == 'scale':
                     t.scale(args[0], args[1])
                     m *= t
