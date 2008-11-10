@@ -1,0 +1,15 @@
+size(400,400)
+background(1,1,1)
+def flower(x,y):
+        fill(random(0.5,1),0,random(0.5))
+        stroke(0.2)
+        strokewidth(1)
+        transform(CORNER)
+        translate(x,y)
+        for i in range(10):
+                rotate(36)
+                line(0,0,15,15)
+                oval(10,10,10,10)
+        reset()
+for i in range(60):
+        flower(random(WIDTH),random(HEIGHT))

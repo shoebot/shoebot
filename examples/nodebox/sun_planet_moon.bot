@@ -1,0 +1,36 @@
+size(450, 450)
+ 
+def draw():
+    
+    stroke(0)
+    transform(CORNER)
+    
+    # This is the starting origin point,
+    # where we place the sun.
+    translate(225, 225)
+    oval(-5, -5, 10, 10)
+    text("sun", 10, 0)
+    
+    for i in range(3):
+        
+        # Each planet acts as a local origin for the orbitting moon.
+        # Comment out the push() and pop() and see what happens.
+        push()
+        
+        # This is a line with a length of 120,
+        # that starts at the sun and has an angle of i * 120.
+        rotate(i*120)
+        line(0, 0, 120, 0)
+        
+        # Move the origin to the end of the line.
+        translate(120, 0)
+        oval(-5, -5, 10, 10)
+        text("planet", 10, 0)
+        
+        # Keep rotating around the local planet.
+        rotate(60)
+        line(0, 0, 30, 0)
+        text("moon", 32, 0)
+        
+        # Move the origin back to the sun.
+        pop()

@@ -1,5 +1,6 @@
 # THEMES
-
+background(1,1,1)
+size(600,800)
 try:
     colors = ximport("colors")
 except ImportError:

@@ -938,7 +938,7 @@ class CairoCanvas(Canvas):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
-                ctx.translate(item.x,item.y)
+                ctx.translate(item.x,item.y)                
                 m = item._transform.get_matrix_with_center(deltax,deltay)
                 ctx.transform(m)
 

@@ -32,5 +32,5 @@ for name in colors.rules:
 
 # Each of the names in colors.rules
 # is also a command in the library, try out:
-scheme = colors.right_complement(clr)
-scheme.swarm(50,50)
+#scheme = colors.right_complement(clr)
+#scheme.swarm(50,50)
