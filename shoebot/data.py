@@ -962,8 +962,7 @@ class Transform:
 		elif cmd == 'push':
                     r_archived.append(rotang)                                       
                     m_archived.append(m)
-                    global_mlist.append(m)
-                    print m_archived                   
+                    global_mlist.append(m)               
                     lt = ('push',)
                     self.lstack.append(lt)
 		elif cmd == 'pop':
