@@ -960,16 +960,16 @@ class Transform:
                     lt = ('cskew', a)
                     self.lstack.append(lt)
 		elif cmd == 'push':
-                    r_archived.append(rotang)
-                    m_archived.append(global_mlist[-1])
-                    global_mlist.append(m_archived[-1])
+                    r_archived.append(rotang)                                       
+                    m_archived.append(m)
+                    global_mlist.append(m)
+                    print m_archived                   
                     lt = ('push',)
                     self.lstack.append(lt)
 		elif cmd == 'pop':
-                    rotang = r_archived[-1]
-                    r_archived.pop()                    
-                    global_mlist.append(m_archived[-1])                    
-                    m_archived.pop()
+                    rotang = r_archived.pop()               
+                    m = m_archived.pop()
+                    global_mlist.append(m)             
                     lt = ('pop',)
                     self.lstack.append(lt)
 

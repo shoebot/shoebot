@@ -27,16 +27,19 @@ for i in range (6):
         print r5._counter
 #6  
 push()      
+#7
 rotate(45)
 fill(0,1,0)
 r6 = rect(0,0,10,10)
-#7
+#8
 translate(50,0)
 fill(0,0,1)
 r7 = rect(0,0,10,10)
+#9
 pop()
 print r6._counter, r7._counter
 fill(1,.6,0)
-#translate(50,0)
+#10
+translate(20,0)
 r8 = rect(0,0,10,10)
 print r8._counter
