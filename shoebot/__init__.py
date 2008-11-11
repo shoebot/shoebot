@@ -932,9 +932,9 @@ class CairoCanvas(Canvas):
             if isinstance(item, BezierPath):
                 ctx.save()
                 deltax, deltay = item.center
-                counter = item._counter
-                m = global_mlist[counter]
+                m = global_mlist[item._counter]
                 #m *= item._transform.get_matrix_with_center(deltax,deltay)
+                #print m
                 ctx.transform(m)
                 self.drawpath(item)
             elif isinstance(item, Text):

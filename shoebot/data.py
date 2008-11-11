@@ -218,7 +218,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
-        self._counter=self._bot._transform.counter
+        self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
@@ -824,39 +824,39 @@ class Transform:
     def translate(self, x, y):
         t = ('translate', x, y)
         self.stack.append(t)
-        self.counter += 1
+
     def scale(self, x, y):
         t = ('scale', x, y)
         self.stack.append(t)
-        self.counter += 1
+
     def rotate(self, a):
         t = ('rotate', a)
         self.stack.append(t)
-        self.counter += 1
+
     def skew(self, x, y):
         t = ('skew', x, y)
         self.stack.append(t)
-        self.counter += 1
+
     def cscale(self, x, y):
         t = ('cscale', x, y)
         self.stack.append(t)
-        self.counter += 1 
+
     def crotate(self, a):
         t = ('crotate', a)
         self.stack.append(t)
-        self.counter += 1 
+
     def cskew(self, x, y):
         t = ('cskew', x, y)
         self.stack.append(t)
-        self.counter += 1
+
     def push(self):
         t = ('push',)
         self.stack.append(t)
-        self.counter += 1
+
     def pop(self):
         t = ('pop',)
         self.stack.append(t)
-        self.counter += 1
+
 
     def append(self, t):
         if isinstance(t, Transform):

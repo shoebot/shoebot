@@ -12,7 +12,7 @@ def draw():
     oval(-5, -5, 10, 10)
     #text("sun", 10, 0)
     
-    for i in range(3):
+    for i in range(240):
         
         # Each planet acts as a local origin for the orbitting moon.
         # Comment out the push() and pop() and see what happens.
@@ -20,7 +20,7 @@ def draw():
         
         # This is a line with a length of 120,
         # that starts at the sun and has an angle of i * 120.
-        rotate(i*120)
+        rotate(i*1.5)
         line(0, 0, 120, 0)
         
         # Move the origin to the end of the line.
