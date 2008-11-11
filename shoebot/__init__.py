@@ -666,10 +666,10 @@ class NodeBot(Bot):
             self._transform.skew(x,y)
 
     def push(self):
-        self.transform_stack.insert(0,self._transform.copy())
+        self._transform.push()
 
     def pop(self):
-        self._transform = self.transform_stack.pop()
+        self._transform.pop()
 
     def reset(self):
         self._transform = Transform()
@@ -927,17 +927,22 @@ class CairoCanvas(Canvas):
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
+        global_mlist = self._bot._transform.global_matrix() 
         for item in self.grobstack:
             if isinstance(item, BezierPath):
                 ctx.save()
                 deltax, deltay = item.center
-                m = item._transform.get_matrix_with_center(deltax,deltay)
+                counter = item._counter
+                m = global_mlist[counter]
+                #m *= item._transform.get_matrix_with_center(deltax,deltay)
                 ctx.transform(m)
                 self.drawpath(item)
             elif isinstance(item, Text):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
+                counter = item._counter
+                m = global_mlist[counter]
                 ctx.translate(item.x,item.y)                
                 m = item._transform.get_matrix_with_center(deltax,deltay)
                 ctx.transform(m)

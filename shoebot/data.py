@@ -84,7 +84,7 @@ class Grob(object):
     def __init__(self, bot):
         """Initializes this object with the current bot instance."""
         self._bot = bot
-
+        
     def copy(self):
         """Returns a deep copy of this grob."""
         raise NotImplementedError, "Copy is not implemented on this Grob class."
@@ -92,6 +92,7 @@ class Grob(object):
     def draw(self):
         """Appends the grob to the canvas.
            This will result in a draw later on, when the scene graph is rendered."""
+        
         self._bot.canvas.add(self)
 ##
 ##    def inheritFromContext(self, ignore=()):
@@ -217,6 +218,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
+        self._counter=self._bot._transform.counter
         super(BezierPath, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
@@ -793,7 +795,7 @@ class Variable(object):
         return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
 
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'cscale', 'crotate',
-              'cskew']
+              'cskew', 'push', 'pop']
 
 class Transform:
     '''
@@ -803,6 +805,9 @@ class Transform:
     '''
     def __init__(self, transform=None):
         self.stack = []
+        ### inizializza contatore trasformazioni e stack trasformazioni locali
+        self.lstack = []
+        self.counter=0
         if transform is None:
             pass
         elif isinstance(transform, Transform):
@@ -819,24 +824,39 @@ class Transform:
     def translate(self, x, y):
         t = ('translate', x, y)
         self.stack.append(t)
+        self.counter += 1
     def scale(self, x, y):
         t = ('scale', x, y)
         self.stack.append(t)
+        self.counter += 1
     def rotate(self, a):
         t = ('rotate', a)
         self.stack.append(t)
+        self.counter += 1
     def skew(self, x, y):
         t = ('skew', x, y)
         self.stack.append(t)
+        self.counter += 1
     def cscale(self, x, y):
         t = ('cscale', x, y)
         self.stack.append(t)
+        self.counter += 1 
     def crotate(self, a):
         t = ('crotate', a)
         self.stack.append(t)
+        self.counter += 1 
     def cskew(self, x, y):
         t = ('cskew', x, y)
         self.stack.append(t)
+        self.counter += 1
+    def push(self):
+        t = ('push',)
+        self.stack.append(t)
+        self.counter += 1
+    def pop(self):
+        t = ('pop',)
+        self.stack.append(t)
+        self.counter += 1
 
     def append(self, t):
         if isinstance(t, Transform):
@@ -865,35 +885,36 @@ class Transform:
     def __iter__(self):
         for value in self.stack:
             yield value
-
-    def get_matrix(self):
-        '''Returns this transform's matrix. Its centerpoint is presumed to be
-        (0,0), which is the Cairo default.'''
-        return self.get_matrix_with_center(0,0)
-
-    def get_matrix_with_center(self,x,y):
-        '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
+    ### calcola matrice trasformazioni globali
+    def global_matrix(self):
         m = cairo.Matrix()
         rotang = 0
-        centerx = x
-        centery = y
-
+        global_mlist = []
+        m_archived = []
+        r_archived = []
+        global_mlist.append(m)
         for trans in self.stack:
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
+                global_mlist.append(m)
+                lt = ('jump',)
+                self.lstack.append(lt)
             elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
                 # parse transform command
                 cmd = trans[0]
                 args = trans[1:]
                 t = cairo.Matrix()
-
+                
                 if cmd == 'translate':
                     from math import sin, cos
                     xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
                     yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
                     t.translate(xt,yt)
                     m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'rotate':
                     from math import sin, cos
                     # apply existing transform to centerpoint
@@ -908,15 +929,80 @@ class Transform:
                     m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
                     m *= m2
                     rotang += a
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'scale':
                     t.scale(args[0], args[1])
                     m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'skew':
                     x, y = args
                     ## TODO: x and y should be the tangent of an angle
                     t *= cairo.Matrix(1,0,x,1,0,0)
                     t *= cairo.Matrix(1,y,0,1,0,0)
                     m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
+                elif cmd == 'cscale':                    
+                    x, y = args
+                    lt = ('cscale', x, y)
+                    self.lstack.append(lt)                    
+                elif cmd == 'crotate':                    
+                    a = args[0]
+                    lt = ('crotate', a)
+                    self.lstack.append(lt) 
+                elif cmd == 'cskew':
+                    x,y = args
+                    lt = ('cskew', a)
+                    self.lstack.append(lt)
+		elif cmd == 'push':
+                    r_archived.append(rotang)
+                    m_archived.append(global_mlist[-1])
+                    global_mlist.append(m_archived[-1])
+                    lt = ('push',)
+                    self.lstack.append(lt)
+		elif cmd == 'pop':
+                    rotang = r_archived[-1]
+                    r_archived.pop()                    
+                    global_mlist.append(m_archived[-1])                    
+                    m_archived.pop()
+                    lt = ('pop',)
+                    self.lstack.append(lt)
+
+
+        return global_mlist
+        
+
+
+    def get_matrix(self):
+        '''Returns this transform's matrix. Its centerpoint is presumed to be
+        (0,0), which is the Cairo default.'''
+        return self.get_matrix_with_center(0,0)
+
+    def get_matrix_with_center(self,x,y):
+        '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
+        m = cairo.Matrix()
+        rotang = 0
+        centerx = x
+        centery = y
+
+        for trans in self.lstack:
+            if isinstance(trans, cairo.Matrix):
+                # multiply matrix
+                m *= trans
+            elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
+                # parse transform command
+                cmd = trans[0]
+                args = trans[1:]
+                t = cairo.Matrix()
+
+                if cmd == 'jump':
+                    pass                  
+
                 elif cmd == 'cscale':
                     # apply existing transform to centerpoint
                     deltax,deltay = m.transform_point(centerx,centery)
