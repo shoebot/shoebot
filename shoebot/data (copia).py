@@ -6,8 +6,6 @@ from __future__ import division
 import util
 import cairo
 
-
-
 RGB = "rgb"
 HSB = "hsb"
 
@@ -796,7 +794,8 @@ class Variable(object):
     def __repr__(self):
         return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
 
-TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
+TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'cscale', 'crotate',
+              'cskew', 'push', 'pop']
 
 class Transform:
     '''
@@ -838,6 +837,18 @@ class Transform:
         t = ('skew', x, y)
         self.stack.append(t)
 
+    def cscale(self, x, y):
+        t = ('cscale', x, y)
+        self.stack.append(t)
+
+    def crotate(self, a):
+        t = ('crotate', a)
+        self.stack.append(t)
+
+    def cskew(self, x, y):
+        t = ('cskew', x, y)
+        self.stack.append(t)
+
     def push(self):
         t = ('push',)
         self.stack.append(t)
@@ -874,20 +885,19 @@ class Transform:
     def __iter__(self):
         for value in self.stack:
             yield value
-    ### calculates tranformation matrix
-    def get_matrix_with_center(self,x,y,mode,counter):
-        from math import sin, cos
+    ### calcola matrice trasformazioni globali
+    def global_matrix(self):
         m = cairo.Matrix()
         rotang = 0
-        centerx =x
-        centery = y
+        global_mlist = []
         m_archived = []
         r_archived = []
-
-        for trans in self.stack:  #[:counter]:
+        global_mlist.append(m)
+        for trans in self.stack:
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
+                global_mlist.append(m)
                 lt = ('jump',)
                 self.lstack.append(lt)
             elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
@@ -896,91 +906,145 @@ class Transform:
                 args = trans[1:]
                 t = cairo.Matrix()
                 
-                if cmd == 'translate':                    
+                if cmd == 'translate':
+                    from math import sin, cos
                     xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
                     yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
                     t.translate(xt,yt)
                     m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'rotate':
-                    if mode == 'corner':                        
-                        # apply existing transform to cornerpoint
-                        deltax,deltay = m.transform_point(0,0)
-                        a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
-                        rotang += a
-                    elif mode == 'center':
-                        # apply existing transform to centerpoint
-                        deltax,deltay = m.transform_point(centerx,centery)
-                        a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
-                        rotang += a
+                    from math import sin, cos
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(0,0)
+                    a = args[0]
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    # transform centerpoint according to current matrix
+                    m *= m1
+                    m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                    m *= m2
+                    rotang += a
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'scale':
-                    if mode == 'corner':
-                        t.scale(args[0], args[1])
-                        m *= t
-                    elif mode == 'center':
-                        # apply existing transform to centerpoint
-                        deltax,deltay = m.transform_point(centerx,centery)
-                        x, y = args
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        m *= m1
-                        m *= cairo.Matrix(x,0,0,y,0,0)
-                        m *= m2
-
+                    t.scale(args[0], args[1])
+                    m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
                 elif cmd == 'skew':
-                    if mode == 'corner':
-                        x, y = args
-                        ## TODO: x and y should be the tangent of an angle
-                        t *= cairo.Matrix(1,0,x,1,0,0)
-                        t *= cairo.Matrix(1,y,0,1,0,0)
-                        m *= t
-                    elif mode == 'center':
-                        # apply existing transform to centerpoint
-                        deltax,deltay = m.transform_point(centerx,centery)
-                        x,y = args
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        t *= m
-                        t *= m1
-                        t *= cairo.Matrix(1,0,x,1,0,0)
-                        t *= cairo.Matrix(1,y,0,1,0,0)
-                        t *= m2
-                        m = t
-
+                    x, y = args
+                    ## TODO: x and y should be the tangent of an angle
+                    t *= cairo.Matrix(1,0,x,1,0,0)
+                    t *= cairo.Matrix(1,y,0,1,0,0)
+                    m *= t
+                    global_mlist.append(m)
+                    lt = ('jump',)
+                    self.lstack.append(lt)
+                elif cmd == 'cscale':                    
+                    x, y = args
+                    lt = ('cscale', x, y)
+                    self.lstack.append(lt)                    
+                elif cmd == 'crotate':                    
+                    a = args[0]
+                    lt = ('crotate', a)
+                    self.lstack.append(lt) 
+                elif cmd == 'cskew':
+                    x,y = args
+                    lt = ('cskew', a)
+                    self.lstack.append(lt)
 		elif cmd == 'push':
                     r_archived.append(rotang)                                       
                     m_archived.append(m)
-
+                    global_mlist.append(m)               
+                    lt = ('push',)
+                    self.lstack.append(lt)
 		elif cmd == 'pop':
                     rotang = r_archived.pop()               
                     m = m_archived.pop()
+                    global_mlist.append(m)             
+                    lt = ('pop',)
+                    self.lstack.append(lt)
 
 
-        return m        
+        return global_mlist
+        
+
 
     def get_matrix(self):
         '''Returns this transform's matrix. Its centerpoint is presumed to be
         (0,0), which is the Cairo default.'''
         return self.get_matrix_with_center(0,0)
+
+    def get_matrix_with_center(self,x,y):
+        '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
+        m = cairo.Matrix()
+        rotang = 0
+        centerx = x
+        centery = y
+
+        for trans in self.lstack:
+            if isinstance(trans, cairo.Matrix):
+                # multiply matrix
+                m *= trans
+            elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
+                # parse transform command
+                cmd = trans[0]
+                args = trans[1:]
+                t = cairo.Matrix()
+
+                if cmd == 'jump':
+                    pass                  
+
+                elif cmd == 'cscale':
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    x, y = args
+
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+
+                    m *= m1
+                    m *= cairo.Matrix(x,0,0,y,0,0)
+                    m *= m2
+                elif cmd == 'crotate':
+                    from math import sin, cos
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    a = args[0]
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    # transform centerpoint according to current matrix
+                    m *= m1
+                    m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                    m *= m2
+
+                elif cmd == 'cskew':
+                    # apply existing transform to centerpoint
+                    deltax,deltay = m.transform_point(centerx,centery)
+                    x,y = args
+
+                    m1 = cairo.Matrix()
+                    m2 = cairo.Matrix()
+                    m1.translate(-deltax, -deltay)
+                    m2.translate(deltax, deltay)
+                    t *= m
+                    t *= m1
+                    t *= cairo.Matrix(1,0,x,1,0,0)
+                    t *= cairo.Matrix(1,y,0,1,0,0)
+                    t *= m2
+                    m = t
+        return m
 
 class Stack(list):
     def __init__(self):

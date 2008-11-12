@@ -640,7 +640,12 @@ class NodeBot(Bot):
             angle = radians
         else:
             angle = deg2rad(degrees)
-        self._transform.rotate(-angle)
+
+        if self._transformmode == CENTER:
+            # Nodebox's rotate direction is the opposite of Cairo's
+            self._transform.crotate(-angle)
+        else:
+            self._transform.rotate(-angle)
     def scale(self, x=1, y=None):
         if not y:
             y = x
@@ -649,10 +654,16 @@ class NodeBot(Bot):
             x = 1
         if y == 0 or y == -1:
             y = 1
-        self._transform.scale(x,y)
+        if self._transformmode == CENTER:
+            self._transform.cscale(x,y)
+        else:
+            self._transform.scale(x,y)
 
     def skew(self, x=1, y=0):
-        self._transform.skew(x,y)
+        if self._transformmode == CENTER:
+            self._transform.cskew(x,y)
+        else:
+            self._transform.skew(x,y)
 
     def push(self):
         self._transform.push()
@@ -916,12 +927,13 @@ class CairoCanvas(Canvas):
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
-
+        global_mlist = self._bot._transform.global_matrix() 
         for item in self.grobstack:
             if isinstance(item, BezierPath):
                 ctx.save()
                 deltax, deltay = item.center
-                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode,item._counter)
+                m = global_mlist[item._counter]
+                #m *= item._transform.get_matrix_with_center(deltax,deltay)
                 #print m
                 ctx.transform(m)
                 self.drawpath(item)
