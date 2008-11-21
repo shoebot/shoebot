@@ -24,11 +24,12 @@ pop()
 pop()
 fill(1,0,0)
 r4 = rect(0,0,10,10)
-
-for i in range (6):
+push()
+rotate(45)
+for i in range (4000):
         fill(1,0,0,.25)
-        r5 = rect(random(WIDTH/2),random(HEIGHT/2),10,10)
-
+        r5 = rect(random(WIDTH/1.2),random(HEIGHT/1.2),10,10)
+pop()
 #6  
 push()      
 transform(CENTER)

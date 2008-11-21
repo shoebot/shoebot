@@ -875,16 +875,15 @@ class Transform:
         for value in self.stack:
             yield value
     ### calculates tranformation matrix
-    def get_matrix_with_center(self,x,y,mode,counter):
+    def get_matrix_with_center(self,x,y,mode):
         from math import sin, cos
         m = cairo.Matrix()
         rotang = 0
         centerx =x
         centery = y
         m_archived = []
-        r_archived = []
 
-        for trans in self.stack:  #[:counter]:
+        for trans in self.stack: 
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
@@ -967,13 +966,10 @@ class Transform:
                         m = t
 
 		elif cmd == 'push':
-                    r_archived.append(rotang)                                       
-                    m_archived.append(m)
+                    m_archived.append((m, rotang))
 
 		elif cmd == 'pop':
-                    rotang = r_archived.pop()               
-                    m = m_archived.pop()
-
+                    m, rotang = m_archived.pop()
 
         return m        
 
