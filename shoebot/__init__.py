@@ -658,10 +658,12 @@ class NodeBot(Bot):
         self._transform.skew(x,y)
 
     def push(self):
-        self._transform.push()
+        #self._transform.push()
+        self.transform_stack.append(self._transform.copy())
 
     def pop(self):
-        self._transform.pop()
+        self._transform = self.transform_stack.pop()
+        #self._transform.pop()
 
     def reset(self):
         self._transform = Transform()
@@ -922,6 +924,7 @@ class CairoCanvas(Canvas):
 
         for item in self.grobstack:
             if isinstance(item, BezierPath):
+                #print item._transform
                 ctx.save()
                 deltax, deltay = item.center
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)

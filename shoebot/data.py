@@ -136,7 +136,7 @@ class TransformMixin(object):
 
     def _reset(self):
         self._transform = Transform()
-        self._transformmode = CENTER
+        self._transformmode = CENTER        
 
     def _get_transform(self):
         return self._transform
@@ -220,7 +220,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
-        self._counter=len(self._bot._transform.stack)
+        #self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
@@ -806,9 +806,6 @@ class Transform:
     '''
     def __init__(self, transform=None):
         self.stack = []
-        ### inizializza contatore trasformazioni e stack trasformazioni locali
-        self.lstack = []
-        self.counter=0
         if transform is None:
             pass
         elif isinstance(transform, Transform):
@@ -887,8 +884,6 @@ class Transform:
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
-                lt = ('jump',)
-                self.lstack.append(lt)
             elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
                 # parse transform command
                 cmd = trans[0]
