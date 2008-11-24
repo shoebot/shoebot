@@ -824,25 +824,30 @@ class NodeBot(Bot):
         Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
         using PIL
         '''
-        import Image
-        #from ctypes import create_string_buffer        
+        import Image       
         from array import array
 
         img = Image.open(path)
-        print img.size, img.format, img.mode, img.info
         Width, Height = img.size
         if width is None:
             width = Width
             height = Height
         else:
             size = width, height
-            img = img.resize(size,Image.ANTIALIAS)
-        print img.mode
-        img_buffer = array('c')
-        img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
-        #img_buffer = create_string_buffer(img.tostring())
-        imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)            
-        #width, height = im.size
+            img = img.resize(size, Image.ANTIALIAS)
+        if img.mode == "RGBA":
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)
+        elif img.mode == "RGB":
+            img = img.convert('RGBA')
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)            
+        else:
+            raise NotImplementedError("sorry, this image mode is not implemented")
+
+
         #imagesurface = cairo.ImageSurface.create_from_png(path)
         self.canvas._context.set_source_surface (imagesurface, x, y)
         self.canvas._context.rectangle(x, y, width, height)
