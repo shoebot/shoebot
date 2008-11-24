@@ -658,12 +658,10 @@ class NodeBot(Bot):
         self._transform.skew(x,y)
 
     def push(self):
-        #self._transform.push()
         self.transform_stack.append(self._transform.copy())
 
     def pop(self):
         self._transform = self.transform_stack.pop()
-        #self._transform.pop()
 
     def reset(self):
         self._transform = Transform()
@@ -818,6 +816,7 @@ class NodeBot(Bot):
 
     # ----- IMAGE -----
 
+
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
         '''
         TODO:
@@ -825,12 +824,29 @@ class NodeBot(Bot):
         Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
         using PIL
         '''
-        #width, height = im.size
-        imagesurface = cairo.ImageSurface.create_from_png(path)
-        self.context.set_source_surface (imagesurface, x, y)
-        self.context.rectangle(x, y, width, height)
-        self.context.fill()
+        import Image
+        #from ctypes import create_string_buffer        
+        from array import array
 
+        img = Image.open(path)
+        print img.size, img.format, img.mode, img.info
+        Width, Height = img.size
+        if width is None:
+            width = Width
+            height = Height
+        else:
+            size = width, height
+            img = img.resize(size,Image.ANTIALIAS)
+        print img.mode
+        img_buffer = array('c')
+        img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+        #img_buffer = create_string_buffer(img.tostring())
+        imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)            
+        #width, height = im.size
+        #imagesurface = cairo.ImageSurface.create_from_png(path)
+        self.canvas._context.set_source_surface (imagesurface, x, y)
+        self.canvas._context.rectangle(x, y, width, height)
+        self.canvas._context.fill()
 
 
 class Canvas:
@@ -924,7 +940,6 @@ class CairoCanvas(Canvas):
 
         for item in self.grobstack:
             if isinstance(item, BezierPath):
-                #print item._transform
                 ctx.save()
                 deltax, deltay = item.center
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)

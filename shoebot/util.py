@@ -490,3 +490,13 @@ def rgb_to_hsv(r, g, b):
     return h, s, v
 
 rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
+
+
+def rgba_to_argb(stringImage):
+    tempBuffer = [None]*len(stringImage) # Create an empty array of the same size as stringImage
+    tempBuffer[0::4] = stringImage[3::4]
+    tempBuffer[1::4] = stringImage[0::4]
+    tempBuffer[2::4] = stringImage[1::4]
+    tempBuffer[3::4] = stringImage[2::4]
+    stringImage = ''.join(tempBuffer)
+    return stringImage
