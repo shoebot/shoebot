@@ -136,7 +136,7 @@ class TransformMixin(object):
 
     def _reset(self):
         self._transform = Transform()
-        self._transformmode = CENTER
+        self._transformmode = CENTER        
 
     def _get_transform(self):
         return self._transform
@@ -350,7 +350,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
                 ctx.arc (0., 0., 1., 0., 2 * pi)
                 ctx.restore()
         # get boundaries
-        bbox = ctx.fill_extents()
+        bbox = ctx.stroke_extents()
         # is this line necessary? Or does python garbage collect this?
         del surface, ctx, canvas, p
         return bbox

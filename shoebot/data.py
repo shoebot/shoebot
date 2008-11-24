@@ -737,6 +737,75 @@ class Text(Grob, TransformMixin, ColorMixin):
             '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
         return new
 
+class Image(Grob, TransformMixin, ColorMixin):
+    stateAttributes = ('_transform', '_transformmode')
+    kwargs = ()
+
+    def __init__(self, bot, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
+        self._bot = bot
+        #super(Image, self).__init__(self._bot)
+        TransformMixin.__init__(self)
+        ColorMixin.__init__(self, **kwargs)
+
+        if self._bot:
+            _copy_attrs(self._bot, self, self.stateAttributes)
+
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.alpha = alpha
+        self.path = path
+
+        import Image       
+        from array import array
+
+        img = Image.open(self.path)
+        Width, Height = img.size
+        # if no width is given, it assumes the original image dimensions, else image is resized
+        if self.width is None:
+            self.width = Width
+            self.height = Height
+        else:
+            size = self.width, self.height
+            img = img.resize(size, Image.ANTIALIAS)
+        # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
+        # and fills a buffer from array module, then passes it to cairo image surface constructor
+        if img.mode == "RGBA":
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
+        elif img.mode == "RGB":
+            img = img.convert('RGBA')
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
+        else:
+            raise NotImplementedError("sorry, this image mode is not implemented")
+        #this is the item that will be drawn
+        self.imagesurface = imagesurface
+
+
+    def _get_center(self):
+        '''Returns the center point of the path, disregarding transforms.
+        '''
+        x = (2*self.x+self.width)/2
+        y = (2*self.y+self.height)/2
+        return (x,y)
+    center = property(_get_center)
+
+    def copy(self):
+        new = self.__class__(self._bot, self.text)
+        _copy_attrs(self, new, ('x', 'y', 'width', 'height', 'alpha', '_transform', '_transformmode'))
+        return new
+
+
+
+
+
+
+
+
 class Variable(object):
     '''Taken from Nodebox'''
     def __init__(self, name, type, default=None, min=0, max=100, value=None):

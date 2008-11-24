@@ -364,6 +364,18 @@ class NodeBot(Bot):
 
     #### Drawing
 
+    # Image
+
+    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
+        '''Draws a image form path, in x,y and resize it to width, height dimensions.
+        '''
+        r = self.Image(path, x, y, width, height, alpha, data, **kwargs)        
+        if draw:
+            self.canvas.add(r)
+        return r
+
+    # Paths
+
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
         '''Draws a rectangle with top left corner at (x,y)
 
@@ -814,45 +826,6 @@ class NodeBot(Bot):
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
         raise NotImplementedError("fontoptions() isn't implemented yet")
 
-    # ----- IMAGE -----
-
-
-    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
-        '''
-        TODO:
-        width and height ought to be for scaling, not clipping
-        Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
-        using PIL
-        '''
-        import Image       
-        from array import array
-
-        img = Image.open(path)
-        Width, Height = img.size
-        if width is None:
-            width = Width
-            height = Height
-        else:
-            size = width, height
-            img = img.resize(size, Image.ANTIALIAS)
-        if img.mode == "RGBA":
-            img_buffer = array('c')
-            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
-            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)
-        elif img.mode == "RGB":
-            img = img.convert('RGBA')
-            img_buffer = array('c')
-            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
-            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)            
-        else:
-            raise NotImplementedError("sorry, this image mode is not implemented")
-
-
-        #imagesurface = cairo.ImageSurface.create_from_png(path)
-        self.canvas._context.set_source_surface (imagesurface, x, y)
-        self.canvas._context.rectangle(x, y, width, height)
-        self.canvas._context.fill()
-
 
 class Canvas:
     '''
@@ -957,8 +930,14 @@ class CairoCanvas(Canvas):
                 ctx.translate(item.x,item.y)                
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
-
                 self.drawtext(item)
+            elif isinstance(item, Image):
+                ctx.save()
+                deltax, deltay = item.center
+                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
+                ctx.transform(m)
+                self.drawimage(item)        
+
             ctx.restore()
 
 
@@ -989,6 +968,13 @@ class CairoCanvas(Canvas):
             self._context.stroke()
         else:
             print "Warning: Canvas object had no fill or stroke values"
+
+    def drawimage(self,image,ctx=None):
+        if not ctx:
+            ctx = self._context
+        ctx.set_source_surface (image.imagesurface, image.x, image.y)
+        ctx.rectangle(image.x, image.y, image.width, image.height)
+        ctx.fill()
 
     def drawpath(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''

@@ -238,7 +238,10 @@ class Bot:
 
     # from Nodebox, a function to import Nodebox libraries
     def ximport(self, libName):
-        lib = __import__(libName)
+        try:
+            lib = __import__("lib/"+libName)
+        except:
+            lib = __import__(libName)
         self._ns[libName] = lib
         lib._ctx = self
         return lib
@@ -640,12 +643,7 @@ class NodeBot(Bot):
             angle = radians
         else:
             angle = deg2rad(degrees)
-
-        if self._transformmode == CENTER:
-            # Nodebox's rotate direction is the opposite of Cairo's
-            self._transform.crotate(-angle)
-        else:
-            self._transform.rotate(-angle)
+        self._transform.rotate(-angle)
     def scale(self, x=1, y=None):
         if not y:
             y = x
@@ -654,22 +652,16 @@ class NodeBot(Bot):
             x = 1
         if y == 0 or y == -1:
             y = 1
-        if self._transformmode == CENTER:
-            self._transform.cscale(x,y)
-        else:
-            self._transform.scale(x,y)
+        self._transform.scale(x,y)
 
     def skew(self, x=1, y=0):
-        if self._transformmode == CENTER:
-            self._transform.cskew(x,y)
-        else:
-            self._transform.skew(x,y)
+        self._transform.skew(x,y)
 
     def push(self):
-        self._transform.push()
+        self.transform_stack.append(self._transform.copy())
 
     def pop(self):
-        self._transform.pop()
+        self._transform = self.transform_stack.pop()
 
     def reset(self):
         self._transform = Transform()
@@ -824,6 +816,7 @@ class NodeBot(Bot):
 
     # ----- IMAGE -----
 
+
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None):
         '''
         TODO:
@@ -831,12 +824,34 @@ class NodeBot(Bot):
         Use gdk.pixbuf to load an image buffer and convert it to a cairo surface
         using PIL
         '''
-        #width, height = im.size
-        imagesurface = cairo.ImageSurface.create_from_png(path)
-        self.context.set_source_surface (imagesurface, x, y)
-        self.context.rectangle(x, y, width, height)
-        self.context.fill()
+        import Image       
+        from array import array
 
+        img = Image.open(path)
+        Width, Height = img.size
+        if width is None:
+            width = Width
+            height = Height
+        else:
+            size = width, height
+            img = img.resize(size, Image.ANTIALIAS)
+        if img.mode == "RGBA":
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)
+        elif img.mode == "RGB":
+            img = img.convert('RGBA')
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, width, height)            
+        else:
+            raise NotImplementedError("sorry, this image mode is not implemented")
+
+
+        #imagesurface = cairo.ImageSurface.create_from_png(path)
+        self.canvas._context.set_source_surface (imagesurface, x, y)
+        self.canvas._context.rectangle(x, y, width, height)
+        self.canvas._context.fill()
 
 
 class Canvas:
@@ -927,24 +942,20 @@ class CairoCanvas(Canvas):
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
-        global_mlist = self._bot._transform.global_matrix() 
+
         for item in self.grobstack:
             if isinstance(item, BezierPath):
                 ctx.save()
                 deltax, deltay = item.center
-                m = global_mlist[item._counter]
-                #m *= item._transform.get_matrix_with_center(deltax,deltay)
-                #print m
+                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
                 self.drawpath(item)
             elif isinstance(item, Text):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
-                counter = item._counter
-                m = global_mlist[counter]
                 ctx.translate(item.x,item.y)                
-                m = item._transform.get_matrix_with_center(deltax,deltay)
+                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
 
                 self.drawtext(item)
