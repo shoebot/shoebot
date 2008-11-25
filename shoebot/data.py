@@ -756,13 +756,26 @@ class Image(Grob, TransformMixin, ColorMixin):
         self.height = height
         self.alpha = alpha
         self.path = path
+        self.data = data
 
         import Image       
         from array import array
 
-        img = Image.open(self.path)
+        # checks if image data is passed in command call, in this case it wraps
+        # the data in a StringIO oject in order to use it as a file
+        # the data itself must contain an entire image, not just pixel data
+        # it can be useful for example to retrieve images from the web without 
+        # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
+        # if no data is passed the path is used to open a local file
+        if self.data is None:
+            img = Image.open(self.path)
+        elif self.data:
+            from StringIO import StringIO
+            img = Image.open(StringIO(self.data))
+
+        # retrieves original image size
         Width, Height = img.size
-        # if no width is given, it assumes the original image dimensions, else image is resized
+        # if no width is given, it assumes the original image size, else image is resized
         if self.width is None:
             self.width = Width
             self.height = Height
@@ -781,7 +794,7 @@ class Image(Grob, TransformMixin, ColorMixin):
             img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
         else:
-            raise NotImplementedError("sorry, this image mode is not implemented")
+            raise NotImplementedError("sorry, this image mode is not implemented yet")
         #this is the item that will be drawn
         self.imagesurface = imagesurface
 
@@ -789,8 +802,8 @@ class Image(Grob, TransformMixin, ColorMixin):
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        x = (2*self.x+self.width)/2
-        y = (2*self.y+self.height)/2
+        x = (self.x+self.width/2)
+        y = (self.y+self.height/2)
         return (x,y)
     center = property(_get_center)
 
