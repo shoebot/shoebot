@@ -374,6 +374,13 @@ class NodeBot(Bot):
             self.canvas.add(r)
         return r
 
+
+    def imagesize(self, path):
+        import Image
+        img = Image.open(path)
+        return img.size
+
+
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
