@@ -397,6 +397,28 @@ named_colors = {
 
 }
 
+
+# imports a gpl (gimp, inkscape) palette, given the path to file
+def import_palette(path=None):
+    if path is None:
+        pass
+    else:        
+        palette_file = open(path).read()
+        palette_file = palette_file[palette_file.find('#'):]
+        palette_lines = palette_file.splitlines()
+        for entry in palette_lines[1:]:
+            palette_item = entry.split()        
+            color = (float(palette_item[0])/255,float(palette_item[1])/255,float(palette_item[2])/255)
+            color_name = ""
+            for n in palette_item[3:]:
+                color_name += n
+            color_name = color_name.lower()
+            for ch in "_- ": 
+                color_name = color_name.replace(ch, "")
+            named_colors[color_name] = color
+
+
+
 ### COLOR CONTEXT ####################################################################################
 
 # The context is a dictionary of colors mapped to associated words,
