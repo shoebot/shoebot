@@ -777,9 +777,16 @@ class Image(Grob, TransformMixin, ColorMixin):
         Width, Height = img.size
         # if no width is given, it assumes the original image size, else image is resized
         if self.width is None:
-            self.width = Width
-            self.height = Height
+            if self.height is None:
+                self.width = Width
+                self.height = Height
+            else:
+                self.width = self.height*Width/Height
+                size = self.width, self.height
+                img = img.resize(size, Image.ANTIALIAS)
         else:
+            if self.height is None:
+                self.height = self.width*Height/Width
             size = self.width, self.height
             img = img.resize(size, Image.ANTIALIAS)
         # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels

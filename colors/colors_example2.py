@@ -11,7 +11,7 @@ size(550, 400)
 # A list of colors from image pixels.
 # This requires the Core Image library to be installed.
 sea = colors.list("colors/sea.jpg", n=20)
-#image("sea.jpg", 0, 0, width=550)
+image("colors/sea.jpg", 0, 0, width=550)
 
 x = 0
 for clr in sea:
