@@ -1,0 +1,16 @@
+nofill()
+nostroke()
+size(400,400)
+background(0.3,0.1,0)
+points=[]
+for i in range(20):
+    points.append((random(WIDTH),random(HEIGHT)))
+
+stroke(0.8,0.4,0.1)
+strokewidth(1.5)    
+p = findpath(points, curvature=1)
+p1 = findpath(points, curvature=0)
+drawpath(p)
+stroke(1)
+strokewidth(0.5)
+drawpath(p1.copy())
