@@ -274,6 +274,17 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     def ellipse(self,x,y,w,h):
         self.data.append(PathElement(ELLIPSE,x,y,w,h))
         self.closepath()
+
+    ## alternative ellipse implementation, more consistent with nodebox primitives
+    #def ellipse(self,x,y,w,h):
+        #k = 0.5522847498    
+        #self.moveto(x,y+h/2)
+        #self.curveto(x,y+(1-k)*h/2,x+(1-k)*w/2,y,x+w/2,y)
+        #self.curveto(x+(1+k)*w/2,y,x+w,y+(1-k)*h/2,x+w,y+h/2)
+        #self.curveto(x+w,y+(1+k)*h/2,x+(1+k)*w/2,y+h,x+w/2,y+h)
+        #self.curveto(x+(1-k)*w/2,y+h,x,y+(1+k)*h/2,x,y+h/2)
+        #self.closepath()
+
     def rect(self, x, y, w, h, roundness=0.0, rectmode='corner'):
         if not roundness:
             self.moveto(x, y)
