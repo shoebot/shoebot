@@ -6,6 +6,8 @@ apps/*
 # ignore build and dist output
 build/*
 dist/*
+lib/*
+lib
 # python bytecode files
 *.pyc
 *.pyo
