@@ -843,16 +843,15 @@ class NodeBot(Bot):
             self.canvas.add(txt)
           return txt
 
-    def textpath(self, txt, x, y, width=None, height=1000000, draw=True):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
         '''
         Draws an outlined path of the input text
         '''
-        ## FIXME: This should be handled by BezierPath
-        self.canvas._context.save()
-        self.canvas._context.move_to(x,y)
-        self.canvas._context.text_path(txt)
-        self.canvas._context.restore()
-#        return self._path
+        txt = self.Text(txt, x, y, width, height, **kwargs)
+        path = txt.path
+        if draw:
+            self.canvas.add(path)
+        return path
 
     def textwidth(self, txt, width=None):
         '''Returns the width of a string of text according to the current

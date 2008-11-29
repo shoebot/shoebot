@@ -718,6 +718,7 @@ class Text(Grob, TransformMixin, ColorMixin):
     def _get_path(self):
         surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
         ctx = cairo.Context(surface)
+        ctx.move_to(self.x,self.y)
         ctx.set_font_face(self._fontface)
         ctx.set_font_size(self._fontsize)
         ctx.text_path(self.text)
