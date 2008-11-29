@@ -816,16 +816,15 @@ class NodeBot(Bot):
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
-            face = util.create_cairo_font_face_for_file(fontpath, 0)
-            self._font = face
+            self._fontfile = fontpath
         else:
-            return self._font
+            return self._fontfile
         if fontsize is not None:
-            self._fontsize(fontsize)
+            self._fontsize = fontsize
 
     def fontsize(self, fontsize=None):
         if fontsize is not None:
-            self._font_size = fontsize
+            self._fontsize = fontsize
         else:
             return self.canvas.font_size
 
@@ -849,10 +848,10 @@ class NodeBot(Bot):
         Draws an outlined path of the input text
         '''
         ## FIXME: This should be handled by BezierPath
-        self.save()
-        self.context.move_to(x,y)
-        self.context.text_path(txt)
-        self.restore()
+        self.canvas._context.save()
+        self.canvas._context.move_to(x,y)
+        self.canvas._context.text_path(txt)
+        self.canvas._context.restore()
 #        return self._path
 
     def textwidth(self, txt, width=None):
