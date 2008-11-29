@@ -678,7 +678,7 @@ class Color(object):
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
-    kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
+    #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, **kwargs):
         self._bot = bot
@@ -688,17 +688,20 @@ class Text(Grob, TransformMixin, ColorMixin):
 
         if self._bot:
             _copy_attrs(self._bot, self, self.stateAttributes)
-
         self.text = unicode(text)
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self._fontfile = kwargs.get('font', "assets/notcouriersans.ttf")
+        if kwargs.has_key("font"):
+            self._fontfile = kwargs["font"]
         self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
-        self._fontsize = kwargs.get('fontsize', 24)
-        self._lineheight = max(kwargs.get('lineheight', 1.2), 0.01)
-        self._align = kwargs.get('align', LEFT)
+        if kwargs.has_key("fontsize"):
+            self._fontsize = kwargs["fontsize"] 
+        if kwargs.has_key("lineheight"):
+            self._lineheight = max(kwargs["lineheight"], 0.01)       
+        if kwargs.has_key("align"):
+            self._align= kwargs["align"]
 
     def _get_metrics(self):
         surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0)
