@@ -1108,7 +1108,7 @@ class CairoCanvas(Canvas):
             self._context.show_page()
             self._surface.finish()
         else:
-            self._context.write_to_png("DUMMYOUTPUT.png")
+            self._surface.write_to_png(self._bot.targetfilename)
 
     def output(self, target):
         self.draw()
