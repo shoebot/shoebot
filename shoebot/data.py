@@ -5,7 +5,8 @@ Shoebot data structures for bezier path handling
 from __future__ import division
 import util
 import cairo
-
+import pango
+import pangocairo
 
 
 RGB = "rgb"
@@ -695,13 +696,28 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.height = height
         if kwargs.has_key("font"):
             self._fontfile = kwargs["font"]
-        self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
+        #self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
+        self._fontface = pango.FontDescription()
+        self._fontface.set_family(self._fontfile)
+        self._fontface.set_weight(pango.WEIGHT_NORMAL)
         if kwargs.has_key("fontsize"):
             self._fontsize = kwargs["fontsize"] 
+            self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
         if kwargs.has_key("lineheight"):
             self._lineheight = max(kwargs["lineheight"], 0.01)       
         if kwargs.has_key("align"):
             self._align= kwargs["align"]
+        #pang_surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0) 
+        pang_ctx = pangocairo.CairoContext(self._bot.canvas._context)
+        layout = pang_ctx.create_layout()
+        layout.set_font_description(self._fontface)
+        layout.set_text(self.text)
+        if self.width:
+            layout.set_width(self.width*pango.SCALE)    
+        #print layout.get_text()
+        #print layout.get_font_description()
+        pang_ctx.show_layout(layout)
+
 
     def _get_metrics(self):
         surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0)

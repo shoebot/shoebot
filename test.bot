@@ -1,0 +1,2 @@
+size(300,400)
+text("s'i fossi foco arderei lo mondo, s'i fosse vento lo tempesterei, s'io fossi acqua i' l'annegherei, s'i fossi dio manderel' e'in profondo. S'i fossi papa sare' allor giocondo, che tutti li cristiani imbrigherei, s'i foss'imperator sà che farei? a tutti mozzarei lo capo a tondo",10,0, width=200, font="/home/francesco/.fonts/calibri.ttf", fontsize=12)

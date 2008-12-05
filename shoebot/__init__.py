@@ -1111,7 +1111,7 @@ class CairoCanvas(Canvas):
             self._surface.write_to_png(self._bot.targetfilename)
 
     def output(self, target):
-        self.draw()
+        #self.draw()
         if isinstance(target, basestring): # filename
             filename = target
             import os
@@ -1126,7 +1126,7 @@ class CairoCanvas(Canvas):
                 else:
                     # otherwise, we clone the contents of current surface onto
                     # a temporary one
-                    temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+                    temp_surface = util.surfacefromfilename(filename, self._bot.WIDTH, self._bot.HEIGHT)
                     ctx = cairo.Context(temp_surface)
                     ctx.set_source_surface(self._surface, 0, 0)
                     ctx.paint()
