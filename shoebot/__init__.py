@@ -1012,11 +1012,6 @@ class CairoCanvas(Canvas):
     def drawtext(self,txt,ctx=None):
         if not ctx:
             ctx = self._context
-
-        ctx.set_font_face(txt._fontface)
-        ctx.set_font_size(txt._fontsize)
-        ctx.text_path(txt.text)
-
         if txt._fillcolor:
             self._context.set_source_rgba(*txt._fillcolor)
             if txt._strokecolor:
@@ -1036,6 +1031,11 @@ class CairoCanvas(Canvas):
             self._context.stroke()
         else:
             print "Warning: Canvas object had no fill or stroke values"
+
+        txt.pang_ctx.update_layout(txt.layout)
+        txt.pang_ctx.show_layout(txt.layout)
+
+
 
     def drawimage(self,image,ctx=None):
         if not ctx:

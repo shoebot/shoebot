@@ -706,29 +706,18 @@ class Text(Grob, TransformMixin, ColorMixin):
         if kwargs.has_key("lineheight"):
             self._lineheight = max(kwargs["lineheight"], 0.01)       
         if kwargs.has_key("align"):
-            self._align= kwargs["align"]
-        #pang_surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0) 
-        pang_ctx = pangocairo.CairoContext(self._bot.canvas._context)
-        layout = pang_ctx.create_layout()
-        layout.set_font_description(self._fontface)
-        layout.set_text(self.text)
+            self._align= kwargs["align"] 
+        self.pang_ctx = pangocairo.CairoContext(self._bot.canvas._context)
+        self.layout = self.pang_ctx.create_layout()
+        self.layout.set_font_description(self._fontface)
+        self.layout.set_text(self.text)
         if self.width:
-            layout.set_width(self.width*pango.SCALE)    
-        #print layout.get_text()
-        #print layout.get_font_description()
-        pang_ctx.show_layout(layout)
-
+            self.layout.set_width(self.width*pango.SCALE)    
 
     def _get_metrics(self):
-        surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0)
-        ctx = cairo.Context(surface)
-        ctx.set_font_face(self._fontface)
-        ctx.set_font_size(self._fontsize)
-        e = ctx.text_extents(self.text)
-        origin_x, origin_y, w, h, xbearing, ybearing = e
-        x = origin_x + self.x
-        y = origin_y - h + self.y
-        return (x,y,w,h)
+        w,h = self.layout.get_size()
+        x,y = self.x, self.y
+        return (x,y,w/pango.SCALE,h/pango.SCALE)
     metrics = property(_get_metrics)
 
     def _get_path(self):
@@ -757,8 +746,12 @@ class Text(Grob, TransformMixin, ColorMixin):
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        p = self.path
-        return p.center
+        w,h = self.layout.get_size()
+        w = w/pango.SCALE
+        h = h/pango.SCALE
+        x = (self.x+w/2)
+        y = (self.y+h/2)
+        return (x,y)
     center = property(_get_center)
 
     def copy(self):
