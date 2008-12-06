@@ -6,6 +6,8 @@ from __future__ import division
 import util
 import cairo
 
+
+
 RGB = "rgb"
 HSB = "hsb"
 
@@ -84,7 +86,7 @@ class Grob(object):
     def __init__(self, bot):
         """Initializes this object with the current bot instance."""
         self._bot = bot
-
+        
     def copy(self):
         """Returns a deep copy of this grob."""
         raise NotImplementedError, "Copy is not implemented on this Grob class."
@@ -92,6 +94,7 @@ class Grob(object):
     def draw(self):
         """Appends the grob to the canvas.
            This will result in a draw later on, when the scene graph is rendered."""
+        
         self._bot.canvas.add(self)
 ##
 ##    def inheritFromContext(self, ignore=()):
@@ -133,7 +136,7 @@ class TransformMixin(object):
 
     def _reset(self):
         self._transform = Transform()
-        self._transformmode = CENTER
+        self._transformmode = CENTER        
 
     def _get_transform(self):
         return self._transform
@@ -166,14 +169,14 @@ class ColorMixin(object):
 
     def __init__(self, **kwargs):
         try:
-            self._fillcolor = Color('rgb', 1, kwargs['fill'])
+            self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
         except KeyError:
             if self._bot._fillcolor:
                 self._fillcolor = self._bot._fillcolor.copy()
             else:
                 self._fillcolor = None
         try:
-            self._strokecolor = Color('rgb', 1, kwargs['stroke'])
+            self._strokecolor = Color(kwargs['stroke'], mode='rgb', color_range=1)
         except KeyError:
             if self._bot._strokecolor:
                 self._strokecolor = self._bot._strokecolor.copy()
@@ -184,13 +187,13 @@ class ColorMixin(object):
     def _get_fill(self):
         return self._fillcolor
     def _set_fill(self, *args):
-        self._fillcolor = Color('rgb', 1, *args)
+        self._fillcolor = Color(mode='rgb', color_range=1, *args)
     fill = property(_get_fill, _set_fill)
 
     def _get_stroke(self):
         return self._strokecolor
     def _set_stroke(self, *args):
-        self._strokecolor = Color('rgb', 1, *args)
+        self._strokecolor = Color(mode='rgb', color_range=1, *args)
     stroke = property(_get_stroke, _set_stroke)
 
     def _get_strokewidth(self):
@@ -217,6 +220,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
+        #self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
@@ -270,6 +274,17 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     def ellipse(self,x,y,w,h):
         self.data.append(PathElement(ELLIPSE,x,y,w,h))
         self.closepath()
+
+    ## alternative ellipse implementation, more consistent with nodebox primitives
+    #def ellipse(self,x,y,w,h):
+        #k = 0.5522847498    
+        #self.moveto(x,y+h/2)
+        #self.curveto(x,y+(1-k)*h/2,x+(1-k)*w/2,y,x+w/2,y)
+        #self.curveto(x+(1+k)*w/2,y,x+w,y+(1-k)*h/2,x+w,y+h/2)
+        #self.curveto(x+w,y+(1+k)*h/2,x+(1+k)*w/2,y+h,x+w/2,y+h)
+        #self.curveto(x+(1-k)*w/2,y+h,x,y+(1+k)*h/2,x,y+h/2)
+        #self.closepath()
+
     def rect(self, x, y, w, h, roundness=0.0, rectmode='corner'):
         if not roundness:
             self.moveto(x, y)
@@ -346,7 +361,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
                 ctx.arc (0., 0., 1., 0., 2 * pi)
                 ctx.restore()
         # get boundaries
-        bbox = ctx.fill_extents()
+        bbox = ctx.stroke_extents()
         # is this line necessary? Or does python garbage collect this?
         del surface, ctx, canvas, p
         return bbox
@@ -440,9 +455,11 @@ class PathElement:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
 class Color(object):
+    
     '''
-    Taken from Nodebox and modified.
+    Taken from Nodebox colors library and modified.
     Since we have no Cocoa, we have no way to use colour management for the moment.
     So we took another approach.
 
@@ -462,59 +479,206 @@ class Color(object):
     - RRGGBB
     - #RRGGBBAA
     - RRGGBBAA
+    
+    The CMYK parts have been commented out, as it may slow down code execution
+    and at this point is quite useless, left it in place for a possible future implementation
     '''
 
-    def __init__(self, mode='rgb', color_range=1, *v):
-        # unpack one-element tuples, they show up sometimes
-        while isinstance(v, (tuple,list)) and len(v) == 1:
-            v = v[0]
+    def __init__(self, *a, **kwargs):
+        
+        # Values are supplied as a tuple.
+        if len(a) == 1 and isinstance(a[0], tuple):
+            a = a[0]
+            
+        # No values or None, transparent black.
+        if len(a) == 0 or (len(a) == 1 and a[0] == None):
+            raise ShoebotError("got Color() with value None!")         
+            self.r, self.g, self.b, self.a = 0, 0, 0, 0
+            
+        # One value, another color object.
+        elif len(a) == 1 and isinstance(a[0], Color):
+            self.r, self.g, self.b, self.a = a[0].r, a[0].g, a[0].b, a[0].a
+            
+        # One value, a hexadecimal string.
+        elif len(a) == 1 and isinstance(a[0], str):
+            r, g, b, a = util.hex2rgb(a[0])
+            self.r, self.g, self.b, self.a = r, g, b, a
+            
+        # One value, grayscale.
+        elif len(a) == 1:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1
+            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, 1
+            
+        # Two values, grayscale and alpha.
+        elif len(a) == 2:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1
+            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, a[1]/ra
+            
+        # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
+        # depending on the mode parameter.
+        elif len(a) >= 3:
+            if kwargs.has_key("color_range"):
+                ra = int(kwargs["color_range"])
+            else:
+                ra = 1            
+            alpha, mode = 1, "rgb" 
+            if len(a) > 3: alpha = a[-1]/ra
+	    
+            if kwargs.has_key("mode"): 
+                mode = kwargs["mode"].lower()
+            if mode == "rgb":                
+                self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
+            elif mode == "hsb":                
+                self.h, self.s, self.brightness, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha                
+            #elif mode == "cmyk":
+                #if len(a) == 4: alpha = 1
+                #self.a = alpha
+                #self.c, self.m, self.y, self.k = a[0], a[1], a[2], a[3]
+	    
 
-        if isinstance(v,type(None)):
-            raise ShoebotError("got Color() with value None!")
-            self.r, self.g, self.b, self.a = (0,0,0,1)
-
-        if isinstance(v, Color):
-            self.r, self.g, self.b, self.a = v
-
-        else:
-            if mode is RGB:
-                self.r, self.g, self.b, self.a = util.parse_color(v, color_range)
-            elif mode is HSB:
-                self.r, self.g, self.b, self.a = util.parse_hsb_color(v, color_range)
-
-        # convenience attributes
+        # Added this
         self.red = self.r
         self.green = self.g
         self.blue = self.b
         self.alpha = self.a
 
         self.data = [self.r, self.g, self.b, self.a]
+        #end added
 
-        self.hue, self.saturation, self.lightness = util.rgb_to_hsl(self.r, self.g, self.b)
 
+
+    def __repr__(self):
+        return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, 
+            self.red, self.green, self.blue, self.alpha)
+
+    def copy(self):
+	return tuple(self.data)
+        
+    def _update_rgb(self, r, g, b):
+        self.__dict__["__r"] = r
+        self.__dict__["__g"] = g
+        self.__dict__["__b"] = b
+    
+    #def _update_cmyk(self, c, m, y, k):
+        #self.__dict__["__c"] = c
+        #self.__dict__["__m"] = m
+        #self.__dict__["__y"] = y
+        #self.__dict__["__k"] = k
+        
+    def _update_hsb(self, h, s, b):
+        self.__dict__["__h"] = h
+        self.__dict__["__s"] = s
+        self.__dict__["__brightness"] = b
+    
+    def _hasattrs(self, list):
+        for a in list:
+            if not self.__dict__.has_key(a):
+                return False
+        return True
+    
+    #added
     def __getitem__(self, index):
         return (self.r, self.g, self.b, self.a)[index]
+        
+
     def __iter__(self):
         for i in range(len(self.data)):
-            yield self.data[i]
-    def __repr__(self):
-        return "(%f,%f,%f,%f)" % (self.r, self.g, self.b, self.a)
+           yield self.data[i]
+
     def __div__(self, other):
         value = float(other)
-        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)
+        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)    
+    #end added
 
-    def blend(self,other,factor):
-        self.r = (self.r + other.r) / factor
-        self.g = (self.g + other.g) / factor
-        self.b = (self.b + other.b) / factor
-        self.a = (self.a + other.a) / factor
-    def copy(self):
-        new = self.__class__('rgb',1,self.data)
-        return new
+
+    def __setattr__(self, a, v):
+        
+        if a in ["a", "alpha"]:
+            self.__dict__["__"+a[0]] = max(0, min(v, 1))
+        
+        # RGB changes, update CMYK and HSB accordingly.
+        elif a in ["r", "g", "b", "red", "green", "blue"]:
+            self.__dict__["__"+a[0]] = max(0, min(v, 1))
+            if self._hasattrs(("__r", "__g", "__b")):
+                r, g, b = (
+                    self.__dict__["__r"], 
+                    self.__dict__["__g"], 
+                    self.__dict__["__b"]
+                )
+                #self._update_cmyk(*util.rgb2cmyk(r, g, b))
+                self._update_hsb(*util.rgb2hsb(r, g, b))
+        
+        # HSB changes, update RGB and CMYK accordingly.
+        elif a in ["h", "s", "hue", "saturation", "brightness"]:
+            if a != "brightness": a = a[0]
+            if a == "h": v = min(v, 0.99999999)
+            self.__dict__["__"+a] = max(0, min(v, 1))
+            if self._hasattrs(("__h", "__s", "__brightness")):
+                r, g, b = util.hsb2rgb(
+                    self.__dict__["__h"], 
+                    self.__dict__["__s"], 
+                    self.__dict__["__brightness"]
+                )
+                self._update_rgb(r, g, b)
+                #self._update_cmyk(*util.rgb2cmyk(r, g, b))
+        
+        # CMYK changes, update RGB and HSB accordingly.
+        #elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
+            #if a != "black": a = a[0]
+            #self.__dict__["__"+a] = max(0, min(v, 1))
+            #if self._hasattrs(("__c", "__m", "__y", "__k")):
+                #r, g, b = util.cmyk2rgb(
+                    #self.__dict__["__c"], 
+                    #self.__dict__["__m"], 
+                    #self.__dict__["__y"], 
+                    #self.__dict__["__k"]
+                #)
+                #self._update_rgb(r, g, b)
+                #self._update_hsb(*util.rgb2hsb(r, g, b))
+                
+        else:
+            self.__dict__[a] = v
+
+    def __getattr__(self, a):
+        
+        """ Available properties:
+        r, g, b, a or red, green, blue, alpha
+        c, m, y, k or cyan, magenta, yellow, black,
+        h, s or hue, saturation, brightness
+        
+        """
+        
+        if self.__dict__.has_key(a):
+            return a
+        #elif a == "black":
+            #return self.__dict__["__k"]        
+        elif a == "brightness":
+            return self.__dict__["__brightness"]
+        #CMYK
+        #elif a in ["a", "alpha",
+                   #"r", "g", "b", "red", "green", "blue",
+                   #"h", "s", "hue", "saturation",
+                   #"c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+        #NO-CMYK 
+        elif a in ["a", "alpha",
+                   "r", "g", "b", "red", "green", "blue",
+                   "h", "s", "hue", "saturation"]:
+            return self.__dict__["__"+a[0]]
+        
+        raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
+
+
+
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
-    kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
+    #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, **kwargs):
         self._bot = bot
@@ -524,17 +688,20 @@ class Text(Grob, TransformMixin, ColorMixin):
 
         if self._bot:
             _copy_attrs(self._bot, self, self.stateAttributes)
-
         self.text = unicode(text)
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self._fontfile = kwargs.get('font', "/home/rlafuente/.fonts/notcouriersans.ttf")
+        if kwargs.has_key("font"):
+            self._fontfile = kwargs["font"]
         self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
-        self._fontsize = kwargs.get('fontsize', 24)
-        self._lineheight = max(kwargs.get('lineheight', 1.2), 0.01)
-        self._align = kwargs.get('align', LEFT)
+        if kwargs.has_key("fontsize"):
+            self._fontsize = kwargs["fontsize"] 
+        if kwargs.has_key("lineheight"):
+            self._lineheight = max(kwargs["lineheight"], 0.01)       
+        if kwargs.has_key("align"):
+            self._align= kwargs["align"]
 
     def _get_metrics(self):
         surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0)
@@ -551,6 +718,7 @@ class Text(Grob, TransformMixin, ColorMixin):
     def _get_path(self):
         surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
         ctx = cairo.Context(surface)
+        ctx.move_to(self.x,self.y)
         ctx.set_font_face(self._fontface)
         ctx.set_font_size(self._fontsize)
         ctx.text_path(self.text)
@@ -583,6 +751,95 @@ class Text(Grob, TransformMixin, ColorMixin):
             ('x', 'y', 'width', 'height', '_transform', '_transformmode',
             '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
         return new
+
+class Image(Grob, TransformMixin, ColorMixin):
+    stateAttributes = ('_transform', '_transformmode')
+    kwargs = ()
+
+    def __init__(self, bot, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
+        self._bot = bot
+        #super(Image, self).__init__(self._bot)
+        TransformMixin.__init__(self)
+        ColorMixin.__init__(self, **kwargs)
+
+        if self._bot:
+            _copy_attrs(self._bot, self, self.stateAttributes)
+
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.alpha = alpha
+        self.path = path
+        self.data = data
+
+        import Image       
+        from array import array
+
+        # checks if image data is passed in command call, in this case it wraps
+        # the data in a StringIO oject in order to use it as a file
+        # the data itself must contain an entire image, not just pixel data
+        # it can be useful for example to retrieve images from the web without 
+        # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
+        # if no data is passed the path is used to open a local file
+        if self.data is None:
+            img = Image.open(self.path)
+        elif self.data:
+            from StringIO import StringIO
+            img = Image.open(StringIO(self.data))
+
+        # retrieves original image size
+        Width, Height = img.size
+        # if no width is given, it assumes the original image size, else image is resized
+        if self.width is None:
+            if self.height is None:
+                self.width = Width
+                self.height = Height
+            else:
+                self.width = self.height*Width/Height
+                size = self.width, self.height
+                img = img.resize(size, Image.ANTIALIAS)
+        else:
+            if self.height is None:
+                self.height = self.width*Height/Width
+            size = self.width, self.height
+            img = img.resize(size, Image.ANTIALIAS)
+        # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
+        # and fills a buffer from array module, then passes it to cairo image surface constructor
+        if img.mode == "RGBA":
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
+        elif img.mode == "RGB":
+            img = img.convert('RGBA')
+            img_buffer = array('c')
+            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
+        else:
+            raise NotImplementedError("sorry, this image mode is not implemented yet")
+        #this is the item that will be drawn
+        self.imagesurface = imagesurface
+
+
+    def _get_center(self):
+        '''Returns the center point of the path, disregarding transforms.
+        '''
+        x = (self.x+self.width/2)
+        y = (self.y+self.height/2)
+        return (x,y)
+    center = property(_get_center)
+
+    def copy(self):
+        new = self.__class__(self._bot, self.text)
+        _copy_attrs(self, new, ('x', 'y', 'width', 'height', 'alpha', '_transform', '_transformmode'))
+        return new
+
+
+
+
+
+
+
 
 class Variable(object):
     '''Taken from Nodebox'''
@@ -643,8 +900,7 @@ class Variable(object):
     def __repr__(self):
         return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
 
-TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'cscale', 'crotate',
-              'cskew']
+TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 
 class Transform:
     '''
@@ -670,24 +926,27 @@ class Transform:
     def translate(self, x, y):
         t = ('translate', x, y)
         self.stack.append(t)
+
     def scale(self, x, y):
         t = ('scale', x, y)
         self.stack.append(t)
+
     def rotate(self, a):
         t = ('rotate', a)
         self.stack.append(t)
+
     def skew(self, x, y):
         t = ('skew', x, y)
         self.stack.append(t)
-    def cscale(self, x, y):
-        t = ('cscale', x, y)
+
+    def push(self):
+        t = ('push',)
         self.stack.append(t)
-    def crotate(self, a):
-        t = ('crotate', a)
+
+    def pop(self):
+        t = ('pop',)
         self.stack.append(t)
-    def cskew(self, x, y):
-        t = ('cskew', x, y)
-        self.stack.append(t)
+
 
     def append(self, t):
         if isinstance(t, Transform):
@@ -716,20 +975,16 @@ class Transform:
     def __iter__(self):
         for value in self.stack:
             yield value
-
-    def get_matrix(self):
-        '''Returns this transform's matrix. Its centerpoint is presumed to be
-        (0,0), which is the Cairo default.'''
-        return self.get_matrix_with_center(0,0)
-
-    def get_matrix_with_center(self,x,y):
-        '''Returns this transform's matrix, relative to a centerpoint (x,y).'''
+    ### calculates tranformation matrix
+    def get_matrix_with_center(self,x,y,mode):
+        from math import sin, cos
         m = cairo.Matrix()
-
-        centerx = x
+        rotang = 0
+        centerx =x
         centery = y
+        m_archived = []
 
-        for trans in self.stack:
+        for trans in self.stack: 
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
@@ -738,65 +993,89 @@ class Transform:
                 cmd = trans[0]
                 args = trans[1:]
                 t = cairo.Matrix()
-
-                if cmd == 'translate':
-                    t.translate(args[0],args[1])
+                
+                if cmd == 'translate':                    
+                    xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
+                    yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
+                    t.translate(xt,yt)
                     m *= t
                 elif cmd == 'rotate':
-                    t.rotate(args[0])
-                    m *= t
+                    if mode == 'corner':                        
+                        # apply existing transform to cornerpoint
+                        deltax,deltay = m.transform_point(0,0)
+                        a = args[0]
+                        m1 = cairo.Matrix()
+                        m2 = cairo.Matrix()
+                        m1.translate(-deltax, -deltay)
+                        m2.translate(deltax, deltay)
+                        # transform centerpoint according to current matrix
+                        m *= m1
+                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                        m *= m2
+                        rotang += a
+                    elif mode == 'center':
+                        # apply existing transform to centerpoint
+                        deltax,deltay = m.transform_point(centerx,centery)
+                        a = args[0]
+                        m1 = cairo.Matrix()
+                        m2 = cairo.Matrix()
+                        m1.translate(-deltax, -deltay)
+                        m2.translate(deltax, deltay)
+                        # transform centerpoint according to current matrix
+                        m *= m1
+                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
+                        m *= m2
+                        rotang += a
                 elif cmd == 'scale':
-                    t.scale(args[0], args[1])
-                    m *= t
+                    if mode == 'corner':
+                        t.scale(args[0], args[1])
+                        m *= t
+                    elif mode == 'center':
+                        # apply existing transform to centerpoint
+                        deltax,deltay = m.transform_point(centerx,centery)
+                        x, y = args
+                        m1 = cairo.Matrix()
+                        m2 = cairo.Matrix()
+                        m1.translate(-deltax, -deltay)
+                        m2.translate(deltax, deltay)
+                        m *= m1
+                        m *= cairo.Matrix(x,0,0,y,0,0)
+                        m *= m2
+
                 elif cmd == 'skew':
-                    x, y = args
-                    ## TODO: x and y should be the tangent of an angle
-                    t *= cairo.Matrix(1,0,x,1,0,0)
-                    t *= cairo.Matrix(1,y,0,1,0,0)
-                    m *= t
-                elif cmd == 'cscale':
-                    # apply existing transform to centerpoint
-                    deltax,deltay = m.transform_point(centerx,centery)
-                    x, y = args
+                    if mode == 'corner':
+                        x, y = args
+                        ## TODO: x and y should be the tangent of an angle
+                        t *= cairo.Matrix(1,0,x,1,0,0)
+                        t *= cairo.Matrix(1,y,0,1,0,0)
+                        m *= t
+                    elif mode == 'center':
+                        # apply existing transform to centerpoint
+                        deltax,deltay = m.transform_point(centerx,centery)
+                        x,y = args
+                        m1 = cairo.Matrix()
+                        m2 = cairo.Matrix()
+                        m1.translate(-deltax, -deltay)
+                        m2.translate(deltax, deltay)
+                        t *= m
+                        t *= m1
+                        t *= cairo.Matrix(1,0,x,1,0,0)
+                        t *= cairo.Matrix(1,y,0,1,0,0)
+                        t *= m2
+                        m = t
 
-                    m1 = cairo.Matrix()
-                    m2 = cairo.Matrix()
-                    m1.translate(-deltax, -deltay)
-                    m2.translate(deltax, deltay)
+		elif cmd == 'push':
+                    m_archived.append((m, rotang))
 
-                    m *= m1
-                    m *= cairo.Matrix(x,0,0,y,0,0)
-                    m *= m2
-                elif cmd == 'crotate':
-                    from math import sin, cos
-                    # apply existing transform to centerpoint
-                    deltax,deltay = m.transform_point(centerx,centery)
-                    a = args[0]
-                    m1 = cairo.Matrix()
-                    m2 = cairo.Matrix()
-                    m1.translate(-deltax, -deltay)
-                    m2.translate(deltax, deltay)
-                    # transform centerpoint according to current matrix
-                    m *= m1
-                    m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                    m *= m2
+		elif cmd == 'pop':
+                    m, rotang = m_archived.pop()
 
-                elif cmd == 'cskew':
-                    # apply existing transform to centerpoint
-                    deltax,deltay = m.transform_point(centerx,centery)
-                    x,y = args
+        return m        
 
-                    m1 = cairo.Matrix()
-                    m2 = cairo.Matrix()
-                    m1.translate(-deltax, -deltay)
-                    m2.translate(deltax, deltay)
-                    t *= m
-                    t *= m1
-                    t *= cairo.Matrix(1,0,x,1,0,0)
-                    t *= cairo.Matrix(1,y,0,1,0,0)
-                    t *= m2
-                    m = t
-        return m
+    def get_matrix(self):
+        '''Returns this transform's matrix. Its centerpoint is presumed to be
+        (0,0), which is the Cairo default.'''
+        return self.get_matrix_with_center(0,0)
 
 class Stack(list):
     def __init__(self):

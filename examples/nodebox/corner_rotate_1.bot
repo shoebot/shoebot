@@ -1,0 +1,30 @@
+size(200,200)
+background(.8,.65,.1)
+fill(0,0,0)
+transform(CORNER)
+translate(100,100)
+oval(-5,-5,10,10)
+
+for i in range(8):
+    rotate(45)
+    arrow(30,0,20)
+
+fill(1,1,1)
+for i in range(8):
+    rotate(45)
+    arrow(55,0,20)
+    
+fill(0,0,0,0.75)
+for i in range(16):
+    rotate(22.5)
+    arrow(80,0,20)
+    
+fill(1,1,1,0.4)
+for i in range(16):
+    rotate(22.5)
+    arrow(105,0,20)
+        
+fill(1,1,1,0.2)
+for i in range(16):
+    rotate(22.5)
+    arrow(130,0,20)

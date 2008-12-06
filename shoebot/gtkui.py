@@ -16,18 +16,36 @@ class ShoebotDrawingArea(gtk.DrawingArea):
     def __init__(self, mainwindow, bot = None):
         super(ShoebotDrawingArea, self).__init__()
         self.mainwindow = mainwindow
+        #default dimensions
+        width, height = 200,200
+        is_dynamic = None
         self.connect("expose_event", self.expose)
         # get the bot object to display
         self.bot = bot
+        script_code = self.bot.inputscript
+        lines = script_code.splitlines()
 
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
         self.bot.canvas.setsurface(target=surface)
-        self.bot.run()
 
+
+        # check inputscript for size and wheter is a static script or not 
+        for line in lines:
+            line = line.strip()
+            if line.startswith("size"):
+                line = line[4:].strip().strip('()')
+                width,height = int(line.split(',')[0]),int(line.split(',')[1])
+            elif "def setup" in line:
+                is_dynamic = True
+
+        if is_dynamic:
+            self.bot.run()
+                 
         # set the window size to the one specified in the script
-        self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
+        #self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
+        self.set_size_request(width, height)
 
         # RIGHT CLICK HANDLING
         self.menu = gtk.Menu()

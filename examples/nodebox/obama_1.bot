@@ -1,0 +1,13 @@
+background(.8,.65,.1)
+fill(0,0,0)
+obama(75,75,1.5)
+translate(60,0)
+fill(1,1,1)
+obama(75,75)
+fill(1,0,0)
+rect(20,20,20,20)
+fill(0,1,0)
+rect(41,20,20,20)
+fill(0,0,1)
+rect(62,20,20,20)
+

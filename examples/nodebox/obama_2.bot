@@ -1,0 +1,10 @@
+size(600,600)
+colormode(HSB)
+background("#FFFFFF")
+for x in range(15):
+        for y in range(15):
+                push()
+                rotate(random(360))                
+                fill(0,random(),random())
+                obama(x*40,y*40,0.75)
+                reset()

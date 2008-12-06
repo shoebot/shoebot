@@ -1,0 +1,53 @@
+size(400,400)
+background(1,1,1)
+fill(0,0,0)
+transform(CORNER)
+r0 = rect(10,10,10,10)
+#1
+translate(30,30)
+r = rect(10,10,10,10)
+r1 = rect(21,10,10,10)
+#2
+translate(0,20)
+r2 = rect(10,0,10,10)
+#3
+push()
+rotate(25)
+translate(0,10)
+r3 = rect(10,0,10,10)
+push()
+rotate(30)
+translate(-20,-20)
+fill(0,0,0,.25)
+push()
+translate(25,120)
+r9 = rect(0,0,35,35)
+pop()
+fill(1,0,0)
+r4 = rect(0,0,10,10)
+push()
+rotate(45)
+for i in range (400):
+        fill(1,0,0,.25)
+        r5 = rect(random(WIDTH/1.2),random(HEIGHT/1.2),10,10)
+pop()
+pop()
+pop()
+#6  
+push()      
+transform(CENTER)
+rotate(45)
+fill(0,1,0,0.4)
+#scale(1.5)
+r6 = rect(0,0,10,10)
+#8
+translate(50,0)
+fill(0,0,1)
+r7 = rect(0,0,10,10)
+#9
+pop()
+
+fill(1,.6,0)
+#10
+translate(20,0)
+r8 = rect(0,0,10,10)

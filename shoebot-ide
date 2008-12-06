@@ -10,7 +10,7 @@ import pango
 import gtksourceview
 
 # only necessary for ShoebotError
-import shoebot
+from shoebot import ShoebotError
 
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
@@ -794,7 +794,7 @@ class View(gtk.Window):
         codestring = buffer.get_text(start, end)
         try:
             sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
-        except shoebot.ShoebotError, NameError:
+        except ShoebotError, NameError:
             import traceback
             import sys
 
