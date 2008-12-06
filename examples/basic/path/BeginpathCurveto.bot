@@ -1,0 +1,7 @@
+size(300,300);colorrange(255)
+background(49,125,123)
+fill(40,80,120)
+beginpath(10,20)
+curveto(20,0,170,10,110,50)
+curveto(80,30,40,20,50,80)
+endpath()

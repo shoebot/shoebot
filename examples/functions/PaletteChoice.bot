@@ -1,0 +1,13 @@
+xed=512;yed=256;stp=16
+size(xed,yed);colorrange(255)
+def backgroundhex(t):
+  background(t/0x10000&0xff,t/0x100&0xff,t&0xff)
+def fillhex(t):
+  fill(t/0x10000&0xff,t/0x100&0xff,t&0xff)
+arrcl=[0x7878A8,0xD8C060,0x3D3D3D,0x906048,0x904830]
+#arrcl=[0x007038,0x2A9C63,0x657055,0xC4C178,0x276156]
+backgroundhex(choice(arrcl))
+for y in range (0,yed/(stp*2),1):
+  for x in range (0,xed/(stp*2),1):
+    fillhex(choice(arrcl))
+    rect((stp*2)*x,(stp*2)*y,stp,stp)

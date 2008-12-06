@@ -1,0 +1,7 @@
+var("tx",TEXT,"test")
+var("sz",NUMBER,100.,10.,200.)
+size(400,300);colorrange(255)
+def draw():
+  background(80,80,80)
+  fontsize(sz)
+  text(tx,10,HEIGHT-30)

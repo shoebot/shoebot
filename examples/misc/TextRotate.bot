@@ -1,0 +1,13 @@
+xed=512;yed=256;stpx=80;stpy=32
+size(xed,yed);colorrange(255);colormode(RGB)
+var('noise',NUMBER, 0.,0.,90.)
+wrds_st=["sleep","dream","wake","rest"]
+def draw():
+  background(random(255),random(255),random(255))
+  for y in range(0,(yed/stpy)+1,1):
+    for x in range(0,(xed/stpx)+1,1):
+      rotate(random(-noise,noise))
+      fill((random(255),random(255),random(255)))
+      translate(x*stpx,y*stpy)
+      text(choice(wrds_st),random(4,12),0)
+      reset()

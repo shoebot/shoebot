@@ -1,0 +1,6 @@
+size(300,300);colorrange(255)
+background(50,100,150)
+nostroke();nofill();rect(30,70,100,80) #bug: this should draw nothing...
+nostroke();fill(200,150,110);rect(150,70,100,80)
+stroke(10,20,30);nofill();rect(30,170,100,80)
+stroke(10,20,30);fill(200,150,110);rect(150,170,100,80)

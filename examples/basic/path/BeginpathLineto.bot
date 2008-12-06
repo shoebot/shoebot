@@ -1,0 +1,7 @@
+size(300,300);colorrange(255)
+background(49,125,123)
+fill(40,80,120)
+beginpath(10,20)
+lineto(110,50)
+lineto(50,80)
+endpath()

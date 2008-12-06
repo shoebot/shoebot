@@ -3,6 +3,9 @@ syntax: glob
 # ignore apps for now
 apps/*
 
+# ignore .orig files (leftovers from merges)
+*.orig
+
 # ignore build and dist output
 build/*
 dist/*

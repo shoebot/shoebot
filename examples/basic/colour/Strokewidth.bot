@@ -1,0 +1,5 @@
+size(300,300);colorrange(255)
+background(50,100,150);stroke(10,20,30)
+strokewidth(5);line(30,20,150,20)
+strokewidth(10);line(30,70,150,70)
+strokewidth(20);line(30,120,150,120)

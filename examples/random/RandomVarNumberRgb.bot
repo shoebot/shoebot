@@ -1,0 +1,13 @@
+xed=512;yed=256;stp=16
+size(xed,yed);colorrange(255);colormode(RGB)
+var('red1',NUMBER, 85.,0.,255.)
+var('red2',NUMBER,170.,0.,255.)
+var('gre1',NUMBER, 85.,0.,255.)
+var('gre2',NUMBER,170.,0.,255.)
+var('blu1',NUMBER, 85.,0.,255.)
+var('blu2',NUMBER,170.,0.,255.)
+def draw():
+  for y in range(0,yed/stp,1):
+    for x in range(0,xed/stp,1):
+      fill(random(red1,red2),random(gre1,gre2),random(blu1,blu2)) 
+      rect(x*stp,y*stp,stp,stp)

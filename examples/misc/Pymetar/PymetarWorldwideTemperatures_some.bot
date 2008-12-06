@@ -1,0 +1,61 @@
+import pymetar,sys
+xed=1280;size(xed,xed/2);colorrange(255);colormode(HSB);background(0,0,128)
+temamp=60
+stt_stl=["CYUL","CYVR","CYAZ",               #- canada ::::::::: north america
+         "MUHA",                             #- cuba
+         "MMMX",                             #- mexico
+         "KLGB","PHNL","KNYC","KOPF","PAED", #- united states
+         "SAWH","SAVC",                      #- argentina :::::: south america
+         "NZSP","NZCM",                      #- antartica
+         "SBBH","SBKP","SBRJ","SBMN","SBNT", #- brazil
+         "SCIC",                             #- chile
+         "SPIM",                             #- peru
+         "SVFM",                             #- venezuela
+         "OAKB",                             #- afganistan :::::: asia-oceania
+         "YPAD","YBBN","YPPH","YSSY","YPDN", #- australia
+         "LATI",                             #- albania
+         "VMMC","VHHH","ZSSS","ZBAA",        #- china
+         "VIDP","VECC",                      #- india
+         "OIII",                             #- iran
+         "RJTI","RJCO","RJFK",               #- japan
+         "AYPY",                             #- papua new guinea
+         "ULLI","UUDD","UHMM",               #- russia
+         "UTNN",                             #- uzbekistan
+         "LIBD","LIPE","LIMC","LIRA","LIPZ", #- italia :::::::::::::::: europe
+         "ENEK",                             #- norway
+         "LEBB","LECO","LEGT","LEBL","LEMG", #- spain
+         "LPMA","LPPT","LPPD","LPFR","LPPR", #- portugal
+         "UKKK",                             #- ukraine
+         "EGLL","EGGD","EGPF",               #- united kingdom
+         "TQPF",                             #- anguilla ::::::::::::: unknown
+         "TKPN",                             #- antigua and barbuda
+         "DABB",                             #- algeria ::::::::::::::: africa
+         "FNLU",                             #- angola
+         "FZAA",                             #- congo
+         "FMMI",                             #- madagascar
+         "GQNN",                             #- mauritania 
+         "FQMA",                             #- mozambique
+         "FACT",                             #- south africa
+         "FLCP",                             #- zambia
+         "FVHA"]                             #- zimbabwe
+scr=0
+print;print"starting weather.noaa.gov stations loading"
+for station in stt_stl:
+  print str(scr)+": loading "+station;scr+=1
+  xsiz=44;ysiz=20;yoff=-2;xoff=-8
+  rf=pymetar.ReportFetcher(station);rep=rf.FetchReport()
+  rp=pymetar.ReportParser();pr=rp.ParseReport(rep)
+  celcius=pr.getTemperatureCelsius()
+  lat=pr.getStationLatitudeFloat()
+  lon=pr.getStationLongitudeFloat()
+  xpos=((180+lon)*WIDTH)/360;ypos=((180-(90+lat))*HEIGHT)/180
+  huev=int(255-((((celcius+(temamp/2))%temamp)*255)/temamp))
+  fill(huev,255,128);rect(xpos-xsiz,ypos,xsiz,ysiz)
+  fill(0,0,128);translate(xpos+xoff-xsiz,ypos+ysiz+yoff);text(int(celcius),8,0);reset()
+print;print "done"
+#- station index names added from http://www.nws.noaa.gov/tg/siteloc.shtml
+#- reading stations info is a bit slow - around 3 per second...
+#- i don't know how exceptions works - some non-working stations hangs shoebot
+#- maybe this .bot file needed to be opened by terminal, for opening verbose feedback
+#- important: needs 'sudo apt-get install python-pymetar'
+#- from all almost 6000 stations, only few ones were used

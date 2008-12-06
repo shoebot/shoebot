@@ -1,0 +1,13 @@
+xed=512;yed=256;stp=16
+size(xed,yed);colorrange(255);colormode(RGB)
+var('noise',NUMBER,8.,0.,16.)
+def draw():
+  background(128,128,128)
+  for y in range(0,yed/(stp*2),1):
+    for x in range(0,xed/(stp*2),1):
+      fill(255,255,255)
+      beginpath(x*stp*2+random(0,noise),y*stp*2+random(0,noise))
+      lineto(stp+x*stp*2+random(0,noise),y*stp*2+random(0,noise))
+      lineto(stp+x*stp*2+random(0,noise),stp+y*stp*2+random(0,noise))
+      lineto(x*stp*2+random(0,noise),stp+y*stp*2+random(0,noise))
+      endpath()

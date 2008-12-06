@@ -1,0 +1,12 @@
+xed=512;yed=256;stp=16
+size(xed,yed);colorrange(255);colormode(RGB)
+var('noise',NUMBER, 0.,0.,90.)
+def draw():
+  background(128,128,128)
+  for y in range(0,yed/(stp*2),1):
+    for x in range(0,xed/(stp*2),1):
+      rotate(random(-noise,noise))
+      fill(255,255,255);nostroke();rect(x*stp*2,y*stp*2,stp*1.5,stp*.5)
+      reset()
+      rotate(random(-noise,noise))
+      stroke(0,0,0);nofill();rect(x*stp*2,y*stp*2,stp*1.5,stp*.5)

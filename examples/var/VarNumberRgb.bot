@@ -1,0 +1,6 @@
+size(300,300);colorrange(255);colormode(RGB)
+var('red'  ,NUMBER,192.,0.,255.)
+var('green',NUMBER,128.,0.,255.)
+var('blue', NUMBER, 64.,0.,255.)
+def draw():
+  background(red,green,blue)

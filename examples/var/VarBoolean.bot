@@ -1,0 +1,6 @@
+size(300,300);colorrange(255);colormode(RGB)
+var('qz',BOOLEAN,0)
+def draw():
+  background(255,0,0)
+  if qz==0:
+    background(0,255,255)

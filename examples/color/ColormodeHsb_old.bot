@@ -1,0 +1,4 @@
+size(192,192);colorrange(255);colormode(HSB)
+background(0,0,128)
+for x in range(0,6,1):
+  fill(x*42.66,128,128);rect(0,x*32,160,25)

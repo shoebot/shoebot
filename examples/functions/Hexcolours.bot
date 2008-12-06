@@ -1,0 +1,10 @@
+size(320,240)
+colorrange(255)
+def backgroundhex(t):
+  background(t/0x10000&0xff,t/0x100&0xff,t&0xff)
+def fillhex(t):
+  fill(t/0x10000&0xff,t/0x100&0xff,t&0xff)
+#----------------------------------------------
+backgroundhex(0x883742)
+fillhex(0xAD967B)
+rect(10,30,120,50)

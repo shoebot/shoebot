@@ -1,0 +1,6 @@
+size(300,300);colorrange(255);colormode(HSB)
+var('hue',       NUMBER,  0.,0.,255.)
+var('saturation',NUMBER,128.,0.,255.)
+var('bright',    NUMBER, 96.,0.,255.)
+def draw():
+  background(hue,saturation,bright)

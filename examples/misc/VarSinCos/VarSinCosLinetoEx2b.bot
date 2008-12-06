@@ -1,0 +1,19 @@
+size(512,512);colorrange(255)
+from math import sin,cos
+var("stp",NUMBER,32,3,64)
+var("r1",NUMBER,80,16,256)
+var("r2",NUMBER,200,16,256)
+var("nz",NUMBER,20,0,45)
+def singr(a):
+  return sin(a*.017453289)
+def cosgr(a):
+  return cos(a*.017453289)
+def draw():
+  background(224,224,224);stroke(0,0,0);nofill();strokewidth(2)
+  rv=random(r1,r2)
+  beginpath((WIDTH/2)+rv*singr(0),(HEIGHT/2)+rv*cosgr(0))
+  for i in range (360/stp,360,360/stp):
+    #i2=i*(360/stp)*.017453289
+    rv=random(r1,r2)
+    lineto((WIDTH/2)+rv*singr(i+random(-nz,nz)),(HEIGHT/2)+rv*cosgr(i+random(-nz,nz)))
+  endpath()

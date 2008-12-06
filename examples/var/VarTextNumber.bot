@@ -1,0 +1,8 @@
+size(800,200);colorrange(255);colormode(HSB)
+var("size", NUMBER, 80, 10, 200)
+var("tex1t", TEXT, "test")
+background(80,120,120)
+def draw():
+  fontsize(size)
+  fill(40,80,120)
+  text(tex1t,10,HEIGHT-18)

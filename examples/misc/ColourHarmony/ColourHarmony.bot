@@ -1,0 +1,35 @@
+size(512,128);colorrange(255);colormode(HSB)
+var("hue",NUMBER,0,0,360)
+var("wdth",NUMBER,32,0,128)
+var("kind",NUMBER,0,0,16)
+var("satur1",NUMBER,85,0,256)
+var("satur2",NUMBER,170,0,256)
+var("bright1",NUMBER,85,0,256)
+var("bright2",NUMBER,170,0,256)
+def draw():
+  hrf=(0,60);tx_st="simple adjacent 1"
+  kndi=int(kind)
+  if kndi==1:hrf=(0,30);tx_st="simple adjacent 2"
+  if kndi==2:hrf=(0,180);tx_st="simple complementary"
+  if kndi==3:hrf=(0,120,240);tx_st="equilateral"
+  if kndi==4:hrf=(0,150,210);tx_st="isoceles"
+  if kndi==5:hrf=(0,30,60);tx_st="complex consecutive adjacent"
+  if kndi==6:hrf=(0,60,120);tx_st="complex separated"
+  if kndi==7:hrf=(0,60,180);tx_st="primary secondary 1a"
+  if kndi==8:hrf=(0,120,180);tx_st="primary secondary 1b"
+  if kndi==9:hrf=(0,30,180);tx_st="primary secondary 2a"
+  if kndi==10:hrf=(0,150,180);tx_st="primary secondary 2b"
+  if kndi==11:hrf=(0,90,180,270);tx_st="square"
+  if kndi==12:hrf=(0,60,180,240);tx_st="rectangular"
+  if kndi==13:hrf=(0,150,180,210);tx_st="1 complex 3 adjacent"
+  if kndi==14:hrf=(0,30,150,180,210,330);tx_st="complex opposite 1"
+  if kndi==15:hrf=(0,30,120,150,240,270);tx_st="complex opposite 2"
+  xpos=0
+  while xpos<WIDTH:
+    xpos2=xpos+random(1,wdth)
+    fill(((hue+choice(hrf))%360)*.711,random(satur1,satur2),random(bright1,bright2))
+    rect(xpos,0,xpos2,HEIGHT)
+    xpos=xpos2
+  fill(255,255,255)
+  if (bright1+bright2)>255:fill(0,0,0)
+  translate(20,HEIGHT-20);text(tx_st,8,0)

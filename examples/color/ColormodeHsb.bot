@@ -1,0 +1,7 @@
+size(36*16,96);colorrange(255);colormode(HSB)
+background(0,0,128)
+for hue in range(0,6,1):
+  for sat in range(0,6,1):
+    for bri in range(0,6,1):
+      fill(hue*42.6,42.6+sat*42.6,36.42+bri*36.42) 
+      rect(bri*16+hue*96,sat*16,14,14)

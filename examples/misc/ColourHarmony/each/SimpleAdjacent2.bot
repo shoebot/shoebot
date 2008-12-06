@@ -1,0 +1,15 @@
+size(512,128);colorrange(255);colormode(HSB)
+var("hue",NUMBER,0,0,360)
+var("w",NUMBER,32,0,128)
+var("satur1",NUMBER,85,0,256)
+var("satur2",NUMBER,170,0,256)
+var("bright1",NUMBER,85,0,256)
+var("bright2",NUMBER,170,0,256)
+hrf=(0,30)
+def draw():
+  xpos=0
+  while xpos<WIDTH:
+    xpos2=xpos+random(1,w)
+    fill( ((hue+choice(hrf))%360)*.711  ,random(satur1,satur2),random(bright1,bright2))
+    rect(xpos,0,xpos2,HEIGHT)
+    xpos=xpos2

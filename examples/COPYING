@@ -1,3 +1,19 @@
+The examples in the following directories
+  basic/
+  color/
+  functions/
+  misc/
+  random/
+  systemvariables/
+  var/
+
+are Copyright 2008 Paulo Silva - oct '08 - licensed under the GPL
+http://nitrofurano.linuxkafe.com
+
+The idea of these examples is for providing an easy, fast, and encouraging learning of Shoebot.
+
+The examples from me doesn't follow PEP8 rules (at least for now). It's because i grown since childhood as one-line coder (bad habits from 8bit ansi-basic coding), but with concern on having them as simple as not needing remarks for explaining, and having them fitted into few hundred bytes, or not much more than it.
+
 
 Some of the example files in this folder are taken from other projects.
 

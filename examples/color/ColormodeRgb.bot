@@ -1,0 +1,7 @@
+size(36*16,96);colorrange(255);colormode(RGB)
+background(128,128,128)
+for red in range(0,6,1):
+  for green in range(0,6,1):
+    for blue in range(0,6,1):
+      fill(red*51,green*51,blue*51) 
+      rect(red*16+blue*96,green*16,14,14)

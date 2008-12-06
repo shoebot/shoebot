@@ -1,0 +1,3 @@
+size(300,300);colorrange(255)
+background(49,125,123)
+stroke(40,80,120);line(10,20,120,80)

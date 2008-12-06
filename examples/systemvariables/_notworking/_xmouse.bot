@@ -1,0 +1,3 @@
+size(255,255);colorrange(255);colormode(RGB)
+def draw():
+  background(MOUSEX,green,blue)
