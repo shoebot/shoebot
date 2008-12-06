@@ -10,7 +10,12 @@ import shoebot
 from data import Transform
 import cairo
 import gobject, socket
-from pprint import pprint
+
+if sys.platform != 'win32':
+    ICON_FILE = '/usr/share/shoebot/icon.png'
+else:
+    import os.path
+    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class ShoebotDrawingArea(gtk.DrawingArea):
     def __init__(self, mainwindow, bot = None):
@@ -31,7 +36,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot.canvas.setsurface(target=surface)
 
 
-        # check inputscript for size and wheter is a static script or not 
+        # check inputscript for size and wheter is a static script or not
         for line in lines:
             line = line.strip()
             if line.startswith("size"):
@@ -42,7 +47,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         if is_dynamic:
             self.bot.run()
-                 
+
         # set the window size to the one specified in the script
         #self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
         self.set_size_request(width, height)
@@ -246,7 +251,7 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
-        self.window.set_icon_from_file('/usr/share/shoebot/icon.png')
+        self.window.set_icon_from_file(ICON_FILE)
         self.window.add(self.canvas)
 
         self.uimanager = gtk.UIManager()

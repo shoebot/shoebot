@@ -7,15 +7,48 @@ import sys, os, errno
 import gobject
 import gtk
 import pango
-import gtksourceview
 
-# only necessary for ShoebotError
+# for gtksourceview/gtksourceview2 compatibility
+try:
+    import gtksourceview
+
+except ImportError:
+    import gtksourceview2
+
+    class gtksourceview_SourceBuffer(gtksourceview2.Buffer):
+        def set_highlight(self, bool):
+            return self.set_highlight_syntax(bool)
+
+    class gtksourceview_SourceLanguagesManager(gtksourceview2.LanguageManager):
+        def get_language_from_mime_type(self, mime_types):
+            lang_manager = gtksourceview2.language_manager_get_default()
+            lang_result = None
+            for lang_id in lang_manager.get_language_ids():
+                 lang = lang_manager.get_language(lang_id)
+                 if mime_types in lang.get_mime_types():
+                      lang_result = lang
+                      break
+
+            return lang_result
+
+    gtksourceview = gtksourceview2
+    gtksourceview.SourceBuffer = gtksourceview_SourceBuffer
+    gtksourceview.SourceView = gtksourceview2.View
+    gtksourceview.SourceLanguagesManager = gtksourceview_SourceLanguagesManager
+    del gtksourceview_SourceBuffer
+    del gtksourceview_SourceLanguagesManager
+
+
 from shoebot import ShoebotError
 
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
-ICON_FILE = '/usr/share/pixmaps/shoebot-ide.png'
+if sys.platform != 'win32':
+    ICON_FILE = '/usr/share/shoebot/icon.png'
+else:
+    import os.path
+    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
