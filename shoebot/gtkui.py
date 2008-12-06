@@ -36,7 +36,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot.canvas.setsurface(target=surface)
 
 
-        # check inputscript for size and wheter is a static script or not
+         # check inputscript for size and whether is a static script or not 
         for line in lines:
             line = line.strip()
             if line.startswith("size"):
@@ -78,7 +78,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.context.rectangle(event.area.x, event.area.y,
                             event.area.width, event.area.height)
         self.context.clip()
-
         # clear canvas contents
         self.bot.canvas.clear()
         # reset transforms

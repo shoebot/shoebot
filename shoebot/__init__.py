@@ -832,7 +832,7 @@ class NodeBot(Bot):
         '''
         Draws a string of text according to current font settings.
         '''
-        txt = self.Text(txt, x, y, width, height, **kwargs)
+        txt = self.Text(txt, x, y, width, height, ctx=self.canvas._context, **kwargs)
         if outline:
           path = txt.path
           if draw:
@@ -1012,11 +1012,6 @@ class CairoCanvas(Canvas):
     def drawtext(self,txt,ctx=None):
         if not ctx:
             ctx = self._context
-
-        ctx.set_font_face(txt._fontface)
-        ctx.set_font_size(txt._fontsize)
-        ctx.text_path(txt.text)
-
         if txt._fillcolor:
             self._context.set_source_rgba(*txt._fillcolor)
             if txt._strokecolor:
@@ -1036,6 +1031,11 @@ class CairoCanvas(Canvas):
             self._context.stroke()
         else:
             print "Warning: Canvas object had no fill or stroke values"
+
+        txt.pang_ctx.update_layout(txt.layout)
+        txt.pang_ctx.show_layout(txt.layout)
+
+
 
     def drawimage(self,image,ctx=None):
         if not ctx:
@@ -1111,7 +1111,7 @@ class CairoCanvas(Canvas):
             self._surface.write_to_png(self._bot.targetfilename)
 
     def output(self, target):
-        self.draw()
+        #self.draw()
         if isinstance(target, basestring): # filename
             filename = target
             import os
@@ -1126,7 +1126,7 @@ class CairoCanvas(Canvas):
                 else:
                     # otherwise, we clone the contents of current surface onto
                     # a temporary one
-                    temp_surface = util.surfacefromfilename(filename, self.WIDTH, self.HEIGHT)
+                    temp_surface = util.surfacefromfilename(filename, self._bot.WIDTH, self._bot.HEIGHT)
                     ctx = cairo.Context(temp_surface)
                     ctx.set_source_surface(self._surface, 0, 0)
                     ctx.paint()

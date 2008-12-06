@@ -5,7 +5,8 @@ Shoebot data structures for bezier path handling
 from __future__ import division
 import util
 import cairo
-
+import pango
+import pangocairo
 
 
 RGB = "rgb"
@@ -680,12 +681,17 @@ class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
     #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
-    def __init__(self, bot, text, x=0, y=0, width=None, height=None, **kwargs):
+    def __init__(self, bot, text, x=0, y=0, width=None, height=None, ctx=None, **kwargs):
         self._bot = bot
         super(Text, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
-
+        # in case of textpath it creates a temp cairo context for path extraction
+        if ctx is None:
+            surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
+            ctx = cairo.Context(surface)
+        
+        self.ctx = ctx              
         if self._bot:
             _copy_attrs(self._bot, self, self.stateAttributes)
         self.text = unicode(text)
@@ -693,37 +699,49 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.y = y
         self.width = width
         self.height = height
+
         if kwargs.has_key("font"):
             self._fontfile = kwargs["font"]
-        self._fontface = util.create_cairo_font_face_for_file(self._fontfile)
+        # here we start to do the magic with pango, first we set typeface    
+        self._fontface = pango.FontDescription()
+        self._fontface.set_family(self._fontfile)
+        self._fontface.set_weight(pango.WEIGHT_NORMAL)
+        # then we set fontsize (multiplied by pango.SCALE)
         if kwargs.has_key("fontsize"):
             self._fontsize = kwargs["fontsize"] 
+        self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
         if kwargs.has_key("lineheight"):
-            self._lineheight = max(kwargs["lineheight"], 0.01)       
+            self._lineheight = max(kwargs["lineheight"], 0.01)
+        # TODO: use align with pango layout, is going to be easy           
         if kwargs.has_key("align"):
-            self._align= kwargs["align"]
+            self._align= kwargs["align"] 
+        # we build a PangoCairo context linked to cairo context
+        # then we create a pango layout
+        self.pang_ctx = pangocairo.CairoContext(self.ctx)
+        self.layout = self.pang_ctx.create_layout()
+        # we pass pango font description and the text to the pango layout
+        self.layout.set_font_description(self._fontface)
+        self.layout.set_text(self.text)
+        # check if max text width is set and pass it to pango layout
+        # text will warp
+        if self.width:
+            self.layout.set_width(self.width*pango.SCALE)    
 
     def _get_metrics(self):
-        surface = cairo.ImageSurface(cairo.FORMAT_A8, 0,0)
-        ctx = cairo.Context(surface)
-        ctx.set_font_face(self._fontface)
-        ctx.set_font_size(self._fontsize)
-        e = ctx.text_extents(self.text)
-        origin_x, origin_y, w, h, xbearing, ybearing = e
-        x = origin_x + self.x
-        y = origin_y - h + self.y
-        return (x,y,w,h)
+        w,h = self.layout.get_size()
+        x,y = self.x, self.y
+        return (x,y,w/pango.SCALE,h/pango.SCALE)
     metrics = property(_get_metrics)
 
     def _get_path(self):
-        surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
-        ctx = cairo.Context(surface)
-        ctx.move_to(self.x,self.y)
-        ctx.set_font_face(self._fontface)
-        ctx.set_font_size(self._fontsize)
-        ctx.text_path(self.text)
-        pathdata = ctx.copy_path()
+        self.ctx.move_to(self.x,self.y)
+        # add pango layout to current cairo path in temporary context
+        self.pang_ctx.layout_path(self.layout)
+        # retrieve current path from current context
+        pathdata = self.ctx.copy_path()
+        # creates a BezierPath instance for storing new shoebot path
         p = BezierPath(self._bot)
+        # parsing of cairo path to build a shoebot path
         for item in pathdata:
             cmd = item[0]
             args = item[1]
@@ -736,13 +754,19 @@ class Text(Grob, TransformMixin, ColorMixin):
             elif cmd == 3: # close
                 p.closepath()
         return p
+        # cairo function for freeing path memory
+        pathdata.path_destroy()
     path = property(_get_path)
 
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        p = self.path
-        return p.center
+        w,h = self.layout.get_size()
+        w = w/pango.SCALE
+        h = h/pango.SCALE
+        x = (self.x+w/2)
+        y = (self.y+h/2)
+        return (x,y)
     center = property(_get_center)
 
     def copy(self):
