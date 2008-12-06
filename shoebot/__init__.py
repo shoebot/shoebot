@@ -91,10 +91,10 @@ class Bot:
                                       width = self.WIDTH,
                                       height = self.HEIGHT,
                                       gtkmode = self.gtkmode)
-    # from nodebox
-    if ns is None:
-        ns = {}
-        self._ns = ns
+        # from nodebox
+        if ns is None:
+            ns = {}
+            self._ns = ns
 
     #### Object
 
