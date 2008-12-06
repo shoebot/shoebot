@@ -36,13 +36,15 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot.canvas.setsurface(target=surface)
 
 
-         # check inputscript for size and whether is a static script or not 
+        # check inputscript for size and whether is a static script or not
+        # it is a real weak workaround anyway, it forces size() statement
+        # to be placed alone on its own line, we need some more sophisticated solution 
         for line in lines:
             line = line.strip()
             if line.startswith("size"):
                 line = line[4:].strip().strip('()')
                 width,height = int(line.split(',')[0]),int(line.split(',')[1])
-            elif "def setup" in line:
+            elif ("def setup" in line) or ("def draw" in line):
                 is_dynamic = True
 
         if is_dynamic:
