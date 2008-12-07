@@ -27,8 +27,14 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.connect("expose_event", self.expose)
         # get the bot object to display
         self.bot = bot
-        script_file = self.bot.inputscript
-        lines = open(script_file, 'r').readlines()
+
+        script = self.bot.inputscript
+        # check if the script is a file or a string
+        import os.path
+        if os.path.exists(script):
+            lines = open(script, 'r').readlines()
+        else:
+            lines = script.splitlines()
 
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
