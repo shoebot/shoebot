@@ -223,9 +223,15 @@ class VarWindow:
         textcontainer.pack_start(entry, True, True, 0)
         container.pack_start(textcontainer, True, True, 0)
 
-    def add_boolean(self, v):
-        # TODO: Make the boolean interface
-        pass
+    def add_boolean(self, container, v):
+        buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
+        button = gtk.CheckButton(label=v.name)
+        # we send the state of the button to the callback method
+        button.connect("toggled", self.cb_set_var, v)
+
+        buttoncontainer.pack_start(button, True, True, 0)
+        container.pack_start(buttoncontainer, True, True, 0)
+
 
     def add_button(self, container, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
@@ -242,8 +248,10 @@ class VarWindow:
     def cb_set_var(self, widget, v):
         ''' Called when a slider is adjusted. '''
         # set the appropriate canvas var
-        if v.type in (NUMBER, BOOLEAN):
+        if v.type is NUMBER:
             self.parent.canvas.bot.namespace[v.name] = widget.value
+        elif v.type is BOOLEAN:
+            self.parent.canvas.bot.namespace[v.name] = widget.get_active()
         elif v.type is TEXT:
             self.parent.canvas.bot.namespace[v.name] = widget.get_text()
         # and redraw the canvas

@@ -122,7 +122,7 @@ class Bot:
 
     #### Variables
 
-    def var(self, name, type, default=None, min=0, max=100, value=None):
+    def var(self, name, type, default=None, min=0, max=255, value=None):
         v = Variable(name, type, default, min, max, value)
         v = self.addvar(v)
 
@@ -946,6 +946,8 @@ class CairoCanvas(Canvas):
     def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
         Canvas.__init__(self, bot, target, width, height, gtkmode)
 
+        self.bot = bot
+
         if not gtkmode:
             # image output mode, we need to make a surface
             self.setsurface(target, width, height)
@@ -1137,12 +1139,12 @@ class CairoCanvas(Canvas):
                 # vector snapshots are made with another temporary Bot
 
                 # create a Bot instance using the current running script
-                box = Bot(inputscript=self.inputscript, canvas=self)
+                box = NodeBot(inputscript=self.bot.inputscript, targetfilename=filename)
                 box.run()
 
                 # set its variables to the current ones
-                for v in self.vars:
-                    box.namespace[v.name] = self.namespace[v.name]
+                for v in self.bot.vars:
+                    box.namespace[v.name] = self.bot.namespace[v.name]
                 if 'setup' in box.namespace:
                     box.namespace['setup']()
                 if 'draw' in box.namespace:

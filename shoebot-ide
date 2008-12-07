@@ -344,15 +344,15 @@ class Buffer(gtksourceview.SourceBuffer):
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
 
-	if chooser.run() == gtk.RESPONSE_ACCEPT:
-            old_filename = self.filename
-            self.filename = chooser.get_filename()
-            if self.save_buffer():
+        if chooser.run() == gtk.RESPONSE_ACCEPT:
+                old_filename = self.filename
                 self.filename = chooser.get_filename()
-                self.filename_set()
-            else:
-		self.filename = old_filename
-        chooser.destroy()
+                if self.save_buffer():
+                    self.filename = chooser.get_filename()
+                    self.filename_set()
+                else:
+                    self.filename = old_filename
+                    chooser.destroy()
 
     def check_buffer_saved(self):
         if self.get_modified():
@@ -496,6 +496,7 @@ class View(gtk.Window):
         buffer.set_language(language)
         buffer.set_highlight(True)
 
+        self.shoebot_window = None
 
         try:
             self.set_icon_from_file(ICON_FILE)
@@ -826,7 +827,7 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
         try:
-            sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
+            self.sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
         except ShoebotError, NameError:
             import traceback
             import sys

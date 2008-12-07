@@ -1,5 +1,4 @@
 '''
-
 socketcontrol.py
 =-=-=-=-=-=-=-=-
 
@@ -9,13 +8,9 @@ copyleft 2008 ricardo lafuente
 licensed under the GPLv3
 
 this file is part of Shoebot
-
-
-
 '''
 
 size(200,200)
-
 colormode(HSB)
 
 # create the variables we want to use in the script
