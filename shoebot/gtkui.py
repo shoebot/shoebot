@@ -37,13 +37,16 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
 
         # check inputscript for size and whether is a static script or not
-        # it is a real weak workaround anyway, it forces size() statement
-        # to be placed alone on its own line, we need some more sophisticated solution 
+        # it is not perfect, but should do for the moment
         for line in lines:
             line = line.strip()
-            if line.startswith("size"):
-                line = line[4:].strip().strip('()')
-                width,height = int(line.split(',')[0]),int(line.split(',')[1])
+            if "size" in line:
+                size_line = line.split(";")
+                for l in size_line:
+                    if "size" in l:
+                        l = l.strip()
+                        l = l[4:].strip().strip('()')
+                        width,height = int(l.split(',')[0]),int(l.split(',')[1])
             elif ("def setup" in line) or ("def draw" in line):
                 is_dynamic = True
 
