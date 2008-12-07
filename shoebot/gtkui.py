@@ -27,14 +27,13 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.connect("expose_event", self.expose)
         # get the bot object to display
         self.bot = bot
-        script_code = self.bot.inputscript
-        lines = script_code.splitlines()
+        script_file = self.bot.inputscript
+        lines = open(script_file, 'r').readlines()
 
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
         self.bot.canvas.setsurface(target=surface)
-
 
         # check inputscript for size and whether is a static script or not
         # it is not perfect, but should do for the moment
