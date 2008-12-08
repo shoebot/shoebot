@@ -35,6 +35,7 @@ CORNERS = 'corners'
 
 LEFT = 'left'
 RIGHT = 'right'
+JUSTIFY = 'justify'
 
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
@@ -711,26 +712,38 @@ class Text(Grob, TransformMixin, ColorMixin):
             self._fontsize = kwargs["fontsize"] 
         self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
         if kwargs.has_key("lineheight"):
-            self._lineheight = max(kwargs["lineheight"], 0.01)
-        # TODO: use align with pango layout, is going to be easy           
+            self._lineheight = kwargs["lineheight"]           
         if kwargs.has_key("align"):
             self._align= kwargs["align"] 
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
         self.pang_ctx = pangocairo.CairoContext(self.ctx)
         self.layout = self.pang_ctx.create_layout()
+        # layout line spacing
+        # TODO: the behaviour is not the same as nodebox yet
+        self.layout.set_spacing(self._lineheight*pango.SCALE)
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text)
         # check if max text width is set and pass it to pango layout
         # text will warp
         if self.width:
-            self.layout.set_width(self.width*pango.SCALE)    
+            self.layout.set_width(self.width*pango.SCALE)
+        # set text alignment    
+        if self._align == "right":
+            self.layout.set_alignment(pango.ALIGN_RIGHT)
+        elif self._align == "center":
+            self.layout.set_alignment(pango.ALIGN_CENTER)
+        elif self._align == "justify":
+            self.layout.set_alignment(pango.ALIGN_LEFT)
+            self.layout.set_justify(True)
+        else:
+            self.layout.set_alignment(pango.ALIGN_LEFT)
 
     def _get_metrics(self):
-        w,h = self.layout.get_size()
+        w,h = self.layout.get_pixel_size()
         x,y = self.x, self.y
-        return (x,y,w/pango.SCALE,h/pango.SCALE)
+        return (x,y,w,h)
     metrics = property(_get_metrics)
 
     def _get_path(self):
@@ -761,9 +774,7 @@ class Text(Grob, TransformMixin, ColorMixin):
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        w,h = self.layout.get_size()
-        w = w/pango.SCALE
-        h = h/pango.SCALE
+        w,h = self.layout.get_pixel_size()
         x = (self.x+w/2)
         y = (self.y+h/2)
         return (x,y)
