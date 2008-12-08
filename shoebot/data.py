@@ -721,7 +721,7 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.layout = self.pang_ctx.create_layout()
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
-        self.layout.set_spacing(self._lineheight*pango.SCALE)
+        self.layout.set_spacing(((self._lineheight-1)*self._fontsize)*pango.SCALE)
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text)
