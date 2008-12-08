@@ -994,6 +994,7 @@ class CairoCanvas(Canvas):
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
                 ctx.translate(item.x,item.y)
+                ctx.translate(0,-item.baseline)
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
                 self.drawtext(item)
