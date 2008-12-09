@@ -993,10 +993,10 @@ class CairoCanvas(Canvas):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
+                m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
+                ctx.transform(m)
                 ctx.translate(item.x,item.y)
                 ctx.translate(0,-item.baseline)
-                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
-                ctx.transform(m)
                 self.drawtext(item)
             elif isinstance(item, Image):
                 ctx.save()
