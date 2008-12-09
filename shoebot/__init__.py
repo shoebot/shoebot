@@ -357,6 +357,10 @@ class NodeBot(Bot):
     CENTER = "center"
     CORNER = "corner"
     CORNERS = "corners"
+    
+    LEFT = 'left'
+    RIGHT = 'right'
+    JUSTIFY = 'justify'
 
     def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
         Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode)
@@ -875,19 +879,11 @@ class NodeBot(Bot):
         return txt.metrics
 
     def lineheight(self, height=None):
-        '''
-        NOT IMPLEMENTED
-        '''
-        # default: 1.2
-        # sets leading
-        raise NotImplementedError("lineheight() isn't implemented yet")
+        if height is not None:
+            self._lineheight = height
 
     def align(self, align="LEFT"):
-        '''
-        NOT IMPLEMENTED
-        '''
-        # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        raise NotImplementedError("align() isn't implemented in Shoebot yet")
+        self._align=align
 
     # TODO: Set the framework to setup font options
 
@@ -997,9 +993,9 @@ class CairoCanvas(Canvas):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
-                ctx.translate(item.x,item.y)
-                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
+                m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
                 ctx.transform(m)
+                ctx.translate(item.x,item.y-item.baseline)
                 self.drawtext(item)
             elif isinstance(item, Image):
                 ctx.save()

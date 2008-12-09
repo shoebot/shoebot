@@ -48,8 +48,9 @@ class ShoebotDrawingArea(gtk.DrawingArea):
             if "size" in line:
                 size_line = line.split(";")
                 for l in size_line:
-                    l = l.strip()
-                    if l.startswith("size"):
+                    import re
+                    l = re.sub("\s", "", l)
+                    if l.startswith("size("):
                         l = l[4:].strip().strip('()')
                         width,height = int(l.split(',')[0]),int(l.split(',')[1])
             elif ("def setup" in line) or ("def draw" in line):
