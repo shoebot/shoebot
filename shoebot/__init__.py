@@ -993,12 +993,13 @@ class CairoCanvas(Canvas):
                 ctx.save()
                 x,y = item.metrics[0:2]
                 deltax, deltay = item.center
-                # the following commented-out lines are a better and more correct solution, but they trigger a segfault in pango
+                # the following commented-out lines are a better and more correct solution,
+                # but on some systems they trigger a segfault in pango
                 #m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
-                m = item._transform.get_matrix_with_center(deltax,deltay-item._fontsize,item._transformmode)
+                m = item._transform.get_matrix_with_center(deltax,deltay-item._fontsize+2,item._transformmode)
                 ctx.transform(m)
                 #ctx.translate(item.x,item.y-item.baseline)
-                ctx.translate(item.x,item.y-item._fontsize)
+                ctx.translate(item.x,item.y-item._fontsize+2)
                 self.drawtext(item)
             elif isinstance(item, Image):
                 ctx.save()
