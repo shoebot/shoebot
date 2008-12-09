@@ -741,8 +741,8 @@ class Text(Grob, TransformMixin, ColorMixin):
             self.layout.set_alignment(pango.ALIGN_LEFT)
 
     def _get_baseline(self):
-        iter = self.layout.get_iter()
-        baseline_y = iter.get_baseline()
+        self.iter = self.layout.get_iter()
+        baseline_y = self.iter.get_baseline()
         baseline_delta = baseline_y/pango.SCALE
         return (baseline_delta)
     baseline = property(_get_baseline)
