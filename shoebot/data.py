@@ -726,9 +726,12 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text)
         # check if max text width is set and pass it to pango layout
-        # text will warp
+        # text will wrap, meanwhile it checks if and indent has to be applied
+        # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
             self.layout.set_width(self.width*pango.SCALE)
+            if kwargs.has_key("indent"):
+                self.layout.set_indent(kwargs["indent"]*pango.SCALE)                
         # set text alignment    
         if self._align == "right":
             self.layout.set_alignment(pango.ALIGN_RIGHT)
@@ -740,6 +743,8 @@ class Text(Grob, TransformMixin, ColorMixin):
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
 
+    # This version is probably more pangoesque, but the layout iterator
+    # caused segfaults on some system
     #def _get_baseline(self):
         #self.iter = self.layout.get_iter()
         #baseline_y = self.iter.get_baseline()
@@ -748,9 +753,13 @@ class Text(Grob, TransformMixin, ColorMixin):
     #baseline = property(_get_baseline)
 
     def _get_baseline(self):
+        # retrieves first line of text block
         first_line = self.layout.get_line(0)
+        # get the logical extents rectangle of first line
         first_line_extent = first_line.get_extents()[1]
+        # get the descent value, in order to calculate baseline position
         first_line_descent = pango.DESCENT(first_line.get_extents()[1])
+        # gets the baseline offset from the top of thext block
         baseline_delta = (first_line_extent[3]-first_line_descent)/pango.SCALE
         return (baseline_delta)
     baseline = property(_get_baseline)
