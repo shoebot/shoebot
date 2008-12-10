@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=shoebot-ide
-Comment=shoebot-ide
+Name=Shoebot
+Comment=GUI Editor for Shoebot
 TryExec=shoebot-ide
 Exec=shoebot-ide
 Icon=shoebot-ide
