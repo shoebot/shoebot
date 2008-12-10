@@ -340,6 +340,7 @@ class Bot:
                 sys.exit()
             else:
                 # if on gtkmode, print the error and don't break
+                import gtkexcepthook
                 raise ShoebotError(errmsg)
 
 
