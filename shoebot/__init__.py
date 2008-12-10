@@ -82,6 +82,9 @@ class Bot:
 
         self.WIDTH = Bot.DEFAULT_WIDTH
         self.HEIGHT = Bot.DEFAULT_HEIGHT
+     
+        if self.gtkmode:
+            import gtkexcepthook
 
         if canvas:
             self.canvas = canvas
@@ -340,7 +343,6 @@ class Bot:
                 sys.exit()
             else:
                 # if on gtkmode, print the error and don't break
-                import gtkexcepthook
                 raise ShoebotError(errmsg)
 
 
