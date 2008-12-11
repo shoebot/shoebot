@@ -75,6 +75,13 @@ parser.add_option("-p",
                 default=DEFAULT_SERVERPORT,
                 help="set socketserver port to listen for connections (default is 7777)")
 
+parser.add_option("-r",
+                "--repeat",
+                type="int",
+                dest="repeat",
+                default=False,
+                help="set number of iterations, multiple images will be produced (only in non-windowed mode)")
+
 def error(message):
     '''Prints an error message, the help message and quits'''
     global parser
@@ -103,20 +110,26 @@ if __name__ == '__main__':
         if not options.outputfile:
             print 'No output file specified, defaulting to output.png...'
             outputfile = DEFAULT_OUTPUTFILE
+            filename, extension = os.path.splitext(outputfile)
         else:
             outputfile = options.outputfile
             # is it a valid extension?
             filename, extension = os.path.splitext(outputfile)
             if not extension in OUTPUT_EXTENSIONS:
                 error("Invalid extension in output filename")
-
-        run_oneshot(inputscript, outputfile)
+        if options.repeat:
+            for r in range(options.repeat):
+                outputfile = filename+"_"+str(r+1)+extension
+                run_oneshot(inputscript, outputfile)                                  
+        else:
+            run_oneshot(inputscript, outputfile)
     else:
         # windowed mode - run on a GTK window
         from shoebot import gtkui
         if options.outputfile:
             error('Windowed mode does not take an output file argument.')
-
+        if options.repeat:
+            print "Sorry, repeat option is not valid in Windowed mode, it will be ignored"
         run_window(inputscript,
                     server=options.socketserver,
                     port=options.serverport,
