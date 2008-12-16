@@ -10,6 +10,7 @@ import shoebot
 from data import Transform
 import cairo
 import gobject, socket
+from __future__ import division
 
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
@@ -23,7 +24,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.mainwindow = mainwindow
         #default dimensions
         width, height = 200,200
-        is_dynamic = None
+        self.is_dynamic = None
         self.connect("expose_event", self.expose)
         # get the bot object to display
         self.bot = bot
@@ -38,6 +39,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         # make a dummy surface and context, otherwise scripts without draw()
         # and/or setup() will bork badly
+        #
+        # the surface will be set in expose()
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
         self.bot.canvas.setsurface(target=surface)
 
@@ -54,13 +57,13 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                         l = l[4:].strip().strip('()')
                         width,height = int(l.split(',')[0]),int(l.split(',')[1])
             elif ("def setup" in line) or ("def draw" in line):
-                is_dynamic = True
+                self.is_dynamic = True
 
-        if is_dynamic:
+        if self.is_dynamic:
             self.bot.run()
 
         # set the window size to the one specified in the script
-        #self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
+        # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
         self.set_size_request(width, height)
 
         # RIGHT CLICK HANDLING
@@ -102,7 +105,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot.canvas.draw()
 
         # no setup() or draw() means we have to run the script on each step
-        # FIXME: This actually makes static scripts run twice, not good.
         if not 'setup' in self.bot.namespace and not 'draw' in self.bot.namespace:
             self.bot.run()
             self.bot.canvas.draw()
@@ -311,7 +313,16 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_varwindow:
             VarWindow(self, self.bot)
 
-        gtk.main()
+        # gtk.main()
+        if canvas.is_dynamic:
+            from time import sleep
+            while 1:
+                self.canvas.redraw()
+                sleep(1 / bot.framerate)
+                gtk.main_iteration()
+        else:
+            gtk.main()
+
 
     def do_quit(self, widget):
         if self.has_server:

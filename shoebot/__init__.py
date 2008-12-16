@@ -79,10 +79,11 @@ class Bot:
         self.vars = []
         self._oldvars = self.vars
         self.namespace = {}
+        self.framerate = 30
 
         self.WIDTH = Bot.DEFAULT_WIDTH
         self.HEIGHT = Bot.DEFAULT_HEIGHT
-     
+
         if self.gtkmode:
             import gtkexcepthook
 
@@ -282,7 +283,10 @@ class Bot:
 
         # return (self.WIDTH, self.HEIGHT)
 
-
+    def speed(self, value):
+        if value:
+            self.framerate = value
+        return self.framerate
 
     def finish(self):
         '''Finishes the surface and writes it to the output file.'''
@@ -360,7 +364,7 @@ class NodeBot(Bot):
     CENTER = "center"
     CORNER = "corner"
     CORNERS = "corners"
-    
+
     LEFT = 'left'
     RIGHT = 'right'
     JUSTIFY = 'justify'
