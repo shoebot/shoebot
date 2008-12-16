@@ -79,7 +79,9 @@ class Bot:
         self.vars = []
         self._oldvars = self.vars
         self.namespace = {}
+
         self.framerate = 30
+        self.FRAME = 0
 
         self.WIDTH = Bot.DEFAULT_WIDTH
         self.HEIGHT = Bot.DEFAULT_HEIGHT

@@ -5,12 +5,12 @@ implements the gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
 
+from __future__ import division
 import sys, gtk, random, StringIO
 import shoebot
 from data import Transform
 import cairo
 import gobject, socket
-from __future__ import division
 
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
@@ -61,6 +61,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         if self.is_dynamic:
             self.bot.run()
+            self.bot.namespace['setup']()
 
         # set the window size to the one specified in the script
         # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
@@ -98,8 +99,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot._transform = Transform()
         # attach bot to context
         self.bot.canvas.setsurface(target=self.context)
-        if 'setup' in self.bot.namespace:
-            self.bot.namespace['setup']()
+##        if 'setup' in self.bot.namespace:
+##            self.bot.namespace['setup']()
         if 'draw' in self.bot.namespace:
             self.draw()
         self.bot.canvas.draw()
@@ -313,13 +314,18 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_varwindow:
             VarWindow(self, self.bot)
 
-        # gtk.main()
-        if canvas.is_dynamic:
+        if self.canvas.is_dynamic:
             from time import sleep
             while 1:
+                # redraw canvas
                 self.canvas.redraw()
-                sleep(1 / bot.framerate)
-                gtk.main_iteration()
+                # increase bot frame count
+                self.bot.FRAME += 1
+                # respect framerate
+                sleep(1 / self.bot.framerate)
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                    # gtk.main_iteration(block=True)
         else:
             gtk.main()
 
@@ -328,7 +334,8 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_server:
             self.sock.close()
         self.window.destroy()
-        gtk.main_quit()
+        if not self.canvas.is_dynamic:
+            gtk.main_quit()
         ## FIXME: This doesn't kill the instance :/
 
 
