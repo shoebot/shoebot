@@ -706,7 +706,44 @@ class Text(Grob, TransformMixin, ColorMixin):
         # here we start to do the magic with pango, first we set typeface    
         self._fontface = pango.FontDescription()
         self._fontface.set_family(self._fontfile)
-        self._fontface.set_weight(pango.WEIGHT_NORMAL)
+        # then the font weight
+        self._weight = pango.WEIGHT_NORMAL
+        if kwargs.has_key("weight"):
+            if kwargs["weight"]=="ultralight":
+                self._weight = pango.WEIGHT_ULTRALIGHT
+            if kwargs["weight"]=="light":
+                self._weight = pango.WEIGHT_LIGHT
+            if kwargs["weight"]=="bold":
+                self._weight = pango.WEIGHT_BOLD
+            if kwargs["weight"]=="ultrabold":
+                self._weight = pango.WEIGHT_ULTRABOLD
+            if kwargs["weight"]=="heavy":
+                self._weight = pango.WEIGHT_HEAVY                                                
+        self._fontface.set_weight(self._weight)
+        # the variant
+        self._variant = pango.VARIANT_NORMAL
+        if kwargs.has_key("variant"):
+            if kwargs["variant"]=="small-caps" or kwargs["variant"]=="smallcaps":
+                self._variant = pango.VARIANT_SMALL_CAPS
+        self._fontface.set_variant(self._variant)
+        # the style        
+        self._style = pango.STYLE_NORMAL
+        if kwargs.has_key("style"):
+            if kwargs["style"]=="italic" or kwargs["style"]=="oblique":
+                self._style = pango.STYLE_ITALIC
+        self._fontface.set_style(self._style)       
+        # the stretch
+        self._stretch = pango.STRETCH_NORMAL
+        if kwargs.has_key("stretch"):
+            if kwargs["stretch"]=="ultracondensed" or kwargs["stretch"]=="ultra-condensed":
+                self._stretch = pango.STRETCH_ULTRA_CONDENSED
+            if kwargs["stretch"]=="condensed":
+                self._stretch = pango.STRETCH_CONDENSED
+            if kwargs["stretch"]=="expanded":
+                self._stretch = pango.STRETCH_EXPANDED            
+            if kwargs["stretch"]=="ultraexpanded" or kwargs["stretch"]=="ultra-expanded":
+                self._stretch = pango.STRETCH_ULTRA_EXPANDED
+        self._fontface.set_stretch(self._stretch)                                              
         # then we set fontsize (multiplied by pango.SCALE)
         if kwargs.has_key("fontsize"):
             self._fontsize = kwargs["fontsize"] 

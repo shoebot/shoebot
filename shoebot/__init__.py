@@ -82,6 +82,9 @@ class Bot:
 
         self.WIDTH = Bot.DEFAULT_WIDTH
         self.HEIGHT = Bot.DEFAULT_HEIGHT
+     
+        if self.gtkmode:
+            import gtkexcepthook
 
         if canvas:
             self.canvas = canvas
