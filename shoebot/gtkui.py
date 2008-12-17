@@ -315,17 +315,23 @@ class ShoebotWindow(SocketServerMixin):
             VarWindow(self, self.bot)
 
         if self.canvas.is_dynamic:
-            from time import sleep
+            import time
             while 1:
-                # redraw canvas
+                # redraw canvas and count the time it took
+                start_time = time.time()
                 self.canvas.redraw()
+                end_time = time.time()
+                render_time = end_time - start_time
+
                 # increase bot frame count
                 self.bot.FRAME += 1
-                # respect framerate
-                sleep(1 / self.bot.framerate)
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                    # gtk.main_iteration(block=True)
+
+                # respect framerate and account for rendering time
+                if render_time > 0:
+                    time.sleep(1 / self.bot.framerate - render_time)
+                #while gtk.events_pending():
+                #    gtk.main_iteration()
+                gtk.main_iteration(block=True)
         else:
             gtk.main()
 
