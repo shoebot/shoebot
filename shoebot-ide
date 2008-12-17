@@ -7,7 +7,7 @@ import sys, os, errno
 import gobject
 import gtk
 import pango
-
+import gtkexcepthook
 # for gtksourceview/gtksourceview2 compatibility
 try:
     import gtksourceview
