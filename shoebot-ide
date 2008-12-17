@@ -7,7 +7,7 @@ import sys, os, errno
 import gobject
 import gtk
 import pango
-import gtkexcepthook
+#import gtkexcepthook
 # for gtksourceview/gtksourceview2 compatibility
 try:
     import gtksourceview
@@ -840,7 +840,8 @@ class View(gtk.Window):
             result = dialog.run()
             dialog.destroy()
             return False
-        # TODO: have a try/except that shows an error window
+
+        # TODO: have a try/except that shows an error window         
 
 class Stack(list):
     def __init__(self):

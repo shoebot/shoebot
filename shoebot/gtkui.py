@@ -261,6 +261,37 @@ class VarWindow:
         # and redraw the canvas
         self.parent.canvas.redraw()
 
+class ConsoleWindow:
+    def __init__(self):
+
+        self.console_buffer = StringIO.StringIO()
+        sys.stderr = self.console_buffer
+        sys.stdout = self.console_buffer                
+        self.window = gtk.Window()
+        self.window.set_title("shoebot - console window")
+        vbox = gtk.VBox(False, 0)
+        self.window.add(vbox)
+        self.window.connect("destroy", self.do_quit)
+        self.text_window=gtk.ScrolledWindow()
+        vbox.pack_start(self.text_window, True, True, 0)
+        self.text_area = gtk.TextView()
+        self.text_buffer = self.text_area.get_buffer()
+        
+        self.text_window.add(self.text_area)
+        self.window.set_size_request(500,300)
+        self.window.show_all()
+        #gtk.main()
+
+
+    def update(self):
+        self.text_buffer.insert_at_cursor(self.console_buffer.getvalue())
+        self.console_buffer.flush()
+
+    def do_quit(self, widget):
+        gtk.main_quit()
+
+
+
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
         self.bot = shoebot.NodeBot(gtkmode=True, inputscript=code)
@@ -268,6 +299,8 @@ class ShoebotWindow(SocketServerMixin):
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow
+
+        self.console_error = ConsoleWindow()
 
         # Setup the main GTK window
         self.window = gtk.Window()
@@ -319,6 +352,7 @@ class ShoebotWindow(SocketServerMixin):
             while 1:
                 # redraw canvas
                 self.canvas.redraw()
+                self.console_error.update()
                 # increase bot frame count
                 self.bot.FRAME += 1
                 # respect framerate
@@ -328,6 +362,9 @@ class ShoebotWindow(SocketServerMixin):
                     # gtk.main_iteration(block=True)
         else:
             gtk.main()
+            self.console_error.update()
+            while gtk.events_pending():
+                gtk.main_iteration()
 
 
     def do_quit(self, widget):
