@@ -263,10 +263,7 @@ class VarWindow:
 
 class ConsoleWindow:
     def __init__(self):
-
-        self.console_buffer = StringIO.StringIO()
-        sys.stderr = self.console_buffer
-        sys.stdout = self.console_buffer                
+             
         self.window = gtk.Window()
         self.window.set_title("shoebot - console window")
         vbox = gtk.VBox(False, 0)
@@ -280,12 +277,13 @@ class ConsoleWindow:
         self.text_window.add(self.text_area)
         self.window.set_size_request(500,300)
         self.window.show_all()
-        #gtk.main()
 
-
-    def update(self):
-        self.text_buffer.insert_at_cursor(self.console_buffer.getvalue())
-        self.console_buffer.flush()
+    def write(self, data):
+        self.message = data
+        self.text_buffer.insert_at_cursor(self.message)
+        self.message = ""
+        while gtk.events_pending():
+            gtk.main_iteration(False)        
 
     def do_quit(self, widget):
         gtk.main_quit()
@@ -301,6 +299,8 @@ class ShoebotWindow(SocketServerMixin):
         self.has_varwindow = varwindow
 
         self.console_error = ConsoleWindow()
+        sys.stderr = self.console_error
+        sys.stdout = self.console_error 
 
         # Setup the main GTK window
         self.window = gtk.Window()
@@ -352,7 +352,7 @@ class ShoebotWindow(SocketServerMixin):
             while 1:
                 # redraw canvas
                 self.canvas.redraw()
-                self.console_error.update()
+                #self.console_error.update()
                 # increase bot frame count
                 self.bot.FRAME += 1
                 # respect framerate
@@ -362,7 +362,7 @@ class ShoebotWindow(SocketServerMixin):
                     # gtk.main_iteration(block=True)
         else:
             gtk.main()
-            self.console_error.update()
+            #self.console_error.update()
             while gtk.events_pending():
                 gtk.main_iteration()
 
