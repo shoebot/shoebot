@@ -61,7 +61,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         if self.is_dynamic:
             self.bot.run()
-            self.bot.namespace['setup']()
+            if 'setup' in self.bot.namespace:
+                self.bot.namespace['setup']()
 
         # set the window size to the one specified in the script
         # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
