@@ -413,6 +413,8 @@ class ConsoleWindow:
         self.text_area.set_wrap_mode(gtk.WRAP_WORD)
         self.text_buffer = self.text_area.get_buffer()        
         self.text_window.add(self.text_area)
+        self.text_area.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("dark grey"))
+        self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("white"))
 
     def write(self, data):
         self.message = data
