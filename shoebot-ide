@@ -406,7 +406,8 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 class ConsoleWindow:
     def __init__(self):
              
-        self.text_window=gtk.ScrolledWindow()
+        self.text_window = gtk.ScrolledWindow()
+        self.text_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.text_area = gtk.TextView()
         self.text_area.set_editable(False)
         self.text_area.set_wrap_mode(gtk.WRAP_WORD)
