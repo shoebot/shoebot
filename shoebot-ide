@@ -409,7 +409,7 @@ class ConsoleWindow:
         self.text_window = gtk.ScrolledWindow()
         self.text_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.text_area = gtk.TextView()
-        self.text_area.set_editable(False)
+        self.text_area.set_editable(True)
         self.text_area.set_wrap_mode(gtk.WRAP_WORD)
         self.text_buffer = self.text_area.get_buffer()        
         self.text_window.add(self.text_area)
