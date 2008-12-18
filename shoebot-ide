@@ -472,9 +472,11 @@ class View(gtk.Window):
         self.item_factory.create_items(menu_items)
 
         self.add_accel_group(self.accel_group)
-
+        
+        vpaned = gtk.VPaned()
         vbox = gtk.VBox(False, 0)
-        self.add(vbox)
+        vpaned.add1(vbox)
+        self.add(vpaned)
 
         vbox.pack_start(self.item_factory.get_widget("<main>"),
                         False, False, 0)
@@ -500,12 +502,13 @@ class View(gtk.Window):
         sw.add(self.text_view)
 
         # this creates a console error and output window under script window and redirects stdout and stderr
-        self.error_separator = gtk.HSeparator()
-        vbox.pack_start(self.error_separator, False, False, 0)
         self.console_error = ConsoleWindow()
         sys.stderr = self.console_error
         sys.stdout = self.console_error 
-        vbox.pack_start(self.console_error.text_window, True, True, 0)
+        vpaned.add2(self.console_error.text_window)
+        vpaned.set_position(500)
+        self.console_error.write("This is a console window, error messages and script output are shown here,\n if you want you can select and delete the content and the window is resizable\n\n")        
+        
 
         self.set_default_size(500, 700)
         self.text_view.grab_focus()
