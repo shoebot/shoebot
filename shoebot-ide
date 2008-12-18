@@ -408,6 +408,8 @@ class ConsoleWindow:
              
         self.text_window=gtk.ScrolledWindow()
         self.text_area = gtk.TextView()
+        self.text_area.set_editable(False)
+        self.text_area.set_wrap_mode(gtk.WRAP_WORD)
         self.text_buffer = self.text_area.get_buffer()        
         self.text_window.add(self.text_area)
 
@@ -504,7 +506,7 @@ class View(gtk.Window):
         sys.stdout = self.console_error 
         vbox.pack_start(self.console_error.text_window, True, True, 0)
 
-        self.set_default_size(500, 500)
+        self.set_default_size(500, 700)
         self.text_view.grab_focus()
 
         self.set_view_title()
