@@ -403,6 +403,22 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 
 
 
+class ConsoleWindow:
+    def __init__(self):
+             
+        self.text_window=gtk.ScrolledWindow()
+        self.text_area = gtk.TextView()
+        self.text_buffer = self.text_area.get_buffer()        
+        self.text_window.add(self.text_area)
+
+    def write(self, data):
+        self.message = data
+        self.text_buffer.insert_at_cursor(self.message)
+        self.message = ""
+        while gtk.events_pending():
+            gtk.main_iteration(False)        
+
+
 
 class View(gtk.Window):
     gobject.type_register (ShoebotFileChooserDialog)
@@ -479,6 +495,14 @@ class View(gtk.Window):
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
+
+        # this creates a console error and output window under script window and redirects stdout and stderr
+        self.error_separator = gtk.HSeparator()
+        vbox.pack_start(self.error_separator, False, False, 0)
+        self.console_error = ConsoleWindow()
+        sys.stderr = self.console_error
+        sys.stdout = self.console_error 
+        vbox.pack_start(self.console_error.text_window, True, True, 0)
 
         self.set_default_size(500, 500)
         self.text_view.grab_focus()

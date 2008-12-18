@@ -261,34 +261,6 @@ class VarWindow:
         # and redraw the canvas
         self.parent.canvas.redraw()
 
-class ConsoleWindow:
-    def __init__(self):
-             
-        self.window = gtk.Window()
-        self.window.set_title("shoebot - console window")
-        vbox = gtk.VBox(False, 0)
-        self.window.add(vbox)
-        self.window.connect("destroy", self.do_quit)
-        self.text_window=gtk.ScrolledWindow()
-        vbox.pack_start(self.text_window, True, True, 0)
-        self.text_area = gtk.TextView()
-        self.text_buffer = self.text_area.get_buffer()
-        
-        self.text_window.add(self.text_area)
-        self.window.set_size_request(500,300)
-        self.window.show_all()
-
-    def write(self, data):
-        self.message = data
-        self.text_buffer.insert_at_cursor(self.message)
-        self.message = ""
-        while gtk.events_pending():
-            gtk.main_iteration(False)        
-
-    def do_quit(self, widget):
-        gtk.main_quit()
-
-
 
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
@@ -297,10 +269,6 @@ class ShoebotWindow(SocketServerMixin):
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow
-
-        self.console_error = ConsoleWindow()
-        sys.stderr = self.console_error
-        sys.stdout = self.console_error 
 
         # Setup the main GTK window
         self.window = gtk.Window()
