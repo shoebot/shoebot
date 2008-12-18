@@ -362,7 +362,6 @@ class ShoebotWindow(SocketServerMixin):
                     # gtk.main_iteration(block=True)
         else:
             gtk.main()
-            #self.console_error.update()
             while gtk.events_pending():
                 gtk.main_iteration()
 
