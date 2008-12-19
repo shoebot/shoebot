@@ -451,7 +451,9 @@ class View(gtk.Window):
             ( "/Run/_Run script", "<control>R", self.run_script, False, None ),
             ( "/Run/sep1", None, None, 0, "<Separator>" ),
             ( "/Run/Run socket server", None, self.do_socketserver_changed, True, "<ToggleItem>"),
-            ( "/Run/Show variables window", None, self.do_varwindow_changed, True, "<ToggleItem>")
+            ( "/Run/Show variables window", None, self.do_varwindow_changed, True, "<ToggleItem>"),
+            ( "/_Help", None, None, 0, "<Branch>" ),
+            ( "/Help/_About", None, self.do_about, 0, None )  
             ]
 
         if not buffer:
@@ -726,6 +728,25 @@ class View(gtk.Window):
         buffer = self.text_view.get_buffer()
         if buffer.can_redo():
             buffer.redo()
+            
+    def do_about(self, callback_action, widget):
+        about = '''Shoebot is a pure Python graphics robot: 
+it takes a Python script as input, which describes a drawing process,
+and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG).\n
+It has a simple text editor GUI, and scripts can describe their own GUIs for
+controlling variables interactively.\n\n
+        Thanks to:\n
+        Ricardo Lafuente <r AT sollec.org>
+        Francesco Fantoni<francesco AT hv-a.com>
+        Dave Crossland <dave AT lab6.com>
+        Stuart Axon <stuaxo AT gmail.com>
+        Paulo Silva <nitrofurano AT gmail.com>
+        Tetsuya Saito <t2psyto AT gmail.com>\n
+        http://tinkerhouse.net/shoebot/\n
+        Version: 0.2-beta                
+        '''
+        self.console_error.write(about)            
+            
 
     def init_menus(self):
         text_view = self.text_view
