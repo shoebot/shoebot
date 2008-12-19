@@ -509,7 +509,7 @@ class View(gtk.Window):
         sys.stdout = self.console_error 
         vpaned.add2(self.console_error.text_window)
         vpaned.set_position(500)
-        self.console_error.write("This is a console window, error messages and script output are shown here,\n if you want you can select and delete the content and the window is resizable\n\n")        
+        self.console_error.write("This is a console window, error messages and script output are shown here,\n if you want you can select and delete the content of the window or resize it\n\n")        
         
 
         self.set_default_size(500, 700)
