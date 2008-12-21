@@ -417,14 +417,14 @@ class ConsoleWindow:
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
         self.text_area.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("dark grey"))
-        self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("white"))
+        self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
         self.stdout_tag = gtk.TextTag("stdout")
-        self.stdout_tag.set_property("foreground", "red")
+        self.stdout_tag.set_property("foreground", "black")
         self.tag_table.add(self.stdout_tag)
         self.system_message_tag = gtk.TextTag("system")
-        self.system_message_tag.set_property("foreground", "black")
+        self.system_message_tag.set_property("foreground", "white")
         self.tag_table.add(self.system_message_tag)
 
     def write(self, data, output=None, system=None):
