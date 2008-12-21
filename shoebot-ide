@@ -422,10 +422,16 @@ class ConsoleWindow:
         self.tag_table = self.text_buffer.get_tag_table()
         self.stdout_tag = gtk.TextTag("stdout")
         self.stdout_tag.set_property("foreground", "black")
+        self.stdout_tag.set_property("style", "normal")
+        #self.stdout_tag.set_property("weight", 600)   
+        #self.stdout_tag.set_property("size-points", 9)     
         self.tag_table.add(self.stdout_tag)
         self.system_message_tag = gtk.TextTag("system")
         self.system_message_tag.set_property("foreground", "white")
+        self.system_message_tag.set_property("style", "normal")
         self.tag_table.add(self.system_message_tag)
+        self.text_area.modify_font(pango.FontDescription("monospace 10 italic"))
+
 
     def write(self, data, output=None, system=None):
         self.message = data
