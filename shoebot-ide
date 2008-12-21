@@ -405,31 +405,46 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 
 class ConsoleWindow:
     def __init__(self):
-             
+        # we define a scrollable window with automatic behavior for scrolling bars             
         self.text_window = gtk.ScrolledWindow()
         self.text_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.text_area = gtk.TextView()
+        # set text area as editable in order to let it be cleaned by selecting and deleting
+        # then we set wrap mode for text
         self.text_area.set_editable(True)
         self.text_area.set_wrap_mode(gtk.WRAP_WORD)
         self.text_buffer = self.text_area.get_buffer()        
         self.text_window.add(self.text_area)
+        # here we set default values for background and text of console window
         self.text_area.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("dark grey"))
         self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("white"))
+        # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
         self.stdout_tag = gtk.TextTag("stdout")
         self.stdout_tag.set_property("foreground", "red")
         self.tag_table.add(self.stdout_tag)
+        self.system_message_tag = gtk.TextTag("system")
+        self.system_message_tag.set_property("foreground", "black")
+        self.tag_table.add(self.system_message_tag)
 
-    def write(self, data, output=None):
+    def write(self, data, output=None, system=None):
         self.message = data
         if not output:
-            
+            # no tags set for stderr messages, color will be the one set for TextView            
             self.text_buffer.insert_at_cursor(self.message)
             self.message = ""
+        elif system:
+            # if output and system values are set, text is treated as a system message
+            # and system tag is used
+            self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
+            self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "system")
+            self.message = ""
         else:
+            # if only output value is set, tag used will be stdout
             self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "stdout")
-            self.message = ""            
+            self.message = ""
+        # this is the trick to make gtk refresh the window                    
         while gtk.events_pending():
             gtk.main_iteration(False)        
 
@@ -523,16 +538,20 @@ class View(gtk.Window):
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
 
-        # this creates a console error and output window under script window and redirects stdout and stderr
+        # this creates a console error and output window besides script window
         self.console_error = ConsoleWindow()
+        # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
+        # we redirect stderr
         sys.stderr = self.console_error
+        # stdout is redirected too, but through the filter in order to get different color for text
         sys.stdout = self.stdout_filter
+        # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
-        self.console_error.write("This is a console window, error messages and script output are shown here,\n if you want you can select and delete the content of the window or resize it\n\n")        
-        
-
+        # message displayed in console-error window at start, the double true values passed makes it render with system message tag
+        self.console_error.write("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n", True, True)        
+                
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
 
@@ -771,13 +790,15 @@ class View(gtk.Window):
         webbrowser.open_new(data)
         
     def do_about(self, callback_action, widget):
+        # about dialog
         dlg = gtk.AboutDialog()
         self.website = "http://tinkerhouse.net/shoebot/"
         self.authors = ["Ricardo Lafuente <r AT sollec.org>", "Francesco Fantoni<francesco AT hv-a.com>", "Dave Crossland <dave AT lab6.com>", "Stuart Axon <stuaxo AT gmail.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         gtk.about_dialog_set_url_hook(self.on_url, self.website)
         dlg.set_version("0.2beta")
         dlg.set_name("shoebot")
-        dlg.set_license("GPL-3")
+        # TODO: add license text
+        dlg.set_license("GPLv3")
         dlg.set_authors(self.authors)
         dlg.set_website(self.website)
         def close(w, res):
