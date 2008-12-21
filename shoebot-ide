@@ -415,16 +415,34 @@ class ConsoleWindow:
         self.text_window.add(self.text_area)
         self.text_area.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("dark grey"))
         self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("white"))
+        self.tag_table = self.text_buffer.get_tag_table()
+        self.stdout_tag = gtk.TextTag("stdout")
+        self.stdout_tag.set_property("foreground", "red")
+        self.tag_table.add(self.stdout_tag)
 
-    def write(self, data):
+    def write(self, data, output=None):
         self.message = data
-        self.text_buffer.insert_at_cursor(self.message)
-        self.message = ""
+        if not output:
+            
+            self.text_buffer.insert_at_cursor(self.message)
+            self.message = ""
+        else:
+            self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
+            self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "stdout")
+            self.message = ""            
         while gtk.events_pending():
             gtk.main_iteration(False)        
 
 
+class Stdout_Filter(object):
+    def __init__(self, parent):
+        self.parent = parent
+    def write(self, data):
+        self.message = data
+        self.parent.write(self.message, True)
+        self.message = None
 
+    
 class View(gtk.Window):
     gobject.type_register (ShoebotFileChooserDialog)
 
@@ -507,8 +525,9 @@ class View(gtk.Window):
 
         # this creates a console error and output window under script window and redirects stdout and stderr
         self.console_error = ConsoleWindow()
+        self.stdout_filter = Stdout_Filter(self.console_error)
         sys.stderr = self.console_error
-        sys.stdout = self.console_error 
+        sys.stdout = self.stdout_filter
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         self.console_error.write("This is a console window, error messages and script output are shown here,\n if you want you can select and delete the content of the window or resize it\n\n")        
