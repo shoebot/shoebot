@@ -36,10 +36,10 @@ def run_oneshot(script, file):
         bot.namespace['draw']()
     bot.finish()
 
-def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False):
+def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, go_fullscreen=False):
     ''' Windowed mode:
     Run a Shoebot script in a GTK window.'''
-    win = gtkui.ShoebotWindow(script, server, port, varwindow)
+    win = gtkui.ShoebotWindow(script, server, port, varwindow, go_fullscreen)
 
 # use OptionParser to interpret commandline options
 from optparse import OptionParser
@@ -56,6 +56,13 @@ parser.add_option("-w",
                 default=False,
                 help="run script in a GTK window"
                 )
+parser.add_option("-f",
+                "--fullscreen",
+                action="store_true",
+                dest="fullscreen",
+                default=False,
+                help="run in fullscreen mode"
+                )             
 parser.add_option("-s",
                 "--socketserver",
                 action="store_true",
@@ -135,4 +142,4 @@ if __name__ == '__main__':
         run_window(inputscript,
                     server=options.socketserver,
                     port=options.serverport,
-                    varwindow=options.varwindow)
+                    varwindow=options.varwindow, go_fullscreen=options.fullscreen)
