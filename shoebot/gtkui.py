@@ -163,8 +163,8 @@ class SocketServerMixin:
                     # set the bot namespace to the new value
 
                     ## TODO: we're forced to convert input to floats
-                    # self.canvas.bot.namespace[var] = value.strip(';')
-                    self.canvas.bot.namespace[var] = float(value.strip(';'))
+                    self.canvas.bot.namespace[var] = value.strip(';')
+                    # self.canvas.bot.namespace[var] = float(value.strip(';'))
                     # and redraw
                     self.canvas.redraw()
                 return True
@@ -327,11 +327,14 @@ class ShoebotWindow(SocketServerMixin):
                 self.bot.FRAME += 1
 
                 # respect framerate and account for rendering time
-                if render_time > 0:
-                    time.sleep(1 / self.bot.framerate - render_time)
+                try:
+                    if render_time > 0:
+                        time.sleep(1 / self.bot.framerate - render_time)
+                except IOError:
+                    time.sleep(1 / self.bot.framerate)
                 #while gtk.events_pending():
                 #    gtk.main_iteration()
-                gtk.main_iteration(block=True)
+                gtk.main_iteration(block=False)
         else:
             gtk.main()
 
