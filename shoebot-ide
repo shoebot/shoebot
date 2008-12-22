@@ -491,6 +491,7 @@ class View(gtk.Window):
             ( "/Run/sep1", None, None, 0, "<Separator>" ),
             ( "/Run/Run socket server", None, self.do_socketserver_changed, True, "<ToggleItem>"),
             ( "/Run/Show variables window", None, self.do_varwindow_changed, True, "<ToggleItem>"),
+            ( "/Run/Run fullscreen", None, self.do_fullscreen_changed, True, "<ToggleItem>"),
             ( "/_Help", None, None, 0, "<Branch>" ),
             ( "/Help/_About", None, self.do_about, 0, None )  
             ]
@@ -567,6 +568,7 @@ class View(gtk.Window):
         # options toggle
         self.use_varwindow = False
         self.use_socketserver = False
+        self.go_fullscreen = False
 
         # setup syntax highlighting
         manager = gtksourceview.SourceLanguagesManager()
@@ -685,6 +687,9 @@ class View(gtk.Window):
 
     def do_socketserver_changed(self, callback_action, widget):
         self.use_socketserver = not self.use_socketserver
+        
+    def do_fullscreen_changed(self, callback_action, widget):
+        self.go_fullscreen = not self.go_fullscreen
 
     def do_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
@@ -946,7 +951,7 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
         try:
-            self.sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow)
+            self.sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
         except ShoebotError, NameError:
             import traceback
             import sys
