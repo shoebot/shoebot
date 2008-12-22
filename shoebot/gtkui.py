@@ -61,7 +61,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         if self.is_dynamic:
             self.bot.run()
-            self.bot.namespace['setup']()
+            if 'setup' in self.bot.namespace:
+                self.bot.namespace['setup']()
 
         # set the window size to the one specified in the script
         # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
@@ -163,8 +164,8 @@ class SocketServerMixin:
                     # set the bot namespace to the new value
 
                     ## TODO: we're forced to convert input to floats
-                    self.canvas.bot.namespace[var] = value.strip(';')
-                    # self.canvas.bot.namespace[var] = float(value.strip(';'))
+                    # self.canvas.bot.namespace[var] = value.strip(';')
+                    self.canvas.bot.namespace[var] = float(value.strip(';'))
                     # and redraw
                     self.canvas.redraw()
                 return True
@@ -261,13 +262,15 @@ class VarWindow:
         # and redraw the canvas
         self.parent.canvas.redraw()
 
+
 class ShoebotWindow(SocketServerMixin):
-    def __init__(self, code=None, server=False, serverport=7777, varwindow=False):
+    def __init__(self, code=None, server=False, serverport=7777, varwindow=False, go_fullscreen=False):
         self.bot = shoebot.NodeBot(gtkmode=True, inputscript=code)
         self.canvas = ShoebotDrawingArea(self, self.bot)
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow
+        self.go_fullscreen = go_fullscreen
 
         # Setup the main GTK window
         self.window = gtk.Window()
@@ -290,6 +293,8 @@ class ShoebotWindow(SocketServerMixin):
                                  ('pdf', 'Save as PDF', 'Save as _PDF', "<Control>2", None, self.canvas.save_output),
                                  ('ps', 'Save as PS', 'Save as P_S', "<Control>3", None, self.canvas.save_output),
                                  ('png', 'Save as PNG', 'Save as P_NG', "<Control>4", None, self.canvas.save_output),
+                                 ('fullscreen', 'Go fullscreen', '_Go fullscreen', "<Control>5", None, self.do_fullscreen),
+                                 ('unfullscreen', 'Exit fullscreen', '_Exit fullscreen', "<Control>6", None, self.do_unfullscreen),
                                  ('close', 'Close window', '_Close Window', "<Control>w", None, self.do_quit)
                                 ])
 
@@ -300,6 +305,9 @@ class ShoebotWindow(SocketServerMixin):
             <menuitem action="pdf"/>
             <menuitem action="png"/>
             <separator/>
+            <menuitem action="fullscreen"/>
+            <menuitem action="unfullscreen"/>            
+            <separator/>            
             <menuitem action="close"/>
         </popup>
         '''
@@ -313,31 +321,34 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.has_varwindow:
             VarWindow(self, self.bot)
+            
+        if self.go_fullscreen:
+            self.window.fullscreen()
 
         if self.canvas.is_dynamic:
-            import time
+            from time import sleep
             while 1:
-                # redraw canvas and count the time it took
-                start_time = time.time()
+                # redraw canvas
                 self.canvas.redraw()
-                end_time = time.time()
-                render_time = end_time - start_time
-
+                #self.console_error.update()
                 # increase bot frame count
                 self.bot.FRAME += 1
-
-                # respect framerate and account for rendering time
-                try:
-                    if render_time > 0:
-                        time.sleep(1 / self.bot.framerate - render_time)
-                except IOError:
-                    time.sleep(1 / self.bot.framerate)
-                #while gtk.events_pending():
-                #    gtk.main_iteration()
-                gtk.main_iteration(block=False)
+                # respect framerate
+                sleep(1 / self.bot.framerate)
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                    # gtk.main_iteration(block=True)
         else:
             gtk.main()
+            while gtk.events_pending():
+                gtk.main_iteration()
 
+
+    def do_fullscreen(self, widget):
+        self.window.fullscreen()
+
+    def do_unfullscreen(self, widget):
+        self.window.unfullscreen()
 
     def do_quit(self, widget):
         if self.has_server:
