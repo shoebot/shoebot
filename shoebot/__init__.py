@@ -83,6 +83,7 @@ class Bot:
         self.framerate = 30
         self.FRAME = 0
 
+        self.screen_ratio = None
         self.WIDTH = Bot.DEFAULT_WIDTH
         self.HEIGHT = Bot.DEFAULT_HEIGHT
 
@@ -987,7 +988,24 @@ class CairoCanvas(Canvas):
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
+        
+        # following block checks if we are in gtkmode and in case of fullscreen it scales cairo context
+        # and centers it on screen
+        if self.bot.gtkmode:
+            if self.bot.screen_ratio:
+                self.canvas_ratio = self.bot.WIDTH / self.bot.HEIGHT
+                if self.bot.screen_ratio < self.canvas_ratio:
+                    self.fullscreen_scale =  float(self.bot.screen_width) / float(self.bot.WIDTH)
+                    self.fullscreen_deltay = (self.bot.screen_height - (self.bot.HEIGHT*self.fullscreen_scale))/2
+                    self.fullscreen_deltax = 0
+                else:
+                    self.fullscreen_scale =  float(self.bot.screen_height) / float(self.bot.HEIGHT)
+                    self.fullscreen_deltax = (self.bot.screen_width - (self.bot.WIDTH*self.fullscreen_scale))/2
+                    self.fullscreen_deltay = 0                
+                ctx.translate(self.fullscreen_deltax, self.fullscreen_deltay)
+                ctx.scale(self.fullscreen_scale, self.fullscreen_scale)
 
+        # draws things
         for item in self.grobstack:
             if isinstance(item, BezierPath):
                 ctx.save()

@@ -323,7 +323,7 @@ class ShoebotWindow(SocketServerMixin):
             VarWindow(self, self.bot)
             
         if self.go_fullscreen:
-            self.window.fullscreen()
+            self.do_fullscreen(self)           
 
         if self.canvas.is_dynamic:
             from time import sleep
@@ -346,9 +346,18 @@ class ShoebotWindow(SocketServerMixin):
 
     def do_fullscreen(self, widget):
         self.window.fullscreen()
+        # next lines seem to be needed for window switching really to
+        # fullscreen mode before reading it's size values
+        while gtk.events_pending():
+            gtk.main_iteration(block=False)
+        # we pass informations on full-screen size to bot
+        self.bot.screen_width = self.window.get_allocation().width
+        self.bot.screen_height = self.window.get_allocation().height
+        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height
 
     def do_unfullscreen(self, widget):
         self.window.unfullscreen()
+        self.bot.screen_ratio = None
 
     def do_quit(self, widget):
         if self.has_server:
