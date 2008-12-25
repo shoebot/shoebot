@@ -430,7 +430,7 @@ class ConsoleWindow:
         self.system_message_tag.set_property("foreground", "white")
         self.system_message_tag.set_property("style", "normal")
         self.tag_table.add(self.system_message_tag)
-        self.text_area.modify_font(pango.FontDescription("monospace 10 italic"))
+        self.text_area.modify_font(pango.FontDescription("monospace italic 10"))
 
 
     def write(self, data, output=None, system=None):
