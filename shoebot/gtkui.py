@@ -355,7 +355,7 @@ class ShoebotWindow(SocketServerMixin):
         #self.bot.screen_height = self.window.get_allocation().height
         self.bot.screen_width = gtk.gdk.screen_width()
         self.bot.screen_height = gtk.gdk.screen_height()      
-        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height
+        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height           
 
     def do_unfullscreen(self, widget):
         self.window.unfullscreen()
