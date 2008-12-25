@@ -8,7 +8,7 @@ http://roscidus.com/desktop/node/413
 from __future__ import division
 import sys, gtk, random, StringIO
 import shoebot
-from data import Transform
+from data import Transform, GTKPointer
 import cairo
 import gobject, socket
 
@@ -72,9 +72,17 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.menu = gtk.Menu()
         self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
 
-        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK |
+            gtk.gdk.BUTTON_RELEASE_MASK |
+            gtk.gdk.POINTER_MOTION_MASK)
 
         self.connect('button_press_event', self.on_button_press)
+
+        pointing_device = GTKPointer()
+        self.connect('button_press_event', pointing_device.gtk_button_press_event)
+        self.connect('button_release_event', pointing_device.gtk_button_release_event)
+        self.connect('motion_notify_event', pointing_device.gtk_motion_event)
+        pointing_device.add_listener(bot)
 
     def on_button_press(self, widget, event):
         # check for right mouse clicks

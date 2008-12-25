@@ -347,6 +347,16 @@ class Bot:
             else:
                 # if on gtkmode, print the error and don't break
                 raise ShoebotError(errmsg)
+                
+    def mouse_down(self, pointer):
+        self.namespace['mousedown'] = True
+    
+    def mouse_up(self, pointer):
+        self.namespace['mousedown'] = False
+    
+    def pointer_moved(self, pointer):
+        self.namespace['MOUSEX'] = pointer.x
+        self.namespace['MOUSEY'] = pointer.y
 
 
 class NodeBot(Bot):

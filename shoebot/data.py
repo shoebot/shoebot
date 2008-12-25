@@ -3,6 +3,7 @@ Shoebot data structures for bezier path handling
 '''
 
 from __future__ import division
+from sets import Set
 import util
 import cairo
 import pango
@@ -36,6 +37,11 @@ CORNERS = 'corners'
 LEFT = 'left'
 RIGHT = 'right'
 JUSTIFY = 'justify'
+
+# Default mouse values
+MOUSEX = -1
+MOUSEY = -1
+mousedown = False
 
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
@@ -1335,6 +1341,100 @@ def parsePath(d):
 
 		retval.append([outputCommand,params])
 	return retval
+
+
+class PointingDevice:
+    """
+    Base class for pointing device, contains only dummy values
+    """
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.buttons_pressed = Set()
+        self.listeners = []
+    
+    def add_listener(self, listener):
+        self.listeners.append(listener)
+    
+    def get_button_down(self):
+        """
+        Return true if any of the buttons are pressed
+        """
+        return bool(self.buttons_pressed)
+    
+    def pointer_moved(self, x, y):
+        self.x = x
+        self.y = y
+        for listener in self.listeners:
+            listener.pointer_moved(self)
+            
+        
+    def button_pressed(self, button):
+        self.buttons_pressed.add(button)
+        for listener in self.listeners:
+            listener.mouse_down(self)
+        
+    def button_released(self, button):
+        self.buttons_pressed.remove(button)
+        for listener in self.listeners:
+            listener.mouse_up(self)
+
+    button_down = property(get_button_down)
+    
+
+class GTKPointer(PointingDevice):
+    def __init__(self):
+        PointingDevice.__init__(self)
+        
+    def gtk_motion_event(self, widget, event):
+        self.pointer_moved(event.x, event.y)
+        
+    def gtk_button_press_event(self, widget, event):
+        self.button_pressed(event.button)
+        
+    def gtk_button_release_event(self, widget, event):
+        self.button_released(event.button)
+
+class PointerGroup(PointingDevice):
+    """
+    Contains a set of pointers
+    """
+    pointers = None
+    
+    def __init__(self):
+        PointingDevice.__init__(self)
+        self.pointers = []
+    
+    def button_down(self):
+        """
+        Return True if any button on any pointer is pressed
+        """
+        for pointer in self.pointers:
+            if pointer.button_down:
+                return True
+        return False
+    
+    def average_x(self):
+        x = 0
+        for pointer in pointers:
+            x += pointer.x
+        else:
+            return x / len(pointers)
+        return 0
+        
+    def average_y(self):
+        y = 0
+        for pointer in pointers:
+            y += pointer.y
+        else:
+            return y / len(pointers)
+        return 0
+
+    def add_pointer(pointer):
+        pointers.append(pointer)
+    
+    x = property(average_x)
+    y = property(average_y)
 
 
 def test_color():
