@@ -1,0 +1,29 @@
+size(600,600)
+
+svg = ximport("svg")
+
+# The parse() command will return
+# a list of the shapes in the SVG file.
+paths = svg.parse_as_dict(open("disegno.svg").read())
+print paths
+background(color(1,1,1))
+#nofill()
+translate(50,50)
+
+scale(5)
+fill(1,0,0)
+drawpath(paths["che"].copy())
+fill(0.6,0.3,0.2,0.5)
+translate(100,100)
+drawpath(paths["circle"].copy())
+translate(20,40)
+fill(0,0,1,0.5)
+drawpath(paths["quad"].copy())
+translate(20,20)
+fill(0,1,0,0.5)
+drawpath(paths["triangle"].copy())
+print paths["triangle"].data
+rotate(45)
+fill(1,0.6,0)
+translate(50,-40)
+drawpath(paths["che"].copy())

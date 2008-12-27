@@ -107,6 +107,8 @@ class Bot:
            This method sets the context of the object to the current context."""
         inst = clazz(self, *args, **kwargs)
         return inst
+    def RestoreCtx(self, *args, **kwargs):
+        return self._makeInstance(RestoreCtx, args, kwargs)
     def BezierPath(self, *args, **kwargs):
         return self._makeInstance(BezierPath, args, kwargs)
     def ClippingPath(self, *args, **kwargs):
@@ -716,32 +718,16 @@ class NodeBot(Bot):
     #### Transform and utility
 
     def beginclip(self,path):
-        #self.save()
-        #self.context.rectangle(x, y, w, h)
-        #self.context.clip()
-        self.canvas.draw()
-        self.saved_canvas = self.canvas
-        self.clip_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.WIDTH, self.HEIGHT)
-        self.clip_canvas = CairoCanvas(bot = self,
-                                      target = self.clip_surface,
-                                      width = self.WIDTH,
-                                      height = self.HEIGHT)
-        self.canvas = self.clip_canvas
-        
-        self.clip_masksurface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.WIDTH, self.HEIGHT)
-        self.clip_maskcanvas = CairoCanvas(bot= self, target=self.clip_masksurface, width=self.WIDTH, height=self.HEIGHT)
-        p = self.BezierPath(path)
-        self.clip_maskcanvas.add(p)
-        self.clip_maskcanvas.draw()
+        #self.canvas._context.save()
+        p = self.ClippingPath(path)
+        self.canvas.add(p)
+        return p
+
 
     def endclip(self):
-
-        self.canvas.draw()
-        #self.clipped_canvas = self.canvas
-        self.canvas = self.saved_canvas
-        self.canvas.grobstack=[]
-        self.canvas._context.set_source_surface(self.clip_surface, 0, 0)
-        self.canvas._context.mask_surface(self.clip_masksurface, 0, 0)       
+        p = self.RestoreCtx()
+        self.canvas.add(p)
+       
 
 
     def transform(self, mode=None): # Mode can be CENTER or CORNER
@@ -1028,28 +1014,76 @@ class CairoCanvas(Canvas):
 
         # draws things
         for item in self.grobstack:
-            if isinstance(item, BezierPath):
+            if isinstance(item, ClippingPath):
+                ctx.save()
                 ctx.save()
                 deltax, deltay = item.center
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
-                self.drawpath(item)
-            elif isinstance(item, Text):
-                ctx.save()
-                x,y = item.metrics[0:2]
-                deltax, deltay = item.center
-                m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
-                ctx.transform(m)
-                ctx.translate(item.x,item.y-item.baseline)
-                self.drawtext(item)
-            elif isinstance(item, Image):
-                ctx.save()
-                deltax, deltay = item.center
-                m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
-                ctx.transform(m)
-                self.drawimage(item)
+                self.drawclip(item)
+            elif isinstance(item, RestoreCtx):
+                ctx.restore()
+            else:
+                if isinstance(item, BezierPath):
+                    ctx.save()
+                    deltax, deltay = item.center
+                    m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
+                    ctx.transform(m)
+                    self.drawpath(item)
+                elif isinstance(item, Text):
+                    ctx.save()
+                    x,y = item.metrics[0:2]
+                    deltax, deltay = item.center
+                    m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
+                    ctx.transform(m)
+                    ctx.translate(item.x,item.y-item.baseline)
+                    self.drawtext(item)
+                elif isinstance(item, Image):
+                    ctx.save()
+                    deltax, deltay = item.center
+                    m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
+                    ctx.transform(m)
+                    self.drawimage(item)
 
-            ctx.restore()
+                ctx.restore()
+
+    def drawclip(self,path,ctx=None):
+        '''Passes the path to a Cairo context.'''
+        if not isinstance(path, ClippingPath):
+            raise ShoebotError("drawpath(): Expecting a ClippingPath, got %s" % (path))
+
+        if not ctx:
+            ctx = self._context
+
+        for element in path.data:
+            cmd = element[0]
+            values = element[1:]
+
+            # apply cairo context commands
+            if cmd == MOVETO:
+                ctx.move_to(*values)
+            elif cmd == LINETO:
+                ctx.line_to(*values)
+            elif cmd == CURVETO:
+                ctx.curve_to(*values)
+            elif cmd == RLINETO:
+                ctx.rel_line_to(*values)
+            elif cmd == RCURVETO:
+                ctx.rel_curve_to(*values)
+            elif cmd == CLOSE:
+                ctx.close_path()
+            elif cmd == ELLIPSE:
+                from math import pi
+                x, y, w, h = values
+                ctx.save()
+                ctx.translate (x + w / 2., y + h / 2.)
+                ctx.scale (w / 2., h / 2.)
+                ctx.arc (0., 0., 1., 0., 2 * pi)
+                ctx.restore()
+            else:
+                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
+        ctx.restore()
+        ctx.clip()
 
 
     def drawtext(self,txt,ctx=None):

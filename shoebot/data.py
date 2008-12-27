@@ -204,6 +204,11 @@ class ColorMixin(object):
         self._strokewidth = max(strokewidth, 0.0001)
     strokewidth = property(_get_strokewidth, _set_strokewidth)
 
+class RestoreCtx(Grob):
+
+    def __init__(self, bot, **kwargs):
+        self._bot = bot
+
 class BezierPath(Grob, TransformMixin, ColorMixin):
     """
     Represents a Bezier path as a list of PathElements.
@@ -397,6 +402,14 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
             trans *= t
         return trans
     transform = property(_get_transform)
+
+class ClippingPath(BezierPath):
+    
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
+    kwargs = ('fill', 'stroke', 'strokewidth')    
+    
+    def __init__(self, bot, path=None, **kwargs):
+        BezierPath.__init__(self, bot, path, **kwargs)
 
 class PathElement:
     '''
