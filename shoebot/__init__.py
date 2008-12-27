@@ -715,13 +715,34 @@ class NodeBot(Bot):
 
     #### Transform and utility
 
-##    def beginclip(self,x,y,w,h):
-##        self.save()
-##        self.context.rectangle(x, y, w, h)
-##        self.context.clip()
-##
-##    def endclip(self):
-##        self.restore()
+    def beginclip(self,path):
+        #self.save()
+        #self.context.rectangle(x, y, w, h)
+        #self.context.clip()
+        self.canvas.draw()
+        self.saved_canvas = self.canvas
+        self.clip_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.WIDTH, self.HEIGHT)
+        self.clip_canvas = CairoCanvas(bot = self,
+                                      target = self.clip_surface,
+                                      width = self.WIDTH,
+                                      height = self.HEIGHT)
+        self.canvas = self.clip_canvas
+        
+        self.clip_masksurface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.WIDTH, self.HEIGHT)
+        self.clip_maskcanvas = CairoCanvas(bot= self, target=self.clip_masksurface, width=self.WIDTH, height=self.HEIGHT)
+        p = self.BezierPath(path)
+        self.clip_maskcanvas.add(p)
+        self.clip_maskcanvas.draw()
+
+    def endclip(self):
+
+        self.canvas.draw()
+        #self.clipped_canvas = self.canvas
+        self.canvas = self.saved_canvas
+        self.canvas.grobstack=[]
+        self.canvas._context.set_source_surface(self.clip_surface, 0, 0)
+        self.canvas._context.mask_surface(self.clip_masksurface, 0, 0)       
+
 
     def transform(self, mode=None): # Mode can be CENTER or CORNER
         if mode:

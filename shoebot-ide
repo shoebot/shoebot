@@ -352,7 +352,7 @@ class Buffer(gtksourceview.SourceBuffer):
                     self.filename_set()
                 else:
                     self.filename = old_filename
-                    chooser.destroy()
+        chooser.destroy()
 
     def check_buffer_saved(self):
         if self.get_modified():
