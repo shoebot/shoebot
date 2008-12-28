@@ -619,6 +619,10 @@ class NodeBot(Bot):
         p = self.BezierPath(path)
         self.canvas.add(p)
 
+    def drawimage(self, image):
+        self.canvas.add(image)
+
+
     def autoclosepath(self, close=True):
         self._autoclosepath = close
 

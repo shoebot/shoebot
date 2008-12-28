@@ -1,0 +1,27 @@
+def setup():
+    size(400,400)
+    global i
+    i = image("assets/hva_studio_3.jpg",0,0, width=400, draw=False)
+
+    fill(0)
+def draw():
+
+    background(0.8,0.8,0.6)
+    push()
+    #translate(10,0)
+    rotate(random(-25,25))
+    p = rect(random(WIDTH),random(HEIGHT/2),150,150, draw=False)
+    pop()
+
+    x = beginclip(p)
+
+    fill(1,0,0)
+    drawimage(i)
+    oval(50,50,100,100)
+    fill(1)
+    rect(0,220,400,180)
+    fill(1,1,0)
+    text("movie clip", 10,250, font="Arial", fontsize=64, weight="bold")
+    endclip()
+    fill(0,0,0,0.5)
+    rect(random(WIDTH),0,2,400)
