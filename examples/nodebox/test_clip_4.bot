@@ -5,7 +5,7 @@ def setup():
 
     fill(0)
 def draw():
-
+    speed(24)
     background(0.8,0.8,0.6)
     push()
     #translate(10,0)
@@ -16,12 +16,38 @@ def draw():
     x = beginclip(p)
 
     fill(1,0,0)
-    drawimage(i)
+    drawpath(i)
     oval(50,50,100,100)
     fill(1)
     rect(0,220,400,180)
     fill(1,1,0)
     text("movie clip", 10,250, font="Arial", fontsize=64, weight="bold")
     endclip()
+    p1 = rect(random(WIDTH),random(HEIGHT/2),150,150, draw=False)
+
+
+    x1 = beginclip(p1)
+
+    fill(1,0,0)
+    drawpath(i)
+    oval(50,50,100,100)
+    fill(1)
+    rect(0,220,400,180)
+    fill(1,1,0)
+    text("movie clip", 10,250, font="Arial", fontsize=64, weight="bold")
+    endclip()
+    p2 = rect(random(WIDTH),random(HEIGHT/2),150,150, draw=False)
+
+
+    x2 = beginclip(p2)
+
+    fill(1,0,0)
+    drawpath(i)
+    oval(50,50,100,100)
+    fill(1)
+    rect(0,220,400,180)
+    fill(1,1,0)
+    text("movie clip", 10,250, font="Arial", fontsize=64, weight="bold")
+    endclip()    
     fill(0,0,0,0.5)
-    rect(random(WIDTH),0,2,400)
+    rect(random(WIDTH),0,1,400)

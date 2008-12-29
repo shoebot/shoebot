@@ -616,8 +616,11 @@ class NodeBot(Bot):
         return p
 
     def drawpath(self,path):
-        p = self.BezierPath(path)
-        self.canvas.add(p)
+        if isinstance(path, BezierPath):
+            p = self.BezierPath(path)
+            self.canvas.add(p)
+        elif isinstance(path, Image):
+            self.canvas.add(path)
 
     def drawimage(self, image):
         self.canvas.add(image)
