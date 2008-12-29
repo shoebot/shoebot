@@ -878,18 +878,6 @@ class NodeBot(Bot):
             self.canvas.add(path)
         return path
 
-    def textwidth(self, txt, width=None):
-        '''Returns the width of a string of text according to the current
-        font settings.
-        '''
-        return textmetrics(txt)[0]
-
-    def textheight(self, txt, width=None):
-        '''Returns the height of a string of text according to the current
-        font settings.
-        '''
-        return textmetrics(txt)[1]
-
     def textmetrics(self, txt, width=None, height=None, **kwargs):
         '''Returns the width and height of a string of text as a tuple
         (according to current font settings).
@@ -898,6 +886,21 @@ class NodeBot(Bot):
         # but maybe we could use the other data from cairo
         txt = self.Text(txt, 0, 0, width, height, **kwargs)
         return txt.metrics
+
+    def textwidth(self, txt, width=None):
+        '''Returns the width of a string of text according to the current
+        font settings.
+        '''
+        w = width
+        return self.textmetrics(txt, width=w)[0]
+
+    def textheight(self, txt, width=None):
+        '''Returns the height of a string of text according to the current
+        font settings.
+        '''
+        w = width
+        return self.textmetrics(txt, width=w)[1]
+
 
     def lineheight(self, height=None):
         if height is not None:

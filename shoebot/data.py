@@ -817,8 +817,7 @@ class Text(Grob, TransformMixin, ColorMixin):
     
     def _get_metrics(self):
         w,h = self.layout.get_pixel_size()
-        x,y = self.x, self.y
-        return (x,y,w,h)
+        return (w,h)
     metrics = property(_get_metrics)
 
     def _get_path(self):
