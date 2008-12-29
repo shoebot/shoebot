@@ -939,9 +939,9 @@ class Image(Grob, TransformMixin, ColorMixin):
     center = property(_get_center)
 
     def copy(self):
-        new = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
-        _copy_attrs(self, new, ('x', 'y', 'width', 'height', 'alpha', '_transform', '_transformmode'))
-        return new
+        p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
+        _copy_attrs(self._bot, p, self.stateAttributes)
+        return p
 
 
 class Variable(object):
