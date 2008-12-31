@@ -53,7 +53,6 @@ _STATE_NAMES = {
 
 class ShoebotError(Exception): pass
 class NodeBoxError(ShoebotError): pass
-
 class Point:
     '''
     Taken from Nodebox and modified
@@ -68,7 +67,7 @@ class Point:
         elif len(args) == 0:
             self.x = self.y = 0.0
         else:
-            raise ShoebotError, "Wrong initializer for Point object"
+            raise ShoebotError, _("Wrong initializer for Point object")
 
     def __repr__(self):
         return (self.x, self.y)
@@ -91,7 +90,7 @@ class Grob(object):
         
     def copy(self):
         """Returns a deep copy of this grob."""
-        raise NotImplementedError, "Copy is not implemented on this Grob class."
+        raise NotImplementedError, _("Copy is not implemented on this Grob class.")
 
     def draw(self):
         """Appends the grob to the canvas.
@@ -107,7 +106,7 @@ class Grob(object):
     def checkKwargs(self, kwargs):
         remaining = [arg for arg in kwargs.keys() if arg not in self.kwargs]
         if remaining:
-            raise ShoebotError, "Unknown argument(s) '%s'" % ", ".join(remaining)
+            raise ShoebotError, _("Unknown argument(s) '%s'") % ", ".join(remaining)
     checkKwargs = classmethod(checkKwargs)
 
 def _copy_attr(v):
@@ -122,7 +121,7 @@ def _copy_attr(v):
     elif isinstance(v, (int, str, unicode, float, bool, long)):
         return v
     else:
-        raise NodeBoxError, "Don't know how to copy '%s'." % v
+        raise NodeBoxError, _("Don't know how to copy '%s'.") % v
 
 def _copy_attrs(source, target, attrs):
     for attr in attrs:
@@ -250,7 +249,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         elif isinstance(path, basestring):
             self.data = svg2pathdata(path)
         else:
-            raise ShoebotError, "Don't know what to do with %s." % path
+            raise ShoebotError, _("Don't know what to do with %s.") % path
         self.closed = False
 
     def copy(self):
@@ -328,7 +327,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         if isinstance(el, PathElement):
             self.data.append(el)
         else:
-            raise TypeError("Wrong data passed to BezierPath.append(): %s" % el)
+            raise TypeError(_("Wrong data passed to BezierPath.append(): %s") % el)
 
     def _get_bounds(self):
         '''Returns the path's bounding box. Note that this doesn't
@@ -452,7 +451,7 @@ class PathElement:
             # some cairo specific functions to draw it in draw_cairo()
             self.x, self.y, self.w, self.h = self.values
         else:
-            raise ShoebotError('Wrong initialiser for PathElement (got "%s")' % (cmd))
+            raise ShoebotError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
     def __getitem__(self,key):
         data = list(self.values)
@@ -507,7 +506,7 @@ class Color(object):
             
         # No values or None, transparent black.
         if len(a) == 0 or (len(a) == 1 and a[0] == None):
-            raise ShoebotError("got Color() with value None!")         
+            raise ShoebotError(_("got Color() with value None!"))         
             self.r, self.g, self.b, self.a = 0, 0, 0, 0
             
         # One value, another color object.
@@ -925,7 +924,7 @@ class Image(Grob, TransformMixin, ColorMixin):
             img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
         else:
-            raise NotImplementedError("sorry, this image mode is not implemented yet")
+            raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
         #this is the item that will be drawn
         self.imagesurface = imagesurface
 
@@ -1024,7 +1023,7 @@ class Transform:
         elif isinstance(transform, cairo.Matrix):
             self.append(transform)
         else:
-            raise ShoebotError, "Transform: Don't know how to handle transform %s." % transform
+            raise ShoebotError, _("Transform: Don't know how to handle transform %s.") % transform
 
     def translate(self, x, y):
         t = ('translate', x, y)
@@ -1058,7 +1057,7 @@ class Transform:
         elif isinstance(t, cairo.Matrix):
             self.stack.append(t)
         else:
-            raise ShoebotError("Transform: Can only append Transforms or Cairo matrices (got %s)" % (t))
+            raise ShoebotError(_("Transform: Can only append Transforms or Cairo matrices (got %s)") % (t))
 
     def prepend(self,t):
         if isinstance(t, Transform):
@@ -1071,7 +1070,7 @@ class Transform:
         elif isinstance(t, cairo.Matrix):
             self.stack.insert(0,t)
         else:
-            raise ShoebotError("Transform: Can only append Transforms or Cairo matrices (got %s)" % (t))
+            raise ShoebotError(_("Transform: Can only append Transforms or Cairo matrices (got %s)") % (t))
 
     def copy(self):
         return self.__class__(self)
@@ -1220,7 +1219,7 @@ def lexPath(d):
             offset = m.end()
             continue
         #TODO: create new exception
-        raise Exception, 'Invalid path data!'
+        raise Exception, _('Invalid path data!')
 '''
 While I am less pleased with my parsing function, I think it works. And that
 is important. There will be time for improvement later.
@@ -1272,7 +1271,7 @@ def parsePath(d):
         needParam = True
         if isCommand:
             if not lastCommand and token.upper() != 'M':
-                raise Exception, 'Invalid path, must begin with moveto.'
+                raise Exception, _('Invalid path, must begin with moveto.')
             else:
                 command = token
         else:
@@ -1285,16 +1284,16 @@ def parsePath(d):
                 else:
                     command = pathdefs[lastCommand.upper()][0].lower()
             else:
-                raise Exception, 'Invalid path, no initial command.'
+                raise Exception, _('Invalid path, no initial command.')
         numParams = pathdefs[command.upper()][1]
         while numParams > 0:
             if needParam:
                 try:
                     token, isCommand = lexer.next()
                     if isCommand:
-                        raise Exception, 'Invalid number of parameters'
+                        raise Exception, _('Invalid number of parameters')
                 except StopIteration:
-                        raise Exception, 'Unexpected end of path'
+                        raise Exception, _('Unexpected end of path')
             cast = pathdefs[command.upper()][2][-numParams]
             param = cast(token)
             if command.islower():

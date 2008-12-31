@@ -7,7 +7,7 @@ import sys, os, errno
 import gobject
 import gtk
 import pango
-#import gtkexcepthook
+
 # for gtksourceview/gtksourceview2 compatibility
 try:
     import gtksourceview
@@ -41,8 +41,20 @@ except ImportError:
 
 from shoebot import ShoebotError
 
+
+APP = 'shoebot'
+DIR = 'locale'
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
+
+import locale
+import gettext
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
+
 
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
@@ -128,9 +140,9 @@ class Buffer(gtksourceview.SourceBuffer):
                 TestText.untitled_serial += 1
 
             if self.untitled_serial == 1:
-                return "Untitled"
+                return _('Untitled')
             else:
-                return "Untitled #%d" % self.untitled_serial
+                return _('Untitled #%d') % self.untitled_serial
 
     def filename_set(self):
         for view in TestText.views:
@@ -169,7 +181,7 @@ class Buffer(gtksourceview.SourceBuffer):
                                    gtk.DIALOG_DESTROY_WITH_PARENT,
                                    gtk.MESSAGE_INFO,
                                    gtk.BUTTONS_OK,
-                                   "%d strings found and marked in red" % i)
+                                   _('%d strings found and marked in red') % i)
 
         dialog.connect("response", lambda x,y: dialog.destroy())
 
@@ -337,7 +349,7 @@ class Buffer(gtksourceview.SourceBuffer):
               return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
-        chooser = ShoebotFileChooserDialog('Save File', None, gtk.FILE_CHOOSER_ACTION_SAVE,
+        chooser = ShoebotFileChooserDialog(_('Save File'), None, gtk.FILE_CHOOSER_ACTION_SAVE,
             (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         chooser.set_do_overwrite_confirmation(True)
@@ -357,7 +369,7 @@ class Buffer(gtksourceview.SourceBuffer):
     def check_buffer_saved(self):
         if self.get_modified():
             pretty_name = self.pretty_name()
-            msg = "Save changes to '%s'?" % pretty_name
+            msg = _("Save changes to '%s'?") % pretty_name
             view = TestText.active_window_stack.get()
             dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
                                        gtk.MESSAGE_QUESTION,
@@ -469,31 +481,31 @@ class View(gtk.Window):
 
     def __init__(self, buffer=None):
         menu_items = [
-            ( "/_File", None, None, 0, "<Branch>" ),
-            ( "/File/_New", "<control>N", self.do_new, 0, None ),
-            ( "/File/_Open", "<control>O", self.do_open, 0, None ),
-            ( "/File/_Save", "<control>S", self.do_save, 0, None ),
-            ( "/File/Save _As...", None, self.do_save_as, 0, None ),
-            ( "/File/sep1", None, None, 0, "<Separator>" ),
-            ( "/File/_Close", "<control>W" , self.do_close, 0, None ),
-            ( "/File/E_xit", "<control>Q" , self.do_exit, 0, None ),
-            ( "/_Edit", None, None, 0, "<Branch>" ),
-            ( "/Edit/Undo", "<control>Z", self.do_undo, 0, None ),
-            ( "/Edit/Redo", "<control><shift>Z", self.do_redo, 0, None ),
-            ( "/Edit/sep1", None, None, 0, "<Separator>" ),
-            ( "/Edit/Find...", "<control>F", self.do_search, 0, None ),
-            ( "/_Settings", None, None, 0, "<Branch>" ),
-            ( "/Settings/Wrap _Off", None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
-            ( "/Settings/Wrap _Words", None, self.do_wrap_changed, gtk.WRAP_WORD, "/Settings/Wrap Off" ),
-            ( "/Settings/Wrap _Chars", None, self.do_wrap_changed, gtk.WRAP_CHAR, "/Settings/Wrap Off" ),
-            ( "/_Run", None, None, 0, "<Branch>" ),
-            ( "/Run/_Run script", "<control>R", self.run_script, False, None ),
-            ( "/Run/sep1", None, None, 0, "<Separator>" ),
-            ( "/Run/Run socket server", None, self.do_socketserver_changed, True, "<ToggleItem>"),
-            ( "/Run/Show variables window", None, self.do_varwindow_changed, True, "<ToggleItem>"),
-            ( "/Run/Run fullscreen", None, self.do_fullscreen_changed, True, "<ToggleItem>"),
-            ( "/_Help", None, None, 0, "<Branch>" ),
-            ( "/Help/_About", None, self.do_about, 0, None )  
+            ( _("/_File"), None, None, 0, "<Branch>" ),
+            ( _("/File/_New"), "<control>N", self.do_new, 0, None ),
+            ( _("/File/_Open"), "<control>O", self.do_open, 0, None ),
+            ( _("/File/_Save"), "<control>S", self.do_save, 0, None ),
+            ( _("/File/Save _As..."), None, self.do_save_as, 0, None ),
+            ( _("/File/sep1"), None, None, 0, "<Separator>" ),
+            ( _("/File/_Close"), "<control>W" , self.do_close, 0, None ),
+            ( _("/File/E_xit"), "<control>Q" , self.do_exit, 0, None ),
+            ( _("/_Edit"), None, None, 0, "<Branch>" ),
+            ( _("/Edit/Undo"), "<control>Z", self.do_undo, 0, None ),
+            ( _("/Edit/Redo"), "<control><shift>Z", self.do_redo, 0, None ),
+            ( _("/Edit/sep1"), None, None, 0, "<Separator>" ),
+            ( _("/Edit/Find..."), "<control>F", self.do_search, 0, None ),
+            ( _("/_Settings"), None, None, 0, "<Branch>" ),
+            ( _("/Settings/Wrap _Off"), None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
+            ( _("/Settings/Wrap _Words"), None, self.do_wrap_changed, gtk.WRAP_WORD, _("/Settings/Wrap Off") ),
+            ( _("/Settings/Wrap _Chars"), None, self.do_wrap_changed, gtk.WRAP_CHAR, _("/Settings/Wrap Off") ),
+            ( _("/_Run"), None, None, 0, "<Branch>" ),
+            ( _("/Run/_Run script"), "<control>R", self.run_script, False, None ),
+            ( _("/Run/sep1"), None, None, 0, "<Separator>" ),
+            ( _("/Run/Run socket server"), None, self.do_socketserver_changed, True, "<ToggleItem>"),
+            ( _("/Run/Show variables window"), None, self.do_varwindow_changed, True, "<ToggleItem>"),
+            ( _("/Run/Run fullscreen"), None, self.do_fullscreen_changed, True, "<ToggleItem>"),
+            ( _("/_Help"), None, None, 0, "<Branch>" ),
+            ( _("/Help/_About"), None, self.do_about, 0, None )  
             ]
 
         if not buffer:
@@ -557,7 +569,7 @@ class View(gtk.Window):
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n", True, True)        
+        self.console_error.write(_("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n"), True, True)        
                 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
@@ -743,7 +755,7 @@ class View(gtk.Window):
         start, end = dialog.buffer.get_bounds()
         search_string = start.get_text(end)
 
-        print "Searching for `%s'\n" % search_string
+        print _("Searching for `%s'\n") % search_string
 
         buffer = self.text_view.get_buffer()
         if response_id == RESPONSE_FORWARD:
@@ -755,10 +767,10 @@ class View(gtk.Window):
 
     def do_search(self, callback_action, widget):
         search_text = gtk.TextView()
-        dialog = gtk.Dialog("Search", self,
+        dialog = gtk.Dialog(_("Search"), self,
                             gtk.DIALOG_DESTROY_WITH_PARENT,
-                            ("Forward", RESPONSE_FORWARD,
-                             "Backward", RESPONSE_BACKWARD,
+                            (_("Forward"), RESPONSE_FORWARD,
+                             _("Backward"), RESPONSE_BACKWARD,
                              gtk.STOCK_CANCEL, gtk.RESPONSE_NONE))
         dialog.vbox.pack_end(search_text, True, True, 0)
         dialog.buffer = search_text.get_buffer()

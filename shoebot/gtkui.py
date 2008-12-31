@@ -12,6 +12,19 @@ from data import Transform
 import cairo
 import gobject, socket
 
+APP = 'shoebot'
+DIR = 'locale'
+
+import locale
+import gettext
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
+
+
+
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
 else:
@@ -139,13 +152,13 @@ class SocketServerMixin:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((host, port))
         self.sock.listen(1)
-        print "Listening on port %i..." % (port)
+        print _("Listening on port %i...") % (port)
         gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
         '''Asynchronous connection listener. Starts a handler for each connection.'''
         self.conn, self.addr = self.sock.accept()
-        print "Connected"
+        print _("Connected")
         gobject.io_add_watch(self.conn, gobject.IO_IN, self.handler)
         return True
 
@@ -153,7 +166,7 @@ class SocketServerMixin:
         '''Asynchronous connection handler. Processes each line from the socket.'''
         line = self.conn.recv(4096)
         if not len(line):
-            print "Connection closed."
+            print _("Connection closed.")
             return False
         else:
             incoming = line.strip()
@@ -288,14 +301,14 @@ class ShoebotWindow(SocketServerMixin):
 
         actiongroup = gtk.ActionGroup('Canvas')
 
-        actiongroup.add_actions([('Save as', None, '_Save as'),
-                                 ('svg', 'Save as SVG', 'Save as _SVG', "<Control>1", None, self.canvas.save_output),
-                                 ('pdf', 'Save as PDF', 'Save as _PDF', "<Control>2", None, self.canvas.save_output),
-                                 ('ps', 'Save as PS', 'Save as P_S', "<Control>3", None, self.canvas.save_output),
-                                 ('png', 'Save as PNG', 'Save as P_NG', "<Control>4", None, self.canvas.save_output),
-                                 ('fullscreen', 'Go fullscreen', '_Go fullscreen', "<Control>5", None, self.do_fullscreen),
-                                 ('unfullscreen', 'Exit fullscreen', '_Exit fullscreen', "<Control>6", None, self.do_unfullscreen),
-                                 ('close', 'Close window', '_Close Window', "<Control>w", None, self.do_quit)
+        actiongroup.add_actions([('Save as', None, _('_Save as')),
+                                 ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.canvas.save_output),
+                                 ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.canvas.save_output),
+                                 ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.canvas.save_output),
+                                 ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.canvas.save_output),
+                                 ('fullscreen', 'Go fullscreen', _('_Go fullscreen'), "<Control>5", None, self.do_fullscreen),
+                                 ('unfullscreen', 'Exit fullscreen', _('_Exit fullscreen'), "<Control>6", None, self.do_unfullscreen),
+                                 ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_quit)
                                 ])
 
         menuxml = '''

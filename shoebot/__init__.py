@@ -34,6 +34,17 @@ VERBOSE = False
 DEBUG = False
 EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
+APP = 'shoebot'
+DIR = 'locale'
+
+import locale
+import gettext
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
+
 class ShoebotError(Exception): pass
 class ShoebotScriptError(Exception): pass
 
@@ -159,7 +170,7 @@ class Bot:
         DEPRECATED, use addvar() instead
         '''
         if not isinstance(args, dict):
-            raise ShoebotError('setvars(): setvars needs a dict!')
+            raise ShoebotError(_('setvars(): setvars needs a dict!'))
         vardict = args
         for item in vardict:
             self.var(item, NUMBER, vardict[item])
@@ -306,7 +317,7 @@ class Bot:
         if not inputcode:
         # no input? see if box has an input file name or string set
             if not self.inputscript:
-                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Bot instance)")
+                raise ShoebotError(_("run() needs an input file name or code string (if none was specified when creating the Bot instance)"))
             inputcode = self.inputscript
         else:
             self.inputscript = inputcode
@@ -415,7 +426,7 @@ class NodeBot(Bot):
         elif mode is None:
             return self.rectmode
         else:
-            raise ShoebotError("rectmode: invalid input")
+            raise ShoebotError(_("rectmode: invalid input"))
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
@@ -484,7 +495,7 @@ class NodeBot(Bot):
             self.endpath()
 #            self.fill_and_stroke()
         else:
-            raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
+            raise NameError(_("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"))
 
     def star(self, startx, starty, points=20, outer=100, inner=50):
         '''Draws a star.
@@ -583,29 +594,29 @@ class NodeBot(Bot):
     def moveto(self, x, y):
         if self._path is None:
             ## self.beginpath()
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def closepath(self):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -632,20 +643,20 @@ class NodeBot(Bot):
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.relmoveto(x,y)
 
     def rellineto(self, x, y):
         '''Draw a line using relative coordinates.'''
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.rellineto(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
         '''
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.relcurveto(x,y)
 
     def findpath(self, points, curvature=1.0):
@@ -779,7 +790,7 @@ class NodeBot(Bot):
         '''
         NOT IMPLEMENTED
         '''
-        raise NotImplementedError("outputmode() isn't implemented yet")
+        raise NotImplementedError(_("outputmode() isn't implemented yet"))
 
     def colormode(self, mode=None, crange=None):
         '''Sets the current colormode (can be RGB or HSB) and eventually
@@ -793,7 +804,7 @@ class NodeBot(Bot):
             elif mode == "hsb":
                 self.color_mode = HSB
             else:
-                raise NameError, "Only RGB and HSB colormodes are supported."
+                raise NameError, _("Only RGB and HSB colormodes are supported.")
         if crange is not None:
             self.color_range = crange
         return self.color_mode
@@ -912,7 +923,7 @@ class NodeBot(Bot):
     # TODO: Set the framework to setup font options
 
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
-        raise NotImplementedError("fontoptions() isn't implemented yet")
+        raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
 
 class Canvas:
@@ -944,7 +955,7 @@ class Canvas:
 
     def add(self, grob):
         if not isinstance(grob, data.Grob):
-            raise ShoebotError("Canvas.add() - wrong argument: expecting a Grob, received %s" % (grob))
+            raise ShoebotError(_("Canvas.add() - wrong argument: expecting a Grob, received %s") % (grob))
         self.grobstack.append(grob)
 
     def setsurface(self):
@@ -981,7 +992,7 @@ class CairoCanvas(Canvas):
         '''
 
         if not target:
-            raise ShoebotError("setsurface(): No target specified!")
+            raise ShoebotError(_("setsurface(): No target specified!"))
         if isinstance(target, basestring):
             # if the target is a string, should be a filename
             filename = target
@@ -1000,7 +1011,7 @@ class CairoCanvas(Canvas):
             self._context = target
             self._surface = self._context.get_target()
         else:
-            raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+            raise ShoebotError(_("setsurface: Argument must be a file name, a Cairo surface or a Cairo context"))
 
     def draw(self, ctx=None):
         if not ctx:
@@ -1060,7 +1071,7 @@ class CairoCanvas(Canvas):
     def drawclip(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''
         if not isinstance(path, ClippingPath):
-            raise ShoebotError("drawpath(): Expecting a ClippingPath, got %s" % (path))
+            raise ShoebotError(_("drawpath(): Expecting a ClippingPath, got %s") % (path))
 
         if not ctx:
             ctx = self._context
@@ -1091,7 +1102,7 @@ class CairoCanvas(Canvas):
                 ctx.arc (0., 0., 1., 0., 2 * pi)
                 ctx.restore()
             else:
-                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
+                raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
         ctx.restore()
         ctx.clip()
 
@@ -1117,7 +1128,7 @@ class CairoCanvas(Canvas):
             self._context.set_source_rgba(*txt._strokecolor)
             self._context.stroke()
         else:
-            print "Warning: Canvas object had no fill or stroke values"
+            print _("Warning: Canvas object had no fill or stroke values")
 
         txt.pang_ctx.update_layout(txt.layout)
         txt.pang_ctx.show_layout(txt.layout)
@@ -1134,7 +1145,7 @@ class CairoCanvas(Canvas):
     def drawpath(self,path,ctx=None):
         '''Passes the path to a Cairo context.'''
         if not isinstance(path, BezierPath):
-            raise ShoebotError("drawpath(): Expecting a BezierPath, got %s" % (path))
+            raise ShoebotError(_("drawpath(): Expecting a BezierPath, got %s") % (path))
 
         if not ctx:
             ctx = self._context
@@ -1168,7 +1179,7 @@ class CairoCanvas(Canvas):
                 ctx.arc (0., 0., 1., 0., 2 * pi)
                 ctx.restore()
             else:
-                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
+                raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
 
         if path._fillcolor:
             self._context.set_source_rgba(*path._fillcolor)
@@ -1188,7 +1199,7 @@ class CairoCanvas(Canvas):
             self._context.set_source_rgba(*path._strokecolor)
             self._context.stroke()
         else:
-            print "Warning: Canvas object had no fill or stroke values"
+            print _("Warning: Canvas object had no fill or stroke values")
 
     def finish(self):
         if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):
@@ -1236,7 +1247,7 @@ class CairoCanvas(Canvas):
                     box.namespace['draw']()
                 box.finish()
                 del box
-            print "Saved snapshot to %s" % filename
+            print _("Saved snapshot to %s") % filename
 
         elif isinstance(target, cairo.Context):
             ctx = target
@@ -1309,7 +1320,7 @@ class OldBot:
             height = self.HEIGHT
 
         if not target:
-            raise ShoebotError("setsurface(): No target specified!")
+            raise ShoebotError(_("setsurface(): No target specified!"))
         if isinstance(target, basestring):
             # if the target is a string, should be a filename
             filename = target
@@ -1324,7 +1335,7 @@ class OldBot:
             self.context = target
             self.surface = self.context.get_target()
         else:
-            raise ShoebotError("setsurface: Argument must be a file name, a Cairo surface or a Cairo context")
+            raise ShoebotError(_("setsurface: Argument must be a file name, a Cairo surface or a Cairo context"))
 
     def get_context(self):
         return self.context
@@ -1386,7 +1397,7 @@ class OldBot:
         elif mode is None:
             return self.opt.rectmode
         else:
-            raise ShoebotError("rectmode: invalid input")
+            raise ShoebotError(_("rectmode: invalid input"))
 
     def oval(self, x, y, width, height):
         '''Draws an ellipse starting from (x,y)'''
@@ -1447,7 +1458,7 @@ class OldBot:
             self.endpath()
 #            self.fill_and_stroke()
         else:
-            raise NameError("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
+            raise NameError(_("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"))
 
     def star(self, startx, starty, points=20, outer=100, inner=50):
         '''Draws a star.
@@ -1490,29 +1501,29 @@ class OldBot:
     def moveto(self, x, y):
         if self._path is None:
             ## self.beginpath()
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def closepath(self):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoebotError, "No current path. Use beginpath() first."
+            raise ShoebotError, _("No current path. Use beginpath() first.")
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -1523,11 +1534,11 @@ class OldBot:
 
     def drawpath(self,path):
         if not isinstance(path, BezierPath):
-            raise ShoebotError, "drawpath(): Input is not a valid BezierPath object"
+            raise ShoebotError, _("drawpath(): Input is not a valid BezierPath object")
         self.context.save()
         for element in path.data:
             if not isinstance(element,PathElement):
-                raise ShoebotError("drawpath(): Path is not properly constructed (expecting a path element, got " + element + ")")
+                raise ShoebotError(_("drawpath(): Path is not properly constructed (expecting a path element, got ") + element + ")")
 
             cmd = element[0]
 
@@ -1550,7 +1561,7 @@ class OldBot:
             elif cmd == CLOSE:
                 self.context.close_path()
             else:
-                raise ShoebotError("PathElement(): error parsing path element command (got '%s')" % (cmd))
+                raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
         ## TODO
         ## if path has state attributes, set the context to those, saving
         ## before and replacing them afterwards with the old values
@@ -1596,7 +1607,7 @@ class OldBot:
         ''' (NOT IMPLEMENTED) Builds a path from a list of point coordinates.
         Curvature: 0=straight lines 1=smooth curves
         '''
-        raise NotImplementedError("findpath() isn't implemented yet (sorry)")
+        raise NotImplementedError(_("findpath() isn't implemented yet (sorry)"))
         #import bezier
         #path = bezier.findpath(points, curvature=curvature)
         #path.ctx = self
@@ -1617,7 +1628,7 @@ class OldBot:
         '''
         NOT IMPLEMENTED
         '''
-        raise NotImplementedError("transform() isn't implemented yet")
+        raise NotImplementedError(_("transform() isn't implemented yet"))
 
     def apply_matrix(self, xx=1.0, yx=0.0, xy=0.0, yy=1.0, x0=0.0, y0=0.0):
         '''
@@ -1648,7 +1659,7 @@ class OldBot:
 
     def scale(self, x=1, y=None):
         if x == 0 or y == 0:
-            print "Scale parameters can't be 0. Ignoring"
+            print _("Scale parameters can't be 0. Ignoring")
             return
         y = x
         # self.context.scale(x,y)
@@ -1684,7 +1695,7 @@ class OldBot:
         '''
         NOT IMPLEMENTED
         '''
-        raise NotImplementedError("outputmode() isn't implemented yet")
+        raise NotImplementedError(_("outputmode() isn't implemented yet"))
 
     def colormode(self, mode=None, crange=None):
         '''Sets the current colormode (can be RGB or HSB) and eventually
@@ -1698,7 +1709,7 @@ class OldBot:
             elif mode == "hsb":
                 self.opt.color_mode = HSB
             else:
-                raise NameError, "Only RGB and HSB colormodes are supported."
+                raise NameError, _("Only RGB and HSB colormodes are supported.")
         if crange is not None:
             self.opt.color_range = crange
         return self.opt.color_mode
@@ -1821,19 +1832,19 @@ class OldBot:
         '''
         # default: 1.2
         # sets leading
-        raise NotImplementedError("lineheight() isn't implemented yet")
+        raise NotImplementedError(_("lineheight() isn't implemented yet"))
 
     def align(self, align="LEFT"):
         '''
         NOT IMPLEMENTED
         '''
         # sets alignment to LEFT, RIGHT, CENTER or JUSTIFY
-        raise NotImplementedError("align() isn't implemented in Shoebot yet")
+        raise NotImplementedError(_("align() isn't implemented in Shoebot yet"))
 
     # TODO: Set the framework to setup font options
 
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
-        raise NotImplementedError("fontoptions() isn't implemented yet")
+        raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
     # ----- IMAGE -----
 
@@ -1883,7 +1894,7 @@ class OldBot:
         DEPRECATED, use addvar() instead
         '''
         if not isinstance(args, dict):
-            raise ShoebotError('setvars(): setvars needs a dict!')
+            raise ShoebotError(_('setvars(): setvars needs a dict!'))
         vardict = args
         for item in vardict:
             self.var(item, NUMBER, vardict[item])
@@ -1998,7 +2009,7 @@ class OldBot:
             if 'draw' in box.namespace:
                 box.namespace['draw']()
             box.finish()
-            print "Saved snapshot to %s" % filename
+            print _(_("Saved snapshot to %s")) % filename
             del box
 
     #### Core functions
@@ -2086,7 +2097,7 @@ class OldBot:
             # write to file
             self.surface.write_to_png(self.targetfilename)
         else:
-            raise ShoebotError("finish(): '%s' is an invalid extension" % ext)
+            raise ShoebotError(_("finish(): '%s' is an invalid extension") % ext)
 
     def run(self, inputcode=None):
         '''
@@ -2099,7 +2110,7 @@ class OldBot:
         if not inputcode:
         # no input? see if box has an input file name or string set
             if not self.inputscript:
-                raise ShoebotError("run() needs an input file name or code string (if none was specified when creating the Box instance)")
+                raise ShoebotError(_("run() needs an input file name or code string (if none was specified when creating the Box instance)"))
             inputcode = self.inputscript
         else:
             self.inputscript = inputcode

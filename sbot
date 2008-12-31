@@ -18,6 +18,18 @@ DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
 OUTPUT_EXTENSIONS = ('.png','.svg','.ps','.pdf')
+APP = 'shoebot'
+DIR = 'locale'
+
+import locale
+import gettext
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
+
+
 
 def run_oneshot(script, file):
     ''' Oneshot mode:
@@ -43,56 +55,56 @@ def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, g
 
 # use OptionParser to interpret commandline options
 from optparse import OptionParser
-parser = OptionParser("usage: %prog [options] inputfile.bot")
+parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
 parser.add_option("-o",
                 "--outputfile",
                 dest="outputfile",
-                help="run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)",
+                help=_("run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)"),
                 metavar="FILE")
 parser.add_option("-w",
                 "--window",
                 action="store_true",
                 dest="window",
                 default=False,
-                help="run script in a GTK window"
+                help=_("run script in a GTK window")
                 )
 parser.add_option("-f",
                 "--fullscreen",
                 action="store_true",
                 dest="fullscreen",
                 default=False,
-                help="run in fullscreen mode"
+                help=_("run in fullscreen mode")
                 )             
 parser.add_option("-s",
                 "--socketserver",
                 action="store_true",
                 dest="socketserver",
                 default=False,
-                help="run a socket server for external control (will run the script in windowed mode)")
+                help=_("run a socket server for external control (will run the script in windowed mode)"))
 parser.add_option("-a",
                 "--variables",
                 action="store_true",
                 dest="varwindow",
                 default=False,
-                help="show a variable tweaking window (will run the script in windowed mode)")
+                help=_("show a variable tweaking window (will run the script in windowed mode)"))
 parser.add_option("-p",
                 "--serverport",
                 type="int",
                 dest="serverport",
                 default=DEFAULT_SERVERPORT,
-                help="set socketserver port to listen for connections (default is 7777)")
+                help=_("set socketserver port to listen for connections (default is 7777)"))
 
 parser.add_option("-r",
                 "--repeat",
                 type="int",
                 dest="repeat",
                 default=False,
-                help="set number of iterations, multiple images will be produced (only in non-windowed mode)")
+                help=_("set number of iterations, multiple images will be produced (only in non-windowed mode)"))
 
 def error(message):
     '''Prints an error message, the help message and quits'''
     global parser
-    print "Error: " + message
+    print _("Error: ") + message
     print
     parser.print_help()
     sys.exit()
@@ -103,11 +115,10 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     if not args and not options.window:
-        error('''Please specify an input script!
-        (check /usr/share/shoebot/examples/ for example scripts)''')
+        error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
     if len(args) > 1:
-        error("Too many arguments!")
+        error(_("Too many arguments!"))
 
     inputscript = args[0]
 
@@ -115,7 +126,7 @@ if __name__ == '__main__':
     if not options.window:
         # oneshot mode - output to file
         if not options.outputfile:
-            print 'No output file specified, defaulting to output.png...'
+            print _('No output file specified, defaulting to output.png...')
             outputfile = DEFAULT_OUTPUTFILE
             filename, extension = os.path.splitext(outputfile)
         else:
@@ -123,9 +134,9 @@ if __name__ == '__main__':
             # is it a valid extension?
             filename, extension = os.path.splitext(outputfile)
             if not extension in OUTPUT_EXTENSIONS:
-                error("Invalid extension in output filename")
+                error(_("Invalid extension in output filename"))
         if options.repeat:
-            print "start sequence..."
+            print _("start sequence...")
             for r in range(options.repeat):
                 outputfile = filename+"_"+str(r+1)+extension
                 run_oneshot(inputscript, outputfile)
@@ -136,9 +147,9 @@ if __name__ == '__main__':
         # windowed mode - run on a GTK window
         from shoebot import gtkui
         if options.outputfile:
-            error('Windowed mode does not take an output file argument.')
+            error(_('Windowed mode does not take an output file argument.'))
         if options.repeat:
-            print "Sorry, repeat option is not valid in Windowed mode, it will be ignored"
+            print _("Sorry, repeat option is not valid in Windowed mode, it will be ignored")
         run_window(inputscript,
                     server=options.socketserver,
                     port=options.serverport,

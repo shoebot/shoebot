@@ -1,0 +1,471 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-31 16:47+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: sbot:58
+msgid "usage: %prog [options] inputfile.bot"
+msgstr ""
+
+#: sbot:62
+msgid ""
+"run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)"
+msgstr ""
+
+#: sbot:69
+msgid "run script in a GTK window"
+msgstr ""
+
+#: sbot:76
+msgid "run in fullscreen mode"
+msgstr ""
+
+#: sbot:83
+msgid ""
+"run a socket server for external control (will run the script in windowed "
+"mode)"
+msgstr ""
+
+#: sbot:89
+msgid "show a variable tweaking window (will run the script in windowed mode)"
+msgstr ""
+
+#: sbot:95
+msgid "set socketserver port to listen for connections (default is 7777)"
+msgstr ""
+
+#: sbot:102
+msgid ""
+"set number of iterations, multiple images will be produced (only in non-"
+"windowed mode)"
+msgstr ""
+
+#: sbot:107
+msgid "Error: "
+msgstr ""
+
+#: sbot:118
+msgid ""
+"Please specify an input script!\n"
+" (check /usr/share/shoebot/examples/ for example scripts)"
+msgstr ""
+
+#: sbot:121
+msgid "Too many arguments!"
+msgstr ""
+
+#: sbot:129
+msgid "No output file specified, defaulting to output.png..."
+msgstr ""
+
+#: sbot:137
+msgid "Invalid extension in output filename"
+msgstr ""
+
+#: sbot:139
+msgid "start sequence..."
+msgstr ""
+
+#: sbot:150
+msgid "Windowed mode does not take an output file argument."
+msgstr ""
+
+#: sbot:152
+msgid "Sorry, repeat option is not valid in Windowed mode, it will be ignored"
+msgstr ""
+
+#: shoebot-ide:143
+msgid "Untitled"
+msgstr ""
+
+#: shoebot-ide:145
+#, python-format
+msgid "Untitled #%d"
+msgstr ""
+
+#: shoebot-ide:184
+#, python-format
+msgid "%d strings found and marked in red"
+msgstr ""
+
+#: shoebot-ide:352
+msgid "Save File"
+msgstr ""
+
+#: shoebot-ide:372
+#, python-format
+msgid "Save changes to '%s'?"
+msgstr ""
+
+#: shoebot-ide:484
+msgid "/_File"
+msgstr ""
+
+#: shoebot-ide:485
+msgid "/File/_New"
+msgstr ""
+
+#: shoebot-ide:486
+msgid "/File/_Open"
+msgstr ""
+
+#: shoebot-ide:487
+msgid "/File/_Save"
+msgstr ""
+
+#: shoebot-ide:488
+msgid "/File/Save _As..."
+msgstr ""
+
+#: shoebot-ide:489
+msgid "/File/sep1"
+msgstr ""
+
+#: shoebot-ide:490
+msgid "/File/_Close"
+msgstr ""
+
+#: shoebot-ide:491
+msgid "/File/E_xit"
+msgstr ""
+
+#: shoebot-ide:492
+msgid "/_Edit"
+msgstr ""
+
+#: shoebot-ide:493
+msgid "/Edit/Undo"
+msgstr ""
+
+#: shoebot-ide:494
+msgid "/Edit/Redo"
+msgstr ""
+
+#: shoebot-ide:495
+msgid "/Edit/sep1"
+msgstr ""
+
+#: shoebot-ide:496
+msgid "/Edit/Find..."
+msgstr ""
+
+#: shoebot-ide:497
+msgid "/_Settings"
+msgstr ""
+
+#: shoebot-ide:498
+msgid "/Settings/Wrap _Off"
+msgstr ""
+
+#: shoebot-ide:499
+msgid "/Settings/Wrap _Words"
+msgstr ""
+
+#: shoebot-ide:499 shoebot-ide:500
+msgid "/Settings/Wrap Off"
+msgstr ""
+
+#: shoebot-ide:500
+msgid "/Settings/Wrap _Chars"
+msgstr ""
+
+#: shoebot-ide:501
+msgid "/_Run"
+msgstr ""
+
+#: shoebot-ide:502
+msgid "/Run/_Run script"
+msgstr ""
+
+#: shoebot-ide:503
+msgid "/Run/sep1"
+msgstr ""
+
+#: shoebot-ide:504
+msgid "/Run/Run socket server"
+msgstr ""
+
+#: shoebot-ide:505
+msgid "/Run/Show variables window"
+msgstr ""
+
+#: shoebot-ide:506
+msgid "/Run/Run fullscreen"
+msgstr ""
+
+#: shoebot-ide:507
+msgid "/_Help"
+msgstr ""
+
+#: shoebot-ide:508
+msgid "/Help/_About"
+msgstr ""
+
+#: shoebot-ide:572
+msgid ""
+"This is a console window, error messages and script output are shown here,\n"
+" you can clear the window selecting and deleting the content\n"
+"\n"
+msgstr ""
+
+#: shoebot-ide:758
+#, python-format
+msgid "Searching for `%s'\n"
+msgstr ""
+
+#: shoebot-ide:770
+msgid "Search"
+msgstr ""
+
+#: shoebot-ide:772
+msgid "Forward"
+msgstr ""
+
+#: shoebot-ide:773
+msgid "Backward"
+msgstr ""
+
+#: shoebot/data.py:70
+msgid "Wrong initializer for Point object"
+msgstr ""
+
+#: shoebot/data.py:93
+msgid "Copy is not implemented on this Grob class."
+msgstr ""
+
+#: shoebot/data.py:109
+#, python-format
+msgid "Unknown argument(s) '%s'"
+msgstr ""
+
+#: shoebot/data.py:124
+#, python-format
+msgid "Don't know how to copy '%s'."
+msgstr ""
+
+#: shoebot/data.py:252
+#, python-format
+msgid "Don't know what to do with %s."
+msgstr ""
+
+#: shoebot/data.py:330
+#, python-format
+msgid "Wrong data passed to BezierPath.append(): %s"
+msgstr ""
+
+#: shoebot/data.py:454
+#, python-format
+msgid "Wrong initialiser for PathElement (got \"%s\")"
+msgstr ""
+
+#: shoebot/data.py:509
+msgid "got Color() with value None!"
+msgstr ""
+
+#: shoebot/data.py:927
+msgid "sorry, this image mode is not implemented yet"
+msgstr ""
+
+#: shoebot/data.py:1026
+#, python-format
+msgid "Transform: Don't know how to handle transform %s."
+msgstr ""
+
+#: shoebot/data.py:1060 shoebot/data.py:1073
+#, python-format
+msgid "Transform: Can only append Transforms or Cairo matrices (got %s)"
+msgstr ""
+
+#: shoebot/data.py:1222
+msgid "Invalid path data!"
+msgstr ""
+
+#: shoebot/data.py:1274
+msgid "Invalid path, must begin with moveto."
+msgstr ""
+
+#: shoebot/data.py:1287
+msgid "Invalid path, no initial command."
+msgstr ""
+
+#: shoebot/data.py:1294
+msgid "Invalid number of parameters"
+msgstr ""
+
+#: shoebot/data.py:1296
+msgid "Unexpected end of path"
+msgstr ""
+
+#: shoebot/__init__.py:173 shoebot/__init__.py:1897
+msgid "setvars(): setvars needs a dict!"
+msgstr ""
+
+#: shoebot/__init__.py:320
+msgid ""
+"run() needs an input file name or code string (if none was specified when "
+"creating the Bot instance)"
+msgstr ""
+
+#: shoebot/__init__.py:429 shoebot/__init__.py:1400
+msgid "rectmode: invalid input"
+msgstr ""
+
+#: shoebot/__init__.py:498 shoebot/__init__.py:1461
+msgid "arrow: available types for arrow() are NORMAL and FORTYFIVE\n"
+msgstr ""
+
+#: shoebot/__init__.py:597 shoebot/__init__.py:602 shoebot/__init__.py:607
+#: shoebot/__init__.py:612 shoebot/__init__.py:619 shoebot/__init__.py:646
+#: shoebot/__init__.py:652 shoebot/__init__.py:659 shoebot/__init__.py:1504
+#: shoebot/__init__.py:1509 shoebot/__init__.py:1514 shoebot/__init__.py:1519
+#: shoebot/__init__.py:1526
+msgid "No current path. Use beginpath() first."
+msgstr ""
+
+#: shoebot/__init__.py:793 shoebot/__init__.py:1698
+msgid "outputmode() isn't implemented yet"
+msgstr ""
+
+#: shoebot/__init__.py:807 shoebot/__init__.py:1712
+msgid "Only RGB and HSB colormodes are supported."
+msgstr ""
+
+#: shoebot/__init__.py:926 shoebot/__init__.py:1847
+msgid "fontoptions() isn't implemented yet"
+msgstr ""
+
+#: shoebot/__init__.py:958
+#, python-format
+msgid "Canvas.add() - wrong argument: expecting a Grob, received %s"
+msgstr ""
+
+#: shoebot/__init__.py:995 shoebot/__init__.py:1323
+msgid "setsurface(): No target specified!"
+msgstr ""
+
+#: shoebot/__init__.py:1014 shoebot/__init__.py:1338
+msgid ""
+"setsurface: Argument must be a file name, a Cairo surface or a Cairo context"
+msgstr ""
+
+#: shoebot/__init__.py:1074
+#, python-format
+msgid "drawpath(): Expecting a ClippingPath, got %s"
+msgstr ""
+
+#: shoebot/__init__.py:1105 shoebot/__init__.py:1182 shoebot/__init__.py:1564
+#, python-format
+msgid "PathElement(): error parsing path element command (got '%s')"
+msgstr ""
+
+#: shoebot/__init__.py:1131 shoebot/__init__.py:1202
+msgid "Warning: Canvas object had no fill or stroke values"
+msgstr ""
+
+#: shoebot/__init__.py:1148
+#, python-format
+msgid "drawpath(): Expecting a BezierPath, got %s"
+msgstr ""
+
+#: shoebot/__init__.py:1250 shoebot/__init__.py:2012
+#, python-format
+msgid "Saved snapshot to %s"
+msgstr ""
+
+#: shoebot/__init__.py:1537
+msgid "drawpath(): Input is not a valid BezierPath object"
+msgstr ""
+
+#: shoebot/__init__.py:1541
+msgid ""
+"drawpath(): Path is not properly constructed (expecting a path element, got "
+msgstr ""
+
+#: shoebot/__init__.py:1610
+msgid "findpath() isn't implemented yet (sorry)"
+msgstr ""
+
+#: shoebot/__init__.py:1631
+msgid "transform() isn't implemented yet"
+msgstr ""
+
+#: shoebot/__init__.py:1662
+msgid "Scale parameters can't be 0. Ignoring"
+msgstr ""
+
+#: shoebot/__init__.py:1835
+msgid "lineheight() isn't implemented yet"
+msgstr ""
+
+#: shoebot/__init__.py:1842
+msgid "align() isn't implemented in Shoebot yet"
+msgstr ""
+
+#: shoebot/__init__.py:2100
+#, python-format
+msgid "finish(): '%s' is an invalid extension"
+msgstr ""
+
+#: shoebot/__init__.py:2113
+msgid ""
+"run() needs an input file name or code string (if none was specified when "
+"creating the Box instance)"
+msgstr ""
+
+#: shoebot/gtkui.py:155
+#, python-format
+msgid "Listening on port %i..."
+msgstr ""
+
+#: shoebot/gtkui.py:161
+msgid "Connected"
+msgstr ""
+
+#: shoebot/gtkui.py:169
+msgid "Connection closed."
+msgstr ""
+
+#: shoebot/gtkui.py:304
+msgid "_Save as"
+msgstr ""
+
+#: shoebot/gtkui.py:305
+msgid "Save as _SVG"
+msgstr ""
+
+#: shoebot/gtkui.py:306
+msgid "Save as _PDF"
+msgstr ""
+
+#: shoebot/gtkui.py:307
+msgid "Save as P_S"
+msgstr ""
+
+#: shoebot/gtkui.py:308
+msgid "Save as P_NG"
+msgstr ""
+
+#: shoebot/gtkui.py:309
+msgid "_Go fullscreen"
+msgstr ""
+
+#: shoebot/gtkui.py:310
+msgid "_Exit fullscreen"
+msgstr ""
+
+#: shoebot/gtkui.py:311
+msgid "_Close Window"
+msgstr ""
