@@ -43,17 +43,18 @@ from shoebot import ShoebotError
 
 
 APP = 'shoebot'
-DIR = 'locale'
+DIR = sys.prefix + '/share/shoebot/locale'
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
+
 
 import locale
 import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
-
 
 
 if sys.platform != 'win32':

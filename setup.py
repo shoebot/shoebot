@@ -14,8 +14,11 @@ for file_ in files]) for root,dir,files in os.walk('examples')]
 datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
 datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
+datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
+for file_ in files]) for root,dir,files in os.walk('locale')])
+
 setup(name = "shoebot",
-    version = "0.1",
+    version = "0.2beta",
     description = "A vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",

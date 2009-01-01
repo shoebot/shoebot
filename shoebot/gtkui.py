@@ -13,12 +13,13 @@ import cairo
 import gobject, socket
 
 APP = 'shoebot'
-DIR = 'locale'
+DIR = sys.prefix + '/share/shoebot/locale'
 
 import locale
 import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 

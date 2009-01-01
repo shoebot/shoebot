@@ -29,18 +29,20 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 import cairo
 import util
 from data import *
+import sys
 
 VERBOSE = False
 DEBUG = False
 EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 APP = 'shoebot'
-DIR = 'locale'
+DIR = sys.prefix + '/share/shoebot/locale'
 
 import locale
 import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
