@@ -37,6 +37,8 @@ EXTENSIONS = ('.png','.svg','.ps','.pdf')
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
+LIB_DIR = sys.prefix + '/share/shoebot/lib'
+sys.path.append(LIB_DIR)
 
 import locale
 import gettext
