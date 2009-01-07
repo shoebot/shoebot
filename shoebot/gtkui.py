@@ -272,15 +272,15 @@ class VarWindow:
 
     def cb_set_var(self, widget, v):
         ''' Called when a slider is adjusted. '''
-        # set the appropriate canvas var
+        # set the appropriate bot var
         if v.type is NUMBER:
-            self.parent.canvas.bot.namespace[v.name] = widget.value
+            self.parent.drawingarea.bot.namespace[v.name] = widget.value
         elif v.type is BOOLEAN:
-            self.parent.canvas.bot.namespace[v.name] = widget.get_active()
+            self.parent.drawingarea.bot.namespace[v.name] = widget.get_active()
         elif v.type is TEXT:
-            self.parent.canvas.bot.namespace[v.name] = widget.get_text()
+            self.parent.drawingarea.bot.namespace[v.name] = widget.get_text()
         # and redraw the canvas
-        self.parent.canvas.redraw()
+        self.parent.drawingarea.redraw()
 
 
 class ShoebotWindow(SocketServerMixin):
