@@ -976,6 +976,9 @@ class Canvas:
             raise ShoebotError(_("Canvas.add() - wrong argument: expecting a Grob, received %s") % (grob))
         self.grobstack.append(grob)
 
+    def append(self, grob):
+        self.add(self, grob)
+
     def setsurface(self):
         pass
     def get_context(self):
