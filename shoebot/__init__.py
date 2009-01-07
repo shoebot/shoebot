@@ -365,13 +365,17 @@ class Bot:
             else:
                 # if on gtkmode, print the error and don't break
                 raise ShoebotError(errmsg)
-                
+
+    def next_frame(self):
+        '''Updates the FRAME value.'''
+        self.namespace['FRAME'] += 1
+
     def mouse_down(self, pointer):
         self.namespace['mousedown'] = True
-    
+
     def mouse_up(self, pointer):
         self.namespace['mousedown'] = False
-    
+
     def pointer_moved(self, pointer):
         self.namespace['MOUSEX'] = pointer.x
         self.namespace['MOUSEY'] = pointer.y
@@ -759,7 +763,7 @@ class NodeBot(Bot):
     def endclip(self):
         p = self.RestoreCtx()
         self.canvas.add(p)
-       
+
 
 
     def transform(self, mode=None): # Mode can be CENTER or CORNER
@@ -1030,7 +1034,7 @@ class CairoCanvas(Canvas):
     def draw(self, ctx=None):
         if not ctx:
             ctx = self._context
-        
+
         # following block checks if we are in gtkmode and in case of fullscreen it scales cairo context
         # and centers it on screen
         if self.bot.gtkmode:
@@ -1043,7 +1047,7 @@ class CairoCanvas(Canvas):
                 else:
                     self.fullscreen_scale =  float(self.bot.screen_height) / float(self.bot.HEIGHT)
                     self.fullscreen_deltax = (self.bot.screen_width - (self.bot.WIDTH*self.fullscreen_scale))/2
-                    self.fullscreen_deltay = 0                
+                    self.fullscreen_deltay = 0
                 ctx.translate(self.fullscreen_deltax, self.fullscreen_deltay)
                 ctx.scale(self.fullscreen_scale, self.fullscreen_scale)
 

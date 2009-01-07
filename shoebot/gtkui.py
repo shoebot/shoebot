@@ -122,18 +122,16 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.bot._transform = Transform()
         # attach bot to context
         self.bot.canvas.setsurface(target=self.context)
-##        if 'setup' in self.bot.namespace:
-##            self.bot.namespace['setup']()
+        # run draw loop, if applicable
         if 'draw' in self.bot.namespace:
             self.draw()
-        self.bot.canvas.draw()
 
         # no setup() or draw() means we have to run the script on each step
         if not 'setup' in self.bot.namespace and not 'draw' in self.bot.namespace:
             self.bot.run()
-            self.bot.canvas.draw()
+        # render canvas contents and show them in the drawingarea
+        self.bot.canvas.draw()
 
-##        self.draw()
         return False
 
     def redraw(self,dummy='moo'):
@@ -182,14 +180,14 @@ class SocketServerMixin:
             if len(incoming.split()) == 2:
                 var, value = incoming.split()
                 # is value in our variables list?
-                if var in self.canvas.bot.namespace:
+                if var in self.drawingarea.bot.namespace:
                     # set the bot namespace to the new value
 
                     ## TODO: we're forced to convert input to floats
-                    # self.canvas.bot.namespace[var] = value.strip(';')
-                    self.canvas.bot.namespace[var] = float(value.strip(';'))
+                    # self.drawingarea.bot.namespace[var] = value.strip(';')
+                    self.drawingarea.bot.namespace[var] = float(value.strip(';'))
                     # and redraw
-                    self.canvas.redraw()
+                    self.drawingarea.redraw()
                 return True
             else:
                 return True
@@ -288,7 +286,8 @@ class VarWindow:
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False, go_fullscreen=False):
         self.bot = shoebot.NodeBot(gtkmode=True, inputscript=code)
-        self.canvas = ShoebotDrawingArea(self, self.bot)
+        self.drawingarea = ShoebotDrawingArea(self, self.bot)
+
         self.has_server = server
         self.serverport = serverport
         self.has_varwindow = varwindow
@@ -302,7 +301,7 @@ class ShoebotWindow(SocketServerMixin):
         except gobject.GError:
             # icon not found = no icon
             pass
-        self.window.add(self.canvas)
+        self.window.add(self.drawingarea)
 
         self.uimanager = gtk.UIManager()
         accelgroup = self.uimanager.get_accel_group()
@@ -311,10 +310,10 @@ class ShoebotWindow(SocketServerMixin):
         actiongroup = gtk.ActionGroup('Canvas')
 
         actiongroup.add_actions([('Save as', None, _('_Save as')),
-                                 ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.canvas.save_output),
-                                 ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.canvas.save_output),
-                                 ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.canvas.save_output),
-                                 ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.canvas.save_output),
+                                 ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.drawingarea.save_output),
+                                 ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.drawingarea.save_output),
+                                 ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.drawingarea.save_output),
+                                 ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.drawingarea.save_output),
                                  ('fullscreen', 'Go fullscreen', _('_Go fullscreen'), "<Control>5", None, self.do_fullscreen),
                                  ('unfullscreen', 'Exit fullscreen', _('_Exit fullscreen'), "<Control>6", None, self.do_unfullscreen),
                                  ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_quit)
@@ -328,8 +327,8 @@ class ShoebotWindow(SocketServerMixin):
             <menuitem action="png"/>
             <separator/>
             <menuitem action="fullscreen"/>
-            <menuitem action="unfullscreen"/>            
-            <separator/>            
+            <menuitem action="unfullscreen"/>
+            <separator/>
             <menuitem action="close"/>
         </popup>
         '''
@@ -343,23 +342,23 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.has_varwindow:
             VarWindow(self, self.bot)
-            
-        if self.go_fullscreen:
-            self.do_fullscreen(self)           
 
-        if self.canvas.is_dynamic:
+        if self.go_fullscreen:
+            self.do_fullscreen(self)
+
+        if self.drawingarea.is_dynamic:
+            frame = 0
             from time import sleep
             while 1:
-                # redraw canvas
-                self.canvas.redraw()
-                #self.console_error.update()
                 # increase bot frame count
-                self.bot.FRAME += 1
+                self.bot.next_frame()
+                # redraw canvas
+                self.drawingarea.redraw()
+                #self.console_error.update()
                 # respect framerate
-                sleep(1 / self.bot.framerate)
+                sleep(1. / self.bot.framerate)
                 while gtk.events_pending():
                     gtk.main_iteration()
-                    # gtk.main_iteration(block=True)
         else:
             gtk.main()
             while gtk.events_pending():
@@ -376,8 +375,8 @@ class ShoebotWindow(SocketServerMixin):
         #self.bot.screen_width = self.window.get_allocation().width
         #self.bot.screen_height = self.window.get_allocation().height
         self.bot.screen_width = gtk.gdk.screen_width()
-        self.bot.screen_height = gtk.gdk.screen_height()      
-        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height           
+        self.bot.screen_height = gtk.gdk.screen_height()
+        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height
 
     def do_unfullscreen(self, widget):
         self.window.unfullscreen()
@@ -387,7 +386,7 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_server:
             self.sock.close()
         self.window.destroy()
-        if not self.canvas.is_dynamic:
+        if not self.drawingarea.is_dynamic:
             gtk.main_quit()
         ## FIXME: This doesn't kill the instance :/
 
