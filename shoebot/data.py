@@ -887,7 +887,8 @@ class Image(Grob, TransformMixin, ColorMixin):
         self.path = path
         self.data = data
 
-        import Image       
+        import Image
+        import numpy       
         from array import array
 
         # checks if image data is passed in command call, in this case it wraps
@@ -921,17 +922,17 @@ class Image(Grob, TransformMixin, ColorMixin):
         # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
         # and fills a buffer from array module, then passes it to cairo image surface constructor
         if img.mode == "RGBA":
-            img_buffer = array('c')
             r,g,b,a = img.split()
             img = Image.merge("RGBA",(b,g,r,a))             
-            img_buffer.fromstring(img.tostring())            
+            img_buffer = numpy.asarray(img)
+            img_buffer.flags.writeable=True
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
         elif img.mode == "RGB":
             img = img.convert('RGBA')
-            img_buffer = array('c')
             r,g,b,a = img.split()
-            img = Image.merge("RGBA",(b,g,r,a))                        
-            img_buffer.fromstring(img.tostring())           
+            img = Image.merge("RGBA",(b,g,r,a)) 
+            img_buffer = numpy.asarray(img)
+            img_buffer.flags.writeable=True            
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
         else:
             raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
