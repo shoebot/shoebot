@@ -922,12 +922,16 @@ class Image(Grob, TransformMixin, ColorMixin):
         # and fills a buffer from array module, then passes it to cairo image surface constructor
         if img.mode == "RGBA":
             img_buffer = array('c')
-            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            r,g,b,a = img.split()
+            img = Image.merge("RGBA",(b,g,r,a))             
+            img_buffer.fromstring(img.tostring())            
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
         elif img.mode == "RGB":
             img = img.convert('RGBA')
             img_buffer = array('c')
-            img_buffer.fromstring(util.rgba_to_argb(img.tostring()))
+            r,g,b,a = img.split()
+            img = Image.merge("RGBA",(b,g,r,a))                        
+            img_buffer.fromstring(img.tostring())           
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
         else:
             raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
