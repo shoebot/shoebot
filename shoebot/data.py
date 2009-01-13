@@ -919,11 +919,14 @@ class Image(Grob, TransformMixin, ColorMixin):
             size = self.width, self.height
             img = img.resize(size, Image.ANTIALIAS)
         # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
-        # and fills a buffer from array module, then passes it to cairo image surface constructor
+        # and fills an array from numpy module, then passes it to cairo image surface constructor
         if img.mode == "RGBA":
+            # swapping b and r channels with PIL
             r,g,b,a = img.split()
             img = Image.merge("RGBA",(b,g,r,a))             
             img_buffer = numpy.asarray(img)
+            # resulting numpy array defaults to read-only, but cairo needs a writeable object
+            # so we are forced to change a flag
             img_buffer.flags.writeable=True
             imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
         elif img.mode == "RGB":
