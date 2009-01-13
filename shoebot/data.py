@@ -889,7 +889,6 @@ class Image(Grob, TransformMixin, ColorMixin):
 
         import Image
         import numpy       
-        from array import array
 
         # checks if image data is passed in command call, in this case it wraps
         # the data in a StringIO oject in order to use it as a file
