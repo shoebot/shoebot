@@ -899,7 +899,7 @@ class Image(Grob, TransformMixin, ColorMixin):
         if self.data is None:
             img = Image.open(self.path)
         elif self.data:
-            from StringIO import StringIO
+            from cStringIO import StringIO
             img = Image.open(StringIO(self.data))
 
         # retrieves original image size
