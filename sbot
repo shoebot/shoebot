@@ -138,10 +138,10 @@ if __name__ == '__main__':
                 error(_("Invalid extension in output filename"))
         if options.repeat:
             print _("start sequence...")
-            for r in range(options.repeat):
-                outputfile = filename+"_"+str(r+1)+extension
+            for r in range(1, options.repeat+1):
+                outputfile = filename + "_%03d" %r + extension
                 run_oneshot(inputscript, outputfile)
-                print r+1                                  
+                print "Output %s" % outputfile
         else:
             run_oneshot(inputscript, outputfile)
     else:
