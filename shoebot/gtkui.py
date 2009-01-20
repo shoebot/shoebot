@@ -68,8 +68,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                     import re
                     l = re.sub("\s", "", l)
                     if l.startswith("size("):
-                        l = l[4:].strip().strip('()')
-                        width,height = int(l.split(',')[0]),int(l.split(',')[1])
+                        self.bot.load_namespace()
+                        exec l in self.bot.namespace
             elif ("def setup" in line) or ("def draw" in line):
                 self.is_dynamic = True
 
@@ -80,7 +80,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         # set the window size to the one specified in the script
         # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
-        self.set_size_request(width, height)
+        self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
 
         # RIGHT CLICK HANDLING
         self.menu = gtk.Menu()

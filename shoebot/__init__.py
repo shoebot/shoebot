@@ -310,6 +310,14 @@ class Bot:
         self.canvas.draw()
         self.canvas.finish()
 
+    def load_namespace(self):
+        import data
+        for name in dir(self):
+            # get all stuff in the Bot namespaces
+            self.namespace[name] = getattr(self, name)
+        for name in dir(data):
+            self.namespace[name] = getattr(data, name)
+
     def run(self, inputcode=None):
         '''
         Executes the contents of a Nodebox/Shoebot script
@@ -337,12 +345,7 @@ class Bot:
             # if not, try parsing it as a code string
             source_or_code = inputcode
 
-        import data
-        for name in dir(self):
-            # get all stuff in the Bot namespaces
-            self.namespace[name] = getattr(self, name)
-        for name in dir(data):
-            self.namespace[name] = getattr(data, name)
+        self.load_namespace()
 
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
