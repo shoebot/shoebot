@@ -58,6 +58,10 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
         self.bot.canvas.setsurface(target=surface)
 
+        # these will store the arguments of size()
+        width_exp = None
+        height_exp = None
+
         # check inputscript for size and whether is a static script or not
         # it is not perfect, but should do for the moment
         for line in lines:
@@ -69,18 +73,32 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                     l = re.sub("\s", "", l)
                     if l.startswith("size("):
                         l = l[4:].strip().strip('()')
-                        width,height = int(l.split(',')[0]),int(l.split(',')[1])
+
+                        # parameters could be expressions, so we store them
+                        # to later eval them
+                        width_exp, height_exp = l.split(',')
+                        ## width,height = int(l.split(',')[0]),int(l.split(',')[1])
+
             elif ("def setup" in line) or ("def draw" in line):
                 self.is_dynamic = True
 
+        # do a first-run of the script
+        self.bot.run()
+
+        # run the setup() method if the script comes with one
         if self.is_dynamic:
-            self.bot.run()
             if 'setup' in self.bot.namespace:
                 self.bot.namespace['setup']()
 
+        # if size() was called, eval the params
+        if width_exp and height_exp:
+            # now that we've run the script, let's parse the size() params
+            # using the Bot namespace as eval's globals
+            width = eval(width_exp, self.bot.namespace)
+            height = eval(height_exp, self.bot.namespace)
+
         # set the window size to the one specified in the script
-        # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
-        self.set_size_request(width, height)
+        self.set_size_request(int(width), int(height))
 
         # RIGHT CLICK HANDLING
         self.menu = gtk.Menu()

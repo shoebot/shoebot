@@ -2,7 +2,6 @@ from random import randint
 
 size(1000,1000)
 
-colormode(HSB)
 colorrange(255)
 
 rows = 9
@@ -14,6 +13,8 @@ def block(x,y,z):
     the BOTTOM-CENTER corner, z is the height
     '''
     #TODO : variables for width+depth instead of fixed value
+
+    colormode(HSB)
 
     # no strokes in the inside
     nostroke()
@@ -57,7 +58,6 @@ def block(x,y,z):
     c = color(hue,40,80)
     # set the stroke
     stroke(c)
-    print "done with stroke"
     # and unset fill
     nofill()
     # draw the path
@@ -69,19 +69,15 @@ def block(x,y,z):
     lineto(x+20,y-10)
     endpath()
 
-def setup():
-    pass
+colormode(RGB)
+background(255,255,255)
 
-def draw():
-    # white background
-    background(1,1,1)
-
-    # start from 100,100
-    translate(100,100)
-    # and draw the blocks
-    for x,y in grid(rows,cols,100,100):
-        # height of each block is determined by x,y coordinates
-        z = (x+y)/25
-        # draw it
-        block(x,y,z)
+# start from 100,100
+translate(100,100)
+# and draw the blocks
+for x,y in grid(rows,cols,100,100):
+    # height of each block is determined by x,y coordinates
+    z = (x+y)/25
+    # draw it
+    block(x,y,z)
 
