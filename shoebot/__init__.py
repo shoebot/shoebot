@@ -180,7 +180,10 @@ class Bot:
             self.var(item, NUMBER, vardict[item])
 
     #### Utility
-
+    
+    def drawing_closed(self):
+        pass   
+    
     def color(self, *args):
         #return Color(self.color_mode, self.color_range, *args)
         return Color(mode=self.color_mode, color_range=self.color_range, *args)
@@ -945,7 +948,7 @@ class NodeBot(Bot):
 
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
-
+ 
 
 class Canvas:
     '''
