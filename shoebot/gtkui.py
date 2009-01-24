@@ -297,7 +297,9 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
-        self.bot.drawing_closed = pass
+        def dummy():
+            pass
+        self.bot.drawing_closed = dummy
         try:
             self.window.set_icon_from_file(ICON_FILE)
         except gobject.GError:
