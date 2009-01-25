@@ -180,10 +180,10 @@ class Bot:
             self.var(item, NUMBER, vardict[item])
 
     #### Utility
-    
+
     def drawing_closed(self):
-        pass   
-    
+        pass
+
     def color(self, *args):
         #return Color(self.color_mode, self.color_range, *args)
         return Color(mode=self.color_mode, color_range=self.color_range, *args)
@@ -946,7 +946,7 @@ class NodeBot(Bot):
 
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
- 
+
 
 class Canvas:
     '''
@@ -1066,7 +1066,7 @@ class CairoCanvas(Canvas):
                 deltax, deltay = item.center
                 m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                 ctx.transform(m)
-                self.drawclip(item)
+                self.drawclip(item, ctx)
             elif isinstance(item, RestoreCtx):
                 ctx.restore()
             else:
@@ -1075,7 +1075,7 @@ class CairoCanvas(Canvas):
                     deltax, deltay = item.center
                     m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                     ctx.transform(m)
-                    self.drawpath(item)
+                    self.drawpath(item, ctx)
                 elif isinstance(item, Text):
                     ctx.save()
                     x,y = item.metrics[0:2]
@@ -1083,13 +1083,13 @@ class CairoCanvas(Canvas):
                     m = item._transform.get_matrix_with_center(deltax,deltay-item.baseline,item._transformmode)
                     ctx.transform(m)
                     ctx.translate(item.x,item.y-item.baseline)
-                    self.drawtext(item)
+                    self.drawtext(item, ctx)
                 elif isinstance(item, Image):
                     ctx.save()
                     deltax, deltay = item.center
                     m = item._transform.get_matrix_with_center(deltax,deltay,item._transformmode)
                     ctx.transform(m)
-                    self.drawimage(item)
+                    self.drawimage(item, ctx)
 
                 ctx.restore()
 
@@ -1136,22 +1136,22 @@ class CairoCanvas(Canvas):
         if not ctx:
             ctx = self._context
         if txt._fillcolor:
-            self._context.set_source_rgba(*txt._fillcolor)
+            ctx.set_source_rgba(*txt._fillcolor)
             if txt._strokecolor:
                 # if there's a stroke still to be applied, we need to call fill_preserve()
                 # which still leaves this path as active
-                self._context.fill_preserve()
-                self._context.set_source_rgba(*txt._strokecolor)
+                ctx.fill_preserve()
+                ctx.set_source_rgba(*txt._strokecolor)
                 # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
                 # for further operations if needed)
-                self._context.stroke()
+                ctx.stroke()
             else:
                 # if there isn't a stroke, use plain fill() to close the path
-                self._context.fill()
+                ctx.fill()
         elif txt._strokecolor:
             # if there's no fill, apply stroke only
-            self._context.set_source_rgba(*txt._strokecolor)
-            self._context.stroke()
+            ctx.set_source_rgba(*txt._strokecolor)
+            ctx.stroke()
         else:
             print _("Warning: Canvas object had no fill or stroke values")
 
@@ -1176,7 +1176,7 @@ class CairoCanvas(Canvas):
             ctx = self._context
 
         if path._strokewidth:
-            self._context.set_line_width(path._strokewidth)
+            ctx.set_line_width(path._strokewidth)
 
         for element in path.data:
             cmd = element[0]
@@ -1207,22 +1207,22 @@ class CairoCanvas(Canvas):
                 raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
 
         if path._fillcolor:
-            self._context.set_source_rgba(*path._fillcolor)
+            ctx.set_source_rgba(*path._fillcolor)
             if path._strokecolor:
                 # if there's a stroke still to be applied, we need to call fill_preserve()
                 # which still leaves this path as active
-                self._context.fill_preserve()
-                self._context.set_source_rgba(*path._strokecolor)
+                ctx.fill_preserve()
+                ctx.set_source_rgba(*path._strokecolor)
                 # now apply the stroke (stroke ends the path, we'd use stroke_preserve()
                 # for further operations if needed)
-                self._context.stroke()
+                ctx.stroke()
             else:
                 # if there isn't a stroke, use plain fill() to close the path
-                self._context.fill()
+                ctx.fill()
         elif path._strokecolor:
             # if there's no fill, apply stroke only
-            self._context.set_source_rgba(*path._strokecolor)
-            self._context.stroke()
+            ctx.set_source_rgba(*path._strokecolor)
+            ctx.stroke()
         else:
             print _("Warning: Canvas object had no fill or stroke values")
 
@@ -1234,23 +1234,28 @@ class CairoCanvas(Canvas):
             self._surface.write_to_png(self._bot.targetfilename)
 
     def output(self, target):
-        #self.draw()
+
         if isinstance(target, basestring): # filename
             filename = target
 
-            # create a Bot instance using the current running script
-            tempbot = NodeBot(inputscript=self.bot.inputscript, targetfilename=filename)
-            tempbot.run()
+            import os
+            f, ext = os.path.splitext(filename)
 
-            # set its variables to the current ones
-            for v in self.bot.vars:
-                tempbot.namespace[v.name] = self.bot.namespace[v.name]
-            if 'setup' in tempbot.namespace:
-                tempbot.namespace['setup']()
-            if 'draw' in tempbot.namespace:
-                tempbot.namespace['draw']()
-            tempbot.finish()
-            del tempbot
+            if ext not in EXTENSIONS:
+                raise ShoebotError('CairoCanvas.output: Invalid filename extension')
+
+            output_surface = util.surfacefromfilename(filename, self.bot.WIDTH, self.bot.HEIGHT)
+            output_context = cairo.Context(output_surface)
+            print 'output: starting draw'
+            self.draw(output_context)
+            print 'output: draw is done'
+            if ext == '.png':
+                output_surface.write_to_png(filename)
+            else:
+                output_context.show_page()
+                output_surface.finish()
+
+            del output_context, output_surface
             print _("Saved snapshot to %s") % filename
 
         elif isinstance(target, cairo.Context):
