@@ -1240,7 +1240,7 @@ class CairoCanvas(Canvas):
 
     def output(self, target):
 
-        if isinstance(target, basestring): # filename
+        if isinstance(target, basestring): # is it a filename?
             filename = target
 
             import os
@@ -1251,9 +1251,7 @@ class CairoCanvas(Canvas):
 
             output_surface = util.surfacefromfilename(filename, self.bot.WIDTH, self.bot.HEIGHT)
             output_context = cairo.Context(output_surface)
-            print 'output: starting draw'
             self.draw(output_context)
-            print 'output: draw is done'
             if ext == '.png':
                 output_surface.write_to_png(filename)
             else:
