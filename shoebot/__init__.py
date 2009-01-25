@@ -947,6 +947,11 @@ class NodeBot(Bot):
     def fontoptions(self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
+    def autotext(self, sourceFile):
+        from kgp import KantGenerator
+        k = KantGenerator(sourceFile)
+        return k.output()
+
 
 class Canvas:
     '''
