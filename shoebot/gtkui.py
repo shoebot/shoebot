@@ -202,8 +202,9 @@ class VarWindow:
     def __init__(self, parent, bot):
         self.parent = parent
 
-        window = gtk.Window()
-        window.connect("destroy", self.do_quit)
+        self.window = gtk.Window()
+        self.window.set_destroy_with_parent(True)
+        self.window.connect("destroy", self.do_quit)
         vbox = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
@@ -220,10 +221,10 @@ class VarWindow:
             elif item.type is BUTTON:
                 self.add_button(vbox, item)
 
-        window.add(vbox)
-        window.set_size_request(400,35*len(self.variables))
-        window.show_all()
-        gtk.main()
+        self.window.add(vbox)
+        self.window.set_size_request(400,35*len(self.variables))
+        self.window.show_all()
+        ## gtk.main()
 
     def add_number(self, container, v):
         # create a slider for each var
@@ -269,7 +270,7 @@ class VarWindow:
 
 
     def do_quit(self, widget):
-        gtk.main_quit()
+        pass
 
     def cb_set_var(self, widget, v):
         ''' Called when a slider is adjusted. '''
@@ -342,10 +343,11 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.has_server:
             self.server('', self.serverport)
-        self.window.show_all()
+
 
         if self.has_varwindow:
-            VarWindow(self, self.bot)
+            self.var_window = VarWindow(self, self.bot)
+        self.window.show_all()
 
         if self.go_fullscreen:
             self.do_fullscreen(self)
@@ -389,6 +391,9 @@ class ShoebotWindow(SocketServerMixin):
     def do_quit(self, widget):
         if self.has_server:
             self.sock.close()
+        if self.has_varwindow:
+            self.var_window.window.destroy()
+            del self.var_window
         self.bot.drawing_closed()
         self.window.destroy()
         if not self.drawingarea.is_dynamic:
