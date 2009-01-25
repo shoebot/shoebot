@@ -248,8 +248,6 @@ class Bot:
           vector file with an embedded bitmap - not good. So we just create
           another Bot instance with the currently loaded script, copy the
           current namespace and save its output in a file.
-
-        The shortcomings of this is that
         '''
 
         if filename:
@@ -1236,41 +1234,20 @@ class CairoCanvas(Canvas):
         #self.draw()
         if isinstance(target, basestring): # filename
             filename = target
-            import os
-            f, ext = os.path.splitext(filename)
 
-            if ext == ".png":
-                # bitmap snapshots can be done via Cairo
-                if isinstance(self._surface, cairo.ImageSurface):
-                    # if current surface is a bitmap image surface, we can write the
-                    # file right away
-                    self._surface.write_to_png(filename)
-                else:
-                    # otherwise, we clone the contents of current surface onto
-                    # a temporary one
-                    temp_surface = util.surfacefromfilename(filename, self._bot.WIDTH, self._bot.HEIGHT)
-                    ctx = cairo.Context(temp_surface)
-                    ctx.set_source_surface(self._surface, 0, 0)
-                    ctx.paint()
-                    temp_surface.write_to_png(filename)
-                    del temp_surface
+            # create a Bot instance using the current running script
+            tempbot = NodeBot(inputscript=self.bot.inputscript, targetfilename=filename)
+            tempbot.run()
 
-            if ext in (".svg",".ps",".pdf"):
-                # vector snapshots are made with another temporary Bot
-
-                # create a Bot instance using the current running script
-                box = NodeBot(inputscript=self.bot.inputscript, targetfilename=filename)
-                box.run()
-
-                # set its variables to the current ones
-                for v in self.bot.vars:
-                    box.namespace[v.name] = self.bot.namespace[v.name]
-                if 'setup' in box.namespace:
-                    box.namespace['setup']()
-                if 'draw' in box.namespace:
-                    box.namespace['draw']()
-                box.finish()
-                del box
+            # set its variables to the current ones
+            for v in self.bot.vars:
+                tempbot.namespace[v.name] = self.bot.namespace[v.name]
+            if 'setup' in tempbot.namespace:
+                tempbot.namespace['setup']()
+            if 'draw' in tempbot.namespace:
+                tempbot.namespace['draw']()
+            tempbot.finish()
+            del tempbot
             print _("Saved snapshot to %s") % filename
 
         elif isinstance(target, cairo.Context):
