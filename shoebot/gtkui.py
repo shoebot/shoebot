@@ -43,6 +43,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         # get the bot object to display
         self.bot = bot
 
+
         script = self.bot.inputscript
         # check if the script is a file or a string
         import os.path
@@ -296,6 +297,9 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
+        def dummy():
+            pass
+        self.bot.drawing_closed = dummy
         try:
             self.window.set_icon_from_file(ICON_FILE)
         except gobject.GError:
@@ -385,6 +389,7 @@ class ShoebotWindow(SocketServerMixin):
     def do_quit(self, widget):
         if self.has_server:
             self.sock.close()
+        self.bot.drawing_closed()
         self.window.destroy()
         if not self.drawingarea.is_dynamic:
             gtk.main_quit()
