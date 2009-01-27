@@ -148,7 +148,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
     def save_output(self, action):
         '''Save the current image to a file.'''
         # action is the menu action pointing the extension to use
-        extension = action.get_name()
+        extension = action.get_name()        
         filename = 'output.' + extension
         self.bot.snapshot(filename)
 
