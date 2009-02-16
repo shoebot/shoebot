@@ -117,43 +117,36 @@ After including an import statement,
 
   import shoebot
 
-a Box object needs to be created, and all further drawing commands can be 
+a NodeBot object needs to be created, and all further drawing commands can be 
 called on that instance.
 
-The Box instance should be created with the output file name as an argument. 
+The NodeBot instance should be created with the output file name as an argument. 
 
-  box = shoebot.Box("output.svg")
-  box.size(400,400)
-  box.rect(10,10,100,100)
+  bot = shoebot.NodeBot("output.svg")
+  bot.size(400,400)
+  bot.rect(10,10,100,100)
 
 When you're finished with drawing, just call
 
-  box.finish()
+  bot.finish()
 
 and your output file should be created.
 
 Also, you can save snapshots of the current state if the Box instance like so:
 
-  box.snapshot("snap.png")
+  bot.snapshot("snap.png")
 
 You can even call external Shoebot/Nodebox scripts from your Python script:
 
-  box.run("example.bot")
-
-Known bugs
-----------
-* when using snapshot() or saving images from the GTK window interface
-  right-click menu, any random values in the script will be recalculated. This
-  cannot be avoided until we implement a proper Canvas for Shoebot, which will
-  probably take a while.
+  bot.run("example.bot")
 
 Links
 -----
 
-Source browser:		http://code.tinkerhouse.net/shoebot/hg
-Bug tracker:		http://code.tinkerhouse.net/shoebot/trac
-Announcement blog:  http://identi.ca/shoebot
-Mailing lists:      http://tinkerhouse.net/shoebot/devel
+Source browser:	     http://code.tinkerhouse.net/shoebot/hg
+Bug tracker:         http://code.tinkerhouse.net/shoebot/trac
+Announcement blog:   http://identi.ca/shoebot
+Mailing lists:       http://tinkerhouse.net/shoebot/devel
 
 
 Contact
