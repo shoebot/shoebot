@@ -18,8 +18,8 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('locale')])
 
 setup(name = "shoebot",
-    version = "0.2beta",
-    description = "A vector graphics scripting application",
+    version = "0.2",
+    description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
     license = 'GPL v3',

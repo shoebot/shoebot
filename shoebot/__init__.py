@@ -1239,6 +1239,9 @@ class CairoCanvas(Canvas):
             self._surface.write_to_png(self._bot.targetfilename)
 
     def output(self, target):
+        '''
+        Output the canvas contents to a file, Cairo surface or Cairo context.
+        '''
 
         if isinstance(target, basestring): # is it a filename?
             filename = target
