@@ -17,6 +17,9 @@ datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('locale')])
 
+datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
+for file_ in files]) for root,dir,files in os.walk('lib')])
+
 setup(name = "shoebot",
     version = "0.2",
     description = "Vector graphics scripting application",

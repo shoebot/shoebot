@@ -1,0 +1,25 @@
+size(640,480)
+videolib = ximport("sbopencv")
+
+speed(300)
+video = videolib.camera(width=320, height=240)
+transform(CORNER)
+
+def draw():
+
+    nofill()
+    nostroke()
+    frame = video.frame(flip=True, bthreshold=128, bthreshmode=0)
+    push()
+    scale(2)
+    blobs = frame.blobs
+    image(None,0,0,data=frame.data)
+
+    #print blobs.count
+    for b in blobs.items:
+        fill(0,0.6,1,.5)
+        rect(b.minx, b.miny, b.maxx-b.minx, b.maxy-b.miny)
+        fill(0)
+        text(b.etiqueta, b.minx, b.miny, fontsize=12, font="Arial")
+        nofill()
+    pop()

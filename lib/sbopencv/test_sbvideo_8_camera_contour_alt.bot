@@ -1,0 +1,32 @@
+size(640,480)
+videolib = ximport("sbopencv")
+
+speed(300)
+video = videolib.camera(width=320, height=240)
+#video = videolib.movie('/mnt/movies/violeta.avi')
+
+transform(CORNER)
+
+def draw():
+    background(0.6,0.2,0.1)
+    nofill()
+    nostroke()
+    frame = video.frame()
+    push()
+    scale(2)
+    # uncomment next image() line if you want to have webcam
+    # grabbed frame as background
+    image(None,0,0,data=frame.data)
+    n, contours = frame.contours(threshold=100)
+    #print "found", n, "contour(s)"
+
+    for contour in contours:
+        points=[]
+   
+        for pt in contour:
+            points.append((pt[0], pt[1]))
+        stroke(1)
+        p1 = findpath(points, curvature=0.5)
+        drawpath(p1)
+        nostroke
+    pop()

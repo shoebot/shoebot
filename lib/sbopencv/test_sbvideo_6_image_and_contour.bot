@@ -1,0 +1,23 @@
+size(650,509)
+speed(300)
+opencv = ximport("sbopencv")
+nofill()
+nostroke()
+img = opencv.image("/home/francesco/Desktop/multitouch.png")
+im = image(None,0,0,data=img.data)
+n, contours = img.contours(threshold=128)
+print "found", n, "contour(s)"
+#print contours
+
+def draw():
+    drawimage(im)
+    for contour in contours:
+        points=[]
+   
+        for pt in contour:
+           points.append((pt[0]*random(0.97,1.03), pt[1]*random(0.97,1.03)))
+        
+        stroke(1)
+        p1 = findpath(points, curvature=0.3)
+        drawpath(p1)
+        nostroke

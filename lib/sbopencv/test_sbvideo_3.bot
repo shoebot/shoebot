@@ -1,0 +1,46 @@
+size(720,576)
+videolib = ximport("sbopencv")
+
+speed(30)
+
+# replace the file name in following lines with two small video files (320x240) on your computer
+video = videolib.movie('/mnt/movies/house_of_the_future_1.avi')
+video1 = videolib.movie('/mnt/movies/house_of_the_future_2.avi')
+
+from math import sin, cos
+
+def draw():
+    background(0)
+    nofill()
+    nostroke()
+    frame = video.frame()
+    frame1 = video1.frame()
+    push()
+    rotate(FRAME*2)
+    scale(abs(sin(FRAME*0.02)))
+    image(None,100,100,data=frame.data)
+    pop()
+    push()
+    rotate(FRAME*-3)
+    scale(abs(cos(FRAME*0.02)))    
+    image(None, 250,110,data=frame1.data)
+    pop()
+    fill(1)
+    text(str(FRAME),20,550)
+    nofill()
+    #print frame.width, frame.height, frame.time
+    
+    #points=[]
+    #for i in range(10):
+    #    points.append((random(WIDTH),random(HEIGHT)))
+
+    #stroke(1)
+    #strokewidth(1.5)
+    #oval(points[0][0]-5,points[0][1]-5,10,10) 
+    #oval(points[-1][0]-5,points[-1][1]-5,10,10) 
+    #p = findpath(points, curvature=1)
+    #p1 = findpath(points, curvature=0)
+    #drawpath(p)
+    #stroke(0)
+    #strokewidth(0.5)
+    #drawpath(p1.copy())

@@ -1,0 +1,29 @@
+size(720,576)
+videolib = ximport("sbopencv")
+
+speed(300)
+video = videolib.camera(width=320, height=240)
+
+transform(CORNER)
+
+def draw():
+
+    nofill()
+    nostroke()
+    frame = video.frame()
+    push()
+    scale(2)
+    image(None,0,0,data=frame.data)
+    n, contours = frame.contours(threshold=128)
+    #print "found", n, "contour(s)"
+
+    for contour in contours:
+       points=[]
+       
+       for pt in contour:
+           points.append((pt.x, pt.y))
+       stroke(1)
+       p1 = findpath(points, curvature=0)
+       drawpath(p1)
+       nostroke
+    pop()

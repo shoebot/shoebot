@@ -1,0 +1,31 @@
+White House, http://www.whitehouse.gov/rss/news.xml
+Second Life, http://blog.secondlife.com/feed/
+delicious, http://del.icio.us/rss/
+Reuters, http://feeds.reuters.com/reuters/topNews/
+Slashdot, http://rss.slashdot.org/Slashdot/slashdot
+Reuters Oddly Enough, http://feeds.reuters.com/reuters/oddlyEnoughNews/
+New York Times, http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml
+MSNBC, http://rss.msnbc.msn.com/id/3032091/device/rss/rss.xml
+MIT, http://web.mit.edu/newsoffice/mitnews-rss.xml
+Cosmopolitan, http://www.ivillage.com/rss/0,,187712131206,00.xml
+Nature, http://www.nature.com/nature/current_issue/rss/index.html
+UC Berkeley, http://www.berkeley.edu/news/rss/UCBNewsCenter.rss
+Wired, http://feeds.wired.com/wired/topheadlines
+freshmeat, http://rss.freshmeat.net/freshmeat/feeds/fm-releases-global
+Harvard University, http://www.hno.harvard.edu/rss/home.xml
+Herald Tribune, http://www.iht.com/rss/frontpage.xml
+Al Jazeera, http://csociety.ecn.purdue.edu/~jacoby/XML/aljazeera.rss
+Urban Dictionary, http://feeds.urbandictionary.com/UrbanWordOfTheDay
+BBC, http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml
+MTV, http://www.mtv.com/rss/news/latestcached.jhtml
+CNN, http://rss.cnn.com/rss/edition.rss
+Processing Blogs, http://www.processingblogs.org/feed/atom/
+Yahoo!, http://rss.news.yahoo.com/rss/topstories
+Wikinews, http://feeds.feedburner.com/WikinewsLatestNews
+Google, http://news.google.com/news?ned=us&topic=h&output=rss
+Apple, http://images.apple.com/main/rss/hotnews/hotnews.rss
+Blogger, http://feeds.feedburner.com/BloggerBuzz
+Science Magazine, http://www.sciencemag.org/rss/podcast.xml
+NASA, http://www.nasa.gov/rss/breaking_news.rss
+The Washington Post, http://www.washingtonpost.com/wp-dyn/rss/linkset/2005/03/24/LI2005032400102.xml
+TIME, http://feeds.feedburner.com/time/topstories

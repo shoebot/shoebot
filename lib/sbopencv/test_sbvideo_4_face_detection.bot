@@ -1,0 +1,25 @@
+size(720,576)
+videolib = ximport("sbopencv")
+
+speed(300)
+#video = videolib.movie('/mnt/movies/viole1001.mpeg')
+video = videolib.camera(0, width=320, height=240)
+
+
+def draw():
+
+    nofill()
+    nostroke()
+    frame = video.frame()
+    #push()
+    #rotate(random(-5,5))
+    image(None,0,0,data=frame.data)
+    faces = frame.faces
+    for i in faces:
+        #print i.x, i.y, i.width, i.height
+        stroke(1)
+        strokewidth(1)
+        fill(1,1,1,0.5)
+        oval(i.x,i.y,i.width,i.height)
+        nostroke()
+        nofill

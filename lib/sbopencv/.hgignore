@@ -1,0 +1,21 @@
+syntax: glob
+
+# ignore apps for now
+apps/*
+
+# ignore .orig files (leftovers from merges)
+*.orig
+
+# ignore build and dist output
+build/*
+dist/*
+lib/*
+lib
+# python bytecode files
+*.pyc
+*.pyo
+# backup files
+*.bak
+*~
+# binary libraries
+*.so

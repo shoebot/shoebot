@@ -1,0 +1,44 @@
+size(350,270)
+videolib = ximport("sbopencv")
+
+speed(300)
+video = videolib.camera(width=320,height=240)
+p = textpath("clip path",100,150, font="arial", fontsize=54, weight="bold")
+
+
+def draw():
+
+    nofill()
+    nostroke()
+    frame = video.frame()
+    
+    push()
+    rotate(random(-2,2))
+    translate(random(20),random(20))
+    image(None,0,0,data=frame.data)
+    pop()
+    beginclip(p)
+    image(None,0,0,data=frame.data)
+    endclip()
+
+    fill(1,1,1,0.5)
+    text("jittering", 120,120, font="arial", fontsize=24, weight="bold")
+
+    
+
+    #print frame.width, frame.height, frame.time
+    
+    #points=[]
+    #for i in range(10):
+    #    points.append((random(WIDTH),random(HEIGHT)))
+
+    #stroke(1)
+    #strokewidth(1.5)
+    #oval(points[0][0]-5,points[0][1]-5,10,10) 
+    #oval(points[-1][0]-5,points[-1][1]-5,10,10) 
+    #p = findpath(points, curvature=1)
+    #p1 = findpath(points, curvature=0)
+    #drawpath(p)
+    #stroke(0)
+    #strokewidth(0.5)
+    #drawpath(p1.copy())
