@@ -354,15 +354,20 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.drawingarea.is_dynamic:
             frame = 0
-            from time import sleep
+            from time import sleep, time
+            start_time = time()
             while 1:
                 # increase bot frame count
                 self.bot.next_frame()
                 # redraw canvas
                 self.drawingarea.redraw()
                 #self.console_error.update()
+                
                 # respect framerate
-                sleep(1. / self.bot.framerate)
+                completion_time = time()
+                exc_time = completion_time - start_time
+                start_time = completion_time
+                sleep(1. / (self.bot.framerate - exc_time))
                 while gtk.events_pending():
                     gtk.main_iteration()
         else:
