@@ -290,6 +290,8 @@ class Buffer(gtksourceview.SourceBuffer):
 
         bak_filename = self.filename + "~"
         try:
+            if os.path.isfile(bak_filename):
+                os.remove(bak_filename)
             os.rename(self.filename, bak_filename)
         except (OSError, IOError), (errnum, errmsg):
             if errnum != errno.ENOENT:
