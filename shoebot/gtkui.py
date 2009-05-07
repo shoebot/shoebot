@@ -1,3 +1,32 @@
+#!/usr/bin/env python
+
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 Experimental GTK front-end for Shoebot
 
@@ -6,30 +35,30 @@ http://roscidus.com/desktop/node/413
 '''
 
 from __future__ import division
-import sys, gtk, random, StringIO
+import sys, os
+import gtk
+import random, StringIO
+import re
 import shoebot
 from data import Transform, GTKPointer
 import cairo
 import gobject, socket
+import locale
+import gettext
+from time import sleep
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 
-import locale
-import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
-
-
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
 else:
-    import os.path
     ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class ShoebotDrawingArea(gtk.DrawingArea):
@@ -46,7 +75,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         script = self.bot.inputscript
         # check if the script is a file or a string
-        import os.path
         if os.path.exists(script):
             lines = open(script, 'r').readlines()
         else:
@@ -66,7 +94,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
             if "size" in line:
                 size_line = line.split(";")
                 for l in size_line:
-                    import re
                     l = re.sub("\s", "", l)
                     if l.startswith("size("):
                         self.bot.load_namespace()
@@ -354,7 +381,6 @@ class ShoebotWindow(SocketServerMixin):
 
         if self.drawingarea.is_dynamic:
             frame = 0
-            from time import sleep
             while 1:
                 # increase bot frame count
                 self.bot.next_frame()
@@ -401,8 +427,3 @@ class ShoebotWindow(SocketServerMixin):
         ## FIXME: This doesn't kill the instance :/
 
 
-##if __name__ == "__main__":
-##    import sys
-##    win = MainWindow('letter_h_obj.py')
-##    win.server('',7777)
-##    win.run()

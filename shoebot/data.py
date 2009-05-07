@@ -1,14 +1,54 @@
-'''
-Shoebot data structures for bezier path handling
+#!/usr/bin/env python
+
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+''' Data structures for use in Shoebot
+
+These are 'agnostic' classes for representing primitive shapes, paths, colors,
+transforms, text and image objects, live variables and user interaction 
+elements (such as pointing devices).
+
+The drawing objects could benefit from an actual, proper Python library to
+handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
+
 '''
 
+from shoebot import CairoCanvas
 from __future__ import division
 from sets import Set
 import util
 import cairo
 import pango
 import pangocairo
-
+from math import sin, cos, pi
+import Image
+import numpy
+from cStringIO import StringIO
 
 RGB = "rgb"
 HSB = "hsb"
@@ -340,7 +380,6 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         take transforms into account.'''
         # we don't have any direct way to calculate bbox from a path, but Cairo
         # does! So we make a new cairo context to calculate path bounds
-        from shoebot import CairoCanvas
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
         ctx = cairo.Context(surface)
         canvas = CairoCanvas(target=ctx)
@@ -365,7 +404,6 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
             elif cmd == CLOSE:
                 ctx.close_path()
             elif cmd == ELLIPSE:
-                from math import pi
                 x, y, w, h = values
                 ctx.save()
                 ctx.translate (x + w / 2., y + h / 2.)
@@ -894,9 +932,6 @@ class Image(Grob, TransformMixin, ColorMixin):
             
         else:
 
-            import Image
-            import numpy       
-
             # checks if image data is passed in command call, in this case it wraps
             # the data in a StringIO oject in order to use it as a file
             # the data itself must contain an entire image, not just pixel data
@@ -906,7 +941,6 @@ class Image(Grob, TransformMixin, ColorMixin):
             if self.data is None:
                 img = Image.open(self.path)
             elif self.data:
-                from cStringIO import StringIO
                 img = Image.open(StringIO(self.data))
 
             # retrieves original image size
@@ -1099,7 +1133,6 @@ class Transform:
             yield value
     ### calculates tranformation matrix
     def get_matrix_with_center(self,x,y,mode):
-        from math import sin, cos
         m = cairo.Matrix()
         rotang = 0
         centerx =x
