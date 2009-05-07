@@ -85,8 +85,8 @@ MOUSEY = -1
 mousedown = False
 
 # Default key values
-key = -1
-keycode = -1
+key = '-'
+keycode = 0
 keydown = False
 
 _STATE_NAMES = {
@@ -388,6 +388,9 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         # does! So we make a new cairo context to calculate path bounds
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
         ctx = cairo.Context(surface)
+        # FIXME: this is a bad way to do it, but we don't have a shape drawing
+        # library yet...
+        from shoebot import CairoCanvas
         canvas = CairoCanvas(target=ctx)
         p = self.copy()
 

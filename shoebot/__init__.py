@@ -920,7 +920,7 @@ class NodeBot(Bot):
             self.canvas.add(txt)
           return txt
 
-    def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
         '''
         Draws an outlined path of the input text
         '''
