@@ -33,6 +33,7 @@ import sys, os
 import locale, gettext
 from optparse import OptionParser
 import shoebot
+from shoebot import gtkui
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'

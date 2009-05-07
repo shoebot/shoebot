@@ -40,7 +40,7 @@ import gtk
 import random, StringIO
 import re
 import shoebot
-from data import Transform, GTKPointer
+from data import Transform, GTKPointer, GTKKeyStateHandler
 import cairo
 import gobject, socket
 import locale
@@ -114,9 +114,14 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.menu = gtk.Menu()
         self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
 
+        # necessary for catching keyboard events
+        self.set_flags(gtk.CAN_FOCUS)
+        
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK |
             gtk.gdk.BUTTON_RELEASE_MASK |
-            gtk.gdk.POINTER_MOTION_MASK)
+            gtk.gdk.POINTER_MOTION_MASK |
+            gtk.gdk.KEY_PRESS_MASK |
+            gtk.gdk.KEY_RELEASE_MASK)
 
         self.connect('button_press_event', self.on_button_press)
 
@@ -125,6 +130,11 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.connect('button_release_event', pointing_device.gtk_button_release_event)
         self.connect('motion_notify_event', pointing_device.gtk_motion_event)
         pointing_device.add_listener(bot)
+        
+        key_state_handler = GTKKeyStateHandler()
+        self.connect('key_press_event', key_state_handler.gtk_key_press_event)
+        self.connect('key_release_event', key_state_handler.gtk_key_press_event)
+        key_state_handler.add_listener(bot)
 
     def on_button_press(self, widget, event):
         # check for right mouse clicks

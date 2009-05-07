@@ -36,17 +36,18 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 
 import cairo
 import util
-from data import *
 import sys, os, traceback
 import locale
 import gettext
 from glob import glob
 from math import sin, cos, pi
 from math import radians as deg2rad
-import random
+import random as r
 import Image
 from kgp import KantGenerator
 from types import TupleType
+
+from data import *
 
 VERBOSE = False
 DEBUG = False
@@ -115,7 +116,7 @@ class Bot:
 
         self.screen_ratio = None
         self.WIDTH = Bot.DEFAULT_WIDTH
-        self.HEIGHT = Bot.DEFAULT_HEIGHT
+        self.HEIGHT = Bot.DEFAULT_HEIGHT        
 
         if canvas:
             self.canvas = canvas
@@ -203,26 +204,26 @@ class Bot:
         #return Color(self.color_mode, self.color_range, *args)
         return Color(mode=self.color_mode, color_range=self.color_range, *args)
 
+    choice = r.choice
+
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
         if v1 is not None and v2 is None:
             if isinstance(v1, float):
-                return random.random() * v1
+                return r.random() * v1
             else:
-                return int(random.random() * v1)
+                return int(r.random() * v1)
         elif v1 != None and v2 != None:
             if isinstance(v1, float) or isinstance(v2, float):
                 start = min(v1, v2)
                 end = max(v1, v2)
-                return start + random.random() * (end-start)
+                return start + r.random() * (end-start)
             else:
                 start = min(v1, v2)
                 end = max(v1, v2) + 1
-                return int(start + random.random() * (end-start))
+                return int(start + r.random() * (end-start))
         else: # No values means 0.0 -> 1.0
-            return random.random()
-
-    self.choice = random.choice
+            return r.random()
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
         """Returns an iterator that contains coordinate tuples.
@@ -394,6 +395,14 @@ class Bot:
     def pointer_moved(self, pointer):
         self.namespace['MOUSEX'] = pointer.x
         self.namespace['MOUSEY'] = pointer.y
+       
+    def key_down(self, keystate):
+        self.namespace['key'] = keystate.key
+        self.namespace['keycode'] = keystate.keycode
+        self.namespace['keydown'] = True
+        
+    def key_up(self, keystate):
+        self.namespace['keydown'] = False
 
 
 class NodeBot(Bot):

@@ -38,8 +38,8 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
 '''
 
-from shoebot import CairoCanvas
 from __future__ import division
+# from shoebot import CairoCanvas
 from sets import Set
 import util
 import cairo
@@ -48,6 +48,7 @@ import pangocairo
 from math import sin, cos, pi
 import Image
 import numpy
+import gtk
 from cStringIO import StringIO
 
 RGB = "rgb"
@@ -82,6 +83,11 @@ JUSTIFY = 'justify'
 MOUSEX = -1
 MOUSEY = -1
 mousedown = False
+
+# Default key values
+key = -1
+keycode = -1
+keydown = False
 
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
@@ -1268,7 +1274,7 @@ class PointingDevice:
         for listener in self.listeners:
             listener.pointer_moved(self)
             
-        
+            
     def button_pressed(self, button):
         self.buttons_pressed.add(button)
         for listener in self.listeners:
@@ -1280,7 +1286,7 @@ class PointingDevice:
             listener.mouse_up(self)
 
     button_down = property(get_button_down)
-    
+         
 
 class GTKPointer(PointingDevice):
     def __init__(self):
@@ -1294,6 +1300,49 @@ class GTKPointer(PointingDevice):
         
     def gtk_button_release_event(self, widget, event):
         self.button_released(event.button)
+
+
+class KeyStateHandler:
+    '''
+    Base class for the state of the keyboard
+    '''
+    def __init__(self):
+        self.key = None
+        self.keycode = None
+        self.keys_pressed = Set()
+        self.listeners = []
+        
+    def add_listener(self, listener):
+        self.listeners.append(listener)
+        
+    def get_key_down(self):
+        ''' Return True if any key is pressed '''
+        return bool(self.keys_pressed)
+    
+    def key_pressed(self, key, keycode):
+        self.key = key
+        self.keycode = keycode
+        self.keys_pressed.add(keycode)
+        for listener in self.listeners:
+            listener.key_down(self)
+            
+    def key_released(self, keycode):
+        self.keys_pressed.remove(keycode)
+        for listener in self.listeners:
+            listener.key_up(self)
+    
+    key_down = property(get_key_down)
+
+
+class GTKKeyStateHandler(KeyStateHandler):
+    def __init__(self):
+        KeyStateHandler.__init__(self)
+        
+    def gtk_key_press_event(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS:
+            self.key_pressed(event.string, event.keyval)
+        else:
+            self.key_released(event.keyval)
 
 class PointerGroup(PointingDevice):
     """
