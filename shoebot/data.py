@@ -1305,6 +1305,7 @@ class PointerGroup(PointingDevice):
 
 
 def test_color():
+    # TODO: Rewrite this as a proper unit test!
     # this test checks with a 4 decimal point precision
 
     testvalues = {
