@@ -46,7 +46,7 @@ import cairo
 import pango
 import pangocairo
 from math import sin, cos, pi
-import Image
+import Image as PILImage
 import numpy
 import gtk
 from cStringIO import StringIO
@@ -948,9 +948,9 @@ class Image(Grob, TransformMixin, ColorMixin):
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
-                img = Image.open(self.path)
+                img = PILImage.open(self.path)
             elif self.data:
-                img = Image.open(StringIO(self.data))
+                img = PILImage.open(StringIO(self.data))
 
             # retrieves original image size
             Width, Height = img.size
@@ -962,18 +962,18 @@ class Image(Grob, TransformMixin, ColorMixin):
                 else:
                     self.width = int(self.height*Width/Height)
                     size = self.width, self.height
-                    img = img.resize(size, Image.ANTIALIAS)
+                    img = img.resize(size, PILImage.ANTIALIAS)
             else:
                 if self.height is None:
                     self.height = int(self.width*Height/Width)
                 size = self.width, self.height
-                img = img.resize(size, Image.ANTIALIAS)
+                img = img.resize(size, PILImage.ANTIALIAS)
             # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
             # and fills an array from numpy module, then passes it to cairo image surface constructor
             if img.mode == "RGBA":
                 # swapping b and r channels with PIL
                 r,g,b,a = img.split()
-                img = Image.merge("RGBA",(b,g,r,a))             
+                img = PILImage.merge("RGBA",(b,g,r,a))             
                 img_buffer = numpy.asarray(img)
                 # resulting numpy array defaults to read-only, but cairo needs a writeable object
                 # so we are forced to change a flag
@@ -982,7 +982,7 @@ class Image(Grob, TransformMixin, ColorMixin):
             elif img.mode == "RGB":
                 img = img.convert('RGBA')
                 r,g,b,a = img.split()
-                img = Image.merge("RGBA",(b,g,r,a)) 
+                img = PILImage.merge("RGBA",(b,g,r,a)) 
                 img_buffer = numpy.asarray(img)
                 img_buffer.flags.writeable=True            
                 imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
