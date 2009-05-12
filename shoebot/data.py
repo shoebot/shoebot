@@ -1147,7 +1147,7 @@ class Transform:
         centerx =x
         centery = y
         m_archived = []
-
+        
         for trans in self.stack: 
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
@@ -1159,36 +1159,25 @@ class Transform:
                 t = cairo.Matrix()
                 
                 if cmd == 'translate':                    
-                    xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
-                    yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
-                    t.translate(xt,yt)
-                    m *= t
+                    xt = args[0]
+                    yt = args[1]
+                    m.translate(xt,yt)
                 elif cmd == 'rotate':
                     if mode == 'corner':                        
                         # apply existing transform to cornerpoint
                         deltax,deltay = m.transform_point(0,0)
                         a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
+                        ct = cos(a)
+                        st = sin(a)
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
                         rotang += a
                     elif mode == 'center':
                         # apply existing transform to centerpoint
                         deltax,deltay = m.transform_point(centerx,centery)
                         a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
+                        ct = cos(a)
+                        st = sin(a)
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
                         rotang += a
                 elif cmd == 'scale':
                     if mode == 'corner':
