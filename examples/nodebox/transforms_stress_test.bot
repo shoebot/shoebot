@@ -1,0 +1,53 @@
+from math import sin, cos, log
+
+#import psyco
+#psyco.full()
+
+size(600, 600)
+speed(100)
+ 
+ 
+def setup():
+        global MOON_SIZE
+        MOON_SIZE = 25
+ 
+
+
+def draw_planet():
+    global MOON_SIZE
+    
+    oval(-50, -50, 100, 100)
+    
+    for angle in range(0, 360, 60):
+        push()
+        rotate((FRAME * 4) + angle)
+        translate(80, 0)
+        oval(-MOON_SIZE, -MOON_SIZE, MOON_SIZE, MOON_SIZE)
+        pop()
+
+
+def draw_system():    
+    draw_planet()
+    for angle in range(0, 360, 60):
+        push()
+        rotate(angle - (FRAME * 2))
+        translate(200, 0)
+        draw_planet()
+        pop()
+
+
+def draw():    
+    background(1, 1, 0)
+    transform(CORNER)
+    
+    fill(0, 0, 0)
+    translate(WIDTH / 2, HEIGHT / 2)
+
+    draw_system()
+    
+    for angle in range(0, 360, 60):
+        push()
+        rotate(angle + FRAME * 2)
+        translate(600, 0)
+        draw_system()
+        pop()

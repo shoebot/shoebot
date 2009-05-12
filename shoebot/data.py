@@ -1143,7 +1143,6 @@ class Transform:
     ### calculates tranformation matrix
     def get_matrix_with_center(self,x,y,mode):
         m = cairo.Matrix()
-        rotang = 0
         centerx =x
         centery = y
         m_archived = []
@@ -1170,7 +1169,6 @@ class Transform:
                         ct = cos(a)
                         st = sin(a)
                         m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
-                        rotang += a
                     elif mode == 'center':
                         # apply existing transform to centerpoint
                         deltax,deltay = m.transform_point(centerx,centery)
@@ -1178,7 +1176,6 @@ class Transform:
                         ct = cos(a)
                         st = sin(a)
                         m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
-                        rotang += a
                 elif cmd == 'scale':
                     if mode == 'corner':
                         t.scale(args[0], args[1])
@@ -1217,9 +1214,9 @@ class Transform:
                         t *= m2
                         m = t
                 elif cmd == 'push':
-                    m_archived.append((m, rotang))
+                    m_archived.append(m)
                 elif cmd == 'pop':
-                    m, rotang = m_archived.pop()
+                    m = m_archived.pop()
 
         return m        
 
