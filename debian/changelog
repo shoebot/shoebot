@@ -1,0 +1,12 @@
+shoebot (0.2-1) unstable; urgency=low
+
+  * Initial release
+
+  * TODO: add ITP or LP bug number here before submiting package
+          to official debian or ubuntu repos)
+	
+  * Closes: Bug#00000
+
+	
+ -- Ricardo Lafuente <r@sollec.org>  Thu, 19 Feb 2009 11:40:36 +0100
+
