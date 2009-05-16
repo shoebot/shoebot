@@ -277,7 +277,7 @@ class Bot:
         try:
             lib = __import__("lib/"+libName)
         except:
-            lib = __import__(libName)
+            lib = __import__(libName)    
         self._ns[libName] = lib
         lib._ctx = self
         return lib
