@@ -1,16 +1,39 @@
 #!/usr/bin/env python
 
-'''
-Shoebot console runner
-
-Copyright 2007, 2008 Ricardo Lafuente
-Developed at the Piet Zwart Institute, Rotterdam
-
-This file is part of Shoebot.
-'''
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+''' Shoebot console runner '''
 
 import sys, os
+import locale, gettext
+from optparse import OptionParser
 import shoebot
+from shoebot import gtkui
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
@@ -21,20 +44,14 @@ OUTPUT_EXTENSIONS = ('.png','.svg','.ps','.pdf')
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 
-import locale
-import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
-
-
 def run_oneshot(script, file):
-    ''' Oneshot mode:
-    Run a Shoebot script and save output to an image file.'''
+    ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
     bot = shoebot.NodeBot(targetfilename = file)
 
@@ -50,12 +67,10 @@ def run_oneshot(script, file):
     bot.finish()
 
 def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, go_fullscreen=False):
-    ''' Windowed mode:
-    Run a Shoebot script in a GTK window.'''
-    win = gtkui.ShoebotWindow(script, server, port, varwindow, go_fullscreen)
+    ''' Windowed mode: Run a Shoebot script in a GTK window.'''
+    win = shoebot.gtkui.ShoebotWindow(script, server, port, varwindow, go_fullscreen)
 
 # use OptionParser to interpret commandline options
-from optparse import OptionParser
 parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
 parser.add_option("-o",
                 "--outputfile",
@@ -110,6 +125,10 @@ def error(message):
     parser.print_help()
     sys.exit()
 
+def warn(message):
+    '''Print a warning message'''
+    print _("Warning: ") + message
+
 if __name__ == '__main__':
 
     # get optparse arguments and check for sanity
@@ -146,12 +165,12 @@ if __name__ == '__main__':
             run_oneshot(inputscript, outputfile)
     else:
         # windowed mode - run on a GTK window
-        from shoebot import gtkui
         if options.outputfile:
             error(_('Windowed mode does not take an output file argument.'))
         if options.repeat:
-            print _("Sorry, repeat option is not valid in Windowed mode, it will be ignored")
+            warn(_("Sorry, repeat option is not valid in Windowed mode, it will be ignored"))
         run_window(inputscript,
-                    server=options.socketserver,
-                    port=options.serverport,
-                    varwindow=options.varwindow, go_fullscreen=options.fullscreen)
+                   server=options.socketserver,
+                   port=options.serverport,
+                   varwindow=options.varwindow, 
+                   go_fullscreen=options.fullscreen)

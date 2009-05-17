@@ -1,25 +1,33 @@
 #!/usr/bin/env python
 
-'''
-Shoebot module
-
-Copyright 2007, 2008 Ricardo Lafuente
-Developed at the Piet Zwart Institute, Rotterdam
-
-This file is part of Shoebot.
-
-Shoebot is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Shoebot is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Shoebot.  If not, see <http://www.gnu.org/licenses/>.
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+''' Shoebot core elements
 
 This file uses code from Nodebox (http://www.nodebox.net).
 The relevant code parts are marked with a "Taken from Nodebox" comment.
@@ -28,8 +36,18 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 
 import cairo
 import util
+import sys, os, traceback
+import locale
+import gettext
+from glob import glob
+from math import sin, cos, pi
+from math import radians as deg2rad
+import random as r
+import Image
+from kgp import KantGenerator
+from types import TupleType
+
 from data import *
-import sys
 
 VERBOSE = False
 DEBUG = False
@@ -40,8 +58,6 @@ DIR = sys.prefix + '/share/shoebot/locale'
 LIB_DIR = sys.prefix + '/share/shoebot/lib'
 sys.path.append(LIB_DIR)
 
-import locale
-import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
@@ -100,7 +116,7 @@ class Bot:
 
         self.screen_ratio = None
         self.WIDTH = Bot.DEFAULT_WIDTH
-        self.HEIGHT = Bot.DEFAULT_HEIGHT
+        self.HEIGHT = Bot.DEFAULT_HEIGHT        
 
         if canvas:
             self.canvas = canvas
@@ -188,27 +204,26 @@ class Bot:
         #return Color(self.color_mode, self.color_range, *args)
         return Color(mode=self.color_mode, color_range=self.color_range, *args)
 
+    choice = r.choice
+
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
-        import random
         if v1 is not None and v2 is None:
             if isinstance(v1, float):
-                return random.random() * v1
+                return r.random() * v1
             else:
-                return int(random.random() * v1)
+                return int(r.random() * v1)
         elif v1 != None and v2 != None:
             if isinstance(v1, float) or isinstance(v2, float):
                 start = min(v1, v2)
                 end = max(v1, v2)
-                return start + random.random() * (end-start)
+                return start + r.random() * (end-start)
             else:
                 start = min(v1, v2)
                 end = max(v1, v2) + 1
-                return int(start + random.random() * (end-start))
+                return int(start + r.random() * (end-start))
         else: # No values means 0.0 -> 1.0
-            return random.random()
-
-    from random import choice
+            return r.random()
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
         """Returns an iterator that contains coordinate tuples.
@@ -234,7 +249,6 @@ class Bot:
             f = files('*.gif')
         """
         # Taken ipsis verbis from Nodebox
-        from glob import glob
         return glob(path)
 
     def snapshot(self,filename=None, surface=None):
@@ -263,7 +277,7 @@ class Bot:
         try:
             lib = __import__("lib/"+libName)
         except:
-            lib = __import__(libName)
+            lib = __import__(libName)    
         self._ns[libName] = lib
         lib._ctx = self
         return lib
@@ -335,7 +349,7 @@ class Bot:
         else:
             self.inputscript = inputcode
 
-        import os
+        
         # is it a proper filename?
         if os.path.exists(inputcode):
             filename = inputcode
@@ -357,8 +371,6 @@ class Bot:
         except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-            import traceback
-            import sys
             errmsg = traceback.format_exc()
 
 #            print "Exception in Shoebot code:"
@@ -383,6 +395,14 @@ class Bot:
     def pointer_moved(self, pointer):
         self.namespace['MOUSEX'] = pointer.x
         self.namespace['MOUSEY'] = pointer.y
+       
+    def key_down(self, keystate):
+        self.namespace['key'] = keystate.key
+        self.namespace['keycode'] = keystate.keycode
+        self.namespace['keydown'] = True
+        
+    def key_up(self, keystate):
+        self.namespace['keydown'] = False
 
 
 class NodeBot(Bot):
@@ -422,7 +442,6 @@ class NodeBot(Bot):
 
 
     def imagesize(self, path):
-        import Image
         img = Image.open(path)
         return img.size
 
@@ -452,7 +471,6 @@ class NodeBot(Bot):
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
-        from math import pi
         r = self.BezierPath(**kwargs)
         r.ellipse(x,y,width,height)
         # r.inheritFromContext(kwargs.keys())
@@ -462,7 +480,6 @@ class NodeBot(Bot):
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y)'''
-        from math import pi
         r = self.BezierPath(**kwargs)
         r.ellipse(x,y,width,height)
         # r.inheritFromContext(kwargs.keys())
@@ -524,7 +541,6 @@ class NodeBot(Bot):
 
         Taken from Nodebox.
         '''
-        from math import sin, cos, pi
         self.beginpath()
         self.moveto(startx, starty + outer)
 
@@ -702,8 +718,7 @@ class NodeBot(Bot):
         # The list of points consists of Point objects,
         # but it shouldn't crash on something straightforward
         # as someone supplying a list of (x,y)-tuples.
-
-        from types import TupleType
+        
         for i, pt in enumerate(points):
             if type(pt) == TupleType:
                 points[i] = Point(pt[0], pt[1])
@@ -783,7 +798,6 @@ class NodeBot(Bot):
     def translate(self, x, y):
         self._transform.translate(x,y)
     def rotate(self, degrees=0, radians=0):
-        from math import radians as deg2rad
         if radians:
             angle = radians
         else:
@@ -906,7 +920,7 @@ class NodeBot(Bot):
             self.canvas.add(txt)
           return txt
 
-    def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
         '''
         Draws an outlined path of the input text
         '''
@@ -953,7 +967,6 @@ class NodeBot(Bot):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
     def autotext(self, sourceFile):
-        from kgp import KantGenerator
         k = KantGenerator(sourceFile)
         return k.output()
 
@@ -1129,7 +1142,6 @@ class CairoCanvas(Canvas):
             elif cmd == CLOSE:
                 ctx.close_path()
             elif cmd == ELLIPSE:
-                from math import pi
                 x, y, w, h = values
                 ctx.save()
                 ctx.translate (x + w / 2., y + h / 2.)
@@ -1208,7 +1220,6 @@ class CairoCanvas(Canvas):
             elif cmd == CLOSE:
                 ctx.close_path()
             elif cmd == ELLIPSE:
-                from math import pi
                 x, y, w, h = values
                 ctx.save()
                 ctx.translate (x + w / 2., y + h / 2.)
@@ -1253,7 +1264,6 @@ class CairoCanvas(Canvas):
         if isinstance(target, basestring): # is it a filename?
             filename = target
 
-            import os
             f, ext = os.path.splitext(filename)
 
             if ext not in EXTENSIONS:
@@ -1423,7 +1433,6 @@ class OldBot:
 
     def oval(self, x, y, width, height):
         '''Draws an ellipse starting from (x,y)'''
-        from math import pi
 
         self.context.save()
         self.context.translate (x + width / 2., y + height / 2.);
@@ -1487,7 +1496,6 @@ class OldBot:
 
         Taken from Nodebox.
         '''
-        from math import sin, cos, pi
         self.beginpath()
         self.moveto(startx, starty + outer)
 
@@ -1670,8 +1678,6 @@ class OldBot:
         self.apply_matrix(1,0,0,1,x,y)
 
     def rotate(self, degrees=0, radians=0):
-        from math import sin, cos
-        from math import radians as deg2rad
         if degrees:
             a = deg2rad(degrees)
         else:
@@ -1925,7 +1931,6 @@ class OldBot:
 
     def random(self,v1=None, v2=None):
         # ipsis verbis from Nodebox
-        import random
         if v1 is not None and v2 is None:
             if isinstance(v1, float):
                 return random.random() * v1
@@ -1942,8 +1947,6 @@ class OldBot:
                 return int(start + random.random() * (end-start))
         else: # No values means 0.0 -> 1.0
             return random.random()
-
-    from random import choice
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
         """Returns an iterator that contains coordinate tuples.
@@ -1969,7 +1972,6 @@ class OldBot:
             f = files('*.gif')
         """
         # Taken ipsis verbis from Nodebox
-        from glob import glob
         return glob(path)
 
     def snapshot(self,filename=None, surface=None):
@@ -1990,7 +1992,6 @@ class OldBot:
         The shortcomings of this is that
         '''
 
-        import os
         f, ext = os.path.splitext(filename)
 
         if ext == "png":
@@ -2108,7 +2109,6 @@ class OldBot:
         '''Finishes the surface and writes it to the output file.'''
 
         # get the extension from the filename
-        import os
         f, ext = os.path.splitext(self.targetfilename)
         # if this is a vector file, wrap up and finish
         if ext in (".svg",".ps",".pdf"):
@@ -2137,7 +2137,6 @@ class OldBot:
         else:
             self.inputscript = inputcode
 
-        import os
         # is it a proper filename?
         if os.path.exists(inputcode):
             filename = inputcode
@@ -2164,8 +2163,6 @@ class OldBot:
         except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-            import traceback
-            import sys
             errmsg = traceback.format_exc(limit=1)
 
 #            print "Exception in Shoebot code:"
@@ -2222,7 +2219,6 @@ if __name__ == "__main__":
     This file can only be used as a Python module.
     Use the 'sbot' script for commandline use.
     '''
-    import sys
     sys.exit()
 
 

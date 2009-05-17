@@ -1,40 +1,41 @@
+#!/usr/bin/env python
 
-# ----- OTHER FUNCTIONS -----
-
-# RGB/HSL conversion functions
-# Borrowed from Inkscape (coloreffect.py)
-
-'''
-Shoebot utility functions
-
-Copyright 2007, 2008 Ricardo Lafuente
-Developed at the Piet Zwart Institute, Rotterdam
-
-This file is part of Shoebot.
-
-Shoebot is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Shoebot is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Shoebot.  If not, see <http://www.gnu.org/licenses/>.
-
-This file uses code from Nodebox (http://www.nodebox.net).
-The relevant code parts are marked with a "Taken from Nodebox" note.
-
-Some code parts were taken from Inkscape and marked as such.
-Copyright (C) 2006 Jos Hirth, kaioa.com
-Subject to the terms of the GPLv2 or any later version.
-'''
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''Assorted utility functions, mainly for color and font handling'''
 
 from __future__ import division
 from math import floor
+import os
+import string
+import data
+import ctypes
+import cairo
 
 def rgb_to_hsl(r, g, b):
     '''Converts RGB values to the HSL colourspace. '''
@@ -163,7 +164,6 @@ def rgb_to_hsv(r, g, b):
 
 
 def hex2dec(hexdata):
-    import string
     return int(string.atoi(hexdata, 16))
 
 def dec2hex(number):
@@ -189,7 +189,6 @@ def parse_color(v, color_range=1):
     The 'color_range' parameter sets the colour range in which the
     colour data values are specified (except in hexstrings).
     '''
-    import data
 
     # unpack one-element tuples, they show up sometimes
     while isinstance(v, (tuple,list)) and len(v) == 1:
@@ -257,8 +256,6 @@ def create_cairo_font_face_for_file (filename, faceindex=0, loadoptions=0):
     # Taken from the Cairo cookbook
     # http://cairographics.org/freetypepython/
 
-    import ctypes
-    import cairo
     global _initialized
     global _freetype_so
     global _cairo_so
@@ -317,8 +314,6 @@ def surfacefromfilename(outfile, width, height):
     # convert to ints, cairo.ImageSurface is picky
     width = int(width)
     height = int(height)
-
-    import cairo, os
 
     # check across all possible formats and create the appropriate kind of surface
     # and also be sure that Cairo was built with support for that

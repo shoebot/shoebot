@@ -1,0 +1,51 @@
+v0.2
+====
+  Shoebot got the love of some very talented hackers, and a truckload of lovely
+  features saw the light of day:
+
+  New features:
+    * colors can be specified using hexcolour values (e.g. #FF00FF)
+    * fill and/or stroke values can be specified using keyword arguments (e.g. 
+      a = Rect(x,y,w,h,fill='#FF00FF'))
+    * experimental animation support
+    * internationalization 
+    * transforms were overhauled, and are now fully consistent with Nodebox
+      behaviour
+    * clipping paths!
+    * a powerful text API was introduced using Pango, matching and even 
+      extending Nodebox's capabilities, and working great with transforms
+    * image support is now there, and working great!
+    * ximport() can now be used to import Nodebox's libraries
+    * many Nodebox libraries ported and included in Shoebot! Boids, Cornu,
+      Database, Ants, Photobot, Supershape, SVG and Web are fully working (as
+      far as we could determine! :) ; Colors and L-System are partially working. 
+    * easteregg(x,y,size) ;)
+    * GIMP colour palette import!
+    * repeat mode (-r) in commandline mode to output multiple images
+    * fullscreen mode!
+    * new example scripts
+    * Shoebot now runs on Windows, and the IDE too! 
+    * new goodies in the Shoebot IDE: error reporting console, layout 
+      dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop
+      entry
+    * preliminary mouse events implementation in GTK mode
+
+  Bug fixes:
+    * drawpath() and findpath() are working; drawpath() can be used with images
+      as well (load once, use many times)
+    * bounding box calculations for line() are fixed
+    * fixed order of buttons on quit - save file dialogue in shoebot-ide
+  
+  API changes:
+    * big rewrite of the code structure; now there are generic Bot and Canvas 
+      classes, equivalent to a 'context' and a 'surface', but differently named
+      to avoid confusion with Cairo; those can be subclassed to implement new
+      languages (see NodeBot class for the implementation of Nodebox) and new
+      graphical backends (see CairoCanvas).
+    * the 'Box' class was renamed to 'Bot'
+    * oval() deprecated and introduced ellipse(), the correct term for this
+      operation
+
+v0.1
+====
+  Shoebot says hello world!

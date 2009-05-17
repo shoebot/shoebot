@@ -1,14 +1,55 @@
-'''
-Shoebot data structures for bezier path handling
+#!/usr/bin/env python
+
+# This file is part of Shoebot.
+# Copyright (C) 2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+''' Data structures for use in Shoebot
+
+These are 'agnostic' classes for representing primitive shapes, paths, colors,
+transforms, text and image objects, live variables and user interaction 
+elements (such as pointing devices).
+
+The drawing objects could benefit from an actual, proper Python library to
+handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
+
 '''
 
 from __future__ import division
+# from shoebot import CairoCanvas
 from sets import Set
 import util
 import cairo
 import pango
 import pangocairo
-
+from math import sin, cos, pi
+import Image as PILImage
+import numpy
+import gtk
+from cStringIO import StringIO
 
 RGB = "rgb"
 HSB = "hsb"
@@ -42,6 +83,11 @@ JUSTIFY = 'justify'
 MOUSEX = -1
 MOUSEY = -1
 mousedown = False
+
+# Default key values
+key = '-'
+keycode = 0
+keydown = False
 
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
@@ -340,9 +386,11 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         take transforms into account.'''
         # we don't have any direct way to calculate bbox from a path, but Cairo
         # does! So we make a new cairo context to calculate path bounds
-        from shoebot import CairoCanvas
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
         ctx = cairo.Context(surface)
+        # FIXME: this is a bad way to do it, but we don't have a shape drawing
+        # library yet...
+        from shoebot import CairoCanvas
         canvas = CairoCanvas(target=ctx)
         p = self.copy()
 
@@ -365,7 +413,6 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
             elif cmd == CLOSE:
                 ctx.close_path()
             elif cmd == ELLIPSE:
-                from math import pi
                 x, y, w, h = values
                 ctx.save()
                 ctx.translate (x + w / 2., y + h / 2.)
@@ -894,9 +941,6 @@ class Image(Grob, TransformMixin, ColorMixin):
             
         else:
 
-            import Image
-            import numpy       
-
             # checks if image data is passed in command call, in this case it wraps
             # the data in a StringIO oject in order to use it as a file
             # the data itself must contain an entire image, not just pixel data
@@ -904,10 +948,9 @@ class Image(Grob, TransformMixin, ColorMixin):
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
-                img = Image.open(self.path)
+                img = PILImage.open(self.path)
             elif self.data:
-                from cStringIO import StringIO
-                img = Image.open(StringIO(self.data))
+                img = PILImage.open(StringIO(self.data))
 
             # retrieves original image size
             Width, Height = img.size
@@ -919,18 +962,18 @@ class Image(Grob, TransformMixin, ColorMixin):
                 else:
                     self.width = int(self.height*Width/Height)
                     size = self.width, self.height
-                    img = img.resize(size, Image.ANTIALIAS)
+                    img = img.resize(size, PILImage.ANTIALIAS)
             else:
                 if self.height is None:
                     self.height = int(self.width*Height/Width)
                 size = self.width, self.height
-                img = img.resize(size, Image.ANTIALIAS)
+                img = img.resize(size, PILImage.ANTIALIAS)
             # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
             # and fills an array from numpy module, then passes it to cairo image surface constructor
             if img.mode == "RGBA":
                 # swapping b and r channels with PIL
                 r,g,b,a = img.split()
-                img = Image.merge("RGBA",(b,g,r,a))             
+                img = PILImage.merge("RGBA",(b,g,r,a))             
                 img_buffer = numpy.asarray(img)
                 # resulting numpy array defaults to read-only, but cairo needs a writeable object
                 # so we are forced to change a flag
@@ -939,7 +982,7 @@ class Image(Grob, TransformMixin, ColorMixin):
             elif img.mode == "RGB":
                 img = img.convert('RGBA')
                 r,g,b,a = img.split()
-                img = Image.merge("RGBA",(b,g,r,a)) 
+                img = PILImage.merge("RGBA",(b,g,r,a)) 
                 img_buffer = numpy.asarray(img)
                 img_buffer.flags.writeable=True            
                 imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
@@ -1099,13 +1142,11 @@ class Transform:
             yield value
     ### calculates tranformation matrix
     def get_matrix_with_center(self,x,y,mode):
-        from math import sin, cos
         m = cairo.Matrix()
-        rotang = 0
         centerx =x
         centery = y
         m_archived = []
-
+        
         for trans in self.stack: 
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
@@ -1117,37 +1158,24 @@ class Transform:
                 t = cairo.Matrix()
                 
                 if cmd == 'translate':                    
-                    xt = args[0]*cos(-rotang)+args[1]*sin(-rotang)
-                    yt = args[1]*cos(-rotang)-args[0]*sin(-rotang)
-                    t.translate(xt,yt)
-                    m *= t
+                    xt = args[0]
+                    yt = args[1]
+                    m.translate(xt,yt)
                 elif cmd == 'rotate':
                     if mode == 'corner':                        
                         # apply existing transform to cornerpoint
                         deltax,deltay = m.transform_point(0,0)
                         a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
-                        rotang += a
+                        ct = cos(a)
+                        st = sin(a)
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
                     elif mode == 'center':
                         # apply existing transform to centerpoint
                         deltax,deltay = m.transform_point(centerx,centery)
                         a = args[0]
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        # transform centerpoint according to current matrix
-                        m *= m1
-                        m *= cairo.Matrix(cos(a), sin(a), -sin(a), cos(a),0,0)
-                        m *= m2
-                        rotang += a
+                        ct = cos(a)
+                        st = sin(a)
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
                 elif cmd == 'scale':
                     if mode == 'corner':
                         t.scale(args[0], args[1])
@@ -1186,9 +1214,9 @@ class Transform:
                         t *= m2
                         m = t
                 elif cmd == 'push':
-                    m_archived.append((m, rotang))
+                    m_archived.append(m)
                 elif cmd == 'pop':
-                    m, rotang = m_archived.pop()
+                    m = m_archived.pop()
 
         return m        
 
@@ -1209,156 +1237,6 @@ class Stack(list):
 
     def get(self):
         return self[0]
-
-def lexPath(d):
-    """
-    returns an iterator that breaks path data
-    identifies command and parameter tokens
-    """
-    import re
-
-    offset = 0
-    length = len(d)
-    delim = re.compile(r'[ \t\r\n,]+')
-    command = re.compile(r'[MLHVCSQTAZmlhvcsqtaz]')
-    parameter = re.compile(r'(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)')
-    while 1:
-        m = delim.match(d, offset)
-        if m:
-            offset = m.end()
-        if offset >= length:
-            break
-        m = command.match(d, offset)
-        if m:
-            yield [d[offset:m.end()], True]
-            offset = m.end()
-            continue
-        m = parameter.match(d, offset)
-        if m:
-            yield [d[offset:m.end()], False]
-            offset = m.end()
-            continue
-        #TODO: create new exception
-        raise Exception, _('Invalid path data!')
-'''
-While I am less pleased with my parsing function, I think it works. And that
-is important. There will be time for improvement later.
-'''
-
-'''
-pathdefs = {commandfamily:
-    [
-    implicitnext,
-    #params,
-    [casts,cast,cast],
-    [coord type,x,y,0]
-    ]}
-'''
-
-pathdefs = {
-    'M':['L', 2, [float, float], ['x','y']],
-    'L':['L', 2, [float, float], ['x','y']],
-    'H':['H', 1, [float], ['x']],
-    'V':['V', 1, [float], ['y']],
-    'C':['C', 6, [float, float, float, float, float, float], ['x','y','x','y','x','y']],
-    'S':['S', 4, [float, float, float, float], ['x','y','x','y']],
-    'Q':['Q', 4, [float, float, float, float], ['x','y','x','y']],
-    'T':['T', 2, [float, float], ['x','y']],
-    'A':['A', 7, [float, float, float, int, int, float, float], [0,0,0,0,0,'x','y']],
-    'Z':['L', 0, [], []]
-    }
-
-def parsePath(d):
-    """
-    Parse SVG path and return an array of segments.
-    Removes all shorthand notation.
-    Converts coordinates to absolute.
-    """
-    retval = []
-    lexer = lexPath(d)
-
-    pen = (0.0,0.0)
-    subPathStart = pen
-    lastControl = pen
-    lastCommand = ''
-
-    while 1:
-        try:
-            token, isCommand = lexer.next()
-        except StopIteration:
-            break
-        params = []
-        needParam = True
-        if isCommand:
-            if not lastCommand and token.upper() != 'M':
-                raise Exception, _('Invalid path, must begin with moveto.')
-            else:
-                command = token
-        else:
-            #command was omited
-            #use last command's implicit next command
-            needParam = False
-            if lastCommand:
-                if token.isupper():
-                    command = pathdefs[lastCommand.upper()][0]
-                else:
-                    command = pathdefs[lastCommand.upper()][0].lower()
-            else:
-                raise Exception, _('Invalid path, no initial command.')
-        numParams = pathdefs[command.upper()][1]
-        while numParams > 0:
-            if needParam:
-                try:
-                    token, isCommand = lexer.next()
-                    if isCommand:
-                        raise Exception, _('Invalid number of parameters')
-                except StopIteration:
-                        raise Exception, _('Unexpected end of path')
-            cast = pathdefs[command.upper()][2][-numParams]
-            param = cast(token)
-            if command.islower():
-                if pathdefs[command.upper()][3][-numParams]=='x':
-                    param += pen[0]
-                elif pathdefs[command.upper()][3][-numParams]=='y':
-                    param += pen[1]
-            params.append(param)
-            needParam = True
-            numParams -= 1
-        #segment is now absolute so
-        outputCommand = command.upper()
-
-        #Flesh out shortcut notation
-        if outputCommand in ('H','V'):
-            if outputCommand == 'H':
-                params.append(pen[1])
-            if outputCommand == 'V':
-                params.insert(0,pen[0])
-            outputCommand = 'L'
-        if outputCommand in ('S','T'):
-            params.insert(0,pen[1]+(pen[1]-lastControl[1]))
-            params.insert(0,pen[0]+(pen[0]-lastControl[0]))
-            if outputCommand == 'S':
-                outputCommand = 'C'
-            if outputCommand == 'T':
-                outputCommand = 'Q'
-
-        #current values become "last" values
-        if outputCommand == 'M':
-            subPathStart = tuple(params[0:2])
-        if outputCommand == 'Z':
-            pen = subPathStart
-        else:
-            pen = tuple(params[-2:])
-
-        if outputCommand in ('Q','C'):
-            lastControl = tuple(params[-4:-2])
-        else:
-            lastControl = pen
-        lastCommand = command
-
-        retval.append([outputCommand,params])
-    return retval
-
 
 class PointingDevice:
     """
@@ -1385,7 +1263,7 @@ class PointingDevice:
         for listener in self.listeners:
             listener.pointer_moved(self)
             
-        
+            
     def button_pressed(self, button):
         self.buttons_pressed.add(button)
         for listener in self.listeners:
@@ -1397,7 +1275,7 @@ class PointingDevice:
             listener.mouse_up(self)
 
     button_down = property(get_button_down)
-    
+         
 
 class GTKPointer(PointingDevice):
     def __init__(self):
@@ -1411,6 +1289,49 @@ class GTKPointer(PointingDevice):
         
     def gtk_button_release_event(self, widget, event):
         self.button_released(event.button)
+
+
+class KeyStateHandler:
+    '''
+    Base class for the state of the keyboard
+    '''
+    def __init__(self):
+        self.key = None
+        self.keycode = None
+        self.keys_pressed = Set()
+        self.listeners = []
+        
+    def add_listener(self, listener):
+        self.listeners.append(listener)
+        
+    def get_key_down(self):
+        ''' Return True if any key is pressed '''
+        return bool(self.keys_pressed)
+    
+    def key_pressed(self, key, keycode):
+        self.key = key
+        self.keycode = keycode
+        self.keys_pressed.add(keycode)
+        for listener in self.listeners:
+            listener.key_down(self)
+            
+    def key_released(self, keycode):
+        self.keys_pressed.remove(keycode)
+        for listener in self.listeners:
+            listener.key_up(self)
+    
+    key_down = property(get_key_down)
+
+
+class GTKKeyStateHandler(KeyStateHandler):
+    def __init__(self):
+        KeyStateHandler.__init__(self)
+        
+    def gtk_key_press_event(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS:
+            self.key_pressed(event.string, event.keyval)
+        else:
+            self.key_released(event.keyval)
 
 class PointerGroup(PointingDevice):
     """
@@ -1455,6 +1376,7 @@ class PointerGroup(PointingDevice):
 
 
 def test_color():
+    # TODO: Rewrite this as a proper unit test!
     # this test checks with a 4 decimal point precision
 
     testvalues = {

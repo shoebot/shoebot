@@ -1,0 +1,18 @@
+# keyboard interaction example
+
+def setup():
+    size(300,300)
+    font('NotCourier-sans', 80)
+
+def draw():
+    # make text flash if a key is pressed
+    if keydown:
+        fill(1,0,0)
+    else:
+        fill(0)
+    # use the currently pressed key as text
+    text(key, 20, 70)
+    # comment the previous line and uncomment the next one to show the keycodes
+    # text(keycode, 20, 70)
+
+
