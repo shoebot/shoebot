@@ -1,5 +1,33 @@
-'''
-Experimental GTK front-end for Shoebot
+#!/usr/bin/env python
+
+# This file is part of Shoebot.
+# Copyright (C) 2007-2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''GTK front-end for Shoebot
 
 implements the gobject-based socket server from
 http://roscidus.com/desktop/node/413
@@ -8,7 +36,7 @@ http://roscidus.com/desktop/node/413
 from __future__ import division
 import sys, gtk, random, StringIO
 import shoebot
-from data import Transform, GTKPointer
+from data import Transform, GTKPointer, GTKKeyStateHandler
 import cairo
 import gobject, socket
 
@@ -23,9 +51,6 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
-
-
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
 else:
@@ -36,13 +61,12 @@ class ShoebotDrawingArea(gtk.DrawingArea):
     def __init__(self, mainwindow, bot = None):
         super(ShoebotDrawingArea, self).__init__()
         self.mainwindow = mainwindow
-        #default dimensions
+        # default dimensions
         width, height = 200,200
         self.is_dynamic = None
         self.connect("expose_event", self.expose)
         # get the bot object to display
         self.bot = bot
-
 
         script = self.bot.inputscript
         # check if the script is a file or a string
@@ -80,16 +104,20 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                 self.bot.namespace['setup']()
 
         # set the window size to the one specified in the script
-        # self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
         self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
 
-        # RIGHT CLICK HANDLING
+        # right click handling
         self.menu = gtk.Menu()
         self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
 
+        # necessary for catching keyboard events
+        self.set_flags(gtk.CAN_FOCUS)
+
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK |
             gtk.gdk.BUTTON_RELEASE_MASK |
-            gtk.gdk.POINTER_MOTION_MASK)
+            gtk.gdk.POINTER_MOTION_MASK |
+            gtk.gdk.KEY_PRESS_MASK |
+            gtk.gdk.KEY_RELEASE_MASK)
 
         self.connect('button_press_event', self.on_button_press)
 
@@ -98,6 +126,12 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         self.connect('button_release_event', pointing_device.gtk_button_release_event)
         self.connect('motion_notify_event', pointing_device.gtk_motion_event)
         pointing_device.add_listener(bot)
+
+        key_state_handler = GTKKeyStateHandler()
+        self.connect('key_press_event', key_state_handler.gtk_key_press_event)
+        self.connect('key_release_event', key_state_handler.gtk_key_press_event)
+        key_state_handler.add_listener(bot)
+
 
     def on_button_press(self, widget, event):
         # check for right mouse clicks
@@ -148,7 +182,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
     def save_output(self, action):
         '''Save the current image to a file.'''
         # action is the menu action pointing the extension to use
-        extension = action.get_name()        
+        extension = action.get_name()
         filename = 'output.' + extension
         self.bot.snapshot(filename)
 
@@ -362,7 +396,7 @@ class ShoebotWindow(SocketServerMixin):
                 # redraw canvas
                 self.drawingarea.redraw()
                 #self.console_error.update()
-                
+
                 # respect framerate
                 completion_time = time()
                 exc_time = completion_time - start_time
