@@ -1,3 +1,7 @@
+NUMBER = 1
+TEXT = 2
+BOOLEAN = 3
+BUTTON = 4
 
 class Variable(object):
     '''Taken from Nodebox'''

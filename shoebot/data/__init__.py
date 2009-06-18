@@ -40,8 +40,16 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
 from __future__ import division
 
+# FIXME: These globals pollute the namespace, but for now we have to keep them
+# since Bot will need them on the global namespace
 RGB = "rgb"
 HSB = "hsb"
+
+DEBUG = False
+
+CENTER = 'center'
+CORNER = 'corner'
+CORNERS = 'corners'
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -52,17 +60,6 @@ RCURVETO = "rcurveto"
 ARC = 'arc'
 ELLIPSE = 'ellipse'
 CLOSE = "close"
-
-DEBUG = False
-
-NUMBER = 1
-TEXT = 2
-BOOLEAN = 3
-BUTTON = 4
-
-CENTER = 'center'
-CORNER = 'corner'
-CORNERS = 'corners'
 
 LEFT = 'left'
 RIGHT = 'right'
@@ -120,6 +117,7 @@ from grob import Grob, RestoreCtx
 from bezier import BezierPath, PathElement, ClippingPath
 from typography import Text
 from img import Image
+from variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
 from input_devices import PointingDevice, PointerGroup, KeyStateHandler, \
                GTKPointer, GTKKeyStateHandler
 

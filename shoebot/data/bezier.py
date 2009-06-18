@@ -3,7 +3,7 @@ from shoebot.data import _copy_attrs
 import cairo
 from math import pi
 from shoebot.data import Grob, TransformMixin, ColorMixin, \
-                         CENTER, CORNER, ELLIPSE
+                         CENTER, CORNER
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
