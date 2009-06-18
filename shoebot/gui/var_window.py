@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 import sys
+import gtk
+
+NUMBER = 1
+TEXT = 2
+BOOLEAN = 3
+BUTTON = 4
 
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'

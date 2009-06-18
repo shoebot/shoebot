@@ -2,8 +2,16 @@
 gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
-
+import sys
 import gobject, socket
+import gettext, locale
+APP = 'shoebot'
+DIR = sys.prefix + '/share/shoebot/locale'
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+_ = gettext.gettext
 
 class SocketServerMixin:
     def server(self, host, port):

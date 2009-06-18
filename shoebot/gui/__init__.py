@@ -29,11 +29,6 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''GTK front-end for Shoebot'''
 
-NUMBER = 1
-TEXT = 2
-BOOLEAN = 3
-BUTTON = 4
-
 from gtk_drawingarea import ShoebotDrawingArea
 from socket_server import SocketServerMixin
 from var_window import VarWindow

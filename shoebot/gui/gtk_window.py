@@ -1,9 +1,10 @@
 from __future__ import division
 import sys, os
 import gtk
+import gobject
 import cairo
 import shoebot
-from shoebot.gui import SocketServerMixin
+from shoebot.gui import SocketServerMixin, ShoebotDrawingArea, VarWindow
 
 import locale
 import gettext
