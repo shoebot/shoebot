@@ -9,6 +9,9 @@ apps/*
 # ignore build and dist output
 build/*
 dist/*
+# as well as sphinx output
+doc/build/*
+
 
 # python bytecode files
 *.pyc
