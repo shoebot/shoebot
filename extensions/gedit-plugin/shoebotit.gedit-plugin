@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=shoebotit
+IAge=2
+Name=ShoebotIt
+Description=Run scripts inside Shoebot
+Authors=Ricardo Lafuente <r@sollec.org>
+Copyright=Copyright © 2009 Ricardo Lafuente <r@sollec.org>
+Website=http://tinkerhouse.net/shoebot
