@@ -116,7 +116,7 @@ class Bot:
 
         self.screen_ratio = None
         self.WIDTH = Bot.DEFAULT_WIDTH
-        self.HEIGHT = Bot.DEFAULT_HEIGHT        
+        self.HEIGHT = Bot.DEFAULT_HEIGHT
 
         if canvas:
             self.canvas = canvas
@@ -277,7 +277,7 @@ class Bot:
         try:
             lib = __import__("lib/"+libName)
         except:
-            lib = __import__(libName)    
+            lib = __import__(libName)
         self._ns[libName] = lib
         lib._ctx = self
         return lib
@@ -349,7 +349,7 @@ class Bot:
         else:
             self.inputscript = inputcode
 
-        
+
         # is it a proper filename?
         if os.path.exists(inputcode):
             filename = inputcode
@@ -395,12 +395,12 @@ class Bot:
     def pointer_moved(self, pointer):
         self.namespace['MOUSEX'] = pointer.x
         self.namespace['MOUSEY'] = pointer.y
-       
+
     def key_down(self, keystate):
         self.namespace['key'] = keystate.key
         self.namespace['keycode'] = keystate.keycode
         self.namespace['keydown'] = True
-        
+
     def key_up(self, keystate):
         self.namespace['keydown'] = False
 
@@ -644,11 +644,11 @@ class NodeBot(Bot):
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
         self._path.curveto(x1, y1, x2, y2, x3, y3)
-        
+
     def arc(self, x, y, radius, angle1, angle2):
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.arc(x, y, radius, angle1, angle2)    
+        self._path.arc(x, y, radius, angle1, angle2)
 
     def closepath(self):
         if self._path is None:
@@ -718,7 +718,7 @@ class NodeBot(Bot):
         # The list of points consists of Point objects,
         # but it shouldn't crash on something straightforward
         # as someone supplying a list of (x,y)-tuples.
-        
+
         for i, pt in enumerate(points):
             if type(pt) == TupleType:
                 points[i] = Point(pt[0], pt[1])
