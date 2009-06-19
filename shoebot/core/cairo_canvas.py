@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import cairo
 from math import pi
 # FIXME: we ought to make relative imports, but only when Cairocanvas is not called
@@ -55,7 +55,7 @@ class CairoCanvas(Canvas):
                 width = self.WIDTH
             if not height:
                 height = self.HEIGHT
-            self._surface = util.surfacefromfilename(filename,width,height)
+            self._surface = surfacefromfilename(filename,width,height)
             self._context = cairo.Context(self._surface)
         elif isinstance(target, cairo.Surface):
             # and if it's a surface, attach our Cairo context to it
@@ -295,4 +295,41 @@ class CairoCanvas(Canvas):
             ctx = target.get_context()
             self.draw(ctx)
 
+
+def surfacefromfilename(outfile, width, height):
+    '''
+    Creates a Cairo surface according to the filename extension,
+    since Cairo requires the type of surface (svg, pdf, ps, png) to
+    be specified on creation.
+    '''
+    # convert to ints, cairo.ImageSurface is picky
+    width = int(width)
+    height = int(height)
+
+    # check across all possible formats and create the appropriate kind of surface
+    # and also be sure that Cairo was built with support for that
+    f, ext = os.path.splitext(outfile)
+    if ext == '.svg':
+        if not cairo.HAS_SVG_SURFACE:
+                raise SystemExit ('cairo was not compiled with SVG support')
+        surface = cairo.SVGSurface(outfile, width, height)
+
+    elif ext == '.ps':
+        if not cairo.HAS_PS_SURFACE:
+                raise SystemExit ('cairo was not compiled with PostScript support')
+        surface = cairo.PSSurface(outfile, width, height)
+
+    elif ext == '.pdf':
+        if not cairo.HAS_PDF_SURFACE:
+                raise SystemExit ('cairo was not compiled with PDF support')
+        surface = cairo.PDFSurface(outfile, width, height)
+
+    elif ext == '.png':
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+
+    else:
+        surface = None
+        raise NameError("%s is not a valid extension" % ext)
+
+    return surface
 

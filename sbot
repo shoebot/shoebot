@@ -34,6 +34,7 @@ import locale, gettext
 from optparse import OptionParser
 import shoebot
 from shoebot.gui import ShoebotWindow
+from shoebot.core import NodeBot
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
@@ -53,7 +54,7 @@ _ = gettext.gettext
 def run_oneshot(script, file):
     ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
-    bot = shoebot.NodeBot(targetfilename = file)
+    bot = NodeBot(targetfilename = file)
 
     # run it, and then its setup and draw methods, if they're there
     # (running setup() and draw() isn't always desirable, but for image
