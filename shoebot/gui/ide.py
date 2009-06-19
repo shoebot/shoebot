@@ -7,6 +7,7 @@ import sys, os, errno
 import gobject
 import gtk
 import pango
+import shoebot
 
 # for gtksourceview/gtksourceview2 compatibility
 try:
@@ -959,14 +960,12 @@ class View(gtk.Window):
         return count
 
     def run_script(self, callback_action, widget):
-        from shoebot import gtkui
-
         # get the buffer contents
         buffer = self.text_view.get_buffer()
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
         try:
-            self.sbot_window = gtkui.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
+            self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
         except ShoebotError, NameError:
             import traceback
             import sys

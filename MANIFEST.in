@@ -1,7 +1,7 @@
 include README
 include sbot
-include shoebot/__init__.py
-include shoebot/data.py
-include shoebot/gtkui.py
-include shoebot/util.py
+include shoebot-ide
+recursive-include shoebot/data
+recursive-include shoebot/core
+recursive-include shoebot/gui
 recursive-include examples *

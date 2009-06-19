@@ -5,6 +5,7 @@ import gobject
 import cairo
 import shoebot
 from shoebot.gui import SocketServerMixin, ShoebotDrawingArea, VarWindow
+from shoebot.core import NodeBot
 
 import locale
 import gettext
@@ -24,7 +25,7 @@ else:
 
 class ShoebotWindow(SocketServerMixin):
     def __init__(self, code=None, server=False, serverport=7777, varwindow=False, go_fullscreen=False):
-        self.bot = shoebot.NodeBot(gtkmode=True, inputscript=code)
+        self.bot = NodeBot(gtkmode=True, inputscript=code)
         self.drawingarea = ShoebotDrawingArea(self, self.bot)
 
         self.has_server = server

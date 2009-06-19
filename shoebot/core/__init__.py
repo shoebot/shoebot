@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # This file is part of Shoebot.
-# Copyright (C) 2007-2009 the Shoebot authors
+# Copyright (C) 2009 the Shoebot authors
 # See the COPYING file for the full license text.
 #
 #   Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,25 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''GTK front-end for Shoebot'''
+''' Shoebot core elements
 
-from gtk_drawingarea import ShoebotDrawingArea
-from socket_server import SocketServerMixin
-from var_window import VarWindow
-from gtk_window import ShoebotWindow
+This file uses code from Nodebox (http://www.nodebox.net).
+The relevant code parts are marked with a "Taken from Nodebox" comment.
+
+'''
+
+from bot import Bot
+from nodebox import NodeBot
+from canvas import Canvas
+from cairo_canvas import CairoCanvas
+
+# from data import *
+
+VERBOSE = False
+DEBUG = False
+EXTENSIONS = ('.png','.svg','.ps','.pdf')
+
+import sys
+LIB_DIR = sys.prefix + '/share/shoebot/lib'
+sys.path.append(LIB_DIR)
 
