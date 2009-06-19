@@ -1,8 +1,9 @@
 import cairo
 from math import sin, cos
-from shoebot.data import CENTER, CORNER
                          
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
+CENTER = 'center'
+CORNER = 'corner'
 
 class Transform:
     '''

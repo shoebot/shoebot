@@ -42,7 +42,7 @@ from __future__ import division
 
 # FIXME: These globals pollute the namespace, but for now we have to keep them
 # since Bot will need them on the global namespace
-RGB = "rgb"
+'''RGB = "rgb"
 HSB = "hsb"
 
 DEBUG = False
@@ -74,7 +74,7 @@ mousedown = False
 key = '-'
 keycode = 0
 keydown = False
-
+'''
 _STATE_NAMES = {
     '_outputmode':    'outputmode',
     '_colorrange':    'colorrange',

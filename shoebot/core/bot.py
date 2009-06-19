@@ -46,6 +46,16 @@ class Bot:
     cm = 28.3465
     mm = 2.8346
 
+    # Default mouse values
+    MOUSEX = -1
+    MOUSEY = -1
+    mousedown = False
+
+    # Default key values
+    key = '-'
+    keycode = 0
+    keydown = False
+
     DEFAULT_WIDTH = 200
     DEFAULT_HEIGHT = 200
 
