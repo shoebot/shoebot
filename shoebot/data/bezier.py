@@ -3,7 +3,6 @@ from shoebot.data import _copy_attrs
 import cairo
 from math import pi
 from shoebot.data import Grob, TransformMixin, ColorMixin, CENTER 
-from shoebot.core import CairoCanvas
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -145,6 +144,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         ctx = cairo.Context(surface)
         # FIXME: this is a bad way to do it, but we don't have a shape drawing
         # library yet...
+        from shoebot.core import CairoCanvas
         canvas = CairoCanvas(target=ctx)
         p = self.copy()
 

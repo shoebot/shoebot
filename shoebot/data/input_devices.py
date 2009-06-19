@@ -1,5 +1,4 @@
 import gtk
-from sets import Set
 
 class PointingDevice:
     """
@@ -8,7 +7,7 @@ class PointingDevice:
     def __init__(self):
         self.x = 0
         self.y = 0
-        self.buttons_pressed = Set()
+        self.buttons_pressed = set()
         self.listeners = []
     
     def add_listener(self, listener):
@@ -61,7 +60,7 @@ class KeyStateHandler:
     def __init__(self):
         self.key = None
         self.keycode = None
-        self.keys_pressed = Set()
+        self.keys_pressed = set()
         self.listeners = []
         
     def add_listener(self, listener):

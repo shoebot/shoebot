@@ -39,13 +39,4 @@ from nodebox import NodeBot
 from canvas import Canvas
 from cairo_canvas import CairoCanvas
 
-# from data import *
-
-VERBOSE = False
-DEBUG = False
-EXTENSIONS = ('.png','.svg','.ps','.pdf')
-
-import sys
-LIB_DIR = sys.prefix + '/share/shoebot/lib'
-sys.path.append(LIB_DIR)
 

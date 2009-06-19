@@ -1,14 +1,12 @@
 import sys, os
-import cairo
 import shoebot
 
 from shoebot import ShoebotError
+from shoebot.data import BezierPath, RestoreCtx, Color, Text, Variable, \
+                         Image, ClippingPath, Transform
 
 from glob import glob
 import random as r
-import Image
-from types import TupleType
-
 import traceback
 
 import locale, gettext
@@ -19,6 +17,10 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+import sys
+LIB_DIR = sys.prefix + '/share/shoebot/lib'
+sys.path.append(LIB_DIR)
 
 class Bot:
     '''
@@ -63,7 +65,7 @@ class Bot:
         self._strokecolor = None
         self._strokewidth = 1.0
 
-        self._transform = shoebot.data.Transform()
+        self._transform = Transform()
         self._transformmode = Bot.CENTER
         self.transform_stack = []
 
@@ -105,28 +107,28 @@ class Bot:
         inst = clazz(self, *args, **kwargs)
         return inst
     def RestoreCtx(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.RestoreCtx, args, kwargs)
+        return self._makeInstance(RestoreCtx, args, kwargs)
     def BezierPath(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.BezierPath, args, kwargs)
+        return self._makeInstance(BezierPath, args, kwargs)
     def ClippingPath(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.ClippingPath, args, kwargs)
+        return self._makeInstance(ClippingPath, args, kwargs)
     def Rect(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Rect, args, kwargs)
+        return self._makeInstance(Rect, args, kwargs)
     def Oval(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Oval, args, kwargs)
+        return self._makeInstance(Oval, args, kwargs)
     def Ellipse(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Ellipse, args, kwargs)
+        return self._makeInstance(Ellipse, args, kwargs)
     def Color(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Color, args, kwargs)
+        return self._makeInstance(Color, args, kwargs)
     def Image(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Image, args, kwargs)
+        return self._makeInstance(Image, args, kwargs)
     def Text(self, *args, **kwargs):
-        return self._makeInstance(shoebot.data.Text, args, kwargs)
+        return self._makeInstance(Text, args, kwargs)
 
     #### Variables
 
     def var(self, name, type, default=None, min=0, max=255, value=None):
-        v = shoebot.data.Variable(name, type, default, min, max, value)
+        v = Variable(name, type, default, min, max, value)
         v = self.addvar(v)
 
     def addvar(self, v):
@@ -168,7 +170,7 @@ class Bot:
 
     def color(self, *args):
         #return Color(self.color_mode, self.color_range, *args)
-        return shoebot.data.Color(mode=self.color_mode, color_range=self.color_range, *args)
+        return Color(mode=self.color_mode, color_range=self.color_range, *args)
 
     choice = r.choice
 
