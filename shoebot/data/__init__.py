@@ -60,7 +60,7 @@ def _copy_attrs(source, target, attrs):
         setattr(target, attr, _copy_attr(getattr(source, attr)))
 
 from point import Point
-from colors import Color, ColorMixin
+from basecolor import Color, ColorMixin
 from transforms import Transform, TransformMixin
 from grob import Grob, RestoreCtx
 from bezier import BezierPath, PathElement, ClippingPath
