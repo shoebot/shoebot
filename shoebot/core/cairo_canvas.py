@@ -53,6 +53,10 @@ class CairoCanvas(Canvas):
                     self.fullscreen_deltay = 0
                 self.context.translate(self.fullscreen_deltax, self.fullscreen_deltay)
                 self.context.scale(self.fullscreen_scale, self.fullscreen_scale)
+                
+        # we'll use these to calculate path bounds and centerpoints
+        self.dummy_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 0, 0)
+        self.dummy_ctx = cairo.Context(self.dummy_surface)
 
     def drawitem(self, item):
         # clips are special cases
@@ -61,16 +65,14 @@ class CairoCanvas(Canvas):
             return
         if isinstance(item, ClippingPath):
             self.context.save()
-            
-        if isinstance(item,Text):
-            deltay -= item.baseline
-            
+                        
         # get the bot's current transform matrix and apply it to the context
         self.context.save()
         if self.bot._transformmode == CORNER:
             deltax, deltay = (0,0)
         else:
-            deltax, deltay = item.center
+            deltax, deltay = self.get_item_center(item)
+                       
         mtrx = self.bot._transform.get_matrix_with_center(deltax,deltay)
         self.context.transform(mtrx)
         
@@ -138,8 +140,8 @@ class CairoCanvas(Canvas):
         else:
             print _("Warning: Canvas object had no fill or stroke values")
 
-        txt.pang_self.context.update_layout(txt.layout)
-        txt.pang_self.context.show_layout(txt.layout)
+        txt.pang_ctx.update_layout(txt.layout)
+        txt.pang_ctx.show_layout(txt.layout)
 
 
 
@@ -202,6 +204,71 @@ class CairoCanvas(Canvas):
             self.context.stroke()
         else:
             print _("Warning: Canvas object had no fill or stroke values")
+
+    def get_item_center(self, item):
+        '''Returns the path's center point. Note that this doesn't
+        take transforms into account.'''
+        
+        # we don't have any direct way to calculate bbox from a path, but Cairo
+        # does! So we make a new cairo context to calculate path bounds
+        
+        # this is a bad way to do it, but until we change the path code
+        # to use 2geom, this is the next best thing
+        
+        # text objects have their own center-fetching method
+        if isinstance(item,Text):
+            x,y = self.get_textitem_center(item)
+            y -= item.baseline
+            return (x,y)
+
+        # pass path to temporary context
+        for element in item.data:
+            cmd = element[0]
+            values = element[1:]
+
+            # apply cairo context commands
+            if cmd == MOVETO:
+                self.dummy_ctx.move_to(*values)
+            elif cmd == LINETO:
+                self.dummy_ctx.line_to(*values)
+            elif cmd == CURVETO:
+                self.dummy_ctx.curve_to(*values)
+            elif cmd == RLINETO:
+                self.dummy_ctx.rel_line_to(*values)
+            elif cmd == RCURVETO:
+                self.dummy_ctx.rel_curve_to(*values)
+            elif cmd == CLOSE:
+                self.dummy_ctx.close_path()
+            elif cmd == ELLIPSE:
+                x, y, w, h = values
+                self.dummy_ctx.save()
+                self.dummy_ctx.translate (x + w / 2., y + h / 2.)
+                self.dummy_ctx.scale (w / 2., h / 2.)
+                self.dummy_ctx.arc (0., 0., 1., 0., 2 * pi)
+                self.dummy_ctx.restore()
+        # get boundaries
+        bbox = self.dummy_ctx.stroke_extents()
+        
+        # get the center point
+        (x1,y1,x2,y2) = bbox
+        x = (x1 + x2) / 2
+        y = (y1 + y2) / 2
+        
+        # reset the dummy context
+        # FIXME: there ought to be a cleaner way to do this
+        self.dummy_ctx.stroke()
+        
+        # here's the point you asked for, kind sir, can i get you
+        # a martini with that?
+        return (x,y)
+
+    def get_textitem_center(self, item):
+        '''Returns the center point of the text item, disregarding transforms.
+        '''
+        w,h = item.layout.get_pixel_size()
+        x = (item.x+w/2)
+        y = (item.y+h/2)
+        return (x,y)
 
     def finish(self):
         if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):

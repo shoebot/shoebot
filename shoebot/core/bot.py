@@ -300,7 +300,6 @@ class Bot:
 
     def finish(self):
         '''Finishes the surface and writes it to the output file.'''
-        self.canvas.draw()
         self.canvas.finish()
 
     def load_namespace(self):

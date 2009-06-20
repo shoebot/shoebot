@@ -136,6 +136,11 @@ class BezierPath(Grob, ColorMixin):
         else:
             raise TypeError(_("Wrong data passed to BezierPath.append(): %s") % el)
 
+# the following functions were used to determine the center point of the
+# path, but this logic was moved to the canvas to avoid creating a new
+# context for each path.
+
+"""
     def _get_bounds(self):
         '''Returns the path's bounding box. Note that this doesn't
         take transforms into account.'''
@@ -207,7 +212,7 @@ class BezierPath(Grob, ColorMixin):
             trans *= t
         return trans
     transform = property(_get_transform)
-
+"""
 class ClippingPath(BezierPath):
     
     stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
