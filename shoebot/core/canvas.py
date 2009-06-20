@@ -39,7 +39,7 @@ class Canvas:
     def add(self, grob):
         if not isinstance(grob, shoebot.data.Grob):
             raise ValueError(_("Canvas.add() - wrong argument: expecting a Grob, received %s") % (grob))
-        self.grobstack.append(grob)
+        self.drawitem(grob)
 
     def append(self, grob):
         self.add(self, grob)
@@ -52,6 +52,8 @@ class Canvas:
         return self._surface
 
     def draw(self, ctx=None):
+        pass
+    def drawitem(self, grob):
         pass
     def output(self, filename):
         pass

@@ -89,7 +89,9 @@ class Transform:
         for value in self.stack:
             yield value
     ### calculates tranformation matrix
-    def get_matrix_with_center(self,x,y,mode='center'):
+    def get_matrix_with_center(self,x,y):
+        # FIXME: this breaks CORNER mode, we have to fix this when it's ready
+        mode = 'center'
         m = cairo.Matrix()
         centerx =x
         centery = y

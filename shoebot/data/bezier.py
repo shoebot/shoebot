@@ -15,7 +15,7 @@ ARC = 'arc'
 ELLIPSE = 'ellipse'
 CLOSE = "close"
 
-class BezierPath(Grob, TransformMixin, ColorMixin):
+class BezierPath(Grob, ColorMixin):
     """
     Represents a Bezier path as a list of PathElements.
 
@@ -28,14 +28,14 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     for getting path dimensions)
     """
 
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
     kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
         #self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
-        TransformMixin.__init__(self)
+        # TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
         # inherit the Bot properties if applicable
@@ -145,12 +145,9 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         ctx = cairo.Context(surface)
         # FIXME: this is a bad way to do it, but we don't have a shape drawing
         # library yet...
-        from shoebot.core import CairoCanvas
-        canvas = CairoCanvas(target=ctx)
-        p = self.copy()
 
         # pass path to temporary context
-        for element in p.data:
+        for element in self.data:
             cmd = element[0]
             values = element[1:]
 
@@ -177,7 +174,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         # get boundaries
         bbox = ctx.stroke_extents()
         # is this line necessary? Or does python garbage collect this?
-        del surface, ctx, canvas, p
+        del surface, ctx
         return bbox
     bounds = property(_get_bounds)
 
@@ -196,6 +193,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         (rel_x, rel_y) = self._get_center()
         m = self._transform.copy()._matrix
         return m.transform_point(rel_x, rel_y)
+    abs_center = property(_get_abs_center)
 
     def _get_transform(self):
         trans = self._transform.copy()
@@ -212,7 +210,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
 
 class ClippingPath(BezierPath):
     
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth', '_transform', '_transformmode')
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
     kwargs = ('fill', 'stroke', 'strokewidth')    
     
     def __init__(self, bot, path=None, **kwargs):
