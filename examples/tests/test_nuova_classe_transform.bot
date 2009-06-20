@@ -19,12 +19,12 @@ r3 = rect(10,0,10,10)
 pop()
 fill(1,0,0)
 r4 = rect(0,0,10,10)
-print r0._counter, r._counter, r1._counter, r2._counter, r3._counter, r4._counter
+# print r0._counter, r._counter, r1._counter, r2._counter, r3._counter, r4._counter
 
 for i in range (6):
         fill(1,0,0,.25)
         r5 = rect(random(WIDTH/2),random(HEIGHT/2),10,10)
-        print r5._counter
+        # print r5._counter
 #6  
 push()      
 #7
@@ -37,9 +37,9 @@ fill(0,0,1)
 r7 = rect(0,0,10,10)
 #9
 pop()
-print r6._counter, r7._counter
+#print r6._counter, r7._counter
 fill(1,.6,0)
 #10
 translate(20,0)
 r8 = rect(0,0,10,10)
-print r8._counter
+#print r8._counter

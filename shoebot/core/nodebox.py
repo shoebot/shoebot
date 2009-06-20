@@ -1,8 +1,9 @@
 import sys
 from shoebot.core import Bot
-from shoebot.data import Transform, Image
+from shoebot.data import Point, BezierPath, Transform, Image
 from math import sin, cos, pi
 from math import radians as deg2rad
+from types import TupleType
 
 import locale, gettext
 APP = 'shoebot'
