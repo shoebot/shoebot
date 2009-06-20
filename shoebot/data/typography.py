@@ -1,7 +1,7 @@
 import cairo
 import pango
 import pangocairo
-from shoebot.data import Grob, TransformMixin, ColorMixin, _copy_attrs
+from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
