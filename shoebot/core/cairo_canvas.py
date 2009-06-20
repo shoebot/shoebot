@@ -65,16 +65,14 @@ class CairoCanvas(Canvas):
             return
         if isinstance(item, ClippingPath):
             self.context.save()
-            
-        if isinstance(item,Text):
-            deltay -= item.baseline
-            
+                        
         # get the bot's current transform matrix and apply it to the context
         self.context.save()
         if self.bot._transformmode == CORNER:
             deltax, deltay = (0,0)
         else:
             deltax, deltay = self.get_item_center(item)
+                       
         mtrx = self.bot._transform.get_matrix_with_center(deltax,deltay)
         self.context.transform(mtrx)
         
@@ -142,8 +140,8 @@ class CairoCanvas(Canvas):
         else:
             print _("Warning: Canvas object had no fill or stroke values")
 
-        txt.pang_self.context.update_layout(txt.layout)
-        txt.pang_self.context.show_layout(txt.layout)
+        txt.pang_ctx.update_layout(txt.layout)
+        txt.pang_ctx.show_layout(txt.layout)
 
 
 
@@ -216,6 +214,12 @@ class CairoCanvas(Canvas):
         
         # this is a bad way to do it, but until we change the path code
         # to use 2geom, this is the next best thing
+        
+        # text objects have their own center-fetching method
+        if isinstance(item,Text):
+            x,y = self.get_textitem_center(item)
+            y -= item.baseline
+            return (x,y)
 
         # pass path to temporary context
         for element in item.data:
@@ -256,6 +260,14 @@ class CairoCanvas(Canvas):
         
         # here's the point you asked for, kind sir, can i get you
         # a martini with that?
+        return (x,y)
+
+    def get_textitem_center(self, item):
+        '''Returns the center point of the text item, disregarding transforms.
+        '''
+        w,h = item.layout.get_pixel_size()
+        x = (item.x+w/2)
+        y = (item.y+h/2)
         return (x,y)
 
     def finish(self):

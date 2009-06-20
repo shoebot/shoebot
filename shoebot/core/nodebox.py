@@ -504,7 +504,7 @@ class NodeBot(Bot):
         '''
         Draws a string of text according to current font settings.
         '''
-        txt = self.Text(txt, x, y, width, height, ctx=self.canvas._context, **kwargs)
+        txt = self.Text(txt, x, y, width, height, ctx=self.canvas.context, **kwargs)
         if outline:
           path = txt.path
           if draw:
