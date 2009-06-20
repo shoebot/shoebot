@@ -141,7 +141,7 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
         take transforms into account.'''
         # we don't have any direct way to calculate bbox from a path, but Cairo
         # does! So we make a new cairo context to calculate path bounds
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100,100)
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 0, 0)
         ctx = cairo.Context(surface)
         # FIXME: this is a bad way to do it, but we don't have a shape drawing
         # library yet...
