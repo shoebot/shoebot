@@ -38,57 +38,6 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
 '''
 
-from __future__ import division
-
-# FIXME: These globals pollute the namespace, but for now we have to keep them
-# since Bot will need them on the global namespace
-'''RGB = "rgb"
-HSB = "hsb"
-
-DEBUG = False
-
-CENTER = 'center'
-CORNER = 'corner'
-CORNERS = 'corners'
-
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
-CLOSE = "close"
-
-LEFT = 'left'
-RIGHT = 'right'
-JUSTIFY = 'justify'
-
-# Default mouse values
-MOUSEX = -1
-MOUSEY = -1
-mousedown = False
-
-# Default key values
-key = '-'
-keycode = 0
-keydown = False
-'''
-_STATE_NAMES = {
-    '_outputmode':    'outputmode',
-    '_colorrange':    'colorrange',
-    '_fillcolor':     'fill',
-    '_strokecolor':   'stroke',
-    '_strokewidth':   'strokewidth',
-    '_transform':     'transform',
-    '_transformmode': 'transformmode',
-    '_fontname':      'font',
-    '_fontsize':      'fontsize',
-    '_align':         'align',
-    '_lineheight':    'lineheight',
-}
-
 class ShoebotError(Exception): pass
 class NodeBoxError(ShoebotError): pass
 

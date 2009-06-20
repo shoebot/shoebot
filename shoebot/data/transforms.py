@@ -1,9 +1,19 @@
+import sys
 import cairo
 from math import sin, cos
                          
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 CENTER = 'center'
 CORNER = 'corner'
+
+import locale, gettext
+APP = 'shoebot'
+DIR = sys.prefix + '/share/shoebot/locale'
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+_ = gettext.gettext
 
 class Transform:
     '''
