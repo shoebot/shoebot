@@ -85,7 +85,10 @@ class CairoCanvas(Canvas):
             self.drawtext(item)
         elif isinstance(item, Image):
             self.drawimage(item)
-            
+        
+        # TODO: see if this improves performance
+        # del item
+        
         self.context.restore()
 
     def drawclip(self,path):
@@ -255,8 +258,7 @@ class CairoCanvas(Canvas):
         y = (y1 + y2) / 2
         
         # reset the dummy context
-        # FIXME: there ought to be a cleaner way to do this
-        self.dummy_ctx.stroke()
+        self.dummy_ctx.new_path()
         
         # here's the point you asked for, kind sir, can i get you
         # a martini with that?
