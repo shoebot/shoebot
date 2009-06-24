@@ -2,7 +2,7 @@ import sys, os
 import shoebot
 
 from shoebot import ShoebotError
-from shoebot.data import BezierPath, RestoreCtx, Color, Text, Variable, \
+from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, Transform
 
 from glob import glob
@@ -116,8 +116,8 @@ class Bot:
            This method sets the context of the object to the current context."""
         inst = clazz(self, *args, **kwargs)
         return inst
-    def RestoreCtx(self, *args, **kwargs):
-        return self._makeInstance(RestoreCtx, args, kwargs)
+    def EndClip(self, *args, **kwargs):
+        return self._makeInstance(EndClip, args, kwargs)
     def BezierPath(self, *args, **kwargs):
         return self._makeInstance(BezierPath, args, kwargs)
     def ClippingPath(self, *args, **kwargs):

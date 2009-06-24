@@ -1,9 +1,17 @@
+import sys, locale, gettext
 from shoebot.data import _copy_attrs
+from shoebot.data import Grob, ColorMixin
 
-import cairo
-from math import pi
-from shoebot.data import Grob, TransformMixin, ColorMixin
 CENTER = 'center'
+
+APP = 'shoebot'
+DIR = sys.prefix + '/share/shoebot/locale'
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -215,11 +223,15 @@ class BezierPath(Grob, ColorMixin):
 """
 class ClippingPath(BezierPath):
     
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
-    kwargs = ('fill', 'stroke', 'strokewidth')    
+    # stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
+    # kwargs = ('fill', 'stroke', 'strokewidth')    
     
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, path, **kwargs)
+
+class EndClip(Grob):
+    def __init__(self, bot, **kwargs):
+        self._bot = bot
 
 class PathElement:
     '''

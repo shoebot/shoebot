@@ -19,3 +19,4 @@ doc/build/*
 # backup files
 *.bak
 *~
+*.swp

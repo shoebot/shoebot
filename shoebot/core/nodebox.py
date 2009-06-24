@@ -1,4 +1,5 @@
 import sys
+from shoebot import ShoebotError
 from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Transform, Image
 from math import sin, cos, pi
@@ -35,11 +36,9 @@ class NodeBot(Bot):
             self.canvas.add(r)
         return r
 
-
     def imagesize(self, path):
         img = Image.open(path)
         return img.size
-
 
     # Paths
 
@@ -373,17 +372,15 @@ class NodeBot(Bot):
     #### Transform and utility
 
     def beginclip(self,path):
-        #self.canvas._context.save()
+        # FIXME: this save should go into Canvas
         p = self.ClippingPath(path)
         self.canvas.add(p)
         return p
 
 
     def endclip(self):
-        p = self.RestoreCtx()
+        p = self.EndClip()
         self.canvas.add(p)
-
-
 
     def transform(self, mode=None): # Mode can be CENTER or CORNER
         if mode:

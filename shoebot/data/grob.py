@@ -28,7 +28,4 @@ class Grob(object):
             raise ValueError, _("Unknown argument(s) '%s'") % ", ".join(remaining)
     checkKwargs = classmethod(checkKwargs)
 
-class RestoreCtx(Grob):
-    def __init__(self, bot, **kwargs):
-        self._bot = bot
 
