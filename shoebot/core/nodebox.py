@@ -504,7 +504,7 @@ class NodeBot(Bot):
         if fontsize is not None:
             self._fontsize = fontsize
         else:
-            return self.canvas.font_size
+            return self._fontsize
 
     def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''

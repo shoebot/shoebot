@@ -84,7 +84,6 @@ class CairoCanvas(Canvas):
 
         # get the item's transform, if appropriate
         if item.transform.stack:
-            print item.transform.stack
             self.push()
             cx, cy = self.get_item_center(item) 
             self.context.transform(item.transform.get_matrix_with_center(cx, cy))
@@ -143,6 +142,9 @@ class CairoCanvas(Canvas):
         # coder, you choose)
 
     def drawtext(self,txt):
+        self.context.save()
+        self.context.translate(txt.x, txt.y-txt.baseline)
+
         if txt._fillcolor:
             self.context.set_source_rgba(*txt._fillcolor)
             if txt._strokecolor:
@@ -165,6 +167,8 @@ class CairoCanvas(Canvas):
 
         txt.pang_ctx.update_layout(txt.layout)
         txt.pang_ctx.show_layout(txt.layout)
+
+        self.context.restore()
 
     def drawimage(self,image):
         self.context.set_source_surface (image.imagesurface, image.x, image.y)
