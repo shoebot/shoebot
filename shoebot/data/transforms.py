@@ -21,8 +21,9 @@ class Transform:
     translation, scaling, rotation and skewing.
 
     '''
-    def __init__(self, transform=None):
+    def __init__(self, transform=None, mode=CENTER):
         self.stack = []
+        self.mode = mode
         if transform is None:
             pass
         elif isinstance(transform, Transform):
@@ -90,8 +91,7 @@ class Transform:
             yield value
     ### calculates tranformation matrix
     def get_matrix_with_center(self,x,y):
-        # FIXME: this breaks CORNER mode, we have to fix this when it's ready
-        mode = 'center'
+        mode = self.mode
         m = cairo.Matrix()
         centerx =x
         centery = y

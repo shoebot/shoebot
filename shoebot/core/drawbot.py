@@ -34,12 +34,26 @@ TODO:
 
 '''
 
-
+CORNER = 'corner'
 
 class DrawBot(Bot):
     
     def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
         Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode)
+        self._transformmode = CORNER
+
+    def flip_canvas(self):
+        ''' Flip the canvas vertically, in order to achieve the Drawbot coord
+        system (origin on bottom-left).'''
+        w = self.WIDTH
+        h = self.HEIGHT
+        self.translate(w/2., h/2.)
+        self.scale(1,-1)
+        self.translate(-w/2., -h/2.)
+    
+    def size(self, x, y):
+        Bot.size(self, x, y)
+        self.flip_canvas()
 
     #### Drawing
 
@@ -173,7 +187,7 @@ class DrawBot(Bot):
     def drawimage(self, image):
         self.canvas.add(image)
 
-    def autoclosepath(self, close=True):
+    def autoclosepath(self, close=True): 
         self._autoclosepath = close
 
     def relmoveto(self, x, y):
@@ -209,10 +223,10 @@ class DrawBot(Bot):
     def scale(self, x=1, y=None):
         if not y:
             y = x
-        if x == 0 or x == -1:
+        if x == 0:
             # Cairo borks on zero values
             x = 1
-        if y == 0 or y == -1:
+        if y == 0:
             y = 1
         self._transform.scale(x,y)
 

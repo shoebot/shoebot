@@ -32,9 +32,8 @@
 import sys, os
 import locale, gettext
 from optparse import OptionParser
-import shoebot
 from shoebot.gui import ShoebotWindow
-from shoebot.core import NodeBot
+from shoebot.core import NodeBot, DrawBot
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
@@ -51,10 +50,16 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-def run_oneshot(script, file):
+NODEBOX = 'nodebox'
+DRAWBOT = 'drawbot'
+
+def run_oneshot(script, file, bot=NODEBOX):
     ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
-    bot = NodeBot(targetfilename = file)
+    if bot == NODEBOX:
+        bot = NodeBot(targetfilename = file)
+    elif bot == DRAWBOT:
+        bot = DrawBot(targetfilename = file)
 
     # run it, and then its setup and draw methods, if they're there
     # (running setup() and draw() isn't always desirable, but for image
@@ -67,9 +72,9 @@ def run_oneshot(script, file):
         bot.namespace['draw']()
     bot.finish()
 
-def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, go_fullscreen=False):
+def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, go_fullscreen=False, bot=NODEBOX):
     ''' Windowed mode: Run a Shoebot script in a GTK window.'''
-    win = ShoebotWindow(script, server, port, varwindow, go_fullscreen)
+    win = ShoebotWindow(script, server, port, varwindow, go_fullscreen, bot)
 
 # use OptionParser to interpret commandline options
 parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
@@ -110,13 +115,18 @@ parser.add_option("-p",
                 dest="serverport",
                 default=DEFAULT_SERVERPORT,
                 help=_("set socketserver port to listen for connections (default is 7777)"))
-
 parser.add_option("-r",
                 "--repeat",
                 type="int",
                 dest="repeat",
                 default=False,
                 help=_("set number of iterations, multiple images will be produced (only in non-windowed mode)"))
+parser.add_option("-b",
+                "--bot",
+                dest="bot",
+                default=NODEBOX,
+                help=_("Select between 'nodebox' (default) or 'drawbot' languages"),
+                )
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -160,7 +170,9 @@ if __name__ == '__main__':
             print _("start sequence...")
             for r in range(1, options.repeat+1):
                 outputfile = filename + "_%03d" %r + extension
-                run_oneshot(inputscript, outputfile)
+                run_oneshot(inputscript, 
+                            outputfile,
+                            bot_type=options.bot)
                 print "Output %s" % outputfile
         else:
             run_oneshot(inputscript, outputfile)
@@ -174,4 +186,5 @@ if __name__ == '__main__':
                    server=options.socketserver,
                    port=options.serverport,
                    varwindow=options.varwindow,
-                   go_fullscreen=options.fullscreen)
+                   go_fullscreen=options.fullscreen,
+                   bot=options.bot)

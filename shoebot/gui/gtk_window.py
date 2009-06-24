@@ -5,7 +5,7 @@ import gobject
 import cairo
 import shoebot
 from shoebot.gui import SocketServerMixin, ShoebotDrawingArea, VarWindow
-from shoebot.core import NodeBot
+from shoebot.core import NodeBot, DrawBot
 
 import locale
 import gettext
@@ -18,14 +18,22 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+NODEBOX = 'nodebox'
+DRAWBOT = 'drawbot'
+
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
 else:
     ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class ShoebotWindow(SocketServerMixin):
-    def __init__(self, code=None, server=False, serverport=7777, varwindow=False, go_fullscreen=False):
-        self.bot = NodeBot(gtkmode=True, inputscript=code)
+    def __init__(self, code=None, server=False, serverport=7777,
+            varwindow=False, go_fullscreen=False, bot=NODEBOX):
+
+        if bot == NODEBOX:
+            self.bot = NodeBot(gtkmode=True, inputscript=code)
+        elif bot == DRAWBOT:
+            self.bot = DrawBot(gtkmode=True, inputscript=code)
         self.drawingarea = ShoebotDrawingArea(self, self.bot)
 
         self.has_server = server

@@ -35,7 +35,10 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 '''
 
 from bot import Bot
+
 from nodebox import NodeBot
+from drawbot import DrawBot
+
 from canvas import Canvas
 from cairo_canvas import CairoCanvas
 
