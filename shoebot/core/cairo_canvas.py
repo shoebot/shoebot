@@ -80,6 +80,12 @@ class CairoCanvas(Canvas):
                        
         mtrx = self.bot._transform.get_matrix_with_center(deltax,deltay)
         self.context.transform(mtrx)
+
+        # get the item's transform, if appropriate
+        if item.transform:
+            self.push()
+            cx, cy = self.get_item_center(item) 
+            self.context.transform(item.transform.get_matrix_with_center(cx, cy))
         
         # find item type and call appropriate drawing method
         if isinstance(item, ClippingPath):
@@ -91,12 +97,18 @@ class CairoCanvas(Canvas):
         elif isinstance(item, Image):
             self.drawimage(item)
         
+        if item.transform:
+            self.pop()
+       
+        if isinstance(item, ClippingPath):
+            self.context.clip()
+        else:
+            # clip paths must keep the graphics context, i spent hours before i figured this out
+            self.pop()
+
         # TODO: see if this improves performance
         # del item
 
-        # clip paths must keep the graphics context, i spent hours before i figured this out
-        if not isinstance(item, ClippingPath):
-            self.pop()
 
     def drawclip(self,path):
         for element in path.data:
@@ -125,7 +137,8 @@ class CairoCanvas(Canvas):
                 self.context.restore()
             else:
                 raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
-        self.context.clip()
+        # self.context.clip() is called inside drawitem() because Cairo's fucking picky (or maybe i'm a dumb
+        # coder, you choose)
 
     def drawtext(self,txt):
         if txt._fillcolor:

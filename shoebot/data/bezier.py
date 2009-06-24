@@ -1,6 +1,6 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
-from shoebot.data import Grob, ColorMixin
+from shoebot.data import Grob, ColorMixin, TransformMixin
 
 CENTER = 'center'
 
@@ -23,7 +23,7 @@ ARC = 'arc'
 ELLIPSE = 'ellipse'
 CLOSE = "close"
 
-class BezierPath(Grob, ColorMixin):
+class BezierPath(Grob, TransformMixin, ColorMixin):
     """
     Represents a Bezier path as a list of PathElements.
 
@@ -36,14 +36,15 @@ class BezierPath(Grob, ColorMixin):
     for getting path dimensions)
     """
 
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth',
+            '_transform', '_transformmode')
     kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
         #self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
-        # TransformMixin.__init__(self)
+        TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
         # inherit the Bot properties if applicable

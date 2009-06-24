@@ -1,5 +1,3 @@
-from shoebot.data import _copy_attrs
-
 class Grob(object):
     """A GRaphic OBject is the base class for all DrawingPrimitives."""
 
