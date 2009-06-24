@@ -2,8 +2,15 @@ import os
 import gedit
 import gtk
 from gettext import gettext as _
-from shoebot import gtkui
-import shoebot
+
+try:
+    # 0.2
+    from shoebot import gtkui
+    import shoebot
+except ImportError:
+    # 0.3
+    from shoebot.gui import ShoebotWindow
+    from shoebot import ShoebotError, ShoebotScriptError
 
 ui_str = """
 <ui>
@@ -39,11 +46,6 @@ class ShoebotWindowHelper:
         self.action_group = None
         del self.shoebot_window
 
-    def update_ui(self):
-        # Called whenever the window has been updated (active tab
-        # changed, etc.)
-        pass
-
     def insert_menu(self):
         manager = self.window.get_ui_manager()
         self.action_group = gtk.ActionGroup("ShoebotPluginActions")
@@ -76,11 +78,11 @@ class ShoebotWindowHelper:
         start, end = doc.get_bounds()
         code = doc.get_text(start, end)
         try:
-            self.shoebot_window = gtkui.ShoebotWindow(code, 
+            self.shoebot_window = ShoebotWindow(code, 
                                                    self.use_socketserver, 7777, 
                                                    self.use_varwindow, 
                                                    self.use_fullscreen)
-        except shoebot.ShoebotError, NameError:
+        except ShoebotError, NameError:
             import traceback            
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
