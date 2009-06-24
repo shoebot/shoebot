@@ -67,6 +67,7 @@ class CairoCanvas(Canvas):
         if isinstance(item, EndClip):
             # end clip instruction -> restore cairo context (it's saved in drawclip)
             self.pop()
+            self.pop()
             return
         elif isinstance(item, ClippingPath):
             self.push()
@@ -82,7 +83,8 @@ class CairoCanvas(Canvas):
         self.context.transform(mtrx)
 
         # get the item's transform, if appropriate
-        if item.transform:
+        if item.transform.stack:
+            print item.transform.stack
             self.push()
             cx, cy = self.get_item_center(item) 
             self.context.transform(item.transform.get_matrix_with_center(cx, cy))
@@ -97,7 +99,7 @@ class CairoCanvas(Canvas):
         elif isinstance(item, Image):
             self.drawimage(item)
         
-        if item.transform:
+        if item.transform.stack:
             self.pop()
        
         if isinstance(item, ClippingPath):

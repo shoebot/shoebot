@@ -36,8 +36,8 @@ class BezierPath(Grob, TransformMixin, ColorMixin):
     for getting path dimensions)
     """
 
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth',
-            '_transform', '_transformmode')
+    # transforms are not here because they shouldn't be inherited from Bot
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth',)
     kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, bot, path=None, **kwargs):
