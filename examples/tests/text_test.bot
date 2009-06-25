@@ -1,0 +1,10 @@
+size(300,300)
+background(0)
+
+text('default text', 20, 20)
+fontsize(20)
+text('text with size 20', 20, 60)
+fontsize(30)
+text('text with size 30', 20, 100)
+
+

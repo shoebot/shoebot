@@ -1,5 +1,3 @@
-from shoebot.data import _copy_attrs
-
 class Grob(object):
     """A GRaphic OBject is the base class for all DrawingPrimitives."""
 
@@ -28,7 +26,4 @@ class Grob(object):
             raise ValueError, _("Unknown argument(s) '%s'") % ", ".join(remaining)
     checkKwargs = classmethod(checkKwargs)
 
-class RestoreCtx(Grob):
-    def __init__(self, bot, **kwargs):
-        self._bot = bot
 

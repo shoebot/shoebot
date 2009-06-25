@@ -1,4 +1,5 @@
 import sys
+from shoebot import ShoebotError
 from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Transform, Image
 from math import sin, cos, pi
@@ -35,11 +36,9 @@ class NodeBot(Bot):
             self.canvas.add(r)
         return r
 
-
     def imagesize(self, path):
         img = Image.open(path)
         return img.size
-
 
     # Paths
 
@@ -53,6 +52,8 @@ class NodeBot(Bot):
         #r.inheritFromContext(kwargs.keys())
         if draw:
             self.canvas.add(r)
+        else:
+            r.transform = self._transform.copy()
         return r
 
     def rectmode(self, mode=None):
@@ -71,6 +72,8 @@ class NodeBot(Bot):
         # r.inheritFromContext(kwargs.keys())
         if draw:
             self.canvas.add(r)
+        else:
+            r.transform = self._transform.copy()
         return r
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
@@ -80,6 +83,8 @@ class NodeBot(Bot):
         # r.inheritFromContext(kwargs.keys())
         if draw:
             self.canvas.add(r)
+        else:
+            r.transform = self._transform.copy()
         return r
 
     def circle(self, x, y, diameter):
@@ -92,7 +97,7 @@ class NodeBot(Bot):
         self.lineto(x2,y2)
         self.endpath()
 
-    def arrow(self, x, y, width, type=NORMAL):
+    def arrow(self, x, y, width, type=NORMAL, draw=True):
         '''Draws an arrow.
 
         Arrows can be two types: NORMAL or FORTYFIVE.
@@ -113,7 +118,7 @@ class NodeBot(Bot):
             self.endpath()
 #            self.fill_and_stroke()
         elif type == self.FORTYFIVE:
-            head = .3
+            head = .3 
             tail = 1 + head
             self.beginpath()
             self.moveto(x, y)
@@ -126,12 +131,12 @@ class NodeBot(Bot):
             self.lineto(x-width, y+width*head)
             self.lineto(x-width*(1-head), y)
             self.lineto(x, y)
-            self.endpath()
+            self.endpath(draw)
 #            self.fill_and_stroke()
         else:
             raise NameError(_("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"))
 
-    def star(self, startx, starty, points=20, outer=100, inner=50):
+    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True):
         '''Draws a star.
 
         Taken from Nodebox.
@@ -151,7 +156,7 @@ class NodeBot(Bot):
             y = starty + radius * y
             self.lineto(x,y)
 
-        self.endpath()
+        self.endpath(draw)
 
     def obama(self, x=0, y=0, s=1):
         self.beginpath()
@@ -262,6 +267,9 @@ class NodeBot(Bot):
         if draw:
             self.canvas.add(p)
             self._path = None
+        else:
+            # keep the transform so we don't lose it
+            self._path.transform = self._transform.copy()
         return p
 
     def drawpath(self,path):
@@ -373,17 +381,15 @@ class NodeBot(Bot):
     #### Transform and utility
 
     def beginclip(self,path):
-        #self.canvas._context.save()
+        # FIXME: this save should go into Canvas
         p = self.ClippingPath(path)
         self.canvas.add(p)
         return p
 
 
     def endclip(self):
-        p = self.RestoreCtx()
+        p = self.EndClip()
         self.canvas.add(p)
-
-
 
     def transform(self, mode=None): # Mode can be CENTER or CORNER
         if mode:
@@ -498,7 +504,7 @@ class NodeBot(Bot):
         if fontsize is not None:
             self._fontsize = fontsize
         else:
-            return self.canvas.font_size
+            return self._fontsize
 
     def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''

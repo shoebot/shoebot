@@ -1,9 +1,17 @@
+import sys, locale, gettext
 from shoebot.data import _copy_attrs
+from shoebot.data import Grob, ColorMixin, TransformMixin
 
-import cairo
-from math import pi
-from shoebot.data import Grob, TransformMixin, ColorMixin
 CENTER = 'center'
+
+APP = 'shoebot'
+DIR = sys.prefix + '/share/shoebot/locale'
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -15,7 +23,7 @@ ARC = 'arc'
 ELLIPSE = 'ellipse'
 CLOSE = "close"
 
-class BezierPath(Grob, ColorMixin):
+class BezierPath(Grob, TransformMixin, ColorMixin):
     """
     Represents a Bezier path as a list of PathElements.
 
@@ -28,14 +36,15 @@ class BezierPath(Grob, ColorMixin):
     for getting path dimensions)
     """
 
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
+    # transforms are not here because they shouldn't be inherited from Bot
+    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth',)
     kwargs = ('fill', 'stroke', 'strokewidth')
 
     def __init__(self, bot, path=None, **kwargs):
         self._bot = bot
         #self._counter=len(self._bot._transform.stack)
         super(BezierPath, self).__init__(self._bot)
-        # TransformMixin.__init__(self)
+        TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
         # inherit the Bot properties if applicable
@@ -215,11 +224,15 @@ class BezierPath(Grob, ColorMixin):
 """
 class ClippingPath(BezierPath):
     
-    stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
-    kwargs = ('fill', 'stroke', 'strokewidth')    
+    # stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
+    # kwargs = ('fill', 'stroke', 'strokewidth')    
     
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, path, **kwargs)
+
+class EndClip(Grob):
+    def __init__(self, bot, **kwargs):
+        self._bot = bot
 
 class PathElement:
     '''

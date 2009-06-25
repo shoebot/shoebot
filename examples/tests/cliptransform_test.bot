@@ -1,0 +1,29 @@
+size(256, 256)
+
+angle = 0
+
+def draw():
+    global angle
+    angle += 2
+
+    push()
+    rotate(angle)
+    e = rect(20,20, 160, 160, draw=False)
+    pop()
+
+    beginclip(e)
+
+    fill(0)
+    rect(0, 0, 256, 256)
+
+    stroke(0,1,0)
+    strokewidth(10)
+    nofill()
+    beginpath()
+    moveto(0, 0)
+    lineto(256, 256)
+    moveto(256, 0)
+    lineto(0, 256)
+    endpath()
+
+    endclip()

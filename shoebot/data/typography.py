@@ -4,7 +4,7 @@ import pangocairo
 from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 
 class Text(Grob, TransformMixin, ColorMixin):
-    stateAttributes = ('_transform', '_transformmode', '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
+    stateAttributes = ('_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
     #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, ctx=None, **kwargs):
@@ -12,14 +12,16 @@ class Text(Grob, TransformMixin, ColorMixin):
         super(Text, self).__init__(self._bot)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
+
         # in case of textpath it creates a temp cairo context for path extraction
         if ctx is None:
             surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
             ctx = cairo.Context(surface)
-        
         self.ctx = ctx              
+
         if self._bot:
             _copy_attrs(self._bot, self, self.stateAttributes)
+
         self.text = unicode(text)
         self.x = x
         self.y = y
@@ -28,9 +30,11 @@ class Text(Grob, TransformMixin, ColorMixin):
 
         if kwargs.has_key("font"):
             self._fontfile = kwargs["font"]
+
         # here we start to do the magic with pango, first we set typeface    
         self._fontface = pango.FontDescription()
         self._fontface.set_family(self._fontfile)
+
         # then the font weight
         self._weight = pango.WEIGHT_NORMAL
         if kwargs.has_key("weight"):
@@ -45,12 +49,14 @@ class Text(Grob, TransformMixin, ColorMixin):
             if kwargs["weight"]=="heavy":
                 self._weight = pango.WEIGHT_HEAVY                                                
         self._fontface.set_weight(self._weight)
+
         # the variant
         self._variant = pango.VARIANT_NORMAL
         if kwargs.has_key("variant"):
             if kwargs["variant"]=="small-caps" or kwargs["variant"]=="smallcaps":
                 self._variant = pango.VARIANT_SMALL_CAPS
         self._fontface.set_variant(self._variant)
+
         # the style        
         self._style = pango.STYLE_NORMAL
         if kwargs.has_key("style"):

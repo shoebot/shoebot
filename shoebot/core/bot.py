@@ -2,7 +2,7 @@ import sys, os
 import shoebot
 
 from shoebot import ShoebotError
-from shoebot.data import BezierPath, RestoreCtx, Color, Text, Variable, \
+from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, Transform
 
 from glob import glob
@@ -63,38 +63,22 @@ class Bot:
 
         self.inputscript = inputscript
         self.targetfilename = targetfilename
-
+        
         # init internal path container
         self._path = None
         self._autoclosepath = True
 
-        self.color_range = 1.
-        self.color_mode = Bot.RGB
-
-        self._fillcolor = self.color(.2)
-        self._strokecolor = None
-        self._strokewidth = 1.0
-
         self._transform = Transform()
-        self._transformmode = Bot.CENTER
         self.transform_stack = []
-
-        self._fontfile = "assets/notcouriersans.ttf"
-        self._fontsize = 16
-        self._align = Bot.LEFT
-        self._lineheight = 1
 
         self.gtkmode = gtkmode
         self.vars = []
         self._oldvars = self.vars
         self.namespace = {}
-
-        self.framerate = 30
         self.FRAME = 0
-
         self.screen_ratio = None
-        self.WIDTH = Bot.DEFAULT_WIDTH
-        self.HEIGHT = Bot.DEFAULT_HEIGHT
+
+        self.set_defaults()
 
         if canvas:
             self.canvas = canvas
@@ -111,13 +95,36 @@ class Bot:
 
     #### Object
 
+    def set_defaults(self):
+        '''Set the default values. Called at __init__ and at the end of run(),
+        do that new draw loop iterations don't take up values left over by the
+        previous one.'''
+
+        self._fontfile = "assets/notcouriersans.ttf"
+        self._fontsize = 16
+        self._align = Bot.LEFT
+        self._lineheight = 1
+
+        self.framerate = 30
+
+        self.WIDTH = Bot.DEFAULT_WIDTH
+        self.HEIGHT = Bot.DEFAULT_HEIGHT
+
+        self._transformmode = Bot.CENTER
+
+        self.color_range = 1.
+        self.color_mode = Bot.RGB
+        self._fillcolor = self.color(.2)
+        self._strokecolor = None
+        self._strokewidth = 1.0
+
     def _makeInstance(self, clazz, args, kwargs):
         """Creates an instance of a class defined in this document.
            This method sets the context of the object to the current context."""
         inst = clazz(self, *args, **kwargs)
         return inst
-    def RestoreCtx(self, *args, **kwargs):
-        return self._makeInstance(RestoreCtx, args, kwargs)
+    def EndClip(self, *args, **kwargs):
+        return self._makeInstance(EndClip, args, kwargs)
     def BezierPath(self, *args, **kwargs):
         return self._makeInstance(BezierPath, args, kwargs)
     def ClippingPath(self, *args, **kwargs):
@@ -358,6 +365,9 @@ class Bot:
             else:
                 # if on gtkmode, print the error and don't break
                 raise shoebot.ShoebotError(errmsg)
+
+        # go back to default values for next iteration
+        self.set_defaults()
 
     def next_frame(self):
         '''Updates the FRAME value.'''

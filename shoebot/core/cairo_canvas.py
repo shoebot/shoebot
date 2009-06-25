@@ -5,7 +5,7 @@ from math import pi
 # from BezierPath
 from shoebot import ShoebotError
 from shoebot.core import Canvas
-from shoebot.data import BezierPath, ClippingPath, RestoreCtx, Image, Text
+from shoebot.data import BezierPath, ClippingPath, EndClip, Image, Text
 
 import locale, gettext
 APP = 'shoebot'
@@ -34,6 +34,10 @@ class CairoCanvas(Canvas):
     def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
         Canvas.__init__(self, bot, target, width, height, gtkmode)
         self.bot = bot
+
+        # keep track of save/restore times
+        self.saves = 0
+
         if not gtkmode:
             # image output mode, we need to make a surface
             self.setsurface(target, width, height)
@@ -60,14 +64,16 @@ class CairoCanvas(Canvas):
 
     def drawitem(self, item):
         # clips are special cases
-        if isinstance(item, RestoreCtx):
-            self.context.restore()
+        if isinstance(item, EndClip):
+            # end clip instruction -> restore cairo context (it's saved in drawclip)
+            self.pop()
+            self.pop()
             return
-        if isinstance(item, ClippingPath):
-            self.context.save()
-                        
+        elif isinstance(item, ClippingPath):
+            self.push()
+
         # get the bot's current transform matrix and apply it to the context
-        self.context.save()
+        self.push()
         if self.bot._transformmode == CORNER:
             deltax, deltay = (0,0)
         else:
@@ -75,6 +81,12 @@ class CairoCanvas(Canvas):
                        
         mtrx = self.bot._transform.get_matrix_with_center(deltax,deltay)
         self.context.transform(mtrx)
+
+        # get the item's transform, if appropriate
+        if item.transform.stack:
+            self.push()
+            cx, cy = self.get_item_center(item) 
+            self.context.transform(item.transform.get_matrix_with_center(cx, cy))
         
         # find item type and call appropriate drawing method
         if isinstance(item, ClippingPath):
@@ -86,10 +98,18 @@ class CairoCanvas(Canvas):
         elif isinstance(item, Image):
             self.drawimage(item)
         
+        if item.transform.stack:
+            self.pop()
+       
+        if isinstance(item, ClippingPath):
+            self.context.clip()
+        else:
+            # clip paths must keep the graphics context, i spent hours before i figured this out
+            self.pop()
+
         # TODO: see if this improves performance
         # del item
-        
-        self.context.restore()
+
 
     def drawclip(self,path):
         for element in path.data:
@@ -118,11 +138,13 @@ class CairoCanvas(Canvas):
                 self.context.restore()
             else:
                 raise ShoebotError(_("PathElement(): error parsing path element command (got '%s')") % (cmd))
-        self.context.restore()
-        self.context.clip()
-
+        # self.context.clip() is called inside drawitem() because Cairo's fucking picky (or maybe i'm a dumb
+        # coder, you choose)
 
     def drawtext(self,txt):
+        self.context.save()
+        self.context.translate(txt.x, txt.y-txt.baseline)
+
         if txt._fillcolor:
             self.context.set_source_rgba(*txt._fillcolor)
             if txt._strokecolor:
@@ -146,7 +168,7 @@ class CairoCanvas(Canvas):
         txt.pang_ctx.update_layout(txt.layout)
         txt.pang_ctx.show_layout(txt.layout)
 
-
+        self.context.restore()
 
     def drawimage(self,image):
         self.context.set_source_surface (image.imagesurface, image.x, image.y)
@@ -158,7 +180,7 @@ class CairoCanvas(Canvas):
 
         if path._strokewidth:
             self.context.set_line_width(path._strokewidth)
-
+        
         for element in path.data:
             cmd = element[0]
             values = element[1:]
@@ -219,10 +241,15 @@ class CairoCanvas(Canvas):
         # to use 2geom, this is the next best thing
         
         # text objects have their own center-fetching method
-        if isinstance(item,Text):
+        if isinstance(item, Text):
             x,y = self.get_textitem_center(item)
             y -= item.baseline
             return (x,y)
+
+        # same for images
+        if isinstance(item, Image):
+            x,y = item.center
+            return(x,y)
 
         # pass path to temporary context
         for element in item.data:
@@ -272,6 +299,18 @@ class CairoCanvas(Canvas):
         y = (item.y+h/2)
         return (x,y)
 
+    def push(self):
+        '''Save the context; this is here for help debugging save/restore queues'''
+        self.saves += 1
+        # print 'Save:      ' + str(self.saves)
+        self.context.save()
+
+    def pop(self):
+        '''Restore the graphics context'''
+        self.saves -= 1
+        # print 'Restore:   ' + str(self.saves)
+        self.context.restore()
+
     def finish(self):
         if isinstance(self._surface, (cairo.SVGSurface, cairo.PSSurface, cairo.PDFSurface)):
             self.context.show_page()
@@ -288,11 +327,11 @@ class CairoCanvas(Canvas):
             filename = target
 
             f, ext = os.path.splitext(filename)
-
+            EXTENSIONS = ['.svg', '.png', '.ps', '.pdf']
             if ext not in EXTENSIONS:
                 raise ShoebotError('CairoCanvas.output: Invalid filename extension')
 
-            output_surface = util.surfacefromfilename(filename, self.bot.WIDTH, self.bot.HEIGHT)
+            output_surface = surfacefromfilename(filename, self.bot.WIDTH, self.bot.HEIGHT)
             output_context = cairo.Context(output_surface)
             self.draw(output_context)
             if ext == '.png':
