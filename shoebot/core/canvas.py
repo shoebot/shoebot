@@ -9,6 +9,9 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+TOP_LEFT = 1
+BOTTOM_LEFT = 2
+
 class Canvas:
     '''
     This class contains a Cairo context or surface, as well as methods to pass
@@ -22,7 +25,10 @@ class Canvas:
         if bot:
             self._bot = bot
 
-        self.grobstack = []
+        self.width = 200
+        self.height = 200
+        self.origin = TOP_LEFT
+
         self.font_size = 12
         # self.outputmode = RGB
         # self.linecap
@@ -60,4 +66,18 @@ class Canvas:
 
     def clear(self):
         self.grobstack = []
+
+
+    def set_size(self, x, y):
+        # reset transforms
+        self.context.identity_matrix()
+        self.width = x
+        self.height = y
+
+    def flip(self):
+        w = self.width
+        h = self.height
+        self.context.translate(w/2., h/2.)
+        self.context.scale(1,-1)
+        self.context.translate(-w/2., -h/2.)
 

@@ -29,6 +29,9 @@ CLOSE = "close"
 CENTER = 'center'
 CORNER = 'corner'
 
+TOP_LEFT = 1
+BOTTOM_LEFT = 2
+
 class CairoCanvas(Canvas):    
    
     def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
@@ -61,6 +64,8 @@ class CairoCanvas(Canvas):
         # we'll use these to calculate path bounds and centerpoints
         self.dummy_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 0, 0)
         self.dummy_ctx = cairo.Context(self.dummy_surface)
+
+
 
     def drawitem(self, item):
         # clips are special cases
@@ -381,8 +386,6 @@ class CairoCanvas(Canvas):
         else:
             raise ShoebotError(_("setsurface: Argument must be a file name, a Cairo surface or a Cairo context"))
         
-
-
 
 def surfacefromfilename(outfile, width, height):
     '''

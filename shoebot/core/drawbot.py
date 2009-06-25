@@ -14,25 +14,11 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 '''
-Tentative Drawbot port
-
-TODO:
-    - overload size() so that the drawing area is flipped after setting it
-
-      def size(self, x, y):
-          super(DrawBot, self).size(x,y)
-          self.flip_canvas()
-
-    - if a drawable is called before size, then we set default size and flip it
-      * this means having a method like
-
-      def set_default_size(self):
-          self.size(DEFAULT_WIDTH, DEFAULT_HEIGHT)
-          self.flip_canvas()
-
     - text() should be flipped in CENTER mode, maybe include it in the text class?
-
 '''
+
+TOP_LEFT = 1
+BOTTOM_LEFT = 2
 
 CORNER = 'corner'
 
@@ -40,38 +26,11 @@ class DrawBot(Bot):
     
     def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
         Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode)
-        self._transformmode = CORNER
 
-    def flip_canvas(self):
-        ''' Flip the canvas vertically, in order to achieve the Drawbot coord
-        system (origin on bottom-left).'''
-        w = self.WIDTH
-        h = self.HEIGHT
-        self.translate(w/2., h/2.)
-        self.scale(1,-1)
-        self.translate(-w/2., -h/2.)
-    
-    def size(self, x, y):
-        Bot.size(self, x, y)
-        self.flip_canvas()
+        self._transformmode = CORNER
+        self.canvas.origin = BOTTOM_LEFT
 
     #### Drawing
-
-    # Image
-
-    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
-        '''Draws a image form path, in x,y and resize it to width, height dimensions.
-        '''
-        r = self.Image(path, x, y, width, height, alpha, data, **kwargs)
-        if draw:
-            self.canvas.add(r)
-        return r
-
-
-    def imagesize(self, path):
-        img = Image.open(path)
-        return img.size
-
 
     # Paths
 
@@ -184,12 +143,6 @@ class DrawBot(Bot):
         elif isinstance(path, Image):
             self.canvas.add(path)
 
-    def drawimage(self, image):
-        self.canvas.add(image)
-
-    def autoclosepath(self, close=True): 
-        self._autoclosepath = close
-
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
         if self._path is None:
@@ -208,6 +161,26 @@ class DrawBot(Bot):
         if self._path is None:
             raise ShoebotError, _("No current path. Use newpath() first.")
         self._path.relcurveto(x,y)
+
+    def autoclosepath(self, close=True): 
+        self._autoclosepath = close
+
+    # Image
+
+    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
+        '''Draws a image form path, in x,y and resize it to width, height dimensions.
+        '''
+        r = self.Image(path, x, y, width, height, alpha, data, **kwargs)
+        if draw:
+            self.canvas.add(r)
+        return r
+
+    def imagesize(self, path):
+        img = Image.open(path)
+        return img.size
+
+    def drawimage(self, image):
+        self.canvas.add(image)
 
     #### Transform and utility
 

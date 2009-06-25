@@ -7,7 +7,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         super(ShoebotDrawingArea, self).__init__()
         self.mainwindow = mainwindow
         # default dimensions
-        width, height = 200,200
         self.is_dynamic = None
         self.connect("expose_event", self.expose)
         # get the bot object to display
@@ -50,7 +49,8 @@ class ShoebotDrawingArea(gtk.DrawingArea):
 
         # set the window size to the one specified in the script
         self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
-
+        # self.set_size_request(self.bot.canvas.width, self.bot.canvas.height)
+        
         # right click handling
         self.menu = gtk.Menu()
         self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
@@ -111,6 +111,9 @@ class ShoebotDrawingArea(gtk.DrawingArea):
             self.bot.run()
         # render canvas contents and show them in the drawingarea
         self.bot.canvas.draw()
+       
+        # resize DA to fit canvas
+        # self.set_size_request(self.bot.canvas.width, self.bot.canvas.height)
 
         return False
 

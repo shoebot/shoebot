@@ -22,6 +22,9 @@ import sys
 LIB_DIR = sys.prefix + '/share/shoebot/lib'
 sys.path.append(LIB_DIR)
 
+TOP_LEFT = 1
+BOTTOM_LEFT = 2
+
 class Bot:
     '''
     A Bot is an interface to receive user commands (through scripts or direct
@@ -84,14 +87,14 @@ class Bot:
             self.canvas = canvas
         else:
             self.canvas = shoebot.core.CairoCanvas(bot = self,
-                                      target = self.targetfilename,
-                                      width = self.WIDTH,
-                                      height = self.HEIGHT,
-                                      gtkmode = self.gtkmode)
+                                                   target = self.targetfilename,
+                                                   width = self.WIDTH,
+                                                   height = self.HEIGHT,
+                                                   gtkmode = self.gtkmode)
         # from nodebox
         if ns is None:
             ns = {}
-            self._ns = ns
+            self._ns  = ns
 
     #### Object
 
@@ -279,6 +282,8 @@ class Bot:
             w = self.WIDTH
         if not h:
             h = self.HEIGHT
+        if not w and not h:
+            return (self.WIDTH, self.HEIGHT)
 
         if self.gtkmode:
             # in windowed mode we don't set the surface in the Bot itself,
@@ -288,6 +293,7 @@ class Bot:
             self.HEIGHT = int(h)
             self.namespace['WIDTH'] = self.WIDTH
             self.namespace['HEIGHT'] = self.HEIGHT
+            self.canvas.set_size(w,h)
 
         else:
             self.WIDTH = int(w)
@@ -297,8 +303,12 @@ class Bot:
             self.namespace['HEIGHT'] = self.HEIGHT
             # make a new surface for us
             self.canvas.setsurface(self.targetfilename, w, h)
+            self.canvas.set_size(w,h)
+        
 
-        # return (self.WIDTH, self.HEIGHT)
+        if self.canvas.origin == BOTTOM_LEFT:
+            self.canvas.flip()
+            print 'Canvas flipped'
 
     def speed(self, value):
         if value:
@@ -347,6 +357,7 @@ class Bot:
         self.load_namespace()
 
         try:
+            self.canvas.set_size(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
