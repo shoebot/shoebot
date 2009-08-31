@@ -104,8 +104,11 @@ class ShoebotWindow(SocketServerMixin):
                 # respect framerate
                 completion_time = time()
                 exc_time = completion_time - start_time
-                start_time = completion_time
-                sleep(1. / (self.bot.framerate - exc_time))
+                sleep_for = (1.0 / self.bot.framerate) - exc_time
+                if sleep_for > 0:
+                    sleep(sleep_for)
+                start_time = completion_time + sleep_for
+                
                 while gtk.events_pending():
                     gtk.main_iteration()
         else:
