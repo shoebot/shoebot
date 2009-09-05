@@ -353,14 +353,18 @@ class Buffer(gtksourceview.SourceBuffer):
               return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
+        """
+        Return True if the buffer was saved
+        """
         chooser = ShoebotFileChooserDialog(_('Save File'), None, gtk.FILE_CHOOSER_ACTION_SAVE,
             (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         chooser.set_do_overwrite_confirmation(True)
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
-
-        if chooser.run() == gtk.RESPONSE_ACCEPT:
+        
+        saved = chooser.run() == gtk.RESPONSE_ACCEPT
+        if saved:
                 old_filename = self.filename
                 self.filename = chooser.get_filename()
                 if self.save_buffer():
@@ -369,8 +373,15 @@ class Buffer(gtksourceview.SourceBuffer):
                 else:
                     self.filename = old_filename
         chooser.destroy()
+        return saved
 
     def check_buffer_saved(self):
+        """
+        If the buffer was not saved then give the user the chance to save it
+        or cancel.
+        
+        Return True is the buffer was saved in the end
+        """
         if self.get_modified():
             pretty_name = self.pretty_name()
             msg = _("Save changes to '%s'?") % pretty_name
@@ -381,14 +392,15 @@ class Buffer(gtksourceview.SourceBuffer):
             dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
             result = dialog.run()
             dialog.destroy()
-            if result == gtk.RESPONSE_ACCEPT:
+            if result == gtk.RESPONSE_YES:
                 if self.filename:
                     return self.save_buffer()
-                return self.save_as_buffer()
-            elif result == gtk.RESPONSE_CANCEL:
-                return False
-            else:
+                else:
+                    return self.save_as_buffer()
+            elif result == gtk.RESPONSE_NO:
                 return True
+            else:
+                return False
         else:
             return True
 
