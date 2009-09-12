@@ -115,14 +115,14 @@ class Transform:
                     if mode == 'corner':                        
                         # apply existing transform to cornerpoint
                         deltax,deltay = m.transform_point(0,0)
-                        a = args[0]
+                        a = -args[0] / 2.0
                         ct = cos(a)
                         st = sin(a)
                         m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
                     elif mode == 'center':
                         # apply existing transform to centerpoint
                         deltax,deltay = m.transform_point(centerx,centery)
-                        a = args[0]
+                        a = -args[0] / 2.0
                         ct = cos(a)
                         st = sin(a)
                         m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
