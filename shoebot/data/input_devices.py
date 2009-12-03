@@ -78,7 +78,7 @@ class KeyStateHandler:
             listener.key_down(self)
             
     def key_released(self, keycode):
-        self.keys_pressed.remove(keycode)
+        self.keys_pressed.discard(keycode)
         for listener in self.listeners:
             listener.key_up(self)
     
