@@ -36,6 +36,7 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
+        self.window.set_title('Shoebot - Running')
         def dummy():
             pass
         self.bot.drawing_closed = dummy
