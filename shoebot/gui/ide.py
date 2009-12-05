@@ -977,6 +977,8 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
         try:
+            if buffer.filename:
+                os.chdir(os.path.dirname(buffer.filename))
             self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
         except ShoebotError, NameError:
             import traceback
