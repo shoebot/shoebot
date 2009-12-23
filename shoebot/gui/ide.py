@@ -578,7 +578,10 @@ class View(gtk.Window):
                  	 View.FONT = 'Bitstream Vera Sans Mono 8'
                  	 break
 	     else:
-	     	     View.FONT = 'Mono 8'
+	         print 'Bitstream Vera Font not found.'
+	         print 'Download and install it from here'
+	         print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
+	         View.FONT = 'Mono 8'
 
         self.text_view.modify_font(pango.FontDescription(View.FONT))
 
