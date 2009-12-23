@@ -494,7 +494,8 @@ class Stdout_Filter(object):
     
 class View(gtk.Window):
     gobject.type_register (ShoebotFileChooserDialog)
-
+    FONT = None
+    
     def __init__(self, buffer=None):
         menu_items = [
             ( _("/_File"), None, None, 0, "<Branch>" ),
@@ -567,8 +568,19 @@ class View(gtk.Window):
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
+        
+        if View.FONT is None:
+             # Get font or fallback
+	     context = self.text_view.get_pango_context()
+	     fonts = context.list_families()
+	     for font in fonts:
+                 if font.get_name() == 'Bitstream Vera Sans Mono':
+                 	 View.FONT = 'Bitstream Vera Sans Mono 8'
+                 	 break
+	     else:
+	     	     View.FONT = 'Mono 8'
 
-        self.text_view.modify_font(pango.FontDescription('Bitstream Vera Sans Mono 8'))
+        self.text_view.modify_font(pango.FontDescription(View.FONT))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
