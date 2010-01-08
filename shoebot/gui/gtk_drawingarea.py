@@ -90,7 +90,6 @@ class ShoebotDrawingArea(gtk.DrawingArea):
         '''Handle GTK expose events.'''
 
         # reset context
-        self.context = None
         self.context = widget.window.cairo_create()
         # set a clip region for the expose event
         self.context.rectangle(event.area.x, event.area.y,

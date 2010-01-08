@@ -44,6 +44,7 @@ class ShoebotWindow(SocketServerMixin):
         # Setup the main GTK window
         self.window = gtk.Window()
         self.window.connect("destroy", self.do_quit)
+        self.window.set_title('Shoebot - Running')
         def dummy():
             pass
         self.bot.drawing_closed = dummy
@@ -102,7 +103,7 @@ class ShoebotWindow(SocketServerMixin):
             frame = 0
             from time import sleep, time
             start_time = time()
-            while 1:
+            while self.window:
                 # increase bot frame count
                 self.bot.next_frame()
                 # redraw canvas
@@ -112,8 +113,11 @@ class ShoebotWindow(SocketServerMixin):
                 # respect framerate
                 completion_time = time()
                 exc_time = completion_time - start_time
-                start_time = completion_time
-                sleep(1. / (self.bot.framerate - exc_time))
+                sleep_for = (1.0 / self.bot.framerate) - exc_time
+                if sleep_for > 0:
+                    sleep(sleep_for)
+                start_time = completion_time + sleep_for
+                
                 while gtk.events_pending():
                     gtk.main_iteration()
         else:
@@ -147,6 +151,7 @@ class ShoebotWindow(SocketServerMixin):
             del self.var_window
         self.bot.drawing_closed()
         self.window.destroy()
+        self.window = None
         if not self.drawingarea.is_dynamic:
             gtk.main_quit()
         ## FIXME: This doesn't kill the instance :/

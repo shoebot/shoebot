@@ -353,14 +353,18 @@ class Buffer(gtksourceview.SourceBuffer):
               return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
+        """
+        Return True if the buffer was saved
+        """
         chooser = ShoebotFileChooserDialog(_('Save File'), None, gtk.FILE_CHOOSER_ACTION_SAVE,
             (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
              gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         chooser.set_do_overwrite_confirmation(True)
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
-
-        if chooser.run() == gtk.RESPONSE_ACCEPT:
+        
+        saved = chooser.run() == gtk.RESPONSE_ACCEPT
+        if saved:
                 old_filename = self.filename
                 self.filename = chooser.get_filename()
                 if self.save_buffer():
@@ -369,8 +373,15 @@ class Buffer(gtksourceview.SourceBuffer):
                 else:
                     self.filename = old_filename
         chooser.destroy()
+        return saved
 
     def check_buffer_saved(self):
+        """
+        If the buffer was not saved then give the user the chance to save it
+        or cancel.
+        
+        Return True is the buffer was saved in the end
+        """
         if self.get_modified():
             pretty_name = self.pretty_name()
             msg = _("Save changes to '%s'?") % pretty_name
@@ -381,14 +392,15 @@ class Buffer(gtksourceview.SourceBuffer):
             dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
             result = dialog.run()
             dialog.destroy()
-            if result == gtk.RESPONSE_ACCEPT:
+            if result == gtk.RESPONSE_YES:
                 if self.filename:
                     return self.save_buffer()
-                return self.save_as_buffer()
-            elif result == gtk.RESPONSE_CANCEL:
-                return False
-            else:
+                else:
+                    return self.save_as_buffer()
+            elif result == gtk.RESPONSE_NO:
                 return True
+            else:
+                return False
         else:
             return True
 
@@ -482,7 +494,8 @@ class Stdout_Filter(object):
     
 class View(gtk.Window):
     gobject.type_register (ShoebotFileChooserDialog)
-
+    FONT = None
+    
     def __init__(self, buffer=None):
         menu_items = [
             ( _("/_File"), None, None, 0, "<Branch>" ),
@@ -555,8 +568,22 @@ class View(gtk.Window):
         self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
+        
+        if View.FONT is None:
+             # Get font or fallback
+	     context = self.text_view.get_pango_context()
+	     fonts = context.list_families()
+	     for font in fonts:
+                 if font.get_name() == 'Bitstream Vera Sans Mono':
+                 	 View.FONT = 'Bitstream Vera Sans Mono 8'
+                 	 break
+	     else:
+	         print 'Bitstream Vera Font not found.'
+	         print 'Download and install it from here'
+	         print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
+	         View.FONT = 'Mono 8'
 
-        self.text_view.modify_font(pango.FontDescription('Bitstream Vera Sans Mono 8'))
+        self.text_view.modify_font(pango.FontDescription(View.FONT))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
@@ -965,6 +992,8 @@ class View(gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end)
         try:
+            if buffer.filename:
+                os.chdir(os.path.dirname(buffer.filename))
             self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
         except ShoebotError, NameError:
             import traceback
