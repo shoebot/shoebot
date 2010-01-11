@@ -1,12 +1,42 @@
+shoebot (0.3b-1) unstable; urgency=low
+
+  * Huge code refactoring, now it should be a lot easier to hack around.
+  * Gedit and Inkscape plug-ins now included
+
+ -- Ricardo Lafuente <r@sollec.org>  Mon, 11 Jan 2010 16:36:07 +0000
+
 shoebot (0.2-1) unstable; urgency=low
 
-  * Initial release
+  * colors can be specified using hexcolour values (e.g. #FF00FF)
+  * fill and/or stroke values can be specified using keyword arguments (e.g. a = Rect(x,y,w,h,fill='#FF00FF'))
+  * experimental animation support
+  * internationalization
+  * transforms were overhauled, and are now fully consistent with Nodebox behaviour
+  * clipping paths!
+  * a powerful text API was introduced using Pango, matching and even extending Nodebox's capabilities, and working great with transforms
+  * image support is now there, and working great!
+  * ximport() can now be used to import Nodebox's libraries
+  * many Nodebox libraries ported and included in Shoebot! Boids, Cornu, Database, Ants, Photobot, Supershape, SVG and Web are fully working (as far as we could determine! :) ; Colors and L-System are partially working.
+  * easteregg(x,y,size) ;)
+  * GIMP colour palette import!
+  * repeat mode (-r) in commandline mode to output multiple images
+  * fullscreen mode!
+  * new example scripts
+  * Shoebot now runs on Windows, and the IDE too!
+  * new goodies in the Shoebot IDE: error reporting console, layout dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop entry
+  * preliminary mouse events implementation in GTK mode 
 
-  * TODO: add ITP or LP bug number here before submiting package
-          to official debian or ubuntu repos)
-	
-  * Closes: Bug#00000
+  Bug fixes:
 
-	
+  * drawpath() and findpath() are working; drawpath() can be used with images as well (load once, use many times)
+  * bounding box calculations for line() are fixed
+  * fixed order of buttons on quit - save file dialogue in shoebot-ide 
+
+  API changes:
+
+  * big rewrite of the code structure; now there are generic Bot and Canvas classes, equivalent to a 'context' and a 'surface', but differently named to avoid confusion with Cairo; those can be subclassed to implement new languages (see NodeBot? class for the implementation of Nodebox) and new graphical backends (see CairoCanvas?).
+  * the 'Box' class was renamed to 'Bot'
+  * oval() deprecated and introduced ellipse(), the correct term for this operation 
+
  -- Ricardo Lafuente <r@sollec.org>  Thu, 19 Feb 2009 11:40:36 +0100
 

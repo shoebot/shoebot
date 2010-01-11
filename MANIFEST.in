@@ -1,7 +1,13 @@
 include README
+include AUTHORS
+include VERSION
+include COPYING-GPL-3
 include sbot
 include shoebot-ide
-recursive-include shoebot/data
-recursive-include shoebot/core
-recursive-include shoebot/gui
+recursive-include shoebot/data *
+recursive-include shoebot/core *
+recursive-include shoebot/gui *
 recursive-include examples *
+recursive-include lib *
+recursive-include assets *
+recursive-include locale *

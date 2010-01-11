@@ -21,7 +21,7 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib')])
 
 setup(name = "shoebot",
-    version = "0.2",
+    version = "0.3b",
     description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
