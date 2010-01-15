@@ -12,9 +12,17 @@ except ImportError:
     from shoebot.gui import ShoebotWindow
     from shoebot import ShoebotError, ShoebotScriptError
 
+BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
+
 ui_str = """
 <ui>
   <menubar name="MenuBar">
+    <menu name="HelpMenu" action="Help">
+      <placeholder name="ShoebotOps_1">
+        <separator/>
+        <menuitem name="Open Quicktorial" action="OpenQuicktorial"/>
+      </placeholder>
+    </menu>
     <menu name="ShoebotMenu" action="Shoebot">
       <placeholder name="ShoebotOps_1">
         <menuitem name="Run in Shoebot" action="ShoebotRun"/>
@@ -52,6 +60,7 @@ class ShoebotWindowHelper:
         self.action_group.add_actions([
             ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
+            ("OpenQuicktorial", None, _("Open Quicktorial"), None, _("Open Quicktorial"), self.open_quicktorial_url),
             ])
         self.action_group.add_toggle_actions([
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
@@ -94,6 +103,12 @@ class ShoebotWindowHelper:
         self.use_varwindow = action.get_active()
     def toggle_fullscreen(self, action):
         self.use_fullscreen = action.get_active()
+        
+    def open_quicktorial_url(self, action):
+        import webbrowser
+        q_id = 'rect01'
+        url = BASE_QUICKTORIAL_URL % q_id
+        webbrowser.open(url)
 
 class ShoebotPlugin(gedit.Plugin):
     def __init__(self):
