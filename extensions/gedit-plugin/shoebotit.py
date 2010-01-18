@@ -19,6 +19,14 @@ RE_DELIM = re.compile(r'[\w#/\?:%@&\=\+\.\\~-]+', re.UNICODE|re.MULTILINE)
 
 BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
 
+# function name -> quicktorial id mapping
+QUICKTORIAL_KEYWORDS = {
+        'rect': 'rect01',
+        'oval': 'ellipse01',
+        'var': 'var01'
+        }
+
+
 ui_str = """
 <ui>
   <menubar name="MenuBar">
@@ -168,7 +176,9 @@ class ShoebotWindowHelper:
         menu.prepend(open_quicktorial_item)
 
     def validate_word(self, word):
-        return word
+        if word in QUICKTORIAL_KEYWORDS:
+            return word
+        return None
 
     def on_open_quicktorial(self, menu_item, word):
         self.open_quicktorial(word)
@@ -176,7 +186,7 @@ class ShoebotWindowHelper:
 
     def open_quicktorial(self, word):
         import webbrowser
-        q_id = word
+        q_id = QUICKTORIAL_KEYWORDS[word]
         url = BASE_QUICKTORIAL_URL % q_id
         webbrowser.open(url)
 
