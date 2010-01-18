@@ -221,7 +221,7 @@ class Bot:
                 rect(x,y, 10,10)
         """
         # Taken ipsis verbis from Nodebox
-
+        from random import shuffle
         rowRange = range(int(rows))
         colRange = range(int(cols))
         if (shuffled):
