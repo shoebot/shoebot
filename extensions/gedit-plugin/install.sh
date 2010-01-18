@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -d '~/.gnome2/gedit/plugins' ]; then
+if [ -d ~/.gnome2/gedit/plugins ]; then
   cp shoebotit* ~/.gnome2/gedit/plugins
   echo 'Gedit plugin successfully installed!'
 else

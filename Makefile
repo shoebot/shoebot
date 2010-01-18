@@ -20,6 +20,9 @@ source:
 install:
 	$(PYTHON) setup.py install --root $(DESTDIR) $(COMPILE)
 
+install-gedit:
+	cd extensions/gedit-plugin && $(SHELL) ./install.sh && cd ../..
+
 buildrpm:
 	$(PYTHON) setup.py bdist_rpm --post-install=rpm/postinstall --pre-uninstall=rpm/preuninstall
 
