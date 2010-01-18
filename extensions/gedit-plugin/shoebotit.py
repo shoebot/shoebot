@@ -45,7 +45,6 @@ ui_str = """
 
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
-        print 'window helper created'
         self.window = window
         self.plugin = plugin
         self.insert_menu()
@@ -58,7 +57,6 @@ class ShoebotWindowHelper:
 
         self.started = False
         for view in self.window.get_views():
-            print "connecting view"
             self.connect_view(view)
 
     def deactivate(self):
@@ -127,7 +125,6 @@ class ShoebotWindowHelper:
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
-        print 'connect_view'
         handler_id = view.connect('populate-popup', self.on_view_populate_popup)
         view.set_data(self.id_name, [handler_id])
 
