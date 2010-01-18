@@ -196,5 +196,8 @@ class ShoebotPlugin(gedit.Plugin):
         return True
 
     def open_quicktorial(self, word):
-        print word
+        import webbrowser
+        q_id = word
+        url = BASE_QUICKTORIAL_URL % q_id
+        webbrowser.open(url)
 
