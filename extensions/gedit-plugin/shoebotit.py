@@ -22,12 +22,6 @@ BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
 ui_str = """
 <ui>
   <menubar name="MenuBar">
-    <menu name="HelpMenu" action="Help">
-      <placeholder name="ShoebotOps_1">
-        <separator/>
-        <menuitem name="Open Quicktorial" action="OpenQuicktorial"/>
-      </placeholder>
-    </menu>
     <menu name="ShoebotMenu" action="Shoebot">
       <placeholder name="ShoebotOps_1">
         <menuitem name="Run in Shoebot" action="ShoebotRun"/>
@@ -43,14 +37,21 @@ ui_str = """
 
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
+        print 'window helper created'
         self.window = window
         self.plugin = plugin
         self.insert_menu()
         self.shoebot_window = None
+        self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
         self.use_varwindow = False
         self.use_fullscreen = False
+
+        self.started = False
+        for view in self.window.get_views():
+            print "connecting view"
+            self.connect_view(view)
 
     def deactivate(self):
         self.remove_menu()
@@ -65,7 +66,6 @@ class ShoebotWindowHelper:
         self.action_group.add_actions([
             ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
-            ("OpenQuicktorial", None, _("Open Quicktorial"), None, _("Open Quicktorial"), self.open_quicktorial_url),
             ])
         self.action_group.add_toggle_actions([
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
@@ -84,6 +84,12 @@ class ShoebotWindowHelper:
 
     def update_ui(self):
         self.action_group.set_sensitive(self.window.get_active_document() != None)
+        # hack to make sure that views are connected
+        # since activate() is not called on startup
+        if not self.started and self.window.get_views():
+            for view in self.window.get_views():
+                self.connect_view(view)
+            self.started = True
 
     def on_run_activate(self, action):
         doc = self.window.get_active_document()
@@ -109,33 +115,6 @@ class ShoebotWindowHelper:
     def toggle_fullscreen(self, action):
         self.use_fullscreen = action.get_active()
         
-    def open_quicktorial_url(self, action):
-        import webbrowser
-        q_id = 'rect01'
-        url = BASE_QUICKTORIAL_URL % q_id
-        webbrowser.open(url)
-
-class ShoebotPlugin(gedit.Plugin):
-    def __init__(self):
-        gedit.Plugin.__init__(self)
-        self.instances = {}
-        self.tempfiles = []
-        self.id_name = 'ShoebotPluginID'
-
-    def activate(self, window):
-        self.instances[window] = ShoebotWindowHelper(self, window)
-        for view in window.get_views():
-            self.connect_view(view)
-
-    def deactivate(self, window):
-        self.instances[window].deactivate()
-        del self.instances[window]
-        for tfilename in self.tempfiles:
-            os.remove(tfilename)
-
-    def update_ui(self, window):
-        self.instances[window].update_ui()
-
     # Right-click menu items (for quicktorials)
 
     def connect_view(self, view):
@@ -200,4 +179,23 @@ class ShoebotPlugin(gedit.Plugin):
         q_id = word
         url = BASE_QUICKTORIAL_URL % q_id
         webbrowser.open(url)
+
+class ShoebotPlugin(gedit.Plugin):
+    def __init__(self):
+        gedit.Plugin.__init__(self)
+        self.instances = {}
+        self.tempfiles = []
+
+    def activate(self, window):
+        self.instances[window] = ShoebotWindowHelper(self, window)
+
+    def deactivate(self, window):
+        self.instances[window].deactivate()
+        del self.instances[window]
+        for tfilename in self.tempfiles:
+            os.remove(tfilename)
+
+    def update_ui(self, window):
+        self.instances[window].update_ui()
+
 
