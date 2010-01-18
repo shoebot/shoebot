@@ -1,6 +1,7 @@
 import os
 import gedit
 import gtk
+import re
 from gettext import gettext as _
 
 try:
@@ -10,7 +11,11 @@ try:
 except ImportError:
     # 0.3
     from shoebot.gui import ShoebotWindow
-    from shoebot import ShoebotError, ShoebotScriptError
+    from shoebot import ShoebotError
+
+# regex taken from openuricontextmenu.py and slightly changed
+# to work with Python functions
+RE_DELIM = re.compile(r'[\w#/\?:%@&\=\+\.\\~-]+', re.UNICODE|re.MULTILINE)
 
 BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
 
@@ -115,9 +120,12 @@ class ShoebotPlugin(gedit.Plugin):
         gedit.Plugin.__init__(self)
         self.instances = {}
         self.tempfiles = []
+        self.id_name = 'ShoebotPluginID'
 
     def activate(self, window):
         self.instances[window] = ShoebotWindowHelper(self, window)
+        for view in window.get_views():
+            self.connect_view(view)
 
     def deactivate(self, window):
         self.instances[window].deactivate()
@@ -127,4 +135,66 @@ class ShoebotPlugin(gedit.Plugin):
 
     def update_ui(self, window):
         self.instances[window].update_ui()
+
+    # Right-click menu items (for quicktorials)
+
+    def connect_view(self, view):
+        # taken from gedit-plugins-python-openuricontextmenu
+        print 'connect_view'
+        handler_id = view.connect('populate-popup', self.on_view_populate_popup)
+        view.set_data(self.id_name, [handler_id])
+
+    def on_view_populate_popup(self, view, menu):
+        # taken from gedit-plugins-python-openuricontextmenu
+        doc = view.get_buffer()
+        win = view.get_window(gtk.TEXT_WINDOW_TEXT)
+        x, y, mod = win.get_pointer()
+        x, y = view.window_to_buffer_coords(gtk.TEXT_WINDOW_TEXT, x, y) 
+
+        # first try at pointer location
+        insert = view.get_iter_at_location(x, y)
+
+        # second try at cursor
+        if insert == None:
+            insert = doc.get_iter_at_mark(doc.get_insert())
+
+        while insert.forward_char():
+            if not RE_DELIM.match(insert.get_char()):
+                break
+
+        start = insert.copy()
+        while start.backward_char():
+            if not RE_DELIM.match(start.get_char()):
+                start.forward_char()
+                break
+
+        word = unicode(doc.get_text(start, insert))
+
+        if len(word) == 0:
+            return True
+
+        word = self.validate_word(word)
+        if not word:
+            return True
+
+        open_quicktorial_item = gtk.ImageMenuItem(_("Know more about '%s'") % (word))
+        open_quicktorial_item.set_image(gtk.image_new_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU))
+        open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
+        open_quicktorial_item.show()
+
+        separator = gtk.SeparatorMenuItem()
+        separator.show()
+
+        menu.prepend(separator)
+        menu.prepend(open_quicktorial_item)
+
+    def validate_word(self, word):
+        return word
+
+    def on_open_quicktorial(self, menu_item, word):
+        self.open_quicktorial(word)
+        return True
+
+    def open_quicktorial(self, word):
+        print word
 
