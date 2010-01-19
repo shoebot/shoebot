@@ -56,6 +56,7 @@ class ShoebotWindowHelper:
         self.use_fullscreen = False
 
         self.started = False
+
         for view in self.window.get_views():
             self.connect_view(view)
 
@@ -98,20 +99,37 @@ class ShoebotWindowHelper:
             self.started = True
 
     def on_run_activate(self, action):
+        # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
             return
         start, end = doc.get_bounds()
         code = doc.get_text(start, end)
+        if not code:
+            return False
+        # if the Shoebot window is already open, we'll use it; otherwise,
+        # we'll create a new one
+        window_is_open = False
+        if self.shoebot_window and self.shoebot_window.window:
+            window_is_open = True
         try:
-            self.shoebot_window = ShoebotWindow(code, 
-                                                   self.use_socketserver, 7777, 
-                                                   self.use_varwindow, 
-                                                   self.use_fullscreen)
+            if window_is_open:
+                # pass the text buffer to the running bot
+                self.shoebot_window.bot.run(code)
+                self.shoebot_window.window.queue_draw()
+            else:
+                # create a new shoebot window
+                self.shoebot_window = ShoebotWindow(code, 
+                                            self.use_socketserver, 
+                                            7777, 
+                                            self.use_varwindow, 
+                                            self.use_fullscreen)
         except ShoebotError, NameError:
             import traceback            
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
+            # TODO: This traceback should be sent over to a
+            # log window at the bottom of Gedit
             print err
     
     def toggle_socket_server(self, action):

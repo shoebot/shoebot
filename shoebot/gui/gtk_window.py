@@ -43,7 +43,7 @@ class ShoebotWindow(SocketServerMixin):
 
         # Setup the main GTK window
         self.window = gtk.Window()
-        self.window.connect("destroy", self.do_quit)
+        self.window.connect("destroy", self.do_window_close)
         self.window.set_title('Shoebot - Running')
         def dummy():
             pass
@@ -68,7 +68,7 @@ class ShoebotWindow(SocketServerMixin):
                                  ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.drawingarea.save_output),
                                  ('fullscreen', 'Go fullscreen', _('_Go fullscreen'), "<Control>5", None, self.do_fullscreen),
                                  ('unfullscreen', 'Exit fullscreen', _('_Exit fullscreen'), "<Control>6", None, self.do_unfullscreen),
-                                 ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_quit)
+                                 ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
                                 ])
 
         menuxml = '''
@@ -142,8 +142,7 @@ class ShoebotWindow(SocketServerMixin):
         self.window.unfullscreen()
         self.bot.screen_ratio = None
 
-    def do_quit(self, widget):
-        print 'shoebotWindow do_quit callback'
+    def do_window_close(self, widget):
         if self.has_server:
             self.sock.close()
         if self.has_varwindow:
