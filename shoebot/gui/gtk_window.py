@@ -91,7 +91,6 @@ class ShoebotWindow(SocketServerMixin):
         if self.has_server:
             self.server('', self.serverport)
 
-
         if self.has_varwindow:
             self.var_window = VarWindow(self, self.bot)
         self.window.show_all()
@@ -121,7 +120,7 @@ class ShoebotWindow(SocketServerMixin):
                 while gtk.events_pending():
                     gtk.main_iteration()
         else:
-            gtk.main()
+            # gtk.main()
             while gtk.events_pending():
                 gtk.main_iteration()
 
@@ -144,6 +143,7 @@ class ShoebotWindow(SocketServerMixin):
         self.bot.screen_ratio = None
 
     def do_quit(self, widget):
+        print 'shoebotWindow do_quit callback'
         if self.has_server:
             self.sock.close()
         if self.has_varwindow:
@@ -152,8 +152,9 @@ class ShoebotWindow(SocketServerMixin):
         self.bot.drawing_closed()
         self.window.destroy()
         self.window = None
-        if not self.drawingarea.is_dynamic:
-            gtk.main_quit()
+        # if not self.drawingarea.is_dynamic:
+        #     gtk.main_quit()
+        del self
         ## FIXME: This doesn't kill the instance :/
 
 
