@@ -1,5 +1,6 @@
 from shoebot.data import _copy_attrs
 
+from StringIO import StringIO
 import cairo
 import numpy
 import Image as PILImage
