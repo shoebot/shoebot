@@ -53,12 +53,12 @@ _ = gettext.gettext
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-def run_oneshot(script, file, bot=NODEBOX):
+def run_oneshot(script, file, bot_type=NODEBOX):
     ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
-    if bot == NODEBOX:
+    if bot_type == NODEBOX:
         bot = NodeBot(targetfilename = file)
-    elif bot == DRAWBOT:
+    elif bot_type == DRAWBOT:
         bot = DrawBot(targetfilename = file)
 
     # run it, and then its setup and draw methods, if they're there
