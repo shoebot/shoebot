@@ -78,7 +78,6 @@ class Bot:
         self.vars = []
         self._oldvars = self.vars
         self.namespace = {}
-        self.FRAME = 0
         self.screen_ratio = None
 
         self.set_defaults()
@@ -93,7 +92,7 @@ class Bot:
                                                    gtkmode = self.gtkmode)
         # from nodebox
         if ns is None:
-            ns = {}
+            ns = { 'FRAME': 0 }
             self._ns  = ns
 
     #### Object
