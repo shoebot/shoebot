@@ -66,6 +66,7 @@ class Bot:
 
     DEFAULT_WIDTH = 200
     DEFAULT_HEIGHT = 200
+    FRAME = 0
 
     def __init__ (self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns=None):
 

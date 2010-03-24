@@ -113,7 +113,7 @@ class CairoCanvas(Canvas):
             self.pop()
 
         # TODO: see if this improves performance
-        # del item
+        del item
 
 
     def drawclip(self,path):
