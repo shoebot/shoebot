@@ -45,6 +45,11 @@ class Bot:
     RIGHT = 'right'
     JUSTIFY = 'justify'
 
+    NUMBER = 'number'
+    TEXT = 'text'
+    BOOLEAN = 'boolean'
+    BUTTON = 'button'
+
     inch = 72
     cm = 28.3465
     mm = 2.8346
@@ -165,22 +170,6 @@ class Bot:
             if v.name == name:
                 return v
         return None
-
-    def setvars(self,args):
-        '''Defines the variables that can be externally set.
-
-        Accepts a dictionary with variable names assigned
-        to default values. If called more than once, it updates
-        already existing values and adds new keys to accomodate
-        new entries.
-
-        DEPRECATED, use addvar() instead
-        '''
-        if not isinstance(args, dict):
-            raise ShoebotError(_('setvars(): setvars needs a dict!'))
-        vardict = args
-        for item in vardict:
-            self.var(item, NUMBER, vardict[item])
 
     #### Utility
 
