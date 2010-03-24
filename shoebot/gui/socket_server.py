@@ -37,14 +37,13 @@ class SocketServerMixin:
             print _("Connection closed.")
             return False
         else:
-            incoming = line.strip()
-            if len(incoming.split()) == 2:
-                var, value = incoming.split()
+            incoming = line.strip().split('\n')
+            for packet in incoming:
+                var, value = packet.split()
                 # is value in our variables list?
                 if var in self.drawingarea.bot.namespace:
-                    # set the bot namespace to the new value
-
                     ## TODO: we're forced to convert input to floats
+                    # would be a lot nicer to have a check for the var type
                     # self.drawingarea.bot.namespace[var] = value.strip(';')
                     self.drawingarea.bot.namespace[var] = float(value.strip(';'))
                     # and redraw

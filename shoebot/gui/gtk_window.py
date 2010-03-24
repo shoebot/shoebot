@@ -156,9 +156,3 @@ class ShoebotWindow(SocketServerMixin):
         del self
         ## FIXME: This doesn't kill the instance :/
 
-
-##if __name__ == "__main__":
-##    import sys
-##    win = MainWindow('letter_h_obj.py')
-##    win.server('',7777)
-##    win.run()
