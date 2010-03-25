@@ -407,10 +407,10 @@ class NodeBot(Bot):
     def scale(self, x=1, y=None):
         if not y:
             y = x
-        if x == 0 or x == -1:
+        if x == 0:
             # Cairo borks on zero values
             x = 1
-        if y == 0 or y == -1:
+        if y == 0:
             y = 1
         self._transform.scale(x,y)
 
