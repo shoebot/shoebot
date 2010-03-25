@@ -48,9 +48,7 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                 self.is_dynamic = True
 
         if self.is_dynamic:
-            print self.bot.WIDTH, self.bot.HEIGHT
             self.bot.run()
-	    print self.bot.WIDTH, self.bot.HEIGHT
             if 'setup' in self.bot.namespace:
                 self.bot.namespace['setup']()
 
