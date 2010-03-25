@@ -37,13 +37,20 @@ class ShoebotDrawingArea(gtk.DrawingArea):
                     import re
                     l = re.sub("\s", "", l)
                     if l.startswith("size("):
-                        self.bot.load_namespace()
-                        exec l in self.bot.namespace
+                        # get dimensions from size() line
+                        # it should be "size(x,y)", so we do some
+                        # string-fu
+                        # FIXME: using variables here borks shoebot
+                        x,y = l.strip(')').split('(')[-1].split(',')
+                        self.bot.size(x,y)
+                        # exec l in self.bot.namespace
             elif ("def setup" in line) or ("def draw" in line):
                 self.is_dynamic = True
 
         if self.is_dynamic:
+            print self.bot.WIDTH, self.bot.HEIGHT
             self.bot.run()
+	    print self.bot.WIDTH, self.bot.HEIGHT
             if 'setup' in self.bot.namespace:
                 self.bot.namespace['setup']()
 

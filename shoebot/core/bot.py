@@ -346,7 +346,7 @@ class Bot:
         self.load_namespace()
 
         try:
-            self.canvas.set_size(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
+            self.canvas.set_size(self.WIDTH, self.HEIGHT)
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
@@ -367,7 +367,7 @@ class Bot:
                 raise shoebot.ShoebotError(errmsg)
 
         # go back to default values for next iteration
-        self.set_defaults()
+        # self.set_defaults()
 
     def next_frame(self):
         '''Updates the FRAME value.'''
