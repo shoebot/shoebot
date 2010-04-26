@@ -96,10 +96,9 @@ class Bot:
                                                    width = self.WIDTH,
                                                    height = self.HEIGHT,
                                                    gtkmode = self.gtkmode)
-        # from nodebox
-        if ns is None:
-            ns = { 'FRAME': 0 }
-            self._ns  = ns
+        
+	self._ns = ns or {}
+	self._ns.setdefault('FRAME', 0)
 
     #### Object
 

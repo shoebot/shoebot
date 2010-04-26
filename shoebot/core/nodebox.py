@@ -20,8 +20,8 @@ class NodeBot(Bot):
     NORMAL = "1"
     FORTYFIVE = "2"
 
-    def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False):
-        Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode)
+    def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns = None):
+        Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode, ns)
 
 
     #### Drawing

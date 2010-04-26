@@ -53,19 +53,18 @@ _ = gettext.gettext
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-def run_oneshot(script, file, bot_type=NODEBOX, start_frame = 0):
+def run_oneshot(script, file, bot_type=NODEBOX, ns = None):
     ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
     # create a Bot instance
     if bot_type == NODEBOX:
-        bot = NodeBot(targetfilename = file)
+        bot = NodeBot(targetfilename = file, ns = ns)
     elif bot_type == DRAWBOT:
-        bot = DrawBot(targetfilename = file)
+        bot = DrawBot(targetfilename = file, ns = ns)
 
     # run it, and then its setup and draw methods, if they're there
     # (running setup() and draw() isn't always desirable, but for image
     # output it helps to have the final image as a GTK canvas would
     # display it)
-    bot.namespace['FRAME'] = start_frame
     bot.run(script)
     if 'setup' in bot.namespace:
         bot.namespace['setup']()
@@ -174,7 +173,7 @@ if __name__ == '__main__':
                 run_oneshot(inputscript, 
                             outputfile,
                             bot_type=options.bot,
-                            start_frame = r)
+                            ns = { 'FRAME' :  r })
                 print "Output %s" % outputfile
         else:
             run_oneshot(inputscript, outputfile)
