@@ -178,7 +178,7 @@ class GoogleSearch(GoogleResults, URLAccumulator):
 
         self.query = q
         self.service = service
-        
+
         if cached:
             cache = "google"
         else:

@@ -1,5 +1,5 @@
 # Parsing web pages.
-size(600,600)
+
 try:
     web = ximport("web")
 except:
@@ -27,6 +27,5 @@ print html.links(external=False)
 # Browse through the HTML tree, find <div id="content">,
 # strip tags from it and print out the contents.
 content = html.find(id="content")
-
 fontsize(10)
 text( web.html.plain(content), 20, 20, width=300)

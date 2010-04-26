@@ -37,19 +37,25 @@ class UrbanDictionaryDefinition:
         
         return self.description
 
+class UrbanDictionaryError(Exception):
+    pass
+
 class UrbanDictionary(list):
     
     def __init__(self, q, cached=True):
         
-        url = "http://api.urbandictionary.com/soap"
+        url = "http://api.urbandictionary.com/soap?wsdl"
         key = "91cf66fb7f14bbf7fb59c7cf5e22155f"
-        
+
         # Live connect for uncached queries 
         # or queries we do not have in cache.
         cache = Cache("urbandictionary", ".pickle")
         if not cached or not cache.exists(q):
             server = soap.SOAPProxy(url)
-            definitions = server.lookup(key, q)
+            try:
+                definitions = server.lookup(key, q)
+            except Exception, soap.faultType:
+                raise UrbanDictionaryError, "the API is no longer supported"
             data = []
             for item in definitions:
                 ubd = UrbanDictionaryDefinition(

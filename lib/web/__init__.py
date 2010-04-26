@@ -4,7 +4,7 @@
 # See LICENSE.txt for details.
 
 __author__    = "Tom De Smedt"
-__version__   = "1.9.4.3"
+__version__   = "1.9.4.6"
 __copyright__ = "Copyright (c) 2008 Tom De Smedt"
 __license__   = "GPL"
 
@@ -26,6 +26,8 @@ __license__   = "GPL"
 # Mark Pilgrim's Universal Feed Parser for newsfeeds, a connection to John Forkosh's mimeTeX server, 
 # Leif K-Brooks entity replace algorithm, Bob Ippolito's simplejson.
 
+# Thanks to Serafeim Zanikolas for maintaining Debian compatibility, Stuart Axon for various patches.
+
 ######################################################################################################
 
 import os
@@ -42,7 +44,8 @@ packages = [
     "wikipedia", 
     "morguefile", "flickr", 
     "kuler", "colr",
-    "mimetex",
+    "mimetex", #deprecated
+    "mathtex",
     "urbandictionary",
 ]
 for p in packages:
@@ -75,6 +78,19 @@ def clear_cache():
         try: exec("%s.clear_cache()" % p)
         except NameError:
             pass    
+
+# 1.9.4.6
+# cache.py uses hashlib instead of md5 on Python 2.6+
+# On Windows, cached files are stored under Documents and Settings\UserName\.nodebox-web-cache.
+# Cache files are stored in binary mode to avoid newline issues.
+# Fixed support for Morguefile.
+
+# 1.9.4.5
+# cache.py closes files after reading and writing.
+# This is necessary in Jython.
+
+# 1.9.4.4
+# mathTeX deprecates mimeTeX.
 
 # 1.9.4.3
 # Flickr accepts Unicode queries.

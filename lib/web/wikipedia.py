@@ -1542,7 +1542,6 @@ class WikipediaSearch(WikipediaPage, URLAccumulator):
         url  = "http://"+language+".wikipedia.org/w/api.php"
         url += "?action=query&redirects&format=xml&prop=revisions&rvprop=content&titles="
         url += quote(q)
-        
         return url
     
     def __init__(self, q, language="en", light=False, wait=10, asynchronous=False, cached=True,

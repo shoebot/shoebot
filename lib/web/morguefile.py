@@ -1,7 +1,7 @@
 ### MORGUEFILE #######################################################################################
 # Code for downloading images from MorgueFile.
 
-# Author: Tom De Smedt.
+# Author: Tom De Smedt, Stuart Axon.
 # Copyright (c) 2007 by Tom De Smedt.
 # See LICENSE.txt for details.
 
@@ -34,11 +34,16 @@ class MorgueFileImage(URLAccumulator):
     def __init__(self):
         
         self.id        = 0
-        self.category  = ""
         self.author    = ""
         self.name      = ""
         self.url       = ""
         self.date      = ""
+        self.hi_res    = None
+        self.width     = None
+        self.height    = None
+        
+        # For backwards compatibility (don't exist anymore now).
+        self.category  = ""
         self.views     = 0
         self.downloads = 0
         
@@ -47,17 +52,6 @@ class MorgueFileImage(URLAccumulator):
     def __str__(self):
         
         return self.name.encode("utf-8")
-        
-    def __cmp__(self, other):
-        
-        
-        """ Images in a MorgueFile list can be sorted according to number of views.
-        """
-        
-        if self.views > other.views: 
-            return -1
-        else: 
-            return 1
         
     def download(self, size=SIZE_LARGE, thumbnail=False, wait=60, asynchronous=False):
         
@@ -71,13 +65,13 @@ class MorgueFileImage(URLAccumulator):
         
         if thumbnail == True: size = SIZE_THUMBNAIL # backwards compatibility
         self._size = disambiguate_size(size)
-        if self._size != SIZE_THUMBNAIL:
-            url = self.url.replace("thumbnails", "lowrez")
+        if self._size == SIZE_THUMBNAIL:
+            url = self.url.replace("/preview/", "/med/")
         else:
             url = self.url
         
         cache = "morguefile"
-        extension = os.path.basename(self.url)[-4:]
+        extension = os.path.splitext(url)[1]
         URLAccumulator.__init__(self, url, wait, asynchronous, cache, extension, 2)
         
         if not asynchronous:
@@ -85,8 +79,8 @@ class MorgueFileImage(URLAccumulator):
         
     def load(self, data):
         
-        if self._size != SIZE_THUMBNAIL:
-            url = self.url.replace("thumbnails", "lowrez")
+        if self._size == SIZE_THUMBNAIL:
+            url = self.url.replace("/preview/", "/med/")
         else:
             url = self.url
         
@@ -103,22 +97,30 @@ class MorgueFile(list):
     def _parse_data(self, e, tag):
         
         return e.getElementsByTagName(tag)[0].childNodes[0].data
+        
+    def _parse_attribute(self, e, tag, attr):
+        
+        return e.getElementsByTagName(tag)[0].attributes[attr].value
 
     def _parse(self, xml):
 
         if xml == "": return
         xml = xml.replace("& ", "&amp; ")
+        xml = xml.decode("utf-8", "ignore")
         dom = parseString(xml)
-        for e in dom.getElementsByTagName("image"):
+        for e in dom.getElementsByTagName("item"):
             img = MorgueFileImage()
-            img.id        = self._parse_data(e, "unique_id")
-            img.category  = self._parse_data(e, "category")
-            img.author    = self._parse_data(e, "author")
-            img.name      = self._parse_data(e, "title")
-            img.url       = self._parse_data(e, "photo_path")
-            img.date      = self._parse_data(e, "date_added")
-            img.views     = int(self._parse_data(e, "views"))
-            img.downloads = int(self._parse_data(e, "downloads"))
+            img.id        = self._parse_data(e, "media:guid")
+            img.author    = self._parse_data(e, "media:credit")
+            img.name      = self._parse_data(e, "media:title")
+            img.date      = self._parse_data(e, "pubDate")
+            img.url       = self._parse_attribute(e, "media:thumbnail", "url").replace("/med/", "/preview/")
+            img.hi_res    = self._parse_attribute(e, "media:content", "url")
+            img.width     = float(self._parse_attribute(e, "media:content", "width"))
+            img.height    = float(self._parse_attribute(e, "media:content", "height"))
+            # The width of /preview/ image is always 620,
+            # calculacte the height according to this ratio:
+            img.width, img.height = 620.0, img.height / img.width * 620.0 
             self.append(img)
 
 ### MORGUEFILE SEARCH ################################################################################
@@ -132,10 +134,10 @@ class MorgueFileSearch(MorgueFile, URLAccumulator):
         else:
             cache = None
     
-        arg = "terms"
+        arg = "qury"
         if author == True: arg = "author"
-        url = "http://morguefile.com/archive/archivexml.php"
-        url += "?" + arg + "=" + quote_plus(q) + "&archive_max_image=" + str(max)
+        url = "http://morguefile.com/archive/xml/"
+        url += "?" + arg + "=" + quote_plus(q) + "&lmt=" + str(max)
         URLAccumulator.__init__(self, url, wait, asynchronous, cache, ".xml", 1)
 
     def load(self, data):
@@ -151,11 +153,11 @@ def search(q, max=100, wait=10, asynchronous=False, cached=True):
 def search_by_author(q, max=100, wait=10, asynchronous=False, cached=True):
     
     return MorgueFileSearch(q, True, max, wait, asynchronous, cached)
-    
+
 #images = search("apple")
 #images.sort()
 #for img in images:
-#    print img.views, img.name
+#    print img.name
 
 #img = images[0]
 #img.download()

@@ -1,6 +1,5 @@
 # Reading newsfeeds.
-size(600,600)
-background(1,1,1,1)
+
 try:
     web = ximport("web")
 except:
@@ -24,5 +23,5 @@ for item in feed.items:
     print "- Date        :", item.date
     print "- Author      :", item.author
 
-fontsize(6)
-text(item.description, 20, 20, width=400)
+fontsize(10)
+text(item.description, 20, 20, width=200)

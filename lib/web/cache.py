@@ -7,18 +7,29 @@
 # See LICENSE.txt for details.
 
 import os
-import md5
 import datetime
 import sys
 from glob import glob
 
+try:
+    # Python 2.6+
+    from hashlib import md5
+except:
+    # Python 2.5-
+    from md5 import new as md5
+
 # For Mac OS X, the cache is stored inside the web library folder.
+# For Windows, it is stored in the user's folder (Documents and Settings\UserName\.nodebox-web-cache).
 # For Linux, it is stored in $HOME/.nodebox-web-cache/
-if sys.platform.startswith("darwin") \
-or sys.platform.startswith("win"):
+if sys.platform.startswith("darwin"):
     CACHE_PATH = os.path.join(os.path.dirname(__file__), "cache", "")
+elif sys.platform.startswith("win"):
+    CACHE_PATH = os.path.join(os.environ["HOMEPATH"], ".nodebox-web-cache", "")
+elif sys.platform.startswith("java"):
+    from java.lang import System # Running under Jython, e.g. NodeBox 2.
+    CACHE_PATH = os.path.join(System.getProperty("user.home"), ".nodebox-web-cache", "")
 else:
-    CACHE_PATH = os.path.join(os.environ['HOME'], ".nodebox-web-cache", "")
+    CACHE_PATH = os.path.join(os.environ["HOME"], ".nodebox-web-cache", "")
 
 class Cache:
     
@@ -31,7 +42,7 @@ class Cache:
         
         """
         
-        self.path = CACHE_PATH+name
+        self.path = os.path.join(CACHE_PATH, name)
         self.type = type
         
         if not os.path.exists(self.path):
@@ -42,35 +53,39 @@ class Cache:
         """ Creates a unique filename in the cache for the id.
         """
     
-        h = md5.new(id).hexdigest()
+        h = md5(id).hexdigest()
         return os.path.join(self.path, h+self.type)
 
     def write(self, id, data):
-    
-        f = self.hash(id)
-        open(f, "w").write(data)
+        
+        # Write files using binary mode to avoid extra newlines being inserted.
+        f = open(self.hash(id), "wb")
+        f.write(data)
+        f.close()
     
     def read(self, id):
     
-        f = self.hash(id)
-        if os.path.exists(f):
-            return open(f).read()
+        path = self.hash(id)
+        if os.path.exists(path):
+            f = open(path)
+            data = f.read()
+            f.close()
+            return data
         else:
             return None
 
     def exists(self, id):
 
-        f = self.hash(id)
-        return os.path.exists(f)
+        return os.path.exists(self.hash(id))
         
     def age(self, id):
         
         """ Returns the age of the cache entry, in days.
         """
         
-        f = self.hash(id)
-        if os.path.exists(f):
-            modified = datetime.datetime.fromtimestamp(os.stat(f)[8])
+        path = self.hash(id)
+        if os.path.exists(path):
+            modified = datetime.datetime.fromtimestamp(os.stat(path)[8])
             age = datetime.datetime.today() - modified
             return age.days
         else:
@@ -78,14 +93,14 @@ class Cache:
             
     def remove(self, id):
         
-        f = self.hash(id)
-        if os.path.exists(f):
-            os.unlink(f)
+        path = self.hash(id)
+        if os.path.exists(path):
+            os.unlink(path)
             
     def clear(self):
         
-        for f in glob(os.path.join(self.path,"*")):
-            os.unlink(f)
+        for path in glob(os.path.join(self.path,"*")):
+            os.unlink(path)
         
 #c = Cache("kuler")
 #print c.age("http://kuler.adobe.com/kuler/services/theme/getList.cfm?listType=popular")
