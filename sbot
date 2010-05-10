@@ -48,6 +48,9 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+NODEBOX = 'nodebox'
+DRAWBOT = 'drawbot'
+
 # use OptionParser to interpret commandline options
 parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
 parser.add_option("-o",
