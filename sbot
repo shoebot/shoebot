@@ -32,15 +32,13 @@
 import sys, os
 import locale, gettext
 from optparse import OptionParser
-from shoebot.gui import ShoebotWindow
-from shoebot.core import NodeBot, DrawBot
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
 DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
-OUTPUT_EXTENSIONS = ('.png','.svg','.ps','.pdf')
+OUTPUT_EXTENSIONS = ('.png', '.svg', '.ps', '.pdf')
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 
@@ -49,32 +47,6 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
-
-NODEBOX = 'nodebox'
-DRAWBOT = 'drawbot'
-
-def run_oneshot(script, file, bot_type=NODEBOX, ns = None):
-    ''' Oneshot mode: Run a Shoebot script and save output to an image file.'''
-    # create a Bot instance
-    if bot_type == NODEBOX:
-        bot = NodeBot(targetfilename = file, ns = ns)
-    elif bot_type == DRAWBOT:
-        bot = DrawBot(targetfilename = file, ns = ns)
-
-    # run it, and then its setup and draw methods, if they're there
-    # (running setup() and draw() isn't always desirable, but for image
-    # output it helps to have the final image as a GTK canvas would
-    # display it)
-    bot.run(script)
-    if 'setup' in bot.namespace:
-        bot.namespace['setup']()
-    if 'draw' in bot.namespace:
-        bot.namespace['draw']()
-    bot.finish()
-
-def run_window(script, server=False, port=DEFAULT_SERVERPORT, varwindow=False, go_fullscreen=False, bot=NODEBOX):
-    ''' Windowed mode: Run a Shoebot script in a GTK window.'''
-    win = ShoebotWindow(script, server, port, varwindow, go_fullscreen, bot)
 
 # use OptionParser to interpret commandline options
 parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
@@ -120,7 +92,7 @@ parser.add_option("-r",
                 type="int",
                 dest="repeat",
                 default=False,
-                help=_("set number of iterations, multiple images will be produced (only in non-windowed mode)"))
+                help=_("set number of iteration, multiple images will be produced (only in non-windowed mode)"))
 parser.add_option("-b",
                 "--bot",
                 dest="bot",
@@ -151,43 +123,9 @@ if __name__ == '__main__':
     if len(args) > 1:
         error(_("Too many arguments!"))
 
-    inputscript = args[0]
-
-    # all checked, make it happen
-    if not options.window:
-        # oneshot mode - output to file
-        if not options.outputfile:
-            print _('No output file specified, defaulting to output.png...')
-            outputfile = DEFAULT_OUTPUTFILE
-            filename, extension = os.path.splitext(outputfile)
-        else:
-            outputfile = options.outputfile
-            # is it a valid extension?
-            filename, extension = os.path.splitext(outputfile)
-            if not extension in OUTPUT_EXTENSIONS:
-                error(_("Invalid extension in output filename"))
-        if options.repeat:
-            print _("start sequence...")
-            ns = {}
-            for r in range(1, options.repeat+1):
-                ns['FRAME'] = r
-                outputfile = filename + "_%03d" %r + extension
-                run_oneshot(inputscript, 
-                            outputfile,
-                            bot_type=options.bot,
-                            ns = ns)
-                print "Output %s" % outputfile
-        else:
-            run_oneshot(inputscript, outputfile)
-    else:
-        # windowed mode - run on a GTK window
-        if options.outputfile:
-            error(_('Windowed mode does not take an output file argument.'))
-        if options.repeat:
-            warn(_("Sorry, repeat option is not valid in Windowed mode, it will be ignored"))
-        run_window(inputscript,
-                   server=options.socketserver,
-                   port=options.serverport,
-                   varwindow=options.varwindow,
-                   go_fullscreen=options.fullscreen,
-                   bot=options.bot)
+    
+    run_bot(src = args[0],
+            grammar = options.bot,
+            outputfile = options.outputfile or 'output.svg',
+            iterations = options.repeat or None,
+            window = options.window)

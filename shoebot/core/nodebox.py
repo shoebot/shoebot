@@ -20,9 +20,9 @@ class NodeBot(Bot):
     NORMAL = "1"
     FORTYFIVE = "2"
 
-    def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns = None):
-        Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode, ns)
-
+    def __init__(self, context, canvas, namespace):
+        Bot.__init__(self, context, canvas, namespace)
+        self._path = None
 
     #### Drawing
 
@@ -31,10 +31,7 @@ class NodeBot(Bot):
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
         '''Draws a image form path, in x,y and resize it to width, height dimensions.
         '''
-        r = self.Image(path, x, y, width, height, alpha, data, **kwargs)
-        if draw:
-            self.canvas.add(r)
-        return r
+        return = self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
         img = Image.open(path)
@@ -43,20 +40,14 @@ class NodeBot(Bot):
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        '''Draws a rectangle with top left corner at (x,y)
-
-        The roundness variable sets rounded corners.
-        '''
-        r = self.BezierPath(**kwargs)
-        r.rect(x,y,width,height,roundness,self.rectmode)
-        #r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath()
+        path.rect(x, y, width, height, roundness)
         if draw:
-            self.canvas.add(r)
-        else:
-            r.transform = self._transform.copy()
-        return r
+            path.draw()
+        return path
 
     def rectmode(self, mode=None):
+        ### TODO
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
             self.rectmode = mode
             return self.rectmode
@@ -67,25 +58,19 @@ class NodeBot(Bot):
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
-        r = self.BezierPath(**kwargs)
-        r.ellipse(x,y,width,height)
-        # r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath(**kwargs)
+        path.ellipse(x, y, width, height)
         if draw:
-            self.canvas.add(r)
-        else:
-            r.transform = self._transform.copy()
-        return r
+            path.draw()
+        return path
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y)'''
-        r = self.BezierPath(**kwargs)
-        r.ellipse(x,y,width,height)
-        # r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath(**kwargs)
+        path.ellipse(x,y,width,height)
         if draw:
-            self.canvas.add(r)
-        else:
-            r.transform = self._transform.copy()
-        return r
+            path.draw()
+        return path
 
     def circle(self, x, y, diameter):
         self.ellipse(x, y, diameter, diameter)
@@ -223,7 +208,6 @@ class NodeBot(Bot):
         self._path = self.BezierPath()
         if x and y:
             self._path.moveto(x,y)
-        self._path.closed = False
 
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
@@ -263,25 +247,19 @@ class NodeBot(Bot):
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
-        # p.inheritFromContext()
         if draw:
-            self.canvas.add(p)
+            p.draw()
             self._path = None
         else:
             # keep the transform so we don't lose it
             self._path.transform = self._transform.copy()
         return p
 
-    def drawpath(self,path):
-        if isinstance(path, BezierPath):
-            p = self.BezierPath(path)
-            self.canvas.add(p)
-        elif isinstance(path, Image):
-            self.canvas.add(path)
+    def drawpath(self, path):
+        path.draw()
 
     def drawimage(self, image):
         self.canvas.add(image)
-
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
@@ -382,6 +360,7 @@ class NodeBot(Bot):
 
     def beginclip(self,path):
         # FIXME: this save should go into Canvas
+        ### TODO
         p = self.ClippingPath(path)
         self.canvas.add(p)
         return p
@@ -391,19 +370,25 @@ class NodeBot(Bot):
         p = self.EndClip()
         self.canvas.add(p)
 
-    def transform(self, mode=None): # Mode can be CENTER or CORNER
+    def transform(self, mode):
+        '''Mode can be CENTER or CORNER'''
         if mode:
-            self._transformmode = mode
-        return self._transformmode
+            self._canvas.mode = mode
+        return self._canvas.mode
 
-    def translate(self, x, y):
-        self._transform.translate(x,y)
+    def translate(self, xt, yt, mode = None):
+        self._canvas.translate(xt, yt)
+        if mode:
+            self._canvas.mode = mode
+
     def rotate(self, degrees=0, radians=0):
+        ### TODO change canvas to use radians
         if radians:
             angle = radians
         else:
             angle = deg2rad(degrees)
-        self._transform.rotate(-angle)
+        self._canvas.rotate(-degrees)
+
     def scale(self, x=1, y=None):
         if not y:
             y = x
@@ -412,19 +397,19 @@ class NodeBot(Bot):
             x = 1
         if y == 0:
             y = 1
-        self._transform.scale(x,y)
+        self._canvas.scale(x,y)
 
     def skew(self, x=1, y=0):
         self._transform.skew(x,y)
 
     def push(self):
-        self.transform_stack.append(self._transform.copy())
+        self._canvas.push_matrix()
 
     def pop(self):
-        self._transform = self.transform_stack.pop()
+        self._canvas.pop_matrix()
 
     def reset(self):
-        self._transform = Transform()
+        self._canvas.reset_transform()
 
     #### Color
 
@@ -456,35 +441,32 @@ class NodeBot(Bot):
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-        self._fillcolor = self.color(*args)
-        return self._fillcolor
+        self._canvas.fill = self.color(*args)
+        return self._fill
 
     def nofill(self):
         ''' Stop applying fills to new paths.'''
-        self._fillcolor = None
+        self._canvas.fill = None
 
     def stroke(self,*args):
         '''Set a stroke color, applying it to new paths.'''
-        self._strokecolor = self.color(*args)
-        return self._strokecolor
+        self._canvas.stroke = self.color(*args)
+        return self._stroke
 
     def nostroke(self):
         ''' Stop applying strokes to new paths.'''
-        self._strokecolor = None
+        self._canvas.stroke = None
 
     def strokewidth(self, w=None):
         '''Set the stroke width.'''
         if w is not None:
-            self._strokewidth = w
+            self._canvas.strokewidth = w
         else:
-            return self._strokewidth
+            return self._canvas.strokewidth
 
     def background(self,*args):
         '''Set the background colour.'''
-        r = self.BezierPath()
-        r.rect(0, 0, self.WIDTH, self.HEIGHT)
-        r.fill = self.color(*args)
-        self.canvas.add(r)
+        self._canvas.background = self.color(*args)
 
     #### Text
 

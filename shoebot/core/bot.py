@@ -64,48 +64,19 @@ class Bot:
     keycode = 0
     keydown = False
 
-    DEFAULT_WIDTH = 200
-    DEFAULT_HEIGHT = 200
     FRAME = 0
 
-    def __init__ (self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns=None):
-
-        self.inputscript = inputscript
-        self.targetfilename = targetfilename
-        
-        # init internal path container
-        self._path = None
+    def __init__(self, context, canvas, namespace):
+        self._context = context
+        self._canvas = canvas
+        self._namespace = namespace
         self._autoclosepath = True
-
-        self._transform = Transform()
-        self.transform_stack = []
-
-        self.gtkmode = gtkmode
-        self.vars = []
-        self._oldvars = self.vars
-        self.namespace = {}
-        self.screen_ratio = None
-
-        self.set_defaults()
-
-        if canvas:
-            self.canvas = canvas
-        else:
-            self.canvas = shoebot.core.CairoCanvas(bot = self,
-                                                   target = self.targetfilename,
-                                                   width = self.WIDTH,
-                                                   height = self.HEIGHT,
-                                                   gtkmode = self.gtkmode)
         
-	self._ns = ns or {}
-	self._ns.setdefault('FRAME', 0)
-
-    #### Object
-
     def set_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
+        ### TODO - Move this ?
 
         self._fontfile = "assets/notcouriersans.ttf"
         self._fontsize = 16
@@ -126,10 +97,19 @@ class Bot:
         self._strokewidth = 1.0
 
     def _makeInstance(self, clazz, args, kwargs):
-        """Creates an instance of a class defined in this document.
-           This method sets the context of the object to the current context."""
-        inst = clazz(self, *args, **kwargs)
+        '''Creates an instance of a class defined in this document.
+           This method sets the context of the object to the current context.'''
+        inst = clazz(self._canvas, *args, **kwargs)
         return inst
+
+    def setup(self):
+        """ For override by user sketch """
+        pass
+
+    def draw(self):
+        """ For override by user sketch """
+        pass
+
     def EndClip(self, *args, **kwargs):
         return self._makeInstance(EndClip, args, kwargs)
     def BezierPath(self, *args, **kwargs):
@@ -153,19 +133,19 @@ class Bot:
 
     def var(self, name, type, default=None, min=0, max=255, value=None):
         v = Variable(name, type, default, min, max, value)
-        v = self.addvar(v)
+        v = self._addvar(v)
 
-    def addvar(self, v):
+    def _addvar(self, v):
         ''' Sets a new accessible variable.'''
-
-        oldvar = self.findvar(v.name)
+        ### TODO
+        oldvar = self._findvar(v.name)
         if oldvar is not None:
             if oldvar.compliesTo(v):
                 v.value = oldvar.value
-        self.vars.append(v)
-        self.namespace[v.name] = v.value
+        self._vars.append(v)
+        self._namespace[v.name] = v.value
 
-    def findvar(self, name):
+    def _findvar(self, name):
         for v in self._oldvars:
             if v.name == name:
                 return v
@@ -173,12 +153,9 @@ class Bot:
 
     #### Utility
 
-    def drawing_closed(self):
-        pass
-
     def color(self, *args):
         #return Color(self.color_mode, self.color_range, *args)
-        return Color(mode=self.color_mode, color_range=self.color_range, *args)
+        return Color(mode=self._color_mode, color_range=self._color_range, *args)
 
     choice = r.choice
 
@@ -244,9 +221,9 @@ class Bot:
         '''
 
         if filename:
-            self.canvas.output(filename)
+            self._canvas.output(filename)
         elif surface:
-            self.canvas.output(surface)
+            self._canvas.output(surface)
 
     # from Nodebox, a function to import Nodebox libraries
     def ximport(self, libName):
@@ -261,133 +238,27 @@ class Bot:
 
     #### Core functions
 
-    def size(self,w=None,h=None):
+    def size(self, w = None, h = None):
         '''Sets the size of the canvas, and creates a Cairo surface and context.
 
-        Needs to be the first function call in a script.'''
-
-        if not w:
-            w = self.WIDTH
-        if not h:
-            h = self.HEIGHT
-        if not w and not h:
-            return (self.WIDTH, self.HEIGHT)
-
-        if self.gtkmode:
-            # in windowed mode we don't set the surface in the Bot itself,
-            # the gtkui module takes care of doing that
-            # TODO: Parent widget as an argument?
-            self.WIDTH = int(w)
-            self.HEIGHT = int(h)
-            self.namespace['WIDTH'] = self.WIDTH
-            self.namespace['HEIGHT'] = self.HEIGHT
-            self.canvas.set_size(w,h)
-
-        else:
-            self.WIDTH = int(w)
-            self.HEIGHT = int(h)
-            # hack to get WIDTH and HEIGHT into the local namespace for running
-            self.namespace['WIDTH'] = self.WIDTH
-            self.namespace['HEIGHT'] = self.HEIGHT
-            # make a new surface for us
-            self.canvas.setsurface(self.targetfilename, w, h)
-            self.canvas.set_size(w,h)
+        Only the first call will actually be effective.'''
         
+        if not w:
+            w = self._canvas.width
+        if not h:
+            h = self._canvas.height
+        if not w and not h:
+            return (self._canvas.width, self._canvas.height)
 
-        if self.canvas.origin == BOTTOM_LEFT:
-            self.canvas.flip()
-            print 'Canvas flipped'
+        w, h = self._canvas.set_size((w, h))
+        self._namespace['WIDTH'] = w
+        self._namespace['HEIGHT'] = h
 
-    def speed(self, value):
-        if value:
-            self.framerate = value
-        return self.framerate
-
-    def finish(self):
-        '''Finishes the surface and writes it to the output file.'''
-        self.canvas.finish()
-
-    def load_namespace(self):
-        from shoebot import data
-        for name in dir(self):
-            # get all stuff in the Bot namespaces
-            self.namespace[name] = getattr(self, name)
-        for name in dir(data):
-            self.namespace[name] = getattr(data, name)
-
-    def run(self, inputcode=None):
-        '''
-        Executes the contents of a Nodebox/Shoebot script
-        in current surface's context.
-        '''
-
-        source_or_code = ""
-
-        if not inputcode:
-        # no input? see if box has an input file name or string set
-            if not self.inputscript:
-                raise ShoebotError(_("run() needs an input file name or code string (if none was specified when creating the Bot instance)"))
-            inputcode = self.inputscript
+    def speed(self, framerate):
+        if framerate:
+            self._context.speed = framerate
+            self._context.dynamic = True
         else:
-            self.inputscript = inputcode
-
-
-        # is it a proper filename?
-        if os.path.exists(inputcode):
-            filename = inputcode
-            file = open(filename, 'rU')
-            source_or_code = file.read()
-            file.close()
-        else:
-            # if not, try parsing it as a code string
-            source_or_code = inputcode
-
-        self.load_namespace()
-
-        try:
-            self.canvas.set_size(self.WIDTH, self.HEIGHT)
-            # if it's a string, it needs compiling first; if it's a file, no action needed
-            if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
-            # do the magic
-            exec source_or_code in self.namespace
-        except NameError:
-            # if something goes wrong, print verbose system output
-            # maybe this is too verbose, but okay for now
-            errmsg = traceback.format_exc()
-
-#            print "Exception in Shoebot code:"
-#            traceback.print_exc(file=sys.stdout)
-            if not self.gtkmode:
-                sys.stderr.write(errmsg)
-                sys.exit()
-            else:
-                # if on gtkmode, print the error and don't break
-                raise shoebot.ShoebotError(errmsg)
-
-        # go back to default values for next iteration
-        # self.set_defaults()
-
-    def next_frame(self):
-        '''Updates the FRAME value.'''
-        self.namespace['FRAME'] += 1
-
-    def mouse_down(self, pointer):
-        self.namespace['mousedown'] = True
-
-    def mouse_up(self, pointer):
-        self.namespace['mousedown'] = False
-
-    def pointer_moved(self, pointer):
-        self.namespace['MOUSEX'] = pointer.x
-        self.namespace['MOUSEY'] = pointer.y
-
-    def key_down(self, keystate):
-        self.namespace['key'] = keystate.key
-        self.namespace['keycode'] = keystate.keycode
-        self.namespace['keydown'] = True
-
-    def key_up(self, keystate):
-        self.namespace['keydown'] = False
+            return self._context.speed
 
 

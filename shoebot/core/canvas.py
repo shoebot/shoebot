@@ -1,6 +1,7 @@
 import sys
 import shoebot
 import locale, gettext
+import math as _math
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -13,71 +14,66 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 class Canvas:
-    '''
-    This class contains a Cairo context or surface, as well as methods to pass
-    drawing commands to it.
+    ''' Abstract canvas class '''
+    def __init__(self):
+        self.fill = (0.5, 0.5, 0.5)
+        self.stroke = None
+        self.strokewidth = 1
+        self.background = (1, 1, 1)
+        self.transform = cairo.Matrix()
+        self.DEFAULT_MODE = CENTER
 
-    Its intended use is to get drawable objects from a Bot instance, store them
-    in a stack and draw them to the Cairo context when necessary.
-    '''
-    def __init__(self, bot=None, target=None, width=None, height=None, gtkmode=False):
-
-        if bot:
-            self._bot = bot
-
-        self.width = 200
-        self.height = 200
-        self.origin = TOP_LEFT
-
-        self.font_size = 12
-        # self.outputmode = RGB
-        # self.linecap
-        # self.linejoin
-        # self.fontweight
-        # self.fontslant
-        # self.hintmetrics
-        # self.hintstyle
-        # self.filter
-        # self.operator
-        # self.antialias
-        # self.fillrule
-
-    def add(self, grob):
-        if not isinstance(grob, shoebot.data.Grob):
-            raise ValueError(_("Canvas.add() - wrong argument: expecting a Grob, received %s") % (grob))
-        self.drawitem(grob)
-
-    def append(self, grob):
-        self.add(self, grob)
-
-    def setsurface(self):
-        pass
-    def get_context(self):
-        return self._context
-    def get_surface(self):
-        return self._surface
-
-    def draw(self, ctx=None):
-        pass
-    def drawitem(self, grob):
-        pass
-    def output(self, filename):
+    def initial_drawqueue(self):
+        '''
+        Override to create use special kinds of draw queue
+        '''
+        return DrawQueue()
+    
+    def initial_transform(self):
+        '''
+        Must be overriden to create initial transform matrix
+        '''
         pass
 
-    def clear(self):
-        self.grobstack = []
+    def reset_canvas(self):
+        self.reset_transform()
+        self.reset_drawqueue()
 
+    def size_or_default(self):
+        '''
+        If size is not set, otherwise set size to DEFAULT_SIZE
+        and return it.
 
-    def set_size(self, x, y):
-        # reset transforms
-        self.context.identity_matrix()
-        self.width = x
-        self.height = y
+        This means, only the first call to size() is valid.
+        '''
+        if not self.size:
+            self.size = DEFAULT_SIZE
+        return self.size
 
-    def flip(self):
-        w = self.width
-        h = self.height
-        self.context.translate(w/2., h/2.)
-        self.context.scale(1,-1)
-        self.context.translate(-w/2., -h/2.)
+    def set_size(self, size):
+        '''
+        Size is only set the first time it is called
+        
+        Size that is set is returned
+        '''
+        if self.size is None:
+            self.size = size
+            return size
+        else:
+            return self.size
+    
+    def get_width(self):
+        if self.size != None:
+            return self.size[0]
+        else:
+            return self.DEFAULT_SIZE[0]
+
+    def get_height(self):
+        if self.size != None:
+            return self.size[1]
+        else:
+            return self.DEFAULT_SIZE[1]
+
+    width = property(get_width)
+    height = property(get_height)
 

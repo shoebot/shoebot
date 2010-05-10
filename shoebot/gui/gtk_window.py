@@ -4,7 +4,7 @@ import gtk
 import gobject
 import cairo
 import shoebot
-from shoebot.gui import SocketServerMixin, ShoebotDrawingArea, VarWindow
+from shoebot.gui import SocketServerMixin, VarWindow
 from shoebot.core import NodeBot, DrawBot
 
 import locale
@@ -21,138 +21,85 @@ _ = gettext.gettext
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-if sys.platform != 'win32':
-    ICON_FILE = '/usr/share/shoebot/icon.png'
-else:
-    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
+ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
-class ShoebotWindow(SocketServerMixin):
-    def __init__(self, code=None, server=False, serverport=7777,
-            varwindow=False, go_fullscreen=False, bot=NODEBOX):
+class GtkWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
+    '''Create a GTK+ widget on which we will draw using Cairo'''
 
-        if bot == NODEBOX:
-            self.bot = NodeBot(gtkmode=True, inputscript=code)
-        elif bot == DRAWBOT:
-            self.bot = DrawBot(gtkmode=True, inputscript=code)
-        self.drawingarea = ShoebotDrawingArea(self, self.bot)
-
-        self.has_server = server
-        self.serverport = serverport
-        self.has_varwindow = varwindow
-        self.go_fullscreen = go_fullscreen
-
-        # Setup the main GTK window
-        self.window = gtk.Window()
-        self.window.connect("destroy", self.do_window_close)
-        self.window.set_title('Shoebot - Running')
-        def dummy():
-            pass
-        self.bot.drawing_closed = dummy
-        try:
-            self.window.set_icon_from_file(ICON_FILE)
-        except gobject.GError:
-            # icon not found = no icon
-            pass
-        self.window.add(self.drawingarea)
-
-        self.uimanager = gtk.UIManager()
-        accelgroup = self.uimanager.get_accel_group()
-        self.window.add_accel_group(accelgroup)
-
-        actiongroup = gtk.ActionGroup('Canvas')
-
-        actiongroup.add_actions([('Save as', None, _('_Save as')),
-                                 ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.drawingarea.save_output),
-                                 ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.drawingarea.save_output),
-                                 ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.drawingarea.save_output),
-                                 ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.drawingarea.save_output),
-                                 ('fullscreen', 'Go fullscreen', _('_Go fullscreen'), "<Control>5", None, self.do_fullscreen),
-                                 ('unfullscreen', 'Exit fullscreen', _('_Exit fullscreen'), "<Control>6", None, self.do_unfullscreen),
-                                 ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
-                                ])
-
-        menuxml = '''
-        <popup action="Save as">
-            <menuitem action="svg"/>
-            <menuitem action="ps"/>
-            <menuitem action="pdf"/>
-            <menuitem action="png"/>
-            <separator/>
-            <menuitem action="fullscreen"/>
-            <menuitem action="unfullscreen"/>
-            <separator/>
-            <menuitem action="close"/>
-        </popup>
-        '''
-
-        self.uimanager.insert_action_group(actiongroup, 0)
-        self.uimanager.add_ui_from_string(menuxml)
-
-        if self.has_server:
-            self.server('', self.serverport)
-
-        if self.has_varwindow:
-            self.var_window = VarWindow(self, self.bot)
-        self.window.show_all()
-
-        if self.go_fullscreen:
-            self.do_fullscreen(self)
-
-        if self.drawingarea.is_dynamic:
-            frame = 0
-            from time import sleep, time
-            start_time = time()
-            while self.window:
-                # increase bot frame count
-                self.bot.next_frame()
-                # redraw canvas
-                self.drawingarea.redraw()
-                #self.console_error.update()
-
-                # respect framerate
-                completion_time = time()
-                exc_time = completion_time - start_time
-                sleep_for = (1.0 / self.bot.framerate) - exc_time
-                if sleep_for > 0:
-                    sleep(sleep_for)
-                start_time = completion_time + sleep_for
-                
-                while gtk.events_pending():
-                    gtk.main_iteration()
+    # Draw in response to an expose-event
+    __gsignals__ = { "expose-event": "override" }
+    def __init__(self):
+        gtk.DrawingArea.__init__(self)
+        CairoSink.__init__(self)
+        
+        if os.path.isfile(SHOEBOT_LOGO):
+            self.backing_store = cairo.ImageSurface.create_from_png(SHOEBOT_LOGO)
         else:
-            # gtk.main()
-            while gtk.events_pending():
-                gtk.main_iteration()
+            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
+        self.size = None
 
+    def as_window(self, title = None):
+        '''
+        Create a Gtk Window and add this Widget to it, returns the widget
+        '''
+        window = gtk.Window()
+        if title:
+            window.set_title(title)
+        window.connect("delete-event", gtk.main_quit)
 
-    def do_fullscreen(self, widget):
-        self.window.fullscreen()
-        # next lines seem to be needed for window switching really to
-        # fullscreen mode before reading it's size values
+        self.show()
+        window.add(self)
+        window.present()
+
         while gtk.events_pending():
-            gtk.main_iteration(block=False)
-        # we pass informations on full-screen size to bot
-        #self.bot.screen_width = self.window.get_allocation().width
-        #self.bot.screen_height = self.window.get_allocation().height
-        self.bot.screen_width = gtk.gdk.screen_width()
-        self.bot.screen_height = gtk.gdk.screen_height()
-        self.bot.screen_ratio = self.bot.screen_width / self.bot.screen_height
+            gtk.main_iteration()
 
-    def do_unfullscreen(self, widget):
-        self.window.unfullscreen()
-        self.bot.screen_ratio = None
+        return self
 
-    def do_window_close(self, widget):
-        if self.has_server:
-            self.sock.close()
-        if self.has_varwindow:
-            self.var_window.window.destroy()
-            del self.var_window
-        self.bot.drawing_closed()
-        self.window.destroy()
-        self.window = None
-        # if not self.drawingarea.is_dynamic:
-        #     gtk.main_quit()
-        del self
-        ## FIXME: This doesn't kill the instance :/
+    def do_expose_event(self, event):
+        '''
+        Draw just the exposed part of the backing store
+        '''
+        # Create the cairo context
+        cr = self.window.cairo_create()
 
+        cr.set_source_surface(self.backing_store)
+        # Restrict Cairo to the exposed area; avoid extra work
+        cr.rectangle(event.area.x, event.area.y,
+                event.area.width, event.area.height)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.fill()
+
+    def ctx_create(self, size, frame):
+        '''
+        Creates a meta surface for the bot to draw on
+
+        As we don't have meta surfaces yet, use a PDFSurface
+        with the buffer set to None
+        '''
+        if self.window and not self.size:
+            self.set_size_request(*size)
+            self.size = size
+        meta_surface = RecordingSurface(*size)
+        return cairo.Context(meta_surface)
+
+    def ctx_ready(self, size, frame, ctx):
+        '''
+        Update the backing store from a cairo context and
+        schedule a redraw (expose event)
+        '''
+        if (self.backing_store.get_width(), self.backing_store.get_height()) == size:
+            backing_store = self.backing_store
+        else:
+            backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
+        
+        cr = cairo.Context(backing_store)
+        cr.set_source_surface(ctx.get_target())
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        
+        self.backing_store = backing_store
+        self.queue_draw()
+        
+        while gtk.events_pending():
+            gtk.main_iteration()

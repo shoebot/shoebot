@@ -23,10 +23,10 @@ BOTTOM_LEFT = 2
 CORNER = 'corner'
 
 class DrawBot(Bot):
-    
-    def __init__(self, inputscript=None, targetfilename=None, canvas=None, gtkmode=False, ns = None):
-        Bot.__init__(self, inputscript, targetfilename, canvas, gtkmode, ns)
 
+    def __init__(self, context, canvas, namespace):
+        ### TODO - Need to do whole drawbot class
+        Bot.__init__(self, context, canvas, namespace)
         self._transformmode = CORNER
         self.canvas.origin = BOTTOM_LEFT
 
