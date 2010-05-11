@@ -31,7 +31,7 @@ class NodeBot(Bot):
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
         '''Draws a image form path, in x,y and resize it to width, height dimensions.
         '''
-        return = self.Image(path, x, y, width, height, alpha, data, **kwargs)
+        return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
         img = Image.open(path)
@@ -397,7 +397,7 @@ class NodeBot(Bot):
             x = 1
         if y == 0:
             y = 1
-        self._canvas.scale(x,y)
+        self._canvas.scale(x, y)
 
     def skew(self, x=1, y=0):
         self._transform.skew(x,y)
@@ -442,7 +442,7 @@ class NodeBot(Bot):
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
         self._canvas.fill = self.color(*args)
-        return self._fill
+        return self._canvas.fill
 
     def nofill(self):
         ''' Stop applying fills to new paths.'''

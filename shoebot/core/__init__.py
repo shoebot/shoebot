@@ -42,4 +42,10 @@ from drawbot import DrawBot
 from canvas import Canvas
 from cairo_canvas import CairoCanvas
 
+from drawqueue import DrawQueue
+from cairo_drawqueue import CairoDrawQueue
+from cairo_sink import CairoImageSink, CairoSink
+from cairo_util import RecordingSurface
+
+from context import Context
 

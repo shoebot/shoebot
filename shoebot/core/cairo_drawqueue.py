@@ -1,3 +1,8 @@
+import cairo
+
+from drawqueue import DrawQueue
+from shoebot.util import RecordingSurface
+
 class CairoDrawQueue(DrawQueue):
     '''
     Runs functions on a meta surface as the bot is running, instead of running

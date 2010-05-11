@@ -1,3 +1,6 @@
+import os
+import cairo
+
 class CairoSink:
     '''
     Cairo canvases need a CairoSink to create and recieve

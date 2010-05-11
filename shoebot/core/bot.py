@@ -66,13 +66,16 @@ class Bot:
 
     FRAME = 0
 
+    _DEFAULT_SIZE = 400, 400
+
     def __init__(self, context, canvas, namespace):
         self._context = context
         self._canvas = canvas
         self._namespace = namespace
         self._autoclosepath = True
+        self._set_defaults()
         
-    def set_defaults(self):
+    def _set_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
@@ -85,13 +88,12 @@ class Bot:
 
         self.framerate = 30
 
-        self.WIDTH = Bot.DEFAULT_WIDTH
-        self.HEIGHT = Bot.DEFAULT_HEIGHT
+        self.WIDTH, self.HEIGHT = Bot._DEFAULT_SIZE
 
         self._transformmode = Bot.CENTER
 
-        self.color_range = 1.
-        self.color_mode = Bot.RGB
+        self._color_range = 1.
+        self._color_mode = Bot.RGB
         self._fillcolor = self.color(.2)
         self._strokecolor = None
         self._strokewidth = 1.0

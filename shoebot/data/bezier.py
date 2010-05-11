@@ -1,7 +1,10 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 from shoebot.data import Grob, ColorMixin, TransformMixin
+from shoebot.util import RecordingSurface
 from math import pi as _pi
+
+import cairo
 
 CENTER = 'center'
 
@@ -209,13 +212,13 @@ class BezierPath(Grob):
         self._traverse(ctx)
         
         if self._fill:
-            ctx.set_source_rgb(*self._fill)
+            ctx.set_source_rgba(*self._fill)
             if self._stroke:
                 ctx.fill_preserve()
             else:
                 ctx.fill()
         if self._stroke:
-            ctx.set_source_rgb(*self._stroke)
+            ctx.set_source_rgba(*self._stroke)
             ctx.stroke()
 
     def draw(self):

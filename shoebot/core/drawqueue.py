@@ -1,9 +1,11 @@
+from collections import deque
+
 class DrawQueue:
     '''
     A list of draw commands, stored as callables that
     take a drawing context
     '''
-
+    ### TODO, use kwargs in this generic queue
     def __init__(self, render_funcs = None):
         self.render_funcs = render_funcs or deque()
 

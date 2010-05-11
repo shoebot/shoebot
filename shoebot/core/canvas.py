@@ -2,6 +2,8 @@ import sys
 import shoebot
 import locale, gettext
 import math as _math
+import cairo
+
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -9,6 +11,8 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+CENTER = 'center'
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2

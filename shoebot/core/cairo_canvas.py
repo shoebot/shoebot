@@ -1,22 +1,9 @@
-_svg_surface = None
-def RecordingSurface(*size):
-    '''
-    We don't have RecordingSurfaces until cairo 1.10, so this kludge is used
+from collections import deque
+import cairo
 
-    SVGSurfaces are created, but to stop them ever attempting to output, they
-    are kept in a dict.
-
-    When a surface is needed, create_similar is called to get a Surface from
-    the SVGSurface of the same size
-    '''
-    if os.name == 'nt':
-        fobj = 'nul'
-    else:
-        fobj = None
-    if _svg_surface is None:
-        _svg_surface = cairo.SVGSurface(fobj, 0, 0)
-    return _svg_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, *size)
-
+from canvas import Canvas
+from drawqueue import DrawQueue
+from cairo_drawqueue import CairoDrawQueue
 
 class CairoCanvas(Canvas):
     ''' Cairo implementation of Canvas '''
@@ -65,17 +52,17 @@ class CairoCanvas(Canvas):
     def translate(self, xt, yt):
         self.transform.translate(xt, yt)
 
-    def rotate(self, degrees):
-        self.transform.rotate(_math.radians(degrees))
+    def rotate(self, radians):
+        self.transform.rotate(radians)
 
-    def scale(self, size):
-        self.transform.scale(size, size)
+    def scale(self, w, h):
+        self.transform.scale(w, h)
     
     def ctx_render_background(self, ctx):
         '''
         Draws the background colour of the bot
         '''
-        ctx.set_source_rgb(*self.background)
+        ctx.set_source_rgba(*self.background)
         ctx.paint()
 
     def render(self, frame):

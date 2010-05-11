@@ -32,6 +32,7 @@
 import sys, os
 import locale, gettext
 from optparse import OptionParser
+from shoebot import run
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
 DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
@@ -127,8 +128,8 @@ if __name__ == '__main__':
         error(_("Too many arguments!"))
 
     
-    run_bot(src = args[0],
-            grammar = options.bot,
-            outputfile = options.outputfile or 'output.svg',
-            iterations = options.repeat or None,
-            window = options.window)
+    run(src = args[0],
+        grammar = options.bot,
+        outputfile = options.outputfile or 'output.svg',
+        iterations = options.repeat or None,
+        window = options.window)

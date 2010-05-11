@@ -4,26 +4,30 @@ import gtk
 import gobject
 import cairo
 import shoebot
-from shoebot.gui import SocketServerMixin, VarWindow
+from socket_server import SocketServerMixin
+from var_window import VarWindow
+
 from shoebot.core import NodeBot, DrawBot
+from shoebot.core import CairoSink
+from shoebot.util import RecordingSurface
 
 import locale
 import gettext
 
-APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
-locale.setlocale(locale.LC_ALL, '')
-gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
-gettext.textdomain(APP)
-_ = gettext.gettext
+###APP = 'shoebot'
+###DIR = sys.prefix + '/share/shoebot/locale'
+###locale.setlocale(locale.LC_ALL, '')
+###gettext.bindtextdomain(APP, DIR)
+####gettext.bindtextdomain(APP)
+###gettext.textdomain(APP)
+###_ = gettext.gettext
 
-NODEBOX = 'nodebox'
-DRAWBOT = 'drawbot'
+###NODEBOX = 'nodebox'
+###DRAWBOT = 'drawbot'
 
 ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
-class GtkWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
+class ShoebotWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
     '''Create a GTK+ widget on which we will draw using Cairo'''
 
     # Draw in response to an expose-event
@@ -32,8 +36,8 @@ class GtkWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
         gtk.DrawingArea.__init__(self)
         CairoSink.__init__(self)
         
-        if os.path.isfile(SHOEBOT_LOGO):
-            self.backing_store = cairo.ImageSurface.create_from_png(SHOEBOT_LOGO)
+        if os.path.isfile(ICON_FILE):
+            self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
         else:
             self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
         self.size = None
