@@ -98,7 +98,7 @@ class BezierPath(Grob):
 
 
     def rellineto(self, x, y):
-        self._append_element(self._canvas.rellineto_closure, (RLINETO, x, y))
+        self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
     def rect(self, x, y, w, h, roundness=0.0, rectmode='corner'):
         if not roundness:

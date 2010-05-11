@@ -91,10 +91,10 @@ class CairoCanvas(Canvas):
             ctx.rel_line_to(x, y)
         return rellineto
     
-    def ctx_render_background(self, ctx):
+    def ctx_render_background(self, cairo_ctx):
         '''
         Draws the background colour of the bot
         '''
-        ctx.set_source_rgba(*self.background)
-        ctx.paint()
+        cairo_ctx.set_source_rgba(*self.background)
+        cairo_ctx.paint()
 
