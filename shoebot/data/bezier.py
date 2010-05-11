@@ -39,7 +39,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, canvas, fill=None, stroke=None):
+    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None):
         # Internally stores two lists
         #
         # _render_funcs  References to functions to render each PathElement
@@ -51,8 +51,9 @@ class BezierPath(Grob):
 
         self._render_funcs = []
         self._elements = []
-        self._fill = fill
-        self._stroke = stroke
+        self._fillcolor = fillcolor
+        self._strokecolor = strokecolor
+        self._strokewidth = strokewidth
         self.closed = False
 
         self._set_mode(canvas.mode)
@@ -157,7 +158,7 @@ class BezierPath(Grob):
 
         center = self._center = x, y
         ### TODO Cache function that draws using the RecordingSurface
-        ### Save the context or surface (without the bounding box stroke)
+        ### Save the context or surface (without the bounding box strokecolor)
         ### to optimise drawing
         return center
 
@@ -190,31 +191,31 @@ class BezierPath(Grob):
         cairo_ctx.set_matrix(transform)
         self._traverse(cairo_ctx)
         
-        if self._fill:
-            if self._fill[3] == 1:
-                cairo_ctx.set_source_rgb(*self._fill[0:3])
+        if self._fillcolor:
+            if self._fillcolor[3] == 1:
+                cairo_ctx.set_source_rgb(*self._fillcolor[0:3])
             else:
-                cairo_ctx.set_source_rgba(*self._fill)
-            if self._stroke:
+                cairo_ctx.set_source_rgba(*self._fillcolor)
+            if self._strokecolor:
                 cairo_ctx.fill_preserve()
             else:
                 cairo_ctx.fill()
-        if self._stroke:
-            if self._stroke[3] == 1:
-                cairo_ctx.set_source_rgb(*self._stroke[0:3])
+        if self._strokecolor:
+            if self._strokecolor[3] == 1:
+                cairo_ctx.set_source_rgb(*self._strokecolor[0:3])
             else:
-                cairo_ctx.set_source_rgba(*self._stroke)
+                cairo_ctx.set_source_rgba(*self._strokecolor)
             cairo_ctx.set_line_width(self._strokewidth)
             cairo_ctx.stroke()
 
     def draw(self):
         '''
-        Save the current fill, stroke and transform
+        Save the current fillcolor, strokecolor and transform
         then add the render function to the draw queue
         '''
-        self._fill = self._fill or self._canvas.fill
-        self._stroke = self._stroke or self._canvas.stroke
-        self._strokewidth = self._canvas.strokewidth
+        self._fillcolor = self._fillcolor or self._canvas.fillcolor
+        self._strokecolor = self._strokecolor or self._canvas.strokecolor
+        self._strokewidth = self._canvas.strokewidth / 32.0  ### TODO < cludge 
         self._transform = cairo.Matrix(*self._canvas.transform)
         self._drawqueue.append(self._render)
 
@@ -244,8 +245,8 @@ class BezierPath(Grob):
 
 class ClippingPath(BezierPath):
     
-    # stateAttributes = ('_fillcolor', '_strokecolor', '_strokewidth')
-    # kwargs = ('fill', 'stroke', 'strokewidth')    
+    # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
+    # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')    
     
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, path, **kwargs)

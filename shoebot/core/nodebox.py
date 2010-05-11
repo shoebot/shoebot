@@ -441,21 +441,21 @@ class NodeBot(Bot):
 
     def fill(self,*args):
         '''Sets a fill color, applying it to new paths.'''
-        self._canvas.fill = self.color(*args)
-        return self._canvas.fill
+        self._canvas.fillcolor = self.color(*args)
+        return self._canvas.fillcolor
 
     def nofill(self):
         ''' Stop applying fills to new paths.'''
-        self._canvas.fill = None
+        self._canvas.fillcolor = None
 
     def stroke(self,*args):
         '''Set a stroke color, applying it to new paths.'''
-        self._canvas.stroke = self.color(*args)
-        return self._canvas.stroke
+        self._canvas.strokecolor = self.color(*args)
+        return self._canvas.strokecolor
 
     def nostroke(self):
         ''' Stop applying strokes to new paths.'''
-        self._canvas.stroke = None
+        self._canvas.strokecolor = None
 
     def strokewidth(self, w=None):
         '''Set the stroke width.'''
@@ -492,14 +492,16 @@ class NodeBot(Bot):
         '''
         Draws a string of text according to current font settings.
         '''
-        txt = self.Text(txt, x, y, width, height, ctx=self.canvas.context, **kwargs)
+        #txt = self.Text(txt, x, y, width, height, ctx=self._canvas.context, **kwargs)
+        txt = self.Text(txt, x, y, width, height, ctx=None, **kwargs)
         if outline:
           path = txt.path
           if draw:
-              self.canvas.add(path)
+              path.draw()
           return path
         else:
           if draw:
+            ### TODO
             self.canvas.add(txt)
           return txt
 

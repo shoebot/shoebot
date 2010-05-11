@@ -38,7 +38,7 @@ class Canvas:
         pass
 
     def reset_canvas(self):
-        self.fill = (0.5, 0.5, 0.5)
+        self.fillcolor = (0.5, 0.5, 0.5, 1.0)
         self.stroke = None
         self.strokewidth = 1
         self.background = (1, 1, 1)

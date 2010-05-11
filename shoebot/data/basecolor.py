@@ -228,7 +228,7 @@ class ColorMixin(object):
         try:
             self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
         except KeyError:
-            if self._bot._fillcolor:
+            if self._canvas._fillcolor:
                 self._fillcolor = self._bot._fillcolor.copy()
             else:
                 self._fillcolor = None

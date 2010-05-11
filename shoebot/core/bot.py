@@ -92,9 +92,9 @@ class Bot:
 
         self._color_range = 1.
         self._color_mode = Bot.RGB
-        self._fillcolor = self.color(.2)
-        self._strokecolor = None
-        self._strokewidth = 1.0
+        self._canvas.fillcolor = self.color(.2)
+        self._canvas.strokecolor = None
+        self._canvas.strokewidth = 1.0
 
     def _makeInstance(self, clazz, args, kwargs):
         '''Creates an instance of a class defined in this document.

@@ -2,20 +2,22 @@ import cairo
 import pango
 import pangocairo
 from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
+from shoebot.util import RecordingSurface
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
     #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
-    def __init__(self, bot, text, x=0, y=0, width=None, height=None, ctx=None, **kwargs):
+    def __init__(self, bot, text, x=0, y=0, width=None, height=None, ctx=None, canvas=None,**kwargs):
         self._bot = bot
-        super(Text, self).__init__(self._bot)
+        self._canvas = canvas
+        super(Text, self).__init__()
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, **kwargs)
 
         # in case of textpath it creates a temp cairo context for path extraction
         if ctx is None:
-            surface = cairo.ImageSurface(cairo.FORMAT_A8, 0, 0)
+            surface = RecordingSurfaceA8(0, 0)
             ctx = cairo.Context(surface)
         self.ctx = ctx              
 
