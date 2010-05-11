@@ -179,21 +179,33 @@ class BezierPath(Grob):
         '''
         return transform
 
-    def _render(self, ctx):
+    def _render(self, cairo_ctx):
+        '''
+        At the moment this is based on cairo.
+
+        TODO: Need to work out how to move the cairo specific
+              bits somewhere else.
+        '''
         transform = self._call_transform_mode(self._transform)
-        ctx.set_matrix(transform)
-        self._traverse(ctx)
+        cairo_ctx.set_matrix(transform)
+        self._traverse(cairo_ctx)
         
         if self._fill:
-            ctx.set_source_rgba(*self._fill)
-            if self._stroke:
-                ctx.fill_preserve()
+            if self._fill[3] == 1:
+                cairo_ctx.set_source_rgb(*self._fill[0:3])
             else:
-                ctx.fill()
+                cairo_ctx.set_source_rgba(*self._fill)
+            if self._stroke:
+                cairo_ctx.fill_preserve()
+            else:
+                cairo_ctx.fill()
         if self._stroke:
-            ctx.set_source_rgba(*self._stroke)
-            ctx.set_line_width(self._strokewidth)
-            ctx.stroke()
+            if self._stroke[3] == 1:
+                cairo_ctx.set_source_rgb(*self._fill[0:3])
+            else:
+                cairo_ctx.set_source_rgba(*self._fill)
+            cairo_ctx.set_line_width(self._strokewidth)
+            cairo_ctx.stroke()
 
     def draw(self):
         '''
