@@ -18,6 +18,9 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 class Canvas:
+    DEFAULT_SIZE = 400, 400
+    DEFAULT_MODE = CENTER
+
     ''' Abstract canvas class '''
     def __init__(self):
         self.fill = (0.5, 0.5, 0.5)
@@ -25,7 +28,6 @@ class Canvas:
         self.strokewidth = 1
         self.background = (1, 1, 1)
         self.transform = cairo.Matrix()
-        self.DEFAULT_MODE = CENTER
 
     def initial_drawqueue(self):
         '''
@@ -51,7 +53,7 @@ class Canvas:
         This means, only the first call to size() is valid.
         '''
         if not self.size:
-            self.size = DEFAULT_SIZE
+            self.size = self.DEFAULT_SIZE
         return self.size
 
     def set_size(self, size):

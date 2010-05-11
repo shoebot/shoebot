@@ -72,7 +72,7 @@ class CairoCanvas(Canvas):
         '''
         ### TODO - Threading this could be a place to spawn
         ### a thread
-        ctx = self.ctx_sink.ctx_create(self.size, frame)
+        ctx = self.ctx_sink.ctx_create(self.size_or_default(), frame)
         self.drawqueue.render(ctx)
         self.ctx_sink.ctx_ready(self.size, frame, ctx)
 

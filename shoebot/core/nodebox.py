@@ -387,7 +387,7 @@ class NodeBot(Bot):
             angle = radians
         else:
             angle = deg2rad(degrees)
-        self._canvas.rotate(-degrees)
+        self._canvas.rotate(-angle)
 
     def scale(self, x=1, y=None):
         if not y:

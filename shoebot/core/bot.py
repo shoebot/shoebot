@@ -66,8 +66,6 @@ class Bot:
 
     FRAME = 0
 
-    _DEFAULT_SIZE = 400, 400
-
     def __init__(self, context, canvas, namespace):
         self._context = context
         self._canvas = canvas
@@ -88,7 +86,7 @@ class Bot:
 
         self.framerate = 30
 
-        self.WIDTH, self.HEIGHT = Bot._DEFAULT_SIZE
+        self.WIDTH, self.HEIGHT = self._canvas.DEFAULT_SIZE
 
         self._transformmode = Bot.CENTER
 
