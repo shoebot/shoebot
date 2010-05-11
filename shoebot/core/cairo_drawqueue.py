@@ -33,7 +33,7 @@ class CairoDrawQueue(DrawQueue):
             self.initial_func = render_func
         self.count += 1
 
-    def render(self, ctx):
-        self.initial_func(ctx)
-        ctx.set_source_surface(self.meta_surface)
-        ctx.paint()
+    def render(self, cairo_ctx):
+        self.initial_func(cairo_ctx)
+        cairo_ctx.set_source_surface(self.meta_surface)
+        cairo_ctx.paint()

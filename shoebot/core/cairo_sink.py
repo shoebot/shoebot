@@ -1,34 +1,14 @@
 import os
 import cairo
 
-class CairoSink:
-    '''
-    Cairo canvases need a CairoSink to create and recieve
-    cairo contexts for it.
-    '''
-    def __init__(self):
-        pass
+from drawqueue import DrawQueueSink
 
-    def ctx_create(self, context, frame):
-        '''
-        Returns a cairo context for drawing this
-        frame of the bot
-        '''
-        raise NotImplementedExceptio()
-    
-    def ctx_ready(self, ctx):
-        '''
-        Called when the bot has been rendered
-        '''
-        raise NotImplementedExceptio()
-
-
-class CairoImageSink(CairoSink):
+class CairoImageSink(DrawQueueSink):
     '''
-    Generates cairo contexts that output to supported formats
+    DrawQueueSink that uses cairo contexts as the render context.
     '''
     def __init__(self, filename, format = None, multifile = False):
-        CairoSink.__init__(self)
+        DrawQueueSink.__init__(self)
         if format is None:
             format = os.path.splitext(filename)[1][1:].lower()
         self.format = format
@@ -42,7 +22,7 @@ class CairoImageSink(CairoSink):
         else:
             return self.filename
 
-    def ctx_create(self, size, frame):
+    def create_rcontext(self, size, frame):
         '''
         Called when CairoCanvas needs a cairo context to draw on
         '''
@@ -56,7 +36,7 @@ class CairoImageSink(CairoSink):
             surface = cairo.SVGSurface(self._filename(frame), *size)
         return cairo.Context(surface)
 
-    def ctx_ready(self, size, frame, ctx):
+    def rcontext_ready(self, size, frame, cairo_ctx):
         '''
         Called when CairoCanvas has rendered a bot
         '''

@@ -451,7 +451,7 @@ class NodeBot(Bot):
     def stroke(self,*args):
         '''Set a stroke color, applying it to new paths.'''
         self._canvas.stroke = self.color(*args)
-        return self._stroke
+        return self._canvas.stroke
 
     def nostroke(self):
         ''' Stop applying strokes to new paths.'''

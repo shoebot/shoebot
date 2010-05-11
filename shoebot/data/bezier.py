@@ -219,6 +219,7 @@ class BezierPath(Grob):
                 ctx.fill()
         if self._stroke:
             ctx.set_source_rgba(*self._stroke)
+            ctx.set_line_width(self._strokewidth)
             ctx.stroke()
 
     def draw(self):

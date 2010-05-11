@@ -8,7 +8,7 @@ from socket_server import SocketServerMixin
 from var_window import VarWindow
 
 from shoebot.core import NodeBot, DrawBot
-from shoebot.core import CairoSink
+from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
 import locale
@@ -27,14 +27,14 @@ import gettext
 
 ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
-class ShoebotWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
+class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     '''Create a GTK+ widget on which we will draw using Cairo'''
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
     def __init__(self):
         gtk.DrawingArea.__init__(self)
-        CairoSink.__init__(self)
+        DrawQueueSink.__init__(self)
         
         if os.path.isfile(ICON_FILE):
             self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
@@ -74,7 +74,7 @@ class ShoebotWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.fill()
 
-    def ctx_create(self, size, frame):
+    def create_rcontext(self, size, frame):
         '''
         Creates a meta surface for the bot to draw on
 
@@ -87,7 +87,7 @@ class ShoebotWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
         meta_surface = RecordingSurface(*size)
         return cairo.Context(meta_surface)
 
-    def ctx_ready(self, size, frame, ctx):
+    def rcontext_ready(self, size, frame, cairo_ctx):
         '''
         Update the backing store from a cairo context and
         schedule a redraw (expose event)
@@ -98,7 +98,7 @@ class ShoebotWidget(gtk.DrawingArea, CairoSink, SocketServerMixin):
             backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         
         cr = cairo.Context(backing_store)
-        cr.set_source_surface(ctx.get_target())
+        cr.set_source_surface(cairo_ctx.get_target())
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         

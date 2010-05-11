@@ -7,10 +7,9 @@ from cairo_drawqueue import CairoDrawQueue
 
 class CairoCanvas(Canvas):
     ''' Cairo implementation of Canvas '''
-    def __init__(self, ctx_sink, enable_cairo_queue = False):
-        Canvas.__init__(self)
+    def __init__(self, sink, enable_cairo_queue = False):
+        Canvas.__init__(self, sink)
         self.size = None
-        self.ctx_sink = ctx_sink
         self.enable_cairo_queue = enable_cairo_queue
         self.reset_canvas()
 
@@ -64,15 +63,4 @@ class CairoCanvas(Canvas):
         '''
         ctx.set_source_rgba(*self.background)
         ctx.paint()
-
-    def render(self, frame):
-        '''
-        Get a context from the CairoSink and render to it
-        Once rendering is complete call ctx_ready
-        '''
-        ### TODO - Threading this could be a place to spawn
-        ### a thread
-        ctx = self.ctx_sink.ctx_create(self.size_or_default(), frame)
-        self.drawqueue.render(ctx)
-        self.ctx_sink.ctx_ready(self.size, frame, ctx)
 

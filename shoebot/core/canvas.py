@@ -22,12 +22,8 @@ class Canvas:
     DEFAULT_MODE = CENTER
 
     ''' Abstract canvas class '''
-    def __init__(self):
-        self.fill = (0.5, 0.5, 0.5)
-        self.stroke = None
-        self.strokewidth = 1
-        self.background = (1, 1, 1)
-        self.transform = cairo.Matrix()
+    def __init__(self, sink):
+        self.sink = sink
 
     def initial_drawqueue(self):
         '''
@@ -42,6 +38,11 @@ class Canvas:
         pass
 
     def reset_canvas(self):
+        self.fill = (0.5, 0.5, 0.5)
+        self.stroke = None
+        self.strokewidth = 1
+        self.background = (1, 1, 1)
+
         self.reset_transform()
         self.reset_drawqueue()
 
@@ -79,6 +80,15 @@ class Canvas:
             return self.size[1]
         else:
             return self.DEFAULT_SIZE[1]
+
+    def render(self, frame):
+        '''
+        Passes the drawqueue to the sink for rendering
+        '''
+        ### TODO - Threading this could be a place to spawn
+        ### a thread
+        self.sink.render(self.size_or_default(), frame, self.drawqueue)
+
 
     width = property(get_width)
     height = property(get_height)
