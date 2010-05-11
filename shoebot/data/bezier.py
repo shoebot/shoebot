@@ -61,10 +61,8 @@ class BezierPath(Grob):
 
     def _append_element(self, render_func, element):
         '''
-        Append an element to the list
-
-        element is either a tuple containing arguments
-        to pass to a PathElement or an actual PathElement
+        Append a render function and the parameters to pass
+        an equivilent PathElement, or the PathElement itself.
         '''
         self._render_funcs.append(render_func)
         self._elements.append(element)
@@ -82,41 +80,25 @@ class BezierPath(Grob):
             raise ValueError('mode must be CENTER or CORNER')
 
     def moveto(self, x, y):
-        def render_moveto(ctx):
-            ctx.move_to(x, y)
-        self._append_element(render_moveto, (MOVETO, x, y))
+        self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
 
     def lineto(self, x, y):
-        def render(ctx):
-            ctx.line_to(x, y)
-        self._append_element(render, (LINETO, x, y))
+        self._append_element(self._canvas.lineto_closure(x, y), (LINETO, x, y))
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
-        def render(ctx):
-            ctx.curve_to(x1, y1, x2, y2, x3, y3)
-        self._append_element(render, (CURVETO, x1, y1, x2, y2, x3, y3))
+        self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
     def closepath(self):
-        def render_closepath(ctx):
-            ctx.close_path()
-        self._append_element(render_closepath, (CLOSE))
+        self._append_element(self._canvas.closepath_closure(), (CLOSE))
         self.closed = True
 
     def ellipse(self, x, y, w, h):
-        def render_ellipse(ctx):
-            ctx.translate(x + w / 2., y + h / 2.)
-            ctx.scale(w / 2., h / 2.)
-            ctx.arc(0., 0., 1., 0., 2 * _pi)
-            ctx.close_path()
-            
-        self._append_element(render_ellipse, (ELLIPSE, x, y, w, h)) 
-
+        self._append_element(self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h)) 
         self.closed = True
 
+
     def rellineto(self, x, y):
-        def render_rellineto(ctx):
-            ctx.rel_line_to(x, y)
-        self._append_element(render_rellineto, (RLINETO, x, y))
+        self._append_element(self._canvas.rellineto_closure, (RLINETO, x, y))
 
     def rect(self, x, y, w, h, roundness=0.0, rectmode='corner'):
         if not roundness:
@@ -137,17 +119,12 @@ class BezierPath(Grob):
             self.curveto(x, y+h, x, y+h, x, y+h-curve)
             self.closepath()
     
-    def _traverse(self, ctx):
+    def _traverse(self, cairo_ctx):
         '''
         Traverse this path
-        
-        ### TODO - Investigate if Path should be a DrawQueue once
-        it's more fully formed
         '''
-        ##(render_func() for render_func in self._render_funcs)
-
         for render_func in self._render_funcs:
-            render_func(ctx)
+            render_func(cairo_ctx)
 
     def _call_transform_mode(self):
         '''
@@ -167,14 +144,10 @@ class BezierPath(Grob):
         if self._center:
             return self._center
 
-        # Cairo 1.10 Will have RecordingSurfaces, in the meantime we
-        # can make use of a PDFSurface
-        #
-        meta_surface = RecordingSurface(*self._canvas.size)
-        dummy_ctx = cairo.Context(meta_surface)
+        record_surface = RecordingSurface(*self._canvas.size)
+        dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
         
-        #bounds = dummy_ctx.stroke_extents()
         bounds = dummy_ctx.path_extents()
         
         # get the center point

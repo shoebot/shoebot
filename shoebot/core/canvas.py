@@ -89,7 +89,6 @@ class Canvas:
         ### a thread
         self.sink.render(self.size_or_default(), frame, self.drawqueue)
 
-
     width = property(get_width)
     height = property(get_height)
 

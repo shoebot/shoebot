@@ -1,4 +1,5 @@
 from collections import deque
+from math import pi as _pi
 import cairo
 
 from canvas import Canvas
@@ -56,6 +57,39 @@ class CairoCanvas(Canvas):
 
     def scale(self, w, h):
         self.transform.scale(w, h)
+
+    def moveto_closure(self, x, y):
+        def moveto(ctx):
+            ctx.move_to(x, y)
+        return moveto
+
+    def lineto_closure(self, x, y):
+        def lineto(ctx):
+            ctx.line_to(x, y)
+        return lineto
+
+    def curveto_closure(self, x1, y1, x2, y2, x3, y3):
+        def curveto(ctx):
+            ctx.curve_to(x1, y1, x2, y2, x3, y3)
+        return curveto
+
+    def closepath_closure(self):
+        def closepath(ctx):
+            ctx.close_path()
+        return closepath
+
+    def ellipse_closure(self, x, y, w, h):
+        def ellipse(ctx):
+            ctx.translate(x + w / 2., y + h / 2.)
+            ctx.scale(w / 2., h / 2.)
+            ctx.arc(0., 0., 1., 0., 2 * _pi)
+            ctx.close_path()
+        return ellipse
+
+    def rellineto_closure(self, x, y):
+        def rellineto(ctx):
+            ctx.rel_line_to(x, y)
+        return rellineto
     
     def ctx_render_background(self, ctx):
         '''
