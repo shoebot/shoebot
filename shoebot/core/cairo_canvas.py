@@ -1,3 +1,34 @@
+#!/usr/bin/env python
+
+# This file is part of Shoebot.
+# Copyright (C) 2007-2009 the Shoebot authors
+# See the COPYING file for the full license text.
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+#   The name of the author may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+#
+#   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+#   EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''Cairo implementation of the canvas'''
+
 from collections import deque
 from math import pi as _pi
 import os.path
@@ -92,34 +123,45 @@ class CairoCanvas(Canvas):
             ctx.rel_line_to(x, y)
         return rellineto
 
-    def output_closure(self, target):
+    def output_closure(self, target, file_number=None):
         '''
         Function to output to a cairo surface
+
+        target is a cairo Context or filename
+        if file_number is set, then files will be numbered
+        (this is usually set to the current frame number)
         '''
-        def output(ctx):
-            if isinstance(target, cairo.Context):
-                target_ctx = target
+        def output_context(ctx):
+            target_ctx = target
+            target_ctx.set_source_surface(ctx.get_target())
+            target_ctx.paint()
+
+        def output_file(ctx):
+            root, extension = os.path.splitext(target)
+            if file_number:
+                filename = '%s_%04d%s' % (root, file_number ,extension)
+            else:
+                filename = target
+
+            if extension == '.png':
+                ctx.write_to_png(target)
+            elif extension == '.pdf':
+                target_ctx = cairo.Context(cairo.PDFSurface(filename, *self.size_or_default()))
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
-            else:
-                extension = os.path.splitext(target)[1]
-                print target
-                print extension
-                if extension == '.png':
-                    ctx.write_to_png(target)
-                elif extension == '.pdf':
-                    target_ctx = cairo.Context(cairo.PDFSurface(target, *self.size_or_default()))
-                    target_ctx.set_source_surface(ctx.get_target())
-                    target_ctx.paint()
-                elif extension == '.ps':
-                    target_ctx = cairo.Context(cairo.PSSurface(target, *self.size_or_default()))
-                    target_ctx.set_source_surface(ctx.get_target())
-                    target_ctx.paint()
-                elif extension == '.svg':
-                    target_ctx = cairo.Context(cairo.SVGSurface(target, *self.size_or_default()))
-                    target_ctx.set_source_surface(ctx.get_target())
-                    target_ctx.paint()
-        return output
+            elif extension == '.ps':
+                target_ctx = cairo.Context(cairo.PSSurface(filename, *self.size_or_default()))
+                target_ctx.set_source_surface(ctx.get_target())
+                target_ctx.paint()
+            elif extension == '.svg':
+                target_ctx = cairo.Context(cairo.SVGSurface(filename, *self.size_or_default()))
+                target_ctx.set_source_surface(ctx.get_target())
+                target_ctx.paint()
+
+        if isinstance(target, cairo.Context):
+            return output_context            
+        else:
+            return output_file
 
     def ctx_render_background(self, cairo_ctx):
         '''
