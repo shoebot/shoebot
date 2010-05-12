@@ -236,7 +236,6 @@ class Bot:
         return glob(path)
 
     def snapshot(self,filename=None, surface=None, immediate=False, autonumber=False):
-        ### TODO correct comment for new drawing stuff
         '''Save the contents of current surface into a file.
 
         There's two uses for this method:
@@ -244,22 +243,12 @@ class Bot:
         - called from the Shoebot window menu, which requires the source surface
         to be specified in the arguments.
 
-        - if output is bitmap (PNG, GTK), then it clones current surface via
-          Cairo
-        - if output is vector, doing the source paint in Cairo ends up in a
-          vector file with an embedded bitmap - not good. So we just create
-          another Bot instance with the currently loaded script, copy the
-          current namespace and save its output in a file.
-        '''
+        Setting immediate to True:
+        Ensures that a file is written before returning, but can hamper performance.
+        Usually you won't want to do this.
 
-        '''
-        If immediate is set to True, the bot will wait for the drawqueue
-        to catch up, the output will happen.
-
-        In general, this is bad for performance, so it's best to leave
-        this set to False.  In the case of output to a surface, this
-        always happens with immediate set to True otherwise the surface
-        would not be ready on return.
+        The drawqueue will have to stop and render everything up until this
+        point.
         '''
         if autonumber:
             file_number=self._context.frame
