@@ -1,18 +1,12 @@
-from __future__ import division
+#from __future__ import division
 import sys, os
 import gtk
-import gobject
 import cairo
-import shoebot
 from socket_server import SocketServerMixin
-from var_window import VarWindow
 
-from shoebot.core import NodeBot, DrawBot
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
-import locale
-import gettext
 
 ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
