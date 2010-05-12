@@ -143,6 +143,7 @@ class CairoCanvas(Canvas):
             else:
                 filename = target
 
+            extension = extension.lower()
             if extension == '.png':
                 ctx.write_to_png(target)
             elif extension == '.pdf':
