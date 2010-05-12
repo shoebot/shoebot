@@ -92,9 +92,9 @@ class Canvas:
         '''
         output_func = self.output_closure(target)
         if immediate:
-            self._drawqueue.append_immediate(output_func)
+            self.drawqueue.append_immediate(output_func)
         else:
-            self._drawqueue.append(output_func)
+            self.drawqueue.append(output_func)
 
     def render(self, frame):
         '''

@@ -1,5 +1,6 @@
 from collections import deque
 from math import pi as _pi
+import os.path
 import cairo
 
 from canvas import Canvas
@@ -102,18 +103,20 @@ class CairoCanvas(Canvas):
                 target_ctx.paint()
             else:
                 extension = os.path.splitext(target)[1]
-                if extension == 'png':
+                print target
+                print extension
+                if extension == '.png':
                     ctx.write_to_png(target)
-                elif extension == 'pdf':
-                    target_ctx = cairo.Context(cairo.PDFSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                elif extension == '.pdf':
+                    target_ctx = cairo.Context(cairo.PDFSurface(target, *self.size_or_default()))
                     target_ctx.set_source_surface(ctx.get_target())
                     target_ctx.paint()
-                elif extension == 'ps':
-                    target_ctx = cairo.Context(cairo.PSSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                elif extension == '.ps':
+                    target_ctx = cairo.Context(cairo.PSSurface(target, *self.size_or_default()))
                     target_ctx.set_source_surface(ctx.get_target())
                     target_ctx.paint()
-                elif extension == 'svg':
-                    target_ctx = cairo.Context(cairo.SVGSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                elif extension == '.svg':
+                    target_ctx = cairo.Context(cairo.SVGSurface(target, *self.size_or_default()))
                     target_ctx.set_source_surface(ctx.get_target())
                     target_ctx.paint()
         return output
