@@ -201,11 +201,11 @@ class BezierPath(Grob):
             else:
                 cairo_ctx.fill()
         if self._strokecolor:
+            cairo_ctx.set_line_width(self._strokewidth / 75.0)
             if self._strokecolor[3] == 1:
                 cairo_ctx.set_source_rgb(*self._strokecolor[0:3])
             else:
                 cairo_ctx.set_source_rgba(*self._strokecolor)
-            cairo_ctx.set_line_width(self._strokewidth)
             cairo_ctx.stroke()
 
     def draw(self):
@@ -215,7 +215,7 @@ class BezierPath(Grob):
         '''
         self._fillcolor = self._fillcolor or self._canvas.fillcolor
         self._strokecolor = self._strokecolor or self._canvas.strokecolor
-        self._strokewidth = self._canvas.strokewidth * 0.75
+        self._strokewidth = self._canvas.strokewidth
         self._transform = cairo.Matrix(*self._canvas.transform)
         self._drawqueue.append(self._render)
 

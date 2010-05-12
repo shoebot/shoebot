@@ -145,7 +145,8 @@ class CairoCanvas(Canvas):
 
             extension = extension.lower()
             if extension == '.png':
-                ctx.write_to_png(target)
+                surface = ctx.get_target()
+                surface.write_to_png(target)
             elif extension == '.pdf':
                 target_ctx = cairo.Context(cairo.PDFSurface(filename, *self.size_or_default()))
                 target_ctx.set_source_surface(ctx.get_target())

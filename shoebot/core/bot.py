@@ -254,10 +254,19 @@ class Bot:
             file_number=self._context.frame
         else:
             file_number=None
+        if surface:
+            self._canvas.output(surface, immediate=True)
+        if filename is None:
+            # If nothing specied, we can see if a filename is available
+            script_file = self._namespace.get('__file__')
+            if script_file:
+                filename = os.path.splitext(script_file)[0] + '.svg'
+                file_number=True
+
         if filename:
             self._canvas.output(filename, immediate=immediate, file_number=file_number)
-        elif surface:
-            self._canvas.output(surface, immediate=True, file_number=file_number)
+            
+            
 
     # from Nodebox, a function to import Nodebox libraries
     def ximport(self, libName):
