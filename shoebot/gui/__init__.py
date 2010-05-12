@@ -30,8 +30,8 @@
 '''GTK front-end for Shoebot'''
 
 ### TODO
-from gtk_drawingarea import ShoebotDrawingArea
+from gtk_drawingarea import ShoebotWidget
 from socket_server import SocketServerMixin
 from var_window import VarWindow
-from gtk_window import ShoebotWidget
+from gtk_window import ShoebotWindow
 

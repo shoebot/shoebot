@@ -1,140 +1,83 @@
+from __future__ import division
+import sys, os
 import gtk
+import gobject
 import cairo
-from shoebot.data import Transform, GTKPointer, GTKKeyStateHandler
+import shoebot
+from socket_server import SocketServerMixin
+from var_window import VarWindow
 
-class ShoebotDrawingArea(gtk.DrawingArea):
-    def __init__(self, mainwindow, bot = None):
-        super(ShoebotDrawingArea, self).__init__()
-        self.mainwindow = mainwindow
-        # default dimensions
-        self.is_dynamic = None
-        self.connect("expose_event", self.expose)
-        # get the bot object to display
-        self.bot = bot
+from shoebot.core import NodeBot, DrawBot
+from shoebot.core import DrawQueueSink
+from shoebot.util import RecordingSurface
 
-        script = self.bot.inputscript
-        # check if the script is a file or a string
-        import os.path
-        if os.path.exists(script):
-            lines = open(script, 'r').readlines()
-        else:
-            lines = script.splitlines()
+import locale
+import gettext
 
-        # make a dummy surface and context, otherwise scripts without draw()
-        # and/or setup() will bork badly
-        #
-        # the surface will be set in expose()
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1,1)
-        self.bot.canvas.setsurface(target=surface)
+ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
-        # check inputscript for size and whether is a static script or not
-        # it is not perfect, but should do for the moment
-        for line in lines:
-            line = line.strip()
-            if "size" in line:
-                size_line = line.split(";")
-                for l in size_line:
-                    import re
-                    l = re.sub("\s", "", l)
-                    if l.startswith("size("):
-                        # get dimensions from size() line
-                        # it should be "size(x,y)", so we do some
-                        # string-fu
-                        # FIXME: using variables here borks shoebot
-                        x,y = l.strip(')').split('(')[-1].split(',')
-                        self.bot.size(x,y)
-                        # exec l in self.bot.namespace
-            elif ("def setup" in line) or ("def draw" in line):
-                self.is_dynamic = True
+class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
+    '''
+    Create a double buffered GTK+ widget on which we will draw using Cairo        
+    '''
 
-        if self.is_dynamic:
-            self.bot.run()
-            if 'setup' in self.bot.namespace:
-                self.bot.namespace['setup']()
-
-        # set the window size to the one specified in the script
-        self.set_size_request(self.bot.WIDTH, self.bot.HEIGHT)
-        # self.set_size_request(self.bot.canvas.width, self.bot.canvas.height)
+    # Draw in response to an expose-event
+    __gsignals__ = { "expose-event": "override" }
+    def __init__(self):
+        gtk.DrawingArea.__init__(self)
+        DrawQueueSink.__init__(self)
         
-        # right click handling
-        self.menu = gtk.Menu()
-        self.menu.attach(gtk.MenuItem('Hello'), 0, 1, 0, 1)
+        # Default picture is the shoebot icon
+        if os.path.isfile(ICON_FILE):
+            self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
+        else:
+            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
+        self.size = None
 
-        # necessary for catching keyboard events
-        self.set_flags(gtk.CAN_FOCUS)
+    def do_expose_event(self, event):
+        '''
+        Draw just the exposed part of the backing store
+        '''
+        # Create the cairo context
+        cr = self.window.cairo_create()
 
-        self.add_events(gtk.gdk.BUTTON_PRESS_MASK |
-            gtk.gdk.BUTTON_RELEASE_MASK |
-            gtk.gdk.POINTER_MOTION_MASK |
-            gtk.gdk.KEY_PRESS_MASK |
-            gtk.gdk.KEY_RELEASE_MASK)
+        cr.set_source_surface(self.backing_store)
+        # Restrict Cairo to the exposed area; avoid extra work
+        cr.rectangle(event.area.x, event.area.y,
+                event.area.width, event.area.height)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.fill()
 
-        self.connect('button_press_event', self.on_button_press)
+    def create_rcontext(self, size, frame):
+        '''
+        Creates a meta surface for the bot to draw on
 
-        pointing_device = GTKPointer()
-        self.connect('button_press_event', pointing_device.gtk_button_press_event)
-        self.connect('button_release_event', pointing_device.gtk_button_release_event)
-        self.connect('motion_notify_event', pointing_device.gtk_motion_event)
-        pointing_device.add_listener(bot)
+        As we don't have meta surfaces yet, use a PDFSurface
+        with the buffer set to None
+        '''
+        if self.window and not self.size:
+            self.set_size_request(*size)
+            self.size = size
+        meta_surface = RecordingSurface(*size)
+        return cairo.Context(meta_surface)
 
-        key_state_handler = GTKKeyStateHandler()
-        self.connect('key_press_event', key_state_handler.gtk_key_press_event)
-        self.connect('key_release_event', key_state_handler.gtk_key_press_event)
-        key_state_handler.add_listener(bot)
-
-
-    def on_button_press(self, widget, event):
-        # check for right mouse clicks
-        if event.button == 3:
-            menu = self.mainwindow.uimanager.get_widget('/Save as')
-            menu.popup(None, None, None, event.button, event.time)
-            return True
-        return False
-
-    def expose(self, widget, event):
-        '''Handle GTK expose events.'''
-
-        # reset context
-        self.context = widget.window.cairo_create()
-        # set a clip region for the expose event
-        self.context.rectangle(event.area.x, event.area.y,
-                            event.area.width, event.area.height)
-        self.context.clip()
-        # clear canvas contents
-        self.bot.canvas.clear()
-        # reset transforms
-        self.bot._transform = Transform()
-        # attach bot to context
-        self.bot.canvas.setsurface(target=self.context)
-        # run draw loop, if applicable
-        if 'draw' in self.bot.namespace:
-            self.draw()
-
-        # no setup() or draw() means we have to run the script on each step
-        if not 'setup' in self.bot.namespace and not 'draw' in self.bot.namespace:
-            self.bot.run()
-        # render canvas contents and show them in the drawingarea
-        self.bot.canvas.draw()
-       
-        # resize DA to fit canvas
-        # self.set_size_request(self.bot.canvas.width, self.bot.canvas.height)
-
-        return False
-
-    def redraw(self,dummy='moo'):
-        '''Handle redraws.'''
-        # dummy is in the arguments because GTK seems to require it, but works
-        # fine with any value, so we get away with this hack
+    def rcontext_ready(self, size, frame, cairo_ctx):
+        '''
+        Update the backing store from a cairo context and
+        schedule a redraw (expose event)
+        '''
+        if (self.backing_store.get_width(), self.backing_store.get_height()) == size:
+            backing_store = self.backing_store
+        else:
+            backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
+        
+        cr = cairo.Context(backing_store)
+        cr.set_source_surface(cairo_ctx.get_target())
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+        
+        self.backing_store = backing_store
         self.queue_draw()
-
-    def draw(self):
-        if 'draw' in self.bot.namespace:
-            self.bot.namespace['draw']()
-
-    def save_output(self, action):
-        '''Save the current image to a file.'''
-        # action is the menu action pointing the extension to use
-        extension = action.get_name()
-        filename = 'output.' + extension
-        self.bot.snapshot(filename)
-
+        
+        while gtk.events_pending():
+            gtk.main_iteration()

@@ -7,6 +7,7 @@ import shoebot
 from socket_server import SocketServerMixin
 from var_window import VarWindow
 
+from gtk_drawingarea import ShoebotWidget
 from shoebot.core import NodeBot, DrawBot
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
@@ -14,96 +15,38 @@ from shoebot.util import RecordingSurface
 import locale
 import gettext
 
-###APP = 'shoebot'
-###DIR = sys.prefix + '/share/shoebot/locale'
-###locale.setlocale(locale.LC_ALL, '')
-###gettext.bindtextdomain(APP, DIR)
-####gettext.bindtextdomain(APP)
-###gettext.textdomain(APP)
-###_ = gettext.gettext
-
-###NODEBOX = 'nodebox'
-###DRAWBOT = 'drawbot'
-
-ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
-
-class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
-    '''Create a GTK+ widget on which we will draw using Cairo'''
+class ShoebotWindow(gtk.Window, DrawQueueSink):
+    '''Create a GTK+ window that contains a ShoebotWidget'''
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self):
-        gtk.DrawingArea.__init__(self)
+    def __init__(self, title):
+        gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
-        
-        if os.path.isfile(ICON_FILE):
-            self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
-        else:
-            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
-        self.size = None
 
-    def as_window(self, title = None):
-        '''
-        Create a Gtk Window and add this Widget to it, returns the widget
-        '''
-        window = gtk.Window()
+        sb_widget = ShoebotWidget()
+
         if title:
-            window.set_title(title)
-        window.connect("delete-event", gtk.main_quit)
+            self.set_title(title)
+        self.connect("delete-event", gtk.main_quit)
 
-        self.show()
-        window.add(self)
-        window.present()
+        sb_widget.show()
+        self.add(sb_widget)
+        self.present()
 
         while gtk.events_pending():
             gtk.main_iteration()
 
-        return self
-
-    def do_expose_event(self, event):
-        '''
-        Draw just the exposed part of the backing store
-        '''
-        # Create the cairo context
-        cr = self.window.cairo_create()
-
-        cr.set_source_surface(self.backing_store)
-        # Restrict Cairo to the exposed area; avoid extra work
-        cr.rectangle(event.area.x, event.area.y,
-                event.area.width, event.area.height)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.fill()
+        self.sb_widget = sb_widget
 
     def create_rcontext(self, size, frame):
         '''
-        Creates a meta surface for the bot to draw on
-
-        As we don't have meta surfaces yet, use a PDFSurface
-        with the buffer set to None
+        Delegates to the ShoebotWidget
         '''
-        if self.window and not self.size:
-            self.set_size_request(*size)
-            self.size = size
-        meta_surface = RecordingSurface(*size)
-        return cairo.Context(meta_surface)
+        return self.sb_widget.create_rcontext(size, frame)
 
     def rcontext_ready(self, size, frame, cairo_ctx):
         '''
-        Update the backing store from a cairo context and
-        schedule a redraw (expose event)
+        Delegates to the ShoebotWidget
         '''
-        if (self.backing_store.get_width(), self.backing_store.get_height()) == size:
-            backing_store = self.backing_store
-        else:
-            backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
-        
-        cr = cairo.Context(backing_store)
-        cr.set_source_surface(cairo_ctx.get_target())
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
-        
-        self.backing_store = backing_store
-        self.queue_draw()
-        
-        while gtk.events_pending():
-            gtk.main_iteration()
+        return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)

@@ -71,8 +71,9 @@ class Canvas:
     def reset_canvas(self):
         self.fillcolor = (0.5, 0.5, 0.5, 1.0)
         self.stroke = None
-        self.strokewidth = 1
-        self.background = (1, 1, 1)
+        self.strokewidth = 1.0
+        self.strokecolor = None
+        self.background = (1, 1, 1, 1)
 
         self.reset_transform()
         self.reset_drawqueue()

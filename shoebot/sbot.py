@@ -39,10 +39,8 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     '''
     Convenience function to make it easy to start bots from external programs
     '''
-    from core import Context
-    from core import CairoCanvas
-    from core import CairoImageSink
-    from gui import ShoebotWidget
+    from core import Context, CairoCanvas, CairoImageSink
+    from gui import ShoebotWidget, ShoebotWindow
 
     from core import NodeBot
     ###from drawbot import Drawbot ###TODO
@@ -52,7 +50,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
             title = 'Untitled - Shoebot'
-        cairo_sink = ShoebotWidget().as_window(title)
+        cairo_sink = ShoebotWindow(title)
     else:
         if iterations is None:
             iterations = 1
