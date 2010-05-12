@@ -1,19 +1,7 @@
-from __future__ import division
-import sys, os
 import gtk
-import gobject
-import cairo
-import shoebot
-from socket_server import SocketServerMixin
-from var_window import VarWindow
 
 from gtk_drawingarea import ShoebotWidget
-from shoebot.core import NodeBot, DrawBot
 from shoebot.core import DrawQueueSink
-from shoebot.util import RecordingSurface
-
-import locale
-import gettext
 
 class ShoebotWindow(gtk.Window, DrawQueueSink):
     '''Create a GTK+ window that contains a ShoebotWidget'''
