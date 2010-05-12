@@ -10,16 +10,27 @@ class CairoDrawQueue(DrawQueue):
 
     TODO Threading:
     As functions are added to the queue, another thread takes them off the queue
-    and draws them to the meta_surface
+    and draws them to the recording_surface
 
     Hacks:  1st command is currently special cased (it draws the background)
     '''
     def __init__(self, canvas_size):
         DrawQueue.__init__(self)
-        self.meta_surface = RecordingSurface(*canvas_size)
-        self.context = cairo.Context(self.meta_surface)
+        self.recording_surface = RecordingSurface(*canvas_size)
+        self.context = cairo.Context(self.recording_surface)
         self.count = 0
         self.initial_func = None
+
+    def append_immediate(self, render_func):
+        '''
+        ## TODO - The queue will execute up until render_func
+        ##        is executed before returning.
+        This is how snapshots of surfaces get back to the bot
+
+        Note - Once threading is enabled, calling append immediate
+        Will probably severly affect performance
+        '''
+        raise NotImplementedError()
 
     def append(self, render_func):
         '''
@@ -35,5 +46,5 @@ class CairoDrawQueue(DrawQueue):
 
     def render(self, cairo_ctx):
         self.initial_func(cairo_ctx)
-        cairo_ctx.set_source_surface(self.meta_surface)
+        cairo_ctx.set_source_surface(self.recording_surface)
         cairo_ctx.paint()

@@ -90,11 +90,39 @@ class CairoCanvas(Canvas):
         def rellineto(ctx):
             ctx.rel_line_to(x, y)
         return rellineto
-    
+
+    def output_closure(self, target):
+        '''
+        Function to output to a cairo surface
+        '''
+        def output(ctx):
+            if isinstance(target, cairo.Context):
+                target_ctx = target
+                target_ctx.set_source_surface(ctx.get_target())
+                target_ctx.paint()
+            else:
+                extension = os.path.splitext(target)[1]
+                if extension == 'png':
+                    ctx.write_to_png(target)
+                elif extension == 'pdf':
+                    target_ctx = cairo.Context(cairo.PDFSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                    target_ctx.set_source_surface(ctx.get_target())
+                    target_ctx.paint()
+                elif extension == 'ps':
+                    target_ctx = cairo.Context(cairo.PSSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                    target_ctx.set_source_surface(ctx.get_target())
+                    target_ctx.paint()
+                elif extension == 'svg':
+                    target_ctx = cairo.Context(cairo.SVGSurface(cairo.FORMAT_ARGB,*self.size_or_default()))
+                    target_ctx.set_source_surface(ctx.get_target())
+                    target_ctx.paint()
+        return output
+
     def ctx_render_background(self, cairo_ctx):
         '''
         Draws the background colour of the bot
         '''
+        ### TODO - rename this
         cairo_ctx.set_source_rgba(*self.background)
         cairo_ctx.paint()
 

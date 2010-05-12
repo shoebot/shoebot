@@ -215,7 +215,7 @@ class BezierPath(Grob):
         '''
         self._fillcolor = self._fillcolor or self._canvas.fillcolor
         self._strokecolor = self._strokecolor or self._canvas.strokecolor
-        self._strokewidth = self._canvas.strokewidth / 32.0  ### TODO < cludge 
+        self._strokewidth = self._canvas.strokewidth * 0.75
         self._transform = cairo.Matrix(*self._canvas.transform)
         self._drawqueue.append(self._render)
 

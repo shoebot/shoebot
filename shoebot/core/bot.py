@@ -204,7 +204,8 @@ class Bot:
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self,filename=None, surface=None):
+    def snapshot(self,filename=None, surface=None, immediate=False):
+        ### TODO correct comment for new drawing stuff
         '''Save the contents of current surface into a file.
 
         There's two uses for this method:
@@ -220,10 +221,19 @@ class Bot:
           current namespace and save its output in a file.
         '''
 
+        '''
+        If immediate is set to True, the bot will wait for the drawqueue
+        to catch up, the output will happen.
+
+        In general, this is bad for performance, so it's best to leave
+        this set to False.  In the case of output to a surface, this
+        always happens with immediate set to True otherwise the surface
+        would not be ready on return.
+        '''
         if filename:
-            self._canvas.output(filename)
+            self._canvas.output(filename, immediate=immediate)
         elif surface:
-            self._canvas.output(surface)
+            self._canvas.output(surface, immediate=True)
 
     # from Nodebox, a function to import Nodebox libraries
     def ximport(self, libName):

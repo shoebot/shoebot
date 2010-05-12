@@ -9,6 +9,13 @@ class DrawQueue:
     def __init__(self, render_funcs = None):
         self.render_funcs = render_funcs or deque()
 
+    def append_immediate(self, render_func):
+        '''
+        In implementations of drawqueue that use buffering
+        this will run the whole queue up to this point
+        '''
+        raise NotImplementedError('Not supported in DrawQueue')
+
     def append(self, render_func):
         '''
         Add a render function to the queue

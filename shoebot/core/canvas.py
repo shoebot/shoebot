@@ -81,6 +81,21 @@ class Canvas:
         else:
             return self.DEFAULT_SIZE[1]
 
+    def output(self, target, immediate=False):
+        '''
+        Ask the drawqueue to output to target.
+
+        target can be anything supported by the combination
+        of canvas implementation and drawqueue implmentation.
+
+        If target is not supported then an exception is thrown.
+        '''
+        output_func = self.output_closure(target)
+        if immediate:
+            self._drawqueue.append_immediate(output_func)
+        else:
+            self._drawqueue.append(output_func)
+
     def render(self, frame):
         '''
         Passes the drawqueue to the sink for rendering
