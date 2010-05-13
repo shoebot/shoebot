@@ -190,7 +190,8 @@ class BezierPath(Grob):
         transform = self._call_transform_mode(self._transform)
         cairo_ctx.set_matrix(transform)
         self._traverse(cairo_ctx)
-        cairo_ctx.set_matrix(cairo.Matrix()) ## Reset the matrix, otherwise weird things happen to the stroke
+        ## Matrix affects stroke, so we need to reset it:
+        cairo_ctx.set_matrix(cairo.Matrix())
         if self._fillcolor:
             cairo_ctx.set_source_rgba(*self._fillcolor)
             if self._strokecolor:
