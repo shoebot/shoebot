@@ -192,20 +192,14 @@ class BezierPath(Grob):
         self._traverse(cairo_ctx)
         
         if self._fillcolor:
-            if self._fillcolor[3] == 1:
-                cairo_ctx.set_source_rgb(*self._fillcolor[0:3])
-            else:
-                cairo_ctx.set_source_rgba(*self._fillcolor)
-            if self._strokecolor:
+            cairo_ctx.set_source_rgba(*self._fillcolor)
+            if self._fillcolor:
                 cairo_ctx.fill_preserve()
             else:
                 cairo_ctx.fill()
         if self._strokecolor:
             cairo_ctx.set_line_width(self._strokewidth / 75.0)### cludge !
-            if self._strokecolor[3] == 1:
-                cairo_ctx.set_source_rgb(*self._strokecolor[0:3])
-            else:
-                cairo_ctx.set_source_rgba(*self._strokecolor)
+            cairo_ctx.set_source_rgba(*self._strokecolor)
             cairo_ctx.stroke()
 
     def draw(self):
