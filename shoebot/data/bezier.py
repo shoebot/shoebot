@@ -187,8 +187,10 @@ class BezierPath(Grob):
         TODO: Need to work out how to move the cairo specific
               bits somewhere else.
         '''
+        # Go to initial point (CORNER or CENTER):
         transform = self._call_transform_mode(self._transform)
         cairo_ctx.set_matrix(transform)
+        # Run the path commands on the cairo context:
         self._traverse(cairo_ctx)
         ## Matrix affects stroke, so we need to reset it:
         cairo_ctx.set_matrix(cairo.Matrix())
