@@ -2,27 +2,29 @@ import cairo
 import pango
 import pangocairo
 from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
-from shoebot.util import RecordingSurface
+from shoebot.util import RecordingSurfaceA8
 
 class Text(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
     #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
-    def __init__(self, bot, text, x=0, y=0, width=None, height=None, ctx=None, canvas=None,**kwargs):
-        self._bot = bot
+    def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
         self._canvas = canvas
         super(Text, self).__init__()
         TransformMixin.__init__(self)
-        ColorMixin.__init__(self, **kwargs)
+        ColorMixin.__init__(self, canvas, **kwargs)
 
         # in case of textpath it creates a temp cairo context for path extraction
         if ctx is None:
             surface = RecordingSurfaceA8(0, 0)
             ctx = cairo.Context(surface)
-        self.ctx = ctx              
+            immediate = False
+        else:
+            immediate = True
+        self.ctx = ctx            
 
-        if self._bot:
-            _copy_attrs(self._bot, self, self.stateAttributes)
+        ###if self._bot:
+        ###    _copy_attrs(self._bot, self, self.stateAttributes)
 
         self.text = unicode(text)
         self.x = x
@@ -30,8 +32,10 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.width = width
         self.height = height
 
-        if kwargs.has_key("font"):
-            self._fontfile = kwargs["font"]
+        self._fontfile = kwargs.get('font', canvas.fontfile)
+        self._fontsize = kwargs.get('fontsize', canvas.fontsize)
+        self._lineheight = kwargs.get('lineheight', canvas.lineheight)
+        self._align = kwargs.get('align', canvas.align)
 
         # here we start to do the magic with pango, first we set typeface    
         self._fontface = pango.FontDescription()
@@ -84,7 +88,18 @@ class Text(Grob, TransformMixin, ColorMixin):
         if kwargs.has_key("lineheight"):
             self._lineheight = kwargs["lineheight"]           
         if kwargs.has_key("align"):
-            self._align= kwargs["align"] 
+            self._align= kwargs["align"]
+
+        ### TODO This render bit is wrong....
+        if immediate:
+            self._render(ctx)
+
+        ## Queue this up to be rendered
+        if not outline:
+            # If were outline then you want the path instead
+            self._canvas.drawqueue.append(self._render)
+
+    def _render(self, ctx):
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
         self.pang_ctx = pangocairo.CairoContext(self.ctx)
@@ -112,6 +127,7 @@ class Text(Grob, TransformMixin, ColorMixin):
             self.layout.set_justify(True)
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
+
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
@@ -141,13 +157,14 @@ class Text(Grob, TransformMixin, ColorMixin):
     metrics = property(_get_metrics)
 
     def _get_path(self):
+        self._render(self.ctx) ### TODO - is this right ?
         self.ctx.move_to(self.x,self.y)
         # add pango layout to current cairo path in temporary context
         self.pang_ctx.layout_path(self.layout)
         # retrieve current path from current context
         pathdata = self.ctx.copy_path()
         # creates a BezierPath instance for storing new shoebot path
-        p = BezierPath(self._bot)
+        p = BezierPath(self._canvas)
         # parsing of cairo path to build a shoebot path
         for item in pathdata:
             cmd = item[0]

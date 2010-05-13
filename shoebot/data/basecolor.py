@@ -224,21 +224,16 @@ class ColorMixin(object):
     """Mixin class for color support.
     Adds the _fillcolor, _strokecolor and _strokewidth attributes to the class."""
 
-    def __init__(self, **kwargs):
-        try:
+    def __init__(self, canvas, **kwargs):
+        if 'fill' in kwargs:
             self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
-        except KeyError:
-            if self._canvas._fillcolor:
-                self._fillcolor = self._bot._fillcolor.copy()
-            else:
-                self._fillcolor = None
-        try:
-            self._strokecolor = Color(kwargs['stroke'], mode='rgb', color_range=1)
-        except KeyError:
-            if self._bot._strokecolor:
-                self._strokecolor = self._bot._strokecolor.copy()
-            else:
-                self._strokecolor = None
+        else:
+            self._fillcolor = canvas.fillcolor
+
+        if 'stroke' in kwargs:
+            self._strokecolor = Color(kwargs['fill'], mode='rgb', color_range=1)
+        else:
+            self._strokecolor = self._canvas.strokecolor
         self._strokewidth = kwargs.get('strokewidth', 1.0)
 
     def _get_fill(self):

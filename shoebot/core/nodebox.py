@@ -259,7 +259,7 @@ class NodeBot(Bot):
         path.draw()
 
     def drawimage(self, image):
-        self.canvas.add(image)
+        self._canvas.add(image)### TODO
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
@@ -362,13 +362,13 @@ class NodeBot(Bot):
         # FIXME: this save should go into Canvas
         ### TODO
         p = self.ClippingPath(path)
-        self.canvas.add(p)
+        self._canvas.add(p)
         return p
 
 
     def endclip(self):
         p = self.EndClip()
-        self.canvas.add(p)
+        self._canvas.add(p)
 
     def transform(self, mode):
         '''Mode can be CENTER or CORNER'''
@@ -492,17 +492,13 @@ class NodeBot(Bot):
         '''
         Draws a string of text according to current font settings.
         '''
-        #txt = self.Text(txt, x, y, width, height, ctx=self._canvas.context, **kwargs)
-        txt = self.Text(txt, x, y, width, height, ctx=None, **kwargs)
+        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
           path = txt.path
           if draw:
               path.draw()
           return path
         else:
-          if draw:
-            ### TODO
-            self.canvas.add(txt)
           return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
@@ -512,7 +508,7 @@ class NodeBot(Bot):
         txt = self.Text(txt, x, y, width, height, **kwargs)
         path = txt.path
         if draw:
-            self.canvas.add(path)
+            path.draw()
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):

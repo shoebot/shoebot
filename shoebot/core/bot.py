@@ -109,13 +109,20 @@ class Bot:
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
         ### TODO - Move this ?
+        ### TODO - This is only called once, not every loop now, probably
+        ###        should call it every loop
 
-        self._fontfile = "assets/notcouriersans.ttf"
-        self._fontsize = 16
-        self._align = Bot.LEFT
-        self._lineheight = 1
+        self._canvas.settings(
+            fontfile = "assets/notcouriersans.ttf",
+            fontsize = 16,
+            align = Bot.LEFT,
+            lineheight = 1,
+            fillcolor = self.color(.2),
+            strokecolor = None,
+            strokewidth = 1.0,
+            background = self.color(1, 1, 1))
 
-        self.framerate = 30
+        ### self.framerate = 30
 
         self.WIDTH, self.HEIGHT = self._canvas.DEFAULT_SIZE
 
@@ -123,9 +130,6 @@ class Bot:
 
         self._color_range = 1.
         self._color_mode = Bot.RGB
-        self._canvas.fillcolor = self.color(.2)
-        self._canvas.strokecolor = None
-        self._canvas.strokewidth = 1.0
 
     def _makeInstance(self, clazz, args, kwargs):
         '''Creates an instance of a class defined in this document.

@@ -69,14 +69,15 @@ class Canvas:
         pass
 
     def reset_canvas(self):
-        self.fillcolor = (0.5, 0.5, 0.5, 1.0)
-        self.stroke = None
-        self.strokewidth = 1.0
-        self.strokecolor = None
-        self.background = (1, 1, 1, 1)
-
         self.reset_transform()
         self.reset_drawqueue()
+
+    def settings(self, **kwargs):
+        '''
+        Pass a load of settings into the canvas
+        '''
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def size_or_default(self):
         '''

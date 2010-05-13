@@ -216,5 +216,5 @@ def RecordingSurfaceA8(*size):
         fobj = None
     if _svg_surface is None:
         _svg_surface = SVGSurface(fobj, 0, 0)
-    return _svg_surface.create_similar(cairo.FORMAT_A8, *size)
+    return _svg_surface.create_similar(cairo.CONTENT_ALPHA, *size)
 
