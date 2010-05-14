@@ -112,15 +112,6 @@ class Bot:
         ### TODO - This is only called once, not every loop now, probably
         ###        should call it every loop
 
-        self._canvas.settings(
-            fontfile = "assets/notcouriersans.ttf",
-            fontsize = 16,
-            align = Bot.LEFT,
-            lineheight = 1,
-            fillcolor = self.color(.2),
-            strokecolor = None,
-            strokewidth = 1.0,
-            background = self.color(1, 1, 1))
 
         ### self.framerate = 30
 
@@ -130,6 +121,16 @@ class Bot:
 
         self._color_range = 1.
         self._color_mode = Bot.RGB
+
+        self._canvas.settings(
+            fontfile = "assets/notcouriersans.ttf",
+            fontsize = 16,
+            align = Bot.LEFT,
+            lineheight = 1,
+            fillcolor = self.color(.2),
+            strokecolor = None,
+            strokewidth = 1.0,
+            background = self.color(1, 1, 1))
 
     def _makeInstance(self, clazz, args, kwargs):
         '''Creates an instance of a class defined in this document.

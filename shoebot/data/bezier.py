@@ -7,6 +7,7 @@ from math import pi as _pi
 import cairo
 
 CENTER = 'center'
+CORNER = 'corner'
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
