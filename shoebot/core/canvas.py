@@ -56,6 +56,8 @@ class Canvas:
     def __init__(self, sink):
         self.sink = sink
         self.finished = False
+        self.color_range = 1
+        self.color_mode = 1
 
     def initial_drawqueue(self):
         '''

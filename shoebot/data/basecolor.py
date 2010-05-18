@@ -29,8 +29,8 @@ class Color(object):
     and at this point is quite useless, left it in place for a possible future implementation
     '''
 
-    def __init__(self, *a, **kwargs):
-        
+    def __init__(self, canvas, *a, **kwargs):
+        self._canvas = canvas
         # Values are supplied as a tuple.
         if len(a) == 1 and isinstance(a[0], tuple):
             a = a[0]
@@ -62,7 +62,7 @@ class Color(object):
             if kwargs.has_key("color_range"):
                 ra = int(kwargs["color_range"])
             else:
-                ra = 1
+                ra = canvas.color_range
             self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, a[1]/ra
             
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
@@ -71,7 +71,7 @@ class Color(object):
             if kwargs.has_key("color_range"):
                 ra = int(kwargs["color_range"])
             else:
-                ra = 1            
+                ra = canvas.color_mode
             alpha, mode = 1, "rgb" 
             if len(a) > 3: alpha = a[-1]/ra
         

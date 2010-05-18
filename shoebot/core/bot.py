@@ -103,24 +103,18 @@ class Bot:
         self._namespace = namespace
         self._autoclosepath = True
         self._set_defaults()
+        self._vars = []
+        self._oldvars = []
         
     def _set_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
-        ### TODO - Move this ?
-        ### TODO - This is only called once, not every loop now, probably
-        ###        should call it every loop
-
-
         ### self.framerate = 30
 
         self.WIDTH, self.HEIGHT = self._canvas.DEFAULT_SIZE
 
         self._transformmode = Bot.CENTER
-
-        self._color_range = 1.
-        self._color_mode = Bot.RGB
 
         self._canvas.settings(
             fontfile = "assets/notcouriersans.ttf",
@@ -191,7 +185,7 @@ class Bot:
 
     def color(self, *args):
         #return Color(self.color_mode, self.color_range, *args)
-        return Color(mode=self._color_mode, color_range=self._color_range, *args)
+        return self.Color(*args)
 
     choice = r.choice
 
