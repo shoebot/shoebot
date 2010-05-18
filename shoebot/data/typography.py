@@ -5,8 +5,6 @@ from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_att
 from shoebot.util import RecordingSurfaceA8
 
 class Text(Grob, TransformMixin, ColorMixin):
-    stateAttributes = ('_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight')
-    #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
     def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
         Grob.__init__(self, canvas)
@@ -14,17 +12,7 @@ class Text(Grob, TransformMixin, ColorMixin):
         ColorMixin.__init__(self, canvas, **kwargs)
 
         self.ctx = ctx
-        # in case of textpath it creates a temp cairo context for path extraction
-        #if ctx is None:
-        #    surface = RecordingSurfaceA8(0, 0)
-        #    ctx = cairo.Context(surface)
-        #    immediate = False
-        #else:
-        #    immediate = True
-        #self.ctx = ctx
-
-        ###if self._bot:
-        ###    _copy_attrs(self._bot, self, self.stateAttributes)
+        self.pang_ctx = None
 
         self.text = unicode(text)
         self.x = x
@@ -90,10 +78,8 @@ class Text(Grob, TransformMixin, ColorMixin):
         if kwargs.has_key("align"):
             self._align= kwargs["align"]
 
-
-        if bool(ctx) or outline:
-            # If theres a context, or in outline mode then render now
-            ctx or self._get_context()
+        
+        if bool(ctx):
             self._render(self.ctx)
         else:
             # Normal rendering, can be deferred
@@ -103,7 +89,8 @@ class Text(Grob, TransformMixin, ColorMixin):
         self.ctx = self.ctx or cairo.Context(RecordingSurfaceA8(0, 0))
         return self.ctx
 
-    def _render(self, ctx):
+    def _render(self, ctx = None):
+        ctx = ctx or self._get_context()
         ctx.move_to(self.x,self.y)
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
@@ -167,10 +154,12 @@ class Text(Grob, TransformMixin, ColorMixin):
     metrics = property(_get_metrics)
 
     def _get_path(self):
+        if not self.pang_ctx:
+            self._render()
         # add pango layout to current cairo path in temporary context
         self.pang_ctx.layout_path(self.layout)
         # retrieve current path from current context
-        pathdata = self.ctx.copy_path()
+        pathdata = self._get_context().copy_path()
         # creates a BezierPath instance for storing new shoebot path
         p = BezierPath(self._canvas)
         # parsing of cairo path to build a shoebot path
