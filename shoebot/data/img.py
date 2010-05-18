@@ -49,6 +49,7 @@ class Image(Grob, ColorMixin):
                         imagesurface = RecordingSurface(width or swidth, height or sheight)
                         ctx = cairo.Context(imagesurface)
                         handle.render_cairo(ctx)
+                        self._surface_cache[path] = imagesurface
                 else:
                     if path in self._surface_cache:
                         imagesurface = self._surface_cache[path]
@@ -68,6 +69,7 @@ class Image(Grob, ColorMixin):
                         ct2.paint()
                         ''' surface now contains the image in a Cairo surface '''
                         imagesurface = ct2.get_target()
+                        self._surface_cache[path] = imagesurface
 
                 if width is not None or height is not None:
                     if width:
