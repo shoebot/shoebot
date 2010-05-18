@@ -9,19 +9,19 @@ class Text(Grob, TransformMixin, ColorMixin):
     #kwargs = ('fill', 'font', 'fontsize', 'align', 'lineheight')
 
     def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
-        self._canvas = canvas
-        super(Text, self).__init__()
+        Grob.__init__(self, canvas)
         TransformMixin.__init__(self)
         ColorMixin.__init__(self, canvas, **kwargs)
 
+        self.ctx = ctx
         # in case of textpath it creates a temp cairo context for path extraction
-        if ctx is None:
-            surface = RecordingSurfaceA8(0, 0)
-            ctx = cairo.Context(surface)
-            immediate = False
-        else:
-            immediate = True
-        self.ctx = ctx            
+        #if ctx is None:
+        #    surface = RecordingSurfaceA8(0, 0)
+        #    ctx = cairo.Context(surface)
+        #    immediate = False
+        #else:
+        #    immediate = True
+        #self.ctx = ctx
 
         ###if self._bot:
         ###    _copy_attrs(self._bot, self, self.stateAttributes)
@@ -90,19 +90,24 @@ class Text(Grob, TransformMixin, ColorMixin):
         if kwargs.has_key("align"):
             self._align= kwargs["align"]
 
-        ### TODO This render bit is wrong....
-        if immediate:
-            self._render(ctx)
 
-        ## Queue this up to be rendered
-        if not outline:
-            # If were outline then you want the path instead
+        if bool(ctx) or outline:
+            # If theres a context, or in outline mode then render now
+            ctx or self._get_context()
+            self._render(self.ctx)
+        else:
+            # Normal rendering, can be deferred
             self._canvas.drawqueue.append(self._render)
 
+    def _get_context(self):
+        self.ctx = self.ctx or cairo.Context(RecordingSurfaceA8(0, 0))
+        return self.ctx
+
     def _render(self, ctx):
+        ctx.move_to(self.x,self.y)
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
-        self.pang_ctx = pangocairo.CairoContext(self.ctx)
+        self.pang_ctx = pangocairo.CairoContext(ctx)
         self.layout = self.pang_ctx.create_layout()
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
@@ -127,6 +132,11 @@ class Text(Grob, TransformMixin, ColorMixin):
             self.layout.set_justify(True)
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
+
+        ctx.set_source_rgba(*self._strokecolor)
+        self.pang_ctx.show_layout(self.layout)
+        self.pang_ctx.update_layout(self.layout)
+        
 
 
     # This version is probably more pangoesque, but the layout iterator
@@ -157,8 +167,6 @@ class Text(Grob, TransformMixin, ColorMixin):
     metrics = property(_get_metrics)
 
     def _get_path(self):
-        self._render(self.ctx) ### TODO - is this right ?
-        self.ctx.move_to(self.x,self.y)
         # add pango layout to current cairo path in temporary context
         self.pang_ctx.layout_path(self.layout)
         # retrieve current path from current context

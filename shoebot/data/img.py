@@ -4,20 +4,19 @@ from StringIO import StringIO
 import cairo
 import numpy
 import Image as PILImage
+import gtk
 from shoebot.data import Grob, TransformMixin, ColorMixin
 
 class Image(Grob, TransformMixin, ColorMixin):
     stateAttributes = ('_transform', '_transformmode')
-    kwargs = ()
 
-    def __init__(self, bot, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
-        self._bot = bot
+    def __init__(self, canvas, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
         #super(Image, self).__init__(self._bot)
+        Grob.__init__(self, canvas)
         TransformMixin.__init__(self)
-        ColorMixin.__init__(self, **kwargs)
+        ColorMixin.__init__(self, canvas, **kwargs)
 
-        if self._bot:
-            _copy_attrs(self._bot, self, self.stateAttributes)
+        #_copy_attrs(self._canvas, self, self.stateAttributes)
 
         self.x = x
         self.y = y
@@ -30,10 +29,8 @@ class Image(Grob, TransformMixin, ColorMixin):
         if isinstance(self.data, cairo.ImageSurface):
             self.width = self.data.get_width()
             self.height = self.data.get_height()
-            self.imagesurface = self.data
-            
+            self._imagesurface = self.data
         else:
-
             # checks if image data is passed in command call, in this case it wraps
             # the data in a StringIO oject in order to use it as a file
             # the data itself must contain an entire image, not just pixel data
@@ -41,49 +38,53 @@ class Image(Grob, TransformMixin, ColorMixin):
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
-                img = PILImage.open(self.path)
-            elif self.data:
-                img = PILImage.open(StringIO(self.data))
+                pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+                width = pixbuf.get_width()
+                height = pixbuf.get_height()
 
-            # retrieves original image size
-            Width, Height = img.size
+                ''' create a new cairo surface to place the image on '''
+                surface = cairo.ImageSurface(0, width, height)
+                ''' create a context to the new surface '''
+                ct = cairo.Context(surface)
+                ''' create a GDK formatted Cairo context to the new Cairo native context '''
+                ct2 = gtk.gdk.CairoContext(ct)
+                ''' draw from the pixbuf to the new surface '''
+                ct2.set_source_pixbuf(pixbuf, 0, 0)
+                ct2.paint()
+                ''' surface now contains the image in a Cairo surface '''
+                imagesurface = ct2.get_target()
+
+            #elif self.data:
+            #    img = PILImage.open(StringIO(self.data))
+            #
             # if no width is given, it assumes the original image size, else image is resized
-            if self.width is None:
-                if self.height is None:
-                    self.width = Width
-                    self.height = Height
-                else:
-                    self.width = int(self.height*Width/Height)
-                    size = self.width, self.height
-                    img = img.resize(size, PILImage.ANTIALIAS)
-            else:
-                if self.height is None:
-                    self.height = int(self.width*Height/Width)
-                size = self.width, self.height
-                img = img.resize(size, PILImage.ANTIALIAS)
-            # check image mode and transforms it in ARGB32 for cairo, transforming it to string, swapping channels
-            # and fills an array from numpy module, then passes it to cairo image surface constructor
-            if img.mode == "RGBA":
-                # swapping b and r channels with PIL
-                r,g,b,a = img.split()
-                img = PILImage.merge("RGBA",(b,g,r,a))             
-                img_buffer = numpy.asarray(img)
-                # resulting numpy array defaults to read-only, but cairo needs a writeable object
-                # so we are forced to change a flag
-                img_buffer.flags.writeable=True
-                imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)
-            elif img.mode == "RGB":
-                img = img.convert('RGBA')
-                r,g,b,a = img.split()
-                img = PILImage.merge("RGBA",(b,g,r,a)) 
-                img_buffer = numpy.asarray(img)
-                img_buffer.flags.writeable=True            
-                imagesurface = cairo.ImageSurface.create_for_data(img_buffer, cairo.FORMAT_ARGB32, self.width, self.height)            
-            else:
-                raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
-            #this is the item that will be drawn
-            self.imagesurface = imagesurface
+            #if self.width is None:
+            #    if self.height is None:
+            #        self.width = width
+            #        self.height = height
+            #    else:
+            #        self.width = int(self.height*width/height)
+            #        size = self.width, self.height
+            #        img = img.resize(size, PILImage.ANTIALIAS)
+            #else:
+            #    if self.height is None:
+            #        self.height = int(self.width*height/width)
+            #    size = self.width, self.height
+            #    img = img.resize(size, PILImage.ANTIALIAS)
+            #else:
+            #    raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
+            ##this is the item that will be drawn
+            self._imagesurface = imagesurface
 
+        ### TODO - Get transform stuff from bezier path,
+        ###        Probably move it to TransformMixin        
+        self._stamp()
+
+    def _render(self, ctx):
+        ctx.set_matrix(self._transform)
+        ctx.move_to(self.x, self.y)
+        ctx.set_source_surface(self._imagesurface)
+        ctx.paint()
 
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
@@ -94,8 +95,8 @@ class Image(Grob, TransformMixin, ColorMixin):
     center = property(_get_center)
 
     def copy(self):
-        p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
-        _copy_attrs(self._bot, p, self.stateAttributes)
+        p = self.__class__(self._canvas, self.path, self.x, self.y, self.width, self.height)
+        _copy_attrs(self._canvas, p, self.stateAttributes)
         return p
 
 

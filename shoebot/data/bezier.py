@@ -46,15 +46,13 @@ class BezierPath(Grob):
         # _render_funcs  References to functions to render each PathElement
         # _elements      Items start as tuples, but if a PathElement is
         #                requested then it is stored there.
-        Grob.__init__(self)
-        self._drawqueue = canvas.drawqueue
-        self._canvas = canvas
+        Grob.__init__(self, canvas = canvas)
 
         self._render_funcs = []
         self._elements = []
-        self._fillcolor = fillcolor
-        self._strokecolor = strokecolor
-        self._strokewidth = strokewidth
+        self._fillcolor = fillcolor or canvas.fillcolor
+        self._strokecolor = strokecolor or canvas.strokecolor
+        self._strokewidth = strokewidth or canvas.strokewidth
         self.closed = False
 
         self._set_mode(canvas.mode)
@@ -163,24 +161,6 @@ class BezierPath(Grob):
         ### to optimise drawing
         return center
 
-    def _center_transform(self, transform):
-        ''''
-        Works like setupTransform of a version of java nodebox
-        http://dev.nodebox.net/browser/nodebox-java/branches/rewrite/src/java/net/nodebox/graphics/Grob.java
-        '''
-        dx, dy = self._get_center()
-        t = cairo.Matrix()
-        t.translate(dx, dy)
-        t = transform * t
-        t.translate(-dx, -dy)
-        return t
-
-    def _corner_transform(self, transform):
-        '''
-        CENTER is the default, so we just return the transform
-        '''
-        return transform
-
     def _render(self, cairo_ctx):
         '''
         At the moment this is based on cairo.
@@ -214,8 +194,7 @@ class BezierPath(Grob):
         self._fillcolor = self._fillcolor or self._canvas.fillcolor
         self._strokecolor = self._strokecolor or self._canvas.strokecolor
         self._strokewidth = self._canvas.strokewidth
-        self._transform = cairo.Matrix(*self._canvas.transform)
-        self._drawqueue.append(self._render)
+        self._stamp()
 
     def _path_element(self, el):
         '''
