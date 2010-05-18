@@ -12,12 +12,10 @@ from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
 
 class Image(Grob, ColorMixin):
-    # Pixbuff cache is [path]
     _surface_cache = {}
 
     def __init__(self, canvas, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
         Grob.__init__(self, canvas)
-        #TransformMixin.__init__(self)
         ColorMixin.__init__(self, canvas, **kwargs)
 
         self.x = x
