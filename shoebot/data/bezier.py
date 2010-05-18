@@ -6,9 +6,6 @@ from math import pi as _pi
 
 import cairo
 
-CENTER = 'center'
-CORNER = 'corner'
-
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -55,7 +52,6 @@ class BezierPath(Grob):
         self._strokewidth = strokewidth or canvas.strokewidth
         self.closed = False
 
-        self._set_mode(canvas.mode)
         self._drawn = False
         self._center = None
 
@@ -66,18 +62,6 @@ class BezierPath(Grob):
         '''
         self._render_funcs.append(render_func)
         self._elements.append(element)
-
-    def _set_mode(self, mode):
-        '''
-        Sets call_transform_mode to point to the
-        center_transform or corner_transform
-        '''
-        if mode == CENTER:
-            self._call_transform_mode = self._center_transform
-        elif mode == CORNER:
-            self._call_transform_mode = self._corner_transform
-        else:
-            raise ValueError('mode must be CENTER or CORNER')
 
     def moveto(self, x, y):
         self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
@@ -125,15 +109,6 @@ class BezierPath(Grob):
         '''
         for render_func in self._render_funcs:
             render_func(cairo_ctx)
-
-    def _call_transform_mode(self):
-        '''
-        This should never get called:
-        set mode, changes the value of this to point
-
-        corner_transform or center_transform
-        '''
-        raise Error('_call_transform_mode called without mode set!')
 
     def _get_center(self):
         '''
@@ -194,7 +169,7 @@ class BezierPath(Grob):
         self._fillcolor = self._fillcolor or self._canvas.fillcolor
         self._strokecolor = self._strokecolor or self._canvas.strokecolor
         self._strokewidth = self._canvas.strokewidth
-        self._stamp()
+        self._deferred_render()
 
     def _path_element(self, el):
         '''

@@ -7,16 +7,14 @@ import Image as PILImage
 import gtk
 from shoebot.data import Grob, TransformMixin, ColorMixin
 
-class Image(Grob, TransformMixin, ColorMixin):
-    stateAttributes = ('_transform', '_transformmode')
+#class Image(Grob, TransformMixin, ColorMixin):
+class Image(Grob, ColorMixin):
+    _pixbuf_cache = {}
 
     def __init__(self, canvas, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
-        #super(Image, self).__init__(self._bot)
         Grob.__init__(self, canvas)
-        TransformMixin.__init__(self)
+        #TransformMixin.__init__(self)
         ColorMixin.__init__(self, canvas, **kwargs)
-
-        #_copy_attrs(self._canvas, self, self.stateAttributes)
 
         self.x = x
         self.y = y
@@ -38,7 +36,7 @@ class Image(Grob, TransformMixin, ColorMixin):
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
-                pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+                pixbuf = self._pixbuf_cache.setdefault(path, gtk.gdk.pixbuf_new_from_file(path))
                 width = pixbuf.get_width()
                 height = pixbuf.get_height()
 
@@ -53,6 +51,18 @@ class Image(Grob, TransformMixin, ColorMixin):
                 ct2.paint()
                 ''' surface now contains the image in a Cairo surface '''
                 imagesurface = ct2.get_target()
+
+                if width is not None or height is not None:
+                    if width:
+                        wscale = width / imagesurface.get_width()
+                    else:
+                        wscale = 1.0
+                    if height:
+                        hscale = height / imagesurface.get_height()
+                    else:   
+                        hscale = 1.0
+                    self._transform.scale(wscale, hscale)
+                    
 
             #elif self.data:
             #    img = PILImage.open(StringIO(self.data))
@@ -78,7 +88,7 @@ class Image(Grob, TransformMixin, ColorMixin):
 
         ### TODO - Get transform stuff from bezier path,
         ###        Probably move it to TransformMixin        
-        self._stamp()
+        self._deferred_render()
 
     def _render(self, ctx):
         ctx.set_matrix(self._transform)

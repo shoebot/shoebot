@@ -1,14 +1,40 @@
 import cairo
 
+CENTER = 'center'
+CORNER = 'corner'
+
 class Grob:
     '''A GRaphic OBject is the base class for all DrawingPrimitives.'''
 
     def __init__(self, canvas):
         self._canvas = canvas
         self._drawqueue = canvas.drawqueue
+        self._set_mode(canvas.mode)
+        self._transform = cairo.Matrix(*self._canvas.transform)
+
+    def _set_mode(self, mode):
+        '''
+        Sets call_transform_mode to point to the
+        center_transform or corner_transform
+        '''
+        if mode == CENTER:
+            self._call_transform_mode = self._center_transform
+        elif mode == CORNER:
+            self._call_transform_mode = self._corner_transform
+        else:
+            raise ValueError('mode must be CENTER or CORNER')
 
     def _get_center():
         raise NotImplementedError()
+
+    def _call_transform_mode(self):
+        '''
+        This should never get called:
+        set mode, changes the value of this to point
+
+        corner_transform or center_transform
+        '''
+        raise NotImplementedError('_call_transform_mode called without mode set!')
 
     def _center_transform(self, transform):
         ''''
@@ -28,8 +54,7 @@ class Grob:
         '''
         return transform
 
-    def _stamp(self, render_func=None):
-        self._transform = cairo.Matrix(*self._canvas.transform)
+    def _deferred_render(self, render_func=None):
         self._drawqueue.append(render_func or self._render)
 
     def _render(self, ctx):

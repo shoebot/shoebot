@@ -86,7 +86,7 @@ class Text(Grob, ColorMixin):
             self._render(self.ctx)
         else:
             # Normal rendering, can be deferred
-            self._canvas.drawqueue.append(self._render)
+            self._deferred_render()
 
     def _get_context(self):
         self.ctx = self.ctx or cairo.Context(RecordingSurfaceA8(0, 0))
