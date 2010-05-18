@@ -4,12 +4,15 @@ import pangocairo
 from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 from shoebot.util import RecordingSurfaceA8
 
-class Text(Grob, TransformMixin, ColorMixin):
+##class Text(Grob, TransformMixin, ColorMixin):
+class Text(Grob, ColorMixin):
 
     def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
         Grob.__init__(self, canvas)
-        TransformMixin.__init__(self)
+        ##TransformMixin.__init__(self) ### TODO TransformMixin
         ColorMixin.__init__(self, canvas, **kwargs)
+
+        self._transform = canvas.transform
 
         self.ctx = ctx
         self.pang_ctx = None
@@ -91,7 +94,6 @@ class Text(Grob, TransformMixin, ColorMixin):
 
     def _render(self, ctx = None):
         ctx = ctx or self._get_context()
-        ctx.move_to(self.x,self.y)
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
         self.pang_ctx = pangocairo.CairoContext(ctx)
@@ -120,7 +122,12 @@ class Text(Grob, TransformMixin, ColorMixin):
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
 
+        # Go to initial point (CORNER or CENTER):
+        transform = self._call_transform_mode(self._transform)
+
         ctx.set_source_rgba(*self._strokecolor)
+        ctx.set_matrix(self._canvas.transform)
+        ctx.move_to(self.x,self.y)
         self.pang_ctx.show_layout(self.layout)
         self.pang_ctx.update_layout(self.layout)
         
