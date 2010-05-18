@@ -133,4 +133,4 @@ if __name__ == '__main__':
         outputfile = options.outputfile or 'output.svg',
         iterations = options.repeat or None,
         window = options.window,
-        varwindow = options.varwindow)
+        show_vars = options.varwindow)

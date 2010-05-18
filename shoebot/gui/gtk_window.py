@@ -1,6 +1,6 @@
 import gtk
 
-from gtk_drawingarea import ShoebotWidget
+from shoebot.gui import ShoebotWidget, VarWindow
 from shoebot.core import DrawQueueSink
 
 class ShoebotWindow(gtk.Window, DrawQueueSink):
@@ -8,7 +8,7 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, title):
+    def __init__(self, title=None, show_vars=False):
         gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
 
@@ -21,6 +21,9 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
 
         sb_widget.show()
         self.add(sb_widget)
+
+        #if show_vars:
+        #    self.var_window = VarWindow(self, self.bot)
         self.present()
 
         while gtk.events_pending():
