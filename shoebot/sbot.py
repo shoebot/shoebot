@@ -55,10 +55,11 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
         if iterations is None:
             iterations = 1
         cairo_sink = CairoImageSink(outputfile, format, iterations > 1)
-    bot_classes = {
+
+    BOT_CLASSES = {
         #DRAWBOT : Drawbot,
         NODEBOX : NodeBot,
         #SHOEBOT : Shoebot,
     }
-    context = Context(bot_classes[grammar], CairoCanvas(cairo_sink, enable_cairo_queue = True))
+    context = Context(BOT_CLASSES[grammar], CairoCanvas(cairo_sink, enable_cairo_queue = True))
     context.run(src, iterations, True)

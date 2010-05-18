@@ -55,6 +55,7 @@ class Canvas:
     ''' Abstract canvas class '''
     def __init__(self, sink):
         self.sink = sink
+        self.finished = False
 
     def initial_drawqueue(self):
         '''
@@ -133,8 +134,6 @@ class Canvas:
         '''
         Passes the drawqueue to the sink for rendering
         '''
-        ### TODO - Threading this could be a place to spawn
-        ### a thread
         self.sink.render(self.size_or_default(), frame, self.drawqueue)
 
     width = property(get_width)

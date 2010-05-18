@@ -52,6 +52,7 @@ class Context:
 
         self.namespace = namespace or {}
         self.bot = bot_class(self, canvas, self.namespace)
+        canvas.sink.set_botcontext(self)
 
     def set_defaults(self):
         '''
@@ -139,7 +140,6 @@ class Context:
             self._load_namespace()
 
         try:
-            ### self.canvas.set_size(self.WIDTH, self.HEIGHT)
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")

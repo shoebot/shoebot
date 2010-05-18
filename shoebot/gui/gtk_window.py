@@ -17,6 +17,7 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
         if title:
             self.set_title(title)
         self.connect("delete-event", gtk.main_quit)
+        self.connect("destroy", self.do_window_close)
 
         sb_widget.show()
         self.add(sb_widget)
@@ -38,3 +39,6 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
         Delegates to the ShoebotWidget
         '''
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
+
+    def do_window_close(self, widget):
+        self.botcontext.quit = True

@@ -46,6 +46,9 @@ class DrawQueueSink:
     def __init__(self):
         pass
 
+    def set_botcontext(self, botcontext):
+        self.botcontext = botcontext
+
     def render(self, size, frame, drawqueue):
         '''
         Accepts a drawqueue and
@@ -54,15 +57,15 @@ class DrawQueueSink:
         drawqueue.render(r_context)
         self.rcontext_ready(size, frame, r_context)
 
-    #def create_rcontext(self, size, frame):
-    #    '''
-    #    Returns a cairo context for drawing this
-    #    frame of the bot
-    #    '''
-    #    raise NotImplementedError('Child class should implement create_rcontext')
+    def create_rcontext(self, size, frame):
+        '''
+        Returns a cairo context for drawing this
+        frame of the bot
+        '''
+        raise NotImplementedError('Child class should implement create_rcontext')
     
-    #def rcontext_ready(self, size, frame, r_context):
-    #    '''
-    #    Called when the bot has been rendered
-    #    '''
-    #    raise NotImplementedError('Child class should implement rcontext_ready')
+    def rcontext_ready(self, size, frame, r_context):
+        '''
+        Called when the bot has been rendered
+        '''
+        raise NotImplementedError('Child class should implement rcontext_ready')
