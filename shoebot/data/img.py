@@ -1,15 +1,19 @@
 from shoebot.data import _copy_attrs
 
 from StringIO import StringIO
+import os.path
 import cairo
 import numpy
 import Image as PILImage
 import gtk
-from shoebot.data import Grob, TransformMixin, ColorMixin
+import rsvg
 
-#class Image(Grob, TransformMixin, ColorMixin):
+from shoebot.data import Grob, ColorMixin
+from shoebot.util import RecordingSurface
+
 class Image(Grob, ColorMixin):
-    _pixbuf_cache = {}
+    # Pixbuff cache is [path]
+    _surface_cache = {}
 
     def __init__(self, canvas, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
         Grob.__init__(self, canvas)
@@ -36,21 +40,34 @@ class Image(Grob, ColorMixin):
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
-                pixbuf = self._pixbuf_cache.setdefault(path, gtk.gdk.pixbuf_new_from_file(path))
-                width = pixbuf.get_width()
-                height = pixbuf.get_height()
+                if os.path.splitext(path)[1].lower() == '.svg':
+                    if path in self._surface_cache:
+                        imagesurface = self._surface_cache[path]
+                    else:
+                        handle = rsvg.Handle(path)
+                        swidth, sheight = handle.get_dimension_data()[:2]
+                        imagesurface = RecordingSurface(width or swidth, height or sheight)
+                        ctx = cairo.Context(imagesurface)
+                        handle.render_cairo(ctx)
+                else:
+                    if path in self._surface_cache:
+                        imagesurface = self._surface_cache[path]
+                    else:
+                        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+                        width = pixbuf.get_width()
+                        height = pixbuf.get_height()
 
-                ''' create a new cairo surface to place the image on '''
-                surface = cairo.ImageSurface(0, width, height)
-                ''' create a context to the new surface '''
-                ct = cairo.Context(surface)
-                ''' create a GDK formatted Cairo context to the new Cairo native context '''
-                ct2 = gtk.gdk.CairoContext(ct)
-                ''' draw from the pixbuf to the new surface '''
-                ct2.set_source_pixbuf(pixbuf, 0, 0)
-                ct2.paint()
-                ''' surface now contains the image in a Cairo surface '''
-                imagesurface = ct2.get_target()
+                        ''' create a new cairo surface to place the image on '''
+                        surface = cairo.ImageSurface(0, width, height)
+                        ''' create a context to the new surface '''
+                        ct = cairo.Context(surface)
+                        ''' create a GDK formatted Cairo context to the new Cairo native context '''
+                        ct2 = gtk.gdk.CairoContext(ct)
+                        ''' draw from the pixbuf to the new surface '''
+                        ct2.set_source_pixbuf(pixbuf, 0, 0)
+                        ct2.paint()
+                        ''' surface now contains the image in a Cairo surface '''
+                        imagesurface = ct2.get_target()
 
                 if width is not None or height is not None:
                     if width:
@@ -86,8 +103,6 @@ class Image(Grob, ColorMixin):
             ##this is the item that will be drawn
             self._imagesurface = imagesurface
 
-        ### TODO - Get transform stuff from bezier path,
-        ###        Probably move it to TransformMixin        
         self._deferred_render()
 
     def _render(self, ctx):
