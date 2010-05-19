@@ -120,7 +120,7 @@ class Bot(object):
             align = Bot.LEFT,
             lineheight = 1,
             fillcolor = self.color(.2),
-            strokecolor = None,
+            strokecolor = self.color(1, 1, 1, 1),
             strokewidth = 1.0,
             background = self.color(1, 1, 1))
 

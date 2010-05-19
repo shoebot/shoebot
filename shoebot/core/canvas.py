@@ -129,16 +129,19 @@ class Canvas(object):
         '''
         output_func = self.output_closure(target, file_number)
         if defer:
-            self.drawqueue.append(output_func)
+            self._drawqueue.append(output_func)
         else:
-            self.drawqueue.append_immediate(output_func)
+            self._drawqueue.append_immediate(output_func)
             
 
-    def render(self, frame):
+    def render_canvas(self, frame):
         '''
         Passes the drawqueue to the sink for rendering
         '''
-        self.sink.render(self.size_or_default(), frame, self.drawqueue)
+        self.sink.render(self.size_or_default(), frame, self._drawqueue)
+
+    def deferred_render(self, render_func):
+        self._drawqueue.append(render_func)
 
     width = property(get_width)
     height = property(get_height)

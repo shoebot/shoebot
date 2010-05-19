@@ -156,7 +156,7 @@ class Context(object):
             while self._should_run(iterations):
                 frame = self.frame
                 self._exec_frame(source_or_code)
-                canvas.render(frame)
+                canvas.render_canvas(frame)
 
         except NameError:
             # if something goes wrong, print verbose system output

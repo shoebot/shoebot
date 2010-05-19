@@ -64,8 +64,8 @@ class CairoCanvas(Canvas):
         return cairo.Matrix()
 
     def reset_drawqueue(self):
-        self.drawqueue = self.initial_drawqueue()
-        self.drawqueue.append(self.ctx_render_background)
+        self._drawqueue = self.initial_drawqueue()
+        self._drawqueue.append(self.ctx_render_background)
 
     def reset_transform(self):
         self.mode = self.DEFAULT_MODE

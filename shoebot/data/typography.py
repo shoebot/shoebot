@@ -153,11 +153,12 @@ class Text(Grob, ColorMixin):
         # Go to initial point (CORNER or CENTER):
         transform = self._call_transform_mode(self._transform)
 
-        ctx.set_source_rgba(*self._strokecolor)
-        ctx.set_matrix(self._canvas.transform)
-        ctx.move_to(self.x,self.y)
-        self._pang_ctx.show_layout(self.layout)
-        self._pang_ctx.update_layout(self.layout)
+        if self._strokecolor is not None:
+            ctx.set_source_rgba(*self._strokecolor)
+            ctx.set_matrix(self._canvas.transform)
+            ctx.move_to(self.x,self.y)
+            self._pang_ctx.show_layout(self.layout)
+            self._pang_ctx.update_layout(self.layout)
         
 
 

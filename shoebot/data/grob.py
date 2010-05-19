@@ -8,7 +8,6 @@ class Grob(object):
 
     def __init__(self, canvas):
         self._canvas = canvas
-        self._drawqueue = canvas.drawqueue
         self._set_mode(canvas.mode)
         self._transform = cairo.Matrix(*self._canvas.transform)
 
@@ -57,8 +56,10 @@ class Grob(object):
 
     def _deferred_render(self, render_func=None):
         '''
-        Add a render function to the draw queue, defaults to self._render'''
-        self._drawqueue.append(render_func or self._render)
+        Pass a function to the canvas for deferred rendering,
+        defaults to self._render
+        '''
+        self._canvas.deferred_render(render_func or self._render)
 
     def _render(self, ctx):
         '''For overriding by GRaphicOBjects'''
