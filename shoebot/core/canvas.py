@@ -134,13 +134,14 @@ class Canvas(object):
             self._drawqueue.append_immediate(output_func)
             
 
-    def render_canvas(self, frame):
+    def flush(self, frame):
         '''
         Passes the drawqueue to the sink for rendering
         '''
         self.sink.render(self.size_or_default(), frame, self._drawqueue)
 
     def deferred_render(self, render_func):
+        '''Add a render function to the queue for rendering later'''
         self._drawqueue.append(render_func)
 
     width = property(get_width)
