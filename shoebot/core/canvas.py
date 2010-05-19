@@ -118,7 +118,7 @@ class Canvas(object):
         else:
             return self.DEFAULT_SIZE[1]
 
-    def output(self, target, defer=True, file_number=None):
+    def snapshot(self, target, defer=True, file_number=None):
         '''
         Ask the drawqueue to output to target.
 

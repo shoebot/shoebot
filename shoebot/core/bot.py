@@ -258,7 +258,7 @@ class Bot(object):
         if surface:
             if defer is None:
                 defer=False
-            self._canvas.output(surface, defer)
+            self._canvas.snapshot(surface, defer)
         if filename is None:
             # If nothing specied, we can see if a filename is available
             script_file = self._namespace.get('__file__')
@@ -269,7 +269,7 @@ class Bot(object):
         if filename:
             if defer is None:
                 defer=True
-            self._canvas.output(filename, defer=defer, file_number=file_number)
+            self._canvas.snapshot(filename, defer=defer, file_number=file_number)
             
             
 
