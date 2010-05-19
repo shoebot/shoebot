@@ -43,12 +43,12 @@ class Context(object):
     context.
     """
     def __init__(self, bot_class, canvas, namespace = None):
-        self.canvas = canvas
+        self._canvas = canvas
         self._set_defaults()
-        self.dynamic = True
-        self.speed = None
+        self._dynamic = True
+        self._speed = None
         self.quit = False
-        self.iteration = 0
+        self._iteration = 0
 
         self.namespace = namespace or {}
         self.bot = bot_class(self, canvas, self.namespace)
@@ -58,7 +58,7 @@ class Context(object):
         '''
         Set defaults before rendering
         '''
-        self.canvas.size = None
+        self._canvas.size = None
         self.frame = 0
 
     def _load_namespace(self, filename = None):
@@ -84,38 +84,38 @@ class Context(object):
         Run single frame of the bot
         '''
         namespace = self.namespace
-        self.canvas.reset_canvas()
+        self._canvas.reset_canvas()
         self._set_dynamic_vars()
-        if self.iteration == 0:
+        if self._iteration == 0:
             # First frame
             exec source_or_code in namespace
             namespace['setup']()
             namespace['draw']()
         else:
             # Subsequent frames
-            if self.dynamic:
+            if self._dynamic:
                 namespace['draw']()
             else:
                 exec source_or_code in namespace
         
         self.frame += 1
-        self.iteration += 1
+        self._iteration += 1
 
-    def should_run(self, iterations):
+    def _should_run(self, iterations):
         '''
         Return False if bot should quit
         '''
-        if self.iteration == 0:
+        if self._iteration == 0:
             # First frame always runs
             return True
         if self.quit:
             return False
         if iterations:
-            if self.iteration < iterations:
+            if self._iteration < iterations:
                 return True
         elif iterations is None:
             return True
-        if not self.dynamic:
+        if not self._dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
             print '###TODO'
@@ -147,13 +147,13 @@ class Context(object):
             if isinstance(source_or_code, basestring):
                 source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
             # do the magic            
-            canvas = self.canvas
+            canvas = self._canvas
             if not iterations:
                 if run_forever:
                     iterations = None
                 else:
                     iterations = 1
-            while self.should_run(iterations):
+            while self._should_run(iterations):
                 frame = self.frame
                 self._exec_frame(source_or_code)
                 canvas.render(frame)
