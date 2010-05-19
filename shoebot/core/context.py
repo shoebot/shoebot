@@ -44,7 +44,7 @@ class Context(object):
     """
     def __init__(self, bot_class, canvas, namespace = None):
         self.canvas = canvas
-        self.set_defaults()
+        self._set_defaults()
         self.dynamic = True
         self.speed = None
         self.quit = False
@@ -54,7 +54,7 @@ class Context(object):
         self.bot = bot_class(self, canvas, self.namespace)
         canvas.sink.set_botcontext(self)
 
-    def set_defaults(self):
+    def _set_defaults(self):
         '''
         Set defaults before rendering
         '''

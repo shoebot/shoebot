@@ -67,7 +67,5 @@ from bezier import BezierPath, PathElement, ClippingPath, EndClip
 from typography import Text
 from img import Image
 from variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
-from input_devices import PointingDevice, PointerGroup, KeyStateHandler, \
-               GTKPointer, GTKKeyStateHandler
 
 

@@ -48,4 +48,4 @@ from cairo_sink import DrawQueueSink, CairoImageSink
 from cairo_util import RecordingSurface
 
 from context import Context
-
+from input_device import InputDeviceMixin
