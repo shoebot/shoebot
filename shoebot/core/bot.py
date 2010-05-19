@@ -234,7 +234,7 @@ class Bot:
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self,filename=None, surface=None, immediate=None, autonumber=False):
+    def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file.
 
         There's two uses for this method:
@@ -242,11 +242,11 @@ class Bot:
         - called from the Shoebot window menu, which requires the source surface
         to be specified in the arguments.
 
-        Setting immediate to True:
+        Setting defer to False:
         Ensures that a file is written before returning, but can hamper performance.
         Usually you won't want to do this.
 
-        For files immediate defaults to False, and for Surfaces to True, this means
+        For files defer defaults to True, and for Surfaces to False, this means
         writing files won't stop execution, while the surface will be ready when
         snapshot returns.
         
@@ -258,9 +258,9 @@ class Bot:
         else:
             file_number=None
         if surface:
-            if immediate is None:
-                immediate=True
-            self._canvas.output(surface, immediate)
+            if defer is None:
+                defer=False
+            self._canvas.output(surface, defer)
         if filename is None:
             # If nothing specied, we can see if a filename is available
             script_file = self._namespace.get('__file__')
@@ -269,9 +269,9 @@ class Bot:
                 file_number=True
 
         if filename:
-            if immediate is None:
-                immediate=False
-            self._canvas.output(filename, immediate=immediate, file_number=file_number)
+            if defer is None:
+                defer=True
+            self._canvas.output(filename, defer=defer, file_number=file_number)
             
             
 

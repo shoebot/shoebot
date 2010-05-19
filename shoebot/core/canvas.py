@@ -117,7 +117,7 @@ class Canvas:
         else:
             return self.DEFAULT_SIZE[1]
 
-    def output(self, target, immediate=False, file_number=None):
+    def output(self, target, defer=True, file_number=None):
         '''
         Ask the drawqueue to output to target.
 
@@ -127,10 +127,11 @@ class Canvas:
         If target is not supported then an exception is thrown.
         '''
         output_func = self.output_closure(target, file_number)
-        if immediate:
-            self.drawqueue.append_immediate(output_func)
-        else:
+        if defer:
             self.drawqueue.append(output_func)
+        else:
+            self.drawqueue.append_immediate(output_func)
+            
 
     def render(self, frame):
         '''
