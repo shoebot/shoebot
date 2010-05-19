@@ -55,8 +55,11 @@ class Grob:
         return transform
 
     def _deferred_render(self, render_func=None):
+        '''
+        Add a render function to the draw queue, defaults to self._render'''
         self._drawqueue.append(render_func or self._render)
 
     def _render(self, ctx):
+        '''For overriding by GRaphicOBjects'''
         raise NotImplementedError()
-        pass
+
