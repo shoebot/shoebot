@@ -32,6 +32,7 @@ import pango
 import pangocairo
 from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 from shoebot.util import RecordingSurfaceA8
+from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
 ##class Text(Grob, TransformMixin, ColorMixin):
 class Text(Grob, ColorMixin):
@@ -202,13 +203,13 @@ class Text(Grob, ColorMixin):
         for item in pathdata:
             cmd = item[0]
             args = item[1]
-            if cmd == 0: # moveto
+            if cmd == PATH_MOVE_TO:
                 p.moveto(*args)
-            elif cmd == 1: # lineto
+            elif cmd == PATH_LINE_TO:
                 p.lineto(*args)
-            elif cmd == 2: # curveto
+            elif cmd == PATH_CURVE_TO:
                 p.curveto(*args)
-            elif cmd == 3: # close
+            elif cmd == PATH_CLOSE_PATH:
                 p.closepath()
         return p
         # cairo function for freeing path memory
