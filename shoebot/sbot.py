@@ -45,7 +45,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     from core import NodeBot
     ###from drawbot import Drawbot ###TODO
 
-    if window or varwindow:
+    if window or show_vars:
         if os.path.isfile(src):
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:

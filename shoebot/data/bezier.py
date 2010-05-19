@@ -37,7 +37,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None):
+    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode='corner'):
         # Internally stores two lists
         #
         # _render_funcs  References to functions to render each PathElement
@@ -50,6 +50,7 @@ class BezierPath(Grob):
         self._fillcolor = fillcolor or canvas.fillcolor
         self._strokecolor = strokecolor or canvas.strokecolor
         self._strokewidth = strokewidth or canvas.strokewidth
+        self._pathmode = pathmode or canvas.pathmode
         self.closed = False
 
         self._drawn = False
@@ -145,11 +146,24 @@ class BezierPath(Grob):
         '''
         # Go to initial point (CORNER or CENTER):
         transform = self._call_transform_mode(self._transform)
+
+        # Change the origin if nessacary
+        if self._pathmode == 'center':
+            xc, yc = self._get_center()
+            transform.translate(-xc, -yc)
+
         cairo_ctx.set_matrix(transform)
+
+        # Change the origin if nessacary
+        if self._pathmode == 'center':
+            xc, yc = self._get_center()
+            cairo_ctx.move_to(-xc, -yc)
+
         # Run the path commands on the cairo context:
         self._traverse(cairo_ctx)
         ## Matrix affects stroke, so we need to reset it:
         cairo_ctx.set_matrix(cairo.Matrix())
+
         if self._fillcolor:
             cairo_ctx.set_source_rgba(*self._fillcolor)
             if self._strokecolor:

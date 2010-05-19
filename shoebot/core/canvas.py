@@ -58,6 +58,7 @@ class Canvas:
         self.finished = False
         self.color_range = 1
         self.color_mode = 1
+        self.path_mode = 'CORNER'
 
     def initial_drawqueue(self):
         '''

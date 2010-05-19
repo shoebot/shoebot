@@ -1,4 +1,5 @@
 import sys
+import cairo
 from shoebot import ShoebotError
 from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Transform, Image
@@ -40,7 +41,7 @@ class NodeBot(Bot):
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        path = self.BezierPath()
+        path = self.BezierPath(**kwargs)
         path.rect(x, y, width, height, roundness)
         if draw:
             path.draw()
@@ -400,7 +401,11 @@ class NodeBot(Bot):
         self._canvas.scale(x, y)
 
     def skew(self, x=1, y=0):
-        self._transform.skew(x,y)
+        ### TODO bring back transform mixin
+        t = self._canvas.transform
+        t *= cairo.Matrix(1,0,x,1,0,0)
+        t *= cairo.Matrix(1,y,0,1,0,0)
+        self._canvas.transform = t
 
     def push(self):
         self._canvas.push_matrix()
