@@ -6,6 +6,8 @@ from math import pi as _pi
 
 import cairo
 
+from grob import CENTER, CORNER
+
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -37,7 +39,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode='corner'):
+    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER):
         # Internally stores two lists
         #
         # _render_funcs  References to functions to render each PathElement
@@ -85,7 +87,7 @@ class BezierPath(Grob):
     def rellineto(self, x, y):
         self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
-    def rect(self, x, y, w, h, roundness=0.0, rectmode='corner'):
+    def rect(self, x, y, w, h, roundness=0.0, rectmode=CORNER):
         if not roundness:
             self.moveto(x, y)
             self.rellineto(w, 0)
@@ -148,14 +150,14 @@ class BezierPath(Grob):
         transform = self._call_transform_mode(self._transform)
 
         # Change the origin if nessacary
-        if self._pathmode == 'center':
+        if self._pathmode == CENTER:
             xc, yc = self._get_center()
             transform.translate(-xc, -yc)
 
         cairo_ctx.set_matrix(transform)
 
         # Change the origin if nessacary
-        if self._pathmode == 'center':
+        if self._pathmode == CENTER:
             xc, yc = self._get_center()
             cairo_ctx.move_to(-xc, -yc)
 
