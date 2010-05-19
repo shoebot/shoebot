@@ -234,7 +234,7 @@ class Bot:
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self,filename=None, surface=None, immediate=False, autonumber=False):
+    def snapshot(self,filename=None, surface=None, immediate=None, autonumber=False):
         '''Save the contents of current surface into a file.
 
         There's two uses for this method:
@@ -246,6 +246,10 @@ class Bot:
         Ensures that a file is written before returning, but can hamper performance.
         Usually you won't want to do this.
 
+        For files immediate defaults to False, and for Surfaces to True, this means
+        writing files won't stop execution, while the surface will be ready when
+        snapshot returns.
+        
         The drawqueue will have to stop and render everything up until this
         point.
         '''
@@ -254,7 +258,9 @@ class Bot:
         else:
             file_number=None
         if surface:
-            self._canvas.output(surface, immediate=True)
+            if immediate is None:
+                immediate=True
+            self._canvas.output(surface, immediate)
         if filename is None:
             # If nothing specied, we can see if a filename is available
             script_file = self._namespace.get('__file__')
@@ -263,6 +269,8 @@ class Bot:
                 file_number=True
 
         if filename:
+            if immediate is None:
+                immediate=False
             self._canvas.output(filename, immediate=immediate, file_number=file_number)
             
             
