@@ -156,11 +156,6 @@ class BezierPath(Grob):
 
         cairo_ctx.set_matrix(transform)
 
-        # Change the origin if nessacary
-        if self._pathmode == CENTER:
-            xc, yc = self._get_center()
-            cairo_ctx.move_to(-xc, -yc)
-
         # Run the path commands on the cairo context:
         self._traverse(cairo_ctx)
         ## Matrix affects stroke, so we need to reset it:
