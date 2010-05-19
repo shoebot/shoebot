@@ -34,18 +34,16 @@ from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_att
 from shoebot.util import RecordingSurfaceA8
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
-##class Text(Grob, TransformMixin, ColorMixin):
 class Text(Grob, ColorMixin):
 
     def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
         Grob.__init__(self, canvas)
-        ##TransformMixin.__init__(self) ### TODO TransformMixin
         ColorMixin.__init__(self, canvas, **kwargs)
 
         self._transform = canvas.transform
 
-        self.ctx = ctx
-        self.pang_ctx = None
+        self._ctx = ctx
+        self._pang_ctx = None
 
         self.text = unicode(text)
         self.x = x
@@ -67,13 +65,13 @@ class Text(Grob, ColorMixin):
         if kwargs.has_key("weight"):
             if kwargs["weight"]=="ultralight":
                 self._weight = pango.WEIGHT_ULTRALIGHT
-            if kwargs["weight"]=="light":
+            elif kwargs["weight"]=="light":
                 self._weight = pango.WEIGHT_LIGHT
-            if kwargs["weight"]=="bold":
+            elif kwargs["weight"]=="bold":
                 self._weight = pango.WEIGHT_BOLD
-            if kwargs["weight"]=="ultrabold":
+            elif kwargs["weight"]=="ultrabold":
                 self._weight = pango.WEIGHT_ULTRABOLD
-            if kwargs["weight"]=="heavy":
+            elif kwargs["weight"]=="heavy":
                 self._weight = pango.WEIGHT_HEAVY                                                
         self._fontface.set_weight(self._weight)
 
@@ -113,21 +111,21 @@ class Text(Grob, ColorMixin):
 
         
         if bool(ctx):
-            self._render(self.ctx)
+            self._render(self._ctx)
         else:
             # Normal rendering, can be deferred
             self._deferred_render()
 
     def _get_context(self):
-        self.ctx = self.ctx or cairo.Context(RecordingSurfaceA8(0, 0))
-        return self.ctx
+        self._ctx = self._ctx or cairo.Context(RecordingSurfaceA8(0, 0))
+        return self._ctx
 
     def _render(self, ctx = None):
         ctx = ctx or self._get_context()
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
-        self.pang_ctx = pangocairo.CairoContext(ctx)
-        self.layout = self.pang_ctx.create_layout()
+        self._pang_ctx = pangocairo.CairoContext(ctx)
+        self.layout = self._pang_ctx.create_layout()
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
         self.layout.set_spacing(((self._lineheight-1)*self._fontsize)*pango.SCALE)
@@ -158,8 +156,8 @@ class Text(Grob, ColorMixin):
         ctx.set_source_rgba(*self._strokecolor)
         ctx.set_matrix(self._canvas.transform)
         ctx.move_to(self.x,self.y)
-        self.pang_ctx.show_layout(self.layout)
-        self.pang_ctx.update_layout(self.layout)
+        self._pang_ctx.show_layout(self.layout)
+        self._pang_ctx.update_layout(self.layout)
         
 
 
@@ -191,10 +189,10 @@ class Text(Grob, ColorMixin):
     metrics = property(_get_metrics)
 
     def _get_path(self):
-        if not self.pang_ctx:
+        if not self._pang_ctx:
             self._render()
         # add pango layout to current cairo path in temporary context
-        self.pang_ctx.layout_path(self.layout)
+        self._pang_ctx.layout_path(self.layout)
         # retrieve current path from current context
         pathdata = self._get_context().copy_path()
         # creates a BezierPath instance for storing new shoebot path

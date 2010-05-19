@@ -30,7 +30,7 @@
 
 from collections import deque
 
-class DrawQueue:
+class DrawQueue(object):
     '''
     A list of draw commands, stored as callables that, are
     passed a set of parameters to draw on from the canvas
@@ -64,7 +64,7 @@ class DrawQueue:
             render_func(r_context)
 
 
-class DrawQueueSink:
+class DrawQueueSink(object):
     '''
     DrawQueueSink, creates parameters for use by the draw queue.
     (the render_context).

@@ -48,7 +48,7 @@ CENTER = 'center'
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
-class Canvas:
+class Canvas(object):
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
 

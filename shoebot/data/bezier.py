@@ -218,7 +218,7 @@ class EndClip(Grob):
     def __init__(self, bot, **kwargs):
         self._bot = bot
 
-class PathElement:
+class PathElement(object):
     '''
     Represents a single element in a Bezier path.
 

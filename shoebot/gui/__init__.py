@@ -29,7 +29,6 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''GTK front-end for Shoebot'''
 
-### TODO
 from gtk_drawingarea import ShoebotWidget
 from socket_server import SocketServerMixin
 from var_window import VarWindow

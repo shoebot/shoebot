@@ -1,4 +1,4 @@
-class Point:
+class Point(object):
     '''
     Taken from Nodebox and modified
     '''

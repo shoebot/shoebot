@@ -13,7 +13,7 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-class SocketServerMixin:
+class SocketServerMixin(object):
     def server(self, host, port):
         '''Initialize server and start listening.'''
         self.sock = socket.socket()

@@ -13,7 +13,7 @@ else:
     import os.path
     ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
-class VarWindow:
+class VarWindow(object):
     def __init__(self, parent, bot):
         self.parent = parent
 

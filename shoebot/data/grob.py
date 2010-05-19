@@ -3,7 +3,7 @@ import cairo
 CENTER = 'center'
 CORNER = 'corner'
 
-class Grob:
+class Grob(object):
     '''A GRaphic OBject is the base class for all DrawingPrimitives.'''
 
     def __init__(self, canvas):

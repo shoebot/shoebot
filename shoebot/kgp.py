@@ -82,7 +82,7 @@ def openAnything(source):
 
 class NoSourceError(Exception): pass
 
-class KantGenerator:
+class KantGenerator(object):
     """generates mock philosophy based on a context-free grammar"""
     
     def __init__(self, grammar, source=None):

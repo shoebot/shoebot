@@ -32,7 +32,7 @@
 import os
 import traceback
 
-class Context:
+class Context(object):
     """
     Context that Bot is executed within.
 
@@ -45,7 +45,7 @@ class Context:
     def __init__(self, bot_class, canvas, namespace = None):
         self.canvas = canvas
         self.set_defaults()
-        self.dynamic = False
+        self.dynamic = True
         self.speed = None
         self.quit = False
         self.iteration = 0
@@ -89,13 +89,11 @@ class Context:
         if self.iteration == 0:
             # First frame
             exec source_or_code in namespace
-            if 'setup' in namespace:
-                namespace['setup']()
-            if 'draw' in self.namespace:
-                namespace['draw']()
+            namespace['setup']()
+            namespace['draw']()
         else:
             # Subsequent frames
-            if 'draw' in namespace:
+            if self.dynamic:
                 namespace['draw']()
             else:
                 exec source_or_code in namespace
@@ -117,6 +115,11 @@ class Context:
                 return True
         elif iterations is None:
             return True
+        if not self.dynamic:
+            ### TODO... gtk window needs to run in another thread, that will keep
+            ### going until explicitly closed
+            print '###TODO'
+            return False
         return False
 
     def run(self, inputcode, iterations = None, run_forever = False):

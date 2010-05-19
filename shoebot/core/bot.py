@@ -56,7 +56,7 @@ sys.path.append(LIB_DIR)
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
-class Bot:
+class Bot(object):
     '''
     A Bot is an interface to receive user commands (through scripts or direct
     calls) and pass them to a canvas for drawing.
@@ -102,16 +102,14 @@ class Bot:
         self._canvas = canvas
         self._namespace = namespace
         self._autoclosepath = True
-        self._set_defaults()
+        self._set_initial_defaults()
         self._vars = []
         self._oldvars = []
         
-    def _set_defaults(self):
+    def _set_initial_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
-        ### self.framerate = 30
-
         self.WIDTH, self.HEIGHT = self._canvas.DEFAULT_SIZE
 
         self._transformmode = Bot.CENTER
@@ -138,7 +136,8 @@ class Bot:
 
     def draw(self):
         """ For override by user sketch """
-        pass
+        print 'bot.draw'
+        self._context.dynamic = False
 
     def EndClip(self, *args, **kwargs):
         return self._makeInstance(EndClip, args, kwargs)
@@ -167,7 +166,6 @@ class Bot:
 
     def _addvar(self, v):
         ''' Sets a new accessible variable.'''
-        ### TODO
         oldvar = self._findvar(v.name)
         if oldvar is not None:
             if oldvar.compliesTo(v):

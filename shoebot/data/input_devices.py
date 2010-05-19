@@ -1,6 +1,6 @@
 import gtk
 
-class PointingDevice:
+class PointingDevice(object):
     """
     Base class for pointing device, contains only dummy values
     """
