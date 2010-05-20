@@ -55,6 +55,7 @@ class Text(Grob, ColorMixin):
         self._fontsize = kwargs.get('fontsize', canvas.fontsize)
         self._lineheight = kwargs.get('lineheight', canvas.lineheight)
         self._align = kwargs.get('align', canvas.align)
+        self._indent = kwargs.get("indent")
 
         # here we start to do the magic with pango, first we set typeface    
         self._fontface = pango.FontDescription()
@@ -101,15 +102,9 @@ class Text(Grob, ColorMixin):
                 self._stretch = pango.STRETCH_ULTRA_EXPANDED
         self._fontface.set_stretch(self._stretch)                                              
         # then we set fontsize (multiplied by pango.SCALE)
-        if kwargs.has_key("fontsize"):
-            self._fontsize = kwargs["fontsize"] 
         self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
-        if kwargs.has_key("lineheight"):
-            self._lineheight = kwargs["lineheight"]           
-        if kwargs.has_key("align"):
-            self._align= kwargs["align"]
 
-        
+
         if bool(ctx):
             self._render(self._ctx)
         else:
@@ -137,8 +132,8 @@ class Text(Grob, ColorMixin):
         # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
             self.layout.set_width(self.width*pango.SCALE)
-            if kwargs.has_key("indent"):
-                self.layout.set_indent(kwargs["indent"]*pango.SCALE)                
+            if self._indent:
+                self.layout.set_indent(self._indent*pango.SCALE)                
         # set text alignment    
         if self._align == "right":
             self.layout.set_alignment(pango.ALIGN_RIGHT)
@@ -150,13 +145,14 @@ class Text(Grob, ColorMixin):
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
 
-        # Go to initial point (CORNER or CENTER):
-        transform = self._call_transform_mode(self._transform)
-
         if self._fillcolor is not None:
-            ctx.set_source_rgba(*self._fillcolor)
+            # Go to initial point (CORNER or CENTER):
+            transform = self._call_transform_mode(self._transform)
             ctx.set_matrix(self._canvas.transform)
+
             ctx.move_to(self.x,self.y)
+
+            ctx.set_source_rgba(*self._fillcolor)
             self._pang_ctx.show_layout(self.layout)
             self._pang_ctx.update_layout(self.layout)
         
