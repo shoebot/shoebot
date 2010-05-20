@@ -59,7 +59,7 @@ class Context(object):
         Set defaults before rendering
         '''
         self._canvas.size = None
-        self.frame = 0
+        self._frame = 0
 
     def _load_namespace(self, filename = None):
         namespace = self.namespace
@@ -77,7 +77,7 @@ class Context(object):
         self.namespace = namespace
 
     def _set_dynamic_vars(self):
-        self.namespace['FRAME'] = self.frame
+        self.namespace['FRAME'] = self._frame
 
     def _exec_frame(self, source_or_code):
         '''
@@ -98,7 +98,7 @@ class Context(object):
             else:
                 exec source_or_code in namespace
         
-        self.frame += 1
+        self._frame += 1
         self._iteration += 1
 
     def _should_run(self, iterations):
@@ -154,7 +154,7 @@ class Context(object):
                 else:
                     iterations = 1
             while self._should_run(iterations):
-                frame = self.frame
+                frame = self._frame
                 self._exec_frame(source_or_code)
                 canvas.flush(frame)
 
