@@ -120,15 +120,11 @@ class Bot(object):
             align = Bot.LEFT,
             lineheight = 1,
             fillcolor = self.color(.2),
-            strokecolor = self.color(1, 1, 1, 1),
+            strokecolor = None,
             strokewidth = 1.0,
             background = self.color(1, 1, 1))
 
-    def _makeInstance(self, clazz, args, kwargs):
-        '''Creates an instance of a class defined in this document.
-           This method sets the context of the object to the current context.'''
-        inst = clazz(self._canvas, *args, **kwargs)
-        return inst
+    #### Functions for override
 
     def setup(self):
         """ For override by user sketch """
@@ -137,6 +133,14 @@ class Bot(object):
     def draw(self):
         """ For override by user sketch """
         self._context.dynamic = False
+
+    #### Classes
+
+    def _makeInstance(self, clazz, args, kwargs):
+        '''Creates an instance of a class defined in this document.
+           This method sets the context of the object to the current context.'''
+        inst = clazz(self._canvas, *args, **kwargs)
+        return inst
 
     def EndClip(self, *args, **kwargs):
         return self._makeInstance(EndClip, args, kwargs)
