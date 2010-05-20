@@ -50,6 +50,7 @@ class Text(Grob, ColorMixin):
         self.y = y
         self.width = width
         self.height = height
+        self._outline = outline
 
         self._fontfile = kwargs.get('font', canvas.fontfile)
         self._fontsize = kwargs.get('fontsize', canvas.fontsize)
@@ -151,8 +152,9 @@ class Text(Grob, ColorMixin):
             ctx.set_matrix(self._canvas.transform)
 
             ctx.move_to(self.x,self.y)
-
-            ctx.set_source_rgba(*self._fillcolor)
+            
+            if self._outline is False:
+                ctx.set_source_rgba(*self._fillcolor)
             self._pang_ctx.show_layout(self.layout)
             self._pang_ctx.update_layout(self.layout)
         
