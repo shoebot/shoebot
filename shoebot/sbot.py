@@ -45,21 +45,25 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     from core import NodeBot
     ###from drawbot import Drawbot ###TODO
 
+    sink_class, sink_params = None, None
     if window or show_vars:
         if os.path.isfile(src):
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
             title = 'Untitled - Shoebot'
-        cairo_sink = ShoebotWindow(title, show_vars)
+        sink_class, sink_params = ShoebotWindow, { 'title' : title, 'show_vars' : show_vars }
     else:
         if iterations is None:
             iterations = 1
-        cairo_sink = CairoImageSink(outputfile, format, iterations > 1)
+        sink_class, sink_params = CairoImageSink(outputfile, format, iterations > 1)
 
     BOT_CLASSES = {
         #DRAWBOT : Drawbot,
         NODEBOX : NodeBot,
         #SHOEBOT : Shoebot,
     }
-    context = Context(BOT_CLASSES[grammar], CairoCanvas(cairo_sink, enable_cairo_queue = True))
+    #context = Context(BOT_CLASSES[grammar], CairoCanvas(cairo_sink, enable_cairo_queue = True))
+    context = Context(BOT_CLASSES[grammar],
+                      CairoCanvas, canvas_params={'sink_class': sink_class, 'sink_params': sink_params, 'enable_cairo_queue': True})
+
     context.run(src, iterations, True)

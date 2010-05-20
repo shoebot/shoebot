@@ -73,10 +73,7 @@ class DrawQueueSink(object):
     parameters used by implementations of the drawqueue,
     canvas, and sink.
     '''
-    def __init__(self):
-        pass
-
-    def set_botcontext(self, botcontext):
+    def __init__(self, botcontext):
         self.botcontext = botcontext
 
     def render(self, size, frame, drawqueue):

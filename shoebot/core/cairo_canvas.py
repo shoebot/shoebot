@@ -40,10 +40,10 @@ from cairo_drawqueue import CairoDrawQueue
 
 class CairoCanvas(Canvas):
     ''' Cairo implementation of Canvas '''
-    def __init__(self, sink, enable_cairo_queue = False):
-        Canvas.__init__(self, sink)
+    def __init__(self, botcontext, **kwargs):
+        Canvas.__init__(self, botcontext, **kwargs)
         self.size = None
-        self.enable_cairo_queue = enable_cairo_queue
+        self.enable_cairo_queue = kwargs.get('enable_cairo_queue', True)
         self.reset_canvas()
 
     def initial_drawqueue(self):

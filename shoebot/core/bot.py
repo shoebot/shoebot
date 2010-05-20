@@ -136,7 +136,6 @@ class Bot(object):
 
     def draw(self):
         """ For override by user sketch """
-        print 'bot.draw'
         self._context.dynamic = False
 
     def EndClip(self, *args, **kwargs):

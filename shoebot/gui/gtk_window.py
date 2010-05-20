@@ -8,12 +8,13 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, title=None, show_vars=False):
+    def __init__(self, botcontext, **kwargs):
         gtk.Window.__init__(self)
-        DrawQueueSink.__init__(self)
+        DrawQueueSink.__init__(self, botcontext)
 
-        sb_widget = ShoebotWidget()
+        sb_widget = ShoebotWidget(botcontext)
 
+        title = kwargs['title']
         if title:
             self.set_title(title)
         self.connect("delete-event", gtk.main_quit)

@@ -36,8 +36,11 @@ class CairoImageSink(DrawQueueSink):
     '''
     DrawQueueSink that uses cairo contexts as the render context.
     '''
-    def __init__(self, filename, format = None, multifile = False):
-        DrawQueueSink.__init__(self)
+    def __init__(self, botcontext, **kwargs):
+        DrawQueueSink.__init__(self, botcontext)
+        format = kwargs.get('format')
+        filename = kwargs.get('filename')
+        multifile = kwargs.get('multifile', False)
         if format is None:
             format = os.path.splitext(filename)[1][1:].lower()
         self.format = format

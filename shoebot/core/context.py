@@ -42,8 +42,9 @@ class Context(object):
     will always use ctx in the name, and bot contexts
     context.
     """
-    def __init__(self, bot_class, canvas, namespace = None):
-        self._canvas = canvas
+    def __init__(self, bot_class, canvas_class, canvas_params = None, namespace = None):
+        # Construct canvas class:
+        self._canvas = canvas_class(self, **canvas_params)
         self._set_defaults()
         self._dynamic = True
         self._speed = None
@@ -51,8 +52,7 @@ class Context(object):
         self._iteration = 0
 
         self.namespace = namespace or {}
-        self.bot = bot_class(self, canvas, self.namespace)
-        canvas.sink.set_botcontext(self)
+        self.bot = bot_class(self, self._canvas, self.namespace)
 
     def _set_defaults(self):
         '''
