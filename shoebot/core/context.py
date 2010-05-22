@@ -64,16 +64,15 @@ class Context(object):
     def _load_namespace(self, filename = None):
         namespace = self.namespace
 
-        for name in dir(self.bot):
-            if name[0] != '_':
-                namespace[name] = getattr(self.bot, name)
-
         from shoebot import data
         for name in dir(data):
             namespace[name] = getattr(data, name)
 
-        if filename:
-            namespace['__file__'] = filename
+        for name in dir(self.bot):
+            if name[0] != '_':
+                namespace[name] = getattr(self.bot, name)
+
+        namespace['__file__'] = filename
         self.namespace = namespace
 
     def _set_dynamic_vars(self):
