@@ -66,6 +66,14 @@ class BezierPath(Grob):
         self._render_funcs.append(render_func)
         self._elements.append(element)
 
+    def append(self, pe):
+        if pe.cmd == MOVETO:
+            self._append_element(self._canvas.moveto_closure(p.x, p.y), pe)
+        elif pe.cmd == LINETO:
+            self._append_element(self._canvas.lineto_closure(p.x, p.y), pe)
+        elif pe.cmd == CURVETO:
+            self._append_element(self._canvas.curveto_closure(p.x, p.y, p.ctrl1.x, p.ctrl1.y, p.ctrl2.x, p.ctrl2.y), pe)
+
     def moveto(self, x, y):
         self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
 

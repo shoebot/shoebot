@@ -3,6 +3,7 @@ class Point(object):
     Taken from Nodebox and modified
     '''
     def __init__(self, *args):
+        self.cmd = args[0]
         if len(args) == 3:
             self.x, self.y, self.z = args
         if len(args) == 2:
