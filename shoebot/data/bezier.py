@@ -66,7 +66,8 @@ class BezierPath(Grob):
 
     def append(self, *args):
         if len(args) is 2:
-            self.moveto(*args)            
+            ## TODO, check this against nodebox
+            self.moveto(*args)
         else:
             if pe.cmd == MOVETO:
                 self._append_element(self._canvas.moveto_closure(p.x, p.y), pe)
