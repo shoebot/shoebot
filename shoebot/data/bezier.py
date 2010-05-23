@@ -40,14 +40,13 @@ class BezierPath(Grob):
     for getting path dimensions)
     '''
     def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER):
-        # Internally stores two lists
+        # Stores _elements list, this is a 2 dimensional list, storing 
+        # render_function and either a PathElement or the arguments that need
+        # to be passed to a PathElement when it's created.
         #
-        # _render_funcs  References to functions to render each PathElement
-        # _elements      Items start as tuples, but if a PathElement is
-        #                requested then it is stored there.
+        # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, canvas = canvas)
 
-        self._render_funcs = []
         self._elements = []
         self._fillcolor = fillcolor or canvas.fillcolor
         self._strokecolor = strokecolor or canvas.strokecolor
@@ -58,13 +57,12 @@ class BezierPath(Grob):
         self._drawn = False
         self._center = None
 
-    def _append_element(self, render_func, element):
+    def _append_element(self, render_func, pe):
         '''
         Append a render function and the parameters to pass
         an equivilent PathElement, or the PathElement itself.
         '''
-        self._render_funcs.append(render_func)
-        self._elements.append(element)
+        self._elements.append((render_func, pe))
 
     def append(self, pe):
         if pe.cmd == MOVETO:
@@ -73,6 +71,12 @@ class BezierPath(Grob):
             self._append_element(self._canvas.lineto_closure(p.x, p.y), pe)
         elif pe.cmd == CURVETO:
             self._append_element(self._canvas.curveto_closure(p.x, p.y, p.ctrl1.x, p.ctrl1.y, p.ctrl2.x, p.ctrl2.y), pe)
+
+    def copy(self):
+        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._pathmode)
+        path.closed = self.closed
+        path._center = self._center
+        path._elements = list(self._elements)
 
     def moveto(self, x, y):
         self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
@@ -118,7 +122,7 @@ class BezierPath(Grob):
         '''
         Traverse this path
         '''
-        for render_func in self._render_funcs:
+        for render_func, pe in self._elements:
             render_func(cairo_ctx)
 
     def _get_center(self):
