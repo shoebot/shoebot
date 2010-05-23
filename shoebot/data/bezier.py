@@ -77,6 +77,7 @@ class BezierPath(Grob):
         path.closed = self.closed
         path._center = self._center
         path._elements = list(self._elements)
+        return path
 
     def moveto(self, x, y):
         self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
