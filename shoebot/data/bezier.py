@@ -48,10 +48,10 @@ class BezierPath(Grob):
         Grob.__init__(self, canvas = canvas)
 
         self._elements = []
-        self._fillcolor = fillcolor or canvas.fillcolor
-        self._strokecolor = strokecolor or canvas.strokecolor
-        self._strokewidth = strokewidth or canvas.strokewidth
-        self._pathmode = pathmode or canvas.pathmode
+        self._fillcolor = fillcolor
+        self._strokecolor = strokecolor
+        self._strokewidth = strokewidth
+        self._pathmode = pathmode
         self.closed = False
 
         self._drawn = False
@@ -73,7 +73,7 @@ class BezierPath(Grob):
             self._append_element(self._canvas.curveto_closure(p.x, p.y, p.ctrl1.x, p.ctrl1.y, p.ctrl2.x, p.ctrl2.y), pe)
 
     def copy(self):
-        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._pathmode)
+        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
         path.closed = self.closed
         path._center = self._center
         path._elements = list(self._elements)
@@ -159,6 +159,8 @@ class BezierPath(Grob):
         TODO: Need to work out how to move the cairo specific
               bits somewhere else.
         '''
+        self._set_draw_attributes()
+
         # Go to initial point (CORNER or CENTER):
         transform = self._call_transform_mode(self._transform)
 
