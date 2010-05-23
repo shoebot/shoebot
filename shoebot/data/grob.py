@@ -23,19 +23,33 @@ class Grob(object):
         else:
             raise ValueError('mode must be CENTER or CORNER')
 
-    def _set_draw_attributes(self):
-        '''
-        If any of fillcolor, strokecolor, strokewidth or pathmode
-        are not set then fetches it from the canvas.
-        '''
-        if self._fillcolor is None:
-            self._fillcolor = self._canvas.fillcolor
-        if self._strokecolor is None:
-            self._strokecolor = self._canvas.strokecolor
-        if self._strokewidth is None:
-            self._strokewidth = self._canvas.strokewidth
-        if self._pathmode is None:
-            self._pathmode = self._canvas.pathmode
+    def _get_fillcolor(self):
+        '''Return fillcolor or get it from self._canvas'''
+        if self._fillcolor is not None:
+            return self._fillcolor
+        else:
+            return self._canvas.fillcolor
+
+    def _get_strokecolor(self):
+        '''Return strokecolor or get it from self._canvas'''
+        if self._strokecolor is not None:
+            return self._strokecolor
+        else:
+            return self._canvas.strokecolor
+
+    def _get_strokewidth(self):
+        '''Return strokewidth or get it from self._canvas'''
+        if self._strokewidth is not None:
+            return self._strokewidth
+        else:
+            return self._canvas.strokewidth
+
+    def _get_pathmode(self):
+        '''Return pathmode or get it from self._canvas'''
+        if self._pathmode is not None:
+            return self._pathmode
+        else:
+            return self._canvas.pathmode
 
     def _get_center():
         '''Implementations must return the x, y of their center'''

@@ -152,50 +152,49 @@ class BezierPath(Grob):
         ### to optimise drawing
         return center
 
-    def _render(self, cairo_ctx):
-        '''
-        At the moment this is based on cairo.
+    def _render_closure(self):
+        '''Use a closure so that draw attributes can be saved'''
+        fillcolor = self._get_fillcolor()
+        strokecolor = self._get_strokecolor()
+        strokewidth = self._get_strokewidth()
 
-        TODO: Need to work out how to move the cairo specific
-              bits somewhere else.
-        '''
-        self._set_draw_attributes()
+        def _render(cairo_ctx):
+            '''
+            At the moment this is based on cairo.
 
-        # Go to initial point (CORNER or CENTER):
-        transform = self._call_transform_mode(self._transform)
+            TODO: Need to work out how to move the cairo specific
+                  bits somewhere else.
+            '''
+            # Go to initial point (CORNER or CENTER):
+            transform = self._call_transform_mode(self._transform)
 
-        # Change the origin if nessacary
-        if self._pathmode == CENTER:
-            xc, yc = self._get_center()
-            transform.translate(-xc, -yc)
+            # Change the origin if nessacary
+            if self._get_pathmode() == CENTER:
+                xc, yc = self._get_center()
+                transform.translate(-xc, -yc)
 
-        cairo_ctx.set_matrix(transform)
+            cairo_ctx.set_matrix(transform)
 
-        # Run the path commands on the cairo context:
-        self._traverse(cairo_ctx)
-        ## Matrix affects stroke, so we need to reset it:
-        cairo_ctx.set_matrix(cairo.Matrix())
+            # Run the path commands on the cairo context:
+            self._traverse(cairo_ctx)
+            ## Matrix affects stroke, so we need to reset it:
+            cairo_ctx.set_matrix(cairo.Matrix())
 
-        if self._fillcolor:
-            cairo_ctx.set_source_rgba(*self._fillcolor)
-            if self._strokecolor:
-                cairo_ctx.fill_preserve()
-            else:
-                cairo_ctx.fill()
-        if self._strokecolor:
-            cairo_ctx.set_line_width(self._strokewidth)
-            cairo_ctx.set_source_rgba(*self._strokecolor)
-            cairo_ctx.stroke()
+            if fillcolor:
+                cairo_ctx.set_source_rgba(*fillcolor)
+                if strokecolor:
+                    cairo_ctx.fill_preserve()
+                else:
+                    cairo_ctx.fill()
+            if strokecolor:
+                cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.set_source_rgba(*strokecolor)
+                cairo_ctx.stroke()
+
+        return _render
 
     def draw(self):
-        '''
-        Save the current fillcolor, strokecolor and transform
-        then add the render function to the draw queue
-        '''
-        self._fillcolor = self._fillcolor or self._canvas.fillcolor
-        self._strokecolor = self._strokecolor or self._canvas.strokecolor
-        self._strokewidth = self._canvas.strokewidth
-        self._deferred_render()
+        self._deferred_render(self._render_closure())
 
     def _path_element(self, el):
         '''
