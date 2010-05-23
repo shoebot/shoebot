@@ -64,13 +64,19 @@ class BezierPath(Grob):
         '''
         self._elements.append((render_func, pe))
 
-    def append(self, pe):
-        if pe.cmd == MOVETO:
-            self._append_element(self._canvas.moveto_closure(p.x, p.y), pe)
-        elif pe.cmd == LINETO:
-            self._append_element(self._canvas.lineto_closure(p.x, p.y), pe)
-        elif pe.cmd == CURVETO:
-            self._append_element(self._canvas.curveto_closure(p.x, p.y, p.ctrl1.x, p.ctrl1.y, p.ctrl2.x, p.ctrl2.y), pe)
+    def append(self, *args):
+        if len(args) is 2:
+            self.moveto(*args)            
+        else:
+            if pe.cmd == MOVETO:
+                self._append_element(self._canvas.moveto_closure(p.x, p.y), pe)
+            elif pe.cmd == LINETO:
+                self._append_element(self._canvas.lineto_closure(p.x, p.y), pe)
+            elif pe.cmd == CURVETO:
+                self._append_element(self._canvas.curveto_closure(p.x, p.y, p.ctrl1.x, p.ctrl1.y, p.ctrl2.x, p.ctrl2.y), pe)
+
+    def addpoint(self, *args):
+        self.append(*args)
 
     def copy(self):
         path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
