@@ -46,7 +46,7 @@ class Context(object):
         # Construct canvas class:
         self._canvas = canvas_class(self, **canvas_params)
         self._set_defaults()
-        self._dynamic = True
+        self.dynamic = True
         self.speed = None
         self.quit = False
         self._iteration = 0
@@ -92,7 +92,7 @@ class Context(object):
             namespace['draw']()
         else:
             # Subsequent frames
-            if self._dynamic:
+            if self.dynamic:
                 namespace['draw']()
             else:
                 exec source_or_code in namespace
@@ -104,21 +104,26 @@ class Context(object):
         '''
         Return False if bot should quit
         '''
-        if self._iteration == 0:
+        iteration = self._iteration
+        if iteration == 0:
             # First frame always runs
             return True
         if self.quit:
             return False
         if iterations:
-            if self._iteration < iterations:
+            if iteration < iterations:
                 return True
         elif iterations is None:
-            return True
-        if not self._dynamic:
+            if self.dynamic:
+                return True
+            else:
+                return False
+        if not self.dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
             print '###TODO'
             return False
+        print 'F'
         return False
 
     def run(self, inputcode, iterations = None, run_forever = False):
@@ -152,6 +157,12 @@ class Context(object):
                     iterations = None
                 else:
                     iterations = 1
+
+            # First iteration
+            self._exec_frame(source_or_code)
+            canvas.flush(self._frame)
+
+            # Subsequent iterations
             while self._should_run(iterations):
                 frame = self._frame
                 self._exec_frame(source_or_code)
