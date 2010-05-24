@@ -19,8 +19,11 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 import sys
-LIB_DIR = sys.prefix + '/share/shoebot/lib'
-sys.path.append(LIB_DIR)
+LIB_DIRS = [
+    os.path.join(sys.prefix, 'local', 'share', 'shoebot', 'lib'), 
+    os.path.join(sys.prefix, 'share', 'shoebot', 'lib')]
+for LIB_DIR in LIB_DIRS:
+    sys.path.append(LIB_DIR)
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
