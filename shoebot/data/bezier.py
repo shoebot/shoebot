@@ -2,6 +2,7 @@ import sys, locale, gettext
 from shoebot.data import _copy_attrs
 from shoebot.data import Grob, ColorMixin, TransformMixin
 from shoebot.util import RecordingSurface
+from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 from math import pi as _pi
 
 import cairo
@@ -17,16 +18,6 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
-CLOSE = "close"
-
 class BezierPath(Grob):
     '''
     Represents a Bezier path as a list of PathElements.
@@ -40,14 +31,16 @@ class BezierPath(Grob):
     for getting path dimensions)
     '''
     def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER):
-        # Stores _elements list, this is a 2 dimensional list, storing 
-        # render_function and either a PathElement or the arguments that need
+        # Stores two lists, _elements and _render_funcs that are kept syncronized
+        # _render_funcs contain functions that do the rendering
+        # _elements contains either a PathElement or the arguments that need
         # to be passed to a PathElement when it's created.
         #
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, canvas = canvas)
 
         self._elements = []
+        self._render_funcs = []
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
@@ -62,7 +55,9 @@ class BezierPath(Grob):
         Append a render function and the parameters to pass
         an equivilent PathElement, or the PathElement itself.
         '''
-        self._elements.append((render_func, pe))
+        print 'APPEND ELEMENT ', pe
+        self._render_funcs.append(render_func)
+        self._elements.append(pe)
 
     def append(self, *args):
         if len(args) is 2:
@@ -96,7 +91,7 @@ class BezierPath(Grob):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
     def closepath(self):
-        self._append_element(self._canvas.closepath_closure(), (CLOSE))
+        self._append_element(self._canvas.closepath_closure(), (CLOSE,))
         self.closed = True
 
     def ellipse(self, x, y, w, h):
@@ -130,7 +125,7 @@ class BezierPath(Grob):
         '''
         Traverse this path
         '''
-        for render_func, pe in self._elements:
+        for render_func in self._render_funcs:
             render_func(cairo_ctx)
 
     def _get_center(self):
@@ -203,25 +198,22 @@ class BezierPath(Grob):
     def draw(self):
         self._deferred_render(self._render_closure())
 
-    def _path_element(self, el):
+    def __getitem__(self, index):
         '''
         el is either a PathElement or the parameters to pass
         to one.
         If el is a PathElement return it
         If el is parameters, create a PathElement and return it
         '''
+        el = self._elements[index]
         if isinstance(el, tuple):
-            el = PathElement(el[1], el[1:])
+            el = PathElement(*el)
             self._elements[index] = el
         return el
 
-    def __getitem__(self, index):
-        el = self._elements[index]
-        return self._path_element(el)
-
     def __iter__(self):
-        for el in self._elements():
-            yield self._path_element(el)
+        for index in xrange(len(self._elements)):
+            yield self.__getitem__(index)
 
     def __len__(self):
         return len(self._elements)

@@ -32,7 +32,7 @@
 import sys, os
 import shoebot
 
-from shoebot import ShoebotError
+from shoebot import ShoebotError, RGB, HSB
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, Transform
 
@@ -50,8 +50,11 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 import sys
-LIB_DIR = sys.prefix + '/share/shoebot/lib'
-sys.path.append(LIB_DIR)
+LIB_DIRS = [
+    os.path.join(sys.prefix, 'local', 'share', 'shoebot', 'lib'), 
+    os.path.join(sys.prefix, 'share', 'shoebot', 'lib')]
+for LIB_DIR in LIB_DIRS:
+    sys.path.append(LIB_DIR)
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
@@ -61,9 +64,8 @@ class Bot(object):
     A Bot is an interface to receive user commands (through scripts or direct
     calls) and pass them to a canvas for drawing.
     '''
-    
-    RGB = "rgb"
-    HSB = "hsb"
+    RGB = RGB
+    HSB = HSB    
 
     LEFT = 'left'
     RIGHT = 'right'
@@ -278,11 +280,8 @@ class Bot(object):
 
     # from Nodebox, a function to import Nodebox libraries
     def ximport(self, libName):
-        try:
-            lib = __import__("lib/"+libName)
-        except:
-            lib = __import__(libName)
-        self._ns[libName] = lib
+        lib = __import__(libName)
+        self._namespace[libName] = lib
         lib._ctx = self
         return lib
 

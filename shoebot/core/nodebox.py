@@ -253,7 +253,7 @@ class NodeBot(Bot):
             self._path = None
         else:
             # keep the transform so we don't lose it
-            self._path.transform = self._transform.copy()
+            self._path.transform = cairo.Matrix(*self._canvas.transform)
         return p
 
     def drawpath(self, path):
