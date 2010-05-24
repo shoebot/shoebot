@@ -168,6 +168,8 @@ class Context(object):
                 self._exec_frame(source_or_code)
                 canvas.flush(frame)
 
+            canvas.sink.finish()
+
         except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now

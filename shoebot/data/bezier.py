@@ -197,6 +197,9 @@ class BezierPath(Grob):
     def draw(self):
         self._deferred_render(self._render_closure())
 
+    def _get_contours(self):
+        raise NotImplementedError()
+
     def __getitem__(self, index):
         '''
         el is either a PathElement or the parameters to pass
@@ -216,6 +219,8 @@ class BezierPath(Grob):
 
     def __len__(self):
         return len(self._elements)
+
+    contours = property(_get_contours)
 
 
 class ClippingPath(BezierPath):

@@ -76,4 +76,5 @@ class CairoImageSink(DrawQueueSink):
             surface = ctx.get_target()
             surface.write_to_png(self._filename(frame))
 
-
+    def finish(self):
+        pass
