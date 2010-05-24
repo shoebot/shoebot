@@ -55,7 +55,6 @@ class BezierPath(Grob):
         Append a render function and the parameters to pass
         an equivilent PathElement, or the PathElement itself.
         '''
-        print 'APPEND ELEMENT ', pe
         self._render_funcs.append(render_func)
         self._elements.append(pe)
 

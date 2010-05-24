@@ -47,7 +47,7 @@ class Context(object):
         self._canvas = canvas_class(self, **canvas_params)
         self._set_defaults()
         self._dynamic = True
-        self._speed = None
+        self.speed = None
         self.quit = False
         self._iteration = 0
 
