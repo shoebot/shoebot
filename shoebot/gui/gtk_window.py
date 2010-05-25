@@ -48,4 +48,5 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
         self.botcontext.quit = True
 
     def finish(self):
-        gtk.main()
+        if not self.botcontext.quit:
+            gtk.main()
