@@ -168,6 +168,7 @@ class Context(object):
                 self._exec_frame(source_or_code)
                 canvas.flush(frame)
 
+            self.quit = True
             canvas.sink.finish()
 
         except NameError:
