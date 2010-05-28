@@ -45,7 +45,6 @@ from cairo_canvas import CairoCanvas
 from drawqueue import DrawQueue, DrawQueueSink
 from cairo_drawqueue import CairoDrawQueue
 from cairo_sink import DrawQueueSink, CairoImageSink
-from cairo_util import RecordingSurface
 
 from context import Context
 from input_device import InputDeviceMixin
