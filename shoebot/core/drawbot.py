@@ -24,11 +24,11 @@ CORNER = 'corner'
 
 class DrawBot(Bot):
 
-    def __init__(self, context, canvas, namespace):
+    def __init__(self, canvas, namespace = None):
         ### TODO - Need to do whole drawbot class
-        Bot.__init__(self, context, canvas, namespace)
+        Bot.__init__(self, canvas, namespace)
         self._transformmode = CORNER
-        self.canvas.origin = BOTTOM_LEFT
+        self._canvas.origin = BOTTOM_LEFT
 
     #### Drawing
 
@@ -39,12 +39,11 @@ class DrawBot(Bot):
 
         The roundness variable sets rounded corners.
         '''
-        r = self.BezierPath(**kwargs)
-        r.rect(x,y,width,height,roundness,self.rectmode)
-        #r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath(**kwargs)
+        path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
-            self.canvas.add(r)
-        return r
+            path.draw()
+        return path
 
     def rectmode(self, mode=None):
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
@@ -57,21 +56,19 @@ class DrawBot(Bot):
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
-        r = self.BezierPath(**kwargs)
-        r.ellipse(x,y,width,height)
-        # r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath(**kwargs)
+        path.ellipse(x, y, width, height)
         if draw:
-            self.canvas.add(r)
-        return r
+            path.draw()
+        return path
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draws an ellipse starting from (x,y)'''
-        r = self.BezierPath(**kwargs)
-        r.ellipse(x,y,width,height)
-        # r.inheritFromContext(kwargs.keys())
+        path = self.BezierPath(**kwargs)
+        path.ellipse(x,y,width,height)
         if draw:
-            self.canvas.add(r)
-        return r
+            path.draw()
+        return path
 
     def circle(self, x, y, diameter):
         self.ellipse(x, y, diameter, diameter)
@@ -132,16 +129,16 @@ class DrawBot(Bot):
         p = self._path
         # p.inheritFromContext()
         if draw:
-            self.canvas.add(p)
+            self._path.draw()
             self._path = None
         return p
 
     def drawpath(self,path):
         if isinstance(path, BezierPath):
             p = self.BezierPath(path)
-            self.canvas.add(p)
+            p.draw()
         elif isinstance(path, Image):
-            self.canvas.add(path)
+            self._canvas.add(path)
 
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
@@ -170,17 +167,14 @@ class DrawBot(Bot):
     def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
         '''Draws a image form path, in x,y and resize it to width, height dimensions.
         '''
-        r = self.Image(path, x, y, width, height, alpha, data, **kwargs)
-        if draw:
-            self.canvas.add(r)
-        return r
+        return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
         img = Image.open(path)
         return img.size
 
     def drawimage(self, image):
-        self.canvas.add(image)
+        self.image(image.path, image.x, image.y, data = image.data)
 
     #### Transform and utility
 
@@ -264,10 +258,7 @@ class DrawBot(Bot):
 
     def background(self,*args):
         '''Set the background colour.'''
-        r = self.BezierPath()
-        r.rect(0, 0, self.WIDTH, self.HEIGHT)
-        r.fill = self.color(*args)
-        self.canvas.add(r)
+        self._canvas.background = self.color(*args)
 
     #### Text
 
@@ -287,21 +278,19 @@ class DrawBot(Bot):
         if fontsize is not None:
             self._fontsize = fontsize
         else:
-            return self.canvas.font_size
+            return self._canvas.font_size
 
     def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''
         Draws a string of text according to current font settings.
         '''
-        txt = self.Text(txt, x, y, width, height, ctx=self.canvas.context, **kwargs)
+        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
           path = txt.path
           if draw:
-              self.canvas.add(path)
+              path.draw()
           return path
         else:
-          if draw:
-            self.canvas.add(txt)
           return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
@@ -311,7 +300,7 @@ class DrawBot(Bot):
         txt = self.Text(txt, x, y, width, height, **kwargs)
         path = txt.path
         if draw:
-            self.canvas.add(path)
+            path.draw()
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):

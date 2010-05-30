@@ -41,7 +41,7 @@ class NodeBot(Bot):
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
         path = self.BezierPath(**kwargs)
-        path.rect(x, y, width, height, roundness)
+        path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
             path.draw()
         return path
@@ -259,7 +259,7 @@ class NodeBot(Bot):
         path.draw()
 
     def drawimage(self, image):
-        self._canvas.add(image)### TODO
+        self.image(image.path, image.x, image.y, data = image.data)
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close

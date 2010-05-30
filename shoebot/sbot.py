@@ -39,11 +39,11 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     '''
     Convenience function to make it easy to start bots from external programs
     '''
-    from core import Context, CairoCanvas, CairoImageSink
+    from core import CairoCanvas, CairoImageSink
     from gui import ShoebotWidget, ShoebotWindow
 
     from core import NodeBot
-    ###from drawbot import Drawbot ###TODO
+    from core import DrawBot
 
     if window or show_vars:
         if os.path.isfile(src):
@@ -58,7 +58,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
 
     canvas = CairoCanvas(sink = sink, enable_cairo_queue=True)
     BOT_CLASSES = {
-        #DRAWBOT : Drawbot,
+        DRAWBOT : DrawBot,
         NODEBOX : NodeBot,
         #SHOEBOT : Shoebot,
     }
