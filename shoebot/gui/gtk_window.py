@@ -21,11 +21,12 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, title = None, show_vars = False, server=False, serverport=7777, go_fullscreen=False):
+    def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, serverport=7777, go_fullscreen=False):
         gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
+        self.menu_enabled = menu_enabled
         self.has_server = server
         self.serverport = serverport
         self.show_vars = show_vars
@@ -85,6 +86,14 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.server('', self.serverport)
 
 
+    def gtk_mouse_button_down(self, widget, event):
+        ''' Handle right mouse button clicks '''
+        if self.menu_enabled and event.button == 3:
+            menu = self.uimanager.get_widget('/Save as')
+            menu.popup(None, None, None, event.button, event.time)
+        else:
+            super(ShoebotWindow, self).gtk_mouse_button_down(widget, event)
+
     def create_rcontext(self, size, frame):
         ''' Delegates to the ShoebotWidget  '''
         return self.sb_widget.create_rcontext(size, frame)
@@ -97,20 +106,25 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
-    def snapshot_svg(self):
+    def snapshot_svg(self, widget):
         bot = self.bot
-        filename = bot.namespace['__file__'] or 'output' + '.svg'
+        script = bot._namespace['__file__']
+        if script:
+            filename = os.path.splitext(script)[0] + '.svg'
+        else:
+            filename = 'output.svg'
+        print filename
         ##self.bot.snapshot(self,filename=None, surface=None, defer=False, autonumber=bot.iterations > 1):
         ### Should save at end of frame
         print 'TODO'
 
-    def snapshot_ps(self):
+    def snapshot_ps(self, widget):
         print 'TODO'
 
-    def snapshot_pdf(self):
+    def snapshot_pdf(self, widget):
         print 'TODO'
 
-    def snapshot_png(self):
+    def snapshot_png(self, widget):
         print 'TODO'
 
     def do_fullscreen(self, widget):
