@@ -140,14 +140,14 @@ class Bot(Grammar):
     # Get input
 
     def _mouse_button_down(self, button):
-        self._namespace['mousedown'] = self._input_device.mouse_down
+        self._namespace['mousedown'] = True
 
     def _mouse_button_up(self, button):
         self._namespace['mousedown'] = self._input_device.mouse_down
 
     def _mouse_pointer_moved(self, x, y):
         self._namespace['MOUSEX'] = x
-        self._namespace['MOUSEX'] = y
+        self._namespace['MOUSEY'] = y
 
     def _key_pressed(self, key, keycode):
         self._namespace['key'] = key
