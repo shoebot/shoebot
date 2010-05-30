@@ -9,14 +9,13 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, **kwargs):
+    def __init__(self, title = None, show_vars = False):
         gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
         sb_widget = ShoebotWidget()
 
-        title = kwargs['title']
         if title:
             self.set_title(title)
         self.connect("delete-event", gtk.main_quit)
@@ -25,16 +24,19 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         sb_widget.show()
         self.add(sb_widget)
 
-        #if show_vars:
-        #    self.var_window = VarWindow(self, self.bot)
         self.present()
 
         while gtk.events_pending():
             gtk.main_iteration()
 
+        self.show_vars = show_vars
+        self.var_window = None
         self.sb_widget = sb_widget
         self.attach_gtk(self)
 
+
+    #def set_bot(self, bot):
+    #    super(ShoebotWindow, self).set_bot(bot)
 
     def create_rcontext(self, size, frame):
         '''
@@ -46,6 +48,9 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         '''
         Delegates to the ShoebotWidget
         '''
+        ## A bit hacky... but makes sure bot has executed once:
+        if self.show_vars and self.var_window is None:
+            self.var_window = VarWindow(self, self.bot)
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
     def do_window_close(self, widget):

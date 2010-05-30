@@ -16,6 +16,7 @@ else:
 class VarWindow(object):
     def __init__(self, parent, bot):
         self.parent = parent
+        self.bot = bot
 
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
@@ -25,7 +26,7 @@ class VarWindow(object):
         # set up sliders
         self.variables = []
 
-        for item in bot.vars:
+        for item in bot._vars:
             self.variables.append(item)
             if item.type is NUMBER:
                 self.add_number(vbox, item)
@@ -79,7 +80,7 @@ class VarWindow(object):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         # in buttons, the varname is the function, so we use __name__
         button = gtk.Button(label=v.name.__name__)
-        button.connect("clicked", self.parent.bot.namespace[v.name], None)
+        button.connect("clicked", self.bot._namespace[v.name], None)
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
 
@@ -91,12 +92,12 @@ class VarWindow(object):
         ''' Called when a slider is adjusted. '''
         # set the appropriate bot var
         if v.type is NUMBER:
-            self.parent.drawingarea.bot.namespace[v.name] = widget.value
+            self.bot._namespace[v.name] = widget.value
         elif v.type is BOOLEAN:
-            self.parent.drawingarea.bot.namespace[v.name] = widget.get_active()
+            self.bot._namespace[v.name] = widget.get_active()
         elif v.type is TEXT:
-            self.parent.drawingarea.bot.namespace[v.name] = widget.get_text()
+            self.bot._namespace[v.name] = widget.get_text()
         # and redraw the canvas
-        self.parent.drawingarea.redraw()
+        ###self.parent.drawingarea.redraw() ## TODO - let bot know it should redraw (only if it's not dynamic)
 
 

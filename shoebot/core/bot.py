@@ -197,7 +197,7 @@ class Bot(Grammar):
 
     def var(self, name, type, default=None, min=0, max=255, value=None):
         v = Variable(name, type, default, min, max, value)
-        v = self._addvar(v)
+        return self._addvar(v)
 
     def _addvar(self, v):
         ''' Sets a new accessible variable.'''
@@ -207,6 +207,7 @@ class Bot(Grammar):
                 v.value = oldvar.value
         self._vars.append(v)
         self._namespace[v.name] = v.value
+        return v
 
     def _findvar(self, name):
         for v in self._oldvars:

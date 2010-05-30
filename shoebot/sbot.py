@@ -50,7 +50,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
             title = 'Untitled - Shoebot'
-        sink = ShoebotWindow(title = title, show_vars = show_vars)
+        sink = ShoebotWindow(title, show_vars)
     else:
         if iterations is None:
             iterations = 1
