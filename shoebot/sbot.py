@@ -64,5 +64,5 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     }
     bot = BOT_CLASSES[grammar](canvas)
     canvas.set_bot(bot)
-    bot.sb_run(src, iterations, window)
+    bot.sb_run(src, iterations, run_forever = window, frame_limiter = window)
 
