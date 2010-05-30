@@ -178,15 +178,19 @@ class DrawBot(Bot):
 
     #### Transform and utility
 
-    def translate(self, x, y):
-        self._transform.translate(x,y)
-    
+    def translate(self, xt, yt, mode = None):
+        self._canvas.translate(xt, yt)
+        if mode:
+            self._canvas.mode = mode
+
     def rotate(self, degrees=0, radians=0):
+        ### TODO change canvas to use radians
         if radians:
             angle = radians
         else:
             angle = deg2rad(degrees)
-        self._transform.rotate(-angle)
+        self._canvas.rotate(-angle)
+
     def scale(self, x=1, y=None):
         if not y:
             y = x
@@ -195,19 +199,19 @@ class DrawBot(Bot):
             x = 1
         if y == 0:
             y = 1
-        self._transform.scale(x,y)
+        self._canvas.scale(x, y)
 
     def skew(self, x=1, y=0):
         self._transform.skew(x,y)
 
     def push(self):
-        self.transform_stack.append(self._transform.copy())
+        self._canvas.push_matrix()
 
     def pop(self):
-        self._transform = self.transform_stack.pop()
+        self._canvas.pop_matrix()
 
     def reset(self):
-        self._transform = Transform()
+        self._canvas.reset_transform()
 
     #### Color
 
