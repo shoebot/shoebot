@@ -266,8 +266,8 @@ class ClippingPath(BezierPath):
     # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
     # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')    
     
-    def __init__(self, bot, path=None, **kwargs):
-        BezierPath.__init__(self, bot, path, **kwargs)
+    def __init__(self, canvas, path=None, **kwargs):
+        BezierPath.__init__(self, canvas, path, **kwargs)
 
 class EndClip(Grob):
     def __init__(self, bot, **kwargs):

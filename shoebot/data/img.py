@@ -80,6 +80,8 @@ class Image(Grob, ColorMixin):
                         hscale = 1.0
                     self._transform.scale(wscale, hscale)
                     
+            else:
+                print 'TODO - Image from data'
             ### TODO
             #elif self.data:
             #    img = PILImage.open(StringIO(self.data))
