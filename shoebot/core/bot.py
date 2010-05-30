@@ -34,7 +34,8 @@ import shoebot
 
 from shoebot import ShoebotError, RGB, HSB
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
-                         Image, ClippingPath, Transform
+                         Image, ClippingPath, Transform,\
+                         NUMBER, TEXT, BOOLEAN, BUTTON
 from grammar import Grammar
 
 from glob import glob
@@ -79,10 +80,10 @@ class Bot(Grammar):
     RIGHT = 'right'
     JUSTIFY = 'justify'
 
-    NUMBER = 'number'
-    TEXT = 'text'
-    BOOLEAN = 'boolean'
-    BUTTON = 'button'
+    NUMBER = NUMBER
+    TEXT = TEXT
+    BOOLEAN = BOOLEAN
+    BUTTON = BUTTON
 
     inch = 72
     cm = 28.3465
