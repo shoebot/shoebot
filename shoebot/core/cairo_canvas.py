@@ -169,7 +169,7 @@ class CairoCanvas(Canvas):
                 target_ctx.paint()
 
         if isinstance(target, cairo.Context):
-            return output_context            
+            return output_context
         else:
             return output_file
 

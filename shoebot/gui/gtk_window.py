@@ -1,6 +1,8 @@
+import os
 import sys
 import gtk
 
+from collections import deque
 from shoebot.gui import ShoebotWidget, VarWindow, SocketServerMixin
 from shoebot.core import DrawQueueSink
 from gtk_input_device import GtkInputDeviceMixin
@@ -80,6 +82,8 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         self.present()
 
+        self.scheduled_snapshots = deque()
+
         while gtk.events_pending():
             gtk.main_iteration()
         if server:
@@ -96,6 +100,13 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     def create_rcontext(self, size, frame):
         ''' Delegates to the ShoebotWidget  '''
+
+        ### Any snapshots that need to be taken
+        for snapshot_func in self.scheduled_snapshots:
+            snapshot_func()
+        else:
+            self.scheduled_snapshots = deque()
+
         return self.sb_widget.create_rcontext(size, frame)
 
     def rcontext_ready(self, size, frame, cairo_ctx):
@@ -106,26 +117,36 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
-    def snapshot_svg(self, widget):
+    def schedule_snapshot(self, format):
+        '''
+        Since the right click comes in after things have been rendered
+        it's easiest to schedule snapshots for the next render.
+
+        (There is only a bitmap copy of the screen available at this
+         point...)
+        '''
+        self.scheduled_snapshots.append(lambda: self.do_snapshot(format))
+
+    def do_snapshot(self, format):
         bot = self.bot
         script = bot._namespace['__file__']
         if script:
-            filename = os.path.splitext(script)[0] + '.svg'
+            filename = os.path.splitext(script)[0] + '.' + format
         else:
-            filename = 'output.svg'
-        print filename
-        ##self.bot.snapshot(self,filename=None, surface=None, defer=False, autonumber=bot.iterations > 1):
-        ### Should save at end of frame
-        print 'TODO'
+            filename = 'output.' + format
+        self.bot._canvas.user_snapshot(filename)
+
+    def snapshot_svg(self, widget):
+        self.schedule_snapshot('svg')
 
     def snapshot_ps(self, widget):
-        print 'TODO'
+        self.schedule_snapshot('ps')
 
     def snapshot_pdf(self, widget):
-        print 'TODO'
+        self.schedule_snapshot('pdf')
 
     def snapshot_png(self, widget):
-        print 'TODO'
+        self.schedule_snapshot('png')
 
     def do_fullscreen(self, widget):
         self.fullscreen()

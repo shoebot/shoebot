@@ -156,6 +156,12 @@ class Canvas(object):
         '''Add a render function to the queue for rendering later'''
         self._drawqueue.append(render_func)
 
+    def user_snapshot(self, filename):
+        ''' Snapshot called from gui '''
+        output_func = self.output_closure(filename, self.bot._frame)
+        self._drawqueue.append_post_render(output_func)
+
+
     width = property(get_width)
     height = property(get_height)
 

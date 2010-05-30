@@ -38,6 +38,7 @@ class DrawQueue(object):
     '''
     def __init__(self, render_funcs = None):
         self.render_funcs = render_funcs or deque()
+        self.post_render_funcs = None
 
     def append_immediate(self, render_func):
         '''
@@ -62,4 +63,18 @@ class DrawQueue(object):
         '''
         for render_func in self.render_funcs:
             render_func(r_context)
+
+        self._post_render(r_context)
+
+    def _post_render(self, r_context):
+        ''' Run tasks after render (such as user snapshots) '''
+        if self.post_render_funcs is not None:
+            for render_func in self.post_render_funcs:
+                render_func(r_context)
+
+    def append_post_render(self, render_func):
+        if self.post_render_funcs is None:
+            self.post_render_funcs = deque()
+        self.post_render_funcs.append(render_func)
+
 
