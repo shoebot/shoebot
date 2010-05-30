@@ -35,22 +35,16 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.attach_gtk(self)
 
 
-    #def set_bot(self, bot):
-    #    super(ShoebotWindow, self).set_bot(bot)
-
     def create_rcontext(self, size, frame):
-        '''
-        Delegates to the ShoebotWidget
-        '''
+        ''' Delegates to the ShoebotWidget  '''
         return self.sb_widget.create_rcontext(size, frame)
 
     def rcontext_ready(self, size, frame, cairo_ctx):
-        '''
-        Delegates to the ShoebotWidget
-        '''
+        ''' Delegates to the ShoebotWidget '''
         ## A bit hacky... but makes sure bot has executed once:
         if self.show_vars and self.var_window is None:
             self.var_window = VarWindow(self, self.bot)
+
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
     def do_window_close(self, widget):

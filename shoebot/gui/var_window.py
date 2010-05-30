@@ -26,7 +26,7 @@ class VarWindow(object):
         # set up sliders
         self.variables = []
 
-        for item in bot._vars:
+        for item in sorted(bot._vars.values()):
             self.variables.append(item)
             if item.type is NUMBER:
                 self.add_number(vbox, item)
@@ -93,11 +93,12 @@ class VarWindow(object):
         # set the appropriate bot var
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.value
+            self.bot._vars[v.name].value = widget.value  ## Not sure if this is how to do this - stu
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
+            self.bot._vars[v.name].value = widget.get_active()  ## Not sure if this is how to do this - stu
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
-        # and redraw the canvas
-        ###self.parent.drawingarea.redraw() ## TODO - let bot know it should redraw (only if it's not dynamic)
+            self.bot._vars[v.name].value = widget.get_text()  ## Not sure if this is how to do this - stu
 
 

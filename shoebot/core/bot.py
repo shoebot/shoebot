@@ -136,6 +136,7 @@ class Bot(Grammar):
     def _set_dynamic_vars(self):
         self._namespace['FRAME'] = self._frame
 
+
     # Get input
 
     def _mouse_button_down(self, button):
@@ -199,21 +200,6 @@ class Bot(Grammar):
         v = Variable(name, type, default, min, max, value)
         return self._addvar(v)
 
-    def _addvar(self, v):
-        ''' Sets a new accessible variable.'''
-        oldvar = self._findvar(v.name)
-        if oldvar is not None:
-            if oldvar.compliesTo(v):
-                v.value = oldvar.value
-        self._vars.append(v)
-        self._namespace[v.name] = v.value
-        return v
-
-    def _findvar(self, name):
-        for v in self._oldvars:
-            if v.name == name:
-                return v
-        return None
 
     #### Utility
 
