@@ -257,11 +257,6 @@ class Bot(Grammar):
     def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file.
 
-        There's two uses for this method:
-        - called from a script to create a output file
-        - called from the Shoebot window menu, which requires the source surface
-        to be specified in the arguments.
-
         Setting defer to False:
         Ensures that a file is written before returning, but can hamper performance.
         Usually you won't want to do this.
