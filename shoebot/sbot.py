@@ -51,19 +51,22 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
             title = 'Untitled - Shoebot'
-        sink_class, sink_params = ShoebotWindow, { 'title' : title, 'show_vars' : show_vars }
+        sink = ShoebotWindow(title = title, show_vars = show_vars)
     else:
         if iterations is None:
             iterations = 1
-        sink_class, sink_params = CairoImageSink, {'filename' : outputfile, 'format' : format, 'multifile' : iterations > 1}
+        sink = CairoImageSink(filename = outputfile, format = format, multifile = iterations > 1)
 
+    canvas = CairoCanvas(sink = sink, enable_cairo_queue=True)
     BOT_CLASSES = {
         #DRAWBOT : Drawbot,
         NODEBOX : NodeBot,
         #SHOEBOT : Shoebot,
     }
-    #context = Context(BOT_CLASSES[grammar], CairoCanvas(cairo_sink, enable_cairo_queue = True))
-    context = Context(BOT_CLASSES[grammar],
-                      CairoCanvas, canvas_params={'sink_class': sink_class, 'sink_params': sink_params, 'enable_cairo_queue': True})
+    bot = BOT_CLASSES[grammar](canvas)
+    canvas.set_bot(bot)
+    bot.sb_run(src, iterations, window)
+    #context = Context(BOT_CLASSES[grammar],
+    #                  CairoCanvas, canvas_params={'sink_class': sink_class, 'sink_params': sink_params, 'enable_cairo_queue': True})
 
-    context.run(src, iterations, True)
+    #context.run(src, iterations, True)

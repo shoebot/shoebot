@@ -35,6 +35,7 @@ import shoebot
 from shoebot import ShoebotError, RGB, HSB
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, Transform
+from grammar import Grammar
 
 from glob import glob
 import random as r
@@ -59,10 +60,10 @@ for LIB_DIR in LIB_DIRS:
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
-class Bot(object):
+
+class Bot(Grammar):
     '''
-    A Bot is an interface to receive user commands (through scripts or direct
-    calls) and pass them to a canvas for drawing.
+    The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot.
     '''
     RGB = RGB
     HSB = HSB    
@@ -99,14 +100,14 @@ class Bot(object):
 
     FRAME = 0
 
-    def __init__(self, context, canvas, namespace):
-        self._context = context
-        self._canvas = canvas
-        self._namespace = namespace
+    def __init__(self, canvas, namespace = None):
+        Grammar.__init__(self, canvas, namespace)
         self._autoclosepath = True
-        self._set_initial_defaults()
-        self._vars = []
-        self._oldvars = []
+        self._path = None
+
+        self._set_initial_defaults() ### TODO Look at these
+        self._set_defaults()
+
         
     def _set_initial_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
@@ -126,6 +127,14 @@ class Bot(object):
             strokewidth = 1.0,
             background = self.color(1, 1, 1))
 
+    def _set_defaults(self):
+        ''' Set defaults before rendering '''
+        self._canvas.size = None
+        self._frame = 0
+
+    def _set_dynamic_vars(self):
+        self._namespace['FRAME'] = self._frame
+
     #### Functions for override
 
     def setup(self):
@@ -134,7 +143,7 @@ class Bot(object):
 
     def draw(self):
         """ For override by user sketch """
-        self._context.dynamic = False
+        self._dynamic = False
 
     #### Classes
 
@@ -257,7 +266,7 @@ class Bot(object):
         point.
         '''
         if autonumber:
-            file_number=self._context.frame
+            file_number=self._frame
         else:
             file_number=None
         if surface:
@@ -306,9 +315,9 @@ class Bot(object):
 
     def speed(self, framerate):
         if framerate:
-            self._context.speed = framerate
-            self._context.dynamic = True
+            self._speed = framerate
+            self._dynamic = True
         else:
-            return self._context.speed
+            return self._speed
 
 

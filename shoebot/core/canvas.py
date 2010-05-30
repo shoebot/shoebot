@@ -53,15 +53,19 @@ class Canvas(object):
     DEFAULT_MODE = CENTER
 
     ''' Abstract canvas class '''
-    def __init__(self, botcontext, **kwargs):
+    def __init__(self, sink):
         # Construct sink class:
-        self.sink = kwargs['sink_class'](botcontext, **kwargs['sink_params'])
+        self.sink = sink
 
         self.finished = False
         self.color_range = 1
         self.color_mode = 1
         self.path_mode = 'CORNER'
-        self._botcontext = botcontext
+
+    def set_bot(self, bot):
+        ''' Bot must be set before running '''
+        self.bot = bot
+        self.sink.set_bot(bot)
 
     def initial_drawqueue(self):
         '''

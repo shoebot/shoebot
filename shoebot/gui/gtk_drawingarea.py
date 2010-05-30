@@ -17,9 +17,9 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, botcontext):
+    def __init__(self):
         gtk.DrawingArea.__init__(self)
-        DrawQueueSink.__init__(self, botcontext)
+        DrawQueueSink.__init__(self)
         
         # Default picture is the shoebot icon
         if os.path.isfile(ICON_FILE):

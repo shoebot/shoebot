@@ -21,9 +21,8 @@ class NodeBot(Bot):
     NORMAL = "1"
     FORTYFIVE = "2"
 
-    def __init__(self, context, canvas, namespace):
-        Bot.__init__(self, context, canvas, namespace)
-        self._path = None
+    def __init__(self, canvas, namespace = None):
+        Bot.__init__(self, canvas, namespace)
 
     #### Drawing
 

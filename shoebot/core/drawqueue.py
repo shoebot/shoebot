@@ -63,36 +63,3 @@ class DrawQueue(object):
         for render_func in self.render_funcs:
             render_func(r_context)
 
-
-class DrawQueueSink(object):
-    '''
-    DrawQueueSink, creates parameters for use by the draw queue.
-    (the render_context).
-
-    The render context is a set of platform sepecific
-    parameters used by implementations of the drawqueue,
-    canvas, and sink.
-    '''
-    def __init__(self, botcontext):
-        self.botcontext = botcontext
-
-    def render(self, size, frame, drawqueue):
-        '''
-        Accepts a drawqueue and
-        '''
-        r_context = self.create_rcontext(size, frame)
-        drawqueue.render(r_context)
-        self.rcontext_ready(size, frame, r_context)
-
-    def create_rcontext(self, size, frame):
-        '''
-        Returns a cairo context for drawing this
-        frame of the bot
-        '''
-        raise NotImplementedError('Child class should implement create_rcontext')
-    
-    def rcontext_ready(self, size, frame, r_context):
-        '''
-        Called when the bot has been rendered
-        '''
-        raise NotImplementedError('Child class should implement rcontext_ready')

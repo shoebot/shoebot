@@ -8,11 +8,11 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, botcontext, **kwargs):
+    def __init__(self, **kwargs):
         gtk.Window.__init__(self)
-        DrawQueueSink.__init__(self, botcontext)
+        DrawQueueSink.__init__(self)
 
-        sb_widget = ShoebotWidget(botcontext)
+        sb_widget = ShoebotWidget()
 
         title = kwargs['title']
         if title:
@@ -45,8 +45,8 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
     def do_window_close(self, widget):
-        self.botcontext.quit = True
+        self.bot._quit = True
 
     def finish(self):
-        if not self.botcontext.quit:
+        if not self.bot._quit:
             gtk.main()
