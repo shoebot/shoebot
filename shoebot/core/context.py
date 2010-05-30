@@ -79,9 +79,8 @@ class Context(object):
         self.namespace['FRAME'] = self._frame
 
     def _exec_frame(self, source_or_code):
-        '''
-        Run single frame of the bot
-        '''
+        ''' Run single frame of the bot '''
+
         namespace = self.namespace
         self._canvas.reset_canvas()
         self._set_dynamic_vars()
@@ -101,9 +100,8 @@ class Context(object):
         self._iteration += 1
 
     def _should_run(self, iterations):
-        '''
-        Return False if bot should quit
-        '''
+        ''' Return False if bot should quit '''
+
         iteration = self._iteration
         if iteration == 0:
             # First frame always runs
@@ -123,7 +121,7 @@ class Context(object):
             ### going until explicitly closed
             print '###TODO'
             return False
-        print 'F'
+
         return False
 
     def run(self, inputcode, iterations = None, run_forever = False):
