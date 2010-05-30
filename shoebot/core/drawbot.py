@@ -202,7 +202,11 @@ class DrawBot(Bot):
         self._canvas.scale(x, y)
 
     def skew(self, x=1, y=0):
-        self._transform.skew(x,y)
+        ### TODO bring back transform mixin
+        t = self._canvas.transform
+        t *= cairo.Matrix(1,0,x,1,0,0)
+        t *= cairo.Matrix(1,y,0,1,0,0)
+        self._canvas.transform = t
 
     def push(self):
         self._canvas.push_matrix()
