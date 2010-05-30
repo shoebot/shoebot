@@ -55,9 +55,7 @@ class Context(object):
         self.bot = bot_class(self, self._canvas, self.namespace)
 
     def _set_defaults(self):
-        '''
-        Set defaults before rendering
-        '''
+        ''' Set defaults before rendering '''
         self._canvas.size = None
         self._frame = 0
 
@@ -96,6 +94,7 @@ class Context(object):
             else:
                 exec source_or_code in namespace
         
+        self._canvas.flush(self._frame)
         self._frame += 1
         self._iteration += 1
 
@@ -147,9 +146,8 @@ class Context(object):
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + "\n\n", "shoebot_code", "exec")
+                source_or_code = compile(source_or_code, "shoebot_code", "exec")
             # do the magic            
-            canvas = self._canvas
             if not iterations:
                 if run_forever:
                     iterations = None
@@ -158,16 +156,13 @@ class Context(object):
 
             # First iteration
             self._exec_frame(source_or_code)
-            canvas.flush(self._frame)
 
             # Subsequent iterations
             while self._should_run(iterations):
-                frame = self._frame
                 self._exec_frame(source_or_code)
-                canvas.flush(frame)
 
             self.quit = True
-            canvas.sink.finish()
+            self.canvas.sink.finish()
 
         except NameError:
             # if something goes wrong, print verbose system output
