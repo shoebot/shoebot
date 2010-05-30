@@ -7,7 +7,6 @@ from socket_server import SocketServerMixin
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
-
 ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):

@@ -44,6 +44,7 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 CENTER = 'center'
+CORNER = 'corner'
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
@@ -60,12 +61,16 @@ class Canvas(object):
         self.finished = False
         self.color_range = 1
         self.color_mode = 1
-        self.path_mode = 'CORNER'
+        self.path_mode = CORNER
 
     def set_bot(self, bot):
         ''' Bot must be set before running '''
         self.bot = bot
         self.sink.set_bot(bot)
+
+    def get_input_device(self):
+        ''' Overrides can return actual input device '''
+        return None
 
     def initial_drawqueue(self):
         '''

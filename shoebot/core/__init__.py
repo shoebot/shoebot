@@ -34,6 +34,7 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 
 '''
 
+from input_device import InputDeviceMixin
 from grammar import Grammar
 from bot import Bot
 

@@ -34,6 +34,7 @@ from math import pi as _pi
 import os.path
 import cairo
 
+from shoebot.core import InputDeviceMixin
 from canvas import Canvas
 from drawqueue import DrawQueue
 from cairo_drawqueue import CairoDrawQueue
@@ -62,6 +63,12 @@ class CairoCanvas(Canvas):
         Return an identity matrix
         '''
         return cairo.Matrix()
+
+    def get_input_device(self):
+        if isinstance(self.sink, InputDeviceMixin):
+            return self.sink
+        else:
+            return None
 
     def reset_drawqueue(self):
         self._drawqueue = self.initial_drawqueue()

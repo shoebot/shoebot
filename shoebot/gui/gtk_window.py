@@ -2,8 +2,9 @@ import gtk
 
 from shoebot.gui import ShoebotWidget, VarWindow
 from shoebot.core import DrawQueueSink
+from gtk_input_device import GtkInputDeviceMixin
 
-class ShoebotWindow(gtk.Window, DrawQueueSink):
+class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
     '''Create a GTK+ window that contains a ShoebotWidget'''
 
     # Draw in response to an expose-event
@@ -11,6 +12,7 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
     def __init__(self, **kwargs):
         gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
+        GtkInputDeviceMixin.__init__(self)
 
         sb_widget = ShoebotWidget()
 
@@ -31,6 +33,8 @@ class ShoebotWindow(gtk.Window, DrawQueueSink):
             gtk.main_iteration()
 
         self.sb_widget = sb_widget
+        self.attach_gtk(self)
+
 
     def create_rcontext(self, size, frame):
         '''

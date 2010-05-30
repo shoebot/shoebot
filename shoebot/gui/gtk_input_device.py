@@ -1,10 +1,12 @@
+import gtk
+
 from shoebot.core import InputDeviceMixin
 
 class GtkInputDeviceMixin(InputDeviceMixin):
-    def __init__(self):
-        InputDeviceMixin.__init__(self)
+    def __init__(self, **kwargs):
+        InputDeviceMixin.__init__(self, **kwargs)
     
-    def _attach_gtk(self, widget):
+    def attach_gtk(self, widget):
         # necessary for catching keyboard events
         widget.set_flags(gtk.CAN_FOCUS)
 
@@ -13,26 +15,28 @@ class GtkInputDeviceMixin(InputDeviceMixin):
             gtk.gdk.POINTER_MOTION_MASK |
             gtk.gdk.KEY_PRESS_MASK |
             gtk.gdk.KEY_RELEASE_MASK)
-        widget.connect('button_press_event', self._gtk_mouse_button_press)
-        widget.connect('button_release_event', self.gtk_mouse_button_release)
-        widget.connect('motion_notify_event', self.gtk_mouse_move)
+        widget.connect('button_press_event', self.gtk_mouse_button_down)
+        widget.connect('button_release_event', self.gtk_mouse_button_up)
+        widget.connect('motion_notify_event', self.gtk_mouse_pointer_moved)
 
-        widget.connect('key_press_event', self.gtk_key_press)
-        widget.connect('key_release_event', self.gtk_key_release)
+        widget.connect('key_press_event', self.gtk_key_pressed)
+        widget.connect('key_release_event', self.gtk_key_released)
 
-    def _gtk_mouse_button_press(self, widget, event):
-        self._mouse_button_press_func()
+    def gtk_mouse_button_down(self, widget, event):
+        self.mouse_button_down(event.button)
 
-    def _gtk_mouse_button_release(self, widget, event):
-        self._mouse_button_release_func()
+    def gtk_mouse_button_up(self, widget, event):
+        self.mouse_button_up(event.button)
 
-    def _gtk_mouse_move(self, widget, event):
-        self._mouse_move_func()
+    def gtk_mouse_pointer_moved(self, widget, event):
+        self.mouse_pointer_moved(event.x, event.y)
 
-    def _gtk_key_press(self, widget, event):
-        self._key_press_func()
+    def gtk_key_pressed(self, widget, event):
+        self.keys_pressed.add(event.keyval)
+        self.key_pressed(event.string, event.keyval)
 
-    def _gtk_key_release(self, widget, event):
-        self._key_release_func()
+    def gtk_key_released(self, widget, event):
+        self.keys_pressed.discard(event.keyval)
+        self.key_released(event.string, event.keyval)
 
 

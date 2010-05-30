@@ -135,6 +135,26 @@ class Bot(Grammar):
     def _set_dynamic_vars(self):
         self._namespace['FRAME'] = self._frame
 
+    # Get input
+
+    def _mouse_button_down(self, button):
+        self._namespace['mousedown'] = self._input_device.mouse_down
+
+    def _mouse_button_up(self, button):
+        self._namespace['mousedown'] = self._input_device.mouse_down
+
+    def _mouse_pointer_moved(self, x, y):
+        self._namespace['MOUSEX'] = x
+        self._namespace['MOUSEX'] = y
+
+    def _key_pressed(self, key, keycode):
+        self._namespace['key'] = key
+        self._namespace['keycode'] = keycode
+        self._namespace['keydown'] = True
+
+    def _key_released(self, key, keycode):
+        self._namespace['keydown'] = self._input_device.key_down
+
     #### Functions for override
 
     def setup(self):
@@ -288,6 +308,7 @@ class Bot(Grammar):
             
 
     # from Nodebox, a function to import Nodebox libraries
+
     def ximport(self, libName):
         lib = __import__(libName)
         self._namespace[libName] = lib
@@ -319,5 +340,4 @@ class Bot(Grammar):
             self._dynamic = True
         else:
             return self._speed
-
 
