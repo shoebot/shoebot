@@ -30,7 +30,8 @@
 import cairo
 import pango
 import pangocairo
-from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
+## from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
+from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from shoebot.util import RecordingSurfaceA8
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 

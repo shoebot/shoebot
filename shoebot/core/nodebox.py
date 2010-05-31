@@ -2,7 +2,7 @@ import sys
 import cairo
 from shoebot import ShoebotError
 from shoebot.core import Bot
-from shoebot.data import Point, BezierPath, Transform, Image
+from shoebot.data import Point, BezierPath, Image
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType

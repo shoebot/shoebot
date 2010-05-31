@@ -1,6 +1,6 @@
 import sys
 from shoebot.core import Bot
-from shoebot.data import BezierPath, Transform, Image
+from shoebot.data import BezierPath, Image
 from math import radians as deg2rad
 from shoebot import ShoebotError
 

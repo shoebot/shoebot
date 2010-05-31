@@ -1,6 +1,7 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
-from shoebot.data import Grob, ColorMixin, TransformMixin
+##from shoebot.data import Grob, ColorMixin, TransformMixin
+from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
 from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 from math import pi as _pi

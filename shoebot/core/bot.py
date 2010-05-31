@@ -34,7 +34,7 @@ import shoebot
 
 from shoebot import ShoebotError, RGB, HSB
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
-                         Image, ClippingPath, Transform,\
+                         Image, ClippingPath, \
                          NUMBER, TEXT, BOOLEAN, BUTTON
 from grammar import Grammar
 
