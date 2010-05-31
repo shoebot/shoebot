@@ -218,5 +218,5 @@ def RecordingSurfaceA8(*size):
     the SVGSurface of the same size
     '''
     svg_surface = get_svg_surface()
-    return _svg_surface.create_similar(cairo.CONTENT_ALPHA, *size)
+    return svg_surface.create_similar(cairo.CONTENT_ALPHA, *size)
 
