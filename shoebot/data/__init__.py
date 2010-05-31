@@ -61,7 +61,6 @@ def _copy_attrs(source, target, attrs):
 
 from point import Point
 from basecolor import Color, ColorMixin
-from transforms import Transform, TransformMixin
 from grob import Grob 
 from bezier import BezierPath, PathElement, ClippingPath, EndClip
 from typography import Text
