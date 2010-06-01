@@ -13,11 +13,16 @@ import opencv
 from opencv import highgui as hg
 import os
 
+class SBVideoError(RuntimeError):
+    pass
+
 class Movie:
     
     def __init__(self, path, start=0, stop=None):
         self.path = path
         self.video = hg.cvCreateFileCapture(self.path)
+        if self.video is None:
+            raise SBVideoError("Could not open stream %s" % self.path)
 
         # these functions don't seem to work at present on my linux system
         
