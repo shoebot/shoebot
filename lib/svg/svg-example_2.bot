@@ -1,7 +1,4 @@
-import os.path
-
-# SVG is in same folder as this bot:
-svg_file = os.path.dirname('__file__') + 'circles.svg'
+from os import getcwd
 
 size(600,600)
 
@@ -9,7 +6,7 @@ svg = ximport("svg")
 
 # The parse() command will return
 # a list of the shapes in the SVG file.
-paths = svg.parse(open(svg_file).read())
+paths = svg.parse(open(getcwd() + "circles.svg").read())
 
 
 
