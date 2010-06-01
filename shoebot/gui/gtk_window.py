@@ -89,6 +89,8 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         if server:
             self.server('', self.serverport)
 
+        self.window_open = True
+
 
     def gtk_mouse_button_down(self, widget, event):
         ''' Handle right mouse button clicks '''
@@ -175,7 +177,8 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.var_window = None
 
         self.destroy()
+        self.window_open = False
 
     def finish(self):
-        if not self.bot._quit:
-            gtk.main()
+        while self.bot._quit == False and self.window_open == True:
+            gtk.main_iteration()
