@@ -362,13 +362,11 @@ class NodeBot(Bot):
         # FIXME: this save should go into Canvas
         ### TODO
         p = self.ClippingPath(path)
-        self._canvas.add(p)
         return p
 
 
     def endclip(self):
         p = self.EndClip()
-        self._canvas.add(p)
 
     def transform(self, mode):
         '''Mode can be CENTER or CORNER'''

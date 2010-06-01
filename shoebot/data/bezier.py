@@ -271,8 +271,11 @@ class ClippingPath(BezierPath):
         BezierPath.__init__(self, canvas, path, **kwargs)
 
 class EndClip(Grob):
-    def __init__(self, bot, **kwargs):
-        self._bot = bot
+    def __init__(self, canvas, **kwargs):
+        Grob.__init__(canvas = canvas)
+
+    def _render(self, ctx):
+        pass
 
 class PathElement(object):
     '''

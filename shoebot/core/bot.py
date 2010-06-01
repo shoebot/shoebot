@@ -55,6 +55,8 @@ import sys
 LIB_DIRS = [
     os.path.join(sys.prefix, 'local', 'share', 'shoebot', 'lib'), 
     os.path.join(sys.prefix, 'share', 'shoebot', 'lib')]
+for LIB_DIR in LIB_DIRS:
+    sys.path.append(LIB_DIR)
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
@@ -291,9 +293,6 @@ class Bot(Grammar):
     # from Nodebox, a function to import Nodebox libraries
 
     def ximport(self, libName):
-        for LIB_DIR in LIB_DIRS:
-            sys.path.append(LIB_DIR)
-
         lib = __import__(libName)
         self._namespace[libName] = lib
         lib._ctx = self
