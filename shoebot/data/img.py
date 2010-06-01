@@ -14,7 +14,7 @@ from shoebot.util import RecordingSurface
 class Image(Grob, ColorMixin):
     _surface_cache = {}
 
-    def __init__(self, canvas, path, x, y, width=None, height=None, alpha=1.0, data=None, **kwargs):
+    def __init__(self, canvas, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, **kwargs):
         Grob.__init__(self, canvas)
         ColorMixin.__init__(self, canvas, **kwargs)
 

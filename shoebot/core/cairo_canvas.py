@@ -143,6 +143,11 @@ class CairoCanvas(Canvas):
             target_ctx.set_source_surface(ctx.get_target())
             target_ctx.paint()
 
+        def output_surface(ctx):
+            target_ctx = cairo.Context(target)
+            target_ctx.set_source_surface(ctx.get_target())
+            target_ctx.paint()
+
         def output_file(ctx):
             root, extension = os.path.splitext(target)
             if file_number:
@@ -170,6 +175,8 @@ class CairoCanvas(Canvas):
 
         if isinstance(target, cairo.Context):
             return output_context
+        elif isinstance(target, cairo.Surface):
+            return output_surface
         else:
             return output_file
 

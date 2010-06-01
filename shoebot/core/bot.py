@@ -259,9 +259,12 @@ class Bot(Grammar):
         return glob(path)
 
     def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
-        '''Save the contents of current surface into a file.
+        '''Save the contents of current surface into a file or cairo surface/context
 
-        Setting defer to False:
+        Defer option:
+        Decides whether the action needs to happen now or can happen later.
+
+        Defer set to False
         Ensures that a file is written before returning, but can hamper performance.
         Usually you won't want to do this.
 
