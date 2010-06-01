@@ -44,8 +44,8 @@ from xml.dom.minidom import parseString
 from random import random, choice
 
 try:
-    from shoebot import Grob, RGB, HSB, CMYK, CORNER
-    from shoebot import _restore, _save    
+    from shoebot.data import Grob
+    from shoebot import _restore, _save, RGB, HSB, CMYK, CORNER
 except:
     class Grob: pass
 
@@ -530,7 +530,11 @@ class Color(BaseColor):
                kwargs.has_key("b"):
                     r, g, b = kwargs["r"], kwargs["g"], kwargs["b"]
                else:
-                    r, g, b, a = (args)
+                    if len(args) == 3:
+                        r, g, b = args
+                        a = 1.0
+                    else:
+                        r, g, b, a = (args)
 		
 	    _ctx.colormode(RGB, ra)
             BaseColor.__init__(self, r,g,b,a, mode='rgb', color_range=ra)
@@ -3003,7 +3007,7 @@ class shadow(Grob):
         
         """
         
-        Grob.__init__(self, _ctx)
+        Grob.__init__(self, _ctx._canvas)
         if clr == None: 
             clr = color(0, 0, 0, alpha, mode="rgb")
         self.dx = dx

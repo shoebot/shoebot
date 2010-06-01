@@ -3,6 +3,8 @@ import cairo
 from shoebot import ShoebotError
 from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Image
+from shoebot import RGB, \
+                    CORNER
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType
@@ -21,8 +23,14 @@ class NodeBot(Bot):
     NORMAL = "1"
     FORTYFIVE = "2"
 
+    # Default values    
+    color_mode = RGB
+    color_range = None
+
     def __init__(self, canvas, namespace = None):
         Bot.__init__(self, canvas, namespace)
+        canvas.mode = CORNER
+
 
     #### Drawing
 
@@ -429,9 +437,9 @@ class NodeBot(Bot):
         '''
         if mode is not None:
             if mode == "rgb":
-                self.color_mode = Bot.RGB
+                self.color_mode = RGB
             elif mode == "hsb":
-                self.color_mode = Bot.HSB
+                self.color_mode = HSB
             else:
                 raise NameError, _("Only RGB and HSB colormodes are supported.")
         if crange is not None:

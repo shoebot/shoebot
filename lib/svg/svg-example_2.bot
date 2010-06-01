@@ -20,5 +20,3 @@ for path in paths:
         drawpath(path)
 
 
-        
-    

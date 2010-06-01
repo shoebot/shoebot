@@ -32,10 +32,14 @@
 import sys, os
 import shoebot
 
-from shoebot import ShoebotError, RGB, HSB
+from shoebot import ShoebotError, \
+                    RGB, HSB, \
+                    CENTER, CORNER, CORNERS
+
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, \
                          NUMBER, TEXT, BOOLEAN, BUTTON
+
 from grammar import Grammar
 
 from glob import glob
@@ -72,9 +76,9 @@ class Bot(Grammar):
     LEFT = 'left'
     RIGHT = 'right'
 
-    CENTER = "center"
-    CORNER = "corner"
-    CORNERS = "corners"
+    CENTER = CENTER
+    CORNER = CORNER
+    CORNERS = CORNERS
 
     LEFT = 'left'
     RIGHT = 'right'
