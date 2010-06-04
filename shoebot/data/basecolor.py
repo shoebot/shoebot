@@ -77,7 +77,7 @@ class Color(object):
         
             if kwargs.has_key("mode"): 
                 mode = kwargs["mode"].lower()
-            if mode == "rgb":                
+            if mode == "rgb":
                 self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
             elif mode == "hsb":                
                 self.h, self.s, self.brightness, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha                
