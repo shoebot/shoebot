@@ -49,6 +49,7 @@ class BezierPath(Grob):
         self.closed = False
 
         self._drawn = False
+        self._bounds = None
         self._center = None
 
     def _append_element(self, render_func, pe):
@@ -75,7 +76,7 @@ class BezierPath(Grob):
         self.append(*args)
 
     def copy(self):
-        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
+        path =BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
         path.closed = self.closed
         path._center = self._center
         path._elements = list(self._elements)
@@ -128,6 +129,26 @@ class BezierPath(Grob):
         for render_func in self._render_funcs:
             render_func(cairo_ctx)
 
+    def _get_bounds(self):
+        '''
+        Return cached bounds of this Grob.
+        If bounds are not cached, render to a meta surface, and
+        keep the meta surface and bounds cached.
+        '''
+        if self._bounds:
+            return self._bounds
+
+        record_surface = RecordingSurface(0, 0)
+        dummy_ctx = cairo.Context(record_surface)
+        self._traverse(dummy_ctx)
+        
+        self._bounds = dummy_ctx.path_extents()        
+        return self._bounds
+
+    def _get_dimensions(self):
+        bounds = (x1,y1,x2,y2) = self._get_bounds()
+        return x1, y1
+
     def _get_center(self):
         '''
         Return cached bounds of this Grob.
@@ -137,14 +158,9 @@ class BezierPath(Grob):
         if self._center:
             return self._center
 
-        record_surface = RecordingSurface(*self._canvas.size)
-        dummy_ctx = cairo.Context(record_surface)
-        self._traverse(dummy_ctx)
-        
-        bounds = dummy_ctx.path_extents()
-        
+       
         # get the center point
-        (x1,y1,x2,y2) = bounds
+        (x1,y1,x2,y2) = self._get_bounds()
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
 
@@ -175,23 +191,36 @@ class BezierPath(Grob):
                 xc, yc = self._get_center()
                 transform.translate(-xc, -yc)
 
-            cairo_ctx.set_matrix(transform)
 
+            cairo_ctx.transform(transform)
             # Run the path commands on the cairo context:
             self._traverse(cairo_ctx)
             ## Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
-            if fillcolor:
+            if fillcolor is not None and strokecolor is not None:
+                # Draw onto intermediate surface so that stroke
+                # does not overlay fill
+                cairo_ctx.push_group()
+
                 cairo_ctx.set_source_rgba(*fillcolor)
-                if strokecolor:
-                    cairo_ctx.fill_preserve()
-                else:
-                    cairo_ctx.fill()
-            if strokecolor:
-                cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.fill_preserve()
+
                 cairo_ctx.set_source_rgba(*strokecolor)
+                cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
+                cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
+            
+                cairo_ctx.pop_group_to_source ()
+                cairo_ctx.paint ()
+            elif fillcolor is not None:
+                cairo_ctx.set_source_rgba(*fillcolor)
+                cairo_ctx.fill()
+            elif strokecolor is not None:
+                cairo_ctx.set_source_rgba(*strokecolor)
+                cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.stroke()
+
 
         return _render
 
