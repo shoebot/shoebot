@@ -52,36 +52,37 @@ class Image(Grob, ColorMixin):
                     if path in self._surface_cache:
                         imagesurface = self._surface_cache[path]
                     else:
-                        pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-                        width = pixbuf.get_width()
-                        height = pixbuf.get_height()
+                        if os.path.splitext(path)[1].lower() == '.png':
+                            imagesurface = cairo.ImageSurface.create_from_png(path)
+                        else:
+                            pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+                            width = pixbuf.get_width()
+                            height = pixbuf.get_height()
 
-                        ''' create a new cairo surface to place the image on '''
-                        surface = cairo.ImageSurface(0, width, height)
-                        ''' create a context to the new surface '''
-                        ct = cairo.Context(surface)
-                        ''' create a GDK formatted Cairo context to the new Cairo native context '''
-                        ct2 = gtk.gdk.CairoContext(ct)
-                        ''' draw from the pixbuf to the new surface '''
-                        ct2.set_source_pixbuf(pixbuf, 0, 0)
-                        ct2.paint()
-                        ''' surface now contains the image in a Cairo surface '''
-                        imagesurface = ct2.get_target()
+                            ''' create a new cairo surface to place the image on '''
+                            surface = cairo.ImageSurface(0, width, height)
+                            ''' create a context to the new surface '''
+                            ct = cairo.Context(surface)
+                            ''' create a GDK formatted Cairo context to the new Cairo native context '''
+                            ct2 = gtk.gdk.CairoContext(ct)
+                            ''' draw from the pixbuf to the new surface '''
+                            ct2.set_source_pixbuf(pixbuf, 0, 0)
+                            ct2.paint()
+                            ''' surface now contains the image in a Cairo surface '''
+                            imagesurface = ct2.get_target()
                         self._surface_cache[path] = imagesurface
 
-                if width is not None or height is not None:
-                    if width:
-                        wscale = width / imagesurface.get_width()
-                    else:
-                        wscale = 1.0
-                    if height:
-                        hscale = height / imagesurface.get_height()
-                    else:   
-                        hscale = 1.0
-                    self._transform.scale(wscale, hscale)
+            if width is not None or height is not None:
+                if width:
+                    wscale = width / imagesurface.get_width()
+                else:
+                    wscale = 1.0
+                if height:
+                    hscale = height / imagesurface.get_height()
+                else:   
+                    hscale = 1.0
+                self._transform.scale(wscale, hscale)
                     
-            else:
-                print 'TODO - Image from data'
             ### TODO
             #elif self.data:
             #    img = PILImage.open(StringIO(self.data))
@@ -109,7 +110,7 @@ class Image(Grob, ColorMixin):
 
     def _render(self, ctx):
         ctx.set_matrix(self._transform)
-        ctx.move_to(self.x, self.y)
+        ctx.translate(self.x, self.y)
         ctx.set_source_surface(self._imagesurface)
         ctx.paint()
 
