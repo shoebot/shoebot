@@ -64,19 +64,20 @@ class BezierPath(Grob):
         if len(args) is 2:
             ## TODO, check this against nodebox
             self.moveto(*args)
-        else:
-            if pe.cmd == MOVETO:
-                self._append_element(self._canvas.moveto_closure(p.x, p.y), pe)
-            elif pe.cmd == LINETO:
-                self._append_element(self._canvas.lineto_closure(p.x, p.y), pe)
-            elif pe.cmd == CURVETO:
-                self._append_element(self._canvas.curveto_closure(p.x, p.y, p.c1x, p.c1y, p.c2x, p.c2y), pe)
+        elif isinstance(args[0], PathElement):
+            p = args[0]
+            if p.cmd == MOVETO:
+                self._append_element(self._canvas.moveto_closure(p.x, p.y), p)
+            elif p.cmd == LINETO:
+                self._append_element(self._canvas.lineto_closure(p.x, p.y), p)
+            elif p.cmd == CURVETO:
+                self._append_element(self._canvas.curveto_closure(p.x, p.y, p.c1x, p.c1y, p.c2x, p.c2y), p)
 
     def addpoint(self, *args):
         self.append(*args)
 
     def copy(self):
-        path =BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
+        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
         path.closed = self.closed
         path._center = self._center
         path._elements = list(self._elements)
@@ -199,20 +200,30 @@ class BezierPath(Grob):
             cairo_ctx.set_matrix(cairo.Matrix())
 
             if fillcolor is not None and strokecolor is not None:
-                # Draw onto intermediate surface so that stroke
-                # does not overlay fill
-                cairo_ctx.push_group()
+                if strokecolor[3] < 1:
+                    # Draw onto intermediate surface so that stroke
+                    # does not overlay fill
+                    cairo_ctx.push_group()
 
-                cairo_ctx.set_source_rgba(*fillcolor)
-                cairo_ctx.fill_preserve()
+                    cairo_ctx.set_source_rgba(*fillcolor)
+                    cairo_ctx.fill_preserve()
 
-                cairo_ctx.set_source_rgba(*strokecolor)
-                cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
-                cairo_ctx.set_line_width(strokewidth)
-                cairo_ctx.stroke()
-            
-                cairo_ctx.pop_group_to_source ()
-                cairo_ctx.paint ()
+                    e = cairo_ctx.stroke_extents()
+                    cairo_ctx.set_source_rgba(*strokecolor)
+                    cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
+                    cairo_ctx.set_line_width(strokewidth)
+                    cairo_ctx.stroke()
+                
+                    cairo_ctx.pop_group_to_source ()
+                    cairo_ctx.paint ()
+                else:
+                    # Fast path if no alpha in stroke
+                    cairo_ctx.set_source_rgba(*fillcolor)
+                    cairo_ctx.fill_preserve()
+
+                    cairo_ctx.set_source_rgba(*strokecolor)
+                    cairo_ctx.set_line_width(strokewidth)
+                    cairo_ctx.stroke()                    
             elif fillcolor is not None:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
@@ -220,7 +231,6 @@ class BezierPath(Grob):
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
-
 
         return _render
 
