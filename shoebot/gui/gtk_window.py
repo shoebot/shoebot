@@ -120,9 +120,9 @@ class ShoebotWindow(SocketServerMixin):
                 while gtk.events_pending():
                     gtk.main_iteration()
         else:
-            # gtk.main()
-            while gtk.events_pending():
-                gtk.main_iteration()
+            while self.window:
+                while gtk.events_pending():
+                    gtk.main_iteration()
 
 
     def do_fullscreen(self, widget):
