@@ -48,8 +48,8 @@ class NodeBot(Bot):
 
     # Paths
 
-    def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        path = self.BezierPath(**kwargs)
+    def rect(self, x, y, width, height, roundness=0.0, draw=True, fill=None, **kwargs):
+        path = self.BezierPath(fillcolor=fill, **kwargs)
         path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
             path.draw()
