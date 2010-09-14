@@ -336,7 +336,7 @@ class DrawBot(Bot):
 
     def lineheight(self, height=None):
         if height is not None:
-            self._lineheight = height
+            self.canvas._lineheight = height
 
     def align(self, align="LEFT"):
         self._align=align
