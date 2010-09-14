@@ -339,7 +339,7 @@ class DrawBot(Bot):
             self.canvas._lineheight = height
 
     def align(self, align="LEFT"):
-        self._align=align
+        self._canvas.align=align
 
     # TODO: Set the framework to setup font options
 
