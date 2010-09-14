@@ -96,7 +96,7 @@ parser.add_option("-r",
                 type="int",
                 dest="repeat",
                 default=False,
-                help=_("set number of iteration, multiple images will be produced (only in non-windowed mode)"))
+                help=_("set number of iteration, multiple images will be produced"))
 parser.add_option("-b",
                 "--bot",
                 dest="bot",
