@@ -55,7 +55,6 @@ class Text(Grob, ColorMixin):
 
         self._fontfile = kwargs.get('font', canvas.fontfile)
         self._fontsize = kwargs.get('fontsize', canvas.fontsize)
-        print self._fontsize
         self._lineheight = kwargs.get('lineheight', canvas.lineheight)
         self._align = kwargs.get('align', canvas.align)
         self._indent = kwargs.get("indent")
