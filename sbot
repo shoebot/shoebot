@@ -132,5 +132,5 @@ if __name__ == '__main__':
         grammar = options.bot,
         outputfile = options.outputfile or 'output.svg',
         iterations = options.repeat or None,
-        window = options.window or options.varwindow,
+        window = options.window or options.varwindow or options.socketserver,
         show_vars = options.varwindow)
