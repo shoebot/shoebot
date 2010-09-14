@@ -493,7 +493,7 @@ def add_color_info(e, path):
     if path[0].x == path[len(path)-1].x and \
        path[0].y == path[len(path)-1].y: 
         path.closed = True
-    for p in path[1, -1]:
+    for p in path[1:-1]:
         if p.cmd == MOVETO:
             path.closed = False
         
