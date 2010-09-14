@@ -149,6 +149,8 @@ class Grammar(object):
             while self._should_run(iterations):
                 self._exec_frame(source_or_code, limit = frame_limiter)
 
+            if not run_forever:
+                self._quit = True
             self._canvas.sink.finish()
 
         except NameError:

@@ -35,7 +35,7 @@ NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 SHOEBOT = 'shoebot'
 
-def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterations = None, window = False, show_vars = False):
+def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterations = None, window = False, close_window = False, show_vars = False):
     '''
     Convenience function to make it easy to start bots from external programs
     '''
@@ -64,5 +64,5 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     }
     bot = BOT_CLASSES[grammar](canvas)
     canvas.set_bot(bot)
-    bot.sb_run(src, iterations, run_forever = window, frame_limiter = window)
+    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
 

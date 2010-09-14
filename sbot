@@ -103,6 +103,13 @@ parser.add_option("-b",
                 default=NODEBOX,
                 help=_("Select between 'nodebox' (default) or 'drawbot' languages"),
                 )
+parser.add_option("-c",
+                "--close",
+                action="store_true",
+                dest="close",
+                default=False,
+                help=_("Close window after running bot (use with -r for benchmarking)"),
+                )
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -133,4 +140,5 @@ if __name__ == '__main__':
         outputfile = options.outputfile or 'output.svg',
         iterations = options.repeat or None,
         window = options.window or options.varwindow or options.socketserver,
+        close_window = options.close,
         show_vars = options.varwindow)
