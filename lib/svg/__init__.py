@@ -43,6 +43,7 @@ class cache(dict):
         p.stroke = path.stroke
         p.strokewidth = path.strokewidth
         p.closed = path.closed
+        p.id = path.id 
         return p
     
     def clear(self):
@@ -68,6 +69,18 @@ def parse(svg, cached=False, _copy=True):
         paths = _cache.load(id, _copy)
    
     return paths
+
+def parse_as_dict(svg, cached=False, _copy=True): 
+    paths_dict = {} 
+    noid = 0 
+    paths = parse(svg) 
+    for p in paths: 
+        if p.id: 
+            paths_dict[p.id] = p 
+        else: 
+            noid += 1 
+            paths_dict["no_id_"+str(noid)] = p 
+    return paths_dict 
 
 def get_attribute(element, attribute, default=0):
     
@@ -476,10 +489,11 @@ def add_color_info(e, path):
     # A path with beginning and ending coordinate
     # at the same location is considered closed.
     # Unless it contains a MOVETO somewhere in the middle.
-    if path[0].x == path[-1].x and \
-       path[0].y == path[-1].y: 
+    path.closed = False
+    if path[0].x == path[len(path)-1].x and \
+       path[0].y == path[len(path)-1].y: 
         path.closed = True
-    for i in range(1,-1):
+    for i in range(1,len(path)-1):
         if path[i].cmd == MOVETO:
             path.closed = False
         
