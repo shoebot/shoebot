@@ -4,6 +4,7 @@ from shoebot import ShoebotError
 from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot import RGB, \
+                    HSB, \
                     CORNER
 from math import sin, cos, pi
 from math import radians as deg2rad
