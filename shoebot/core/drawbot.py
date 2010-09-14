@@ -288,7 +288,7 @@ class DrawBot(Bot):
         else:
             return self._canvas.font_size
 
-    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
+    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, fontsize=self._fontsize, **kwargs):
         '''
         Draws a string of text according to current font settings.
         '''
