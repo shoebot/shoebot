@@ -4,9 +4,10 @@ size(500, 500)
 
 svg = ximport("svg")
 
-# The parse() command will return
+# The parse() command will returnpaths = svg.parse(open(getcwd() + "/flower.svg").read())
+
 # a list of the shapes in the SVG file.
-paths = svg.parse(open(getcwd() + "flower.svg").read())
+paths = svg.parse(open(getcwd() + "/flower.svg").read())
 
 background(color(0.1, 0.1, 0.0))
 

@@ -68,10 +68,7 @@ class Color(object):
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
         # depending on the mode parameter.
         elif len(a) >= 3:
-            if kwargs.has_key("color_range"):
-                ra = int(kwargs["color_range"])
-            else:
-                ra = canvas.color_mode
+            ra = int(kwargs.get('color_range', 1))
             alpha, mode = 1, "rgb" 
             if len(a) > 3: alpha = a[-1]/ra
         

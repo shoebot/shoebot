@@ -208,8 +208,8 @@ class Bot(Grammar):
     #### Utility
 
     def color(self, *args):
-        #return Color(self.color_mode, self.color_range, *args)
-        return self.Color(*args)
+        return self.Color(color_mode = self.color_mode, color_range = self.color_range, *args)
+        #return self.Color(*args)
 
     choice = r.choice
 

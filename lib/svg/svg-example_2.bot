@@ -6,7 +6,7 @@ svg = ximport("svg")
 
 # The parse() command will return
 # a list of the shapes in the SVG file.
-paths = svg.parse(open(getcwd() + "circles.svg").read())
+paths = svg.parse(open(getcwd() + "/circles.svg").read())
 
 
 

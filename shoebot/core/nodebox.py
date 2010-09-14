@@ -26,7 +26,7 @@ class NodeBot(Bot):
 
     # Default values    
     color_mode = RGB
-    color_range = None
+    color_range = 1
 
     def __init__(self, canvas, namespace = None):
         Bot.__init__(self, canvas, namespace)
