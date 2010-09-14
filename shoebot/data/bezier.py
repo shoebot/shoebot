@@ -193,12 +193,16 @@ class BezierPath(Grob):
                 transform.translate(-xc, -yc)
 
 
+            if fillcolor is None and strokecolor is None:
+                # Fixes _bug_FillStrokeNofillNostroke.bot
+                return
+                
             cairo_ctx.transform(transform)
             # Run the path commands on the cairo context:
             self._traverse(cairo_ctx)
             ## Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
-
+            
             if fillcolor is not None and strokecolor is not None:
                 if strokecolor[3] < 1:
                     # Draw onto intermediate surface so that stroke
