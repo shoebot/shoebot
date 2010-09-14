@@ -491,19 +491,19 @@ class NodeBot(Bot):
         else:
             return self._fontfile
         if fontsize is not None:
-            self._fontsize = fontsize
+            self._canvas.fontsize = fontsize
 
     def fontsize(self, fontsize=None):
         if fontsize is not None:
-            self._fontsize = fontsize
+            self._canvas.fontsize = fontsize
         else:
-            return self._fontsize
+            return self._canvas.fontsize
 
     def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''
         Draws a string of text according to current font settings.
         '''
-        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, fontsize=self._fontsize, **kwargs)
+        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, fontsize=self._canvas.fontsize, **kwargs)
         if outline:
           path = txt.path
           if draw:
