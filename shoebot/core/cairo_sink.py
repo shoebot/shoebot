@@ -70,7 +70,7 @@ class CairoImageSink(DrawQueueSink):
         Called when CairoCanvas has rendered a bot
         '''
         if self.format == 'png':
-            surface = ctx.get_target()
+            surface = cairo_ctx.get_target()
             surface.write_to_png(self._filename(frame))
 
     def finish(self):
