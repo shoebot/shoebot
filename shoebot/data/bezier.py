@@ -31,7 +31,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER):
+    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
@@ -40,8 +40,12 @@ class BezierPath(Grob):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, canvas = canvas)
 
-        self._elements = []
-        self._render_funcs = []
+        if packed_elements != None:
+            self.elements, self._render_funcs = packed_elements
+        else:
+            self._elements = []
+            self._render_funcs = []
+        
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
@@ -77,10 +81,9 @@ class BezierPath(Grob):
         self.append(*args)
 
     def copy(self):
-        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode)
+        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
         path.closed = self.closed
         path._center = self._center
-        path._elements = list(self._elements)
         return path
 
     def moveto(self, x, y):
