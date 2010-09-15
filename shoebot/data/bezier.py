@@ -197,7 +197,7 @@ class BezierPath(Grob):
                 # Fixes _bug_FillStrokeNofillNostroke.bot
                 return
                 
-            cairo_ctx.transform(transform)
+            cairo_ctx.set_matrix(transform)
             # Run the path commands on the cairo context:
             self._traverse(cairo_ctx)
             ## Matrix affects stroke, so we need to reset it:
