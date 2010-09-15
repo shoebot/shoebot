@@ -289,11 +289,16 @@ class BezierPath(Grob):
         If el is a PathElement return it
         If el is parameters, create a PathElement and return it
         '''
-        el = self._elements[index]
-        if isinstance(el, tuple):
-            el = PathElement(*el)
-            self._elements[index] = el
-        return el
+        if isinstance(item, slice):
+            indices = item.indices(len(self))
+            for index in indicies:
+                yield self.__getitem__(index)
+        else:
+            el = self._elements[index]
+            if isinstance(el, tuple):
+                el = PathElement(*el)
+                self._elements[index] = el
+            yield el
 
     def __iter__(self):
         for index in xrange(len(self._elements)):
