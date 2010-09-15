@@ -1,7 +1,10 @@
 import sys, os
 import shoebot
 
-from shoebot import ShoebotError
+from shoebot import ShoebotError, \
+                    RGB, HSB, \
+                    CENTER, CORNER, CORNERS
+
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, Transform
 
@@ -34,8 +37,8 @@ class Bot:
     calls) and pass them to a canvas for drawing.
     '''
     
-    RGB = "rgb"
-    HSB = "hsb"
+    RGB = RGB
+    HSB = HSB
 
     LEFT = 'left'
     RIGHT = 'right'

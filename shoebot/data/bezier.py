@@ -1,6 +1,7 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 from shoebot.data import Grob, ColorMixin, TransformMixin
+from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 
 CENTER = 'center'
 
@@ -12,16 +13,6 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
-CLOSE = "close"
 
 class BezierPath(Grob, TransformMixin, ColorMixin):
     """
