@@ -29,6 +29,9 @@ class Grob(object):
             return self._fillcolor
         else:
             return self._canvas.fillcolor
+            
+    def _set_fillcolor(self, fill):
+        self._fillcolor = fill
 
     def _get_strokecolor(self):
         '''Return strokecolor or get it from self._canvas'''
@@ -36,6 +39,9 @@ class Grob(object):
             return self._strokecolor
         else:
             return self._canvas.strokecolor
+            
+    def _set_strokecolor(self, fill):
+        self._strokecolor = fill
 
     def _get_strokewidth(self):
         '''Return strokewidth or get it from self._canvas'''
@@ -93,3 +99,5 @@ class Grob(object):
         '''For overriding by GRaphicOBjects'''
         raise NotImplementedError()
 
+    fill = property(_get_fillcolor, _set_fillcolor)
+    stroke = property(_get_strokecolor, _set_strokecolor)
