@@ -29,7 +29,7 @@ setup(name = "shoebot",
     url = "http://tinkerhouse.net/shoebot",
     packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui"],
     data_files = datafiles,
-    scripts = ["sbot", "shoebot-ide"],
+    scripts = ["sbot", "sbot.cmd", "shoebot-ide"],
     long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
  which describes a drawing process, and outputs a graphic in a common open
