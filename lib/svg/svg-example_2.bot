@@ -8,17 +8,11 @@ svg = ximport("svg")
 # a list of the shapes in the SVG file.
 paths = svg.parse(open(getcwd() + "/circles.svg").read())
 
-
-
 for path in paths:
         # Use copies of the paths
         # that adhere to the transformations 
         # (translate, scale, rotate) we defined.
 
-
-
-
-        
         drawpath(path)
 
 
