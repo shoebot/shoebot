@@ -493,10 +493,10 @@ def add_color_info(e, path):
     # at the same location is considered closed.
     # Unless it contains a MOVETO somewhere in the middle.
     path.closed = False
-    if path[0].x == path[len(path)-1].x and \
-       path[0].y == path[len(path)-1].y: 
+    if path[0].x == path[-1].x and \
+       path[0].y == path[-1].y: 
         path.closed = True
-    for i in range(1,len(path)-1):
+    for i in range(1,-1):
         if path[i].cmd == MOVETO:
             path.closed = False
         
