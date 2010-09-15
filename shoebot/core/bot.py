@@ -103,7 +103,7 @@ class Bot(Grammar):
     keycode = 0
     keydown = False
 
-    FRAME = 0
+    FRAME = 1
 
     def __init__(self, canvas, namespace = None):
         Grammar.__init__(self, canvas, namespace)
