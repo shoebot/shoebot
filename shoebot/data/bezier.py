@@ -282,7 +282,7 @@ class BezierPath(Grob):
             yield el
 
 
-    def __getitem__(self, index):
+    def __getitem__(self, item):
         '''
         el is either a PathElement or the parameters to pass
         to one.
@@ -291,14 +291,13 @@ class BezierPath(Grob):
         '''
         if isinstance(item, slice):
             indices = item.indices(len(self))
-            for index in indicies:
-                yield self.__getitem__(index)
+            return [self.__getitem__(i) for i in range(*indices)]
         else:
-            el = self._elements[index]
+            el = self._elements[item]
             if isinstance(el, tuple):
                 el = PathElement(*el)
-                self._elements[index] = el
-            yield el
+                self._elements[item] = el
+            return el
 
     def __iter__(self):
         for index in xrange(len(self._elements)):
