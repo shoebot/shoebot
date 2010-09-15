@@ -377,7 +377,7 @@ class NodeBot(Bot):
     def endclip(self):
         p = self.EndClip()
 
-    def transform(self, mode):
+    def transform(self, mode = None):
         '''Mode can be CENTER or CORNER'''
         if mode:
             self._canvas.mode = mode
