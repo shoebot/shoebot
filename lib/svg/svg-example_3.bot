@@ -1,6 +1,6 @@
 from os import getcwd
 
-ximport("svg")
+svg = ximport("svg")
 
 size(600,600)
 

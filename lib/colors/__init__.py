@@ -44,7 +44,8 @@ from xml.dom.minidom import parseString
 from random import random, choice
 
 try:
-    from shoebot import Grob, RGB, HSB, CMYK, CORNER
+    from shoebot.core import Bot
+    from shoebot.data import Grob
     from shoebot import _restore, _save    
 except:
     class Grob: pass
@@ -460,7 +461,8 @@ class Color(BaseColor):
 
         self.name = ""
 
-        
+        RGB = Bot.RGB
+        HSB = Bot.HSB
         mode, range = _ctx.color_mode, _ctx.color_range
         modes = [RGB, HSB]
         
