@@ -13,7 +13,10 @@ import arc
 import xml.dom.minidom as parser
 import re
 import md5
-from shoebot import RGB, MOVETO
+from shoebot.core import Bot
+from shoebot.core.cairo_canvas import MOVETO
+
+RGB = Bot.RGB
 
 #### CACHE ###########################################################################################
 
@@ -449,8 +452,8 @@ def add_color_info(e, path):
         b = n&0xff
         return _ctx.color(r/255.0, g/255.0, b/255.0, alpha)
 
-    path.fill = None
-    path.stroke = None
+    path.fill = (0,0,0,0)
+    path.stroke = (0,0,0,0)
     path.strokewidth = 0
 
     # See if we can find an opacity attribute,
@@ -484,8 +487,8 @@ def add_color_info(e, path):
             elif s.startswith("stroke-width:"):
                 path.strokewidth = float(s.replace("stroke-width:", ""))
         except:
-            pass
-    
+            pass    
+
     # A path with beginning and ending coordinate
     # at the same location is considered closed.
     # Unless it contains a MOVETO somewhere in the middle.

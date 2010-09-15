@@ -460,7 +460,6 @@ class Color(BaseColor):
 
         self.name = ""
 
-        
         mode, range = _ctx.color_mode, _ctx.color_range
         modes = [RGB, HSB]
         
