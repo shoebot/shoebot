@@ -41,13 +41,11 @@ class SocketServerMixin(object):
             for packet in incoming:
                 var, value = packet.split()
                 # is value in our variables list?
-                if var in self.drawingarea.bot.namespace:
+                if var in self.bot._namespace:
                     ## TODO: we're forced to convert input to floats
                     # would be a lot nicer to have a check for the var type
-                    # self.drawingarea.bot.namespace[var] = value.strip(';')
-                    self.drawingarea.bot.namespace[var] = float(value.strip(';'))
-                    # and redraw
-                    self.drawingarea.redraw()
+                    # self.drawingarea.bot._namespace[var] = value.strip(';')
+                    self.bot._namespace[var] = float(value.strip(';'))
                 return True
             else:
                 return True

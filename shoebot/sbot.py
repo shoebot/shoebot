@@ -35,7 +35,7 @@ NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 SHOEBOT = 'shoebot'
 
-def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterations = None, window = False, close_window = False, show_vars = False):
+def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterations = None, window = False, close_window = False, server=False, port=7777, show_vars = False):
     '''
     Convenience function to make it easy to start bots from external programs
     '''
@@ -50,7 +50,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
             title = 'Untitled - Shoebot'
-        sink = ShoebotWindow(title, show_vars)
+        sink = ShoebotWindow(title, show_vars, server=server, port=port)
     else:
         if iterations is None:
             iterations = 1

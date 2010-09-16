@@ -23,14 +23,14 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, serverport=7777, go_fullscreen=False):
+    def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, port=7777, go_fullscreen=False):
         gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
         self.menu_enabled = menu_enabled
         self.has_server = server
-        self.serverport = serverport
+        self.serverport = port
         self.show_vars = show_vars
         self.var_window = None
 

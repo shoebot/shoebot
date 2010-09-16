@@ -141,4 +141,6 @@ if __name__ == '__main__':
         iterations = options.repeat or None,
         window = options.window or options.varwindow or options.socketserver,
         close_window = options.close,
+        server=options.socketserver,
+        port=options.serverport,
         show_vars = options.varwindow)
