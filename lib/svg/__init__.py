@@ -13,10 +13,7 @@ import arc
 import xml.dom.minidom as parser
 import re
 import md5
-from shoebot.core import Bot
-from shoebot.core.cairo_canvas import MOVETO
-
-RGB = Bot.RGB
+from shoebot import RGB, MOVETO
 
 #### CACHE ###########################################################################################
 
