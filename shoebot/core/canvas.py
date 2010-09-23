@@ -29,6 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Abstract canvas class'''
 
+from collections import deque
 import sys
 import shoebot
 import locale, gettext
@@ -87,6 +88,7 @@ class Canvas(object):
     def reset_canvas(self):
         self.reset_transform()
         self.reset_drawqueue()
+        self.matrix_stack = deque()
 
     def settings(self, **kwargs):
         '''

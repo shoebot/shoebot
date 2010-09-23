@@ -29,7 +29,6 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Cairo implementation of the canvas'''
 
-from collections import deque
 from math import pi as _pi
 import os.path
 import cairo
@@ -76,7 +75,6 @@ class CairoCanvas(Canvas):
 
     def reset_transform(self):
         self.mode = self.DEFAULT_MODE
-        self.matrix_stack = deque()
         self.transform = self.initial_transform()
         return self.transform
 
@@ -119,10 +117,11 @@ class CairoCanvas(Canvas):
 
     def ellipse_closure(self, x, y, w, h):
         def ellipse(ctx):
-            ctx.translate(x + w / 2., y + h / 2.)
-            ctx.scale(w / 2., h / 2.)
-            ctx.arc(0., 0., 1., 0., 2 * _pi)
-            ctx.close_path()
+            if w != 0.0 and h != 0.0:
+                ctx.translate(x + w / 2., y + h / 2.)
+                ctx.scale(w / 2., h / 2.)
+                ctx.arc(0., 0., 1., 0., 2 * _pi)
+                ctx.close_path()
         return ellipse
 
     def rellineto_closure(self, x, y):
