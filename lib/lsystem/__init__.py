@@ -166,11 +166,11 @@ class LSystem(object):
     	"""
         
         angle = self.angle
-        if time and ease:
+        if time is not None and ease:
         	angle = min(self.angle, self.angle * time / ease)
 
     	self._timed = True
-    	if not time:
+    	if time is None:
     		self._timed = False
     		time = maxint        
 
