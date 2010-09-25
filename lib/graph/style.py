@@ -133,7 +133,7 @@ class style:
         self.stroke      = _ctx.color(0.80, 0.80, 0.80, 0.75)
         self.strokewidth = 0.5
         self.text        = _ctx.color(1.00, 1.00, 1.00, 0.85)
-        self.font        = "/home/francesco/.fonts/calibri.ttf"
+        self.font        = "Calibri"
         self.fontsize    = 10
         self.textwidth   = 100
         self.align       = 1
