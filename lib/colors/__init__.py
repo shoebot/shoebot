@@ -3004,6 +3004,7 @@ class shadow(Grob):
 
         Both the fill and stroke of a path get a dropshadow.
         
+        TODO - Implement shadow, could work as a postprocessing effect
         """
         
         Grob.__init__(self, _ctx._canvas)
@@ -3014,11 +3015,11 @@ class shadow(Grob):
         self.blur = blur
         self.clr = clr.copy()
         self.clr.alpha = alpha
-        self._shadow = NSShadow.alloc().init()
-        self._shadow.setShadowOffset_((dx, -dy))
-        self._shadow.setShadowColor_(clr._rgb)
-        self._shadow.setShadowBlurRadius_(blur)
-        self.draw()
+        #self._shadow = NSShadow.alloc().init()
+        #self._shadow.setShadowOffset_((dx, -dy))
+        #self._shadow.setShadowColor_(clr._rgb)
+        #self._shadow.setShadowBlurRadius_(blur)
+        #self.draw()
         
         global _shadow
         _shadow = self
