@@ -357,7 +357,7 @@ class BezierPath(Grob):
             # If amount=4, we want the point at t 0.0, 0.33, 0.66 and 1.0.
             # If amount=2, we want the point at t 0.0 and 1.0.
             d = float(n) / (amount-1)
-        for i in xrange(amount):
+        for i in xrange(int(amount)):
             yield self.point(start+d*i, segments)
 
     def _linepoint(self, t, x0, y0, x1, y1):
@@ -491,6 +491,9 @@ class BezierPath(Grob):
                 self._elements[index] = el
             yield el
 
+    def extend(self, pathelements):
+        self._elements.extend(pathelements)
+        
     def __getitem__(self, item):
         '''
         el is either a PathElement or the parameters to pass
