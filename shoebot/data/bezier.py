@@ -163,7 +163,6 @@ class BezierPath(Grob):
         if self._center:
             return self._center
 
-       
         # get the center point
         (x1,y1,x2,y2) = self._get_bounds()
         x = (x1 + x2) / 2
@@ -518,6 +517,7 @@ class BezierPath(Grob):
     def __len__(self):
         return len(self._elements)
 
+    bounds = property(_get_bounds)
     contours = property(_get_contours)
     length = property(_get_length)
 
