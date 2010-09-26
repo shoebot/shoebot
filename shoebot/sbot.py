@@ -56,7 +56,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
             iterations = 1
         sink = CairoImageSink(outputfile, format, multifile = iterations > 1)
 
-    canvas = CairoCanvas(sink = sink, enable_cairo_queue=True)
+    canvas = CairoCanvas(sink, enable_cairo_queue=True)
     BOT_CLASSES = {
         DRAWBOT : DrawBot,
         NODEBOX : NodeBot,

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from sbot import run
 
 class ShoebotError(Exception): pass
@@ -23,3 +22,11 @@ ARC = 'arc'
 ELLIPSE = 'ellipse'
 CLOSE = "close"
 
+
+def _save():
+    # Dummy function used by color lib; TODO investigate what is needed
+    pass
+
+def _restore():
+    # Dummy function used by color lib; TODO investigate what is needed
+    pass
