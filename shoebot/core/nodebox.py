@@ -5,7 +5,18 @@ from shoebot.core import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot import RGB, \
                     HSB, \
-                    CORNER
+                    CORNER, \
+                    CENTER, \
+                    MOVETO, \
+                    RMOVETO, \
+                    LINETO, \
+                    RLINETO, \
+                    CURVETO, \
+                    RCURVETO, \
+                    ARC, \
+                    ELLIPSE, \
+                    CLOSE
+                    
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType
@@ -23,6 +34,18 @@ class NodeBot(Bot):
     
     NORMAL = "1"
     FORTYFIVE = "2"
+    
+    CORNER = CORNER
+    CENTER = CENTER
+    MOVETO = MOVETO
+    RMOVETO = RMOVETO
+    LINETO = LINETO
+    RLINETO = RLINETO
+    CURVETO = CURVETO
+    RCURVETO = RCURVETO
+    ARC = ARC
+    ELLIPSE = ELLIPSE # Shoebot, not nodebox 1.x
+    CLOSE = CLOSE
 
     # Default values    
     color_mode = RGB
