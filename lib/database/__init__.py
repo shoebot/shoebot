@@ -11,7 +11,7 @@ __license__   = "MIT"
 import sys, os
 sys.path.append(os.path.dirname(__file__))
 
-from pysqlite2 import dbapi2 as sqlite
+from sqlite3 import dbapi2 as sqlite
 
 
 
