@@ -249,9 +249,8 @@ class BezierPath(Grob):
         Returns a list of contours in the path, as BezierPath objects.
         A contour is a sequence of lines and curves separated from the next contour by a MOVETO.
         For example, the glyph "o" has two contours: the inner circle and the outer circle.
-
-        From nodebox
         """
+        # Originally from nodebox-gl
         contours = []
         current_contour = None
         empty = True
@@ -286,7 +285,7 @@ class BezierPath(Grob):
             point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
             the length during each iteration. 
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         if segments == None:
             segments = self._segment_lengths(relative=True) 
         if len(segments) == 0:
@@ -315,7 +314,7 @@ class BezierPath(Grob):
             point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
             the length during each iteration.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         if len(self._elements) == 0:
             raise PathError, "The given path is empty"
             
@@ -346,6 +345,7 @@ class BezierPath(Grob):
         """ Returns an iterator with a list of calculated points for the path.
             To omit the last point on closed paths: end=1-1.0/amount
         """
+        # Originally from nodebox-gl
         if len(self._elements) == 0:
             raise PathError, "The given path is empty"
         n = end - start
@@ -366,7 +366,7 @@ class BezierPath(Grob):
             x0 and y0 define the starting point of the line, 
             x1 and y1 the ending point of the line.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         out_x = x0 + t * (x1-x0)
         out_y = y0 + t * (y1-y0)
         return (out_x, out_y)
@@ -374,7 +374,7 @@ class BezierPath(Grob):
     def _linelength(self, x0, y0, x1, y1):
         """ Returns the length of the line.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         a = pow(abs(x0 - x1), 2)
         b = pow(abs(y0 - y1), 2)
         return sqrt(a+b)
@@ -391,7 +391,7 @@ class BezierPath(Grob):
             If the handles parameter is set, returns not only the point at t,
             but the modified control points of p0 and p3 should this point split the path as well.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         mint = 1 - t
         x01 = x0 * mint + x1 * t
         y01 = y0 * mint + y1 * t
@@ -418,7 +418,7 @@ class BezierPath(Grob):
             (n=10 would add the lengths of lines between 0.0 and 0.1, between 0.1 and 0.2, and so on).
             The default n=20 is fine for most cases, usually resulting in a deviation of less than 0.01.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         length = 0
         xi = x0
         yi = y0
@@ -474,7 +474,7 @@ class BezierPath(Grob):
             as values between 0.0 and 1.0, defining the relative length of each spline
             in relation to the total path length.
         """
-        # From nodebox-gl
+        # Originally from nodebox-gl
         if not segmented:
             return sum(self._segment_lengths(n=precision), 0.0)
         else:
@@ -625,20 +625,20 @@ class PathElement(object):
 
 
 class PathError(Exception):
-    # From nodebox-gl
+    # Originally from nodebox-gl
     pass
 class NoCurrentPointForPath(Exception):
-    # From nodebox-gl
+    # Originally from nodebox-gl
     pass
 class NoCurrentPath(Exception):
-    # From nodebox-gl
+    # Originally from nodebox-gl
     pass
 
 
 #--- POINT -------------------------------------------------------------------------------------------
 
 class Point(object):
-    # From nodebox-gl
+    # Originally from nodebox-gl
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
