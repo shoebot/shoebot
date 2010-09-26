@@ -4,7 +4,7 @@ from shoebot.data import _copy_attrs
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
 from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
-from math import pi as _pi
+from math import pi as _pi, sqrt
 
 import cairo
 
@@ -55,6 +55,7 @@ class BezierPath(Grob):
         self._drawn = False
         self._bounds = None
         self._center = None
+        self._segments = None
 
     def _append_element(self, render_func, pe):
         '''
@@ -274,6 +275,212 @@ class BezierPath(Grob):
             contours.append(current_contour)
         return contours
 
+    def _locate(self, t, segments=None):
+        """ Locates t on a specific segment in the path.
+            Returns (index, t, PathElement)
+            A path is a combination of lines and curves (segments).
+            The returned index indicates the start of the segment that contains point t.
+            The returned t is the absolute time on that segment,
+            in contrast to the relative t on the whole of the path.
+            The returned point is the last MOVETO, any subsequent CLOSETO after i closes to that point.
+            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True), 
+            point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
+            the length during each iteration. 
+        """
+        # From nodebox-gl
+        if segments == None:
+            segments = self._segment_lengths(relative=True) 
+        if len(segments) == 0:
+            raise PathError, "The given path is empty"
+        for i, el in enumerate(self._get_elements()):
+            if i == 0 or el.cmd == MOVETO:
+                closeto = Point(el.x, el.y)
+            if t <= segments[i] or i == len(segments)-1: 
+                break
+            else: 
+                t -= segments[i]
+        try: t /= segments[i]
+        except ZeroDivisionError: 
+            pass
+        if i == len(segments)-1 and segments[i] == 0: i -= 1
+        return (i, t, closeto)
+        
+    def point(self, t, segments=None):
+        """
+            Returns the PathElement at time t (0.0-1.0) on the path.
+            
+            Returns coordinates for point at t on the path.
+            Gets the length of the path, based on the length of each curve and line in the path.
+            Determines in what segment t falls. Gets the point on that segment.
+            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True), 
+            point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
+            the length during each iteration.
+        """
+        # From nodebox-gl
+        if len(self._elements) == 0:
+            raise PathError, "The given path is empty"
+            
+        if self._segments is None:
+            self._segments = self._get_length(segmented=True, precision=10)
+        
+        i, t, closeto = self._locate(t, segments=self._segments)
+        x0, y0 = self[i].x, self[i].y
+        p1 = self[i+1]
+        if p1.cmd == CLOSE:
+            x, y = self._linepoint(t, x0, y0, closeto.x, closeto.y)
+            return PathElement(LINETO, x, y)
+        elif p1.cmd == LINETO:
+            x1, y1 = p1.x, p1.y
+            x, y = self._linepoint(t, x0, y0, x1, y1)
+            return PathElement(LINETO, x, y)
+        elif p1.cmd == CURVETO:
+            # Note: the handles need to be interpreted differenty than in a BezierPath.
+            # In a BezierPath, ctrl1 is how the curve started, and ctrl2 how it arrives in this point.
+            # Here, ctrl1 is how the curve arrives, and ctrl2 how it continues to the next point.
+            x3, y3, x1, y1, x2, y2 = p1.x, p1.y, p1.ctrl1.x, p1.ctrl1.y, p1.ctrl2.x, p1.ctrl2.y
+            x, y, c1x, c1y, c2x, c2y = self._curvepoint(t, x0, y0, x1, y1, x2, y2, x3, y3)
+            return PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
+        else:
+            raise PathError, "Unknown cmd '%s' for p1 %s" % (p1.cmd, p1)
+            
+    def points(self, amount=100, start=0.0, end=1.0, segments=None):
+        """ Returns an iterator with a list of calculated points for the path.
+            To omit the last point on closed paths: end=1-1.0/amount
+        """
+        if len(self._elements) == 0:
+            raise PathError, "The given path is empty"
+        n = end - start
+        d = n
+        if amount > 1: 
+            # The delta value is divided by amount-1, because we also want the last point (t=1.0)
+            # If we don't use amount-1, we fall one point short of the end.
+            # If amount=4, we want the point at t 0.0, 0.33, 0.66 and 1.0.
+            # If amount=2, we want the point at t 0.0 and 1.0.
+            d = float(n) / (amount-1)
+        for i in xrange(amount):
+            yield self.point(start+d*i, segments)
+
+    def _linepoint(self, t, x0, y0, x1, y1):
+        """ Returns coordinates for point at t on the line.
+            Calculates the coordinates of x and y for a point at t on a straight line.
+            The t parameter is a number between 0.0 and 1.0,
+            x0 and y0 define the starting point of the line, 
+            x1 and y1 the ending point of the line.
+        """
+        # From nodebox-gl
+        out_x = x0 + t * (x1-x0)
+        out_y = y0 + t * (y1-y0)
+        return (out_x, out_y)
+    
+    def _linelength(self, x0, y0, x1, y1):
+        """ Returns the length of the line.
+        """
+        # From nodebox-gl
+        a = pow(abs(x0 - x1), 2)
+        b = pow(abs(y0 - y1), 2)
+        return sqrt(a+b)
+    
+    def _curvepoint(self, t, x0, y0, x1, y1, x2, y2, x3, y3, handles=False):
+        """ Returns coordinates for point at t on the spline.
+            Calculates the coordinates of x and y for a point at t on the cubic bezier spline, 
+            and its control points, based on the de Casteljau interpolation algorithm.
+            The t parameter is a number between 0.0 and 1.0,
+            x0 and y0 define the starting point of the spline,
+            x1 and y1 its control point,
+            x3 and y3 the ending point of the spline,
+            x2 and y2 its control point.
+            If the handles parameter is set, returns not only the point at t,
+            but the modified control points of p0 and p3 should this point split the path as well.
+        """
+        # From nodebox-gl
+        mint = 1 - t
+        x01 = x0 * mint + x1 * t
+        y01 = y0 * mint + y1 * t
+        x12 = x1 * mint + x2 * t
+        y12 = y1 * mint + y2 * t
+        x23 = x2 * mint + x3 * t
+        y23 = y2 * mint + y3 * t
+        out_c1x = x01 * mint + x12 * t
+        out_c1y = y01 * mint + y12 * t
+        out_c2x = x12 * mint + x23 * t
+        out_c2y = y12 * mint + y23 * t
+        out_x = out_c1x * mint + out_c2x * t
+        out_y = out_c1y * mint + out_c2y * t
+        if not handles:
+            return (out_x, out_y, out_c1x, out_c1y, out_c2x, out_c2y)
+        else:
+            return (out_x, out_y, out_c1x, out_c1y, out_c2x, out_c2y, x01, y01, x23, y23)
+    
+    def _curvelength(self, x0, y0, x1, y1, x2, y2, x3, y3, n=20):
+        """ Returns the length of the spline.
+            Integrates the estimated length of the cubic bezier spline defined by x0, y0, ... x3, y3, 
+            by adding the lengths of lineair lines between points at t.
+            The number of points is defined by n 
+            (n=10 would add the lengths of lines between 0.0 and 0.1, between 0.1 and 0.2, and so on).
+            The default n=20 is fine for most cases, usually resulting in a deviation of less than 0.01.
+        """
+        # From nodebox-gl
+        length = 0
+        xi = x0
+        yi = y0
+        for i in range(n):
+            t = 1.0 * (i+1) / n
+            pt_x, pt_y, pt_c1x, pt_c1y, pt_c2x, pt_c2y = \
+                self._curvepoint(t, x0, y0, x1, y1, x2, y2, x3, y3)
+            c = sqrt(pow(abs(xi-pt_x),2) + pow(abs(yi-pt_y),2))
+            length += c
+            xi = pt_x
+            yi = pt_y
+        return length
+
+    def _segment_lengths(self, relative=False, n=20):
+        """ Returns a list with the lengths of each segment in the path.
+        """
+        # From nodebox_gl
+        lengths = []
+        first = True
+        for el in self._get_elements():
+            if first == True:
+                close_x, close_y = el.x, el.y
+                first = False
+            elif el.cmd == MOVETO:
+                close_x, close_y = el.x, el.y
+                lengths.append(0.0)
+            elif el.cmd == CLOSE:
+                lengths.append(self._linelength(x0, y0, close_x, close_y))
+            elif el.cmd == LINETO:
+                lengths.append(self._linelength(x0, y0, el.x, el.y))
+            elif el.cmd == CURVETO:
+                x3, y3, x1, y1, x2, y2 = el.x, el.y, el.c1x, el.c1y, el.c2x, el.c2y
+                #(el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
+                lengths.append(self._curvelength(x0, y0, x1, y1, x2, y2, x3, y3, n))
+            if el.cmd != CLOSE:
+                x0 = el.x
+                y0 = el.y
+        if relative:
+            length = sum(lengths)
+            try:
+                # Relative segment lengths' sum is 1.0.
+                return map(lambda l: l / length, lengths)
+            except ZeroDivisionError: 
+                # If the length is zero, just return zero for all segments
+                return [0.0] * len(lengths)
+        else:
+            return lengths
+
+    def _get_length(self, segmented=False, precision=10):
+        """ Returns the length of the path.
+            Calculates the length of each spline in the path, using n as a number of points to measure.
+            When segmented is True, returns a list containing the individual length of each spline
+            as values between 0.0 and 1.0, defining the relative length of each spline
+            in relation to the total path length.
+        """
+        # From nodebox-gl
+        if not segmented:
+            return sum(self._segment_lengths(n=precision), 0.0)
+        else:
+            return self._segment_lengths(relative=True, n=precision)
+
     def _get_elements(self):
         '''
         Yields all elements as PathElements
@@ -283,7 +490,6 @@ class BezierPath(Grob):
                 el = PathElement(*el)
                 self._elements[index] = el
             yield el
-
 
     def __getitem__(self, item):
         '''
@@ -310,7 +516,7 @@ class BezierPath(Grob):
         return len(self._elements)
 
     contours = property(_get_contours)
-
+    length = property(_get_length)
 
 class ClippingPath(BezierPath):
     
@@ -326,6 +532,13 @@ class EndClip(Grob):
 
     def _render(self, ctx):
         pass
+
+class CtrlPoint(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    
+EMPTY_CTRL = CtrlPoint(None, None)
 
 class PathElement(object):
     '''
@@ -352,16 +565,21 @@ class PathElement(object):
     def __init__(self, cmd, *args):
         self.cmd = cmd
         self.values = args
+        self._ctrl1 = self._ctrl2 = None
 
         if cmd == MOVETO or cmd == RMOVETO:
             self.x, self.y = self.values
             self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == LINETO or cmd == RLINETO:
             self.x, self.y = self.values
+            self.c1x, self.c1y = self.values # Possibly should be 0
+            self.c2x, self.c2y = self.values # Possibly should be 0
         elif cmd == CURVETO or cmd == RCURVETO:
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
         elif cmd == CLOSE:
-            self.x = self.y = self.c1x = self.c1y = self.c2x = self.c2y = None
+            self.x = self.y = None
+            self.c1x = self.c1y = self.c2x = self.c2y = None
+            
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:
@@ -371,6 +589,18 @@ class PathElement(object):
         else:
             raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
+    @property
+    def ctrl1(self):
+        if self._ctrl1 is None:
+            self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
+        return self._ctrl1
+        
+    @property
+    def ctrl2(self):
+        if self._ctrl2 is None:
+            self._ctrl2 = CtrlPoint(self.c2x, self.c2y)
+        return self._ctrl2
+            
     def __getitem__(self, key):
         data = list(self.values)
         data.insert(0, self.cmd)
@@ -390,3 +620,44 @@ class PathElement(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
+class PathError(Exception):
+    # From nodebox-gl
+    pass
+class NoCurrentPointForPath(Exception):
+    # From nodebox-gl
+    pass
+class NoCurrentPath(Exception):
+    # From nodebox-gl
+    pass
+
+
+#--- POINT -------------------------------------------------------------------------------------------
+
+class Point(object):
+    # From nodebox-gl
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def _get_xy(self):
+        return (self.x, self.y)
+    def _set_xy(self, (x,y)):
+        self.x = x
+        self.y = y
+        
+    xy = property(_get_xy, _set_xy)
+
+    def __iter__(self):
+        return iter((self.x, self.y))
+
+    def __repr__(self):
+        return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
+        
+    def __eq__(self, pt):
+        if not isinstance(pt, Point): return False
+        return self.x == pt.x \
+           and self.y == pt.y
+    
+    def __ne__(self, pt):
+        return not self.__eq__(pt)
