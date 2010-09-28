@@ -4,7 +4,7 @@ from shoebot.data import _copy_attrs
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
 from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
-from math import sqrt
+from math import pi as _pi, sqrt
 
 import cairo
 
@@ -541,6 +541,8 @@ class CtrlPoint(object):
         self.x = x
         self.y = y
     
+EMPTY_CTRL = CtrlPoint(None, None)
+
 class PathElement(object):
     '''
     Represents a single element in a Bezier path.

@@ -103,7 +103,12 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
     def create_rcontext(self, size, frame):
         ''' Delegates to the ShoebotWidget  '''
 
-        self.take_snapshots()
+        ### Any snapshots that need to be taken
+        for snapshot_func in self.scheduled_snapshots:
+            snapshot_func()
+        else:
+            self.scheduled_snapshots = deque()
+
         return self.sb_widget.create_rcontext(size, frame)
 
     def rcontext_ready(self, size, frame, cairo_ctx):
@@ -114,16 +119,6 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
 
-    def take_snapshots(self):
-        '''
-        Take all scheduled snapshots and reset queue
-        '''
-        ### Any snapshots that need to be taken
-        for snapshot_func in self.scheduled_snapshots:
-            snapshot_func()
-        else:
-            self.scheduled_snapshots = deque()
-    
     def schedule_snapshot(self, format):
         '''
         Since the right click comes in after things have been rendered
@@ -186,5 +181,4 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     def finish(self):
         while self.bot._quit == False and self.window_open == True:
-            self.take_snapshots()
             gtk.main_iteration()
