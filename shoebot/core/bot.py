@@ -103,15 +103,14 @@ class Bot(Grammar):
     keycode = 0
     keydown = False
 
-    FRAME = 1
-
     def __init__(self, canvas, namespace = None):
         Grammar.__init__(self, canvas, namespace)
         self._autoclosepath = True
         self._path = None
 
+        self._canvas.size = None
+        self._frame = 1
         self._set_initial_defaults() ### TODO Look at these
-        self._set_defaults()
 
         
     def _set_initial_defaults(self):
@@ -131,11 +130,6 @@ class Bot(Grammar):
             strokecolor = None,
             strokewidth = 1.0,
             background = self.color(1, 1, 1))
-
-    def _set_defaults(self):
-        ''' Set defaults before rendering '''
-        self._canvas.size = None
-        self._frame = 0
 
     def _set_dynamic_vars(self):
         self._namespace['FRAME'] = self._frame
