@@ -44,8 +44,9 @@ from xml.dom.minidom import parseString
 from random import random, choice
 
 try:
+    from shoebot.core import Bot
     from shoebot.data import Grob
-    from shoebot import _restore, _save, RGB, HSB, CMYK, CORNER
+    from shoebot import _restore, _save    
 except:
     class Grob: pass
 
@@ -460,6 +461,8 @@ class Color(BaseColor):
 
         self.name = ""
 
+        RGB = Bot.RGB
+        HSB = Bot.HSB
         mode, range = _ctx.color_mode, _ctx.color_range
         modes = [RGB, HSB]
         
@@ -534,6 +537,7 @@ class Color(BaseColor):
                         a = 1.0
                     else:
                         r, g, b, a = (args)
+
 		
 	    _ctx.colormode(RGB, ra)
             BaseColor.__init__(self, r,g,b,a, mode='rgb', color_range=ra)
@@ -3003,11 +3007,11 @@ class shadow(Grob):
         """ Sets the dropshadow for all onscreen elements.
 
         Both the fill and stroke of a path get a dropshadow.
-        
+
         TODO - Implement shadow, could work as a postprocessing effect
         """
         
-        Grob.__init__(self, _ctx._canvas)
+        Grob.__init__(self, _ctx)
         if clr == None: 
             clr = color(0, 0, 0, alpha, mode="rgb")
         self.dx = dx

@@ -6,10 +6,12 @@ CORNER = 'corner'
 class Grob(object):
     '''A GRaphic OBject is the base class for all DrawingPrimitives.'''
 
-    def __init__(self, canvas):
-        self._canvas = canvas
+    def __init__(self, bot):
+        # Takes bot rather than canvas for compatibility with libraries - e.g. the colors library
+        self._canvas = canvas = bot._canvas
+        self._bot = bot
         self._set_mode(canvas.mode)
-        self._transform = cairo.Matrix(*self._canvas.transform)
+        self._transform = cairo.Matrix(*canvas.transform)
 
     def _set_mode(self, mode):
         '''

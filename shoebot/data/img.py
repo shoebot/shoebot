@@ -14,9 +14,9 @@ from shoebot.util import RecordingSurface
 class Image(Grob, ColorMixin):
     _surface_cache = {}
 
-    def __init__(self, canvas, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, **kwargs):
-        Grob.__init__(self, canvas)
-        ColorMixin.__init__(self, canvas, **kwargs)
+    def __init__(self, bot, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, **kwargs):
+        Grob.__init__(self, bot)
+        ColorMixin.__init__(self, **kwargs)
 
         self.x = x
         self.y = y
@@ -123,8 +123,8 @@ class Image(Grob, ColorMixin):
     center = property(_get_center)
 
     def copy(self):
-        p = self.__class__(self._canvas, self.path, self.x, self.y, self.width, self.height)
-        _copy_attrs(self._canvas, p, self.stateAttributes)
+        p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
+        _copy_attrs(self._bot, p, self.stateAttributes)
         return p
 
 

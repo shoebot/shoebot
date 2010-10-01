@@ -31,14 +31,14 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, canvas, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
         # to be passed to a PathElement when it's created.
         #
         # This way PathElements are not created unless they are used in the bot
-        Grob.__init__(self, canvas = canvas)
+        Grob.__init__(self, bot)
 
         if packed_elements != None:
             self.elements, self._render_funcs = packed_elements
@@ -516,6 +516,10 @@ class BezierPath(Grob):
 
     def __len__(self):
         return len(self._elements)
+        
+    def inheritFromContext(self):
+        print 'TODO'
+        pass
 
     bounds = property(_get_bounds)
     contours = property(_get_contours)
@@ -530,8 +534,8 @@ class ClippingPath(BezierPath):
         BezierPath.__init__(self, canvas, path, **kwargs)
 
 class EndClip(Grob):
-    def __init__(self, canvas, **kwargs):
-        Grob.__init__(self, canvas = canvas)
+    def __init__(self, bot, **kwargs):
+        Grob.__init__(self, bot)
 
     def _render(self, ctx):
         pass
