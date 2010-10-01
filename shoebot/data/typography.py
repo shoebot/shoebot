@@ -37,11 +37,12 @@ from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
 class Text(Grob, ColorMixin):
 
-    def __init__(self, canvas, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
-        Grob.__init__(self, canvas)
-        ColorMixin.__init__(self, canvas, **kwargs)
-
-        self._transform = canvas.transform
+    def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
+        Grob.__init__(self, bot)
+        ColorMixin.__init__(self, **kwargs)
+        canvas = bot._canvas
+        
+        ###self._transform = canvas.transform # TODO remove - this is in grob
 
         self._ctx = ctx
         self._pang_ctx = None
@@ -196,7 +197,7 @@ class Text(Grob, ColorMixin):
         # retrieve current path from current context
         pathdata = self._get_context().copy_path()
         # creates a BezierPath instance for storing new shoebot path
-        p = BezierPath(self._canvas)
+        p = BezierPath(self._bot)
         # parsing of cairo path to build a shoebot path
         for item in pathdata:
             cmd = item[0]
