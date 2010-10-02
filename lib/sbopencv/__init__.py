@@ -14,9 +14,12 @@ from opencv import highgui as hg
 import os
 
 # this imports cvBlobsLib
-from blobs.BlobResult import CBlobResult
-from blobs.Blob import CBlob	# Note: This must be imported in order to destroy blobs and use other methods
-
+try:
+    from blobs.BlobResult import CBlobResult
+    from blobs.Blob import CBlob	# Note: This must be imported in order to destroy blobs and use other methods
+except:
+    print "Could not load blobs extension, some of the library features will not be available"
+    pass
 
 class Movie:
     

@@ -1,0 +1,64 @@
+# Path filter example originally from
+# http://nodebox.net/code/index.php/Path_Filters
+
+from math import degrees, atan2
+from math import sqrt, pow
+from math import radians, sin, cos
+ 
+size(550, 300)
+background(0.23, 0.21, 0.15) 
+ 
+font("Helvetica-Bold", 125)
+path = textpath("SPIKED", 40, 200)
+ 
+m = 5   # spike length
+c = 0.8 # spike curvature
+ 
+# From the NodeBox math tutorial:
+def angle(x0, y0, x1, y1):
+    return degrees( atan2(y1-y0, x1-x0) )
+def distance(x0, y0, x1, y1):
+    return sqrt(pow(x1-x0, 2) + pow(y1-y0, 2))
+def coordinates(x0, y0, distance, angle):
+    x1 = x0 + cos(radians(angle)) * distance
+    y1 = y0 + sin(radians(angle)) * distance
+    return x1, y1
+ 
+# The "spike" function between two points.
+def perpendicular_curve(pt0, pt1, curvature=0.8):
+ 
+    d = distance(pt0.x, pt0.y, pt1.x, pt1.y)
+    a = angle(pt0.x, pt0.y, pt1.x, pt1.y)
+ 
+    mid = Point(
+        pt0.x + (pt1.x-pt0.x) * 0.5,
+        pt0.y + (pt1.y-pt0.y) * 0.5
+    )    
+    dx, dy = coordinates(mid.x, mid.y, m, a-90)    
+ 
+    vx = pt0.x + (mid.x-pt0.x) * curvature
+    vy = pt0.y + (mid.y-pt0.y) * curvature
+    curveto(vx, vy, dx, dy, dx, dy)    
+ 
+    vx = pt1.x + (mid.x-pt1.x) * curvature
+    vy = pt1.y + (mid.y-pt1.y) * curvature
+    curveto(dx, dy, vx, vy, pt1.x, pt1.y)
+ 
+for contour in path.contours:
+    prev = None
+    n = contour.length / 8
+    for pt in contour.points(n):        
+ 
+        nofill()
+        stroke(1)
+        strokewidth(0.75)        
+ 
+        if not prev:
+            beginpath(pt.x, pt.y)
+        elif pt.cmd == MOVETO:
+            moveto(pt.x, pt.y)
+        else:
+            perpendicular_curve(prev, pt, c)
+ 
+        prev = pt 
+    endpath()

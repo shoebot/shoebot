@@ -1,0 +1,58 @@
+# Path filter example originally from
+# http://nodebox.net/code/index.php/Path_Filters
+
+size(550, 300)
+background(0.23, 0.21, 0.15) 
+ 
+font("Georgia-Bold", 175)
+path = textpath("trash", 40, 200)
+ 
+def trash(path, pt0, pt1, m=0.2, n=20, d=3.0):
+ 
+    # Add trash between two points.
+    # m: controls how much of the path is trashed.
+    # n: the number of lines to insert.
+    # d: the maximum length of inserted lines.
+    if random() < m:
+        for i in range(random(n)):
+            pt0.x += random(-d, d)
+            pt0.y += random(-d, d)
+            path.lineto(pt0.x, pt0.y)
+ 
+    path.lineto(pt1.x, pt1.y)
+ 
+    # Create a blot/speckle near the current point.
+    # We have to add this to the path at the end.
+    if random() < m*0.3:
+        x = pt1.x - random(-d*4, d*4)
+        y = pt1.y - random(-d*2, d*2)
+        blot = BezierPath()
+        blot.moveto(x, y)
+        for i in range(random(n)):
+            x += random(-d, d)
+            y += random(-d, d)
+            blot.lineto(x, y)
+        blot.closepath()
+        return blot
+ 
+p = BezierPath()
+extensions = []
+for contour in path.contours:
+    prev = None
+    n = contour.length / 8
+    for pt in contour.points(n):         
+        if not prev:
+            p.moveto(pt.x, pt.y)
+        elif pt.cmd == MOVETO:
+            p.moveto(pt.x, pt.y)
+        else:
+            blot = trash(p, prev, pt)
+            if blot: extensions.append(blot)
+        prev = pt 
+ 
+for blot in extensions:
+    p.extend(blot)
+ 
+fill(1)
+nostroke()   
+drawpath(p)

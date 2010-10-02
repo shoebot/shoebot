@@ -1,0 +1,38 @@
+# Path filter example originally from
+# http://nodebox.net/code/index.php/Path_Filters
+
+size(550, 300)
+background(0.23, 0.21, 0.15)
+ 
+font("Georgia-Bold", 175)
+path = textpath("draft", 40, 200)
+ 
+m = 15
+
+for i in range(m):
+    m -= 1
+ 
+    for contour in path.contours:    
+        prev = None
+        n = contour.length    
+        for pt in contour.points(n/80*i): 
+           
+            nofill()
+            stroke(1, 0.75)
+            strokewidth(0.25)
+ 
+            if prev != None:
+                line(
+                    pt.x, 
+                    pt.y, 
+                    prev.x + random(-m, 0), 
+                    prev.y + random(-m, 0)
+                )
+                line(
+                    pt.x + random(-m, 0), 
+                    pt.y + random(-m, 0), 
+                    prev.x, 
+                    prev.y
+                )
+ 
+            prev = pt

@@ -1,0 +1,32 @@
+# Path filter example originally from
+# http://nodebox.net/code/index.php/Path_Filters
+
+from math import sqrt
+ 
+size(550, 300)
+background(0.23, 0.21, 0.15)
+ 
+font("Helvetica-Bold", 125)
+path = textpath("SPIDER", 20, 200)
+ 
+m = 2.0
+for contour in path.contours:
+    n = contour.length + 50
+    points = list(contour.points(n))
+    for i in range(int(n)):
+        pt1 = choice(points)
+
+        d = float("inf")        
+        while d > fontsize()/5:
+            pt2  = choice(points)
+            d = sqrt((pt2.x-pt1.x)**2 + (pt2.y-pt1.y)**2)
+
+        nofill()
+        stroke(1, 1, 1, 0.9)
+        strokewidth(0.35)            
+        line(
+            pt1.x + random(-m, m), 
+            pt1.y + random(-m, m),
+            pt2.x + random(-m, m),
+            pt2.y + random(-m, m)
+            )
