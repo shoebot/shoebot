@@ -535,7 +535,7 @@ class NodeBot(Bot):
         else:
           return txt
 
-    def textpath(self, txt, x, y, width=None, height=1000000, draw=True, **kwargs):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         '''
         Draws an outlined path of the input text
         '''
