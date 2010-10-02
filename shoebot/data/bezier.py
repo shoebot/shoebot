@@ -82,7 +82,7 @@ class BezierPath(Grob):
         self.append(*args)
 
     def copy(self):
-        path = BezierPath(self._canvas, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
+        path = BezierPath(self._bot, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
         path.closed = self.closed
         path._center = self._center
         return path
@@ -569,7 +569,7 @@ class PathElement(object):
         supposed to be a tuple.
     '''
 
-    def __init__(self, cmd, *args):
+    def __init__(self, cmd = None, *args):
         self.cmd = cmd
         self.values = args
         self._ctrl1 = self._ctrl2 = None
@@ -586,13 +586,14 @@ class PathElement(object):
         elif cmd == CLOSE:
             self.x = self.y = None
             self.c1x = self.c1y = self.c2x = self.c2y = None
-            
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:
             # it doesn't feel right having an "ellipse" element, but we need
             # some cairo specific functions to draw it in draw_cairo()
             self.x, self.y, self.w, self.h = self.values
+        elif cmd is None:
+            self.x = self.y = self.c1x = self.c1y = self.c1x = self.c1y = 0
         else:
             raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
