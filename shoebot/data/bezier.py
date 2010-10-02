@@ -258,7 +258,7 @@ class BezierPath(Grob):
             if el.cmd == MOVETO:
                 if not empty:
                     contours.append(current_contour)
-                current_contour = BezierPath(self._canvas)
+                current_contour = BezierPath(self._bot)
                 current_contour.moveto(el.x, el.y)
                 empty = True
             elif el.cmd == LINETO:
