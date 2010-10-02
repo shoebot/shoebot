@@ -31,7 +31,8 @@ except:
     
         t2 = sin(m * phi / 4) / b
         t2 = abs(t2)
-        t2 = pow(t2, n3)
+        if t2 != 0:
+            t2 = pow(t2, n3)
     
         r = pow(t1 + t2, 1 / n1)
         if abs(r) == 0:
