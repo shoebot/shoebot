@@ -59,6 +59,7 @@ def _copy_attrs(source, target, attrs):
     for attr in attrs:
         setattr(target, attr, _copy_attr(getattr(source, attr)))
 
+import geometry as geo
 from point import Point
 from basecolor import Color, ColorMixin
 from grob import Grob 
