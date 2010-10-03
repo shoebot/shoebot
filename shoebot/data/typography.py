@@ -134,7 +134,7 @@ class Text(Grob, ColorMixin):
         # text will wrap, meanwhile it checks if and indent has to be applied
         # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
-            self.layout.set_width(self.width*pango.SCALE)
+            self.layout.set_width(int(self.width)*pango.SCALE)
             if self._indent:
                 self.layout.set_indent(self._indent*pango.SCALE)                
         # set text alignment    
