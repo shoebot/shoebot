@@ -276,9 +276,9 @@ class DrawBot(Bot):
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
-            self._fontfile = fontpath
+            self._canvas.fontfile = fontpath
         else:
-            return self._fontfile
+            return self._canvas.fontfile
         if fontsize is not None:
             self._canvas.fontsize = fontsize
 
