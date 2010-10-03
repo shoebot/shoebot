@@ -1,5 +1,3 @@
-import gtk
-
 class InputDeviceMixin(object):
     endPoints = 'key_pressed', 'key_released', 'mouse_button_down', 'mouse_button_up', 'mouse_pointer_moved'
 
