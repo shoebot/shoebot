@@ -1,0 +1,168 @@
+#############################################################################
+ 
+# Copyright (c) 2007 Tom De Smedt.
+ 
+__author__    = "Tom De Smedt"
+__version__   = "1.9.1"
+__copyright__ = "Copyright (c) 2007 Tom De Smedt"
+__license__   = "GPL"
+ 
+#############################################################################
+ 
+try:
+    # Try to render shadows using the colors library.
+    colors = ximport("colors")
+    colors.shadow(alpha=0.02, dx=30, dy=30)
+except:
+    pass
+ 
+#############################################################################
+
+# From http://nodebox.net/code/index.php/Growing_things_|_nebula
+# Tweaked imports to work with nodebox
+ 
+# The geo library bundles the commands discussed in:
+# http://nodebox.net/code/index.php/Math
+from shoebot.data import geo
+ 
+def merge(points, x, y, vx, vy, reflected=False, d=0):
+    """ Smooth curves from all points in the list to x, y.
+    """
+    beginpath(0,0)
+    for pt in points:
+        if not reflected:
+            vx0, vy0 = pt.ctrl1.x, pt.ctrl1.y
+        else:
+            vx0, vy0 = geo.reflect(pt.x, pt.y, pt.ctrl1.x, pt.ctrl1.y)
+        moveto(pt.x, pt.y)
+        curveto(vx0, vy0, vx, vy, x+random(-d,d), y+random(-d,d))
+    return endpath(draw=False)
+ 
+def points(n, vx, vy, h=(0.0,1.0), v=(0.0,1.0)):
+    """ Random points in a relative h, v box with vx, vy handles.
+    """
+    points = []
+    for i in range(n):
+        pt = PathElement()
+        pt.x = WIDTH*h[0] + random(WIDTH*(h[1]-h[0]))
+        pt.y = HEIGHT*v[0] + random(HEIGHT*(v[1]+v[0]))
+        pt.ctrl1.x = pt.x+vx
+        pt.ctrl1.y = pt.y+vy
+        points.append(pt)
+    return points
+ 
+#############################################################################
+ 
+def nebula(clr, 
+           bg=True, 
+           n=100, 
+           d=300, 
+           angle=0.5, 
+           iterations=100, 
+           tonality=0.1,
+           growth=[1.01, 1.01, 0.98]):
+ 
+    """ Draws a set of elegant curves in subtle shades of the given color.
+    
+    If bg is True, fills the background with a dark variation of the color.
+    Increasing n produces more curves.
+    Decreasing d keeps curves together more tightly.
+    The angle controls how pattern copies are placed on top of each other.
+    The number of iterations are the number of copies of curve patterns.
+    More iterations yield thicker compositions.
+    The tonality controls the diversity in color.
+    The growth parameter is a list of 3 numbers defining how
+    each of the three layers of curves is scaled.
+    
+    """
+ 
+    def _wrap_around(n, base=1):
+        # e.g. if base is 5, 7 is returned as 2.
+        if n < 0: return base-n
+        if n > base: return n-base
+        return n
+        
+    def _draw_transformed(path, dx=0, dy=0, angle=0, scaling=1.0):
+        try: angle = angle()
+        except:
+            pass
+        rotate(angle)
+        drawpath(path.copy())
+        scale(scaling)
+        translate(dx, dy)        
+ 
+    colormode(HSB)
+    if bg:
+        background(
+            clr.hue, 
+            clr.saturation, 
+            max(0.15, clr.brightness*0.15)
+        )
+    else:
+        background(None)
+    
+    strokewidth(0.1)
+    nofill()
+    autoclosepath(False)
+ 
+    # Create a number of points in a portion of the canvas.
+    # The points all have the same handle vector.
+    # Then, draw a line from each point to a focus point.
+    h = (random(1-random(0.2)), random(0.2))
+    v = (random(1-random(0.2)), random(0.2))
+    pts = points(n, random(-d,d), random(-d,d), h, v)
+    x, y = random(WIDTH), random(HEIGHT)
+    vx, vy = x+random(-d/2,d*2), y+random(-d/4,d/4)
+    path = merge(pts, x, y, vx, vy, d=random(d/2))
+ 
+    # Draw rotating versions of this path
+    # that increment in size and horizontal position.
+    # Colors are dark with variations in hue.
+    #transform(CORNER)
+    direction = choice((-1,1))
+    for i in range(iterations/2):
+        stroke(_wrap_around((clr.hue + random(tonality)*direction)),
+               clr.saturation, 
+               clr.brightness * (0.4 + random(0.6)), random(0.25))
+        _draw_transformed(path, 1.5, 0, angle, growth[0])
+ 
+    for i in range(choice((2,3))):
+        reset()
+        
+        # Draw lines from the foucs point to new points,
+        # with their handles reflected from the focus' handles.
+        h = (random(1-random(0.2)), random(0.2))
+        v = (random(1-random(0.2)), random(0.2))
+        pts = points(n, random(-d,d), random(-d,d), h, v)
+        vx, vy = geo.reflect(x, y, vx, vy)
+        path = merge(pts, x, y, vx, vy, reflected=True, d=10)
+        
+        # Incremental variations of the path.
+        # Colors are light and desaturated.
+        for i in range(iterations/2):
+            stroke(clr.hue, 
+                   clr.saturation + random(-0.6), 
+                   random(0.2) + 0.8, 
+                   random(0.25))
+            _draw_transformed(path, random(), random(), angle, growth[1])
+    
+    # Variations that decrement in size.
+    # Colors are light with variations in hue.
+    direction = choice((-1,1))
+    for i in range(iterations):
+        stroke(_wrap_around((clr.hue + random(tonality)*direction)), 
+               clr.saturation + random(-0.2), 
+               random(0.2) + 0.8, 
+               random(0.25))
+        _draw_transformed(path, 1.5, 0, angle, growth[2])
+    
+    reset()
+ 
+#############################################################################
+ 
+# Set a base color for the nebula.
+colormode(HSB)
+clr = color(0.1, 0.3, 1)
+ 
+size(700,700)
+nebula(clr)
