@@ -46,7 +46,6 @@ class Color(object):
             
         # No values or None, transparent black.
         if len(a) == 0 or (len(a) == 1 and a[0] == None):
-            raise ValueError(_("got Color() with value None!"))         
             self.r, self.g, self.b, self.a = 0, 0, 0, 0
             
         # One value, another color object.
@@ -81,8 +80,8 @@ class Color(object):
             alpha, mode = 1, "rgb" 
             if len(a) > 3: alpha = a[-1]/ra
         
-            if kwargs.has_key("mode"): 
-                mode = kwargs["mode"].lower()
+            if kwargs.has_key("color_mode"):
+                mode = kwargs["color_mode"].lower()
             if mode == "rgb":
                 self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
             elif mode == "hsb":                
