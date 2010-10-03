@@ -80,8 +80,8 @@ class Color(object):
             alpha, mode = 1, "rgb" 
             if len(a) > 3: alpha = a[-1]/ra
         
-            if kwargs.has_key("color_mode"):
-                mode = kwargs["color_mode"].lower()
+            if kwargs.has_key("mode"):
+                mode = kwargs["mode"].lower()
             if mode == "rgb":
                 self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
             elif mode == "hsb":                
@@ -520,7 +520,7 @@ def test_color():
     passed = True
     for value in testvalues:
         result = Color(value, color_range = 255)
-        # print "%s = %s (%s, %s)" % (str(value), str(result), str(result.color_range), str(result.color_mode))
+        # print "%s = %s (%s, %s)" % (str(value), str(result), str(result.color_range), str(result.mode))
         equal = True
         for index in range(0,4):
             # check if difference is bigger than 0.0001, since floats
