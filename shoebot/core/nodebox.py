@@ -551,7 +551,7 @@ class NodeBot(Bot):
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):

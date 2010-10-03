@@ -273,8 +273,7 @@ class DrawBot(Bot):
     def font(self, fontpath=None, fontsize=None):
         '''Set the font to be used with new text instances.
 
-        Accepts TrueType and OpenType files. Depends on FreeType being
-        installed.'''
+        Accepts any font Pango can recognize'''
         if fontpath is not None:
             self._canvas.fontfile = fontpath
         else:
@@ -317,7 +316,10 @@ class DrawBot(Bot):
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, **kwargs)
+        
+        # we send doRender=False to prevent the actual rendering process, only the path generation is enabled
+        # not the most efficient way, but it generates accurate results
+        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):

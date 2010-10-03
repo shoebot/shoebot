@@ -39,7 +39,7 @@ class Text(Grob, ColorMixin):
     
     # several reference docs can be found at http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
 
-    def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, **kwargs):
+    def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, enableRendering=True, **kwargs):
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
         canvas = bot._canvas
@@ -48,7 +48,9 @@ class Text(Grob, ColorMixin):
 
         self._ctx = ctx
         self._pang_ctx = None
-
+        
+        self._doRender = enableRendering
+                
         self.text = unicode(text)
         self.x = x
         self.y = y
@@ -62,33 +64,30 @@ class Text(Grob, ColorMixin):
         self._align = kwargs.get('align', canvas.align)
         self._indent = kwargs.get("indent")
 
-        # here we start to do the magic with pango, first we set typeface 
         # we use the pango parser instead of trying this by hand
         self._fontface = pango.FontDescription(self._fontfile)
                                                       
         # then we set fontsize (multiplied by pango.SCALE)
         self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
-
-
-        if bool(ctx):
-            self._render(self._ctx)
-        else:
-            # Normal rendering, can be deferred
-            self._deferred_render()
-
-    def _get_context(self):
-        self._ctx = self._ctx or cairo.Context(RecordingSurfaceA8(0, 0))
-        return self._ctx
-
-    def _render(self, ctx = None):
-        ctx = ctx or self._get_context()
-        # we build a PangoCairo context linked to cairo context
-        # then we create a pango layout
-        self._pang_ctx = pangocairo.CairoContext(ctx)
+        
+        #we need to pre-render some stuff to enable metrics sizing
+        self._pre_render()
+        
+        if (self._doRender): #this way we do not render if we only need to create metrics
+          if bool(ctx):
+              self._render(self._ctx)
+          else:
+              # Normal rendering, can be deferred
+              self._deferred_render()
+            
+    # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
+    def _pre_render(self):
+        #we use a new CairoContext to pre render the text
+        self._pang_ctx = pangocairo.CairoContext(cairo.Context(RecordingSurfaceA8(0, 0)))
         self.layout = self._pang_ctx.create_layout()
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
-        self.layout.set_spacing(((self._lineheight-1)*self._fontsize)*pango.SCALE)
+        self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text)
@@ -109,6 +108,22 @@ class Text(Grob, ColorMixin):
             self.layout.set_justify(True)
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
+
+    def _get_context(self):
+        self._ctx = self._ctx or cairo.Context(RecordingSurfaceA8(0, 0))
+        return self._ctx
+
+    def _render(self, ctx = None):
+        if (not self._doRender):
+          return
+        ctx = ctx or self._get_context()
+        # we build a PangoCairo context linked to cairo context
+        # then we create a pango layout
+        
+        # we update the context as we already used a null one on the pre-rendering
+        # supposedly there should not be a big performance penalty 
+        self._pang_ctx = pangocairo.CairoContext(ctx)
+        self._pang_ctx.update_layout(self.layout)
 
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
