@@ -539,7 +539,7 @@ class NodeBot(Bot):
         '''
         Draws an outlined path of the input text
         '''
-        txt = self.Text(txt, x, y, width, height, **kwargs)
+        txt = self.Text(txt, x, y, width, height, enableRendering=False, **kwargs)
         path = txt.path
         if draw:
             path.draw()

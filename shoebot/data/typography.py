@@ -108,6 +108,7 @@ class Text(Grob, ColorMixin):
             self.layout.set_justify(True)
         else:
             self.layout.set_alignment(pango.ALIGN_LEFT)
+            
 
     def _get_context(self):
         self._ctx = self._ctx or cairo.Context(RecordingSurfaceA8(0, 0))
@@ -166,15 +167,29 @@ class Text(Grob, ColorMixin):
         return (w,h)
     metrics = property(_get_metrics)
 
+    # this function is quite computational expensive 
+    # there should be a way to make it faster, by not creating a new context each time it's called
     def _get_path(self):
         if not self._pang_ctx:
-            self._render()
-        # add pango layout to current cairo path in temporary context
-        self._pang_ctx.layout_path(self.layout)
-        # retrieve current path from current context
-        pathdata = self._get_context().copy_path()
+            self._pre_render()
+            
+        # here we create a new cairo.Context in order to hold the pathdata
+        tempCairoContext = cairo.Context(RecordingSurfaceA8(0, 0))
+        # in here we create a pangoCairoContext in order to display layout on it
+        tempPangoCairoContext = pangocairo.CairoContext(tempCairoContext)
+        
+        # supposedly showlayout should work, but it fills the path instead,
+        # therefore we use layout_path instead to render the layout to pangoCairoContext
+        #tempPangoCairoContext.show_layout(self.layout) 
+        tempPangoCairoContext.layout_path(self.layout)
+        #here we extract the path from the temporal cairo.Context we used to draw on the previous step
+        pathdata = tempCairoContext.copy_path()
+        
+        #print tempCairoContext
+        
         # creates a BezierPath instance for storing new shoebot path
         p = BezierPath(self._bot)
+       
         # parsing of cairo path to build a shoebot path
         for item in pathdata:
             cmd = item[0]
