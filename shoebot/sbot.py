@@ -40,12 +40,13 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     Convenience function to make it easy to start bots from external programs
     '''
     from core import CairoCanvas, CairoImageSink
-    from gui import ShoebotWidget, ShoebotWindow
 
     from core import NodeBot
     from core import DrawBot
 
     if window or show_vars:
+        from gui import ShoebotWindow
+        
         if os.path.isfile(src):
             title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
         else:
