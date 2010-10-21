@@ -38,8 +38,8 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         if title:
             self.set_title(title)
-        self.connect("delete-event", gtk.main_quit)
-        self.connect("destroy", self.do_window_close)
+        self.connect("delete-event", self.do_window_close)
+        #self.connect("destroy", )
 
         self.sb_widget = sb_widget
         self.attach_gtk(self)
@@ -167,7 +167,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.unfullscreen()
         self.bot._screen_ratio = None
 
-    def do_window_close(self, widget):
+    def do_window_close(self, widget,data=None):
         self.bot._quit = True
 
         if self.has_server:
