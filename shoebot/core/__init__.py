@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # This file is part of Shoebot.
 # Copyright (C) 2009 the Shoebot authors

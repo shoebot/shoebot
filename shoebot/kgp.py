@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python22
 """Kant Generator for Python
 
 Generates mock philosophy based on a context-free grammar
