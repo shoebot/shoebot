@@ -129,7 +129,7 @@ class Text(Grob, ColorMixin):
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
-            ctx.set_matrix(self._canvas.transform)
+            ctx.set_matrix(self._transform)
 
             ctx.move_to(self.x,self.y-self.baseline)
             
