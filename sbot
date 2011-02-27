@@ -137,7 +137,7 @@ if __name__ == '__main__':
     
     run(src = args[0],
         grammar = options.bot,
-        outputfile = options.outputfile or 'output.svg',
+        outputfile = options.outputfile,
         iterations = options.repeat or None,
         window = options.window or options.varwindow or options.socketserver,
         close_window = options.close,

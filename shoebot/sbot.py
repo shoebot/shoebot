@@ -35,7 +35,7 @@ NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 SHOEBOT = 'shoebot'
 
-def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterations = None, window = False, close_window = False, server=False, port=7777, show_vars = False):
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = None, window = False, close_window = False, server=False, port=7777, show_vars = False):
     '''
     Convenience function to make it easy to start bots from external programs
     '''
@@ -55,6 +55,11 @@ def run(src, grammar = NODEBOX, format = None, outputfile = 'output.svg', iterat
     else:
         if iterations is None:
             iterations = 1
+        if outputfile is None:
+            if os.path.isfile(src):
+                outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
+            else:
+                outputfile = 'output.svg'
         sink = CairoImageSink(outputfile, format, multifile = iterations > 1)
 
     canvas = CairoCanvas(sink, enable_cairo_queue=True)
