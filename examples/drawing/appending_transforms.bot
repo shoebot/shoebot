@@ -10,7 +10,7 @@ for i in range(100):
     rotate(random(-10, 10))
     # Use the next line instead of the previous ones to see 
     # what russian constructivism looks like.
-    # rotate(random(1,4)*45) 
+    #rotate(random(1,4)*45) 
     scale(random(0.5,1.5))
     fill(random()-0.4, 0.2, 0.2, random())
     translate(random(-5,5),random(-5,5))

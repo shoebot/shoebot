@@ -6,6 +6,9 @@ apps/*
 # ignore .orig files (leftovers from merges)
 *.orig
 
+# ignore git generated bulk
+.git/
+
 # ignore build and dist output
 build/*
 dist/*
