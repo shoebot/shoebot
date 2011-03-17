@@ -12,7 +12,8 @@ import os
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('examples')]
 datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
-datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
+#as the IDE is non functional, I'm commenting this
+#datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('locale')])
@@ -26,10 +27,10 @@ setup(name = "shoebot",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
     license = 'GPL v3',
-    url = "http://tinkerhouse.net/shoebot",
+    url = "http://shoebot.net",
     packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui"],
     data_files = datafiles,
-    scripts = ["sbot", "sbot.cmd", "shoebot-ide"],
+    scripts = ["sbot", "sbot.cmd"],
     long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
  which describes a drawing process, and outputs a graphic in a common open
