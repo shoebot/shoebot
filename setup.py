@@ -5,6 +5,9 @@
 # 'python setup.py install', or
 # 'python setup.py --help' for more options
 
+# the following libraries will not be installed
+EXCLUDE_LIBS = ['sbopencv']
+
 from distutils.core import setup
 import os
 
@@ -18,8 +21,10 @@ datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('locale')])
 
+# include all libs EXCEPT sbopencv, which is giving us packaging headaches
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
-for file_ in files]) for root,dir,files in os.walk('lib')])
+for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
+datafiles
 
 setup(name = "shoebot",
     version = "0.4a4",
