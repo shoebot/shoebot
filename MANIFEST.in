@@ -9,6 +9,6 @@ recursive-include shoebot/core *
 recursive-include shoebot/gui *
 recursive-include examples *
 recursive-include lib *
-recursive-exclude lib/sbopencv *
+prune lib/sbopencv
 recursive-include assets *
 recursive-include locale *

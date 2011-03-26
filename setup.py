@@ -6,10 +6,17 @@
 # 'python setup.py --help' for more options
 
 # the following libraries will not be installed
-EXCLUDE_LIBS = ['sbopencv']
 
-from distutils.core import setup
+EXCLUDE_LIBS = ['lib/sbopencv', 'lib/colors/aggregated']
+
 import os
+from distutils.core import setup
+
+for lib in EXCLUDE_LIBS:
+    # get subdirs of excluded libs
+    for root, dir, files in list(os.walk(lib))[1:]:
+        EXCLUDE_LIBS.append(root)
+
 
 # dir globbing approach taken from Mercurial's setup.py
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
@@ -24,7 +31,6 @@ for file_ in files]) for root,dir,files in os.walk('locale')])
 # include all libs EXCEPT sbopencv, which is giving us packaging headaches
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
-datafiles
 
 setup(name = "shoebot",
     version = "0.4a4",
