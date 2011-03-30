@@ -1,11 +1,18 @@
-shoebot (0.3b-1) unstable; urgency=low
+shoebot (0.4a4-1) lucid; urgency=low
+
+  * Rewrite of the core code around drawing queues by Stuart Axon
+  * Debian packaging scripts finally working
+
+ -- Ricardo Lafuente <r@sollec.org>  Sat, 26 Mar 2011 03:23:11 +0000
+
+shoebot (0.3b-1) lucid; urgency=low
 
   * Huge code refactoring, now it should be a lot easier to hack around.
   * Gedit and Inkscape plug-ins now included
 
  -- Ricardo Lafuente <r@sollec.org>  Mon, 11 Jan 2010 16:36:07 +0000
 
-shoebot (0.2-1) unstable; urgency=low
+shoebot (0.2-1) lucid; urgency=low
 
   * colors can be specified using hexcolour values (e.g. #FF00FF)
   * fill and/or stroke values can be specified using keyword arguments (e.g. a = Rect(x,y,w,h,fill='#FF00FF'))

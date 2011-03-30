@@ -3,12 +3,18 @@ include AUTHORS
 include VERSION
 include COPYING-GPL-3
 include sbot
-include shoebot-ide
 recursive-include shoebot/data *
 recursive-include shoebot/core *
 recursive-include shoebot/gui *
 recursive-include examples *
 recursive-include lib *
+prune shoebot/lib/sbopencv
+prune shoebot/lib/sbopencv/blobs
 prune lib/sbopencv
+prune lib/sbopencv/blobs
+prune shoebot/lib/colors/aggregated
+prune lib/colors/aggregated
+prune lib/supershape
+prune shoebot/lib/supershape
 recursive-include assets *
 recursive-include locale *

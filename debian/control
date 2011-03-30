@@ -7,7 +7,7 @@ Standards-Version: 3.8.3
 
 Package: shoebot
 Architecture: all
-Homepage: http://tinkerhouse.net/shoebot
+Homepage: http://shoebot.net
 Depends: ${python:Depends}, ${misc:Depends}, python-cairo, python-gtk2, python-gobject, python-gtksourceview2
 Description: vector graphics scripting made easy with Python
  Shoebot is a pure Python graphics robot: It takes a Python script as input,

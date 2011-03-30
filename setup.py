@@ -7,7 +7,7 @@
 
 # the following libraries will not be installed
 
-EXCLUDE_LIBS = ['lib/sbopencv', 'lib/colors/aggregated']
+EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs', 'lib/colors/aggregated', 'lib/supershape']
 
 import os
 from distutils.core import setup
@@ -28,7 +28,7 @@ datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('locale')])
 
-# include all libs EXCEPT sbopencv, which is giving us packaging headaches
+# include all libs EXCEPT the ones mentioned in EXCLUDE_LIBS
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
