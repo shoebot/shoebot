@@ -1,0 +1,37 @@
+Virtualenv setup
+
+Virtualenv lets you isolate python libraries from the global python 
+installation and other python libraries.
+
+If you want to develop with or on shoebot virtualenv and pip are a great
+way of doing it.
+
+
+To install a virtualenv environment:
+
+$ virtualenv shoebot-env
+
+Your prompt will then change
+
+(shoebot-env) $
+
+
+
+Global Requirments:
+
+PyGtk doesn't support installation in a virtualenv and will need to be
+installed using your usual package manager
+
+
+Install the shoebot requirements:
+
+(shoebot-env) $ pip install -r requirements.txt
+
+
+Install shoebot in virtualenv:
+
+(shoebot-env) $ cd ..
+(shoebot-env) $ python setup.py
+
+
+
