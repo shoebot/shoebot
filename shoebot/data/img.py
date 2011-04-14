@@ -84,26 +84,25 @@ class Image(Grob, ColorMixin):
                 self._transform.scale(wscale, hscale)
                     
             ### TODO
-            #elif self.data:
-            #    img = PILImage.open(StringIO(self.data))
-            #
-            # if no width is given, it assumes the original image size, else image is resized
-            #if self.width is None:
-            #    if self.height is None:
-            #        self.width = width
-            #        self.height = height
-            #    else:
-            #        self.width = int(self.height*width/height)
-            #        size = self.width, self.height
-            #        img = img.resize(size, PILImage.ANTIALIAS)
-            #else:
-            #    if self.height is None:
-            #        self.height = int(self.width*height/width)
-            #    size = self.width, self.height
-            #    img = img.resize(size, PILImage.ANTIALIAS)
-            #else:
-            #    raise NotImplementedError(_("sorry, this image mode is not implemented yet"))
-            ##this is the item that will be drawn
+            elif self.data:
+                img = PILImage.open(StringIO(self.data))
+
+                # if no width is given, it assumes the original image size, else image is resized
+                if self.width is None:
+                    if self.height is None:
+                        self.width = width
+                        self.height = height
+                    else:
+                        self.width = int(self.height*width/height)
+                        size = self.width, self.height
+
+                if img.mode != 'RGBA':
+                    img = img.convert("RGBA")
+                
+                w, h = img.size 
+                data = numpy.array(img.getdata(), dtype=numpy.int8)
+                imagesurface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, w, h, w*4) 
+
             self._imagesurface = imagesurface
 
         self._deferred_render()
@@ -113,6 +112,9 @@ class Image(Grob, ColorMixin):
         ctx.translate(self.x, self.y)
         ctx.set_source_surface(self._imagesurface)
         ctx.paint()
+
+    def draw():
+        self._deferred_render()
 
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
