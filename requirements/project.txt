@@ -3,3 +3,4 @@
 pygtk
 numpy
 pycairo
+PIL
