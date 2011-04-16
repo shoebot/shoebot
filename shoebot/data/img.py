@@ -1,5 +1,6 @@
 from shoebot.data import _copy_attrs
 
+import array
 from StringIO import StringIO
 import os.path
 import cairo
@@ -100,8 +101,10 @@ class Image(Grob, ColorMixin):
                     img = img.convert("RGBA")
                 
                 w, h = img.size 
-                data = numpy.array(img.getdata(), dtype=numpy.int8)
-                imagesurface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, w, h, w*4) 
+                # Would be nice to not have to do some of these conversions :-\
+                bgra_data = img.tostring('raw', 'BGRA', 0, 1)
+                bgra_array = array.array('B', bgra_data)
+                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, w, h, w*4) 
 
             self._imagesurface = imagesurface
 
