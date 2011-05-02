@@ -116,7 +116,7 @@ class Image(Grob, ColorMixin):
         ctx.set_source_surface(self._imagesurface)
         ctx.paint()
 
-    def draw():
+    def draw(self):
         self._deferred_render()
 
     def _get_center(self):
