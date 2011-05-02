@@ -111,10 +111,11 @@ class Image(Grob, ColorMixin):
         self._deferred_render()
 
     def _render(self, ctx):
-        ctx.set_matrix(self._transform)
-        ctx.translate(self.x, self.y)
-        ctx.set_source_surface(self._imagesurface)
-        ctx.paint()
+        if self.width and self.height:
+            ctx.set_matrix(self._transform)
+            ctx.translate(self.x, self.y)
+            ctx.set_source_surface(self._imagesurface)
+            ctx.paint()
 
     def draw(self):
         self._deferred_render()
