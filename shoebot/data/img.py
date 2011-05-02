@@ -12,10 +12,13 @@ import rsvg
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
 
+CENTER = 'center'
+CORNER = 'corner'
+
 class Image(Grob, ColorMixin):
     _surface_cache = {}
 
-    def __init__(self, bot, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, **kwargs):
+    def __init__(self, bot, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
 
@@ -26,6 +29,7 @@ class Image(Grob, ColorMixin):
         self.alpha = alpha
         self.path = path
         self.data = data
+        self._pathmode = pathmode
         
         if isinstance(self.data, cairo.ImageSurface):
             self.width = self.data.get_width()
@@ -75,11 +79,11 @@ class Image(Grob, ColorMixin):
 
             if width is not None or height is not None:
                 if width:
-                    wscale = width / imagesurface.get_width()
+                    wscale = float(width) / imagesurface.get_width()
                 else:
                     wscale = 1.0
                 if height:
-                    hscale = height / imagesurface.get_height()
+                    hscale = float(height) / imagesurface.get_height()
                 else:   
                     hscale = 1.0
                 self._transform.scale(wscale, hscale)
@@ -112,6 +116,14 @@ class Image(Grob, ColorMixin):
 
     def _render(self, ctx):
         if self.width and self.height:
+            # Go to initial point (CORNER or CENTER):
+            transform = self._call_transform_mode(self._transform)
+
+            # Change the origin if nessacary
+            if self._get_pathmode() == CENTER:
+                xc, yc = self._get_center()
+                transform.translate(-xc, -yc)
+            
             ctx.set_matrix(self._transform)
             ctx.translate(self.x, self.y)
             ctx.set_source_surface(self._imagesurface)
