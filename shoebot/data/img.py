@@ -101,8 +101,11 @@ class Image(Grob, ColorMixin):
                     wscale = 1.0
                 if height:
                     hscale = float(height) / sh
-                else:   
-                    hscale = 1.0
+                else:
+                    if width:
+                        hscale = wscale
+                    else:   
+                        hscale = 1.0
                 self._transform.scale(wscale, hscale)
 
             self.width = width or sw
