@@ -30,10 +30,11 @@ class Image(Grob, ColorMixin):
         self.path = path
         self.data = data
         self._pathmode = pathmode
+        sh = sw = None  # Surface Height and Width
         
         if isinstance(self.data, cairo.ImageSurface):
-            self.width = self.data.get_width()
-            self.height = self.data.get_height()
+            sw = self.data.get_width()
+            sh = self.data.get_height()
             self._imagesurface = self.data
         else:
             # checks if image data is passed in command call, in this case it wraps
@@ -46,26 +47,31 @@ class Image(Grob, ColorMixin):
                 if os.path.splitext(path)[1].lower() == '.svg':
                     if path in self._surface_cache:
                         imagesurface = self._surface_cache[path]
+                        sw = imagesurface.get_width()
+                        sh = imagesurface.get_height()
                     else:
                         handle = rsvg.Handle(path)
-                        swidth, sheight = handle.get_dimension_data()[:2]
-                        imagesurface = RecordingSurface(width or swidth, height or sheight)
+                        sw, sh = handle.get_dimension_data()[:2]
+                        imagesurface = RecordingSurface(sw, sh)
                         ctx = cairo.Context(imagesurface)
                         handle.render_cairo(ctx)
-                        self._surface_cache[path] = imagesurface
                 else:
                     if path in self._surface_cache:
                         imagesurface = self._surface_cache[path]
+                        sw = imagesurface.get_width()
+                        sh = imagesurface.get_height()
                     else:
                         if os.path.splitext(path)[1].lower() == '.png':
                             imagesurface = cairo.ImageSurface.create_from_png(path)
+                            sw = imagesurface.get_width()
+                            sh = imagesurface.get_height()
                         else:
                             pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-                            width = pixbuf.get_width()
-                            height = pixbuf.get_height()
+                            sw = pixbuf.get_width()
+                            sh = pixbuf.get_height()
 
                             ''' create a new cairo surface to place the image on '''
-                            surface = cairo.ImageSurface(0, width, height)
+                            surface = cairo.ImageSurface(0, sw, sh)
                             ''' create a context to the new surface '''
                             ct = cairo.Context(surface)
                             ''' create a GDK formatted Cairo context to the new Cairo native context '''
@@ -75,41 +81,32 @@ class Image(Grob, ColorMixin):
                             ct2.paint()
                             ''' surface now contains the image in a Cairo surface '''
                             imagesurface = ct2.get_target()
-                        self._surface_cache[path] = imagesurface
-
-            if width is not None or height is not None:
-                if width:
-                    wscale = float(width) / imagesurface.get_width()
-                else:
-                    wscale = 1.0
-                if height:
-                    hscale = float(height) / imagesurface.get_height()
-                else:   
-                    hscale = 1.0
-                self._transform.scale(wscale, hscale)
-                    
-            ### TODO
-            elif self.data:
+                self._surface_cache[path] = imagesurface
+            else:
                 img = PILImage.open(StringIO(self.data))
-
-                # if no width is given, it assumes the original image size, else image is resized
-                if self.width is None:
-                    if self.height is None:
-                        self.width = width
-                        self.height = height
-                    else:
-                        self.width = int(self.height*width/height)
-                        size = self.width, self.height
 
                 if img.mode != 'RGBA':
                     img = img.convert("RGBA")
                 
-                w, h = img.size 
+                sw, sh = img.size
                 # Would be nice to not have to do some of these conversions :-\
                 bgra_data = img.tostring('raw', 'BGRA', 0, 1)
                 bgra_array = array.array('B', bgra_data)
-                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, w, h, w*4) 
+                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4) 
 
+            if width is not None or height is not None:
+                if width:
+                    wscale = float(width) / sw
+                else:
+                    wscale = 1.0
+                if height:
+                    hscale = float(height) / sh
+                else:   
+                    hscale = 1.0
+                self._transform.scale(wscale, hscale)
+
+            self.width = width or sw
+            self.height = height or sh
             self._imagesurface = imagesurface
 
         self._deferred_render()
