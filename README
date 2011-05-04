@@ -24,25 +24,25 @@ Fedora:
   yum install pycairo pycairo-devel pygtk2 pygtk2-devel \
   pygobject2 pygobject2 pygobject2-devel
 
-For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Mercurial for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
+For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
 
 Ubuntu/Debian:
 
-  sudo apt-get install mercurial
+  sudo apt-get install git
 
 Fedora:
 
-  yum install mercurial
+  yum install git
 
 Gentoo:
 
-  emerge mercurial
+  emerge git
 
 Make a temporary directory to download all source files into, and then get the source itself.
 
   mkdir ~/src
   cd ~/src
-  hg clone https://code.goto10.org/hg/shoebot
+  git clone git@gitorious.org:shoebot/shoebot.git
 
 You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
@@ -76,10 +76,10 @@ Using the Shoebot console runner is straightforward:
   sbot inputfile.bot
 
 This command will run the 'inputfile.bot' script, and create an output image
-file (output.png). You'll want to specify your own filename, which can be
+file (output.svg). You'll want to specify your own filename, which can be
 done like so:
 
-  sbot inputfile.bot -o image.svg
+  sbot inputfile.bot -o image.png
 
 The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
 
@@ -132,7 +132,7 @@ When you're finished with drawing, just call
 
 and your output file should be created.
 
-Also, you can save snapshots of the current state if the Box instance like so:
+Also, you can save snapshots of the current state if the Bot instance like so:
 
   bot.snapshot("snap.png")
 
@@ -143,7 +143,7 @@ You can even call external Shoebot/Nodebox scripts from your Python script:
 Links
 -----
 
-Source browser:	     http://code.tinkerhouse.net/shoebot/hg
+Source browser:	     https://gitorious.org/shoebot
 Bug tracker:         http://code.tinkerhouse.net/shoebot/trac
 Announcement blog:   http://identi.ca/shoebot
 Mailing lists:       http://tinkerhouse.net/shoebot/devel
