@@ -143,8 +143,9 @@ You can even call external Shoebot/Nodebox scripts from your Python script:
 Links
 -----
 
+Website:             http://shoebot.net
 Source browser:	     https://gitorious.org/shoebot
-Bug tracker:         http://code.tinkerhouse.net/shoebot/trac
+Bug tracker:         http://bugs.shoebot.net/
 Announcement blog:   http://identi.ca/shoebot
 Mailing lists:       http://tinkerhouse.net/shoebot/devel
 
