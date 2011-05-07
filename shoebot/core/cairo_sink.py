@@ -65,7 +65,7 @@ class CairoImageSink(DrawQueueSink):
             surface = cairo.SVGSurface(self._filename(frame), *size)
         return cairo.Context(surface)
 
-    def rcontext_ready(self, size, frame, cairo_ctx):
+    def rendering_finished(self, size, frame, cairo_ctx):
         '''
         Called when CairoCanvas has rendered a bot
         '''
