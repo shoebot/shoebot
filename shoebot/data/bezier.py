@@ -524,15 +524,37 @@ class ClippingPath(BezierPath):
     # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
     # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')    
     
-    def __init__(self, canvas, path=None, **kwargs):
-        BezierPath.__init__(self, canvas, path, **kwargs)
+    def __init__(self, bot, path=None, **kwargs):
+        BezierPath.__init__(self, bot, **kwargs)
+    	self._drawn = False
+        self._path = path
+
+    def _render_closure(self):
+        def render(cairo_ctx):
+            # Go to initial point (CORNER or CENTER):
+            transform = self._call_transform_mode(self._transform)
+            cairo_ctx.set_matrix(transform)
+            
+            # Traverse the path
+            self._path._traverse(cairo_ctx)
+            cairo_ctx.save()
+            cairo_ctx.clip()
+            
+        return render
+
 
 class EndClip(Grob):
     def __init__(self, bot, **kwargs):
         Grob.__init__(self, bot)
 
-    def _render(self, ctx):
-        pass
+    def _render_closure(self):
+        def render(cairo_ctx):
+            cairo_ctx.restore()
+        return render
+
+    def draw(self):
+        self._deferred_render(self._render_closure())
+
 
 class CtrlPoint(object):
     def __init__(self, x, y):
