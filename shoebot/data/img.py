@@ -3,8 +3,8 @@ from shoebot.data import _copy_attrs
 import array
 from StringIO import StringIO
 import os.path
+
 import cairo
-import numpy
 import Image as PILImage
 import gtk
 import rsvg
