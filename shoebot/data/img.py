@@ -118,11 +118,6 @@ class Image(Grob, ColorMixin):
         if self.width and self.height:
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
-
-            # Change the origin if nessacary
-            if self._get_pathmode() == CENTER:
-                xc, yc = self._get_center()
-                transform.translate(-xc, -yc)
             
             ctx.set_matrix(self._transform)
             ctx.translate(self.x, self.y)

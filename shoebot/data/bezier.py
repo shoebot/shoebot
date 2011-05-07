@@ -190,12 +190,6 @@ class BezierPath(Grob):
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
 
-            # Change the origin if nessacary
-            if self._get_pathmode() == CENTER:
-                xc, yc = self._get_center()
-                transform.translate(-xc, -yc)
-
-
             if fillcolor is None and strokecolor is None:
                 # Fixes _bug_FillStrokeNofillNostroke.bot
                 return
