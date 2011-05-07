@@ -111,13 +111,13 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         return self.sb_widget.create_rcontext(size, frame)
 
-    def rcontext_ready(self, size, frame, cairo_ctx):
+    def rendering_finished(self, size, frame, cairo_ctx):
         ''' Delegates to the ShoebotWidget '''
         ## A bit hacky... but makes sure bot has executed once:
         if self.show_vars and self.var_window is None:
             self.var_window = VarWindow(self, self.bot)
 
-        return self.sb_widget.rcontext_ready(size, frame, cairo_ctx)
+        return self.sb_widget.rendering_finished(size, frame, cairo_ctx)
 
     def schedule_snapshot(self, format):
         '''
