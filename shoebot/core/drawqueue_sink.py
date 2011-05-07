@@ -15,11 +15,11 @@ class DrawQueueSink(object):
         '''
         Calls implmentation to get a render context,
         passes it to the drawqueues render function
-        then calls self.rcontext_ready
+        then calls self.rendering_finished
         '''
         r_context = self.create_rcontext(size, frame)
         drawqueue.render(r_context)
-        self.rcontext_ready(size, frame, r_context)
+        self.rendering_finished(size, frame, r_context)
 
     def create_rcontext(self, size, frame):
         '''
@@ -28,8 +28,8 @@ class DrawQueueSink(object):
         '''
         raise NotImplementedError('Child class should implement create_rcontext')
     
-    def rcontext_ready(self, size, frame, r_context):
+    def rendering_finished(self, size, frame, r_context):
         '''
         Called when the bot has been rendered
         '''
-        raise NotImplementedError('Child class should implement rcontext_ready')
+        raise NotImplementedError('Child class should implement rendering_finished')
