@@ -3,11 +3,14 @@ from shoebot.data import _copy_attrs
 import array
 from StringIO import StringIO
 import os.path
+from sys import platform
 
 import cairo
 import Image as PILImage
 import gtk
-import rsvg
+
+if platform != 'darwin':
+	import rsvg
 
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface

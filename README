@@ -17,12 +17,24 @@ First thing is to install the appropriate dependencies. If this is your first ti
 Debian/Ubuntu:
 
   sudo apt-get install python-cairo python-gtk2 \
-  python-gobject python-gtksourceview2
+  python-gobject python-gtksourceview2 python-rsvg
 
 Fedora:
 
   yum install pycairo pycairo-devel pygtk2 pygtk2-devel \
   pygobject2 pygobject2 pygobject2-devel
+
+OSX:
+
+  With MacPorts (http://www.macports.org) and python2.5
+
+  sudo port install py25-numpy -atlas
+  sudo port install pango +quartz
+  sudo port install librsvg py25-pil py25-cairo py25-gtk
+
+  MacPorts does not have the python-rsvg package, so svg output won't work.
+  shoebot-ide won't work either.
+  TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
 
 For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
 
@@ -38,6 +50,10 @@ Gentoo:
 
   emerge git
 
+OSX:
+
+  sudo port install git-core
+
 Make a temporary directory to download all source files into, and then get the source itself.
 
   mkdir ~/src
@@ -48,6 +64,11 @@ You should now see a new shoebot/ directory. The only remaining step is to insta
 
   cd shoebot
   sudo python setup.py install
+
+OSX:
+
+  cd shoebot
+  sudo /opt/local/bin/python2.5 setup.py install
 
 
 Running the Shoebot IDE

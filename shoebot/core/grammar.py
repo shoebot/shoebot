@@ -121,8 +121,9 @@ class Grammar(object):
 
         # is it a proper filename?
         if os.path.isfile(inputcode):
-            with open(inputcode, 'rU') as file:
-                source_or_code = file.read()
+            file = open(inputcode, 'rU')
+            source_or_code = file.read()
+            file.close()
             self._load_namespace(inputcode)
         else:
             # if not, try parsing it as a code string
