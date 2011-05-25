@@ -71,7 +71,6 @@ class Grammar(object):
         if not self._dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
-            print '###TODO'
             return False
 
         return False
