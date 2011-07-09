@@ -1,14 +1,14 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
-from shoebot.data import Grob, ColorMixin
+from grob import Grob
+from basecolor import ColorMixin
 from shoebot.util import RecordingSurface
-from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 from math import pi as _pi, sqrt
 
 import cairo
 
-from grob import CENTER, CORNER
+from transform import CENTER, CORNER
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -17,6 +17,17 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+
+MOVETO = "moveto"
+RMOVETO = "rmoveto"
+LINETO = "lineto"
+RLINETO = "rlineto"
+CURVETO = "curveto"
+RCURVETO = "rcurveto"
+ARC = 'arc'
+ELLIPSE = 'ellipse'
+CLOSE = "close"
 
 
 class BezierPath(Grob):
@@ -41,7 +52,7 @@ class BezierPath(Grob):
         Grob.__init__(self, bot)
 
         if packed_elements != None:
-            self.elements, self._render_funcs = packed_elements
+            self._elements, self._render_funcs = packed_elements
         else:
             self._elements = []
             self._render_funcs = []
