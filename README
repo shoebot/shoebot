@@ -21,8 +21,7 @@ Debian/Ubuntu:
 
 Fedora:
 
-  yum install pycairo pycairo-devel pygtk2 pygtk2-devel \
-  pygobject2 pygobject2 pygobject2-devel
+  yum install pycairo pygtk2 pygobject2 gnome-python2-rsvg
 
 OSX:
 
@@ -143,7 +142,7 @@ called on that instance.
 
 The NodeBot instance should be created with the output file name as an argument. 
 
-  bot = shoebot.NodeBot("output.svg")
+  bot = shoebot.core.NodeBot("output.svg")
   bot.size(400,400)
   bot.rect(10,10,100,100)
 
