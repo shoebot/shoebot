@@ -8,7 +8,7 @@ from math import pi as _pi, sqrt
 
 import cairo
 
-from transform import CENTER, CORNER
+from transforms import CENTER, CORNER
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
