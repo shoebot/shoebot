@@ -11,6 +11,9 @@ To install a virtualenv environment:
 
 $ virtualenv shoebot-env
 
+Activate the virtualenv
+$ . shoebot-env/bin/activate
+
 Your prompt will then change
 
 (shoebot-env) $

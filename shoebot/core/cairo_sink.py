@@ -59,7 +59,7 @@ class CairoImageSink(DrawQueueSink):
             surface = cairo.PDFSurface(self._filename(frame), *size)
         elif self.format == 'png':
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
-        elif self.format == 'ps':
+        elif self.format in ('ps', 'eps'):
             surface = cairo.PSSurface(self._filename(frame), *size)
         if self.format == 'svg':
             surface = cairo.SVGSurface(self._filename(frame), *size)
