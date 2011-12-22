@@ -140,8 +140,8 @@ class DrawBot(Bot):
         elif isinstance(path, Image):
             self._canvas.add(path)
         elif hasattr(path, '__iter__'):
-            p = self.BezierPath(path)
-            for point in sequence:
+            p = self.BezierPath()
+            for point in path:
                 p.addpoint(point)
             p.draw()
         
