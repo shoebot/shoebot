@@ -287,8 +287,17 @@ class NodeBot(Bot):
             self._path.transform = cairo.Matrix(*self._canvas.transform)
         return p
 
-    def drawpath(self, path):
-        path.draw()
+    def drawpath(self,path):
+        if isinstance(path, BezierPath):
+            p = self.BezierPath(path)
+            p.draw()
+        elif isinstance(path, Image):
+            self._canvas.add(path)
+        elif hasattr(path, '__iter__')
+            p = self.BezierPath(path)
+            for point in sequence:
+                p.addpoint(point)
+            p.draw()
 
     def drawimage(self, image):
         self.image(image.path, image.x, image.y, data = image.data)

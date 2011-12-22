@@ -139,6 +139,12 @@ class DrawBot(Bot):
             p.draw()
         elif isinstance(path, Image):
             self._canvas.add(path)
+        elif hasattr(path, '__iter__')
+            p = self.BezierPath(path)
+            for point in sequence:
+                p.addpoint(point)
+            p.draw()
+        
 
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
