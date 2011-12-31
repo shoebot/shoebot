@@ -39,7 +39,7 @@ setup(name = "shoebot",
     author_email = "r@sollec.org",
     license = 'GPL v3',
     url = "http://shoebot.net",
-    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui"],
+    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar"],
     data_files = datafiles,
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
