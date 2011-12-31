@@ -1,7 +1,8 @@
+import os.path
 import sys
 import cairo
 from shoebot import ShoebotError
-from shoebot.core import Bot
+from bot import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot import RGB, \
                     HSB, \
@@ -30,6 +31,8 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
+
 class NodeBot(Bot):
     
     NORMAL = "1"
@@ -54,6 +57,7 @@ class NodeBot(Bot):
     def __init__(self, canvas, namespace = None):
         Bot.__init__(self, canvas, namespace)
         canvas.mode = CORNER
+        self._ns = self._namespace
 
 
     #### Drawing
