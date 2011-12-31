@@ -1,5 +1,5 @@
 import sys
-from shoebot.core import Bot
+from bot import Bot
 from shoebot.data import BezierPath, Image
 from math import radians as deg2rad
 from shoebot import ShoebotError
@@ -75,10 +75,12 @@ class DrawBot(Bot):
 
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)'''
+        p = self._path
         self.newpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
         self.endpath()
+        self._path = p
 
     #### Path
     # Path functions taken from Nodebox and modified

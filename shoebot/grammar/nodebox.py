@@ -113,10 +113,12 @@ class NodeBot(Bot):
 
     def line(self, x1, y1, x2, y2):
         '''Draws a line from (x1,y1) to (x2,y2)'''
+        p = self._path
         self.beginpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
         self.endpath()
+        self._path = p
 
     def arrow(self, x, y, width, type=NORMAL, draw=True):
         '''Draws an arrow.
@@ -280,15 +282,15 @@ class NodeBot(Bot):
     def endpath(self, draw=True):
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        if self._autoclosepath:
-            self._path.closepath()
         p = self._path
+        if self._autoclosepath is True:
+            self._path.closepath()
         if draw:
             p.draw()
-            self._path = None
         else:
             # keep the transform so we don't lose it
             self._path.transform = cairo.Matrix(*self._canvas.transform)
+        self._path = None
         return p
 
     def drawpath(self,path):
