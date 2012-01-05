@@ -111,13 +111,13 @@ class NodeBot(Bot):
     def circle(self, x, y, diameter):
         self.ellipse(x, y, diameter, diameter)
 
-    def line(self, x1, y1, x2, y2):
+    def line(self, x1, y1, x2, y2, draw=True):
         '''Draws a line from (x1,y1) to (x2,y2)'''
         p = self._path
         self.beginpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
-        self.endpath()
+        self.endpath(draw=draw)
         self._path = p
 
     def arrow(self, x, y, width, type=NORMAL, draw=True):
