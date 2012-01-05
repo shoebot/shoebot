@@ -1,11 +1,11 @@
 class InputDeviceMixin(object):
-    endPoints = 'key_pressed', 'key_released', 'mouse_button_down', 'mouse_button_up', 'mouse_pointer_moved'
+    SUPPORTED_CALLBACKS = 'key_pressed', 'key_released', 'mouse_button_down', 'mouse_button_up', 'mouse_pointer_moved'
 
     def __init__(self, **kwargs):
         def nop(*args):
             pass
 
-        for name in self.endPoints:
+        for name in self.SUPPORTED_CALLBACKS:
             func = kwargs.get(name, nop)
             setattr(self, name, func)
 
@@ -14,9 +14,9 @@ class InputDeviceMixin(object):
         self.mouse_buttons_down = set()
 
 
-    def set_endpoints(self, **kwargs):
-        ''' Set function to call on any of the events '''
-        for name in self.endPoints:
+    def set_callbacks(self, **kwargs):
+        ''' Set callbacks for input events '''
+        for name in self.SUPPORTED_CALLBACKS:
             func = kwargs.get(name, getattr(self, name))
             setattr(self, name, func)
 
@@ -27,6 +27,9 @@ class InputDeviceMixin(object):
     def get_mouse_down(self):
         ''' Return True if any mouse button is pressed '''
         return bool(self.mouse_buttons_down)
+        
+    def get_key_map(self):
+        return {}
 
     key_down = property(get_key_down)
     mouse_down = property(get_mouse_down)

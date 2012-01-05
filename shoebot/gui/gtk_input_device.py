@@ -1,8 +1,11 @@
-import gtk
+import gtk.gdk
+import gtk.keysyms
 
-from shoebot.core import InputDeviceMixin
+from shoebot.grammar import InputDeviceMixin
 
 class GtkInputDeviceMixin(InputDeviceMixin):
+
+
     def __init__(self, **kwargs):
         InputDeviceMixin.__init__(self, **kwargs)
     
@@ -38,5 +41,18 @@ class GtkInputDeviceMixin(InputDeviceMixin):
     def gtk_key_released(self, widget, event):
         self.keys_pressed.discard(event.keyval)
         self.key_released(event.string, event.keyval)
+
+    def get_key_map(self):
+        '''
+        Return a dict in the form of
+
+        SHOEBOT_KEY_NAME, GTK_VALUE
+
+        Shoebot key names look like KEY_LEFT, whereas gtk uses keysyms.Left
+        '''
+        kdict = {}
+        for gtk_key in dir(gtk.keysyms):
+            kdict['KEY_' + gtk_key.upper()] = getattr(gtk.keysyms, gtk_key)
+        return kdict
 
 

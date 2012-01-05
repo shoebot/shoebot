@@ -24,7 +24,7 @@ class Grammar(object):
 
         input_device = canvas.get_input_device()
         if input_device:
-            input_device.set_endpoints(
+            input_device.set_callbacks(
                 key_pressed = self._key_pressed,
                 key_released = self._key_released,
                 mouse_button_down = self._mouse_button_down,

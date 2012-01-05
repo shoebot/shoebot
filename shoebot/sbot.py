@@ -41,8 +41,8 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = N
     '''
     from core import CairoCanvas, CairoImageSink
 
-    from core import NodeBot
-    from core import DrawBot
+    from grammar import NodeBot
+    from grammar import DrawBot
 
     if window or show_vars:
         from gui import ShoebotWindow
