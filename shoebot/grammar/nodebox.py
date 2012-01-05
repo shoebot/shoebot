@@ -588,7 +588,7 @@ class NodeBot(Bot):
 
     def lineheight(self, height=None):
         if height is not None:
-            self.canvas._lineheight = height
+            self._canvas._lineheight = height
 
     def align(self, align="LEFT"):
         self._canvas.align=align
