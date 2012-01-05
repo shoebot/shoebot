@@ -7,6 +7,7 @@ from shoebot.util import RecordingSurface
 from math import pi as _pi, sqrt
 
 import cairo
+import geometry
 
 CENTER = 'center'
 CORNER = 'corner'
@@ -166,6 +167,23 @@ class BezierPath(Grob):
     def _get_dimensions(self):
         bounds = (x1,y1,x2,y2) = self._get_bounds()
         return x1, y1
+        
+    def contains(self, x, y):
+        '''
+        Return cached bounds of this Grob.
+        If bounds are not cached, render to a meta surface, and
+        keep the meta surface and bounds cached.
+        '''
+        if self._bounds:
+            return self._bounds
+
+        record_surface = RecordingSurface(0, 0)
+        dummy_ctx = cairo.Context(record_surface)
+        self._traverse(dummy_ctx)
+        
+        in_fill = dummy_ctx.in_fill(x, y)
+        return in_fill
+
 
     def _get_center(self):
         '''
@@ -309,7 +327,7 @@ class BezierPath(Grob):
             pass
         if i == len(segments)-1 and segments[i] == 0: i -= 1
         return (i, t, closeto)
-        
+                           
     def point(self, t, segments=None):
         """
             Returns the PathElement at time t (0.0-1.0) on the path.
@@ -626,14 +644,19 @@ class PathElement(object):
         else:
             raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
-    @property
-    def ctrl1(self):
+    def set_ctrl1(self, ctrl1):
+        self._ctrl1 = ctrl1
+        
+    def get_ctrl1(self):
         if self._ctrl1 is None:
             self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
         return self._ctrl1
         
-    @property
-    def ctrl2(self):
+
+    def set_ctrl2(self, ctrl2):
+        self._ctrl2 = ctrl2
+        
+    def get_ctrl2(self):
         if self._ctrl2 is None:
             self._ctrl2 = CtrlPoint(self.c2x, self.c2y)
         return self._ctrl2
@@ -656,6 +679,9 @@ class PathElement(object):
     
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    ctrl1 = property(get_ctrl1, set_ctrl1)
+    ctrl2 = property(get_ctrl2, set_ctrl2)
 
 
 class PathError(Exception):
