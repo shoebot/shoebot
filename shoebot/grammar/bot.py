@@ -105,6 +105,8 @@ class Bot(Grammar):
 
     def __init__(self, canvas, namespace = None):
         Grammar.__init__(self, canvas, namespace)
+	canvas.set_bot(self)
+
         self._autoclosepath = True
         self._path = None
 

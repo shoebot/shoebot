@@ -70,6 +70,5 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = N
         #SHOEBOT : Shoebot,
     }
     bot = BOT_CLASSES[grammar](canvas)
-    canvas.set_bot(bot)
     bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
 
