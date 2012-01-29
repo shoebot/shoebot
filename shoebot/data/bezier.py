@@ -45,7 +45,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, bot, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, path=None, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
@@ -59,7 +59,15 @@ class BezierPath(Grob):
         else:
             self._elements = []
             self._render_funcs = []
-        
+
+        if isinstance(path, (tuple,list)):
+            # list of path elements
+            for element in path:
+                self.append(element)
+        elif isinstance(path, BezierPath):
+            self._elements = list(path._elements)
+            self._render_funcs = list(path._render_funcs)
+                
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
