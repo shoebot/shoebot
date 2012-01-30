@@ -17,7 +17,6 @@ try:
     # for faster performance.
     import pyximport; pyximport.install()
     from superformula import supercalc
-    '
 except:
     
     # Else, use the native python
