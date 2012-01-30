@@ -1,7 +1,8 @@
+import os.path
 import sys
 import cairo
 from shoebot import ShoebotError
-from shoebot.core import Bot
+from bot import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot import RGB, \
                     HSB, \
@@ -30,6 +31,8 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
+
 class NodeBot(Bot):
     
     NORMAL = "1"
@@ -54,6 +57,7 @@ class NodeBot(Bot):
     def __init__(self, canvas, namespace = None):
         Bot.__init__(self, canvas, namespace)
         canvas.mode = CORNER
+        self._ns = self._namespace
 
 
     #### Drawing
@@ -107,12 +111,14 @@ class NodeBot(Bot):
     def circle(self, x, y, diameter):
         self.ellipse(x, y, diameter, diameter)
 
-    def line(self, x1, y1, x2, y2):
+    def line(self, x1, y1, x2, y2, draw=True):
         '''Draws a line from (x1,y1) to (x2,y2)'''
+        p = self._path
         self.beginpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
-        self.endpath()
+        self.endpath(draw=draw)
+        self._path = p
 
     def arrow(self, x, y, width, type=NORMAL, draw=True):
         '''Draws an arrow.
@@ -276,19 +282,28 @@ class NodeBot(Bot):
     def endpath(self, draw=True):
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        if self._autoclosepath:
-            self._path.closepath()
         p = self._path
+        if self._autoclosepath is True:
+            self._path.closepath()
         if draw:
             p.draw()
-            self._path = None
         else:
             # keep the transform so we don't lose it
             self._path.transform = cairo.Matrix(*self._canvas.transform)
+        self._path = None
         return p
 
-    def drawpath(self, path):
-        path.draw()
+    def drawpath(self,path):
+        if isinstance(path, BezierPath):
+            p = self.BezierPath(path)
+            p.draw()
+        elif isinstance(path, Image):
+            self._canvas.add(path)
+        elif hasattr(path, '__iter__'):
+            p = self.BezierPath()
+            for point in path:
+                p.addpoint(point)
+            p.draw()
 
     def drawimage(self, image):
         self.image(image.path, image.x, image.y, data = image.data)
@@ -394,11 +409,13 @@ class NodeBot(Bot):
         # FIXME: this save should go into Canvas
         ### TODO
         p = self.ClippingPath(path)
+        p.draw()
         return p
 
 
     def endclip(self):
         p = self.EndClip()
+        p.draw()
 
     def transform(self, mode = None):
         '''Mode can be CENTER or CORNER'''
@@ -571,7 +588,7 @@ class NodeBot(Bot):
 
     def lineheight(self, height=None):
         if height is not None:
-            self.canvas._lineheight = height
+            self._canvas._lineheight = height
 
     def align(self, align="LEFT"):
         self._canvas.align=align

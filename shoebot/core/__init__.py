@@ -34,13 +34,6 @@ The relevant code parts are marked with a "Taken from Nodebox" comment.
 
 '''
 
-from input_device import InputDeviceMixin
-from grammar import Grammar
-from bot import Bot
-
-from nodebox import NodeBot
-from drawbot import DrawBot
-
 from canvas import Canvas
 from cairo_canvas import CairoCanvas
 
@@ -48,5 +41,3 @@ from drawqueue import DrawQueue
 from drawqueue_sink import DrawQueueSink
 from cairo_drawqueue import CairoDrawQueue
 from cairo_sink import CairoImageSink
-
-from input_device import InputDeviceMixin

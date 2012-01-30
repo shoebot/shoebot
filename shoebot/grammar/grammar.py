@@ -24,7 +24,7 @@ class Grammar(object):
 
         input_device = canvas.get_input_device()
         if input_device:
-            input_device.set_endpoints(
+            input_device.set_callbacks(
                 key_pressed = self._key_pressed,
                 key_released = self._key_released,
                 mouse_button_down = self._mouse_button_down,
@@ -71,7 +71,6 @@ class Grammar(object):
         if not self._dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
-            print '###TODO'
             return False
 
         return False
@@ -121,8 +120,9 @@ class Grammar(object):
 
         # is it a proper filename?
         if os.path.isfile(inputcode):
-            with open(inputcode, 'rU') as file:
-                source_or_code = file.read()
+            file = open(inputcode, 'rU')
+            source_or_code = file.read()
+            file.close()
             self._load_namespace(inputcode)
         else:
             # if not, try parsing it as a code string

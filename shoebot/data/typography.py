@@ -69,6 +69,13 @@ class Text(Grob, ColorMixin):
                                                       
         # then we set fontsize (multiplied by pango.SCALE)
         self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
+
+        # the style
+        self._style = pango.STYLE_NORMAL
+        if kwargs.has_key("style"):
+            if kwargs["style"]=="italic" or kwargs["style"]=="oblique":
+                self._style = pango.STYLE_ITALIC
+        self._fontface.set_style(self._style)
         
         #we need to pre-render some stuff to enable metrics sizing
         self._pre_render()

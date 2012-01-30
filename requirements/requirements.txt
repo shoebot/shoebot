@@ -3,3 +3,5 @@
 pygtk
 numpy
 pycairo
+PIL
+rsvg

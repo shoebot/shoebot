@@ -17,37 +17,57 @@ First thing is to install the appropriate dependencies. If this is your first ti
 Debian/Ubuntu:
 
   sudo apt-get install python-cairo python-gtk2 \
-  python-gobject python-gtksourceview2
+  python-gobject python-gtksourceview2 python-rsvg
 
 Fedora:
 
-  yum install pycairo pycairo-devel pygtk2 pygtk2-devel \
-  pygobject2 pygobject2 pygobject2-devel
+  yum install pycairo pygtk2 pygobject2 gnome-python2-rsvg
 
-For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Mercurial for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
+OSX:
+
+  With MacPorts (http://www.macports.org) and python2.5
+
+  sudo port install py25-numpy -atlas
+  sudo port install pango +quartz
+  sudo port install librsvg py25-pil py25-cairo py25-gtk
+
+  MacPorts does not have the python-rsvg package, so svg output won't work.
+  shoebot-ide won't work either.
+  TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
+
+For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
 
 Ubuntu/Debian:
 
-  sudo apt-get install mercurial
+  sudo apt-get install git
 
 Fedora:
 
-  yum install mercurial
+  yum install git
 
 Gentoo:
 
-  emerge mercurial
+  emerge git
+
+OSX:
+
+  sudo port install git-core
 
 Make a temporary directory to download all source files into, and then get the source itself.
 
   mkdir ~/src
   cd ~/src
-  hg clone https://code.goto10.org/hg/shoebot
+  git clone git@gitorious.org:shoebot/shoebot.git
 
 You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
   cd shoebot
   sudo python setup.py install
+
+OSX:
+
+  cd shoebot
+  sudo /opt/local/bin/python2.5 setup.py install
 
 
 Running the Shoebot IDE
@@ -76,10 +96,10 @@ Using the Shoebot console runner is straightforward:
   sbot inputfile.bot
 
 This command will run the 'inputfile.bot' script, and create an output image
-file (output.png). You'll want to specify your own filename, which can be
+file (output.svg). You'll want to specify your own filename, which can be
 done like so:
 
-  sbot inputfile.bot -o image.svg
+  sbot inputfile.bot -o image.png
 
 The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
 
@@ -122,7 +142,7 @@ called on that instance.
 
 The NodeBot instance should be created with the output file name as an argument. 
 
-  bot = shoebot.NodeBot("output.svg")
+  bot = shoebot.core.NodeBot("output.svg")
   bot.size(400,400)
   bot.rect(10,10,100,100)
 
@@ -132,7 +152,7 @@ When you're finished with drawing, just call
 
 and your output file should be created.
 
-Also, you can save snapshots of the current state if the Box instance like so:
+Also, you can save snapshots of the current state if the Bot instance like so:
 
   bot.snapshot("snap.png")
 
@@ -143,8 +163,9 @@ You can even call external Shoebot/Nodebox scripts from your Python script:
 Links
 -----
 
-Source browser:	     http://code.tinkerhouse.net/shoebot/hg
-Bug tracker:         http://code.tinkerhouse.net/shoebot/trac
+Website:             http://shoebot.net
+Source browser:	     https://gitorious.org/shoebot
+Bug tracker:         http://bugs.shoebot.net/
 Announcement blog:   http://identi.ca/shoebot
 Mailing lists:       http://tinkerhouse.net/shoebot/devel
 

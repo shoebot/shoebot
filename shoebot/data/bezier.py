@@ -1,14 +1,17 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
-from shoebot.data import Grob, ColorMixin
+from grob import Grob
+from basecolor import ColorMixin
 from shoebot.util import RecordingSurface
-from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 from math import pi as _pi, sqrt
 
 import cairo
+import geometry
 
-from grob import CENTER, CORNER
+CENTER = 'center'
+CORNER = 'corner'
+CORNERS = "corners"
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -17,6 +20,17 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+
+MOVETO = "moveto"
+RMOVETO = "rmoveto"
+LINETO = "lineto"
+RLINETO = "rlineto"
+CURVETO = "curveto"
+RCURVETO = "rcurveto"
+ARC = 'arc'
+ELLIPSE = 'ellipse'
+CLOSE = "close"
 
 
 class BezierPath(Grob):
@@ -31,7 +45,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, bot, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, path=None, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
@@ -41,11 +55,19 @@ class BezierPath(Grob):
         Grob.__init__(self, bot)
 
         if packed_elements != None:
-            self.elements, self._render_funcs = packed_elements
+            self._elements, self._render_funcs = packed_elements
         else:
             self._elements = []
             self._render_funcs = []
-        
+
+        if isinstance(path, (tuple,list)):
+            # list of path elements
+            for element in path:
+                self.append(element)
+        elif isinstance(path, BezierPath):
+            self._elements = list(path._elements)
+            self._render_funcs = list(path._render_funcs)
+                
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
@@ -97,7 +119,8 @@ class BezierPath(Grob):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
     def closepath(self):
-        self._append_element(self._canvas.closepath_closure(), (CLOSE,))
+        start_el = self[0]
+        self._append_element(self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y))
         self.closed = True
 
     def ellipse(self, x, y, w, h):
@@ -153,6 +176,23 @@ class BezierPath(Grob):
     def _get_dimensions(self):
         bounds = (x1,y1,x2,y2) = self._get_bounds()
         return x1, y1
+        
+    def contains(self, x, y):
+        '''
+        Return cached bounds of this Grob.
+        If bounds are not cached, render to a meta surface, and
+        keep the meta surface and bounds cached.
+        '''
+        if self._bounds:
+            return self._bounds
+
+        record_surface = RecordingSurface(0, 0)
+        dummy_ctx = cairo.Context(record_surface)
+        self._traverse(dummy_ctx)
+        
+        in_fill = dummy_ctx.in_fill(x, y)
+        return in_fill
+
 
     def _get_center(self):
         '''
@@ -189,12 +229,6 @@ class BezierPath(Grob):
             '''
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
-
-            # Change the origin if nessacary
-            if self._get_pathmode() == CENTER:
-                xc, yc = self._get_center()
-                transform.translate(-xc, -yc)
-
 
             if fillcolor is None and strokecolor is None:
                 # Fixes _bug_FillStrokeNofillNostroke.bot
@@ -302,7 +336,7 @@ class BezierPath(Grob):
             pass
         if i == len(segments)-1 and segments[i] == 0: i -= 1
         return (i, t, closeto)
-        
+                           
     def point(self, t, segments=None):
         """
             Returns the PathElement at time t (0.0-1.0) on the path.
@@ -530,15 +564,37 @@ class ClippingPath(BezierPath):
     # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
     # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')    
     
-    def __init__(self, canvas, path=None, **kwargs):
-        BezierPath.__init__(self, canvas, path, **kwargs)
+    def __init__(self, bot, path=None, **kwargs):
+        BezierPath.__init__(self, bot, **kwargs)
+    	self._drawn = False
+        self._path = path
+
+    def _render_closure(self):
+        def render(cairo_ctx):
+            # Go to initial point (CORNER or CENTER):
+            transform = self._call_transform_mode(self._transform)
+            cairo_ctx.set_matrix(transform)
+            
+            # Traverse the path
+            self._path._traverse(cairo_ctx)
+            cairo_ctx.save()
+            cairo_ctx.clip()
+            
+        return render
+
 
 class EndClip(Grob):
     def __init__(self, bot, **kwargs):
         Grob.__init__(self, bot)
 
-    def _render(self, ctx):
-        pass
+    def _render_closure(self):
+        def render(cairo_ctx):
+            cairo_ctx.restore()
+        return render
+
+    def draw(self):
+        self._deferred_render(self._render_closure())
+
 
 class CtrlPoint(object):
     def __init__(self, x, y):
@@ -584,8 +640,11 @@ class PathElement(object):
         elif cmd == CURVETO or cmd == RCURVETO:
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
         elif cmd == CLOSE:
-            self.x = self.y = None
-            self.c1x = self.c1y = self.c2x = self.c2y = None
+            # Should pass in coordinats of beginning of path
+            self.x, self.y = self.values
+            self.c1x, self.c1y = self.values # Possibly should be 0
+            self.c2x, self.c2y = self.values # Possibly should be 0
+            #self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:
@@ -597,14 +656,19 @@ class PathElement(object):
         else:
             raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
-    @property
-    def ctrl1(self):
+    def set_ctrl1(self, ctrl1):
+        self._ctrl1 = ctrl1
+        
+    def get_ctrl1(self):
         if self._ctrl1 is None:
             self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
         return self._ctrl1
         
-    @property
-    def ctrl2(self):
+
+    def set_ctrl2(self, ctrl2):
+        self._ctrl2 = ctrl2
+        
+    def get_ctrl2(self):
         if self._ctrl2 is None:
             self._ctrl2 = CtrlPoint(self.c2x, self.c2y)
         return self._ctrl2
@@ -627,6 +691,9 @@ class PathElement(object):
     
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    ctrl1 = property(get_ctrl1, set_ctrl1)
+    ctrl2 = property(get_ctrl2, set_ctrl2)
 
 
 class PathError(Exception):

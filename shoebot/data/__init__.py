@@ -67,5 +67,18 @@ from bezier import BezierPath, PathElement, ClippingPath, EndClip
 from typography import Text
 from img import Image
 from variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
+from transforms import Transform
 
+MOVETO = "moveto"
+RMOVETO = "rmoveto"
+LINETO = "lineto"
+RLINETO = "rlineto"
+CURVETO = "curveto"
+RCURVETO = "rcurveto"
+ARC = 'arc'
+ELLIPSE = 'ellipse'
+CLOSE = "close"
 
+CENTER = 'center'
+CORNER = 'corner'
+CORNERS = "corners"

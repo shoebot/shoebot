@@ -1,5 +1,5 @@
 import sys
-from shoebot.core import Bot
+from bot import Bot
 from shoebot.data import BezierPath, Image
 from math import radians as deg2rad
 from shoebot import ShoebotError
@@ -73,12 +73,14 @@ class DrawBot(Bot):
     def circle(self, x, y, diameter):
         self.ellipse(x, y, diameter, diameter)
 
-    def line(self, x1, y1, x2, y2):
+    def line(self, x1, y1, x2, y2, draw=True):
         '''Draws a line from (x1,y1) to (x2,y2)'''
+        p = self._path
         self.newpath()
         self.moveto(x1,y1)
         self.lineto(x2,y2)
-        self.endpath()
+        self.endpath(draw=draw)
+        self._path = p
 
     #### Path
     # Path functions taken from Nodebox and modified
@@ -139,6 +141,12 @@ class DrawBot(Bot):
             p.draw()
         elif isinstance(path, Image):
             self._canvas.add(path)
+        elif hasattr(path, '__iter__'):
+            p = self.BezierPath()
+            for point in path:
+                p.addpoint(point)
+            p.draw()
+        
 
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
@@ -338,7 +346,7 @@ class DrawBot(Bot):
 
     def lineheight(self, height=None):
         if height is not None:
-            self.canvas._lineheight = height
+            self._canvas._lineheight = height
 
     def align(self, align="LEFT"):
         self._canvas.align=align

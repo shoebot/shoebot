@@ -39,9 +39,9 @@ setup(name = "shoebot",
     author_email = "r@sollec.org",
     license = 'GPL v3',
     url = "http://shoebot.net",
-    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui"],
+    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics"],
     data_files = datafiles,
-    scripts = ['sbot', 'sbot.cmd'] if os.name in ['os2', 'nt'] else ['sbot'],
+    scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
  which describes a drawing process, and outputs a graphic in a common open

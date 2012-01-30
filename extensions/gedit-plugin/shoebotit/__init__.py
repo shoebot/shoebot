@@ -109,6 +109,7 @@ class ShoebotWindowHelper:
           self.shoebot_window = sbot.run(code,
                                         iterations = None,
                                         window = True,
+                                        title = doc.get_short_name_for_display() + ' - Shoebot',
                                         server = self.use_socketserver,
                                         show_vars = self.use_varwindow)
                                         # no more fullscreen for you!

@@ -33,7 +33,7 @@ from math import pi as _pi
 import os.path
 import cairo
 
-from shoebot.core import InputDeviceMixin
+from shoebot.grammar import InputDeviceMixin
 from canvas import Canvas
 from drawqueue import DrawQueue
 from cairo_drawqueue import CairoDrawQueue
@@ -164,7 +164,8 @@ class CairoCanvas(Canvas):
                 target_ctx.paint()
             elif extension in ('.ps', '.eps'):
                 target_ctx = cairo.Context(cairo.PSSurface(filename, *self.size_or_default()))
-                target_ctx.set_eps(extension = '.eps')
+                if extension == '.eps':
+                    target_ctx.set_eps(extension = '.eps')
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             elif extension == '.svg':

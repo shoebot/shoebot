@@ -26,6 +26,7 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         else:
             self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
         self.size = None
+	self.last_rendering = None
 
     def do_expose_event(self, event):
         '''
@@ -45,8 +46,8 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         '''
         Creates a meta surface for the bot to draw on
 
-        As we don't have meta surfaces yet, use a PDFSurface
-        with the buffer set to None
+        Uses a proxy to an SVGSurface to render on so 
+        it's scalable
         '''
         if self.window and not self.size:
             self.set_size_request(*size)
@@ -54,7 +55,7 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         meta_surface = RecordingSurface(*size)
         return cairo.Context(meta_surface)
 
-    def rcontext_ready(self, size, frame, cairo_ctx):
+    def rendering_finished(self, size, frame, cairo_ctx):
         '''
         Update the backing store from a cairo context and
         schedule a redraw (expose event)
