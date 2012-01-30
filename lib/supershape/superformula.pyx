@@ -1,7 +1,11 @@
+import cython
+
 from libc.math cimport sin, cos, pow, abs
 
 # Else, use the native python
 # calculation of supershapes.
+
+@cython.cdivision(True)    # turn division by zero checking off
 def supercalc(double m, double n1, double n2, double n3, double phi):
     cdef double a = 1.0
     cdef double b = 1.0
