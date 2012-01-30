@@ -7,7 +7,7 @@
 
 # the following libraries will not be installed
 
-EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs', 'lib/colors/aggregated', 'lib/supershape']
+EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs', 'lib/colors/aggregated']
 
 import os
 from distutils.core import setup
