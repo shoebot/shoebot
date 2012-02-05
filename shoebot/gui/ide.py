@@ -994,7 +994,9 @@ class View(gtk.Window):
         try:
             if buffer.filename:
                 os.chdir(os.path.dirname(buffer.filename))
-            self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
+            #self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
+            bot = shoebot.run(codestring, grammar = 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+            self.sbot_window = bot._canvas.sink
         except ShoebotError, NameError:
             import traceback
             import sys
