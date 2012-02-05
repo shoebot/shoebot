@@ -701,6 +701,8 @@ class View(gtk.Window):
         for tmp in TestText.buffers:
             if not tmp.check_buffer_saved():
                 return
+        if self.sbot_window:
+            self.sbot_window.finish()
 
         gtk.main_quit()
         TestText.active_window_stack.pop()
@@ -835,7 +837,7 @@ class View(gtk.Window):
         #Paulo Silva <nitrofurano AT gmail.com>
         #Tetsuya Saito <t2psyto AT gmail.com>\n
         #http://tinkerhouse.net/shoebot/\n
-        #Version: 0.2-beta                
+        #Version: 0.4-beta                
         #'''
         #self.console_error.write(about)            
 
@@ -849,7 +851,7 @@ class View(gtk.Window):
         self.website = "http://tinkerhouse.net/shoebot/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         gtk.about_dialog_set_url_hook(self.on_url, self.website)
-        dlg.set_version("0.2")
+        dlg.set_version("0.4")
         dlg.set_name("shoebot")
         # TODO: add license text
         dlg.set_license("GPLv3")
@@ -994,9 +996,11 @@ class View(gtk.Window):
         try:
             if buffer.filename:
                 os.chdir(os.path.dirname(buffer.filename))
-            #self.sbot_window = shoebot.gui.gtk_window.ShoebotWindow(codestring, self.use_socketserver, 7777, self.use_varwindow, self.go_fullscreen)
-            bot = shoebot.run(codestring, grammar = 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+                
+                
+            bot = shoebot.init_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
+            bot.sb_run(codestring)
         except ShoebotError, NameError:
             import traceback
             import sys
