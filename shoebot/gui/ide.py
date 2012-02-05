@@ -701,8 +701,9 @@ class View(gtk.Window):
         for tmp in TestText.buffers:
             if not tmp.check_buffer_saved():
                 return
-        if self.sbot_window:
+        if hasattr(self, 'sbot_window'):
             self.sbot_window.finish()
+            self.sbot_window.destroy()
 
         gtk.main_quit()
         TestText.active_window_stack.pop()
@@ -1000,7 +1001,7 @@ class View(gtk.Window):
                 
             bot = shoebot.init_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
-            bot.sb_run(codestring)
+            bot.sb_run(codestring, run_forever = True, iterations = None)
         except ShoebotError, NameError:
             import traceback
             import sys
