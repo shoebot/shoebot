@@ -1,4 +1,8 @@
+from abc import ABCMeta, abstractproperty
+
 class DrawQueueSink(object):
+    __metaclass__ = ABCMeta
+    
     '''
     DrawQueueSink, creates parameters for use by the draw queue.
     (the render_context).
@@ -21,15 +25,17 @@ class DrawQueueSink(object):
         drawqueue.render(r_context)
         self.rendering_finished(size, frame, r_context)
 
+    @abstractproperty
     def create_rcontext(self, size, frame):
         '''
         Returns a cairo context for drawing this
         frame of the bot
         '''
-        raise NotImplementedError('Child class should implement create_rcontext')
+        pass
     
+    @abstractproperty
     def rendering_finished(self, size, frame, r_context):
         '''
         Called when the bot has been rendered
         '''
-        raise NotImplementedError('Child class should implement rendering_finished')
+        pass
