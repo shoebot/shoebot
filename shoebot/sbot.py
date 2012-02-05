@@ -37,6 +37,8 @@ DRAWBOT = 'drawbot'
 def create_canvas(src, format = None, outputfile = None, multifile = False, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
     '''
     Convience file to create canvas and output sink for a shoebot bot
+
+    Creates a CairoCanvas on a ShoebotWindow or attached to a CairoImageSink
     '''
     from core import CairoCanvas, CairoImageSink
 
@@ -44,14 +46,14 @@ def create_canvas(src, format = None, outputfile = None, multifile = False, wind
         from gui import ShoebotWindow
 
         if not title:
-            if os.path.isfile(src):
+            if src and os.path.isfile(src):
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
             else:
                 title = 'Untitled - Shoebot'
         sink = ShoebotWindow(title, show_vars, server=server, port=port)
     else:
         if outputfile is None:
-            if os.path.isfile(src):
+            if src and os.path.isfile(src):
                 outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
             else:
                 outputfile = 'output.svg'
@@ -61,12 +63,10 @@ def create_canvas(src, format = None, outputfile = None, multifile = False, wind
 
     return canvas
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
-    '''
-    Convenience function to make it easy to start bots from external programs
 
-    Creates a canvas to draw to, then a 'sink' for the canvas to output to
-    (either a window or the image sink)
+def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
+    '''
+    Convienience function to create a bot
     '''
     canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, close_window, server=False, port=7777, show_vars = False)
 
@@ -76,5 +76,9 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
     else:
         bot = NodeBot(canvas)
 
-    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
+    return bot
 
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
+    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, server, port, show_vars)
+    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
+    return bot

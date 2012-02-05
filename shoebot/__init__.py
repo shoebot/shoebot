@@ -1,4 +1,4 @@
-from sbot import run
+from sbot import run, init_bot, create_canvas
 
 class ShoebotError(Exception): pass
 class ShoebotScriptError(Exception): pass
