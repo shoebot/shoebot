@@ -138,7 +138,7 @@ class Text(Grob, ColorMixin):
             transform = self._call_transform_mode(self._transform)
             ctx.set_matrix(self._transform)
 
-            ctx.move_to(self.x,self.y-self.baseline)
+            ctx.translate(self.x,self.y-self.baseline)
             
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
