@@ -60,7 +60,7 @@ class Image(Grob, ColorMixin):
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
                 else:
-                    pixbuf = sw, sh, gtk.gdk.pixbuf_new_from_file(path)
+                    pixbuf = gtk.gdk.pixbuf_new_from_file(path)
                     sw = pixbuf.get_width()
                     sh = pixbuf.get_height()
 
