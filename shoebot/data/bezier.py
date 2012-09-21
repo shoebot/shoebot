@@ -365,7 +365,7 @@ class BezierPath(Grob):
         if p1.cmd == CLOSE:
             x, y = self._linepoint(t, x0, y0, closeto.x, closeto.y)
             return PathElement(LINETO, x, y)
-        elif p1.cmd == LINETO:
+        elif p1.cmd in (LINETO, MOVETO):
             x1, y1 = p1.x, p1.y
             x, y = self._linepoint(t, x0, y0, x1, y1)
             return PathElement(LINETO, x, y)
