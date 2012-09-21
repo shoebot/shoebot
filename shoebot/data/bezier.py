@@ -115,6 +115,10 @@ class BezierPath(Grob):
     def lineto(self, x, y):
         self._append_element(self._canvas.lineto_closure(x, y), (LINETO, x, y))
 
+    def line(self, x1, y1, x2, y2):
+        self.moveto(x1, y1)
+        self.lineto(x2, y2)
+
     def curveto(self, x1, y1, x2, y2, x3, y3):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
