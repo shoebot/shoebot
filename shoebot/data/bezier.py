@@ -54,7 +54,7 @@ class BezierPath(Grob):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
 
-        if packed_elements != None:
+        if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
         else:
             self._elements = []
