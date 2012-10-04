@@ -437,7 +437,7 @@ for f in glob(path):
 
 
 
-from shoebot.core.bot import Color as BaseColor
+from shoebot.data import Color as BaseColor
 
 
 # ...let's get started!

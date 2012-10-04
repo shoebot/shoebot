@@ -54,7 +54,7 @@ class BezierPath(Grob):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
 
-        if packed_elements != None:
+        if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
         else:
             self._elements = []
@@ -114,6 +114,10 @@ class BezierPath(Grob):
 
     def lineto(self, x, y):
         self._append_element(self._canvas.lineto_closure(x, y), (LINETO, x, y))
+
+    def line(self, x1, y1, x2, y2):
+        self.moveto(x1, y1)
+        self.lineto(x2, y2)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
@@ -361,7 +365,7 @@ class BezierPath(Grob):
         if p1.cmd == CLOSE:
             x, y = self._linepoint(t, x0, y0, closeto.x, closeto.y)
             return PathElement(LINETO, x, y)
-        elif p1.cmd == LINETO:
+        elif p1.cmd in (LINETO, MOVETO):
             x1, y1 = p1.x, p1.y
             x, y = self._linepoint(t, x0, y0, x1, y1)
             return PathElement(LINETO, x, y)
