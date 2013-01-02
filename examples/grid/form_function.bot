@@ -1,4 +1,5 @@
 size(600, 600)
+
 for x, y in grid(30,30,20,20):
     if random() > 0.6:
         # Here, we choose between two functions: oval and rect. 

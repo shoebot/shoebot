@@ -1,0 +1,10 @@
+size(800, 400)
+colorrange(255)
+colormode(RGB)
+
+stp = 16
+
+for y in range(0, HEIGHT/stp, 1):
+    for x in range(0, WIDTH/stp, 1):
+       fill(random(0, 255), random(0, 255), random(0, 255)) 
+       rect(x*stp, y*stp, stp, stp)

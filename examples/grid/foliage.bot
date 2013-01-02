@@ -1,4 +1,5 @@
 size(700, 700)
+
 # A foliage generator!
 # The foliage are actually green stars with random 
 # inner and outer radii and a random number of points.

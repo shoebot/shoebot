@@ -11,5 +11,5 @@ def draw():
     background(hue, saturation, brightness)
     if show:
         fill(255)
-        ellipse(100,100,100,100)
+        ellipse(100, 100, 100, 100)
 
