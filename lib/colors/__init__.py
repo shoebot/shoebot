@@ -47,11 +47,12 @@ try:
     from shoebot.core import Bot
     from shoebot.data import Grob
     from shoebot import _restore, _save    
-except:
+except ImportError:
     class Grob: pass
 
-try: import favorites as _favorites
-except:
+try: 
+    import favorites as _favorites
+except ImportError:
     pass
 
 ######################################################################################################
