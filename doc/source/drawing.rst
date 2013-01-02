@@ -8,9 +8,19 @@ Primitives
 Rectangles
 ----------
 
-Rectangles can be drawn to the canvas using the rect() function:
+.. py:function:: rect(x, y, width, height, roundness=0,0, rectmode=CORNER)
 
-    rect(x, y, width, height)
+   Draw a rectangle on the canvas.
+
+   :param x: x-coordinate of the top left corner
+   :param y: y-coordinate of the top left corner
+   :param width: rectangle width
+   :param height: rectangle height
+   :param roundness: rounded corner radius
+   :param rectmode: change how parameters are specified (see below)
+
+Rectmode
+--------
 
 Shoebot also has a rectmode() function, borrowed from Processing and not yet
 present in Nodebox, which can be called to change the way rectangles are
