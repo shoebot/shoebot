@@ -1,9 +1,6 @@
 Shoebot
 =======
 
-Ricardo Lafuente, 2008
-
-
 Description
 -----------
 
@@ -68,24 +65,6 @@ OSX:
 
   cd shoebot
   sudo /opt/local/bin/python2.5 setup.py install
-
-
-Running the Shoebot IDE
------------------------
-
-For your first taste of Shoebot, try running the Shoebot IDE by typing the
-following in your terminal:
-
-  shoebot-ide
-
-From there, open the primitives.bot example (in the examples/ dir under
-the dir where you downloaded the sources, or in /usr/share/shoebot/examples).
-After it's open, run it (Run->Run script).
-You can now try tweaking the script values and running it again to see how
-each command behaves.
-
-Note: The Shoebot IDE is still in a testing phase and some things might break; 
-please report all bugs or inconsistencies you find at the Shoebot bugtracker.
 
 
 Running Shoebot from the console
@@ -178,23 +157,21 @@ You can even call external Shoebot/Nodebox scripts from your Python script:
 
   bot.run("example.bot")
 
+
 Links
 -----
 
 Website:             http://shoebot.net
-Source browser:	     https://gitorious.org/shoebot
-Bug tracker:         http://bugs.shoebot.net/
-Announcement blog:   http://identi.ca/shoebot
+Source browser:	     http://github.com/shoebot/shoebot
+Bug tracker:         http://github.com/shoebot/shoebot/issues
 Mailing lists:       http://tinkerhouse.net/shoebot/devel
 
 
-Contact
+License
 -------
 
-The author can be reached at r _at_ sollec _dot_ org
-
-    Copyright (C) 2007, 2008  Ricardo Lafuente
-    Developed at the Piet Zwart Institute, Rotterdam
+Copyright (C) 2007-2012 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
+Originally developed by Ricardo Lafuente with the support of the Piet Zwart Institute, Rotterdam.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as
