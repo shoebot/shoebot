@@ -1,9 +1,6 @@
 Shoebot
 =======
 
-Description
------------
-
 Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. 
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
@@ -130,11 +127,11 @@ The Shoebot documentation has quite a lot more information on what you can do wi
 Links
 -----
 
-Website:             http://shoebot.net
-Documentation:       http://shoebot.readthedocs.org
-Mailing lists:       http://tinkerhouse.net/shoebot/devel
-Source browser:	     http://github.com/shoebot/shoebot
-Bug tracker:         http://github.com/shoebot/shoebot/issues
+  * Website:             http://shoebot.net
+  * Documentation:       http://shoebot.readthedocs.org
+  * Mailing lists:       http://tinkerhouse.net/shoebot/devel
+  * Source browser:	     http://github.com/shoebot/shoebot
+  * Bug tracker:         http://github.com/shoebot/shoebot/issues
 
 
 License
