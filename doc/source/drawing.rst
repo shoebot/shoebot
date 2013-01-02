@@ -8,46 +8,55 @@ Primitives
 Rectangles
 ----------
 
-.. py:function:: rect(x, y, width, height, roundness=0,0, rectmode=CORNER)
+.. py:function:: rect(x, y, width, height[, roundness=0,0, rectmode=CORNER])
 
-   Draw a rectangle on the canvas.
+    Draw a rectangle on the canvas.
+ 
+    :param x: x-coordinate of the top left corner
+    :param y: y-coordinate of the top left corner
+    :param width: rectangle width
+    :param height: rectangle height
+    :param roundness: rounded corner radius
+    :param rectmode: change how parameters are specified, see :py:func:`rectmode` below
+    :type rectmode: CORNER, CENTER or CORNERS
 
-   :param x: x-coordinate of the top left corner
-   :param y: y-coordinate of the top left corner
-   :param width: rectangle width
-   :param height: rectangle height
-   :param roundness: rounded corner radius
-   :param rectmode: change how parameters are specified (see below)
 
-Rectmode
---------
+.. py:function:: rectmode(mode=None)
 
-Shoebot also has a rectmode() function, borrowed from Processing and not yet
-present in Nodebox, which can be called to change the way rectangles are
-specified. Each mode alters the parameters necessary to draw a rectangle using
-the rect() function. There are 3 different modes available:
+    :param mode: the mode to draw new rectangles in
+    :type mode: CORNER, CENTER or CORNERS
 
-CORNER mode (default)
-    * x-value of the top left corner
-    * y-value of the top left corner
-    * width
-    * height
+    Shoebot also has a :py:func:`rectmode` function, borrowed from Processing and not yet
+    present in Nodebox, which can be called to change the way rectangles are
+    specified. Each mode alters the parameters necessary to draw a rectangle using
+    the :py:func:`rect` function. 
 
-CENTER mode
-    * x-coordinate of the rectangle's center point
-    * y-coordinate of the rectangle's center point
-    * width
-    * height
+    There are 3 different modes available:
 
-CORNERS mode
-    * x-coordinate of the top left corner
-    * y-coordinate of the top left corner
-    * x-coordinate of the bottom right corner
-    * y-coordinate of the bottom right corner
+    * CORNER mode (default)
+        * x-value of the top left corner
+        * y-value of the top left corner
+        * width
+        * height
 
-So while you always specify 4 parameters to the rect() function, you can use
-rectmode() to change the function's behaviour according to what might suit your
-script's needs.
+    * CENTER mode
+        * x-coordinate of the rectangle's center point
+        * y-coordinate of the rectangle's center point
+        * width
+        * height
+
+    * CORNERS mode
+        * x-coordinate of the top left corner
+        * y-coordinate of the top left corner
+        * x-coordinate of the bottom right corner
+        * y-coordinate of the bottom right corner
+
+    So while you always specify 4 parameters to the :py:func:`rect` function, you can use
+    :py:func:`rectmode` to change the function's behaviour according to what might suit your
+    script's needs.
+
+
+
 
 Ellipses and circles
 --------------------
