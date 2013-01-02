@@ -4,67 +4,71 @@ Shoebot
 Description
 -----------
 
-Shoebot is a pure Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor GUI, and scripts can describe their own GUIs for controlling variables interactively. Being pure Python, it can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. It was directly inspired by DrawBot and Shoes. Thus, "Shoebot." 
+Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. 
 
-Installing Shoebot
-------------------
+Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
+
+Dependencies
+------------
 
 First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:
 
 Debian/Ubuntu:
 
-  sudo apt-get install python-cairo python-gtk2 \
-  python-gobject python-gtksourceview2 python-rsvg
+    sudo apt-get install python-cairo python-gtk2 \
+      python-gobject python-gtksourceview2 python-rsvg
 
 Fedora:
 
-  yum install pycairo pygtk2 pygobject2 gnome-python2-rsvg
+    sudo yum install pycairo pygtk2 pygobject2 gnome-python2-rsvg
 
 OSX:
 
-  With MacPorts (http://www.macports.org) and python2.5
+With MacPorts (http://www.macports.org) and python2.5
 
-  sudo port install py25-numpy -atlas
-  sudo port install pango +quartz
-  sudo port install librsvg py25-pil py25-cairo py25-gtk
+    sudo port install py25-numpy -atlas
+    sudo port install pango +quartz
+    sudo port install librsvg py25-pil py25-cairo py25-gtk
 
-  MacPorts does not have the python-rsvg package, so svg output won't work.
-  shoebot-ide won't work either.
-  TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
+MacPorts does not have the python-rsvg package, so svg output won't work.
+TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
+
+Installing Shoebot
+------------------
 
 For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
 
 Ubuntu/Debian:
 
-  sudo apt-get install git
+    sudo apt-get install git
 
 Fedora:
 
-  yum install git
+    sudo yum install git
 
 Gentoo:
 
-  emerge git
+    emerge git
 
 OSX:
 
-  sudo port install git-core
+    sudo port install git-core
 
 Make a temporary directory to download all source files into, and then get the source itself.
 
-  mkdir ~/src
-  cd ~/src
-  git clone git@gitorious.org:shoebot/shoebot.git
+    mkdir ~/src
+    cd ~/src
+    git clone git@github.com:shoebot/shoebot.git
 
 You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
-  cd shoebot
-  sudo python setup.py install
+    cd shoebot
+    sudo python setup.py install
 
 OSX:
 
-  cd shoebot
-  sudo /opt/local/bin/python2.5 setup.py install
+    cd shoebot
+    sudo /opt/local/bin/python2.5 setup.py install
 
 
 Running Shoebot from the console
@@ -72,44 +76,43 @@ Running Shoebot from the console
 
 Using the Shoebot console runner is straightforward:
 
-  sbot inputfile.bot
+    sbot inputfile.bot
 
 This command will run the 'inputfile.bot' script, and create an output image
 file (output.svg). You'll want to specify your own filename, which can be
 done like so:
 
-  sbot inputfile.bot -o image.png
+    sbot inputfile.bot -o image.png
 
 The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
 
-You can find some example Shoebot scripts in /usr/share/shoebot/examples.
+You can find many example Shoebot scripts in `/usr/share/shoebot/examples`.
 
 Shoebot can also run in a window, which is useful for quick previews, as well
 as realtime manipulation of parameters. For this, just use the window flag:
 
-  sbot -w inputfile.bot
+    sbot -w inputfile.bot
 
 For a list of extra options, type
 
-  sbot -h
+    sbot -h
 
 
 Documentation
 -------------
 
-Shoebot documentation can be generated with sphinx -
+You can find the current docs at [ReadTheDocs](http://shoebot.readthedocs.org/).
 
-Install sphinx
+Shoebot documentation can also be generated locally using sphinx. First, install it::
 
-  pip install sphinx
+    pip install sphinx
 
-The following commands will output the html docs
+The following commands will output the HTML docs::
   
-  cd doc
+    cd doc
+    make html 
 
-  make html 
-
-The documentation should now be available in doc/build
+The documentation should now be available in `doc/build`.
 
 
 Further reading
@@ -117,54 +120,21 @@ Further reading
 
 For a great intro to the Nodebox/Shoebot language, be sure to check the Nodebox tutorials at http://nodebox.net/code/index.php/Tutorial .
 
-The Shoebot website has quite a lot more information on what you can do with Shoebot, such as:
+The Shoebot documentation has quite a lot more information on what you can do with Shoebot, such as:
 
   * running Shoebot as a Python module
   * using the socketserver to have other programs control a Shoebot script
   * using Shoebot to generate images via a CGI script
 
 
-Running Shoebot as a Python module
-----------------------------------
-
-Shoebot can also be loaded as a module. For now, scripts taking advantage of
-this must be placed inside the shoebot dir.
-
-After including an import statement,
-
-  import shoebot
-
-a NodeBot object needs to be created, and all further drawing commands can be 
-called on that instance.
-
-The NodeBot instance should be created with the output file name as an argument. 
-
-  bot = shoebot.core.NodeBot("output.svg")
-  bot.size(400,400)
-  bot.rect(10,10,100,100)
-
-When you're finished with drawing, just call
-
-  bot.finish()
-
-and your output file should be created.
-
-Also, you can save snapshots of the current state if the Bot instance like so:
-
-  bot.snapshot("snap.png")
-
-You can even call external Shoebot/Nodebox scripts from your Python script:
-
-  bot.run("example.bot")
-
-
 Links
 -----
 
 Website:             http://shoebot.net
+Documentation:       http://shoebot.readthedocs.org
+Mailing lists:       http://tinkerhouse.net/shoebot/devel
 Source browser:	     http://github.com/shoebot/shoebot
 Bug tracker:         http://github.com/shoebot/shoebot/issues
-Mailing lists:       http://tinkerhouse.net/shoebot/devel
 
 
 License
