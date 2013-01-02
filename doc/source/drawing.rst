@@ -2,13 +2,10 @@ Drawing with Shoebot
 ====================
 
 
-Primitives
-==========
+Basic shapes
+============
 
-Rectangles
-----------
-
-.. py:function:: rect(x, y, width, height[, roundness=0,0, rectmode=CORNER])
+.. py:function:: rect(x, y, width, height, roundness=0,0, draw=True, fill=None)
 
     Draw a rectangle on the canvas.
  
@@ -17,19 +14,51 @@ Rectangles
     :param width: rectangle width
     :param height: rectangle height
     :param roundness: rounded corner radius
-    :param rectmode: change how parameters are specified, see :py:func:`rectmode` below
-    :type rectmode: CORNER, CENTER or CORNERS
+    :param boolean draw: whether to draw the shape on the canvas or not
+    :param fill: fill color
 
 
+.. py:function:: ellipse(x, y, width, height, draw=True)
+
+    Draw an ellipse on the canvas.
+ 
+    :param x: x-coordinate of the top left corner
+    :param y: y-coordinate of the top left corner
+    :param width: rectangle width
+    :param height: rectangle height
+    :param boolean draw: whether to draw the shape on the canvas or not
+
+
+.. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
+
+    Draw an arrow on the canvas.
+ 
+    :param x: x-coordinate of the top left corner
+    :param y: y-coordinate of the top left corner
+    :param type: arrow type
+    :type type: NORMAL or FORTYFIVE
+    :param boolean draw: whether to draw the shape on the canvas or not
+
+
+.. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
+
+    Draw a star-like polygon on the canvas.
+ 
+    :param startx: x-coordinate of the top left corner
+    :param starty: y-coordinate of the top left corner
+    :param points: amount of points
+    :param outer: outer radius
+    :param inner: inner radius
+    :param boolean draw: whether to draw the shape on the canvas or not
+
+    
 .. py:function:: rectmode(mode=None)
+
+    Change the way rectangles are specified. Each mode alters the parameters
+    necessary to draw a rectangle using the :py:func:`rect` function. 
 
     :param mode: the mode to draw new rectangles in
     :type mode: CORNER, CENTER or CORNERS
-
-    Shoebot also has a :py:func:`rectmode` function, borrowed from Processing and not yet
-    present in Nodebox, which can be called to change the way rectangles are
-    specified. Each mode alters the parameters necessary to draw a rectangle using
-    the :py:func:`rect` function. 
 
     There are 3 different modes available:
 
@@ -38,13 +67,11 @@ Rectangles
         * y-value of the top left corner
         * width
         * height
-
     * CENTER mode
         * x-coordinate of the rectangle's center point
         * y-coordinate of the rectangle's center point
         * width
         * height
-
     * CORNERS mode
         * x-coordinate of the top left corner
         * y-coordinate of the top left corner
@@ -55,34 +82,6 @@ Rectangles
     :py:func:`rectmode` to change the function's behaviour according to what might suit your
     script's needs.
 
-
-
-
-Ellipses and circles
---------------------
-
-Ellipses are available through the ellipse() function:
-
-    ellipse(x, y, width, height)
-
-As you would expect, circles can be achieved by using the same value for the
-width and height parameters.
-
-Arrows
-------
-
-Spiffy arrows can be drawn with the arrow() function:
-
-    arrow(x, y, size, type)
-    
-The type parameter can be either NORMAL (the default) or FORTYFIVE. The first draws __,
-the second draws a 45 degree arrow (which is quite commonplace in contemporary
-graphic design ever since The Designers Republic).
-
-Stars
------
-
-The star() function can come up with ___
 
 Bézier paths
 ============
@@ -99,10 +98,10 @@ In order to create bézier paths in Shoebot, you need to be acquainted with a fe
   * closepath
   * endpath
 
-Colours: fill and stroke
+Colors: fill and stroke
 ========================
 
-Colours can be specified in a few ways:
+Colors can be specified in a few ways:
   * grayscale: (value)
   * grayscale with alpha: (value, alpha)
   * RGB: (red, green, blue)
