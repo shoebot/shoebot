@@ -3,8 +3,8 @@
 
 size(300, 300)
 colorrange(255)
-background(76,102,51)
-fill(186,186,93)
+background(76, 102, 51)
+fill(186, 186, 93)
 
 _total_w = 0
 def flow(w, h):

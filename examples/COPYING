@@ -1,35 +1,21 @@
-The examples in the following directories
-  basic/
-  color/
-  functions/
-  misc/
-  random/
-  systemvariables/
-  var/
-
-are Copyright 2008 Paulo Silva - oct '08 - licensed under the GPL
-http://nitrofurano.linuxkafe.com
-
-The idea of these examples is for providing an easy, fast, and encouraging learning of Shoebot.
-
-The examples from me doesn't follow PEP8 rules (at least for now). It's because i grown since childhood as one-line coder (bad habits from 8bit ansi-basic coding), but with concern on having them as simple as not needing remarks for explaining, and having them fitted into few hundred bytes, or not much more than it.
-
-
 Some of the example files in this folder are taken from other projects.
 
-The files:
+The following files:
 
-drawing/appending_transforms.bot
-        covergen.bot
-        primitives.bot
-        tendrils.bot
-        ovals.bot
-        star_fun.bot
-
+demos/appending_transforms.bot
+      covergen.bot
+      primitives.bot
+      tendrils.bot
+      ovals.bot
+      star_fun.bot
+demos/math/math_sculpture.bot
+           tunnel_effect.bot
+animation/Hypnoval.py
+          Parade.py
+          WishyWorm.py
 grid/*
-math/*
 
-are taken from Nodebox (www.nodebox.net), and are available under an 
+are taken from Nodebox 1 (www.nodebox.net), and are available under an 
 MIT-style license. Nodebox is Copyright (c) Frederik de Bleser and Tom de 
 Smedt.
 
