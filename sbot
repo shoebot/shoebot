@@ -97,11 +97,11 @@ parser.add_argument("-r",
                 dest="repeat",
                 default=False,
                 help=_("set number of iteration, multiple images will be produced"))
-parser.add_argument("-b",
-                "--bot",
-                dest="bot",
+parser.add_argument("-g",
+                "--grammar",
+                dest="grammar",
                 default=NODEBOX,
-                help=_("Select between 'nodebox' (default) or 'drawbot' languages"),
+                help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
                 )
 parser.add_argument("-c",
                 "--close",
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     
     run(src = args.script,
-        grammar = args.bot,
+        grammar = args.grammar,
         outputfile = args.outputfile,
         iterations = args.repeat or None,
         window = args.window or args.varwindow or args.socketserver,
