@@ -137,16 +137,15 @@ class LSystem(object):
         	# If the rule is an F symbol or empty (e.g. in Penrose tiles).
         	# Segment length grows to its full size as time progresses.
             self._segments += 1
-            if draw and time >= 0:
+            if draw and time > 0:
             	length = min(length, length*time)
             	if self._timed:
-            		self.segment(length, generation, time, id=self._segments)
+            	    self.segment(length, generation, time, id=self._segments)
                 else:
-                	self.segment(length, generation, None, id=self._segments)
+                    self.segment(length, generation, None, id=self._segments)
             	_ctx.translate(0, -length)
         
     def segment(self, length, generation, time=None, id=None):
-
     	_ctx.push()
     	_ctx.line(0, 0, 0, -length)
     	_ctx.scale(0.65)
@@ -170,7 +169,7 @@ class LSystem(object):
         	angle = min(self.angle, self.angle * time / ease)
 
     	self._timed = True
-    	if time is None:
+    	if not time:
     		self._timed = False
     		time = maxint        
 
@@ -216,12 +215,11 @@ class LSystem(object):
     	it "branches" from generation to generation.
     	
     	"""
-    	
     	_ctx.push()
         self._reset()
         self._grow(generation, self.root, self.angle, self.d, draw=False)
         _ctx.pop()
-        return self._duration
+        return max(self._duration, 0.1)
 
 def lsystem(angle=20, segmentlength=40, rules={}, root=None):
 	

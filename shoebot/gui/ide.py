@@ -837,7 +837,7 @@ class View(gtk.Window):
         #Stuart Axon <stuaxo AT gmail.com>
         #Paulo Silva <nitrofurano AT gmail.com>
         #Tetsuya Saito <t2psyto AT gmail.com>\n
-        #http://tinkerhouse.net/shoebot/\n
+        #http://shoebot.net/\n
         #Version: 0.4-beta                
         #'''
         #self.console_error.write(about)            
@@ -849,7 +849,7 @@ class View(gtk.Window):
     def do_about(self, callback_action, widget):
         # about dialog
         dlg = gtk.AboutDialog()
-        self.website = "http://tinkerhouse.net/shoebot/"
+        self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         gtk.about_dialog_set_url_hook(self.on_url, self.website)
         dlg.set_version("0.4")
