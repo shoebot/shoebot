@@ -116,14 +116,14 @@ parser.add_argument('args', nargs=argparse.REMAINDER)
 def error(message):
     '''Prints an error message, the help message and quits'''
     global parser
-    print _("Error: ") + message
-    print
+    print (_("Error: ") + message)
+    print ()
     parser.print_help()
     sys.exit()
 
 def warn(message):
     '''Print a warning message'''
-    print _("Warning: ") + message
+    print (_("Warning: ") + message)
 
 if __name__ == '__main__':
 

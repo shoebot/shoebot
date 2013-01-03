@@ -44,7 +44,6 @@ class CairoCanvas(Canvas):
         Canvas.__init__(self, sink)
         self.size = None
         self.enable_cairo_queue = enable_cairo_queue
-        self.reset_canvas()
 
     def initial_drawqueue(self):
         '''
