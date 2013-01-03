@@ -79,12 +79,12 @@ parser.add_argument("-s",
                 dest="socketserver",
                 default=False,
                 help=_("run a socket server for external control (will run the script in windowed mode)"))
-parser.add_argument("-a",
-                "--variables",
+parser.add_argument("-dv",
+                "--disable-vars",
                 action="store_true",
-                dest="varwindow",
+                dest="disable_vars",
                 default=False,
-                help=_("show a variable tweaking window (will run the script in windowed mode)"))
+                help=_("disable the variables pane when in windowed mode."))
 parser.add_argument("-p",
                 "--serverport",
                 type=int,
@@ -142,5 +142,5 @@ if __name__ == '__main__':
         close_window = args.close,
         server=args.socketserver,
         port=args.serverport,
-        show_vars = args.varwindow,
+        show_vars = args.window and args.disable_vars == False,
         args = args.args)
