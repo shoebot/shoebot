@@ -31,7 +31,7 @@
 
 import sys, os
 import locale, gettext
-from optparse import OptionParser
+import argparse
 from shoebot import run
 
 DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
@@ -52,64 +52,66 @@ _ = gettext.gettext
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-# use OptionParser to interpret commandline options
-parser = OptionParser(_("usage: %prog [options] inputfile.bot"))
-parser.add_option("-o",
+# use ArgumentParser to interpret commandline options
+parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
+parser.add_argument("-o",
                 "--outputfile",
                 dest="outputfile",
                 help=_("run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)"),
                 metavar="FILE")
-parser.add_option("-w",
+parser.add_argument("-w",
                 "--window",
                 action="store_true",
                 dest="window",
                 default=False,
                 help=_("run script in a GTK window")
                 )
-parser.add_option("-f",
+parser.add_argument("-f",
                 "--fullscreen",
                 action="store_true",
                 dest="fullscreen",
                 default=False,
                 help=_("run in fullscreen mode")
                 )
-parser.add_option("-s",
+parser.add_argument("-s",
                 "--socketserver",
                 action="store_true",
                 dest="socketserver",
                 default=False,
                 help=_("run a socket server for external control (will run the script in windowed mode)"))
-parser.add_option("-a",
+parser.add_argument("-a",
                 "--variables",
                 action="store_true",
                 dest="varwindow",
                 default=False,
                 help=_("show a variable tweaking window (will run the script in windowed mode)"))
-parser.add_option("-p",
+parser.add_argument("-p",
                 "--serverport",
-                type="int",
+                type=int,
                 dest="serverport",
                 default=DEFAULT_SERVERPORT,
                 help=_("set socketserver port to listen for connections (default is 7777)"))
-parser.add_option("-r",
+parser.add_argument("-r",
                 "--repeat",
-                type="int",
+                type=int,
                 dest="repeat",
                 default=False,
                 help=_("set number of iteration, multiple images will be produced"))
-parser.add_option("-b",
+parser.add_argument("-b",
                 "--bot",
                 dest="bot",
                 default=NODEBOX,
                 help=_("Select between 'nodebox' (default) or 'drawbot' languages"),
                 )
-parser.add_option("-c",
+parser.add_argument("-c",
                 "--close",
                 action="store_true",
                 dest="close",
                 default=False,
                 help=_("Close window after running bot (use with -r for benchmarking)"),
                 )
+parser.add_argument("script")
+parser.add_argument('args', nargs=argparse.REMAINDER)
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -125,22 +127,20 @@ def warn(message):
 
 if __name__ == '__main__':
 
-    # get optparse arguments and check for sanity
-    (options, args) = parser.parse_args()
+    # get argparse arguments and check for sanity
+    args, extra = parser.parse_known_args()
 
-    if not args and not options.window:
+    if not args.script and not args.window:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
-    if len(args) > 1:
-        error(_("Too many arguments!"))
-
     
-    run(src = args[0],
-        grammar = options.bot,
-        outputfile = options.outputfile,
-        iterations = options.repeat or None,
-        window = options.window or options.varwindow or options.socketserver,
-        close_window = options.close,
-        server=options.socketserver,
-        port=options.serverport,
-        show_vars = options.varwindow)
+    run(src = args.script,
+        grammar = args.bot,
+        outputfile = args.outputfile,
+        iterations = args.repeat or None,
+        window = args.window or args.varwindow or args.socketserver,
+        close_window = args.close,
+        server=args.socketserver,
+        port=args.serverport,
+        show_vars = args.varwindow,
+        args = args.args)
