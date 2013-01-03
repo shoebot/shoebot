@@ -79,4 +79,4 @@ class CairoDrawQueue(DrawQueue):
         self.initial_func(cairo_ctx)
         cairo_ctx.set_source_surface(self.recording_surface)
         cairo_ctx.paint()
-        self._post_render(cairo_ctx)
+        self.post_render(cairo_ctx)

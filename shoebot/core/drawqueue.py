@@ -64,13 +64,14 @@ class DrawQueue(object):
         for render_func in self.render_funcs:
             render_func(r_context)
 
-        self._post_render(r_context)
+        self.post_render(r_context)
 
-    def _post_render(self, r_context):
-        ''' Run tasks after render (such as user snapshots) '''
+    def post_render(self, r_context):
+        ''' Run tasks after render and remove them (such as user snapshots) '''
         if self.post_render_funcs is not None:
             for render_func in self.post_render_funcs:
                 render_func(r_context)
+            self.post_render_funcs = deque()
 
     def append_post_render(self, render_func):
         if self.post_render_funcs is None:

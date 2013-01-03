@@ -1,4 +1,4 @@
-from sbot import run
+from .sbot import run
 
 class ShoebotError(Exception): pass
 class ShoebotScriptError(Exception): pass
