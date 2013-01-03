@@ -1,0 +1,26 @@
+size(640, 400)
+colorrange(255)
+colormode(HSB)
+background(0,0,192)
+
+for i in range(0,WIDTH/4,1):
+  sz = random(WIDTH/40, WIDTH/5)
+  xpos = random(-WIDTH/5, WIDTH)
+  ypos = random(-WIDTH/5, HEIGHT)
+  
+  fill(0, 0, random(192, 224), random(85, 255))
+  ellipse(xpos,ypos,sz,sz)
+  
+  nofill()
+  stroke(0,0,0,255)
+  strokewidth(.1)
+  ellipse(xpos,ypos,sz,sz)
+  
+  for j in range(0, WIDTH/80,1):
+    stroke(0, 0, 0, 255)
+    strokewidth(.1)
+    beginpath(random(-WIDTH/2, WIDTH*1.5), random(-HEIGHT/2, HEIGHT*1.5))
+    curveto(random(-WIDTH/2, WIDTH*1.5), random(-HEIGHT/2, HEIGHT*1.5), 
+            random(-WIDTH/2, WIDTH*1.5),random(-HEIGHT/2, HEIGHT*1.5),
+            random(-WIDTH/2, WIDTH*1.5),random(-HEIGHT/2, HEIGHT*1.5))
+    endpath()
