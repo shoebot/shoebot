@@ -315,20 +315,20 @@ class NodeBot(Bot):
         '''Move relatively to the last point.'''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.relmoveto(x,y)
+        self._path.relmoveto(x, y)
 
     def rellineto(self, x, y):
         '''Draw a line using relative coordinates.'''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.rellineto(x,y)
+        self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
         '''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.relcurveto(x,y)
+        self._path.relcurveto(h1x, h1y, h2x, h2y, x, y)
 
     def findpath(self, points, curvature=1.0):
 
@@ -417,7 +417,7 @@ class NodeBot(Bot):
         p = self.EndClip()
         p.draw()
 
-    def transform(self, mode = None):
+    def transform(self, mode=None):
         '''Mode can be CENTER or CORNER'''
         if mode:
             self._canvas.mode = mode
@@ -591,7 +591,7 @@ class NodeBot(Bot):
             self._canvas._lineheight = height
 
     def align(self, align="LEFT"):
-        self._canvas.align=align
+        self._canvas.align = align
 
     # TODO: Set the framework to setup font options
 

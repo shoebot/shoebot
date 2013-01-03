@@ -233,7 +233,7 @@ class Bot(Grammar):
         else: # No values means 0.0 -> 1.0
             return r.random()
 
-    def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
+    def grid(self, cols, rows, colSize=1, rowSize=1, shuffled=False):
         """Returns an iterator that contains coordinate tuples.
         The grid can be used to quickly create grid-like structures.
         A common way to use them is:
