@@ -181,7 +181,7 @@ class Text(Grob, ColorMixin):
             self._pre_render()
             
         # here we create a new cairo.Context in order to hold the pathdata
-        tempCairoContext = cairo.Context(RecordingSurfaceA8(0, 0))
+        tempCairoContext = cairo.Context(RecordingSurfaceA8(1, 1))
         tempCairoContext.move_to(self.x,self.y-self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
         tempPangoCairoContext = pangocairo.CairoContext(tempCairoContext)

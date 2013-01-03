@@ -115,6 +115,24 @@ For a list of extra options, type
   sbot -h
 
 
+Documentation
+-------------
+
+Shoebot documentation can be generated with sphinx -
+
+Install sphinx
+
+  pip install sphinx
+
+The following commands will output the html docs
+  
+  cd doc
+
+  make html 
+
+The documentation should now be available in doc/build
+
+
 Further reading
 ---------------
 
