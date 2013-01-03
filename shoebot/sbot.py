@@ -30,46 +30,58 @@
 '''Convenience function to run a bot'''
 
 import os.path
+import sys
 
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
-SHOEBOT = 'shoebot'
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = None, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
+def create_canvas(src, format = None, outputfile = None, multifile = False, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
     '''
-    Convenience function to make it easy to start bots from external programs
+    Convience file to create canvas and output sink for a shoebot bot
+
+    Creates a CairoCanvas on a ShoebotWindow or attached to a CairoImageSink
     '''
     from core import CairoCanvas, CairoImageSink
 
-    from core import NodeBot
-    from core import DrawBot
-
     if window or show_vars:
         from gui import ShoebotWindow
-        
+
         if not title:
-            if os.path.isfile(src):
+            if src and os.path.isfile(src):
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
             else:
                 title = 'Untitled - Shoebot'
         sink = ShoebotWindow(title, show_vars, server=server, port=port)
     else:
-        if iterations is None:
-            iterations = 1
         if outputfile is None:
-            if os.path.isfile(src):
+            if src and os.path.isfile(src):
                 outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
             else:
                 outputfile = 'output.svg'
-        sink = CairoImageSink(outputfile, format, multifile = iterations > 1)
+        sink = CairoImageSink(outputfile, format, multifile)
 
     canvas = CairoCanvas(sink, enable_cairo_queue=True)
-    BOT_CLASSES = {
-        DRAWBOT : DrawBot,
-        NODEBOX : NodeBot,
-        #SHOEBOT : Shoebot,
-    }
-    bot = BOT_CLASSES[grammar](canvas)
-    canvas.set_bot(bot)
-    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
 
+    return canvas
+
+
+def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
+    '''
+    Convienience function to create a bot
+    '''
+    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, close_window, server=False, port=7777, show_vars = False)
+
+    from shoebot.grammar import DrawBot, NodeBot
+    if grammar == DRAWBOT:
+        bot = DrawBot(canvas)
+    else:
+        bot = NodeBot(canvas)
+
+    return bot
+
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False, args = None):
+    # Munge shoebot sys.argv
+    sys.argv = [sys.argv[0]] + args  # Remove shoebot specfiic parameters so that scripts can be called like normal scripts
+    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, server, port, show_vars)
+    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
+    return bot

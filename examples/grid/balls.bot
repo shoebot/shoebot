@@ -1,4 +1,5 @@
 size(600, 600)
+
 # Use a grid to generate a bubble-like composition.
 # This example shows that a grid doesn't have to be rigid at all.
 # It's very easy to breake loose from the coordinates NodeBox

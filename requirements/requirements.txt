@@ -1,0 +1,7 @@
+# pip / virtualenv support is experimental, we use pygtk which isn't 
+# currently  available through pip, so you'll need to install that manually
+pygtk
+numpy
+pycairo
+PIL
+rsvg

@@ -1,14 +1,17 @@
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
-from shoebot.data import Grob, ColorMixin
+from grob import Grob
+from basecolor import ColorMixin
 from shoebot.util import RecordingSurface
-from shoebot import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 from math import pi as _pi, sqrt
 
 import cairo
+import geometry
 
-from grob import CENTER, CORNER
+CENTER = 'center'
+CORNER = 'corner'
+CORNERS = "corners"
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -17,6 +20,17 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+
+MOVETO = "moveto"
+RMOVETO = "rmoveto"
+LINETO = "lineto"
+RLINETO = "rlineto"
+CURVETO = "curveto"
+RCURVETO = "rcurveto"
+ARC = 'arc'
+ELLIPSE = 'ellipse'
+CLOSE = "close"
 
 
 class BezierPath(Grob):
@@ -31,7 +45,7 @@ class BezierPath(Grob):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
-    def __init__(self, bot, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, path=None, fillcolor=None, strokecolor=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
@@ -40,12 +54,20 @@ class BezierPath(Grob):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
 
-        if packed_elements != None:
-            self.elements, self._render_funcs = packed_elements
+        if packed_elements is not None:
+            self._elements, self._render_funcs = packed_elements
         else:
             self._elements = []
             self._render_funcs = []
-        
+
+        if isinstance(path, (tuple,list)):
+            # list of path elements
+            for element in path:
+                self.append(element)
+        elif isinstance(path, BezierPath):
+            self._elements = list(path._elements)
+            self._render_funcs = list(path._render_funcs)
+                
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
@@ -93,11 +115,16 @@ class BezierPath(Grob):
     def lineto(self, x, y):
         self._append_element(self._canvas.lineto_closure(x, y), (LINETO, x, y))
 
+    def line(self, x1, y1, x2, y2):
+        self.moveto(x1, y1)
+        self.lineto(x2, y2)
+
     def curveto(self, x1, y1, x2, y2, x3, y3):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
     def closepath(self):
-        self._append_element(self._canvas.closepath_closure(), (CLOSE,))
+        start_el = self[0]
+        self._append_element(self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y))
         self.closed = True
 
     def ellipse(self, x, y, w, h):
@@ -153,6 +180,23 @@ class BezierPath(Grob):
     def _get_dimensions(self):
         bounds = (x1,y1,x2,y2) = self._get_bounds()
         return x1, y1
+        
+    def contains(self, x, y):
+        '''
+        Return cached bounds of this Grob.
+        If bounds are not cached, render to a meta surface, and
+        keep the meta surface and bounds cached.
+        '''
+        if self._bounds:
+            return self._bounds
+
+        record_surface = RecordingSurface(0, 0)
+        dummy_ctx = cairo.Context(record_surface)
+        self._traverse(dummy_ctx)
+        
+        in_fill = dummy_ctx.in_fill(x, y)
+        return in_fill
+
 
     def _get_center(self):
         '''
@@ -296,7 +340,7 @@ class BezierPath(Grob):
             pass
         if i == len(segments)-1 and segments[i] == 0: i -= 1
         return (i, t, closeto)
-        
+                           
     def point(self, t, segments=None):
         """
             Returns the PathElement at time t (0.0-1.0) on the path.
@@ -321,7 +365,7 @@ class BezierPath(Grob):
         if p1.cmd == CLOSE:
             x, y = self._linepoint(t, x0, y0, closeto.x, closeto.y)
             return PathElement(LINETO, x, y)
-        elif p1.cmd == LINETO:
+        elif p1.cmd in (LINETO, MOVETO):
             x1, y1 = p1.x, p1.y
             x, y = self._linepoint(t, x0, y0, x1, y1)
             return PathElement(LINETO, x, y)
@@ -600,8 +644,11 @@ class PathElement(object):
         elif cmd == CURVETO or cmd == RCURVETO:
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
         elif cmd == CLOSE:
-            self.x = self.y = None
-            self.c1x = self.c1y = self.c2x = self.c2y = None
+            # Should pass in coordinats of beginning of path
+            self.x, self.y = self.values
+            self.c1x, self.c1y = self.values # Possibly should be 0
+            self.c2x, self.c2y = self.values # Possibly should be 0
+            #self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:
@@ -613,14 +660,19 @@ class PathElement(object):
         else:
             raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
 
-    @property
-    def ctrl1(self):
+    def set_ctrl1(self, ctrl1):
+        self._ctrl1 = ctrl1
+        
+    def get_ctrl1(self):
         if self._ctrl1 is None:
             self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
         return self._ctrl1
         
-    @property
-    def ctrl2(self):
+
+    def set_ctrl2(self, ctrl2):
+        self._ctrl2 = ctrl2
+        
+    def get_ctrl2(self):
         if self._ctrl2 is None:
             self._ctrl2 = CtrlPoint(self.c2x, self.c2y)
         return self._ctrl2
@@ -643,6 +695,9 @@ class PathElement(object):
     
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    ctrl1 = property(get_ctrl1, set_ctrl1)
+    ctrl2 = property(get_ctrl2, set_ctrl2)
 
 
 class PathError(Exception):

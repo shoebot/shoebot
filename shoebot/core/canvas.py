@@ -30,11 +30,13 @@
 '''Abstract canvas class'''
 
 from collections import deque
+from abc import ABCMeta, abstractproperty
 import sys
 import shoebot
 import locale, gettext
 import math as _math
 import cairo
+from shoebot.core.drawqueue import DrawQueue
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -51,9 +53,11 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 class Canvas(object):
+    __metaclass__ = ABCMeta
+    
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
-
+    
     ''' Abstract canvas class '''
     def __init__(self, sink):
         # Construct sink class:
@@ -85,6 +89,14 @@ class Canvas(object):
         '''
         pass
 
+    @abstractproperty
+    def reset_drawqueue(self):
+        pass
+    
+    @abstractproperty
+    def reset_transform(self):
+        pass
+    
     def reset_canvas(self):
         self.reset_transform()
         self.reset_drawqueue()

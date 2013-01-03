@@ -6,8 +6,41 @@ This section is for the Python hackers who want to get dirty with canvas manipul
 Using Shoebot as a Python module
 --------------------------------
 
+Shoebot can also be loaded as a module. For now, scripts taking advantage of
+this must be placed inside the shoebot dir.
+
+After including an import statement,
+
+    import shoebot
+
+a NodeBot object needs to be created, and all further drawing commands can be 
+called on that instance.
+
+The NodeBot instance should be created with the output file name as an argument. 
+
+    bot = shoebot.core.NodeBot("output.svg")
+    bot.size(400,400)
+    bot.rect(10,10,100,100)
+
+When you're finished with drawing, just call
+
+    bot.finish()
+
+and your output file should be created.
+
+Also, you can save snapshots of the current state if the Bot instance like so:
+
+    bot.snapshot("snap.png")
+
+You can even call external Shoebot/Nodebox scripts from your Python script:
+
+    bot.run("example.bot")
+
+
 Working directly with Cairo
 ---------------------------
+TODO
 
 Command-line usage
 ------------------
+TODO

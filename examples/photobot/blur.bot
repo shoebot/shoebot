@@ -1,0 +1,32 @@
+size(400,500)
+pb = ximport("photobot")
+c = pb.canvas(400, 500)
+c.fill((255,255,255))
+
+c.layer("images/mount1.jpg")
+c.layer("images/mount2.jpg")
+c.layer("images/mount3.jpg")
+c.layer("images/mount4.jpg")
+
+c.layers[3].translate(50,0)
+c.layers[3].opacity(60)
+c.layers[4].translate(100,0)
+c.layers[4].opacity(60)
+c.layers[5].translate(150,0)
+c.layers[5].opacity(60)
+
+c.layers[2].duplicate()
+c.layers[3].duplicate()
+c.layers[4].duplicate()
+c.layers[5].duplicate()
+
+c.layers[6].blur()
+c.layers[6].translate(0,250)
+c.layers[7].blur()
+c.layers[7].translate(50,250)
+c.layers[8].blur()
+c.layers[8].translate(100,250)
+c.layers[9].blur()
+c.layers[9].translate(150,250)
+
+c.draw(0,0)

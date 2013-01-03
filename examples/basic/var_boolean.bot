@@ -1,0 +1,10 @@
+size(300, 300)
+colorrange(255)
+colormode(RGB)
+
+var('color_switch', BOOLEAN, 0)
+
+def draw():
+    background(255, 0, 0)
+    if color_switch:
+        background(0, 255, 255)

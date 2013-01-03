@@ -11,6 +11,9 @@ To install a virtualenv environment:
 
 $ virtualenv shoebot-env
 
+Activate the virtualenv
+$ . shoebot-env/bin/activate
+
 Your prompt will then change
 
 (shoebot-env) $
@@ -20,7 +23,14 @@ Your prompt will then change
 Global Requirments:
 
 PyGtk doesn't support installation in a virtualenv and will need to be
-installed using your usual package manager
+installed using your usual package manager.
+
+Once pygtk is installed, symlinks to it's libraries need to be created -
+in ubuntu 12.10 run the following command in the virtualenv:
+
+(shoebot-env) $ ln -sf /usr/lib/python2.7/dist-packages/{glib,gobject,cairo,gtk-2.0,pygtk.py,pygtk.pth} $VIRTUAL_ENV/lib/python2.7/site-packages
+
+
 
 
 Install the shoebot requirements:

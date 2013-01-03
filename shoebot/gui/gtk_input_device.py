@@ -1,8 +1,11 @@
-import gtk
+import gtk.gdk
+import gtk.keysyms
 
-from shoebot.core import InputDeviceMixin
+from shoebot.grammar import InputDeviceMixin
 
 class GtkInputDeviceMixin(InputDeviceMixin):
+
+
     def __init__(self, **kwargs):
         InputDeviceMixin.__init__(self, **kwargs)
     
@@ -31,12 +34,38 @@ class GtkInputDeviceMixin(InputDeviceMixin):
     def gtk_mouse_pointer_moved(self, widget, event):
         self.mouse_pointer_moved(event.x, event.y)
 
+    def get_mapped_key(self, keyval):
+        # Horrible hack to support key values used in beziereditor2 from nodebox
+        #
+        # Values are from beziereditor2 example, probably mac values - probably
+        # should be a way of toggling this hack
+        if keyval == gtk.keysyms.Tab:
+            keyval = 48
+        elif keyval == gtk.keysyms.Escape:
+            keyval = 53
+        return keyval
+
     def gtk_key_pressed(self, widget, event):
-        self.keys_pressed.add(event.keyval)
-        self.key_pressed(event.string, event.keyval)
+        keyval = self.get_mapped_key(event.keyval)
+        self.keys_pressed.add(keyval)
+        self.key_pressed(event.string, keyval)
 
     def gtk_key_released(self, widget, event):
-        self.keys_pressed.discard(event.keyval)
-        self.key_released(event.string, event.keyval)
+        keyval = self.get_mapped_key(event.keyval)
+        self.keys_pressed.discard(keyval)
+        self.key_released(event.string, keyval)
+
+    def get_key_map(self):
+        '''
+        Return a dict in the form of
+
+        SHOEBOT_KEY_NAME, GTK_VALUE
+
+        Shoebot key names look like KEY_LEFT, whereas gtk uses keysyms.Left
+        '''
+        kdict = {}
+        for gtk_key in dir(gtk.keysyms):
+            kdict['KEY_' + gtk_key.upper()] = getattr(gtk.keysyms, gtk_key)
+        return kdict
 
 

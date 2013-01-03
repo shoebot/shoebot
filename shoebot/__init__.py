@@ -1,4 +1,4 @@
-from .sbot import run
+from sbot import run, init_bot, create_canvas
 
 class ShoebotError(Exception): pass
 class ShoebotScriptError(Exception): pass
@@ -11,16 +11,8 @@ CENTER = "center"
 CORNER = "corner"
 CORNERS = "corners"
 
-# TODO - Maybe put these in shoebot.data
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
-CLOSE = "close"
+# TODO - Check if this needs importing here:
+from data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
 
 
 def _save():

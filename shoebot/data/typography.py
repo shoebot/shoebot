@@ -69,6 +69,13 @@ class Text(Grob, ColorMixin):
                                                       
         # then we set fontsize (multiplied by pango.SCALE)
         self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
+
+        # the style
+        self._style = pango.STYLE_NORMAL
+        if kwargs.has_key("style"):
+            if kwargs["style"]=="italic" or kwargs["style"]=="oblique":
+                self._style = pango.STYLE_ITALIC
+        self._fontface.set_style(self._style)
         
         #we need to pre-render some stuff to enable metrics sizing
         self._pre_render()
@@ -131,7 +138,7 @@ class Text(Grob, ColorMixin):
             transform = self._call_transform_mode(self._transform)
             ctx.set_matrix(self._transform)
 
-            ctx.move_to(self.x,self.y-self.baseline)
+            ctx.translate(self.x,self.y-self.baseline)
             
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
@@ -174,7 +181,7 @@ class Text(Grob, ColorMixin):
             self._pre_render()
             
         # here we create a new cairo.Context in order to hold the pathdata
-        tempCairoContext = cairo.Context(RecordingSurfaceA8(0, 0))
+        tempCairoContext = cairo.Context(RecordingSurfaceA8(1, 1))
         tempCairoContext.move_to(self.x,self.y-self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
         tempPangoCairoContext = pangocairo.CairoContext(tempCairoContext)

@@ -13,10 +13,10 @@ TWOPI = pi * 2
 
 try:
     
-    # Attempt to import the C library
+    # Attempt to import the Cython library
     # for faster performance.
-    from cSuperformula import supercalc
-
+    import pyximport; pyximport.install()
+    from superformula import supercalc
 except:
     
     # Else, use the native python

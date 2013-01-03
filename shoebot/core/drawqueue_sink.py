@@ -1,4 +1,5 @@
 class DrawQueueSink(object):
+    
     '''
     DrawQueueSink, creates parameters for use by the draw queue.
     (the render_context).
@@ -26,10 +27,10 @@ class DrawQueueSink(object):
         Returns a cairo context for drawing this
         frame of the bot
         '''
-        raise NotImplementedError('Child class should implement create_rcontext')
+        pass
     
     def rendering_finished(self, size, frame, r_context):
         '''
         Called when the bot has been rendered
         '''
-        raise NotImplementedError('Child class should implement rendering_finished')
+        pass

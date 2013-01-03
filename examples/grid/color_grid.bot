@@ -1,4 +1,5 @@
 size(625, 625)
+
 # Create a color Grid.
 # This example also shows of the HSB color mode that allows
 # you to select colors more naturally, by specifying a hue,
