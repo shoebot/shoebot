@@ -8,40 +8,71 @@ Drawing shapes
 
     Draw a rectangle on the canvas.
  
-    :param x: x-coordinate of the top left corner
-    :param y: y-coordinate of the top left corner
+    :param x: top left x-coordinate
+    :param y: top left y-coordinate
     :param width: rectangle width
     :param height: rectangle height
     :param roundness: rounded corner radius
     :param boolean draw: whether to draw the shape on the canvas or not
     :param fill: fill color
 
+    .. shoebot::
+        :still:
+
+        size(100, 100)
+        background(.8)
+        fill(.3)
+        rect(10, 10, 35, 35)
+        # see how roundness affects the shape
+        rect(55, 10, 35, 35, 0.3)
+        rect(10, 55, 35, 35, 0.7)
+        rect(55, 55, 35, 35, 1)
+
 .. py:function:: ellipse(x, y, width, height, draw=True)
 
     Draw an ellipse on the canvas. Same as `oval()`.
  
-    :param x: x-coordinate of the top left corner
-    :param y: y-coordinate of the top left corner
-    :param width: rectangle width
-    :param height: rectangle height
+    :param x: top left x-coordinate
+    :param y: top left y-coordinate
+    :param width: ellipse width
+    :param height: ellipse height
     :param boolean draw: whether to draw the shape on the canvas or not
+
+    .. shoebot::
+        :still:
+
+        size(100, 100)
+        background(.8)
+        fill(.3)
+        ellipse(10, 20, 30, 60)
+        ellipse(50, 30, 40, 40) # circle
 
 .. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
 
-    Draw an arrow on th e canvas.
+    Draw an arrow on the canvas.
  
-    :param x: x-coordinate of the top left corner
-    :param y: y-coordinate of the top left corner
+    :param x: arrow tip x-coordinate
+    :param y: arrow tip y-coordinate
+    :param width: arrow width (also sets height)
     :param type: arrow type
     :type type: NORMAL or FORTYFIVE
     :param boolean draw: whether to draw the shape on the canvas or not
+
+    .. shoebot::
+        :still:
+
+        size(100, 100)
+        background(.8)
+        fill(.3)
+        arrow(50, 40, 40) # NORMAL is the default arrow type
+        arrow(90, 40, 40, FORTYFIVE)
 
 .. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
 
     Draw a star-like polygon on the canvas.
  
-    :param startx: x-coordinate of the top left corner
-    :param starty: y-coordinate of the top left corner
+    :param startx: top left x-coordinate
+    :param starty: top left y-coordinate
     :param points: amount of points
     :param outer: outer radius
     :param inner: inner radius
