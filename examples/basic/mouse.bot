@@ -1,0 +1,6 @@
+size(255,255)
+colorrange(255)
+colormode(HSB)
+
+def draw():
+    background(MOUSEX, MOUSEY, 180)
