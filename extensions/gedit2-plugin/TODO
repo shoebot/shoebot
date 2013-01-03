@@ -1,0 +1,8 @@
+TODO list for ShoebotIt
+=======================
+
+* have the errors show on the bottom Gedit pane
+* proper syntax highlighting -- for now, one has to set it manually to
+  'Python'; even better would be to add Shoebot specific functions so
+  that they could be highlighted too
+* fix as this broke badly with shoebot-dq
