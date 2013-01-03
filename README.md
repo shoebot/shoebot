@@ -5,15 +5,16 @@ Shoebot is a Python graphics robot: It takes a Python script as input, which des
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
 
-Dependencies
-------------
+What you need
+-------------
+
+Shoebot runs on Python 2.7, which is most probably what you already have installed.
 
 First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:
 
 Debian/Ubuntu:
 
-    sudo apt-get install python-cairo python-gtk2 \
-      python-gobject python-gtksourceview2 python-rsvg
+    sudo apt-get install python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
 
 Fedora:
 
