@@ -34,5 +34,5 @@ size(500, 250)
 speed(20)
 def draw():
     background(0.2, 0, 0.2)
-    time = min(FRAME*0.1, done)
+    time = FRAME * 0.1
     tree.draw(250, 250, 5, time, ease=8)
