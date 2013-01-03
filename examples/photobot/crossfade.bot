@@ -3,7 +3,7 @@ pb = ximport("photobot")
 c = pb.canvas(750, 250)
 reload(pb)
  
-tiles = ["photobot/mount1.jpg", "photobot/mount2.jpg", "photobot/mount3.jpg", "photobot/mount4.jpg", "photobot/castle.jpg"]
+tiles = ["images/mount1.jpg", "images/mount2.jpg", "images/mount3.jpg", "images/mount4.jpg", "images/castle.jpg"]
  
 c.fill((255,255,255))
 c.layer(choice(tiles))  

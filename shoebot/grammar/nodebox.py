@@ -31,6 +31,7 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+# Nodebox compatibility shim
 sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
 
 class NodeBot(Bot):
@@ -70,12 +71,32 @@ class NodeBot(Bot):
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
+        '''
+        Args:
+           path    Path to image.
+        Returns:
+           width, height of image in a tuple.
+        '''
         img = Image.open(path)
         return img.size
 
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, fill=None, **kwargs):
+        '''
+        Draw a rectangle from x, y of width, height.
+
+        Args:
+           x, y           Postion of rectangle
+           width, height  Size of rectangle.
+           roundness      Corner roundness defaults to 0.0 (a right-angle).
+           draw           If True draws immediately.
+           fill           Optionally pass a fill color.
+
+        Returns:
+           path representing the rectangle.
+
+        '''
         path = self.BezierPath(fillcolor=fill, **kwargs)
         path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
@@ -83,6 +104,16 @@ class NodeBot(Bot):
         return path
 
     def rectmode(self, mode=None):
+        '''
+        Set the current rectmode.
+
+        Args:
+           mode CORNER, CENTER, CORNERS
+
+        Returns:
+           rectmode if mode is None or valid.
+
+        '''
         ### TODO
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
             self.rectmode = mode
@@ -93,7 +124,7 @@ class NodeBot(Bot):
             raise ShoebotError(_("rectmode: invalid input"))
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
-        '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
+        '''Draw an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
         path = self.BezierPath(**kwargs)
         path.ellipse(x, y, width, height)
         if draw:
@@ -101,18 +132,24 @@ class NodeBot(Bot):
         return path
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
-        '''Draws an ellipse starting from (x,y)'''
+        '''Draw an ellipse starting from (x,y)'''
         path = self.BezierPath(**kwargs)
         path.ellipse(x,y,width,height)
         if draw:
             path.draw()
         return path
 
-    def circle(self, x, y, diameter):
-        self.ellipse(x, y, diameter, diameter)
+    def circle(self, x, y, diameter, draw=True):
+        '''Draw a circle of diameter x, y.
+
+        Args:
+            x, y     Position of circle.
+            diameter Diameter of circle.
+        '''
+        return self.ellipse(x, y, diameter, diameter, draw)
 
     def line(self, x1, y1, x2, y2, draw=True):
-        '''Draws a line from (x1,y1) to (x2,y2)'''
+        '''Draw a line from (x1,y1) to (x2,y2)'''
         p = self._path
         self.beginpath()
         self.moveto(x1,y1)
@@ -121,11 +158,20 @@ class NodeBot(Bot):
         self._path = p
 
     def arrow(self, x, y, width, type=NORMAL, draw=True):
-        '''Draws an arrow.
+        '''Draw an arrow.
 
         Arrows can be two types: NORMAL or FORTYFIVE.
-        Taken from Nodebox.
+
+        Args:
+           x, y  Position
+           width Width
+           type  NORMAL or FORTYFIVE
+           draw  If True draws arrow immediately
+
+        Returns:
+           Path object representing the arrow. 
         '''
+        # Taken from Nodebox.
         if type == self.NORMAL:
             head = width * .4
             tail = width * .2
@@ -161,9 +207,8 @@ class NodeBot(Bot):
 
     def star(self, startx, starty, points=20, outer=100, inner=50, draw=True):
         '''Draws a star.
-
-        Taken from Nodebox.
         '''
+        # Taken from Nodebox.
         self.beginpath()
         self.moveto(startx, starty + outer)
 
@@ -315,20 +360,20 @@ class NodeBot(Bot):
         '''Move relatively to the last point.'''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.relmoveto(x,y)
+        self._path.relmoveto(x, y)
 
     def rellineto(self, x, y):
         '''Draw a line using relative coordinates.'''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.rellineto(x,y)
+        self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
         '''
         if self._path is None:
             raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.relcurveto(x,y)
+        self._path.relcurveto(h1x, h1y, h2x, h2y, x, y)
 
     def findpath(self, points, curvature=1.0):
 
@@ -417,7 +462,7 @@ class NodeBot(Bot):
         p = self.EndClip()
         p.draw()
 
-    def transform(self, mode = None):
+    def transform(self, mode=None):
         '''Mode can be CENTER or CORNER'''
         if mode:
             self._canvas.mode = mode
@@ -488,6 +533,12 @@ class NodeBot(Bot):
         return self.color_mode
 
     def colorrange(self, crange):
+        '''By default colors range from 0.0 - 1.0 using colorrange
+        other defaults can be used, e.g. 0.0 - 255.0
+
+        Set a color range of 0.0 - 255:
+        >>> colorrange(256)
+        '''
         self.color_range = float(crange)
 
     def fill(self,*args):
@@ -515,8 +566,14 @@ class NodeBot(Bot):
         else:
             return self._canvas.strokewidth
 
-    def background(self,*args):
-        '''Set the background colour.'''
+    def background(self, *args):
+        '''Set the background color.
+        
+        Args:
+           color tuple: (r, g, b)
+
+           Where r, g, b are floats in the range 0.0 - 1.0
+        '''
         self._canvas.background = self.color(*args)
 
     #### Text
@@ -542,6 +599,16 @@ class NodeBot(Bot):
     def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
         '''
         Draws a string of text according to current font settings.
+
+        Args:
+            txt      Text to output
+            x, y     Position of text on canvas
+            width    Width of text
+            height   Height of text
+            outline  If True draws outline text (defaults to False)
+            draw     Set to False to inhibit immediate drawing.
+        Returns:
+            Path object for the text.
         '''
         txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
@@ -554,7 +621,16 @@ class NodeBot(Bot):
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         '''
-        Draws an outlined path of the input text
+        Generates an outlined path of the input text.
+
+        Args:
+            txt    Text to output
+            x, y   Position of text on canvas
+            width  Width of text
+            height Height of text
+            draw   Set to True to draw the path (defaults to False)
+        Returns:
+            Path object for the text.
         '''
         txt = self.Text(txt, x, y, width, height, enableRendering=False, **kwargs)
         path = txt.path
@@ -587,11 +663,13 @@ class NodeBot(Bot):
 
 
     def lineheight(self, height=None):
+        '''Set text lineheight.
+        '''
         if height is not None:
             self._canvas._lineheight = height
 
     def align(self, align="LEFT"):
-        self._canvas.align=align
+        self._canvas.align = align
 
     # TODO: Set the framework to setup font options
 

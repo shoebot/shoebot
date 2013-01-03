@@ -2,11 +2,11 @@ size(400,500)
 pb = ximport("photobot")
 c = pb.canvas(400, 500)
 c.fill((255,255,255))
-library_path="lib/"
-c.layer(library_path+"photobot/mount1.jpg")
-c.layer(library_path+"photobot/mount2.jpg")
-c.layer(library_path+"photobot/mount3.jpg")
-c.layer(library_path+"photobot/mount4.jpg")
+
+c.layer("images/mount1.jpg")
+c.layer("images/mount2.jpg")
+c.layer("images/mount3.jpg")
+c.layer("images/mount4.jpg")
 
 c.layers[3].translate(50,0)
 c.layers[3].opacity(60)
@@ -28,8 +28,5 @@ c.layers[8].blur()
 c.layers[8].translate(100,250)
 c.layers[9].blur()
 c.layers[9].translate(150,250)
-
-
-
 
 c.draw(0,0)

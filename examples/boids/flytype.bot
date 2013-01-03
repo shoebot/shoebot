@@ -50,8 +50,11 @@ def draw():
             
             push()
             rotate(-boid.angle)
-            fontsize(15 + boid.z/4)
-            skew(boid.z / 20)
+            bz = boid.z/4
+            if bz < 0:
+               bz = 0
+            fontsize(15 + bz)
+            
             # Each boid in this flock is represented by a banner character.
             # Boids in the first flock represent the first character,
             # boids in the last flock represent the last character.

@@ -209,6 +209,12 @@ class Bot(Grammar):
     #### Utility
 
     def color(self, *args):
+        '''
+        Args:
+            color in a supported format.
+        Return:
+            Color object containing the color.
+        '''
         return self.Color(mode = self.color_mode, color_range = self.color_range, *args)
         #return self.Color(*args)
 
@@ -233,7 +239,7 @@ class Bot(Grammar):
         else: # No values means 0.0 -> 1.0
             return r.random()
 
-    def grid(self, cols, rows, colSize=1, rowSize=1, shuffled = False):
+    def grid(self, cols, rows, colSize=1, rowSize=1, shuffled=False):
         """Returns an iterator that contains coordinate tuples.
         The grid can be used to quickly create grid-like structures.
         A common way to use them is:
@@ -326,6 +332,14 @@ class Bot(Grammar):
         self._namespace['HEIGHT'] = h
 
     def speed(self, framerate):
+        '''Set animation framerate.
+
+        Args:
+            framerate   Frames per second.
+        
+        Returns:
+            Current framerate of animation.
+        '''
         if framerate:
             self._speed = framerate
             self._dynamic = True
