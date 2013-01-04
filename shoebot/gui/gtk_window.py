@@ -113,9 +113,10 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     def rendering_finished(self, size, frame, cairo_ctx):
         ''' Delegates to the ShoebotWidget '''
-        ## A bit hacky... but makes sure bot has executed once:
-        if self.show_vars and self.var_window is None:
-            self.var_window = VarWindow(self, self.bot)
+        # A bit hacky... only show the variable window once bot has
+        # executed once and there are some variables.
+        if self.show_vars and self.var_window is None and self.bot._vars:
+            self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
 
         return self.sb_widget.rendering_finished(size, frame, cairo_ctx)
 

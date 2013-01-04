@@ -14,7 +14,7 @@ else:
     ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class VarWindow(object):
-    def __init__(self, parent, bot):
+    def __init__(self, parent, bot, title = None):
         self.parent = parent
         self.bot = bot
 
@@ -40,6 +40,9 @@ class VarWindow(object):
         self.window.add(vbox)
         self.window.set_size_request(400,35*len(self.variables))
         self.window.show_all()
+
+        if title:
+            self.window.set_title(title)
         ## gtk.main()
 
     def add_number(self, container, v):
