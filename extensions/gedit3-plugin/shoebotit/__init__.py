@@ -1,6 +1,6 @@
 import os
 import gedit
-import gtk
+from gi.repository import Gtk
 import re
 from gettext import gettext as _
 
@@ -66,7 +66,7 @@ class ShoebotWindowHelper:
 
     def insert_menu(self):
         manager = self.window.get_ui_manager()
-        self.action_group = gtk.ActionGroup("ShoebotPluginActions")
+        self.action_group = Gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
             ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
@@ -142,9 +142,9 @@ class ShoebotWindowHelper:
     def on_view_populate_popup(self, view, menu):
         # taken from gedit-plugins-python-openuricontextmenu
         doc = view.get_buffer()
-        win = view.get_window(gtk.TEXT_WINDOW_TEXT)
+        win = view.get_window(Gtk.TextWindowType.TEXT)
         x, y, mod = win.get_pointer()
-        x, y = view.window_to_buffer_coords(gtk.TEXT_WINDOW_TEXT, x, y) 
+        x, y = view.window_to_buffer_coords(Gtk.TextWindowType.TEXT, x, y) 
 
         # first try at pointer location
         insert = view.get_iter_at_location(x, y)
@@ -172,12 +172,12 @@ class ShoebotWindowHelper:
         if not word:
             return True
 
-        open_quicktorial_item = gtk.ImageMenuItem(_("Know more about '%s'") % (word))
-        open_quicktorial_item.set_image(gtk.image_new_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU))
+        open_quicktorial_item = Gtk.ImageMenuItem(_("Know more about '%s'") % (word))
+        open_quicktorial_item.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU))
         open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
         open_quicktorial_item.show()
 
-        separator = gtk.SeparatorMenuItem()
+        separator = Gtk.SeparatorMenuItem()
         separator.show()
 
         menu.prepend(separator)
