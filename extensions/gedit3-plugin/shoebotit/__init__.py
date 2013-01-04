@@ -1,6 +1,7 @@
 import os
 import subprocess
-from gi.repository import Gtk, GObject, Gedit
+
+from gi.repository import Gtk, GObject, Gedit, Pango
 import re
 from gettext import gettext as _
 
@@ -41,9 +42,31 @@ ui_str = """
 </ui>
 """
 
+def get_child_by_name(parent, name):
+    """
+    Iterate through a gtk container, `parent`, 
+    and return the widget with the name `name`.
+    """
+    def iterate_children(widget, name):
+        if widget.get_name() == name:
+            return widget
+        try:
+            for w in widget.get_children():
+                result = iterate_children(w, name)
+                if result is not None:
+                    return result
+                else:
+                    continue
+        except AttributeError:
+            pass
+    return iterate_children(parent, name)
+
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
         self.window = window
+        panel = window.get_bottom_panel()
+        self.output_widget = get_child_by_name(panel, 'shoebot-output')
+
         self.plugin = plugin
         self.insert_menu()
         self.shoebot_window = None
@@ -105,17 +128,25 @@ class ShoebotWindowHelper:
         code = doc.get_text(start, end, False)
         if not code:
             return False
-        # scraped if window_is_open and just render the stuff right there
+
+        textbuffer = self.output_widget.get_buffer()
+        textbuffer.set_text('')
+
+        ## TODO - run shoebot in the background - don't block gedit!
+
+        command = ['sbot', '-w', code]
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out = proc.communicate()
         try:
-          # Use subprocess since shoebot is still Gtk (as of Jan 2013)
-          subprocess.call(['sbot', '-w', code])
-        except:
-            import traceback 
-            errmsg = traceback.format_exc(limit=1)
-            err = "Error in Shoebot script:\n %s" % (errmsg)
-            # TODO: This traceback should be sent over to a
-            # log window at the bottom of Gedit
-            print err
+            if proc.returncode != 0:
+                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", True)
+                textbuffer.set_text(out[1])
+            else:
+                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", False)
+                textbuffer.set_text("Shoebot finished.")
+        except Exception, e:
+            textbuffer.set_text(e)
+
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
@@ -201,10 +232,22 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         self.tempfiles = []
 
     def do_activate(self):
+        self.text = Gtk.TextView()
+        fontdesc = Pango.FontDescription("Monospace")
+        self.text.modify_font(fontdesc)
+        self.text.set_name('shoebot-output')
+        self.panel = self.window.get_bottom_panel()
+
+        image = Gtk.Image()
+        image.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
+        self.panel.add_item(self.text, 'Shoebot output', 'Shoebot output', image)
+        self.panel.set_property('visible', True)
+
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
 
     def do_deactivate(self):
+        self.panel.remove_item(self.text)
         self.instances[self.window].deactivate()
         del self.instances[self.window]
         for tfilename in self.tempfiles:
