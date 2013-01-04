@@ -6,6 +6,7 @@ import sys
 import cairo
 from math import sin, cos
 from bezier import BezierPath
+from shoebot import ShoebotError
                          
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 CENTER = 'center'
@@ -186,7 +187,7 @@ class Transform:
         if isinstance(path, BezierPath):
             path = path.copy()
         else:
-            raise NodeBoxError, "Can only transform BezierPaths"
+            raise ShoebotError, "Can only transform BezierPaths"
          
         for point in path:
             print point   

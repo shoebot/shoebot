@@ -1,14 +1,15 @@
 import os
-import gedit
-import gtk
+import subprocess
+from gi.repository import Gtk, GObject, Gedit
 import re
 from gettext import gettext as _
 
-try:
-    from shoebot import sbot
-    import shoebot
-except ImportError:
-    print "Failed Import"
+# TODO - reinstate check to see if shoebot available
+#try:
+#    from shoebot import sbot
+#    import shoebot
+#except ImportError:
+#    print "Failed Import"
 
 # regex taken from openuricontextmenu.py and slightly changed
 # to work with Python functions
@@ -66,7 +67,7 @@ class ShoebotWindowHelper:
 
     def insert_menu(self):
         manager = self.window.get_ui_manager()
-        self.action_group = gtk.ActionGroup("ShoebotPluginActions")
+        self.action_group = Gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
             ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
@@ -101,20 +102,13 @@ class ShoebotWindowHelper:
         if not doc:
             return
         start, end = doc.get_bounds()
-        code = doc.get_text(start, end)
+        code = doc.get_text(start, end, False)
         if not code:
             return False
         # scraped if window_is_open and just render the stuff right there
         try:
-          self.shoebot_window = sbot.run(code,
-                                        iterations = None,
-                                        window = True,
-                                        title = doc.get_short_name_for_display() + ' - Shoebot',
-                                        server = self.use_socketserver,
-                                        show_vars = self.use_varwindow)
-                                        # no more fullscreen for you!
-                                        ##close_window = True)
-        #except Error, NameError:
+          # Use subprocess since shoebot is still Gtk (as of Jan 2013)
+          subprocess.call(['sbot', '-w', code])
         except:
             import traceback 
             errmsg = traceback.format_exc(limit=1)
@@ -142,9 +136,9 @@ class ShoebotWindowHelper:
     def on_view_populate_popup(self, view, menu):
         # taken from gedit-plugins-python-openuricontextmenu
         doc = view.get_buffer()
-        win = view.get_window(gtk.TEXT_WINDOW_TEXT)
+        win = view.get_window(Gtk.TextWindowType.TEXT)
         x, y, mod = win.get_pointer()
-        x, y = view.window_to_buffer_coords(gtk.TEXT_WINDOW_TEXT, x, y) 
+        x, y = view.window_to_buffer_coords(Gtk.TextWindowType.TEXT, x, y) 
 
         # first try at pointer location
         insert = view.get_iter_at_location(x, y)
@@ -172,12 +166,12 @@ class ShoebotWindowHelper:
         if not word:
             return True
 
-        open_quicktorial_item = gtk.ImageMenuItem(_("Know more about '%s'") % (word))
-        open_quicktorial_item.set_image(gtk.image_new_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU))
+        open_quicktorial_item = Gtk.ImageMenuItem(_("Know more about '%s'") % (word))
+        open_quicktorial_item.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU))
         open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
         open_quicktorial_item.show()
 
-        separator = gtk.SeparatorMenuItem()
+        separator = Gtk.SeparatorMenuItem()
         separator.show()
 
         menu.prepend(separator)
@@ -198,22 +192,26 @@ class ShoebotWindowHelper:
         url = BASE_QUICKTORIAL_URL % q_id
         webbrowser.open(url)
 
-class ShoebotPlugin(gedit.Plugin):
+class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
+    window = GObject.property(type=Gedit.Window)
+
     def __init__(self):
-        gedit.Plugin.__init__(self)
+        GObject.Object.__init__(self)
         self.instances = {}
         self.tempfiles = []
 
-    def activate(self, window):
-        self.instances[window] = ShoebotWindowHelper(self, window)
+    def do_activate(self):
+        self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
-    def deactivate(self, window):
-        self.instances[window].deactivate()
-        del self.instances[window]
+
+    def do_deactivate(self):
+        self.instances[self.window].deactivate()
+        del self.instances[self.window]
         for tfilename in self.tempfiles:
             os.remove(tfilename)
 
-    def update_ui(self, window):
-        self.instances[window].update_ui()
+
+    def do_update_state(self):
+        self.instances[self.window].update_ui()
 
 
