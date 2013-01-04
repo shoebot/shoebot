@@ -1,0 +1,19 @@
+size(512, 512)
+colorrange(255)
+from math import sin,cos
+
+var("step", NUMBER,32, 3, 64)
+var("r1", NUMBER,80, 16, 256)
+var("r2", NUMBER,200, 16, 256)
+
+def draw():
+    background(128, 128, 128)
+    fill(255, 255, 255)
+    nostroke()
+    rv = random(r1, r2)
+    beginpath(WIDTH/2 + rv * sin(0), HEIGHT/2 + rv * cos(0))
+    for i in range (1, int(step)+1, 1):
+        i2=i * (360/step) * .017453289
+        rv=random(r1, r2)
+        lineto(WIDTH/2 + rv * sin(i2), HEIGHT/2 + rv * cos(i2))
+    endpath()

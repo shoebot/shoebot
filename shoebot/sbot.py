@@ -30,6 +30,7 @@
 '''Convenience function to run a bot'''
 
 import os.path
+import sys
 
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
@@ -68,7 +69,7 @@ def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, it
     '''
     Convienience function to create a bot
     '''
-    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, close_window, server=False, port=7777, show_vars = False)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, close_window, server=server, port=port, show_vars = show_vars)
 
     from shoebot.grammar import DrawBot, NodeBot
     if grammar == DRAWBOT:
@@ -78,7 +79,9 @@ def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, it
 
     return bot
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False):
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, close_window = False, server=False, port=7777, show_vars = False, args = None):
+    # Munge shoebot sys.argv
+    sys.argv = [sys.argv[0]] + args  # Remove shoebot specfiic parameters so that scripts can be called like normal scripts
     bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, server, port, show_vars)
     bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
     return bot

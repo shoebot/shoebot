@@ -1,0 +1,16 @@
+size(512,512)
+colorrange(255)
+
+from math import sin, cos
+var("stp", NUMBER, 32, 3, 64)
+var("rv", NUMBER, 200, 16, 256)
+var("radius", NUMBER, 16, 2, 64)
+
+def draw():
+    background(128,128,128)
+    fill(255,255,255)
+    nostroke()
+    for i in range (0, int(stp) + 1, 1):
+       i2 = i * (360/stp) * .017453289
+       ellipse(WIDTH/2 + rv * sin(i2) - radius/2,
+               HEIGHT/2 + rv * cos(i2) - radius/2, radius, radius)
