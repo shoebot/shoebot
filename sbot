@@ -138,7 +138,7 @@ if __name__ == '__main__':
         grammar = args.grammar,
         outputfile = args.outputfile,
         iterations = args.repeat or None,
-        window = args.window or args.varwindow or args.socketserver,
+        window = args.window or args.socketserver,
         close_window = args.close,
         server=args.socketserver,
         port=args.serverport,

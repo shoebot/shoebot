@@ -10,7 +10,7 @@ Installing
 Run on your terminal
   chmod +x install.sh 
   ./install.sh
-or you can manualy copy the following files and folder over to '~/.gnome2/gedit/plugins':
+or you can manualy copy the following files and folder over to '~/.local/share/gedit/plugins':
   * shoebotit.gedit-plugin
   * shoebotit
 
