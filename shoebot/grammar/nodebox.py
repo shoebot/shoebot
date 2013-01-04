@@ -72,10 +72,8 @@ class NodeBot(Bot):
 
     def imagesize(self, path):
         '''
-        Args:
-           path    Path to image.
-        Returns:
-           width, height of image in a tuple.
+        :param: path    Path to image.
+        :return: image size as tuple (width, height)
         '''
         img = Image.open(path)
         return img.size
@@ -86,15 +84,15 @@ class NodeBot(Bot):
         '''
         Draw a rectangle from x, y of width, height.
 
-        Args:
-           x, y           Postion of rectangle
-           width, height  Size of rectangle.
-           roundness      Corner roundness defaults to 0.0 (a right-angle).
-           draw           If True draws immediately.
-           fill           Optionally pass a fill color.
+        :param startx: top left x-coordinate
+        :param starty: top left y-coordinate
 
-        Returns:
-           path representing the rectangle.
+        :param width: height  Size of rectangle.
+        :roundness: Corner roundness defaults to 0.0 (a right-angle).
+        :draw: If True draws immediately.
+        :fill: Optionally pass a fill color.
+
+        :return: path representing the rectangle.
 
         '''
         path = self.BezierPath(fillcolor=fill, **kwargs)
@@ -107,11 +105,8 @@ class NodeBot(Bot):
         '''
         Set the current rectmode.
 
-        Args:
-           mode CORNER, CENTER, CORNERS
-
-        Returns:
-           rectmode if mode is None or valid.
+        :param: mode CORNER, CENTER, CORNERS
+        :return: rectmode if mode is None or valid.
 
         '''
         ### TODO
@@ -140,11 +135,12 @@ class NodeBot(Bot):
         return path
 
     def circle(self, x, y, diameter, draw=True):
-        '''Draw a circle of diameter x, y.
-
-        Args:
-            x, y     Position of circle.
-            diameter Diameter of circle.
+        '''Draw a circle
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param diameter: Diameter of circle.
+        :param draw: Draw immediately (defaults to True, set to False to inhibit drawing)
+        :return: Path object representing circle
         '''
         return self.ellipse(x, y, diameter, diameter, draw)
 
@@ -162,14 +158,13 @@ class NodeBot(Bot):
 
         Arrows can be two types: NORMAL or FORTYFIVE.
 
-        Args:
-           x, y  Position
-           width Width
-           type  NORMAL or FORTYFIVE
-           draw  If True draws arrow immediately
+        :param x: top left x-coordinate
+        :param y: top left y-coordinate
+        :param width: width of arrow
+        :param type:  NORMAL or FORTYFIVE
+        :draw:  If True draws arrow immediately
 
-        Returns:
-           Path object representing the arrow. 
+        :return: Path object representing the arrow. 
         '''
         # Taken from Nodebox.
         if type == self.NORMAL:
@@ -569,10 +564,7 @@ class NodeBot(Bot):
     def background(self, *args):
         '''Set the background color.
         
-        Args:
-           color tuple: (r, g, b)
-
-           Where r, g, b are floats in the range 0.0 - 1.0
+        :param color: See color() function for supported color formats.
         '''
         self._canvas.background = self.color(*args)
 
@@ -600,15 +592,14 @@ class NodeBot(Bot):
         '''
         Draws a string of text according to current font settings.
 
-        Args:
-            txt      Text to output
-            x, y     Position of text on canvas
-            width    Width of text
-            height   Height of text
-            outline  If True draws outline text (defaults to False)
-            draw     Set to False to inhibit immediate drawing.
-        Returns:
-            Path object for the text.
+        :param txt: Text to output
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param width: text width
+        :param height: text height
+        :param outline: If True draws outline text (defaults to False)
+        :param draw: Set to False to inhibit immediate drawing (defaults to True)
+        :return: Path object representing the text.
         '''
         txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
@@ -623,14 +614,13 @@ class NodeBot(Bot):
         '''
         Generates an outlined path of the input text.
 
-        Args:
-            txt    Text to output
-            x, y   Position of text on canvas
-            width  Width of text
-            height Height of text
-            draw   Set to True to draw the path (defaults to False)
-        Returns:
-            Path object for the text.
+        :param txt: Text to output
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param width: text width
+        :param height: text height
+        :param draw: Set to False to inhibit immediate drawing (defaults to False)
+        :return: Path object representing the text.
         '''
         txt = self.Text(txt, x, y, width, height, enableRendering=False, **kwargs)
         path = txt.path
