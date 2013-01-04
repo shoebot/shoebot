@@ -1,4 +1,4 @@
-[Gedit Plugin]
+[Plugin]
 Loader=python
 Module=shoebotit
 IAge=3
