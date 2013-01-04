@@ -1,0 +1,19 @@
+ShoebotIt: Shoebot plugin for Gedit
+===================================
+
+This Gedit plugin adds a menu to allow for running Shoebot scripts.
+It will open a Shoebot window using the current document as the Shoebot code.
+
+Installing
+==========
+
+Run on your terminal
+  chmod +x install.sh 
+  ./install.sh
+or you can manualy copy the following files and folder over to '~/.gnome2/gedit/plugins':
+  * shoebotit.gedit-plugin
+  * shoebotit
+
+Then enable the plugin from the Gedit plugins menu (Edit-Preferences-Plugins).
+
+
