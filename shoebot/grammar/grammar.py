@@ -88,14 +88,14 @@ class Grammar(object):
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, source_or_code, limit = False):
+    def _exec_frame(self, code, limit = False):
         ''' Run single frame of the bot '''
         namespace = self._namespace
         self._canvas.reset_canvas()
         self._set_dynamic_vars()
         if self._iteration == 0:
             # First frame
-            exec source_or_code in namespace
+            exec code in namespace
             namespace['setup']()
             namespace['draw']()
         else:
@@ -103,7 +103,7 @@ class Grammar(object):
             if self._dynamic:
                 namespace['draw']()
             else:
-                exec source_or_code in namespace
+                exec code in namespace
         
         self._canvas.flush(self._frame)
         if limit:
@@ -117,6 +117,9 @@ class Grammar(object):
         in current surface's context.
         '''
         source_or_code = ""
+
+        # FIXME: I believe that code is always passed as a string, and never as a filename
+        # We should fix that sometime, but it's not that important.
 
         # is it a proper filename?
         if os.path.isfile(inputcode):
@@ -132,32 +135,50 @@ class Grammar(object):
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + '\n\n', "shoebot_code", "exec")
-            # do the magic            
-            if not iterations:
-                if run_forever:
-                    iterations = None
-                else:
-                    iterations = 1
-
-            self._start_time = time()
-
-            # First iteration
-            self._exec_frame(source_or_code, limit = frame_limiter)
-
-            # Subsequent iterations
-            while self._should_run(iterations):
-                self._exec_frame(source_or_code, limit = frame_limiter)
-
-            if not run_forever:
-                self._quit = True
-            self._canvas.sink.finish()
-
+                code = compile(source_or_code + '\n\n', "shoebot_code", "exec")
         except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
             errmsg = traceback.format_exc()
             print errmsg
+            raise
+        
+        # do the magic            
+        if not iterations:
+            if run_forever:
+                iterations = None
+            else:
+                iterations = 1
+
+        self._start_time = time()
+
+        # First iteration
+        try:
+            self._exec_frame(code, limit = frame_limiter)
+        except Exception, e: # this makes KeyboardInterrupts still work
+            # print simple traceback and leave
+            import sys
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            exc = traceback.format_exception(exc_type, exc_value, exc_tb)
+            exc_location = exc[-2]
+            exc_error = exc[-1]
+            # extract line number from traceback
+            line_number = int(exc_location.split(',')[1].replace('line', '').strip())
+            line = source_or_code.split('\n')[line_number-1]
+            print 'Error in the Shoebot script, line %d:' % line_number
+            print '  %s' % line
+            print exc_error.strip()
+            return False
+            # sys.exit(127)
+
+        # Subsequent iterations
+        while self._should_run(iterations):
+            self._exec_frame(code, limit = frame_limiter)
+
+        if not run_forever:
+            self._quit = True
+        self._canvas.sink.finish()
+
 
     #### Variables
     def _addvar(self, v):
