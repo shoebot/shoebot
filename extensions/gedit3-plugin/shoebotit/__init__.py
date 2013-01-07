@@ -170,8 +170,6 @@ class ShoebotWindowHelper:
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
 
-        ## TODO - run shoebot in the background - don't block gedit!
-
         command = ['sbot', '-w']
         if self.use_socketserver:
             command.append('-p')
