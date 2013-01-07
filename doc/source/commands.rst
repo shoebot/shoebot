@@ -17,7 +17,7 @@ Drawing shapes
     :param fill: fill color
 
     .. shoebot::
-        :still:
+        :snapshot:
 
         size(100, 100)
         background(.8)
@@ -39,7 +39,7 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :still:
+        :snapshot:
 
         size(100, 100)
         background(.8)
@@ -59,7 +59,7 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :still:
+        :snapshot:
 
         size(100, 100)
         background(.8)
