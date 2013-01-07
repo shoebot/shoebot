@@ -73,6 +73,13 @@ parser.add_argument("-f",
                 default=False,
                 help=_("run in fullscreen mode")
                 )
+parser.add_argument("-t",
+                "--title",
+                action="store",
+                dest="title",
+                default=None,
+                help=_("Set window title")
+                )
 parser.add_argument("-s",
                 "--socketserver",
                 action="store_true",
@@ -139,6 +146,8 @@ if __name__ == '__main__':
         outputfile = args.outputfile,
         iterations = args.repeat or None,
         window = args.window or args.socketserver,
+        fullscreen = args.fullscreen,
+        title = args.title,
         close_window = args.close,
         server=args.socketserver,
         port=args.serverport,
