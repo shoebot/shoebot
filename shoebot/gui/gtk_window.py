@@ -33,12 +33,14 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.serverport = port
         self.show_vars = show_vars
         self.var_window = None
+        self.is_fullscreen = False
 
         sb_widget = ShoebotWidget()
 
         if title:
             self.set_title(title)
         if fullscreen:
+            self.is_fullscreen = True
             self.fullscreen()
         self.connect("delete-event", self.do_window_close)
         #self.connect("destroy", )
@@ -57,20 +59,26 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
                                  ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
                                  ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
                                  ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
-                                 ('fullscreen', 'Go fullscreen', _('_Go fullscreen'), "<Control>5", None, self.do_fullscreen),
-                                 ('unfullscreen', 'Exit fullscreen', _('_Exit fullscreen'), "<Control>6", None, self.do_unfullscreen),
                                  ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
                                 ])
 
+        actiongroup.add_toggle_actions([('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables, self.show_vars),
+                                        ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False)])
+
+
+
+
+
         menuxml = '''
         <popup action="Save as">
+            <menuitem action="vars"/>
+            <menuitem action="fullscreen"/>
+            <separator/>
             <menuitem action="svg"/>
             <menuitem action="ps"/>
             <menuitem action="pdf"/>
             <menuitem action="png"/>
             <separator/>
-            <menuitem action="fullscreen"/>
-            <menuitem action="unfullscreen"/>
             <separator/>
             <menuitem action="close"/>
         </popup>
@@ -117,8 +125,10 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         ''' Delegates to the ShoebotWidget '''
         # A bit hacky... only show the variable window once bot has
         # executed once and there are some variables.
-        if self.show_vars and self.var_window is None and self.bot._vars:
-            self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
+        if self.show_vars:
+            self.show_variables_window()
+        else:
+            self.hide_variables_window()
 
         return self.sb_widget.rendering_finished(size, frame, cairo_ctx)
 
@@ -131,6 +141,23 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
          point...)
         '''
         self.scheduled_snapshots.append(lambda: self.do_snapshot(format))
+
+    def show_variables_window(self):
+        '''
+        If bot has variables and var window not visible then create it
+        '''
+        if self.var_window is None and self.bot._vars:
+            self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
+
+    def hide_variables_window(self):
+        '''
+        Hide the var window
+        '''
+        print 'hide vars'
+        if self.var_window is not None:
+            self.var_window.window.destroy()
+            self.var_window = None
+
 
     def do_snapshot(self, format):
         bot = self.bot
@@ -160,8 +187,6 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         while gtk.events_pending():
             gtk.main_iteration(block=False)
         # we pass informations on full-screen size to bot
-        #self.bot._screen_width = self.get_allocation().width
-        #self.bot._screen_height = self.get_allocation().height
         self.bot._screen_width = gtk.gdk.screen_width()
         self.bot._screen_height = gtk.gdk.screen_height()
         self.bot._screen_ratio = self.bot._screen_width / self.bot._screen_height
@@ -175,12 +200,28 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         if self.has_server:
             self.sock.close()
-        if self.var_window is not None:
-            self.var_window.window.destroy()
-            self.var_window = None
+
+        self.hide_varwindow(False)
 
         self.destroy()
         self.window_open = False
+
+    def do_toggle_fullscreen(self, action):
+        self.is_fullscreen = action.get_active()
+        if self.is_fullscreen():
+            self.do_fullscreen()
+        else:
+            self.do_unfullscreen()
+                
+
+    def do_toggle_variables(self, action):
+        self.show_vars = action.get_active()
+        if self.show_vars:
+            self.show_variables_window()
+        else:
+            self.hide_variables_window()
+
+
 
     def finish(self):
         while self.bot._quit == False and self.window_open == True:
