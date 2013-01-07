@@ -86,11 +86,18 @@ class ShoebotThread(threading.Thread):
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
 
-        self.stdout, self.stderr = proc.communicate()
+        #self.stdout, self.stderr = proc.communicate()
+
+        while proc.poll() is None:
+            line = proc.stdout.readline()
+            if line:
+                # Process output here
+                #textbuffer.insert(textbuffer.get_end_iter(), line)
+                print line
         try:
             if proc.returncode != 0:
                 Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", True)
-                textbuffer.set_text(out[1])
+                #textbuffer.set_text(out[1])
             else:
                 #Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", False)
                 textbuffer.set_text("Shoebot finished.")
