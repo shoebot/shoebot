@@ -47,6 +47,7 @@ def get_child_by_name(parent, name):
     Iterate through a gtk container, `parent`, 
     and return the widget with the name `name`.
     """
+    # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
     def iterate_children(widget, name):
         if widget.get_name() == name:
             return widget
@@ -61,6 +62,42 @@ def get_child_by_name(parent, name):
             pass
     return iterate_children(parent, name)
 
+
+import threading
+import subprocess
+
+class ShoebotThread(threading.Thread):
+    ''' 
+    Run shoebot in seperate thread
+    '''
+    # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
+    def __init__(self, cmd, textbuffer):
+        self.cmd = cmd
+        self.textbuffer = textbuffer
+        self.stdout = None
+        self.stderr = None
+        threading.Thread.__init__(self)
+
+    def run(self):
+        textbuffer = self.textbuffer
+        
+        proc = subprocess.Popen(self.cmd,
+                             shell=False,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+
+        self.stdout, self.stderr = proc.communicate()
+        try:
+            if proc.returncode != 0:
+                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", True)
+                textbuffer.set_text(out[1])
+            else:
+                #Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", False)
+                textbuffer.set_text("Shoebot finished.")
+        except Exception, e:
+            textbuffer.set_text(str(e))
+
+
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
         self.window = window
@@ -73,10 +110,11 @@ class ShoebotWindowHelper:
         self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
-        self.use_varwindow = False
+        self.show_varwindow = True
         self.use_fullscreen = False
 
         self.started = False
+        self.shoebot_thread = None
 
         for view in self.window.get_views():
             self.connect_view(view)
@@ -134,24 +172,25 @@ class ShoebotWindowHelper:
 
         ## TODO - run shoebot in the background - don't block gedit!
 
-        command = ['sbot', '-w', code]
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out = proc.communicate()
-        try:
-            if proc.returncode != 0:
-                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", True)
-                textbuffer.set_text(out[1])
-            else:
-                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", False)
-                textbuffer.set_text("Shoebot finished.")
-        except Exception, e:
-            textbuffer.set_text(e)
+        command = ['sbot', '-w']
+        if self.use_socketserver:
+            command.append('-p')
 
+        if not self.show_varwindow:
+            command.append('-dv')
+
+        if self.use_fullscreen:
+            command.append('-f')
+
+        command.append(code)
+
+        self.shoebot_thread = ShoebotThread(command, textbuffer)
+        self.shoebot_thread.start()
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
     def toggle_var_window(self, action):
-        self.use_varwindow = action.get_active()
+        self.show_varwindow = action.get_active()
     def toggle_fullscreen(self, action):
         #no full screen for you!
         self.use_fullscreen = False
