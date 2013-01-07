@@ -233,6 +233,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
 
     def do_activate(self):
         self.text = Gtk.TextView()
+        self.text.set_editable(False)
         fontdesc = Pango.FontDescription("Monospace")
         self.text.modify_font(fontdesc)
         self.text.set_name('shoebot-output')
@@ -241,7 +242,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         image = Gtk.Image()
         image.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
         self.panel.add_item(self.text, 'Shoebot output', 'Shoebot output', image)
-        self.panel.set_property('visible', True)
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
