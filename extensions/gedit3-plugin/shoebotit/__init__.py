@@ -86,23 +86,25 @@ class ShoebotThread(threading.Thread):
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
 
+        textbuffer.set_text('')
         #self.stdout, self.stderr = proc.communicate()
 
+        panel = Gedit.App.get_default().get_active_window().get_bottom_panel()
+        visible = panel.get_property("visible")
         while proc.poll() is None:
             line = proc.stdout.readline()
             if line:
                 # Process output here
-                #textbuffer.insert(textbuffer.get_end_iter(), line)
-                print line
+                textbuffer.insert(textbuffer.get_end_iter(), line)
+                if not visible:
+                    panel.set_property("visible", True)
         try:
             if proc.returncode != 0:
-                Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", True)
-                #textbuffer.set_text(out[1])
+                panel.set_property("visible", True)
             else:
-                #Gedit.App.get_default().get_active_window().get_bottom_panel().set_property("visible", False)
-                textbuffer.set_text("Shoebot finished.")
+                textbuffer.insert(textbuffer.get_end_iter(), "Shoebot finished.")
         except Exception, e:
-            textbuffer.set_text(str(e))
+            textbuffer.insert(textbuffer.get_end_iter(), str(e))
 
 
 class ShoebotWindowHelper:
@@ -285,7 +287,9 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
 
         image = Gtk.Image()
         image.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
-        self.panel.add_item(self.text, 'Shoebot output', 'Shoebot output', image)
+
+        
+        self.panel.add_item(self.text, 'Shoebot', 'Shoebot', image)
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
