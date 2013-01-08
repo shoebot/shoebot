@@ -101,8 +101,6 @@ class ShoebotThread(threading.Thread):
         try:
             if proc.returncode != 0:
                 panel.set_property("visible", True)
-            else:
-                textbuffer.insert(textbuffer.get_end_iter(), "Shoebot finished.")
         except Exception, e:
             textbuffer.insert(textbuffer.get_end_iter(), str(e))
 
@@ -288,8 +286,11 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         image = Gtk.Image()
         image.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
 
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.add(self.text)
+        scrolled_window.show_all()
         
-        self.panel.add_item(self.text, 'Shoebot', 'Shoebot', image)
+        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
