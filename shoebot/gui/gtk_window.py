@@ -201,7 +201,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         if self.has_server:
             self.sock.close()
 
-        self.hide_varwindow(False)
+        self.hide_variables_window(False)
 
         self.destroy()
         self.window_open = False
