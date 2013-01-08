@@ -290,7 +290,8 @@ class Bot(Grammar):
             if defer is None:
                 defer=False
             self._canvas.snapshot(surface, defer)
-        if filename is None:
+            return
+        elif filename is None:
             # If nothing specied, we can see if a filename is available
             script_file = self._namespace.get('__file__')
             if script_file:
@@ -301,6 +302,8 @@ class Bot(Grammar):
             if defer is None:
                 defer=True
             self._canvas.snapshot(filename, defer=defer, file_number=file_number)
+        else:
+            raise ShoebotError('No image saved')
             
             
 
