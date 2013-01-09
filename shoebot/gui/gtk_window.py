@@ -153,7 +153,6 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         '''
         Hide the var window
         '''
-        print 'hide vars'
         if self.var_window is not None:
             self.var_window.window.destroy()
             self.var_window = None
@@ -201,14 +200,14 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         if self.has_server:
             self.sock.close()
 
-        self.hide_varwindow(False)
+        self.hide_variables_window()
 
         self.destroy()
         self.window_open = False
 
     def do_toggle_fullscreen(self, action):
         self.is_fullscreen = action.get_active()
-        if self.is_fullscreen():
+        if self.is_fullscreen:
             self.do_fullscreen()
         else:
             self.do_unfullscreen()
