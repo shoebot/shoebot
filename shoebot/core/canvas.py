@@ -67,6 +67,8 @@ class Canvas(object):
         self.color_range = 1
         self.color_mode = 1
         self.path_mode = CORNER
+        self.size = None
+        self.reset_canvas()
 
     def set_bot(self, bot):
         ''' Bot must be set before running '''
