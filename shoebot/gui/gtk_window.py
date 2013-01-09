@@ -208,9 +208,9 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
     def do_toggle_fullscreen(self, action):
         self.is_fullscreen = action.get_active()
         if self.is_fullscreen:
-            self.do_fullscreen()
+            self.fullscreen()
         else:
-            self.do_unfullscreen()
+            self.unfullscreen()
                 
 
     def do_toggle_variables(self, action):
