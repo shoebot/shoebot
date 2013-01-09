@@ -2,6 +2,12 @@ import os
 import traceback
 
 from time import sleep, time
+from shoebot.util import flushfile
+
+import sys
+
+sys.stdout = flushfile(sys.stdout)
+sys.stderr = flushfile(sys.stderr)
 
 class Grammar(object):
     ''' 
