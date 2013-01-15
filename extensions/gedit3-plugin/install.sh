@@ -1,5 +1,4 @@
 #!/bin/bash
-~/.local/share/gedit/plugins
 
 function pluginInstall {
   cp -r -f shoebotit* ~/.local/share/gedit/plugins
