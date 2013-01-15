@@ -7,7 +7,7 @@ function pluginInstall {
 }
 
 function installLangSpecs {
-  cp -f shoebot.lang ~/.gnome2/gtksourceview-3.0/language-specs
+  cp -f shoebot.lang ~/.local/share/gtksourceview-3.0/language-specs
   echo 'GTKSourceView language specs installed!'
 }
 
