@@ -1,3 +1,4 @@
+from distutils.spawn import find_executable as which
 import os
 import subprocess
 
@@ -5,12 +6,8 @@ from gi.repository import Gtk, GObject, Gedit, Pango
 import re
 from gettext import gettext as _
 
-# TODO - reinstate check to see if shoebot available
-#try:
-#    from shoebot import sbot
-#    import shoebot
-#except ImportError:
-#    print "Failed Import"
+if not which('sbot'):
+    print 'Shoebot executable not found.'
 
 # regex taken from openuricontextmenu.py and slightly changed
 # to work with Python functions
@@ -221,7 +218,7 @@ class ShoebotWindowHelper:
         # taken from gedit-plugins-python-openuricontextmenu
         doc = view.get_buffer()
         win = view.get_window(Gtk.TextWindowType.TEXT)
-        x, y, mod = win.get_pointer()
+        ptr_window, x, y, mod = win.get_pointer()
         x, y = view.window_to_buffer_coords(Gtk.TextWindowType.TEXT, x, y) 
 
         # first try at pointer location
@@ -241,7 +238,7 @@ class ShoebotWindowHelper:
                 start.forward_char()
                 break
 
-        word = unicode(doc.get_text(start, insert))
+        word = unicode(doc.get_text(start, insert, False))
 
         if len(word) == 0:
             return True
