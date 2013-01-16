@@ -16,9 +16,10 @@ After including an import statement,
 a NodeBot object needs to be created, and all further drawing commands can be 
 called on that instance.
 
-The NodeBot instance should be created with the output file name as an argument. 
+The quickest way is to use the init_bot function, it sets up an appropriate
+canvas and lets us draw to it.
 
-    bot = shoebot.core.NodeBot("output.svg")
+    bot = shoebot.initbot(outputfile="output.svg")
     bot.size(400,400)
     bot.rect(10,10,100,100)
 
