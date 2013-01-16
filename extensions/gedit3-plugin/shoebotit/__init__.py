@@ -184,7 +184,8 @@ class ShoebotWindowHelper:
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
 
-        command = ['sbot', '-w']
+        command = ['sbot', '-w', '-t%s - Shoebot on gedit' % doc.get_short_name_for_display()]
+
         if self.use_socketserver:
             command.append('-p')
 
@@ -214,6 +215,7 @@ class ShoebotWindowHelper:
         # taken from gedit-plugins-python-openuricontextmenu
         handler_id = view.connect('populate-popup', self.on_view_populate_popup)
         view.set_data(self.id_name, [handler_id])
+
 
     def on_view_populate_popup(self, view, menu):
         # taken from gedit-plugins-python-openuricontextmenu
