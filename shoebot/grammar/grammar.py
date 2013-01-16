@@ -165,6 +165,12 @@ class Grammar(object):
             errmsg = traceback.format_exc()
             print errmsg
 
+    def finish(self):
+        ## For use when using shoebot as a module
+        ## TODO: Not used when running as a bot, possibly should not be available in
+        ## this case
+        self._canvas.flush(1)
+
     #### Variables
     def _addvar(self, v):
         ''' Sets a new accessible variable.'''
