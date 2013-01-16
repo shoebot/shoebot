@@ -23,7 +23,7 @@ canvas and lets us draw to it.
 
 .. code-block:: python
 
-    bot = shoebot.initbot(outputfile="output.svg")
+    bot = shoebot.init_bot(outputfile="output.svg")
     bot.size(400,400)
     bot.rect(10,10,100,100)
 
