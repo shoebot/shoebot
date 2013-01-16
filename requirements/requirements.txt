@@ -5,3 +5,4 @@ numpy
 pycairo
 PIL
 rsvg
+pymetar==0.19    # examples/demos/pymetar.bot
