@@ -82,11 +82,19 @@ class ShoebotThread(threading.Thread):
     def run(self):
         textbuffer = self.textbuffer
         
-        proc = subprocess.Popen(self.cmd,
-                             shell=False,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE,
-                             cwd=self.workingdir)
+        try:
+            proc = subprocess.Popen(self.cmd,
+                                 shell=False,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 cwd=self.workingdir)
+        except OSError as e:
+            if e.errno == 2:
+                textbuffer.insert(textbuffer.get_end_iter(), 'Shoebot executable sbot not found in path.')
+            else:
+                textbuffer.insert(textbuffer.get_end_iter(), str(e))
+            return
+            
 
         textbuffer.set_text('')
         #self.stdout, self.stderr = proc.communicate()
@@ -100,11 +108,8 @@ class ShoebotThread(threading.Thread):
                 textbuffer.insert(textbuffer.get_end_iter(), line)
                 if not visible:
                     panel.set_property("visible", True)
-        try:
-            if proc.returncode != 0:
-                panel.set_property("visible", True)
-        except Exception, e:
-            textbuffer.insert(textbuffer.get_end_iter(), str(e))
+        if proc.returncode != 0:
+            panel.set_property("visible", True)
 
 
 class ShoebotWindowHelper:
