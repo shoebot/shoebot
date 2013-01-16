@@ -169,7 +169,7 @@ class Grammar(object):
         ## For use when using shoebot as a module
         ## TODO: Not used when running as a bot, possibly should not be available in
         ## this case
-        self._canvas.flush(1)
+        self._canvas.flush(self._frame)
 
     #### Variables
     def _addvar(self, v):
