@@ -16,7 +16,7 @@ class Grammar(object):
 
     Bae class for all Grammars, contains just the machinery for running the
     grammars, it has only the private API and nothing else, except for
-    sb_run which is called to actually run the Bot.
+    run which is called to actually run the Bot.
     '''
     def __init__(self, canvas, namespace = None):
         self._canvas = canvas
@@ -117,7 +117,7 @@ class Grammar(object):
         self._frame += 1
         self._iteration += 1
 
-    def sb_run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False):
+    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.

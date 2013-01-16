@@ -1001,7 +1001,7 @@ class View(gtk.Window):
                 
             bot = shoebot.init_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
-            bot.sb_run(codestring, run_forever = True, iterations = None)
+            bot.run(codestring, run_forever = True, iterations = None)
         except ShoebotError, NameError:
             import traceback
             import sys

@@ -83,5 +83,5 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot specfiic parameters so that scripts can be called like normal scripts
     bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, fullscreen, server, port, show_vars)
-    bot.sb_run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
+    bot.run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
     return bot
