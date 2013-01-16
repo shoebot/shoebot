@@ -71,9 +71,10 @@ class ShoebotThread(threading.Thread):
     Run shoebot in seperate thread
     '''
     # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-    def __init__(self, cmd, textbuffer):
+    def __init__(self, cmd, textbuffer, workingdir = None):
         self.cmd = cmd
         self.textbuffer = textbuffer
+        self.workingdir = workingdir
         self.stdout = None
         self.stderr = None
         threading.Thread.__init__(self)
@@ -84,7 +85,8 @@ class ShoebotThread(threading.Thread):
         proc = subprocess.Popen(self.cmd,
                              shell=False,
                              stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+                             stderr=subprocess.PIPE,
+                             cwd=self.workingdir)
 
         textbuffer.set_text('')
         #self.stdout, self.stderr = proc.communicate()
@@ -145,7 +147,7 @@ class ShoebotWindowHelper:
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
             ])
-        manager.insert_action_group(self.action_group, -1)
+        manager.insert_action_group(self.action_group)
         self.ui_id = manager.add_ui_from_string(ui_str)
 
     def remove_menu(self):
