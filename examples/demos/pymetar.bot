@@ -50,15 +50,13 @@ colorrange(255)
 colormode(HSB)
 background(0, 0, 128)
 
-scr = 0
 temamp = 60
 
 print
 print"starting weather.noaa.gov stations loading"
 
-for station in stt_stl:
+for scr, station in enumerate(stations):
     print str(scr) + ": loading " + station
-    scr += 1
     
     xsiz = 44
     ysiz = 20
@@ -71,17 +69,20 @@ for station in stt_stl:
     pr = rp.ParseReport(rep)
 
     celsius = pr.getTemperatureCelsius()
-    lat = pr.getStationLatitudeFloat()
-    lon = pr.getStationLongitudeFloat()
-    xpos = ((180 + lon) * WIDTH) / 360
-    ypos = ((180 - (90+lat)) * HEIGHT) / 180
-    huev = int(255 - ((((celsius + (temamp/2)) % temamp) * 255) / temamp))
-    fill(huev, 255, 128)
-    rect(xpos - xsiz, ypos, xsiz, ysiz)
-    fill(0, 0, 128)
-    translate(xpos + xoff - xsiz, ypos + ysiz + yoff)
-    text(int(celsius), 8, 0)
-    reset()
+    if celsius is not None:
+        lat = pr.getStationLatitudeFloat()
+        lon = pr.getStationLongitudeFloat()
+        xpos = ((180 + lon) * WIDTH) / 360
+        ypos = ((180 - (90+lat)) * HEIGHT) / 180
+        huev = int(255 - ((((celsius + (temamp/2)) % temamp) * 255) / temamp))
+        fill(huev, 255, 128)
+        stroke(huev, 255, 128, 180)
+        strokewidth(3)
+        rect(xpos - xsiz, ypos, xsiz, ysiz, 0.5)
+        fill(0, 0, 180)
+        translate(xpos + xoff - xsiz, ypos + ysiz + yoff)
+        text('%dc' % int(celsius), 8, 0)
+        reset()
 
 print
 print "done"
