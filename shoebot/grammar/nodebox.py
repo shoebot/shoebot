@@ -573,6 +573,9 @@ class NodeBot(Bot):
     def font(self, fontpath=None, fontsize=None):
         '''Set the font to be used with new text instances.
 
+        :param fontpath: path to truetype or opentype font.
+        :param fontsize: size of font
+
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
@@ -647,6 +650,9 @@ class NodeBot(Bot):
     def textheight(self, txt, width=None):
         '''Returns the height of a string of text according to the current
         font settings.
+
+        :param txt: string to measure
+        :param width: width of a line of text in a block
         '''
         w = width
         return self.textmetrics(txt, width=w)[1]
@@ -656,7 +662,7 @@ class NodeBot(Bot):
         '''Set text lineheight.
         '''
         if height is not None:
-            self._canvas._lineheight = height
+            self._canvas.lineheight = height
 
     def align(self, align="LEFT"):
         self._canvas.align = align
