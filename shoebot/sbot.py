@@ -81,7 +81,7 @@ def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, it
 
 def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, args = None):
     # Munge shoebot sys.argv
-    sys.argv = [sys.argv[0]] + args  # Remove shoebot specfiic parameters so that scripts can be called like normal scripts
+    sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
     bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, fullscreen, server, port, show_vars)
     bot.run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
     return bot
