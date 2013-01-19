@@ -110,6 +110,13 @@ parser.add_argument("-c",
                 default=False,
                 help=_("Close window after running bot (use with -r for benchmarking)"),
                 )
+parser.add_argument("-v",
+                "--verbose",
+                action="store_true",
+                dest="verbose",
+                default=False,
+                help=_("Show internal shoebot error information in traceback"),
+                )
 parser.add_argument("script")
 parser.add_argument('args', nargs=argparse.REMAINDER)
 
@@ -143,4 +150,5 @@ if __name__ == '__main__':
         server=args.socketserver,
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
+        verbose = args.verbose,
         args = args.args)

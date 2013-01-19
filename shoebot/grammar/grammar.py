@@ -111,7 +111,7 @@ class Grammar(object):
         self._frame += 1
         self._iteration += 1
 
-    def sb_run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False):
+    def sb_run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False, verbose = False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
