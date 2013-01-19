@@ -290,6 +290,6 @@ Core
 
 .. py:function:: speed(framerate)
 
-.. py:function:: sb_run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
+.. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
     Executes the contents of a Nodebox or Shoebot script in the current surface's context.
