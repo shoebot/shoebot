@@ -7,7 +7,7 @@ from socket_server import SocketServerMixin
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
-ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
+ICON_FILE = os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')
 
 class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     '''
@@ -24,7 +24,7 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         if os.path.isfile(ICON_FILE):
             self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
         else:
-            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 64, 64) 
+            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
         self.size = None
 	self.last_rendering = None
 
@@ -52,6 +52,8 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         if self.window and not self.size:
             self.set_size_request(*size)
             self.size = size
+            while gtk.events_pending():
+                gtk.main_iteration_do(block=False)
         meta_surface = RecordingSurface(*size)
         return cairo.Context(meta_surface)
 
@@ -74,4 +76,5 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         self.queue_draw()
         
         while gtk.events_pending():
-            gtk.main_iteration()
+            gtk.main_iteration_do(block=False)
+
