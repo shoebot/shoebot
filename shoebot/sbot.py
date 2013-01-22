@@ -59,8 +59,7 @@ def create_canvas(src, format = None, outputfile = None, multifile = False, wind
             else:
                 outputfile = 'output.svg'
         sink = CairoImageSink(outputfile, format, multifile)
-
-    canvas = CairoCanvas(sink, enable_cairo_queue=True)
+    canvas = CairoCanvas(sink)
 
     return canvas
 

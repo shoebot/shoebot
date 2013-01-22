@@ -36,25 +36,15 @@ import cairo
 from shoebot.grammar import InputDeviceMixin
 from canvas import Canvas
 from drawqueue import DrawQueue
-from cairo_drawqueue import CairoDrawQueue
 
 class CairoCanvas(Canvas):
     ''' Cairo implementation of Canvas '''
-    def __init__(self, sink, enable_cairo_queue = True):
+    def __init__(self, sink):
         Canvas.__init__(self, sink)
         self.size = None
-        self.enable_cairo_queue = enable_cairo_queue
 
     def initial_drawqueue(self):
-        '''
-        Once the canvas size has been set the
-        CairoDrawQueue can be used for better
-        performance (well, hopefully in future).
-        '''
-        if self.size and self.enable_cairo_queue:
-            return CairoDrawQueue(self.size)
-        else:
-            return DrawQueue()
+        return DrawQueue()
 
     def initial_transform(self):
         '''
