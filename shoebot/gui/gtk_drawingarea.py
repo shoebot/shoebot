@@ -43,12 +43,23 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
             size = self.get_allocation()
 
-            if size.width > source_width:
-                scale = float(size.width) / float(source_width)
-                cr.scale(scale, scale)
-            elif size.height > source_height:
-                scale = float(size.height) / float(source_height)
-                cr.scale(scale, scale)
+            if size.width > source_width or size.height > source_height:
+                # Scale up by largest dimension
+                if size.width > source_width:
+                    xscale = float(size.width) / float(source_width)
+                else:
+                    xscale = 1.0
+
+                if size.height > source_height:
+                    yscale = float(size.height) / float(source_height)
+                else:
+                    yscale = 1.0
+
+                if xscale > yscale:
+                    cr.scale(xscale, xscale)
+                else:
+                    cr.scale(yscale, yscale)
+
 
         cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
