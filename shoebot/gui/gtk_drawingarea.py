@@ -16,16 +16,19 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self):
+    def __init__(self, scale_fit = True):
         gtk.DrawingArea.__init__(self)
         DrawQueueSink.__init__(self)
-        
+
+        self.scale_fit = scale_fit
+
         # Default picture is the shoebot icon
         if os.path.isfile(ICON_FILE):
             self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
         else:
             self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
         self.size = None
+        self.first_run = True
 	self.last_rendering = None
 
     def do_expose_event(self, event):
@@ -34,12 +37,27 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         '''
         # Create the cairo context
         cr = self.window.cairo_create()
+        if self.scale_fit:
+            source_width = self.backing_store.get_width()
+            source_height = self.backing_store.get_height()
+
+            size = self.get_allocation()
+
+            if size.width > source_width:
+                scale = float(size.width) / float(source_width)
+                cr.scale(scale, scale)
+            elif size.height > source_height:
+                scale = float(size.height) / float(source_height)
+                cr.scale(scale, scale)
 
         cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(event.area.x, event.area.y,
                 event.area.width, event.area.height)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
+        if self.first_run:
+            cr.set_operator(cairo.OPERATOR_OVER)
+        else:
+            cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.fill()
 
     def create_rcontext(self, size, frame):

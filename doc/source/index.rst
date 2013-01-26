@@ -31,3 +31,10 @@ More
     * :ref:`modindex`
     * :ref:`search`
 
+.. shoebot::
+   :snapshot:
+   :source:
+   
+   def draw():
+       print 'hello'
+
