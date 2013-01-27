@@ -1,6 +1,6 @@
 #from __future__ import division
 import sys, os
-import gtk
+from gi.repository import Gtk
 import cairo
 from socket_server import SocketServerMixin
 
@@ -9,16 +9,16 @@ from shoebot.util import RecordingSurface
 
 ICON_FILE = os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')
 
-class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
+class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     '''
     Create a double buffered GTK+ widget on which we will draw using Cairo        
     '''
 
     # Draw in response to an expose-event
-    __gsignals__ = { "expose-event": "override" }
     def __init__(self, scale_fit = True):
-        gtk.DrawingArea.__init__(self)
+        Gtk.DrawingArea.__init__(self)
         DrawQueueSink.__init__(self)
+        self.connect("draw", self.draw)
 
         self.scale_fit = scale_fit
 
@@ -31,12 +31,12 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         self.first_run = True
 	self.last_rendering = None
 
-    def do_expose_event(self, event):
+    def draw(self, widget, cr):
         '''
         Draw just the exposed part of the backing store
         '''
+
         # Create the cairo context
-        cr = self.window.cairo_create()
         if self.scale_fit:
             source_width = self.backing_store.get_width()
             source_height = self.backing_store.get_height()
@@ -62,9 +62,8 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
 
         cr.set_source_surface(self.backing_store)
-        # Restrict Cairo to the exposed area; avoid extra work
-        cr.rectangle(event.area.x, event.area.y,
-                event.area.width, event.area.height)
+        cr.rectangle(0, 0,
+                size.width, size.height)
         if self.first_run:
             cr.set_operator(cairo.OPERATOR_OVER)
         else:
@@ -78,11 +77,11 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         Uses a proxy to an SVGSurface to render on so 
         it's scalable
         '''
-        if self.window and not self.size:
+        if self.get_window() and not self.size:
             self.set_size_request(*size)
             self.size = size
-            while gtk.events_pending():
-                gtk.main_iteration_do(block=False)
+            while Gtk.events_pending():
+                Gtk.main_iteration_do(False)
         meta_surface = RecordingSurface(*size)
         return cairo.Context(meta_surface)
 
@@ -104,6 +103,6 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         self.backing_store = backing_store
         self.queue_draw()
         
-        while gtk.events_pending():
-            gtk.main_iteration_do(block=False)
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(False)
 

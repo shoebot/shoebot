@@ -1,5 +1,6 @@
-import gtk.gdk
-import gtk.keysyms
+from gi.repository import Gdk, Gtk
+#import Gtk.gdk
+#import Gtk.keysyms
 
 from shoebot.grammar import InputDeviceMixin
 
@@ -11,13 +12,13 @@ class GtkInputDeviceMixin(InputDeviceMixin):
     
     def attach_gtk(self, widget):
         # necessary for catching keyboard events
-        widget.set_flags(gtk.CAN_FOCUS)
+        widget.set_can_focus(True)
 
-        widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
-            gtk.gdk.BUTTON_RELEASE_MASK |
-            gtk.gdk.POINTER_MOTION_MASK |
-            gtk.gdk.KEY_PRESS_MASK |
-            gtk.gdk.KEY_RELEASE_MASK)
+        widget.add_events(Gdk.EventMask.BUTTON_PRESS_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK |
+            Gdk.EventMask.POINTER_MOTION_MASK |
+            Gdk.EventMask.KEY_PRESS_MASK |
+            Gdk.EventMask.KEY_RELEASE_MASK)
         widget.connect('button_press_event', self.gtk_mouse_button_down)
         widget.connect('button_release_event', self.gtk_mouse_button_up)
         widget.connect('motion_notify_event', self.gtk_mouse_pointer_moved)
@@ -39,9 +40,9 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         #
         # Values are from beziereditor2 example, probably mac values - probably
         # should be a way of toggling this hack
-        if keyval == gtk.keysyms.Tab:
+        if keyval == Gdk.KEY_Tab:
             keyval = 48
-        elif keyval == gtk.keysyms.Escape:
+        elif keyval == Gdk.KEY_Escape:
             keyval = 53
         return keyval
 
@@ -64,8 +65,9 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         Shoebot key names look like KEY_LEFT, whereas gtk uses keysyms.Left
         '''
         kdict = {}
-        for gtk_key in dir(gtk.keysyms):
-            kdict['KEY_' + gtk_key.upper()] = getattr(gtk.keysyms, gtk_key)
+        for name in dir(Gdk):
+            if name.startswith('KEY_'):
+                kdict[name] = getattr(Gdk, name)
         return kdict
 
 

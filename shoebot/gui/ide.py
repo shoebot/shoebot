@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: iso-8859-1 -*-
 
-import pygtk
-pygtk.require('2.0')
+import gi
+gi.require_version('Gtk', '3.0')
 import sys, os, errno
-import gobject
-import gtk
-import pango
+from gi.repository import GObject
+from gi.repository import Gtk
+from gi.repository import Pango
 import shoebot
 
 # for gtksourceview/gtksourceview2 compatibility
@@ -14,15 +14,15 @@ try:
     import gtksourceview
 
 except ImportError:
-    import gtksourceview2
+    from gi.repository import GtkSource
 
-    class gtksourceview_SourceBuffer(gtksourceview2.Buffer):
+    class gtksourceview_SourceBuffer(GtkSource.Buffer):
         def set_highlight(self, bool):
             return self.set_highlight_syntax(bool)
 
-    class gtksourceview_SourceLanguagesManager(gtksourceview2.LanguageManager):
+    class gtksourceview_SourceLanguagesManager(GtkSource.LanguageManager):
         def get_language_from_mime_type(self, mime_types):
-            lang_manager = gtksourceview2.language_manager_get_default()
+            lang_manager = GtkSource.LanguageManager.get_default()
             lang_result = None
             for lang_id in lang_manager.get_language_ids():
                  lang = lang_manager.get_language(lang_id)
@@ -34,7 +34,7 @@ except ImportError:
 
     gtksourceview = gtksourceview2
     gtksourceview.SourceBuffer = gtksourceview_SourceBuffer
-    gtksourceview.SourceView = gtksourceview2.View
+    gtksourceview.SourceView = GtkSource.View
     gtksourceview.SourceLanguagesManager = gtksourceview_SourceLanguagesManager
     del gtksourceview_SourceBuffer
     del gtksourceview_SourceLanguagesManager
@@ -107,7 +107,7 @@ class Buffer(gtksourceview.SourceBuffer):
     PANGO_SCALE = 1024
 
     def __init__(self):
-        gtk.TextBuffer.__init__(self)
+        GObject.GObject.__init__(self)
         tt = self.get_tag_table()
         self.refcount = 0
         self.filename = None
@@ -125,11 +125,11 @@ class Buffer(gtksourceview.SourceBuffer):
                                                 foreground="purple")
         self.found_text_tag = self.create_tag(foreground="red")
 
-        tabs = pango.TabArray(4, True)
-        tabs.set_tab(0, pango.TAB_LEFT, 10)
-        tabs.set_tab(1, pango.TAB_LEFT, 30)
-        tabs.set_tab(2, pango.TAB_LEFT, 60)
-        tabs.set_tab(3, pango.TAB_LEFT, 120)
+        tabs = Pango.TabArray(4, True)
+        tabs.set_tab(0, Pango.TabAlign.LEFT, 10)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 30)
+        tabs.set_tab(2, Pango.TabAlign.LEFT, 60)
+        tabs.set_tab(3, Pango.TabAlign.LEFT, 120)
         self.custom_tabs_tag = self.create_tag(tabs=tabs, foreground="green")
         TestText.buffers.push(self)
 
@@ -162,7 +162,7 @@ class Buffer(gtksourceview.SourceBuffer):
         if str:
             if forward:
                 while 1:
-                    res = iter.forward_search(str, gtk.TEXT_SEARCH_TEXT_ONLY)
+                    res = iter.forward_search(str, Gtk.TextSearchFlags.TEXT_ONLY)
                     if not res:
                         break
                     match_start, match_end = res
@@ -171,7 +171,7 @@ class Buffer(gtksourceview.SourceBuffer):
                     iter = match_end
             else:
                 while 1:
-                    res = iter.backward_search(str, gtk.TEXT_SEARCH_TEXT_ONLY)
+                    res = iter.backward_search(str, Gtk.TextSearchFlags.TEXT_ONLY)
                     if not res:
                         break
                     match_start, match_end = res
@@ -179,10 +179,10 @@ class Buffer(gtksourceview.SourceBuffer):
                     self.apply_tag(self.found_text_tag, match_start, match_end)
                     iter = match_start
 
-        dialog = gtk.MessageDialog(view,
-                                   gtk.DIALOG_DESTROY_WITH_PARENT,
-                                   gtk.MESSAGE_INFO,
-                                   gtk.BUTTONS_OK,
+        dialog = Gtk.MessageDialog(view,
+                                   Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                   Gtk.MessageType.INFO,
+                                   Gtk.ButtonsType.OK,
                                    _('%d strings found and marked in red') % i)
 
         dialog.connect("response", lambda x,y: dialog.destroy())
@@ -213,10 +213,10 @@ class Buffer(gtksourceview.SourceBuffer):
         hue = 0.0
 
         if (enabled and self.color_cycle_timeout_id == 0):
-            self.color_cycle_timeout_id = gtk.timeout_add(
+            self.color_cycle_timeout_id = Gtk.timeout_add(
                 200, self.color_cycle_timeout)
         elif (not enabled and self.color_cycle_timeout_id != 0):
-            gtk.timeout_remove(self.color_cycle_timeout_id)
+            Gtk.timeout_remove(self.color_cycle_timeout_id)
             self.color_cycle_timeout_id = 0
 
         for tag in self.color_tags:
@@ -247,18 +247,18 @@ class Buffer(gtksourceview.SourceBuffer):
     def tag_event_handler(self, tag, widget, event, iter):
         char_index = iter.get_offset()
         tag_name = tag.get_property("name")
-        if event.type == gtk.gdk.MOTION_NOTIFY:
+        if event.type == Gdk.MOTION_NOTIFY:
             print "Motion event at char %d tag `%s'\n" % (char_index, tag_name)
-        elif event.type == gtk.gdk.BUTTON_PRESS:
+        elif event.type == Gdk.EventType.BUTTON_PRESS:
             print "Button press at char %d tag `%s'\n" % (char_index, tag_name)
-        elif event.type == gtk.gdk._2BUTTON_PRESS:
+        elif event.type == Gdk._2BUTTON_PRESS:
             print "Double click at char %d tag `%s'\n" % (char_index, tag_name)
-        elif event.type == gtk.gdk._3BUTTON_PRESS:
+        elif event.type == Gdk._3BUTTON_PRESS:
             print "Triple click at char %d tag `%s'\n" % (char_index, tag_name)
-        elif event.type == gtk.gdk.BUTTON_RELEASE:
+        elif event.type == Gdk.BUTTON_RELEASE:
             print "Button release at char %d tag `%s'\n" % (char_index, tag_name)
-        elif (event.type == gtk.gdk.KEY_PRESS or
-              event.type == gtk.gdk.KEY_RELEASE):
+        elif (event.type == Gdk.KEY_PRESS or
+              event.type == Gdk.KEY_RELEASE):
             print "Key event at char %d tag `%s'\n" % (char_index, tag_name)
         return False
 
@@ -268,9 +268,9 @@ class Buffer(gtksourceview.SourceBuffer):
         except IOError, (errnum, errmsg):
             err = "Cannot open file '%s': %s" % (filename, errmsg)
             view = TestText.active_window_stack.get()
-            dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_INFO,
-                                       gtk.BUTTONS_OK, err);
+            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, err);
             result = dialog.run()
             dialog.destroy()
             return False
@@ -300,9 +300,9 @@ class Buffer(gtksourceview.SourceBuffer):
                                                            bak_filename,
                                                            errmsg)
                 view = TestText.active_window_stack.get()
-                dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                           gtk.MESSAGE_INFO,
-                                           gtk.BUTTONS_OK, err);
+                dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
+                                           Gtk.MessageType.INFO,
+                                           Gtk.ButtonsType.OK, err);
                 dialog.run()
                 dialog.destroy()
                 return False
@@ -319,9 +319,9 @@ class Buffer(gtksourceview.SourceBuffer):
         except IOError, (errnum, errmsg):
             err = "Error writing to '%s': %s" % (self.filename, errmsg)
             view = TestText.active_window_stack.get()
-            dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_INFO,
-                                       gtk.BUTTONS_OK, err);
+            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, err);
             dialog.run()
             dialog.destroy()
 
@@ -332,9 +332,9 @@ class Buffer(gtksourceview.SourceBuffer):
                 err = "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'" % (
                     self.filename, bak_filename, errmsg, bak_filename)
                 view = TestText.active_window_stack.get()
-                dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                           gtk.MESSAGE_INFO,
-                                           gtk.BUTTONS_OK, err);
+                dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
+                                           Gtk.MessageType.INFO,
+                                           Gtk.ButtonsType.OK, err);
                 dialog.run()
                 dialog.destroy()
 
@@ -345,25 +345,25 @@ class Buffer(gtksourceview.SourceBuffer):
       if os.path.exists(self.filename):
           if os.path.exists(self.filename):
               if user_wants_to_replace_read_only_file (uri):
-                  return gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
+                  return Gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
               else:
-                  return gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
+                  return Gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
           else:
               # fall back to the default dialog
-              return gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
+              return Gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
         """
         Return True if the buffer was saved
         """
-        chooser = ShoebotFileChooserDialog(_('Save File'), None, gtk.FILE_CHOOSER_ACTION_SAVE,
-            (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
-             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        chooser = ShoebotFileChooserDialog(_('Save File'), None, Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
+             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         chooser.set_do_overwrite_confirmation(True)
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
         
-        saved = chooser.run() == gtk.RESPONSE_ACCEPT
+        saved = chooser.run() == Gtk.ResponseType.ACCEPT
         if saved:
                 old_filename = self.filename
                 self.filename = chooser.get_filename()
@@ -386,18 +386,18 @@ class Buffer(gtksourceview.SourceBuffer):
             pretty_name = self.pretty_name()
             msg = _("Save changes to '%s'?") % pretty_name
             view = TestText.active_window_stack.get()
-            dialog = gtk.MessageDialog(view, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_QUESTION,
-                                       gtk.BUTTONS_YES_NO, msg);
-            dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.QUESTION,
+                                       Gtk.ButtonsType.YES_NO, msg);
+            dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
             result = dialog.run()
             dialog.destroy()
-            if result == gtk.RESPONSE_YES:
+            if result == Gtk.ResponseType.YES:
                 if self.filename:
                     return self.save_buffer()
                 else:
                     return self.save_as_buffer()
-            elif result == gtk.RESPONSE_NO:
+            elif result == Gtk.ResponseType.NO:
                 return True
             else:
                 return False
@@ -405,7 +405,7 @@ class Buffer(gtksourceview.SourceBuffer):
             return True
 
 
-class ShoebotFileChooserDialog (gtk.FileChooserDialog):
+class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
 
 	CWD = None
 
@@ -413,7 +413,7 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 		super (ShoebotFileChooserDialog, self).__init__ (*args, **kwargs)
 
 		# set some defaults
-		self.set_default_response (gtk.RESPONSE_OK)
+		self.set_default_response (Gtk.ResponseType.OK)
 		self.set_property ('do-overwrite-confirmation', True)
 
 		# set the working directory if available
@@ -424,7 +424,7 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 		response = super (ShoebotFileChooserDialog, self).run ()
 
 		# get the working directory if the user clicked accepted the action
-		if response == gtk.RESPONSE_ACCEPT:
+		if response == Gtk.ResponseType.ACCEPT:
 			ShoebotFileChooserDialog.CWD = self.get_current_folder ()
 
 		return response
@@ -434,31 +434,31 @@ class ShoebotFileChooserDialog (gtk.FileChooserDialog):
 class ConsoleWindow:
     def __init__(self):
         # we define a scrollable window with automatic behavior for scrolling bars             
-        self.text_window = gtk.ScrolledWindow()
-        self.text_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.text_area = gtk.TextView()
+        self.text_window = Gtk.ScrolledWindow()
+        self.text_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.text_area = Gtk.TextView()
         # set text area as editable in order to let it be cleaned by selecting and deleting
         # then we set wrap mode for text
         self.text_area.set_editable(True)
-        self.text_area.set_wrap_mode(gtk.WRAP_WORD)
+        self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_buffer = self.text_area.get_buffer()        
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
-        self.text_area.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("dark grey"))
-        self.text_area.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
+        self.text_area.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse("dark grey"))
+        self.text_area.modify_text(Gtk.StateType.NORMAL, Gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
-        self.stdout_tag = gtk.TextTag("stdout")
+        self.stdout_tag = Gtk.TextTag("stdout")
         self.stdout_tag.set_property("foreground", "black")
         self.stdout_tag.set_property("style", "normal")
         #self.stdout_tag.set_property("weight", 600)   
         #self.stdout_tag.set_property("size-points", 9)     
         self.tag_table.add(self.stdout_tag)
-        self.system_message_tag = gtk.TextTag("system")
+        self.system_message_tag = Gtk.TextTag("system")
         self.system_message_tag.set_property("foreground", "white")
         self.system_message_tag.set_property("style", "normal")
         self.tag_table.add(self.system_message_tag)
-        self.text_area.modify_font(pango.FontDescription("monospace italic 9"))
+        self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
 
 
     def write(self, data, output=None, system=None):
@@ -479,8 +479,8 @@ class ConsoleWindow:
             self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "stdout")
             self.message = ""
         # this is the trick to make gtk refresh the window                    
-        while gtk.events_pending():
-            gtk.main_iteration(False)        
+        while Gtk.events_pending():
+            Gtk.main_iteration(False)        
 
 
 class Stdout_Filter(object):
@@ -492,8 +492,8 @@ class Stdout_Filter(object):
         self.message = None
 
     
-class View(gtk.Window):
-    gobject.type_register (ShoebotFileChooserDialog)
+class View(Gtk.Window):
+    GObject.type_register (ShoebotFileChooserDialog)
     FONT = None
     
     def __init__(self, buffer=None):
@@ -512,9 +512,9 @@ class View(gtk.Window):
             ( _("/Edit/sep1"), None, None, 0, "<Separator>" ),
             ( _("/Edit/Find..."), "<control>F", self.do_search, 0, None ),
             ( _("/_Settings"), None, None, 0, "<Branch>" ),
-            ( _("/Settings/Wrap _Off"), None, self.do_wrap_changed, gtk.WRAP_NONE, "<RadioItem>" ),
-            ( _("/Settings/Wrap _Words"), None, self.do_wrap_changed, gtk.WRAP_WORD, _("/Settings/Wrap Off") ),
-            ( _("/Settings/Wrap _Chars"), None, self.do_wrap_changed, gtk.WRAP_CHAR, _("/Settings/Wrap Off") ),
+            ( _("/Settings/Wrap _Off"), None, self.do_wrap_changed, Gtk.WrapMode.NONE, "<RadioItem>" ),
+            ( _("/Settings/Wrap _Words"), None, self.do_wrap_changed, Gtk.WrapMode.WORD, _("/Settings/Wrap Off") ),
+            ( _("/Settings/Wrap _Chars"), None, self.do_wrap_changed, Gtk.WrapMode.CHAR, _("/Settings/Wrap Off") ),
             ( _("/_Run"), None, None, 0, "<Branch>" ),
             ( _("/Run/_Run script"), "<control>R", self.run_script, False, None ),
             ( _("/Run/sep1"), None, None, 0, "<Separator>" ),
@@ -527,7 +527,7 @@ class View(gtk.Window):
 
         if not buffer:
             buffer = Buffer()
-        gtk.Window.__init__(self)
+        GObject.GObject.__init__(self)
 
         TestText.views.push(self)
 
@@ -538,27 +538,27 @@ class View(gtk.Window):
 
         self.connect("delete_event", self.delete_event_cb)
 
-        self.accel_group = gtk.AccelGroup()
-        self.item_factory = gtk.ItemFactory(gtk.MenuBar, "<main>",
+        self.accel_group = Gtk.AccelGroup()
+        self.item_factory = Gtk.ItemFactory(Gtk.MenuBar, "<main>",
                                         self.accel_group)
         self.item_factory.set_data("view", self)
         self.item_factory.create_items(menu_items)
 
         self.add_accel_group(self.accel_group)
         
-        hpaned = gtk.HPaned()
-        vbox = gtk.VBox(False, 0)
+        hpaned = Gtk.HPaned()
+        vbox = Gtk.VBox(False, 0)
         hpaned.add1(vbox)
         self.add(hpaned)
 
-        vbox.pack_start(self.item_factory.get_widget("<main>"),
+        vbox.pack_start(self.item_factory.get_widget("<main>", True, True, 0),
                         False, False, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         self.text_view = gtksourceview.SourceView(buffer)
-        self.text_view.set_wrap_mode(gtk.WRAP_WORD)
+        self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
         self.text_view.set_insert_spaces_instead_of_tabs(True)
@@ -583,7 +583,7 @@ class View(gtk.Window):
 	         print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
 	         View.FONT = 'Mono 8'
 
-        self.text_view.modify_font(pango.FontDescription(View.FONT))
+        self.text_view.modify_font(Pango.FontDescription(View.FONT))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
@@ -623,7 +623,7 @@ class View(gtk.Window):
 
         try:
             self.set_icon_from_file(ICON_FILE)
-        except gobject.GError:
+        except GObject.GError:
             # icon not found = no icon
             pass
 
@@ -645,8 +645,8 @@ class View(gtk.Window):
             return View(Buffer())
 
     def view_from_widget(widget):
-        if isinstance(widget, gtk.MenuItem):
-            item_factory = gtk.item_factory_from_widget(widget)
+        if isinstance(widget, Gtk.MenuItem):
+            item_factory = Gtk.item_factory_from_widget(widget)
             return item_factory.get_data("view")
         else:
             app = widget.get_toplevel()
@@ -668,11 +668,11 @@ class View(gtk.Window):
             return True
 
     def do_open(self, callback_action, widget):
-        chooser = ShoebotFileChooserDialog('Open File', None, gtk.FILE_CHOOSER_ACTION_OPEN,
-            (gtk.STOCK_OPEN, gtk.RESPONSE_ACCEPT,
-             gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        chooser = ShoebotFileChooserDialog('Open File', None, Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
+             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
-        if chooser.run() == gtk.RESPONSE_ACCEPT:
+        if chooser.run() == Gtk.ResponseType.ACCEPT:
             self.open_ok_func(chooser.get_filename())
         chooser.destroy()
 
@@ -705,7 +705,7 @@ class View(gtk.Window):
             self.sbot_window.finish()
             self.sbot_window.destroy()
 
-        gtk.main_quit()
+        Gtk.main_quit()
         TestText.active_window_stack.pop()
         import sys
         sys.exit()
@@ -800,12 +800,12 @@ class View(gtk.Window):
         dialog.destroy()
 
     def do_search(self, callback_action, widget):
-        search_text = gtk.TextView()
-        dialog = gtk.Dialog(_("Search"), self,
-                            gtk.DIALOG_DESTROY_WITH_PARENT,
+        search_text = Gtk.TextView()
+        dialog = Gtk.Dialog(_("Search"), self,
+                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
                             (_("Forward"), RESPONSE_FORWARD,
                              _("Backward"), RESPONSE_BACKWARD,
-                             gtk.STOCK_CANCEL, gtk.RESPONSE_NONE))
+                             Gtk.STOCK_CANCEL, Gtk.ResponseType.NONE))
         dialog.vbox.pack_end(search_text, True, True, 0)
         dialog.buffer = search_text.get_buffer()
         dialog.connect("response", self.dialog_response_callback)
@@ -848,10 +848,10 @@ class View(gtk.Window):
         
     def do_about(self, callback_action, widget):
         # about dialog
-        dlg = gtk.AboutDialog()
+        dlg = Gtk.AboutDialog()
         self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
-        gtk.about_dialog_set_url_hook(self.on_url, self.website)
+        Gtk.about_dialog_set_url_hook(self.on_url, self.website)
         dlg.set_version("0.4")
         dlg.set_name("shoebot")
         # TODO: add license text
@@ -859,7 +859,7 @@ class View(gtk.Window):
         dlg.set_authors(self.authors)
         dlg.set_website(self.website)
         def close(w, res):
-            if res == gtk.RESPONSE_CANCEL:
+            if res == Gtk.ResponseType.CANCEL:
                     w.hide()
         dlg.connect("response", close)
         dlg.run()
@@ -871,19 +871,19 @@ class View(gtk.Window):
         wrap_mode = text_view.get_wrap_mode()
         menu_item = None
 
-        if direction == gtk.TEXT_DIR_LTR:
+        if direction == Gtk.TextDirection.LTR:
             menu_item = self.item_factory.get_widget("/Settings/Left-to-Right")
-        elif direction == gtk.TEXT_DIR_RTL:
+        elif direction == Gtk.TextDirection.RTL:
             menu_item = self.item_factory.get_widget("/Settings/Right-to-Left")
 
         if menu_item:
             menu_item.activate()
 
-        if wrap_mode == gtk.WRAP_NONE:
+        if wrap_mode == Gtk.WrapMode.NONE:
             menu_item = self.item_factory.get_widget("/Settings/Wrap Off")
-        elif wrap_mode == gtk.WRAP_WORD:
+        elif wrap_mode == Gtk.WrapMode.WORD:
             menu_item = self.item_factory.get_widget("/Settings/Wrap Words")
-        elif wrap_mode == gtk.WRAP_CHAR:
+        elif wrap_mode == Gtk.WrapMode.CHAR:
             menu_item = self.item_factory.get_widget("/Settings/Wrap Chars")
 
         if menu_item:
@@ -900,7 +900,7 @@ class View(gtk.Window):
         self.destroy()
         del self
         if not TestText.views:
-            gtk.main_quit()
+            Gtk.main_quit()
 
     def check_close_view(self):
         buffer = self.text_view.get_buffer()
@@ -928,14 +928,14 @@ class View(gtk.Window):
         text_view = widget
 
         # See if this expose is on the tab stop window
-        top_win = text_view.get_window(gtk.TEXT_WINDOW_TOP)
-        bottom_win = text_view.get_window(gtk.TEXT_WINDOW_BOTTOM)
+        top_win = text_view.get_window(Gtk.TextWindowType.TOP)
+        bottom_win = text_view.get_window(Gtk.TextWindowType.BOTTOM)
 
         if event.window == top_win:
-            type = gtk.TEXT_WINDOW_TOP
+            type = Gtk.TextWindowType.TOP
             target = top_win
         elif event.window == bottom_win:
-            type = gtk.TEXT_WINDOW_BOTTOM
+            type = Gtk.TextWindowType.BOTTOM
             target = bottom_win
         else:
             return False
@@ -948,7 +948,7 @@ class View(gtk.Window):
 
         buffer = text_view.get_buffer()
         insert = buffer.get_iter_at_mark(buffer.get_insert())
-        attrs = gtk.TextAttributes()
+        attrs = Gtk.TextAttributes()
         insert.get_attributes(attrs)
 
         tabslist = []
@@ -959,7 +959,7 @@ class View(gtk.Window):
 
         for align, position in tabslist:
             if not in_pixels:
-                position = pango.PIXELS(position)
+                position = Pango.PIXELS(position)
 
             pos, y = text_view.buffer_to_window_coords(type, position, 0)
             target.draw_line(text_view.style.fg_gc[text_view.state],
@@ -1008,9 +1008,9 @@ class View(gtk.Window):
 
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
-            dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_INFO,
-                                       gtk.BUTTONS_OK, err);
+            dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, err);
             result = dialog.run()
             dialog.destroy()
             return False
@@ -1046,7 +1046,7 @@ class TestText:
         self.active_window_stack.pop()
 
     def main(self):
-        gtk.main()
+        Gtk.main()
         return 0
 
 if __name__ == "__main__":

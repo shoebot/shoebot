@@ -3,7 +3,8 @@ gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
 import sys
-import gobject, socket
+from gi.repository import GObject
+import socket
 import gettext, locale
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -21,13 +22,13 @@ class SocketServerMixin(object):
         self.sock.bind((host, port))
         self.sock.listen(1)
         print _("Listening on port %i...") % (port)
-        gobject.io_add_watch(self.sock, gobject.IO_IN, self.listener)
+        GObject.io_add_watch(self.sock, GObject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
         '''Asynchronous connection listener. Starts a handler for each connection.'''
         self.conn, self.addr = self.sock.accept()
         print _("Connected")
-        gobject.io_add_watch(self.conn, gobject.IO_IN, self.handler)
+        GObject.io_add_watch(self.conn, GObject.IO_IN, self.handler)
         return True
 
     def handler(self, conn, *args):

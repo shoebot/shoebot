@@ -7,10 +7,12 @@ from sys import platform
 
 import cairo
 from PIL import Image as PILImage
-import gtk
+from gi.repository import Gtk
 
-if platform != 'darwin':
+try:
 	import rsvg
+except:
+    pass
 
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
@@ -60,7 +62,7 @@ class Image(Grob, ColorMixin):
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
                 elif gtk is not None and False:
-                    pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
                     sw = pixbuf.get_width()
                     sh = pixbuf.get_height()
 
@@ -69,7 +71,7 @@ class Image(Grob, ColorMixin):
                     ''' create a context to the new surface '''
                     ct = cairo.Context(surface)
                     ''' create a GDK formatted Cairo context to the new Cairo native context '''
-                    ct2 = gtk.gdk.CairoContext(ct)
+                    ct2 = Gdk.CairoContext(ct)
                     ''' draw from the pixbuf to the new surface '''
                     ct2.set_source_pixbuf(pixbuf, 0, 0)
                     ct2.paint()

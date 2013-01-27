@@ -28,8 +28,7 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import cairo
-import pango
-import pangocairo
+from gi.repository import Pango, PangoCairo
 ## from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from shoebot.util import RecordingSurfaceA8
@@ -37,7 +36,7 @@ from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
 class Text(Grob, ColorMixin):
     
-    # several reference docs can be found at http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
+    # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, enableRendering=True, **kwargs):
         Grob.__init__(self, bot)
@@ -65,16 +64,16 @@ class Text(Grob, ColorMixin):
         self._indent = kwargs.get("indent")
 
         # we use the pango parser instead of trying this by hand
-        self._fontface = pango.FontDescription(self._fontfile)
+        self._fontface = Pango.FontDescription(self._fontfile)
                                                       
-        # then we set fontsize (multiplied by pango.SCALE)
-        self._fontface.set_absolute_size(self._fontsize*pango.SCALE)
+        # then we set fontsize (multiplied by Pango.SCALE)
+        self._fontface.set_absolute_size(self._fontsize*Pango.SCALE)
 
         # the style
-        self._style = pango.STYLE_NORMAL
+        self._style = Pango.Style.NORMAL
         if kwargs.has_key("style"):
             if kwargs["style"]=="italic" or kwargs["style"]=="oblique":
-                self._style = pango.STYLE_ITALIC
+                self._style = Pango.Style.ITALIC
         self._fontface.set_style(self._style)
         
         #we need to pre-render some stuff to enable metrics sizing
@@ -94,7 +93,7 @@ class Text(Grob, ColorMixin):
         self.layout = self._pang_ctx.create_layout()
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
-        self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*pango.SCALE)) #pango requires an int casting
+        self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text)
@@ -102,19 +101,19 @@ class Text(Grob, ColorMixin):
         # text will wrap, meanwhile it checks if and indent has to be applied
         # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
-            self.layout.set_width(int(self.width)*pango.SCALE)
+            self.layout.set_width(int(self.width)*Pango.SCALE)
             if self._indent:
-                self.layout.set_indent(self._indent*pango.SCALE)                
+                self.layout.set_indent(self._indent*Pango.SCALE)                
         # set text alignment    
         if self._align == "right":
-            self.layout.set_alignment(pango.ALIGN_RIGHT)
+            self.layout.set_alignment(Pango.Alignment.RIGHT)
         elif self._align == "center":
-            self.layout.set_alignment(pango.ALIGN_CENTER)
+            self.layout.set_alignment(Pango.Alignment.CENTER)
         elif self._align == "justify":
-            self.layout.set_alignment(pango.ALIGN_LEFT)
+            self.layout.set_alignment(Pango.Alignment.LEFT)
             self.layout.set_justify(True)
         else:
-            self.layout.set_alignment(pango.ALIGN_LEFT)
+            self.layout.set_alignment(Pango.Alignment.LEFT)
             
 
     def _get_context(self):
@@ -152,7 +151,7 @@ class Text(Grob, ColorMixin):
     #def _get_baseline(self):
         #self.iter = self.layout.get_iter()
         #baseline_y = self.iter.get_baseline()
-        #baseline_delta = baseline_y/pango.SCALE
+        #baseline_delta = baseline_y/Pango.SCALE
         #return (baseline_delta)
     #baseline = property(_get_baseline)
 
@@ -162,9 +161,9 @@ class Text(Grob, ColorMixin):
         # get the logical extents rectangle of first line
         first_line_extent = first_line.get_extents()[1]
         # get the descent value, in order to calculate baseline position
-        first_line_descent = pango.DESCENT(first_line.get_extents()[1])
+        first_line_descent = Pango.DESCENT(first_line.get_extents()[1])
         # gets the baseline offset from the top of thext block
-        baseline_delta = (first_line_extent[3]-first_line_descent)/pango.SCALE
+        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
         return (baseline_delta)
     baseline = property(_get_baseline)
 

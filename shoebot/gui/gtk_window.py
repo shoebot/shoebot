@@ -1,6 +1,6 @@
 import os
 import sys
-import gtk
+from gi.repository import Gtk, GObject
 
 from collections import deque
 from shoebot.gui import ShoebotWidget, VarWindow, SocketServerMixin
@@ -18,13 +18,12 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
+class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
     '''Create a GTK+ window that contains a ShoebotWidget'''
 
     # Draw in response to an expose-event
-    __gsignals__ = { "expose-event": "override" }
     def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, port=7777, fullscreen=False):
-        gtk.Window.__init__(self)
+        Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
@@ -48,11 +47,11 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.sb_widget = sb_widget
         self.attach_gtk(self)
 
-        self.uimanager = gtk.UIManager()
+        self.uimanager = Gtk.UIManager()
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
 
-        actiongroup = gtk.ActionGroup('Canvas')
+        actiongroup = Gtk.ActionGroup('Canvas')
 
         actiongroup.add_actions([('Save as', None, _('_Save as')),
                                  ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
@@ -94,8 +93,8 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         self.scheduled_snapshots = deque()
 
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
         if server:
             self.server('', self.serverport)
 
@@ -106,7 +105,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         ''' Handle right mouse button clicks '''
         if self.menu_enabled and event.button == 3:
             menu = self.uimanager.get_widget('/Save as')
-            menu.popup(None, None, None, event.button, event.time)
+            menu.popup(None, None, None, None, event.button, event.time)
         else:
             super(ShoebotWindow, self).gtk_mouse_button_down(widget, event)
 
@@ -183,11 +182,11 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.fullscreen()
         # next lines seem to be needed for window switching really to
         # fullscreen mode before reading it's size values
-        while gtk.events_pending():
-            gtk.main_iteration(block=False)
+        while Gtk.events_pending():
+            Gtk.main_iteration(block=False)
         # we pass informations on full-screen size to bot
-        self.bot._screen_width = gtk.gdk.screen_width()
-        self.bot._screen_height = gtk.gdk.screen_height()
+        self.bot._screen_width = Gdk.Screen.width()
+        self.bot._screen_height = Gdk.Screen.height()
         self.bot._screen_ratio = self.bot._screen_width / self.bot._screen_height
 
     def do_unfullscreen(self, widget):
@@ -224,4 +223,4 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
     def finish(self):
         while self.bot._quit == False and self.window_open == True:
-            gtk.main_iteration()
+            Gtk.main_iteration()

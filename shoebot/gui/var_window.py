@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 import sys
-import gtk
+from gi.repository import Gtk
 
 NUMBER = 1
 TEXT = 2
@@ -18,10 +18,10 @@ class VarWindow(object):
         self.parent = parent
         self.bot = bot
 
-        self.window = gtk.Window()
+        self.window = Gtk.Window()
         self.window.set_destroy_with_parent(True)
         self.window.connect("destroy", self.do_quit)
-        vbox = gtk.VBox(homogeneous=True, spacing=20)
+        vbox = Gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
         self.variables = []
@@ -43,35 +43,35 @@ class VarWindow(object):
 
         if title:
             self.window.set_title(title)
-        ## gtk.main()
+        ## Gtk.main()
 
     def add_number(self, container, v):
         # create a slider for each var
-        sliderbox = gtk.HBox(homogeneous=False, spacing=0)
-        label = gtk.Label(v.name)
+        sliderbox = Gtk.HBox(homogeneous=False, spacing=0)
+        label = Gtk.Label(label=v.name)
         sliderbox.pack_start(label, False, True, 20)
 
-        adj = gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
+        adj = Gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
         adj.connect("value_changed", self.cb_set_var, v)
-        hscale = gtk.HScale(adj)
-        hscale.set_value_pos(gtk.POS_RIGHT)
+        hscale = Gtk.HScale(adj)
+        hscale.set_value_pos(Gtk.PositionType.RIGHT)
         sliderbox.pack_start(hscale, True, True, 0)
         container.pack_start(sliderbox, True, True, 0)
 
     def add_text(self, container, v):
-        textcontainer = gtk.HBox(homogeneous=False, spacing=0)
-        label = gtk.Label(v.name)
+        textcontainer = Gtk.HBox(homogeneous=False, spacing=0)
+        label = Gtk.Label(label=v.name)
         textcontainer.pack_start(label, False, True, 20)
 
-        entry = gtk.Entry(max=0)
+        entry = Gtk.Entry(max=0)
         entry.set_text(v.value)
         entry.connect("changed", self.cb_set_var, v)
         textcontainer.pack_start(entry, True, True, 0)
         container.pack_start(textcontainer, True, True, 0)
 
     def add_boolean(self, container, v):
-        buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
-        button = gtk.CheckButton(label=v.name)
+        buttoncontainer = Gtk.HBox(homogeneous=False, spacing=0)
+        button = Gtk.CheckButton(label=v.name)
         # we send the state of the button to the callback method
         button.connect("toggled", self.cb_set_var, v)
 
@@ -80,9 +80,9 @@ class VarWindow(object):
 
 
     def add_button(self, container, v):
-        buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
+        buttoncontainer = Gtk.HBox(homogeneous=False, spacing=0)
         # in buttons, the varname is the function, so we use __name__
-        button = gtk.Button(label=v.name.__name__)
+        button = Gtk.Button(label=v.name.__name__)
         button.connect("clicked", self.bot._namespace[v.name], None)
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
