@@ -118,7 +118,7 @@ parser.add_argument("-c",
                 help=_("Close window after running bot (use with -r for benchmarking)"),
                 )
 parser.add_argument("script")
-parser.add_argument('args', nargs=argparse.REMAINDER)
+parser.add_argument('script_args', nargs=argparse.REMAINDER)
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -152,4 +152,4 @@ if __name__ == '__main__':
         server=args.socketserver,
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
-        args = args.args)
+        args = args.script_args)
