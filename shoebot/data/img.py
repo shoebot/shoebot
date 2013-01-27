@@ -6,7 +6,7 @@ import os.path
 from sys import platform
 
 import cairo
-import Image as PILImage
+from PIL import Image as PILImage
 import gtk
 
 if platform != 'darwin':
