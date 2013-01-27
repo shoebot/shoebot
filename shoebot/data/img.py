@@ -59,7 +59,7 @@ class Image(Grob, ColorMixin):
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                else:
+                elif gtk is not None and False:
                     pixbuf = gtk.gdk.pixbuf_new_from_file(path)
                     sw = pixbuf.get_width()
                     sh = pixbuf.get_height()
@@ -75,6 +75,18 @@ class Image(Grob, ColorMixin):
                     ct2.paint()
                     ''' surface now contains the image in a Cairo surface '''
                     imagesurface = ct2.get_target()
+                else:
+                    img = PILImage.open(path)
+
+                    if img.mode != 'RGBA':
+                        img = img.convert("RGBA")
+
+                    sw, sh = img.size
+                    # Would be nice to not have to do some of these conversions :-\
+                    bgra_data = img.tostring('raw', 'BGRA', 0, 1)
+                    bgra_array = array.array('B', bgra_data)
+                    imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4)
+
                 self._surface_cache[path] = sw, sh, imagesurface
             else:
                 img = PILImage.open(StringIO(self.data))

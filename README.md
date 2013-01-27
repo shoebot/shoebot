@@ -14,7 +14,7 @@ First thing is to install the appropriate dependencies. If this is your first ti
 
 Debian/Ubuntu:
 
-    sudo apt-get install python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
+    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
 
 Fedora:
 
