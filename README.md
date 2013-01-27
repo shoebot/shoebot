@@ -18,7 +18,7 @@ Debian/Ubuntu:
 
 Fedora:
 
-    sudo yum install pycairo pygtk2 pygobject2 gnome-python2-rsvg
+    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
 
 OSX:
 
