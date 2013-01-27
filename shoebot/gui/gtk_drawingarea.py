@@ -63,7 +63,7 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
         cr.set_source_surface(self.backing_store)
         cr.rectangle(0, 0,
-                size.width, size.height)
+                source_width, source_height)
         if self.first_run:
             cr.set_operator(cairo.OPERATOR_OVER)
         else:
