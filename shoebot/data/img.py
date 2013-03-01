@@ -7,7 +7,12 @@ from sys import platform
 
 import cairo
 from PIL import Image as PILImage
-from gi.repository import Gtk
+
+try:
+    from gi.repository import Gtk
+except:
+    Gtk = None
+
 
 try:
 	import rsvg
@@ -61,7 +66,7 @@ class Image(Grob, ColorMixin):
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                elif gtk is not None and False:
+                elif Gtk is not None:
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
                     sw = pixbuf.get_width()
                     sh = pixbuf.get_height()
