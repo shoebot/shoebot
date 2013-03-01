@@ -7,7 +7,10 @@ from sys import platform
 
 import cairo
 from PIL import Image as PILImage
-import gtk
+try:
+    import gtk
+except:
+    gtk = None
 
 if platform != 'darwin':
 	import rsvg
@@ -59,7 +62,7 @@ class Image(Grob, ColorMixin):
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                elif gtk is not None and False:
+                elif gtk is not None:
                     pixbuf = gtk.gdk.pixbuf_new_from_file(path)
                     sw = pixbuf.get_width()
                     sh = pixbuf.get_height()
