@@ -170,6 +170,7 @@ class Grammar(object):
         ## TODO: Not used when running as a bot, possibly should not be available in
         ## this case
         self._canvas.flush(self._frame)
+        self._canvas.sink.finish()
 
     #### Variables
     def _addvar(self, v):
