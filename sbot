@@ -54,6 +54,7 @@ DRAWBOT = 'drawbot'
 
 # use ArgumentParser to interpret commandline options
 parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
+parser.add_argument("script")
 parser.add_argument("-o",
                 "--outputfile",
                 dest="outputfile",
@@ -117,8 +118,7 @@ parser.add_argument("-c",
                 default=False,
                 help=_("Close window after running bot (use with -r for benchmarking)"),
                 )
-parser.add_argument("script")
-parser.add_argument('script_args', nargs=argparse.REMAINDER)
+#parser.add_argument('script_args', nargs=argparse.REMAINDER)
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     if not args.script and not args.window:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
-    
+
     run(src = args.script,
         grammar = args.grammar,
         outputfile = args.outputfile,
@@ -152,4 +152,5 @@ if __name__ == '__main__':
         server=args.socketserver,
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
-        args = args.script_args)
+        # args = args.script_args,
+        )
