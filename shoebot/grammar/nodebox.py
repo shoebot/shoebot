@@ -152,8 +152,9 @@ class NodeBot(Bot):
         self.lineto(x2,y2)
         self.endpath(draw=draw)
         self._path = p
+        return p
 
-    def arrow(self, x, y, width, type=NORMAL, draw=True):
+    def arrow(self, x, y, width, type=NORMAL, draw=True, fill=None, **kwargs):
         '''Draw an arrow.
 
         Arrows can be two types: NORMAL or FORTYFIVE.
@@ -166,41 +167,39 @@ class NodeBot(Bot):
 
         :return: Path object representing the arrow. 
         '''
-        # Taken from Nodebox.
+        # Taken from Nodebox
+        path = self.BezierPath(fillcolor=fill, **kwargs)
         if type == self.NORMAL:
             head = width * .4
             tail = width * .2
-            self.beginpath()
-            self.moveto(x, y)
-            self.lineto(x-head, y+head)
-            self.lineto(x-head, y+tail)
-            self.lineto(x-width, y+tail)
-            self.lineto(x-width, y-tail)
-            self.lineto(x-head, y-tail)
-            self.lineto(x-head, y-head)
-            self.lineto(x, y)
-            self.endpath()
-#            self.fill_and_stroke()
+            path.moveto(x, y)
+            path.lineto(x-head, y+head)
+            path.lineto(x-head, y+tail)
+            path.lineto(x-width, y+tail)
+            path.lineto(x-width, y-tail)
+            path.lineto(x-head, y-tail)
+            path.lineto(x-head, y-head)
+            path.lineto(x, y)
         elif type == self.FORTYFIVE:
             head = .3 
             tail = 1 + head
-            self.beginpath()
-            self.moveto(x, y)
-            self.lineto(x, y+width*(1-head))
-            self.lineto(x-width*head, y+width)
-            self.lineto(x-width*head, y+width*tail*.4)
-            self.lineto(x-width*tail*.6, y+width)
-            self.lineto(x-width, y+width*tail*.6)
-            self.lineto(x-width*tail*.4, y+width*head)
-            self.lineto(x-width, y+width*head)
-            self.lineto(x-width*(1-head), y)
-            self.lineto(x, y)
-            self.endpath(draw)
-#            self.fill_and_stroke()
+            path.moveto(x, y)
+            path.lineto(x, y+width*(1-head))
+            path.lineto(x-width*head, y+width)
+            path.lineto(x-width*head, y+width*tail*.4)
+            path.lineto(x-width*tail*.6, y+width)
+            path.lineto(x-width, y+width*tail*.6)
+            path.lineto(x-width*tail*.4, y+width*head)
+            path.lineto(x-width, y+width*head)
+            path.lineto(x-width*(1-head), y)
+            path.lineto(x, y)
         else:
             raise NameError(_("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"))
+        if draw:
+            path.draw()
+        return path
 
-    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True):
+    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, fill=None):
         '''Draws a star.
         '''
         # Taken from Nodebox.
@@ -219,7 +218,7 @@ class NodeBot(Bot):
             y = starty + radius * y
             self.lineto(x,y)
 
-        self.endpath(draw)
+        return self.endpath(draw)
 
     def obama(self, x=0, y=0, s=1):
         self.beginpath()
@@ -275,14 +274,14 @@ class NodeBot(Bot):
         self.moveto(x+48.335794999999997*s, y+25.116951*s)
         self.curveto(x+52.603257999999997*s, y+28.884436000000001*s, x+42.579355*s, y+36.129815000000001*s, x+44.680596999999999*s, y+27.957156999999999*s)
         self.curveto(x+46.699556999999999*s, y+28.476931999999998*s, x+47.871873000000001*s, y+29.936544999999999*s, x+48.335794999999997*s, y+25.116951*s)
-        self.endpath()
+        return self.endpath()
 
     easteregg = obama
 
     #### Path
     # Path functions taken from Nodebox and modified
 
-    def beginpath(self, x=None, y=None):
+    def beginpath(self, x=None, y=None, fill=None):
         self._path = self.BezierPath()
         if x and y:
             self._path.moveto(x,y)

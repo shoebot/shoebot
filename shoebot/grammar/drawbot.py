@@ -81,6 +81,7 @@ class DrawBot(Bot):
         self.lineto(x2,y2)
         self.endpath(draw=draw)
         self._path = p
+        return p
 
     #### Path
     # Path functions taken from Nodebox and modified
