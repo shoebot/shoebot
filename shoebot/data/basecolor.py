@@ -231,7 +231,7 @@ class ColorMixin(object):
 
     def __init__(self,  **kwargs):
         if 'fill' in kwargs:
-            self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
+            self._fillcolor = Color(self._canvas, kwargs['fill'], mode='rgb', color_range=1)
         else:
             self._fillcolor = self._canvas.fillcolor
 

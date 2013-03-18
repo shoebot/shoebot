@@ -40,9 +40,9 @@ class Text(Grob, ColorMixin):
     # several reference docs can be found at http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, enableRendering=True, **kwargs):
+        self._canvas = canvas = bot._canvas
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
-        canvas = bot._canvas
         
         ###self._transform = canvas.transform # TODO remove - this is in grob
 
@@ -210,9 +210,9 @@ class Text(Grob, ColorMixin):
                 p.curveto(*args)
             elif cmd == PATH_CLOSE_PATH:
                 p.closepath()
-        return p
         # cairo function for freeing path memory
         pathdata.path_destroy()
+        return p
     path = property(_get_path)
 
     def _get_center(self):
