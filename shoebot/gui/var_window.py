@@ -51,10 +51,14 @@ class VarWindow(object):
         label = gtk.Label(v.name)
         sliderbox.pack_start(label, False, True, 20)
 
-        adj = gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
+        if v.max - v.min > 2:
+            adj = gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
+        else:
+            adj = gtk.Adjustment(v.value, v.min, v.max, .1)
         adj.connect("value_changed", self.cb_set_var, v)
         hscale = gtk.HScale(adj)
         hscale.set_value_pos(gtk.POS_RIGHT)
+        hscale.set_value(v.value)
         sliderbox.pack_start(hscale, True, True, 0)
         container.pack_start(sliderbox, True, True, 0)
 
