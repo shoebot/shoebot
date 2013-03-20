@@ -69,7 +69,7 @@ class Grammar(object):
         if iterations:
             if iteration < iterations:
                 return True
-        elif len(self._namespace) > 0:
+        elif len(self._vars) > 0:
             # Vars have been added in script
             return True
         elif iterations is None:
