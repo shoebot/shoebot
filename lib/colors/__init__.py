@@ -44,7 +44,7 @@ from xml.dom.minidom import parseString
 from random import random, choice
 
 try:
-    from shoebot.core import Bot
+    from shoebot.grammar import Bot
     from shoebot.data import Grob
     from shoebot import _restore, _save    
 except ImportError:
