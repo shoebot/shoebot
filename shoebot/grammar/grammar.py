@@ -69,11 +69,15 @@ class Grammar(object):
         if iterations:
             if iteration < iterations:
                 return True
+        elif len(self._namespace) > 0:
+            # Vars have been added in script
+            return True
         elif iterations is None:
             if self._dynamic:
                 return True
             else:
                 return False
+            return True
         if not self._dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
