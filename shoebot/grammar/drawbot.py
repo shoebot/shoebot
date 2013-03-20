@@ -141,7 +141,7 @@ class DrawBot(Bot):
             p = self.BezierPath(path)
             p.draw()
         elif isinstance(path, Image):
-            self._canvas.add(path)
+            path.draw() # Is this right ? - added to make test_clip_4.bot work
         elif hasattr(path, '__iter__'):
             p = self.BezierPath()
             for point in path:
