@@ -27,6 +27,8 @@ class Variable(object):
                 self.default = default
         elif self.type == BUTTON:
             self.default = self.name
+        else:
+            raise AttributeError("Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON")
         self.value = value or self.default
 
     def sanitize(self, val):
