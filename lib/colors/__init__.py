@@ -3048,7 +3048,9 @@ def noshadow():
     shadow(alpha=0)
 
 class gradientpath(Grob):
-    
+    #
+    # This is heavily based on Core Image + will need to be reimplemented.
+    #
     def __init__(self, path, clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
         
         """ Fills a path with a smooth gradient between two colors.
