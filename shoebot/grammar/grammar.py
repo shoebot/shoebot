@@ -28,7 +28,6 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
-        print 'grammar __init__ ', vars
 
         input_device = canvas.get_input_device()
         if input_device:
