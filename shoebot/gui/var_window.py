@@ -1,17 +1,14 @@
 #!/usr/bin/env python2
-import sys
 import gtk
+import os.path
+import sys
 
 NUMBER = 1
 TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
-if sys.platform != 'win32':
-    ICON_FILE = '/usr/share/shoebot/icon.png'
-else:
-    import os.path
-    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
+ICON_FILE = next(f for f in ['/usr/share/shoebot/shoebot-ide.png', os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')] if os.path.exists(f))
 
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):
@@ -76,6 +73,7 @@ class VarWindow(object):
     def add_boolean(self, container, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         button = gtk.CheckButton(label=v.name)
+        button.set_active(v.value)
         # we send the state of the button to the callback method
         button.connect("toggled", self.cb_set_var, v)
 
