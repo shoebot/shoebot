@@ -55,8 +55,8 @@ class NodeBot(Bot):
     color_mode = RGB
     color_range = 1
 
-    def __init__(self, canvas = None, namespace = None):
-        Bot.__init__(self, canvas, namespace)
+    def __init__(self, canvas = None, namespace = None, vars = None):
+        Bot.__init__(self, canvas, namespace = namespace, vars = vars)
         canvas.mode = CORNER
         self._ns = self._namespace
 

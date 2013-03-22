@@ -103,8 +103,8 @@ class Bot(Grammar):
     keycode = 0
     keydown = False
 
-    def __init__(self, canvas, namespace = None):
-        Grammar.__init__(self, canvas, namespace)
+    def __init__(self, canvas, namespace = None, vars = None):
+        Grammar.__init__(self, canvas, namespace = namespace, vars = vars)
         canvas.set_bot(self)
 
         self._autoclosepath = True

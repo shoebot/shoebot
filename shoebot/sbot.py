@@ -64,7 +64,7 @@ def create_canvas(src, format = None, outputfile = None, multifile = False, wind
     return canvas
 
 
-def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False):
+def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None):
     '''
     Convienience function to create a bot
     '''
@@ -72,15 +72,15 @@ def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, it
 
     from shoebot.grammar import DrawBot, NodeBot
     if grammar == DRAWBOT:
-        bot = DrawBot(canvas)
+        bot = DrawBot(canvas, vars = vars)
     else:
-        bot = NodeBot(canvas)
+        bot = NodeBot(canvas, vars = vars)
 
     return bot
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, args = []):
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, args = []):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
-    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, fullscreen, server, port, show_vars)
+    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, fullscreen, server, port, show_vars, vars = vars)
     bot.run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
     return bot

@@ -2,6 +2,7 @@ import os
 import traceback
 
 from time import sleep, time
+from shoebot.data import Variable
 from shoebot.util import flushfile
 
 import sys
@@ -18,15 +19,16 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
-    def __init__(self, canvas, namespace = None):
+    def __init__(self, canvas, namespace = None, vars = None):
         self._canvas = canvas
         self._quit = False
         self._iteration = 0
         self._dynamic = True
         self._speed = None
-        self._vars = {}
+        self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
+        print 'grammar __init__ ', vars
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -181,8 +183,12 @@ class Grammar(object):
         ''' Sets a new accessible variable.'''
         oldvar = self._oldvars.get(v.name)
         if oldvar is not None:
-            if oldvar.compliesTo(v):
-                v.value = oldvar.value
+            if isinstance(oldvar, Variable):
+                if oldvar.compliesTo(v):
+                    v.value = oldvar.value
+            else:
+                # Set from commandline
+                v.value = v.sanitize(oldvar)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
         return v

@@ -24,9 +24,9 @@ CORNER = 'corner'
 
 class DrawBot(Bot):
 
-    def __init__(self, canvas, namespace = None):
+    def __init__(self, canvas, namespace = None, vars = None):
         ### TODO - Need to do whole drawbot class
-        Bot.__init__(self, canvas, namespace)
+        Bot.__init__(self, canvas, namespace = namespace, vars = None)
         self._transformmode = CORNER
         self._canvas.origin = BOTTOM_LEFT
 

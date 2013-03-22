@@ -211,7 +211,6 @@ class Text(Grob, ColorMixin):
             elif cmd == PATH_CLOSE_PATH:
                 p.closepath()
         # cairo function for freeing path memory
-        pathdata.path_destroy()
         return p
     path = property(_get_path)
 

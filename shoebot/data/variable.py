@@ -3,6 +3,9 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
+def clamp(minvalue, value, maxvalue):
+    return max(minvalue, min(value, maxvalue))
+
 class Variable(object):
     '''Taken from Nodebox'''
     def __init__(self, name, type, default=None, min=0, max=100, value=None):
@@ -31,11 +34,12 @@ class Variable(object):
             raise AttributeError("Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON")
         self.value = value or self.default
 
+
     def sanitize(self, val):
         """Given a Variable and a value, cleans it out"""
         if self.type == NUMBER:
             try:
-                return float(val)
+                return clamp(self.min, self.max, float(val))
             except ValueError:
                 return 0.0
         elif self.type == TEXT:
