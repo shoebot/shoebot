@@ -154,8 +154,6 @@ if __name__ == '__main__':
         except Exception as e:
             error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
             raise e
-    else:
-        print 'no vars'
 
     run(src = args.script,
         grammar = args.grammar,
