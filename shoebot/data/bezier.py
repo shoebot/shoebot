@@ -60,14 +60,6 @@ class BezierPath(Grob):
             self._elements = []
             self._render_funcs = []
 
-        if isinstance(path, (tuple,list)):
-            # list of path elements
-            for element in path:
-                self.append(element)
-        elif isinstance(path, BezierPath):
-            self._elements = list(path._elements)
-            self._render_funcs = list(path._render_funcs)
-                
         self._fillcolor = fillcolor
         self._strokecolor = strokecolor
         self._strokewidth = strokewidth
@@ -78,6 +70,17 @@ class BezierPath(Grob):
         self._bounds = None
         self._center = None
         self._segments = None
+
+        if isinstance(path, (tuple,list)):
+            # list of path elements
+            for element in path:
+                self.append(element)
+        elif isinstance(path, BezierPath):
+            self._elements = list(path._elements)
+            self._render_funcs = list(path._render_funcs)
+            self.closed = path.closed
+
+
 
     def _append_element(self, render_func, pe):
         '''
@@ -104,7 +107,7 @@ class BezierPath(Grob):
         self.append(*args)
 
     def copy(self):
-        path = BezierPath(self._bot, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
+        path = BezierPath(self._bot, None, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
         path.closed = self.closed
         path._center = self._center
         return path
