@@ -95,13 +95,13 @@
      inkscape:label="Shoebot output"
      inkscape:groupmode="layer"
      id="g19119">
-    <rect
+    <!--<rect
        id="rect19122"
        style="fill:#b2c23c;stroke:none"
        height="600"
        width="600"
        y="0"
-       x="0" />
+       x="0" />-->
     <path
        style="fill:none;stroke:#112800;stroke-width:10.93604851;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10"
        d="m 117.04985,589.74247 c 0,36.61604 -29.683132,66.29917 -66.299171,66.29917 -36.616039,0 -66.299174,-29.68313 -66.299174,-66.29917 0,-36.61604 29.683135,-66.29917 66.299174,-66.29917 36.616039,0 66.299171,29.68313 66.299171,66.29917"
