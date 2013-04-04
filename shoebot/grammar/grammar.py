@@ -52,6 +52,7 @@ class Grammar(object):
             if name[0] != '_':
                 namespace[name] = getattr(self, name)
 
+        namespace['_ctx'] = self  # Used in older nodebox scripts.
         namespace['__file__'] = filename
         self._namespace = namespace
 
