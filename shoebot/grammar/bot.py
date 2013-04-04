@@ -210,10 +210,9 @@ class Bot(Grammar):
 
     def color(self, *args):
         '''
-        Args:
-            color in a supported format.
-        Return:
-            Color object containing the color.
+        :param args: color in a supported format.
+
+        :return: Color object containing the color.
         '''
         return self.Color(mode = self.color_mode, color_range = self.color_range, *args)
         #return self.Color(*args)
