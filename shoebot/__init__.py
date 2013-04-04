@@ -12,7 +12,7 @@ CORNER = "corner"
 CORNERS = "corners"
 
 # TODO - Check if this needs importing here:
-from data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE
+from data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT
 
 
 def _save():

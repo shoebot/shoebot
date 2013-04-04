@@ -4,7 +4,7 @@ import cairo
 from shoebot import ShoebotError
 from bot import Bot
 from shoebot.data import Point, BezierPath, Image
-from shoebot import RGB, \
+from shoebot.data import RGB, \
                     HSB, \
                     CORNER, \
                     CENTER, \
@@ -16,11 +16,15 @@ from shoebot import RGB, \
                     RCURVETO, \
                     ARC, \
                     ELLIPSE, \
-                    CLOSE
+                    CLOSE, \
+                    LEFT, \
+                    CENTER, \
+                    RIGHT
                     
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType
+from PIL import Image as PILImage
 
 import locale, gettext
 APP = 'shoebot'
@@ -51,6 +55,9 @@ class NodeBot(Bot):
     ELLIPSE = ELLIPSE # Shoebot, not nodebox 1.x
     CLOSE = CLOSE
 
+    LEFT = LEFT
+    RIGHT = RIGHT
+    
     # Default values    
     color_mode = RGB
     color_range = 1
@@ -75,7 +82,7 @@ class NodeBot(Bot):
         :param: path    Path to image.
         :return: image size as tuple (width, height)
         '''
-        img = Image.open(path)
+        img = PILImage.open(path)
         return img.size
 
     # Paths
@@ -334,7 +341,7 @@ class NodeBot(Bot):
 
     def drawpath(self,path):
         if isinstance(path, BezierPath):
-            p = self.BezierPath(path)
+            p = self.BezierPath(path=path)
             p.draw()
         elif isinstance(path, Image):
             path.draw() # Is this right ? - added to make test_clip_4.bot work
