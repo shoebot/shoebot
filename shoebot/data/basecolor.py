@@ -161,7 +161,7 @@ class Color(object):
                     self.__dict__["__g"], 
                     self.__dict__["__b"]
                 )
-                #self._update_cmyk(*rgb2cmyk(r, g, b))
+                self._update_cmyk(*rgb2cmyk(r, g, b))
                 self._update_hsb(*rgb2hsb(r, g, b))
         
         # HSB changes, update RGB and CMYK accordingly.
@@ -176,7 +176,7 @@ class Color(object):
                     self.__dict__["__brightness"]
                 )
                 self._update_rgb(r, g, b)
-                #self._update_cmyk(*rgb2cmyk(r, g, b))
+                self._update_cmyk(*rgb2cmyk(r, g, b))
         
         # CMYK changes, update RGB and HSB accordingly.
         elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
@@ -222,6 +222,7 @@ class Color(object):
             return self.__dict__["__"+a[0]]
         
         raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
+
 
 
 class ColorMixin(object):
