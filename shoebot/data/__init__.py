@@ -82,3 +82,9 @@ CLOSE = "close"
 CENTER = 'center'
 CORNER = 'corner'
 CORNERS = "corners"
+
+LEFT = 'left'
+RIGHT = 'right'
+
+RGB = "rgb"
+HSB = "hsb"
