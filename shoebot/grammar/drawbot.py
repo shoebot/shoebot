@@ -138,7 +138,7 @@ class DrawBot(Bot):
 
     def drawpath(self,path):
         if isinstance(path, BezierPath):
-            p = self.BezierPath(path)
+            p = self.BezierPath(path=path)
             p.draw()
         elif isinstance(path, Image):
             path.draw() # Is this right ? - added to make test_clip_4.bot work
