@@ -37,6 +37,7 @@ _ = gettext.gettext
 
 # Nodebox compatibility shim
 sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
+sys.path.append('.') # ximport can work from current dir
 
 class NodeBot(Bot):
     
