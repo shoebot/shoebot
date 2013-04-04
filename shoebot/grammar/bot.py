@@ -30,7 +30,6 @@
 '''Bot base class'''
 
 import sys, os
-import shoebot
 
 from shoebot import ShoebotError, \
                     RGB, HSB, \
@@ -104,6 +103,11 @@ class Bot(Grammar):
     keydown = False
 
     def __init__(self, canvas, namespace = None, vars = None):
+        '''
+        :param canvas: Canvas implementation for output.
+        :param namespace: Optionally specify a dict to inject as namespace
+        :param vars: Optional dict containing initial values for variables
+        '''
         Grammar.__init__(self, canvas, namespace = namespace, vars = vars)
         canvas.set_bot(self)
 
@@ -145,21 +149,26 @@ class Bot(Grammar):
     # Get input
 
     def _mouse_button_down(self, button):
+        '''GUI callback for mouse button down'''
         self._namespace['mousedown'] = True
 
     def _mouse_button_up(self, button):
+        '''GUI callback for mouse button up'''
         self._namespace['mousedown'] = self._input_device.mouse_down
 
     def _mouse_pointer_moved(self, x, y):
+        '''GUI callback for mouse moved'''
         self._namespace['MOUSEX'] = x
         self._namespace['MOUSEY'] = y
 
     def _key_pressed(self, key, keycode):
+        '''GUI callback for key pressed'''
         self._namespace['key'] = key
         self._namespace['keycode'] = keycode
         self._namespace['keydown'] = True
 
     def _key_released(self, key, keycode):
+        '''GUI callback for key released'''
         self._namespace['keydown'] = self._input_device.key_down
 
     #### Functions for override
@@ -260,6 +269,8 @@ class Bot(Grammar):
         """Returns a list of files.
         You can use wildcards to specify which files to pick, e.g.
             f = files('*.gif')
+
+        :param path: wildcard to use in file list.
         """
         # Taken ipsis verbis from Nodebox
         return glob(path)
@@ -267,19 +278,10 @@ class Bot(Grammar):
     def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file or cairo surface/context
 
-        Defer option:
-        Decides whether the action needs to happen now or can happen later.
-
-        Defer set to False
-        Ensures that a file is written before returning, but can hamper performance.
-        Usually you won't want to do this.
-
-        For files defer defaults to True, and for Surfaces to False, this means
-        writing files won't stop execution, while the surface will be ready when
-        snapshot returns.
-        
-        The drawqueue will have to stop and render everything up until this
-        point.
+        :param filename: Filename to save snapshot as, available formats include .png, .ps, .svg
+        :param surface:  If specified will output snapshot to the supplied cairo surface.
+        :param defer: If true, buffering/threading may be employed however output will not be immediate.
+        :param autonumber: If true then a number will be appended to the filename.
         '''
         if autonumber:
             file_number=self._frame
@@ -306,10 +308,13 @@ class Bot(Grammar):
             
             
 
-    # from Nodebox, a function to import Nodebox libraries
-
     def ximport(self, libName):
-        sys.path.append('.')
+        '''
+        Import nodebox libraries
+
+        :param libName: Library name to import
+        '''
+        # from Nodebox
         lib = __import__(libName)
         self._namespace[libName] = lib
         lib._ctx = self
@@ -319,9 +324,13 @@ class Bot(Grammar):
     #### Core functions
 
     def size(self, w = None, h = None):
-        '''Sets the size of the canvas, and creates a Cairo surface and context.
+        '''Set the canvas size
 
-        Only the first call will actually be effective.'''
+        Only the first call will actually be effective.
+
+        :param w: Width
+        :param h: height
+        '''
         
         if not w:
             w = self._canvas.width
@@ -337,11 +346,8 @@ class Bot(Grammar):
     def speed(self, framerate):
         '''Set animation framerate.
 
-        Args:
-            framerate   Frames per second.
-        
-        Returns:
-            Current framerate of animation.
+        :param framerate: Frames per second to run bot.
+        :return: Current framerate of animation.
         '''
         if framerate:
             self._speed = framerate

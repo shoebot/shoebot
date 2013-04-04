@@ -65,6 +65,13 @@ class NodeBot(Bot):
     color_range = 1
 
     def __init__(self, canvas = None, namespace = None, vars = None):
+        '''
+        Nodebot grammar constructor
+
+        :param canvas: Canvas implementation for output.
+        :param namespace: Optionally specify a dict to inject as namespace
+        :param vars: Optional dict containing initial values for variables
+        '''
         Bot.__init__(self, canvas, namespace = namespace, vars = vars)
         canvas.mode = CORNER
         self._ns = self._namespace
@@ -81,7 +88,7 @@ class NodeBot(Bot):
 
     def imagesize(self, path):
         '''
-        :param: path    Path to image.
+        :param: path    Path to image file.
         :return: image size as tuple (width, height)
         '''
         img = PILImage.open(path)
