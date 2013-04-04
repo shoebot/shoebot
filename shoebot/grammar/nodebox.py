@@ -1,6 +1,7 @@
 import os.path
 import sys
 import cairo
+from shoebot.kgp import KantGenerator
 from shoebot import ShoebotError
 from bot import Bot
 from shoebot.data import Point, BezierPath, Image
@@ -113,7 +114,7 @@ class NodeBot(Bot):
         '''
         Set the current rectmode.
 
-        :param: mode CORNER, CENTER, CORNERS
+        :param mode: CORNER, CENTER, CORNERS
         :return: rectmode if mode is None or valid.
 
         '''
@@ -153,7 +154,12 @@ class NodeBot(Bot):
         return self.ellipse(x, y, diameter, diameter, draw)
 
     def line(self, x1, y1, x2, y2, draw=True):
-        '''Draw a line from (x1,y1) to (x2,y2)'''
+        '''Draw a line from (x1,y1) to (x2,y2)
+        :param x1: start x-coordinate
+        :param y1: start y-coordinate
+        :param x2: end x-coordinate
+        :param y2: end y-coordinate
+        '''
         p = self._path
         self.beginpath()
         self.moveto(x1,y1)
@@ -465,17 +471,34 @@ class NodeBot(Bot):
         p.draw()
 
     def transform(self, mode=None):
-        '''Mode can be CENTER or CORNER'''
+        '''
+        Set the current transform mode.
+
+        :param mode: CENTER or CORNER'''
         if mode:
             self._canvas.mode = mode
         return self._canvas.mode
 
     def translate(self, xt, yt, mode = None):
+        '''
+        Translate the current position by (xt, yt) and
+        optionally set the transform mode.
+
+        :param xt: Amount to move horizontally
+        :param yt: Amount to move vertically
+        :mode: Set the transform mode to CENTER or CORNER
+        '''
         self._canvas.translate(xt, yt)
         if mode:
             self._canvas.mode = mode
 
     def rotate(self, degrees=0, radians=0):
+        '''
+        Set the current rotation in degrees or radians.
+
+        :param degrees: Degrees to rotate
+        :param radians: Radians to rotate
+        '''
         ### TODO change canvas to use radians
         if radians:
             angle = radians
@@ -484,6 +507,14 @@ class NodeBot(Bot):
         self._canvas.rotate(-angle)
 
     def scale(self, x=1, y=None):
+        '''
+        Set a scale at which to draw objects.
+
+        1.0 draws objects at their natural size
+
+        :param x: Scale on the horizontal plane
+        :param y: Scale on the vertical plane
+        '''
         if not y:
             y = x
         if x == 0:
@@ -518,10 +549,15 @@ class NodeBot(Bot):
         raise NotImplementedError(_("outputmode() isn't implemented yet"))
 
     def colormode(self, mode=None, crange=None):
-        '''Sets the current colormode (can be RGB or HSB) and eventually
+        '''Set the current colormode (can be RGB or HSB) and eventually
         the color range.
 
         If called without arguments, it returns the current colormode.
+
+        :param mode: Color mode, either "rgb", or "hsb"
+        :param crange: Maximum scale value for color, e.g. 1.0 or 255
+
+        :return: Returns the current color mode.
         '''
         if mode is not None:
             if mode == "rgb":
@@ -538,13 +574,16 @@ class NodeBot(Bot):
         '''By default colors range from 0.0 - 1.0 using colorrange
         other defaults can be used, e.g. 0.0 - 255.0
 
-        Set a color range of 0.0 - 255:
+        :param crange: Color range of 0.0 - 255:
         >>> colorrange(256)
         '''
         self.color_range = float(crange)
 
     def fill(self,*args):
-        '''Sets a fill color, applying it to new paths.'''
+        '''Sets a fill color, applying it to new paths.
+
+        :param args: color in supported format
+        '''
         self._canvas.fillcolor = self.color(*args)
         return self._canvas.fillcolor
 
@@ -553,16 +592,28 @@ class NodeBot(Bot):
         self._canvas.fillcolor = None
 
     def stroke(self,*args):
-        '''Set a stroke color, applying it to new paths.'''
+        '''Set a stroke color, applying it to new paths.
+
+        :param args: color in supported format
+        '''
         self._canvas.strokecolor = self.color(*args)
         return self._canvas.strokecolor
 
     def nostroke(self):
-        ''' Stop applying strokes to new paths.'''
+        ''' Stop applying strokes to new paths.
+
+        :return: stroke color before nostroke was called.
+        '''
+        c = self._canvas.strokecolor
         self._canvas.strokecolor = None
+        return c
 
     def strokewidth(self, w=None):
-        '''Set the stroke width.'''
+        '''Set the stroke width.
+
+        :param w: Stroke width.
+        :return: If no width was specified then it will be returned.
+        '''
         if w is not None:
             self._canvas.strokewidth = w
         else:
@@ -583,6 +634,7 @@ class NodeBot(Bot):
         :param fontpath: path to truetype or opentype font.
         :param fontsize: size of font
 
+        :return: current current fontpath (if fontpath param not set)
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed.'''
         if fontpath is not None:
@@ -593,6 +645,12 @@ class NodeBot(Bot):
             self._canvas.fontsize = fontsize
 
     def fontsize(self, fontsize=None):
+        '''
+        Set or return size of current font.
+
+        :param fontsize: Size of font.
+        :return: Size of font (if fontsize was not specified)
+        '''
         if fontsize is not None:
             self._canvas.fontsize = fontsize
         else:
@@ -667,11 +725,18 @@ class NodeBot(Bot):
 
     def lineheight(self, height=None):
         '''Set text lineheight.
+
+        :param height: line height.
         '''
         if height is not None:
             self._canvas.lineheight = height
 
-    def align(self, align="LEFT"):
+    def align(self, align=LEFT):
+        '''
+        Set text alignment
+
+        :param align: Text alignment (LEFT, CENTER, RIGHT)
+        '''
         self._canvas.align = align
 
     # TODO: Set the framework to setup font options
@@ -680,7 +745,7 @@ class NodeBot(Bot):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
     def autotext(self, sourceFile):
-        k = KantGenerator(sourceFile)
+        k = Kant1Generator(sourceFile)
         return k.output()
 
 
