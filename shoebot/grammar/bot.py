@@ -310,6 +310,7 @@ class Bot(Grammar):
     # from Nodebox, a function to import Nodebox libraries
 
     def ximport(self, libName):
+        sys.path.append('.')
         lib = __import__(libName)
         self._namespace[libName] = lib
         lib._ctx = self
