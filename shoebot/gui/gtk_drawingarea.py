@@ -29,7 +29,7 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
             self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
         self.size = None
         self.first_run = True
-	self.last_rendering = None
+        self.last_rendering = None
 
     def do_expose_event(self, event):
         '''
@@ -46,19 +46,23 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
             if size.width > source_width or size.height > source_height:
                 # Scale up by largest dimension
                 if size.width > source_width:
-                    xscale = float(size.width) / float(source_width)
+                    scale_x = float(size.width) / float(source_width)
                 else:
-                    xscale = 1.0
+                    scale_x = 1.0
 
                 if size.height > source_height:
-                    yscale = float(size.height) / float(source_height)
+                    scale_y = float(size.height) / float(source_height)
                 else:
-                    yscale = 1.0
+                    scale_y = 1.0
 
-                if xscale > yscale:
-                    cr.scale(xscale, xscale)
+                if scale_x > scale_y:
+                    cr.scale(scale_x, scale_x)
+                    self.scale_x = scale_x
+                    self.scale_y = scale_x
                 else:
-                    cr.scale(yscale, yscale)
+                    cr.scale(scale_y, scale_y)
+                    self.scale_y = scale_y
+                    self.scale_y = scale_y
 
 
         cr.set_source_surface(self.backing_store)
