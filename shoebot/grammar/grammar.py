@@ -41,7 +41,9 @@ class Grammar(object):
 
 
     def _load_namespace(self, filename = None):
-        ''' Export namespace into the user bot '''
+        ''' Export namespace into the user bot
+        :param filename: Will be set to __file__ in the namespace
+        '''
         namespace = self._namespace
 
         from shoebot import data
@@ -101,7 +103,11 @@ class Grammar(object):
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
     def _exec_frame(self, source_or_code, limit = False):
-        ''' Run single frame of the bot '''
+        ''' Run single frame of the bot
+
+        :param source_or_code: path to code to run, or actual code.
+        :param limit: Time a frame should take to run (float - seconds)
+        '''
         namespace = self._namespace
         self._canvas.reset_canvas()
         self._set_dynamic_vars()
@@ -127,9 +133,12 @@ class Grammar(object):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
-        '''
-        source_or_code = ""
 
+        :param inputcode: path to code to run, or actual code.
+        :param iterations: maximum amount of frames to run
+        :param run_forever: if True will run until the user quits the bot
+        :param frame_limiter: Time a frame should take to run (float - seconds)
+        '''
         # is it a proper filename?
         if os.path.isfile(inputcode):
             file = open(inputcode, 'rU')
@@ -180,7 +189,10 @@ class Grammar(object):
 
     #### Variables
     def _addvar(self, v):
-        ''' Sets a new accessible variable.'''
+        ''' Sets a new accessible variable.
+
+        :param v: Variable.
+        '''
         oldvar = self._oldvars.get(v.name)
         if oldvar is not None:
             if isinstance(oldvar, Variable):
