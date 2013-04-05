@@ -105,11 +105,11 @@ class Image(Grob, ColorMixin):
 
             if width is not None or height is not None:
                 if width:
-                    wscale = sw /float(width)
+                    wscale = float(width) / sw
                 else:
                     wscale = 1.0
                 if height:
-                    hscale = sh / float(height)
+                    hscale = float(height) / sh
                 else:
                     if width:
                         hscale = wscale
