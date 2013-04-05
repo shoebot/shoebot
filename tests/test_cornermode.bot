@@ -1,0 +1,29 @@
+def draw_rects(angle = None):
+    push()
+    for i in range(3):
+        translate(0, 50)
+        push()
+        if angle:
+            rotate(angle)
+        rect(0, 0, 40, 40)
+        pop()
+    pop()
+
+
+text('none', 0, 20)
+draw_rects()
+
+
+translate(100, 0)
+text('default', 0, 20)
+draw_rects(angle=10)
+
+transform(CORNER)
+translate(100, 0)
+text('corner', 0, 20)
+draw_rects(angle=10)
+
+transform(CENTER)
+translate(100, 0)
+text('center', 0, 20)
+draw_rects(angle=10)

@@ -1,0 +1,55 @@
+import sys
+SHOEBOT_ICON=sys.prefix+'/share/pixmaps/shoebot-ide.png'
+
+'''
+Corner mode tests for images.
+
+Images should be on top of their respective rectangles
+'''
+
+def draw_rects(angle = None):
+    push()
+    for i in range(3):
+        translate(0, 50)
+        push()
+        if angle:
+            rotate(angle)
+        rect(0, 0, 40, 40)
+        pop()
+    pop()
+
+
+def draw_images(angle = None, img=None):
+    push()
+    for i in range(3):
+        translate(0, 50)
+        push()
+        if angle:
+            rotate(angle)
+        image(img or SHOEBOT_ICON, x=0, y=0, width=40, height=40)
+        pop()
+    pop()
+    
+
+
+text('none', 0, 20)
+draw_rects()
+draw_images()
+
+
+translate(100, 0)
+text('default', 0, 20)
+draw_rects(angle=10)
+draw_images(angle=10)
+
+transform(CORNER)
+translate(100, 0)
+text('corner', 0, 20)
+draw_rects(angle=10)
+draw_images(angle=10)
+
+transform(CENTER)
+translate(100, 0)
+text('center', 0, 20)
+draw_rects(angle=10)
+draw_images(angle=10)
