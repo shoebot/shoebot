@@ -339,9 +339,12 @@ class Bot(Grammar):
         if not w and not h:
             return (self._canvas.width, self._canvas.height)
 
+        # Updating in all these places seems a bit hacky
         w, h = self._canvas.set_size((w, h))
         self._namespace['WIDTH'] = w
         self._namespace['HEIGHT'] = h
+        self.WIDTH = w  # Added to make evolution example work
+        self.HEIGHT = h # Added to make evolution example work
 
     def speed(self, framerate):
         '''Set animation framerate.
