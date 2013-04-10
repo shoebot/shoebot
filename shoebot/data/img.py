@@ -3,7 +3,6 @@ from shoebot.data import _copy_attrs
 import array
 from StringIO import StringIO
 import os.path
-from sys import platform
 
 import cairo
 from PIL import Image as PILImage
