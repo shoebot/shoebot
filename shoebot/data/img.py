@@ -12,8 +12,10 @@ try:
 except:
     gtk = None
 
-if platform != 'darwin':
+try:
 	import rsvg
+else:
+    rsvg = None
 
 from shoebot.data import Grob, ColorMixin
 from shoebot.util import RecordingSurface
@@ -52,7 +54,7 @@ class Image(Grob, ColorMixin):
             if self.data is None:
                 if path in self._surface_cache:
                     sw, sh, imagesurface = self._surface_cache[path]
-                elif os.path.splitext(path)[1].lower() == '.svg':
+                elif os.path.splitext(path)[1].lower() == '.svg' and rsvg is not None:
                     handle = rsvg.Handle(path)
                     sw, sh = handle.get_dimension_data()[:2]
                     imagesurface = RecordingSurface(sw, sh)
