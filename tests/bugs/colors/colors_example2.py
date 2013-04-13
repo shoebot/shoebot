@@ -1,3 +1,5 @@
+import sys
+
 # COLOR LIST FROM PIXELS
 
 try:
@@ -9,9 +11,10 @@ except ImportError:
 size(550, 400)
 
 # A list of colors from image pixels.
-# This requires the Core Image library to be installed.
-sea = colors.list("colors/sea.jpg", n=20)
-image("colors/sea.jpg", 0, 0, width=550)
+COLOR_IMAGE = sys.prefix + "/share/shoebot/lib/colors/sea.jpg"
+sea = colors.list(COLOR_IMAGE, n=20)
+image(COLOR_IMAGE, 0, 0, width=550)
+
 
 x = 0
 for clr in sea:
