@@ -1,3 +1,4 @@
+import Queue
 from distutils.spawn import find_executable as which
 import os
 import subprocess
@@ -63,6 +64,32 @@ def get_child_by_name(parent, name):
 import threading
 import subprocess
 
+
+class AsynchronousFileReader(threading.Thread):
+    '''
+    Helper class to implement asynchronous reading of a file
+    in a separate thread. Pushes read lines on a queue to
+    be consumed in another thread.
+    '''
+
+    def __init__(self, fd, queue):
+        assert isinstance(queue, Queue.Queue)
+        assert callable(fd.readline)
+        threading.Thread.__init__(self)
+        self._fd = fd
+        self._queue = queue
+
+    def run(self):
+        '''The body of the tread: read lines and put them on the queue.'''
+        for line in iter(self._fd.readline, ''):
+            self._queue.put(line)
+
+    def eof(self):
+        '''Check whether there is no more content to expect.'''
+        return not self.is_alive() and self._queue.empty()
+
+
+
 class ShoebotThread(threading.Thread):
     ''' 
     Run shoebot in seperate thread
@@ -103,6 +130,8 @@ class ShoebotThread(threading.Thread):
             if line:
                 # Process output here
                 textbuffer.insert(textbuffer.get_end_iter(), line)
+                while Gtk.events_pending():
+                            Gtk.main_iteration()
                 if not visible:
                     panel.set_property("visible", True)
         if proc.returncode != 0:
@@ -194,8 +223,43 @@ class ShoebotWindowHelper:
 
         command.append(code)
 
-        self.shoebot_thread = ShoebotThread(command, textbuffer)
-        self.shoebot_thread.start()
+        #self.shoebot_thread = ShoebotThread(command, textbuffer)
+        #self.shoebot_thread.start()
+
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Launch the asynchronous readers of the process' stdout and stderr.
+        stdout_queue = Queue.Queue()
+        stdout_reader = AsynchronousFileReader(process.stdout, stdout_queue)
+        stdout_reader.start()
+        stderr_queue = Queue.Queue()
+        stderr_reader = AsynchronousFileReader(process.stderr, stderr_queue)
+        stderr_reader.start()
+
+        # Check the queues if we received some output (until there is nothing more to get).
+        while not stdout_reader.eof() or not stderr_reader.eof():
+            # Show what we received from standard output.
+            while (stdout_queue.empty() == False) or (stderr_queue.empty() == False):
+                if not stdout_queue.empty():
+                    line = stdout_queue.get()                    
+                    #print 'Received line on standard output: ' + repr(line)
+                    textbuffer.insert(textbuffer.get_end_iter(), line)
+                    while Gtk.events_pending():
+                        Gtk.main_iteration()
+
+                if not stderr_queue.empty():
+                    line = stderr_queue.get()                    
+                    #print 'Received line on standard err: ' + repr(line)
+                    textbuffer.insert(textbuffer.get_end_iter(), line)
+                    while Gtk.events_pending():
+                        Gtk.main_iteration()
+
+                self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
+
+
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
