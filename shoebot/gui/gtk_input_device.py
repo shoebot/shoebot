@@ -34,7 +34,6 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         self.mouse_button_up(event.button)
 
     def gtk_mouse_pointer_moved(self, widget, event):
-        #print self.scale_x, self.scale_y
         self.mouse_pointer_moved(event.x / self.scale_x, event.y / self.scale_y)
 
     def get_mapped_key(self, keyval):

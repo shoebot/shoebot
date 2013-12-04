@@ -35,7 +35,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.var_window = None
         self.is_fullscreen = False
 
-        sb_widget = ShoebotWidget()
+        sb_widget = ShoebotWidget(input_device=self)
 
         if title:
             self.set_title(title)

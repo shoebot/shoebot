@@ -16,11 +16,12 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
     # Draw in response to an expose-event
     __gsignals__ = { "expose-event": "override" }
-    def __init__(self, scale_fit = True):
+    def __init__(self, scale_fit=True, input_device=None):
         gtk.DrawingArea.__init__(self)
         DrawQueueSink.__init__(self)
 
         self.scale_fit = scale_fit
+        self.input_device = input_device
 
         # Default picture is the shoebot icon
         if os.path.isfile(ICON_FILE):
@@ -57,12 +58,12 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
                 if scale_x > scale_y:
                     cr.scale(scale_x, scale_x)
-                    self.scale_x = scale_x
-                    self.scale_y = scale_x
                 else:
                     cr.scale(scale_y, scale_y)
-                    self.scale_y = scale_y
-                    self.scale_y = scale_y
+
+                if self.input_device:
+                    self.input_device.scale_x = scale_x
+                    self.input_device.scale_y = scale_y
 
 
         cr.set_source_surface(self.backing_store)
