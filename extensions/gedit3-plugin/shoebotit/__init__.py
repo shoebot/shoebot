@@ -1,4 +1,4 @@
-import Queue
+import queue
 from distutils.spawn import find_executable as which
 import os
 import subprocess
@@ -8,7 +8,7 @@ import re
 from gettext import gettext as _
 
 if not which('sbot'):
-    print 'Shoebot executable not found.'
+    print('Shoebot executable not found.')
 
 # regex taken from openuricontextmenu.py and slightly changed
 # to work with Python functions
@@ -72,12 +72,12 @@ class AsynchronousFileReader(threading.Thread):
     be consumed in another thread.
     '''
 
-    def __init__(self, fd, queue):
-        assert isinstance(queue, Queue.Queue)
+    def __init__(self, fd, q):
+        assert isinstance(q, queue.Queue)
         assert callable(fd.readline)
         threading.Thread.__init__(self)
         self._fd = fd
-        self._queue = queue
+        self._queue = q
 
     def run(self):
         '''The body of the tread: read lines and put them on the queue.'''
@@ -229,10 +229,10 @@ class ShoebotWindowHelper:
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # Launch the asynchronous readers of the process' stdout and stderr.
-        stdout_queue = Queue.Queue()
+        stdout_queue = queue.Queue()
         stdout_reader = AsynchronousFileReader(process.stdout, stdout_queue)
         stdout_reader.start()
-        stderr_queue = Queue.Queue()
+        stderr_queue = queue.Queue()
         stderr_reader = AsynchronousFileReader(process.stderr, stderr_queue)
         stderr_reader.start()
 
