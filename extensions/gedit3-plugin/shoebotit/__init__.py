@@ -241,15 +241,15 @@ class ShoebotWindowHelper:
             # Show what we received from standard output.
             while (stdout_queue.empty() == False) or (stderr_queue.empty() == False):
                 if not stdout_queue.empty():
-                    line = stdout_queue.get()                    
-                    #print 'Received line on standard output: ' + repr(line)
+                    line = stdout_queue.get().decode('utf-8')
+                    #print('Received line on standard output: ' + repr(line))
                     textbuffer.insert(textbuffer.get_end_iter(), line)
                     while Gtk.events_pending():
                         Gtk.main_iteration()
 
                 if not stderr_queue.empty():
-                    line = stderr_queue.get()                    
-                    #print 'Received line on standard err: ' + repr(line)
+                    line = stderr_queue.get().decode('utf-8')
+                    #print('Received line on standard err: ' + repr(line))
                     textbuffer.insert(textbuffer.get_end_iter(), line)
                     while Gtk.events_pending():
                         Gtk.main_iteration()
@@ -275,7 +275,7 @@ class ShoebotWindowHelper:
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
         handler_id = view.connect('populate-popup', self.on_view_populate_popup)
-        view.set_data(self.id_name, [handler_id])
+        #view.set_data(self.id_name, [handler_id])
 
 
     def on_view_populate_popup(self, view, menu):
