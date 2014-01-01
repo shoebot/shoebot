@@ -257,11 +257,8 @@ class ShoebotWindowHelper:
                 self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
 
             process.poll()
-            print(process.returncode)
             while Gtk.events_pending():
                 Gtk.main_iteration()
-
-        print('BOTH EOF')
 
 
 
