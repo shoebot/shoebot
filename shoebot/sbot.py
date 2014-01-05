@@ -35,7 +35,7 @@ import sys
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-def create_canvas(src, format = None, outputfile = None, multifile = False, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False):
+def create_canvas(src, format=None, outputfile=None, multifile=False, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False):
     '''
     Convience file to create canvas and output sink for a shoebot bot
 
@@ -64,11 +64,11 @@ def create_canvas(src, format = None, outputfile = None, multifile = False, wind
     return canvas
 
 
-def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None):
+def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, server=False, port=7777, show_vars = False, vars = None):
     '''
     Convienience function to create a bot
     '''
-    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, close_window, server=server, port=port, show_vars = show_vars)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, fullscreen=fullscreen, server=server, port=port, show_vars = show_vars)
 
     from shoebot.grammar import DrawBot, NodeBot
     if grammar == DRAWBOT:
@@ -81,6 +81,6 @@ def init_bot(src = None, grammar = NODEBOX, format = None, outputfile = None, it
 def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, args = []):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
-    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, close_window, fullscreen, server, port, show_vars, vars = vars)
+    bot = init_bot(src, grammar, format, outputfile, iterations, window, title, fullscreen, server, port, show_vars, vars = vars)
     bot.run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
     return bot
