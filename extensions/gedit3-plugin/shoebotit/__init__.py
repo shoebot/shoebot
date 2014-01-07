@@ -2,6 +2,7 @@ import queue
 from distutils.spawn import find_executable as which
 import os
 import subprocess
+import time
 
 from gi.repository import Gtk, GObject, Gedit, Pango
 import re
@@ -81,12 +82,16 @@ class AsynchronousFileReader(threading.Thread):
 
     def run(self):
         '''The body of the tread: read lines and put them on the queue.'''
-        for line in iter(self._fd.readline, ''):
-            self._queue.put(line)
+        try:
+            for line in iter(self._fd.readline, ''):
+                self._queue.put(line)
+        except ValueError:  # This can happen if we are closed during readline - TODO - better fix.
+            if not self._fd.closed:
+                raise
 
     def eof(self):
         '''Check whether there is no more content to expect.'''
-        return (not self.is_alive()) and self._queue.empty()
+        return (not self.is_alive()) and self._queue.empty() or self._fd.closed
 
 
 
@@ -223,10 +228,7 @@ class ShoebotWindowHelper:
 
         command.append(code)
 
-        #self.shoebot_thread = ShoebotThread(command, textbuffer)
-        #self.shoebot_thread.start()
-
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False, shell=False)
 
         # Launch the asynchronous readers of the process' stdout and stderr.
         stdout_queue = queue.Queue()
@@ -237,28 +239,31 @@ class ShoebotWindowHelper:
         stderr_reader.start()
 
         # Check the queues if we received some output (until there is nothing more to get).
-        while not stdout_reader.eof() or not stderr_reader.eof():
+        while not (stdout_reader.eof() and stderr_reader.eof()):
             # Show what we received from standard output.
             while (stdout_queue.empty() == False) or (stderr_queue.empty() == False):
                 if not stdout_queue.empty():
                     line = stdout_queue.get().decode('utf-8')
-                    #print('Received line on standard output: ' + repr(line))
                     textbuffer.insert(textbuffer.get_end_iter(), line)
-                    while Gtk.events_pending():
-                        Gtk.main_iteration()
 
                 if not stderr_queue.empty():
                     line = stderr_queue.get().decode('utf-8')
-                    #print('Received line on standard err: ' + repr(line))
                     textbuffer.insert(textbuffer.get_end_iter(), line)
-                    while Gtk.events_pending():
-                        Gtk.main_iteration()
-
+            else:
                 self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
 
-            process.poll()
             while Gtk.events_pending():
-                Gtk.main_iteration()
+               Gtk.main_iteration()
+
+            time.sleep(0.1)
+
+            if process.poll() is not None:
+               break
+
+        # Close subprocess' file descriptors.
+        process.stdout.close()
+        process.stderr.close()
+        return True
 
 
 
@@ -276,8 +281,10 @@ class ShoebotWindowHelper:
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
-        handler_id = view.connect('populate-popup', self.on_view_populate_popup)
+        #handler_id = view.connect('populate-popup', self.on_view_populate_popup)
         #view.set_data(self.id_name, [handler_id])
+
+        pass
 
 
     def on_view_populate_popup(self, view, menu):
