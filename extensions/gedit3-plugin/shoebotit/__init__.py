@@ -240,7 +240,7 @@ class ShoebotWindowHelper:
         manager = self.window.get_ui_manager()
         self.action_group = Gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
-            ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
+            ("Shoebot", None, _("Shoe_bot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
             ])
         self.action_group.add_toggle_actions([
