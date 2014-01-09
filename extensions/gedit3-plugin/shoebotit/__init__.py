@@ -83,8 +83,10 @@ class AsynchronousFileReader(threading.Thread):
     def run(self):
         '''The body of the tread: read lines and put them on the queue.'''
         try:
-            for line in iter(self._fd.readline, ''):
+            for line in iter(self._fd.readline, False):
                 self._queue.put(line)
+                if not line:
+                    time.sleep(0.1)
         except ValueError:  # This can happen if we are closed during readline - TODO - better fix.
             if not self._fd.closed:
                 raise
@@ -95,52 +97,113 @@ class AsynchronousFileReader(threading.Thread):
 
 
 
-class ShoebotThread(threading.Thread):
-    ''' 
-    Run shoebot in seperate thread
-    '''
-    # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-    def __init__(self, cmd, textbuffer, workingdir = None):
-        self.cmd = cmd
-        self.textbuffer = textbuffer
-        self.workingdir = workingdir
-        self.stdout = None
-        self.stderr = None
-        threading.Thread.__init__(self)
+#class ShoebotThread(threading.Thread):
+#    ''' 
+#    Run shoebot in seperate thread
+#    '''
+#    # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
+#    def __init__(self, cmd, textbuffer, workingdir = None):
+#        self.cmd = cmd
+#        self.textbuffer = textbuffer
+#        self.workingdir = workingdir
+#        self.stdout = None
+#        self.stderr = None
+#        threading.Thread.__init__(self)
 
-    def run(self):
-        textbuffer = self.textbuffer
-        
-        try:
-            proc = subprocess.Popen(self.cmd,
-                                 shell=False,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 cwd=self.workingdir)
-        except OSError as e:
-            if e.errno == 2:
-                textbuffer.insert(textbuffer.get_end_iter(), 'Shoebot executable sbot not found in path.')
-            else:
-                textbuffer.insert(textbuffer.get_end_iter(), str(e))
-            return
-            
+#    def run(self):
+#        textbuffer = self.textbuffer
+#        
+#        try:
+#            proc = subprocess.Popen(self.cmd,
+#                                 shell=False,
+#                                 stdout=subprocess.PIPE,
+#                                 stderr=subprocess.PIPE,
+#                                 cwd=self.workingdir)
+#        except OSError as e:
+#            if e.errno == 2:
+#                textbuffer.insert(textbuffer.get_end_iter(), 'Shoebot executable sbot not found in path.')
+#            else:
+#                textbuffer.insert(textbuffer.get_end_iter(), str(e))
+#            return
+#            
 
-        textbuffer.set_text('')
-        #self.stdout, self.stderr = proc.communicate()
+#        textbuffer.set_text('')
+#        #self.stdout, self.stderr = proc.communicate()
 
-        panel = Gedit.App.get_default().get_active_window().get_bottom_panel()
-        visible = panel.get_property("visible")
-        while proc.poll() is None:
-            line = proc.stdout.readline()
-            if line:
-                # Process output here
+#        panel = Gedit.App.get_default().get_active_window().get_bottom_panel()
+#        visible = panel.get_property("visible")
+#        while proc.poll() is None:
+#            line = proc.stdout.readline()
+#            if line:
+#                # Process output here
+#                textbuffer.insert(textbuffer.get_end_iter(), line)
+#                while Gtk.events_pending():
+#                            Gtk.main_iteration()
+#                if not visible:
+#                    panel.set_property("visible", True)
+#        if proc.returncode != 0:
+#            panel.set_property("visible", True)
+
+
+class ShoebotProcess:
+    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title):
+        command = ['sbot', '-w', '-t%s - Shoebot on gedit' % title]
+
+        if use_socketserver:
+            command.append('-p')
+
+        if show_varwindow:
+            command.append('-dv')
+
+        if use_fullscreen:
+            command.append('-f')
+
+        command.append(code)
+
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False)
+
+        # Launch the asynchronous readers of the process' stdout and stderr.
+        self.stdout_queue = queue.Queue()
+        self.stdout_reader = AsynchronousFileReader(self.process.stdout, self.stdout_queue)
+        self.stdout_reader.start()
+        self.stderr_queue = queue.Queue()
+        self.stderr_reader = AsynchronousFileReader(self.process.stderr, self.stderr_queue)
+        self.stderr_reader.start()
+
+
+    def _update_ui_text(self, output_widget):
+        textbuffer = output_widget.get_buffer()
+        while False == (self.stdout_queue.empty() and self.stderr_queue.empty()):
+            if not self.stdout_queue.empty():
+                line = self.stdout_queue.get().decode('utf-8')
                 textbuffer.insert(textbuffer.get_end_iter(), line)
-                while Gtk.events_pending():
-                            Gtk.main_iteration()
-                if not visible:
-                    panel.set_property("visible", True)
-        if proc.returncode != 0:
-            panel.set_property("visible", True)
+
+            if not self.stderr_queue.empty():
+                line = self.stderr_queue.get().decode('utf-8')
+                textbuffer.insert(textbuffer.get_end_iter(), line)
+        #else:
+        output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
+    def update_shoebot(self, output_widget):
+        """
+        :param textbuffer: Gtk textbuffer to append shoebot output to.
+        :output_widget: Gtk widget containing the output
+        :return: True if shoebot still running, False if terminated.
+        Send any new shoebot output to a textbuffer.
+        """
+        self._update_ui_text(output_widget)
+
+        if self.process.poll() is not None:
+            # Close subprocess' file descriptors.
+            self._update_ui_text(output_widget)
+            self.process.stdout.close()
+            self.process.stderr.close()
+            return False
+
+        result = not (self.stdout_reader.eof() or self.stderr_reader.eof())
+        return result
 
 
 class ShoebotWindowHelper:
@@ -160,10 +223,12 @@ class ShoebotWindowHelper:
 
         self.started = False
         self.shoebot_thread = None
-
+        
         for view in self.window.get_views():
             self.connect_view(view)
 
+        self.bot = None
+    
     def deactivate(self):
         self.remove_menu()
         self.window = None
@@ -203,10 +268,20 @@ class ShoebotWindowHelper:
             self.started = True
 
     def on_run_activate(self, action):
+        return self.start_shoebot()
+
+    def start_shoebot(self):
+        if self.bot and self.bot.process.poll() == None:
+            print('Has a bot already')
+            return False
+        
         # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
             return
+
+        title = doc.get_short_name_for_display()
+        
         start, end = doc.get_bounds()
         code = doc.get_text(start, end, False)
         if not code:
@@ -214,58 +289,22 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
+        #while Gtk.events_pending():
+        #   Gtk.main_iteration()
 
-        command = ['sbot', '-w', '-t%s - Shoebot on gedit' % doc.get_short_name_for_display()]
 
-        if self.use_socketserver:
-            command.append('-p')
+        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title)
 
-        if not self.show_varwindow:
-            command.append('-dv')
+        GObject.idle_add(self.update_shoebot)
 
-        if self.use_fullscreen:
-            command.append('-f')
 
-        command.append(code)
+    def update_shoebot(self):
+        if self.bot:
+            running = self.bot.update_shoebot(self.output_widget)
 
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False, shell=False)
-
-        # Launch the asynchronous readers of the process' stdout and stderr.
-        stdout_queue = queue.Queue()
-        stdout_reader = AsynchronousFileReader(process.stdout, stdout_queue)
-        stdout_reader.start()
-        stderr_queue = queue.Queue()
-        stderr_reader = AsynchronousFileReader(process.stderr, stderr_queue)
-        stderr_reader.start()
-
-        # Check the queues if we received some output (until there is nothing more to get).
-        while not (stdout_reader.eof() and stderr_reader.eof()):
-            # Show what we received from standard output.
-            while (stdout_queue.empty() == False) or (stderr_queue.empty() == False):
-                if not stdout_queue.empty():
-                    line = stdout_queue.get().decode('utf-8')
-                    textbuffer.insert(textbuffer.get_end_iter(), line)
-
-                if not stderr_queue.empty():
-                    line = stderr_queue.get().decode('utf-8')
-                    textbuffer.insert(textbuffer.get_end_iter(), line)
-            else:
-                self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
-
-            while Gtk.events_pending():
-               Gtk.main_iteration()
-
-            time.sleep(0.1)
-
-            if process.poll() is not None:
-               break
-
-        # Close subprocess' file descriptors.
-        process.stdout.close()
-        process.stderr.close()
+            if not running:
+                 return False
         return True
-
-
 
     
     def toggle_socket_server(self, action):

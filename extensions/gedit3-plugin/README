@@ -16,4 +16,10 @@ or you can manualy copy the following files and folder over to '~/.local/share/g
 
 Then enable the plugin from the Gedit plugins menu (Edit-Preferences-Plugins).
 
+Using with Virtualenv
+=====================
 
+If you have shoebot installed in a virtualenv, run Gedit for the first time from
+within the virtualenv you want to use.
+
+TODO:  UI to choose whether to use the system python or a virtualenv
