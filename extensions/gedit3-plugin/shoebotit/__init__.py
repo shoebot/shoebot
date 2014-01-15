@@ -1,15 +1,38 @@
+from collections import namedtuple
 import queue
+import time
 from distutils.spawn import find_executable as which
 import os
 import subprocess
-import time
+from urllib.request import pathname2url
 
-from gi.repository import Gtk, GObject, Gedit, Pango
+from gi.repository import Gtk, Gio, GObject, Gedit, Pango
 import re
 from gettext import gettext as _
 
+
+def find_example_dir():
+    """
+    Find examples dir .. a little bit ugly..
+
+    # TODO - Move to extensions lib
+    """
+
+    # Needs to run in same python env as shoebot (may be different to gedits)
+    cmd = ["python", "-c", "import sys; print '{}/share/shoebot/examples/'.format(sys.prefix)"]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output, errors = p.communicate()
+    if errors:
+        print('Could not find shoebot examples')
+        return None
+    else:
+        return output.decode('utf-8').strip()
+
+
 if not which('sbot'):
     print('Shoebot executable not found.')
+else:
+    _example_dir = find_example_dir()
 
 # regex taken from openuricontextmenu.py and slightly changed
 # to work with Python functions
@@ -25,12 +48,63 @@ QUICKTORIAL_KEYWORDS = {
         }
 
 
+def get_example_dir():
+    return _example_dir
+
+
+def make_readable_filename(fn):
+    return os.path.splitext(fn)[0].capitalize()
+
+
+def examples_menu(root_dir=None, depth=0):
+    """
+    :return: xml for menu, [(bot_action, label), ...], [(menu_action, label), ...]
+    """
+    examples_dir = get_example_dir()
+    root_dir = root_dir or examples_dir
+
+    file_tmpl = '<menuitem name="{name}" action="{action}"/>'
+    dir_tmpl = '<menu name="{name}" action="{action}">{menu}</menu>'
+
+    file_actions = []
+    submenu_actions = []
+    
+    xml = ""
+
+    for fn in sorted(os.listdir(root_dir)):
+        path = os.path.join(root_dir, fn)
+        rel_path = path[len(examples_dir):]
+        if os.path.isdir(path):            
+            action = 'ShoebotExampleMenu {}'.format(rel_path)
+            label = fn.capitalize()
+
+            sm_xml, sm_file_actions, sm_menu_actions = examples_menu(os.path.join(root_dir, fn), depth+1)
+
+            submenu_actions.extend(sm_menu_actions)
+            file_actions.extend(sm_file_actions)
+            submenu_actions.append((action, label))
+            xml += dir_tmpl.format(name=fn, action=action, menu=sm_xml)
+        elif os.path.splitext(path)[1] in ['.bot', '.py'] and not fn.startswith('_'):
+            action = 'ShoebotExampleOpen {}'.format(rel_path)
+            label = make_readable_filename(fn)
+
+            xml += file_tmpl.format(name=fn, action=action)
+            file_actions.append((action, label))
+
+    return xml, file_actions, submenu_actions
+
+examples_xml, example_actions, submenu_actions = examples_menu()
+
 ui_str = """
 <ui>
   <menubar name="MenuBar">
     <menu name="ShoebotMenu" action="Shoebot">
       <placeholder name="ShoebotOps_1">
         <menuitem name="Run in Shoebot" action="ShoebotRun"/>
+            <separator/>
+                 <menu name="ShoebotExampleMenu" action="ShoebotOpenExampleMenu">
+                    {}
+                </menu>
         <separator/>
         <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
         <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
@@ -39,7 +113,8 @@ ui_str = """
     </menu>
   </menubar>
 </ui>
-"""
+""".format(examples_xml) # Splice in the examples menu
+
 
 def get_child_by_name(parent, name):
     """
@@ -146,13 +221,13 @@ class AsynchronousFileReader(threading.Thread):
 
 
 class ShoebotProcess:
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title):
+    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None):
         command = ['sbot', '-w', '-t%s - Shoebot on gedit' % title]
 
         if use_socketserver:
             command.append('-p')
 
-        if show_varwindow:
+        if not show_varwindow:
             command.append('-dv')
 
         if use_fullscreen:
@@ -160,7 +235,7 @@ class ShoebotProcess:
 
         command.append(code)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False)
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
 
         # Launch the asynchronous readers of the process' stdout and stderr.
         self.stdout_queue = queue.Queue()
@@ -208,6 +283,8 @@ class ShoebotProcess:
 
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
+        self.example_bots = {}
+
         self.window = window
         panel = window.get_bottom_panel()
         self.output_widget = get_child_by_name(panel, 'shoebot-output')
@@ -228,6 +305,7 @@ class ShoebotWindowHelper:
             self.connect_view(view)
 
         self.bot = None
+
     
     def deactivate(self):
         self.remove_menu()
@@ -242,19 +320,48 @@ class ShoebotWindowHelper:
         self.action_group.add_actions([
             ("Shoebot", None, _("Shoe_bot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
+            ('ShoebotOpenExampleMenu', None, _('E_xamples'), None, None, None)
             ])
+        
+
+        for action, label in example_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, self.on_open_example)])
+
+        for action, label in submenu_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, None)])
+
         self.action_group.add_toggle_actions([
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
             ])
         manager.insert_action_group(self.action_group)
+        
         self.ui_id = manager.add_ui_from_string(ui_str)
+        manager.ensure_update()
+
+    def on_open_example(self, action):
+        example_dir = get_example_dir()
+        filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
+        
+        uri      = "file:///" + pathname2url(filename)
+        gio_file = Gio.file_new_for_uri(uri)
+        self.window.create_tab_from_location(
+            gio_file,
+            None,  # encoding
+            0,
+            0,     # column
+            False, # Do not create an empty file
+            True)  # Switch to the tab
+
 
     def remove_menu(self):
         manager = self.window.get_ui_manager()
-        manager.remove_ui(self.ui_id)
         manager.remove_action_group(self.action_group)
+        for bot, ui_id in self.example_bots.items():
+            manager.remove_ui(ui_id)
+        manager.remove_ui(self.ui_id)
+
         # Make sure the manager updates
         manager.ensure_update()
 
@@ -281,7 +388,8 @@ class ShoebotWindowHelper:
             return
 
         title = doc.get_short_name_for_display()
-        
+        cwd = os.path.dirname(doc.get_uri_for_display()) or None
+
         start, end = doc.get_bounds()
         code = doc.get_text(start, end, False)
         if not code:
@@ -289,11 +397,11 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
-        #while Gtk.events_pending():
-        #   Gtk.main_iteration()
+        while Gtk.events_pending():
+           Gtk.main_iteration()
 
 
-        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title)
+        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
 
         GObject.idle_add(self.update_shoebot)
 
@@ -408,7 +516,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         scrolled_window.add(self.text)
         scrolled_window.show_all()
         
-        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)
+        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)   
+        self.output_widget = scrolled_window
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
@@ -419,6 +528,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         del self.instances[self.window]
         for tfilename in self.tempfiles:
             os.remove(tfilename)
+
+        self.panel.remove_item(self.output_widget)
 
 
     def do_update_state(self):
