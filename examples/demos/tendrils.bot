@@ -82,7 +82,7 @@ class Plant:
 background(0.12, 0.12, 0.06)
 nofill()
 stroke(1, 0.5)
-strokewidth(0.05)
+strokewidth(0.06)
  
 plant = Plant(WIDTH/2, HEIGHT/2, tendrils=20)
 for i in range(200): 
