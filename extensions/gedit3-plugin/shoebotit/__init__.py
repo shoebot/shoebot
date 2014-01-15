@@ -53,7 +53,7 @@ def get_example_dir():
 
 
 def make_readable_filename(fn):
-    return os.path.splitext(fn)[0].capitalize()
+    return os.path.splitext(fn)[0].replace('_', ' ').capitalize()
 
 
 def examples_menu(root_dir=None, depth=0):
