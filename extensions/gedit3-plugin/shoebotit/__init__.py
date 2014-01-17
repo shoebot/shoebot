@@ -24,15 +24,20 @@ def find_example_dir():
     output, errors = p.communicate()
     if errors:
         print('Could not find shoebot examples')
+        print('Errors: {}'.format(errors))
         return None
     else:
-        return output.decode('utf-8').strip()
+        examples_dir = output.decode('utf-8').strip()
+        if os.path.isdir(examples_dir):
+            return examples_dir
+        else:
+            print('Could not find shoebot examples at {}'.format(examples_dir))
 
 
 if not which('sbot'):
     print('Shoebot executable not found.')
-else:
-    _example_dir = find_example_dir()
+
+_example_dir = find_example_dir()
 
 # regex taken from openuricontextmenu.py and slightly changed
 # to work with Python functions
@@ -61,6 +66,9 @@ def examples_menu(root_dir=None, depth=0):
     :return: xml for menu, [(bot_action, label), ...], [(menu_action, label), ...]
     """
     examples_dir = get_example_dir()
+    if not examples_dir:
+        return "", [], []
+    
     root_dir = root_dir or examples_dir
 
     file_tmpl = '<menuitem name="{name}" action="{action}"/>'
