@@ -12,6 +12,12 @@ Using the live variables GUI
 Connect to other applications
 -----------------------------
 
+Editors/IDEs
+------------
+
+Embedding
+---------
+
 Pure Data
 ---------
 * link to the pure data example at the Shoebot site
