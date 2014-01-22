@@ -122,7 +122,7 @@ parser.add_argument("-v",
                 "--vars",
                 dest="vars",
                 default=False,
-                help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\", 1}'"),
+                help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
                 )
 parser.add_argument('script_args', nargs='?')
 
