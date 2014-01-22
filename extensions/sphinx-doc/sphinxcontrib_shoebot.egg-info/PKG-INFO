@@ -1,0 +1,30 @@
+Metadata-Version: 1.1
+Name: sphinxcontrib-shoebot
+Version: 0.1dev-20140122
+Summary: Sphinx extension shoebot
+Home-page: http://bitbucket.org/birkenfeld/sphinx-contrib
+Author: Stuart Axon
+Author-email: stuaxo2@yahoo.com
+License: BSD
+Download-URL: http://pypi.python.org/pypi/sphinxcontrib-shoebot
+Description: 
+        This package enables Sphinx documents to render graphics using shoebot.
+        
+        Example::
+          
+          .. shoebot::
+             
+             fill(0, 128, 128)
+             rect(0, 0, 40, 40)
+              
+        
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Documentation
+Classifier: Topic :: Utilities

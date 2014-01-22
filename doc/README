@@ -1,0 +1,15 @@
+Install the sphinx and shoebot sphinx extension before generating the docs.
+
+$ pip install sphinx
+$ pushd ../extensions/sphinx-doc/
+$ python setup.py install
+$ popd
+
+Generate the docs
+
+$ make html
+
+
+TODO:   Support formats other than HTML, more control over screenshot placement.
+
+

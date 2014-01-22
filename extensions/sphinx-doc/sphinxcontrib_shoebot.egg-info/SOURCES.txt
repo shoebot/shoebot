@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README
+setup.cfg
+setup.py
+sphinxcontrib/__init__.py
+sphinxcontrib/shoebot.py
+sphinxcontrib_shoebot.egg-info/PKG-INFO
+sphinxcontrib_shoebot.egg-info/SOURCES.txt
+sphinxcontrib_shoebot.egg-info/dependency_links.txt
+sphinxcontrib_shoebot.egg-info/namespace_packages.txt
+sphinxcontrib_shoebot.egg-info/not-zip-safe
+sphinxcontrib_shoebot.egg-info/requires.txt
+sphinxcontrib_shoebot.egg-info/top_level.txt
