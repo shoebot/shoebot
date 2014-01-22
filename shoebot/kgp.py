@@ -29,12 +29,13 @@ __license__ = "Python"
 
 from xml.dom import minidom
 import random
+import os
 import sys
 import getopt
 
 _debug = 0
 
-def openAnything(source):
+def openAnything(source, searchpaths=None):
     """URI, filename, or string --> stream
 
     This function lets you define parsers that take any input source
@@ -71,11 +72,13 @@ def openAnything(source):
         pass
     
     # try to open with native open function (if source is pathname)
-    try:
-        return open(source)
-    except (IOError, OSError):
-        pass
-    
+    for path in searchpaths or ['.']:
+        try:
+            return open(os.path.join(path, source))
+        except (IOError, OSError):
+            pass
+
+
     # treat source as string
     import StringIO
     return StringIO.StringIO(str(source))
@@ -85,34 +88,36 @@ class NoSourceError(Exception): pass
 class KantGenerator(object):
     """generates mock philosophy based on a context-free grammar"""
     
-    def __init__(self, grammar, source=None):
-        self.loadGrammar(grammar)
-        self.loadSource(source and source or self.getDefaultSource())
+    def __init__(self, grammar, source=None, searchpaths=None):
+        self.loadGrammar(grammar, searchpaths=searchpaths)
+        self.loadSource(source and source or self.getDefaultSource(), searchpaths=searchpaths)
         self.refresh()
 
-    def _load(self, source):
+    def _load(self, source, searchpaths=None):
         """load XML input source, return parsed XML document
 
         - a URL of a remote XML file ("http://diveintopython.org/kant.xml")
         - a filename of a local XML file ("~/diveintopython/common/py/kant.xml")
         - standard input ("-")
         - the actual XML document, as a string
+
+        :param searchpaths: optional searchpaths if file is used.
         """
-        sock = openAnything(source)
+        sock = openAnything(source, searchpaths=searchpaths)
         xmldoc = minidom.parse(sock).documentElement
         sock.close()
         return xmldoc
 
-    def loadGrammar(self, grammar):
+    def loadGrammar(self, grammar, searchpaths=None):
         """load context-free grammar"""
-        self.grammar = self._load(grammar)
+        self.grammar = self._load(grammar, searchpaths=searchpaths)
         self.refs = {}
         for ref in self.grammar.getElementsByTagName("ref"):
             self.refs[ref.attributes["id"].value] = ref
         
-    def loadSource(self, source):
+    def loadSource(self, source, searchpaths=None):
         """load source"""
-        self.source = self._load(source)
+        self.source = self._load(source, searchpaths=searchpaths)
 
     def getDefaultSource(self):
         """guess default source of the current grammar

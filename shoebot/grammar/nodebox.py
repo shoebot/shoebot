@@ -31,6 +31,7 @@ import locale, gettext
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
+ASSETS_DIR = sys.prefix + '/share/shoebot/data'
 gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
@@ -752,7 +753,7 @@ class NodeBot(Bot):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
     def autotext(self, sourceFile):
-        k = Kant1Generator(sourceFile)
+        k = KantGenerator(sourceFile, searchpaths=['.', ASSETS_DIR])
         return k.output()
 
 

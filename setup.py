@@ -22,6 +22,7 @@ for lib in EXCLUDE_LIBS:
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('examples')]
 datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
+datafiles.append(('share/shoebot/data', ['assets/kant.xml']))
 #as the IDE is non functional, I'm commenting this
 #datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
