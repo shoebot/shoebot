@@ -233,7 +233,7 @@ class ShoebotProcess:
         command = ['sbot', '-w', '-t%s - Shoebot on gedit' % title]
 
         if use_socketserver:
-            command.append('-p')
+            command.append('-s')
 
         if not show_varwindow:
             command.append('-dv')
