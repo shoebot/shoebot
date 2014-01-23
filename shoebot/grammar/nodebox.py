@@ -151,7 +151,7 @@ class NodeBot(Bot):
             path.draw()
         return path
 
-    def circle(self, x, y, diameter, draw=True):
+    def circle(self, x, y, diameter, draw=True, **kwargs):
         '''Draw a circle
         :param x: x-coordinate of the top left corner
         :param y: y-coordinate of the top left corner
@@ -159,7 +159,7 @@ class NodeBot(Bot):
         :param draw: Draw immediately (defaults to True, set to False to inhibit drawing)
         :return: Path object representing circle
         '''
-        return self.ellipse(x, y, diameter, diameter, draw)
+        return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
 
     def line(self, x1, y1, x2, y2, draw=True):
         '''Draw a line from (x1,y1) to (x2,y2)
