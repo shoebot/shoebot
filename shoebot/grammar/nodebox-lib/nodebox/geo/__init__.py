@@ -1,7 +1,7 @@
-from math import degrees, atan2, sqrt, pow, radians, sin, cos
+from math import hypot, degrees, atan2, sqrt, pow, radians, sin, cos
 
 def distance(x1, y1, x2, y2):
-     return math.hypot(x2 - x1, y2 - y1)
+     return hypot(x2 - x1, y2 - y1)
 
 def angle(x0, y0, x1, y1):
     # from nodebox1
