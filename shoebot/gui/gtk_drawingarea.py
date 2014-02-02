@@ -58,13 +58,14 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
                 if scale_x > scale_y:
                     cr.scale(scale_x, scale_x)
+                    if self.input_device:
+                        self.input_device.scale_x = scale_x
+                        self.input_device.scale_y = scale_x
                 else:
                     cr.scale(scale_y, scale_y)
-
-                if self.input_device:
-                    self.input_device.scale_x = scale_x
-                    self.input_device.scale_y = scale_y
-
+                    if self.input_device:
+                        self.input_device.scale_x = scale_y
+                        self.input_device.scale_y = scale_y
 
         cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
