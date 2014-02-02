@@ -999,7 +999,7 @@ class View(gtk.Window):
                 os.chdir(os.path.dirname(buffer.filename))
                 
                 
-            bot = shoebot.init_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+            bot = shoebot.bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever = True, iterations = None)
         except ShoebotError, NameError:
