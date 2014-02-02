@@ -39,7 +39,9 @@ class SocketServerMixin(object):
         else:
             incoming = line.strip().split('\n')
             for packet in incoming:
-                var, value = packet.split()
+                if not packet or packet.startswith('#'):
+                    continue
+                var, value = [part.strip() for part in packet.split('=')]
                 # is value in our variables list?
                 if var in self.bot._namespace:
                     ## TODO: we're forced to convert input to floats
