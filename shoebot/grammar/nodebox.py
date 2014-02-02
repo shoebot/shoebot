@@ -7,6 +7,7 @@ from bot import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot.data import RGB, \
                     HSB, \
+                    CMYK, \
                     CORNER, \
                     CENTER, \
                     MOVETO, \
@@ -97,7 +98,7 @@ class NodeBot(Bot):
 
     # Paths
 
-    def rect(self, x, y, width, height, roundness=0.0, draw=True, fill=None, **kwargs):
+    def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
         '''
         Draw a rectangle from x, y of width, height.
 
@@ -112,7 +113,7 @@ class NodeBot(Bot):
         :return: path representing the rectangle.
 
         '''
-        path = self.BezierPath(fillcolor=fill, **kwargs)
+        path = self.BezierPath(**kwargs)
         path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
             path.draw()
@@ -176,7 +177,7 @@ class NodeBot(Bot):
         self._path = p
         return p
 
-    def arrow(self, x, y, width, type=NORMAL, draw=True, fill=None, **kwargs):
+    def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
         '''Draw an arrow.
 
         Arrows can be two types: NORMAL or FORTYFIVE.
@@ -190,7 +191,7 @@ class NodeBot(Bot):
         :return: Path object representing the arrow. 
         '''
         # Taken from Nodebox
-        path = self.BezierPath(fillcolor=fill, **kwargs)
+        path = self.BezierPath(**kwargs)
         if type == self.NORMAL:
             head = width * .4
             tail = width * .2
@@ -221,11 +222,11 @@ class NodeBot(Bot):
             path.draw()
         return path
 
-    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, fill=None):
+    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
         '''Draws a star.
         '''
         # Taken from Nodebox.
-        self.beginpath()
+        self.beginpath(**kwargs)
         self.moveto(startx, starty + outer)
 
         for i in range(1, int(2 * points)):
@@ -303,8 +304,8 @@ class NodeBot(Bot):
     #### Path
     # Path functions taken from Nodebox and modified
 
-    def beginpath(self, x=None, y=None, fill=None):
-        self._path = self.BezierPath()
+    def beginpath(self, x=None, y=None, **kwargs):
+        self._path = self.BezierPath(**kwargs)
         if x and y:
             self._path.moveto(x,y)
 
@@ -354,9 +355,9 @@ class NodeBot(Bot):
         self._path = None
         return p
 
-    def drawpath(self,path):
+    def drawpath(self,path, **kwargs):
         if isinstance(path, BezierPath):
-            p = self.BezierPath(path=path)
+            p = self.BezierPath(path=path, **kwargs)
             p.draw()
         elif isinstance(path, Image):
             path.draw() # Is this right ? - added to make test_clip_4.bot work
@@ -592,7 +593,8 @@ class NodeBot(Bot):
 
         :param args: color in supported format
         '''
-        self._canvas.fillcolor = self.color(*args)
+        if args is not None:
+            self._canvas.fillcolor = self.color(*args)
         return self._canvas.fillcolor
 
     def nofill(self):
@@ -604,7 +606,8 @@ class NodeBot(Bot):
 
         :param args: color in supported format
         '''
-        self._canvas.strokecolor = self.color(*args)
+        if args is not None:
+            self._canvas.strokecolor = self.color(*args)
         return self._canvas.strokecolor
 
     def nostroke(self):
