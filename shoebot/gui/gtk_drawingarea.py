@@ -44,7 +44,7 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
             size = self.get_allocation()
 
-            if size.width > source_width or size.height > source_height:
+            if self.first_run or size.width > source_width or size.height > source_height:
                 # Scale up by largest dimension
                 if size.width > source_width:
                     scale_x = float(size.width) / float(source_width)
