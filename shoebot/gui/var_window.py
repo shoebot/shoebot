@@ -84,8 +84,15 @@ class VarWindow(object):
     def add_button(self, container, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         # in buttons, the varname is the function, so we use __name__
-        button = gtk.Button(label=v.name.__name__)
-        button.connect("clicked", self.bot._namespace[v.name], None)
+
+        func_name = v.name
+
+        def call_func(*args):
+            func = self.bot._namespace[func_name]
+            func()
+
+        button = gtk.Button(label=v.name)
+        button.connect("clicked", call_func, None)
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
 

@@ -11,6 +11,8 @@ class Variable(object):
     def __init__(self, name, type, default=None, min=0, max=100, value=None):
         self.name = name
         self.type = type or NUMBER
+        self.min = None
+        self.max = None
         if self.type == NUMBER:
             if default is None:
                 self.default = 50
