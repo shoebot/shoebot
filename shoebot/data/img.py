@@ -140,7 +140,7 @@ class Image(Grob, ColorMixin):
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
             
-            ctx.set_matrix(self._transform)
+            ctx.set_matrix(transform)
             ctx.translate(self.x, self.y)
             ctx.set_source_surface(self._imagesurface)
             ctx.paint()
