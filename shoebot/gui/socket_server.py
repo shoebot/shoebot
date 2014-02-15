@@ -13,6 +13,26 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+
+# For now this is a bit basic, but works enough.
+
+
+BANNER = """
+############`             [Welcome to Shoebot Telnet Console.]`
+##```####```              `````````````````````````````````````
+############`
+############`
+##```````````
+############`
+`````````````
+
+Set variables with  var=value
+
+Enter dir() to view variables.
+Enter bye() or press CTRL-D to quit.
+
+"""
+
 class SocketServerMixin(object):
     def server(self, host, port):
         '''Initialize server and start listening.'''
@@ -28,11 +48,27 @@ class SocketServerMixin(object):
         self.conn, self.addr = self.sock.accept()
         print _("Connected")
         gobject.io_add_watch(self.conn, gobject.IO_IN, self.handler)
+        self.conn.send(self.msg_banner())
         return True
+
+    def msg_banner(self):
+        return BANNER
+
+    def msg_var_value(self, name):
+        value = self.bot._namespace[name]
+        return 'bot: {}={}\n'.format(name, value)
+
+    def msg_bye(self):
+        return "See you next time.\n"
+
+    def msg_dir(self):
+        # Show variables
+        d = self.bot._vars
+        return '{}\n'.format('\n'.join(['%s = %s' % (key, var.value) for (key, var) in d.items()]))
 
     def handler(self, conn, *args):
         '''Asynchronous connection handler. Processes each line from the socket.'''
-        line = self.conn.recv(4096)
+        line = conn.recv(4096)
         if not len(line):
             print _("Connection closed.")
             return False
@@ -41,14 +77,30 @@ class SocketServerMixin(object):
             for packet in incoming:
                 if not packet or packet.startswith('#'):
                     continue
-                var, value = [part.strip() for part in packet.split('=')]
-                # is value in our variables list?
-                if var in self.bot._namespace:
-                    ## TODO: we're forced to convert input to floats
-                    # would be a lot nicer to have a check for the var type
-                    # self.drawingarea.bot._namespace[var] = value.strip(';')
-                    self.bot._namespace[var] = float(value.strip(';'))
-                return True
-            else:
-                return True
+                elif packet=='dir()':
+                    conn.send(self.msg_dir())
+                elif packet in ['\x03', '\x04'] or packet.lower() in ['bye', 'quit', 'bye()', 'quit()']:
+                    conn.send(self.msg_bye())
+                    conn.close()
+                    return False
+                elif '=' in packet:
+                    name, value = [part.strip() for part in packet.split('=')]
+                    # is value in our variables list?
+                    if name in self.bot._namespace:
+                        ## TODO: we're forced to convert input to floats
+                        # would be a lot nicer to have a check for the var type
+                        # self.drawingarea.bot._namespace[var] = value.strip(';')
+                        value = float(value.strip(';'))
+                        success, msg = self.var_changed(name, value)
+                        if success:
+                            conn.send(self.msg_var_value(name))
+                        else:
+                            conn.send('{}\n'.format(msg))
+                    else:
+                        conn.send('Error: Unknown variable: {}\n'.format(name))
+                elif packet in self.bot._namespace:
+                    conn.send(self.msg_var_value(packet))
+                else:
+                    conn.send('Error: Unknown command: {}\n'.format(packet))
+            return True
 

@@ -157,6 +157,11 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.var_window.window.destroy()
             self.var_window = None
 
+    def var_changed(self, name, value):
+        self.bot._namespace[name] = value
+        if self.var_window:
+            return self.var_window.update_var(name, value)
+
 
     def do_snapshot(self, format):
         bot = self.bot

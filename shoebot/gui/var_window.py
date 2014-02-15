@@ -21,21 +21,22 @@ class VarWindow(object):
         vbox = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
-        self.variables = []
+        self.widgets = {}
 
         for item in sorted(bot._vars.values()):
-            self.variables.append(item)
             if item.type is NUMBER:
-                self.add_number(vbox, item)
+                self.widgets[item.name] = self.add_number(vbox, item)
             elif item.type is TEXT:
-                self.add_text(vbox, item)
+                self.widgets[item.name] = self.add_text(vbox, item)
             elif item.type is BOOLEAN:
-                self.add_boolean(vbox, item)
+                self.widgets[item.name] = self.add_boolean(vbox, item)
             elif item.type is BUTTON:
-                self.add_button(vbox, item)
+                self.widgets[item.name] = self.add_button(vbox, item)
+            else:
+                raise ValueError('Unknown variable type.')
 
         self.window.add(vbox)
-        self.window.set_size_request(400,35*len(self.variables))
+        self.window.set_size_request(400,35*len(self.widgets.keys()))
         self.window.show_all()
 
         if title:
@@ -52,12 +53,14 @@ class VarWindow(object):
             adj = gtk.Adjustment(v.value, v.min, v.max, .1, 2, 1)
         else:
             adj = gtk.Adjustment(v.value, v.min, v.max, .1)
-        adj.connect("value_changed", self.cb_set_var, v)
+        adj.connect("value_changed", self.widget_changed, v)
         hscale = gtk.HScale(adj)
         hscale.set_value_pos(gtk.POS_RIGHT)
         hscale.set_value(v.value)
         sliderbox.pack_start(hscale, True, True, 0)
         container.pack_start(sliderbox, True, True, 0)
+
+        return hscale
 
     def add_text(self, container, v):
         textcontainer = gtk.HBox(homogeneous=False, spacing=0)
@@ -66,19 +69,23 @@ class VarWindow(object):
 
         entry = gtk.Entry(max=0)
         entry.set_text(v.value)
-        entry.connect("changed", self.cb_set_var, v)
+        entry.connect("changed", self.widget_changed, v)
         textcontainer.pack_start(entry, True, True, 0)
         container.pack_start(textcontainer, True, True, 0)
+
+        return entry
 
     def add_boolean(self, container, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         button = gtk.CheckButton(label=v.name)
         button.set_active(v.value)
         # we send the state of the button to the callback method
-        button.connect("toggled", self.cb_set_var, v)
+        button.connect("toggled", self.widget_changed, v)
 
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
+
+        return button
 
 
     def add_button(self, container, v):
@@ -96,11 +103,27 @@ class VarWindow(object):
         buttoncontainer.pack_start(button, True, True, 0)
         container.pack_start(buttoncontainer, True, True, 0)
 
+        return button
+
 
     def do_quit(self, widget):
         pass
 
-    def cb_set_var(self, widget, v):
+    def update_var(self, name, value):
+        """
+        :return: success, err_msg_if_failed
+        """
+        widget = self.widgets.get(name)
+        if widget is None:
+            return False, 'No widget found matching, {}'.format(name)
+
+        try:
+            widget.set_value(value)
+            return True, widget.get_value()
+        except Exception as e:
+            return False, str(e)
+
+    def widget_changed(self, widget, v):
         ''' Called when a slider is adjusted. '''
         # set the appropriate bot var
         if v.type is NUMBER:
