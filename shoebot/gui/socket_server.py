@@ -55,8 +55,8 @@ class SocketServerMixin(object):
         return BANNER
 
     def msg_var_value(self, name):
-        value = self.bot._namespace[name]
-        return 'bot: {}={}\n'.format(name, value)
+        variable = self.bot._vars[name]
+        return 'bot: {}={}\n'.format(name, variable.sanitize(variable.value))
 
     def msg_bye(self):
         return "See you next time.\n"
@@ -86,19 +86,22 @@ class SocketServerMixin(object):
                 elif '=' in packet:
                     name, value = [part.strip() for part in packet.split('=')]
                     # is value in our variables list?
-                    if name in self.bot._namespace:
+                    if name in self.bot._vars:
                         ## TODO: we're forced to convert input to floats
                         # would be a lot nicer to have a check for the var type
                         # self.drawingarea.bot._namespace[var] = value.strip(';')
-                        value = float(value.strip(';'))
-                        success, msg = self.var_changed(name, value)
+                        #value = float(value.strip(';'))
+                        variable = self.bot._vars[name]
+                        variable.value = variable.sanitize(value.strip(';'))
+
+                        success, msg = self.var_changed(name, variable.value)
                         if success:
                             conn.send(self.msg_var_value(name))
                         else:
                             conn.send('{}\n'.format(msg))
                     else:
                         conn.send('Error: Unknown variable: {}\n'.format(name))
-                elif packet in self.bot._namespace:
+                elif packet in self.bot._vars:
                     conn.send(self.msg_var_value(packet))
                 else:
                     conn.send('Error: Unknown command: {}\n'.format(packet))
