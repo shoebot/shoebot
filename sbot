@@ -124,6 +124,13 @@ parser.add_argument("-v",
                 default=False,
                 help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
                 )
+parser.add_argument("-l",
+                "--l",
+                dest="shell",
+                action="store_true",
+                default=False,
+                help=_("Simple shell - for IDE interaction"),
+                )
 parser.add_argument('script_args', nargs='?')
 
 def error(message):
@@ -167,5 +174,6 @@ if __name__ == '__main__':
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
         vars = vars or None,
+        shell = args.shell,
         args = args.script_args or [],
         )
