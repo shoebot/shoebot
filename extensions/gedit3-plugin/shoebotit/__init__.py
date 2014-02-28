@@ -1,4 +1,5 @@
 from collections import namedtuple
+import base64
 import queue
 import time
 from distutils.spawn import find_executable as which
@@ -116,7 +117,8 @@ ui_str = """
         <separator/>
         <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
         <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
-        <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
+        <menuitem name="Fullscreen" action="ShoebotFullscreen"/>
+        <menuitem name="Live Code" action="ShoebotLive"/>
       </placeholder>
     </menu>
   </menubar>
@@ -228,8 +230,11 @@ class AsynchronousFileReader(threading.Thread):
 #            panel.set_property("visible", True)
 
 
-class ShoebotProcess:
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None):
+class ShoebotProcess(object):
+    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, livecoding, title, textbuffer, cwd=None):
+        self.livecoding = livecoding
+        self.textbuffer = textbuffer
+        
         command = ['sbot', '-w', '-t%s - Shoebot on gedit' % title]
 
         if use_socketserver:
@@ -241,9 +246,18 @@ class ShoebotProcess:
         if use_fullscreen:
             command.append('-f')
 
+        if livecoding:
+            self.livecoding = livecoding
+            command.append('-l')
+
         command.append(code)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+
+        if livecoding:
+            self.changed_handler_id = textbuffer.connect("changed", self.doc_changed)
+        else:
+            self.changed_handler_id = None
 
         # Launch the asynchronous readers of the process' stdout and stderr.
         self.stdout_queue = queue.Queue()
@@ -253,7 +267,35 @@ class ShoebotProcess:
         self.stderr_reader = AsynchronousFileReader(self.process.stderr, self.stderr_queue)
         self.stderr_reader.start()
 
+        self.changed_handler_id = None
 
+
+
+    def doc_changed(self, *args):
+        if self.livecoding:
+            start_iter = self.textbuffer.get_start_iter()
+            end_iter = self.textbuffer.get_end_iter()
+            source = self.textbuffer.get_text(start_iter, end_iter, False)
+
+            #self.send_command("load_base64", source)
+            #b64_source = str(base64.b64encode(bytes(source, "utf-8")))
+            try:
+                self.send_command("load_base64", source)
+            except Exception as e:
+                print('FIXME')
+                print(e)
+                if self.changed_handler_id is not None:
+                    self.textbuffer.disconnect(self.changed_handler_id)
+
+    def send_command(self, cmd, *args):
+        if args:
+            self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
+        else:
+            self.process.stdin.write(bytes(cmd, "utf-8"))
+        self.process.stdin.write(b"\n")
+        self.process.stdin.flush()
+
+    
     def _update_ui_text(self, output_widget):
         textbuffer = output_widget.get_buffer()
         while False == (self.stdout_queue.empty() and self.stderr_queue.empty()):
@@ -281,8 +323,13 @@ class ShoebotProcess:
         if self.process.poll() is not None:
             # Close subprocess' file descriptors.
             self._update_ui_text(output_widget)
+            self.process.stdin.close()
             self.process.stdout.close()
             self.process.stderr.close()
+            print('Quit...')
+
+            if self.changed_handler_id is not None:
+                self.textbuffer.disconnect(self.changed_handler_id)
             return False
 
         result = not (self.stdout_reader.eof() or self.stderr_reader.eof())
@@ -305,6 +352,7 @@ class ShoebotWindowHelper:
         self.use_socketserver = False
         self.show_varwindow = True
         self.use_fullscreen = False
+        self.livecoding = False
 
         self.started = False
         self.shoebot_thread = None
@@ -342,6 +390,7 @@ class ShoebotWindowHelper:
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
+            ("ShoebotLive", None, _("Live Code"), '<control><alt>L', _("Live Code"), self.toggle_livecoding, False),
             ])
         manager.insert_action_group(self.action_group)
         
@@ -388,7 +437,11 @@ class ShoebotWindowHelper:
     def start_shoebot(self):
         if self.bot and self.bot.process.poll() == None:
             print('Has a bot already')
-            return False
+            if self.bot.livecoding:
+                print('Sending quit.')
+                self.bot.send_command("quit")
+            else:
+                return False
         
         # get the text buffer
         doc = self.window.get_active_document()
@@ -405,11 +458,12 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
+                
         while Gtk.events_pending():
            Gtk.main_iteration()
 
 
-        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.livecoding, title, doc, cwd=cwd)
 
         GObject.idle_add(self.update_shoebot)
 
@@ -428,9 +482,10 @@ class ShoebotWindowHelper:
     def toggle_var_window(self, action):
         self.show_varwindow = action.get_active()
     def toggle_fullscreen(self, action):
-        #no full screen for you!
-        self.use_fullscreen = False
-        #self.use_fullscreen = action.get_active()
+        self.use_fullscreen = action.get_active()
+    def toggle_livecoding(self, action):
+        self.livecoding = action.get_active()
+    
         
     # Right-click menu items (for quicktorials)
 
@@ -528,7 +583,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         self.output_widget = scrolled_window
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
-
 
     def do_deactivate(self):
         self.panel.remove_item(self.text)

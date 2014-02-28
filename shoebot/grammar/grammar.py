@@ -5,6 +5,7 @@ from time import sleep, time
 from shoebot.data import Variable
 from shoebot.util import flushfile
 
+import copy
 import sys
 
 sys.stdout = flushfile(sys.stdout)
@@ -28,6 +29,7 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
+        self.source_or_code = ""
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -142,18 +144,18 @@ class Grammar(object):
         # is it a proper filename?
         if os.path.isfile(inputcode):
             file = open(inputcode, 'rU')
-            source_or_code = file.read()
+            self.source_or_code = file.read()
             file.close()
             self._load_namespace(inputcode)
         else:
             # if not, try parsing it as a code string
-            source_or_code = inputcode
+            self.source_or_code = inputcode
             self._load_namespace()
 
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
-            if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + '\n\n', "shoebot_code", "exec")
+            if isinstance(self.source_or_code, basestring):
+                self.source_or_code = compile(self.source_or_code + '\n\n', "shoebot_code", "exec")
             # do the magic            
             if not iterations:
                 if run_forever:
@@ -164,11 +166,12 @@ class Grammar(object):
             self._start_time = time()
 
             # First iteration
-            self._exec_frame(source_or_code, limit = frame_limiter)
+            self._exec_frame(self.source_or_code, limit = frame_limiter)
+            self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
 
             # Subsequent iterations
             while self._should_run(iterations):
-                self._exec_frame(source_or_code, limit = frame_limiter)
+                self._exec_frame(self.source_or_code, limit = frame_limiter)
 
             if not run_forever:
                 self._quit = True
