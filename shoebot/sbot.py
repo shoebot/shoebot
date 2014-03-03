@@ -29,9 +29,11 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Convenience function to run a bot'''
 
-import os.path
+import os
+import signal
 import sys
-import thread
+#import thread
+import threading
 
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
@@ -79,23 +81,48 @@ def bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterati
 
     return bot
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, shell=False, args = []):
+
+class ShoebotThread(threading.Thread):
+    def __init__(self, sbot, *args, **kwargs):
+        threading.Thread.__init__(self)
+        self.sbot = sbot
+        self.args = args
+        self.setDaemon(True)
+        if 'shell' in kwargs:
+            self.shell = kwargs['shell']
+            del kwargs['shell']
+
+        self.kwargs = kwargs
+
+    def run(self):
+        #self.sbot.run(src, iterations, run_forever=window if close_window == False else False, frame_limiter = window)
+        self.sbot.run(*self.args, **self.kwargs)
+        if self.shell is not None:
+            # Send the kill
+            os.kill(os.getpid(), signal.SIGINT)
+
+
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, run_shell=False, args = []):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
     sbot = bot(src, grammar, format, outputfile, iterations, window, title, fullscreen, server, port, show_vars, vars = vars)
 
-    def _run():
-        sbot.run(src, iterations, run_forever=window if close_window == False else False, frame_limiter = window)
-
-    if shell:
-        # Run the shell in the main thread, and shoebot in the background.
+    if run_shell:
         import shoebot.gui.shell
-
-        thread.start_new_thread(_run, ())
-
-        shoebot.gui.shell.ShoebotCmd(sbot).cmdloop()
-        print 'qutting ...'
+        shell = shoebot.gui.shell.ShoebotCmd(sbot)
     else:
-        _run()
+        shell = None
+
+    # Run shoebot in a background thread so we can run a cmdline shell in the current thread
+    sbot_thread = ShoebotThread(sbot, src, iterations, run_forever=window if close_window == False else False, frame_limiter = window, shell=shell)
+    sbot_thread.start()
+    if shell is not None:
+        try:
+            shell.cmdloop()
+        except KeyboardInterrupt:
+            if not sbot._quit:
+                raise
+            else:
+                print '\nBye.'
 
     return bot
