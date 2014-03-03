@@ -124,5 +124,7 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
                 raise
             else:
                 print '\nBye.'
+    else:
+        sbot_thread.join()
 
     return bot
