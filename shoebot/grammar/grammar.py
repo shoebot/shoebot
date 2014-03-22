@@ -1,3 +1,4 @@
+import contextlib
 import os
 import traceback
 
@@ -10,6 +11,91 @@ import sys
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
+
+
+class LiveExecution(object):
+    ns = {}
+
+    def __init__(self, code, ns = None):
+        self.edited_code = None
+        self.known_good = code
+        if ns is None:
+            self.ns = {}
+        else:
+            self.ns = ns
+
+    def load_edited_code(self, code):
+        """
+        Load changed code into the execution environment.
+
+        Until the code is executed correctly, it will be
+        in the 'tenuous' state.
+        """
+        self.edited_code = code
+
+    def do_exec(self, code, ns, tenuous = False):
+        """
+        Override if you want to do something other than exec in ns
+
+        tenuous is True if the code has just been edited and may fail
+        """
+        exec code in ns
+
+    def run_tenuous(self):
+        """
+        Run edited code, if no exceptions occur then it
+        graduates to known good.
+        """
+        ns_snapshot = copy.copy(self.ns)
+        try:
+            code = self.edited_code
+            self.edited_code = None
+            self.do_exec(code, ns_snapshot, True)
+            self.known_good = code
+            return True, None
+        except Exception as e:
+            self.ns.clear()
+            self.ns.update(ns_snapshot)
+            return False, e
+
+    def run(self):
+        """
+        Attempt to known good or tenuous code.
+        """
+        if self.edited_code:
+            success, ex = self.run_tenuous()
+            if success:
+                return
+
+        self.do_exec(self.known_good, self.ns)
+
+    @contextlib.contextmanager
+    def run_context(self):
+        """
+        Context in which the user can run the code in a custom manner.
+
+        If no exceptions occur then the code will move from 'tenuous'
+        to 'known good'.
+
+        >>> with run_context() as (tenuous, code, ns):
+        >>> ...  exec code in ns
+        >>> ...  ns['draw']()
+
+        """
+        if self.edited_code is None:
+            yield True, self.known_good, self.ns
+            return
+
+        ns_snapshot = copy.copy(self.ns)
+        try:
+            yield False, self.edited_code, self.ns
+            self.known_good = self.edited_code
+            self.edited_code = None
+        except Exception as e:
+            self.edited_code = None
+            self.ns.clear()
+            self.ns.update(ns_snapshot)
+
 
 class Grammar(object):
     ''' 
@@ -30,6 +116,9 @@ class Grammar(object):
         self._oldvars = self._vars
         self._namespace = namespace or {}
         self.source_or_code = ""
+
+        #self._executor = LiveExecution(ns=self)
+        self._executor = None
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -115,15 +204,21 @@ class Grammar(object):
         self._set_dynamic_vars()
         if self._iteration == 0:
             # First frame
-            exec source_or_code in namespace
+            self._executor.run()
+            #exec source_or_code in namespace
             namespace['setup']()
             namespace['draw']()
         else:
             # Subsequent frames
             if self._dynamic:
-                namespace['draw']()
+                with self._executor.run_context() as (tenuous, code, ns):
+                    self._executor.do_exec(code, ns)
+                    ns['draw']()
+                #self._executor.run()
+                #namespace['draw']()
             else:
-                exec source_or_code in namespace
+                self._executor.run()
+                #exec source_or_code in namespace
         
         self._canvas.flush(self._frame)
         if limit:
@@ -145,6 +240,7 @@ class Grammar(object):
         if os.path.isfile(inputcode):
             file = open(inputcode, 'rU')
             self.source_or_code = file.read()
+            self._executor = LiveExecution(self.source_or_code, ns=self._namespace)
             file.close()
             self._load_namespace(inputcode)
         else:
@@ -156,6 +252,7 @@ class Grammar(object):
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(self.source_or_code, basestring):
                 self.source_or_code = compile(self.source_or_code + '\n\n', "shoebot_code", "exec")
+                self._executor = LiveExecution(self.source_or_code, ns=self._namespace)
             # do the magic            
             if not iterations:
                 if run_forever:
@@ -165,13 +262,14 @@ class Grammar(object):
 
             self._start_time = time()
 
-            # First iteration
-            self._exec_frame(self.source_or_code, limit = frame_limiter)
-            self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
-
-            # Subsequent iterations
-            while self._should_run(iterations):
+            with self._executor.run_context():
+                # First iteration
                 self._exec_frame(self.source_or_code, limit = frame_limiter)
+                self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
+
+                # Subsequent iterations
+                while self._should_run(iterations):
+                    self._exec_frame(self.source_or_code, limit = frame_limiter)
 
             if not run_forever:
                 self._quit = True

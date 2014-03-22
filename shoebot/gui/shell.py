@@ -1,6 +1,7 @@
 import base64
 import cmd
 import copy
+import compiler
 
 class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
@@ -41,22 +42,26 @@ class ShoebotCmd(cmd.Cmd):
         load filename=(file)
         load base64=(base64 encoded)
         """
+        print 'shoebot: load_base64 '
+        #ns_snapshot = copy.copy(self.bot._namespace)
         try:
-            print 'shoebot: load_base64 '
-            print line
+            #print line
             source = str(base64.b64decode(line))
+            #compiler.parse(source) # hopefully will barf on bad code
             source_or_code = compile(source + '\n\n', "shoebot_code", "exec")
-            #self.bot.source_or_code = compile("def draw():\n    print FRAME" + '\n\n', "shoebot_code", "exec")
-            exec source_or_code in self.bot._namespace
-            self.bot.source_or_code = source_or_code
+            #exec source_or_code in self.bot._namespace
+            
+            #self.bot.source_or_code = source_or_code
+            self.bot._executor.load_edited_code(source_or_code)
             #self.bot._load_namespace()
         except Exception as e:
-            print 'got exception'
+            print 'Error Compiling'
             print e
 
-            print 'Exec old code'
+            #self.bot._namespace = ns_snapshot
+
             # Try and re-exec the last known good code
-            exec self.bot.source_or_code in self.bot._namespace
+            #exec self.bot.source_or_code in self.bot._namespace
 
     # def d(self, line):
     #     if not kwargs:
@@ -86,3 +91,4 @@ class ShoebotCmd(cmd.Cmd):
 
 #if __name__ == '__main__':
 #    ShoebotCmd().cmdloop()
+
