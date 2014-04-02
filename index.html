@@ -10,7 +10,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <title>Shoebot by shoebot</title>
+    <title>Shoebot!</title>
   </head>
 
   <body>
@@ -19,7 +19,7 @@
 
         <header>
           <h1>Shoebot</h1>
-          <h2>Coding vector graphics with Python</h2>
+          <h2>Generate vector graphics with Python</h2>
         </header>
 
         <section id="downloads" class="clearfix">
@@ -35,71 +35,49 @@
 <a name="shoebot" class="anchor" href="#shoebot"><span class="octicon octicon-link"></span></a>Shoebot</h1>
 
 <p>Shoebot is a Python graphics robot. Instead of drawing with your mouse, you write code to create images. The syntax is simple and aimed at people without a specific programming background -- though its advanced features might be useful for code ninjas too!</p>
-
 <p>It takes a Python script as input, which describes a drawing process, and outputs a vector graphic in a common open standard format: SVG, PDF, PostScript or PNG. It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line without a GUI for automated tasks. </p>
-
 <p>Shoebot is a port/rewrite of <a href="http://nodebox.net/code/index.php/Home">Nodebox 1</a>. It was also inspired by <a href="http://drawbot.com">DrawBot</a> and <a href="http://shoesrb.com/">Shoes</a>. Thus, "Shoebot".</p>
 
 <h2>
-<a name="what-you-need" class="anchor" href="#what-you-need"><span class="octicon octicon-link"></span></a>What you need</h2>
-
+<a name="what-you-need" class="anchor" href="#what-you-need"><span class="octicon octicon-link"></span></a>Install dependencies</h2>
 <p>Shoebot runs on Python 2.7, which is most probably what you already have installed.</p>
 
-<p>First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:</p>
+<p>The first step is to install the appropriate dependencies. 
+If this is your first time using Shoebot, you'll want to install all of them.</p>
 
-<p>Debian/Ubuntu:</p>
+<p>In Debian/Ubuntu:</p>
 
-<pre><code>sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
-</code></pre>
+<pre><code>sudo apt-get install libjpeg-dev python-cairo python-gtk2 \
+python-gobject python-gtksourceview2 python-rsvg</code></pre>
 
-<p>Fedora:</p>
+<p>In Fedora:</p>
 
-<pre><code>sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
-</code></pre>
+<pre><code>sudo yum install libjpeg-devel pycairo pygtk2 \ 
+pygobject2 gnome-python2-rsvg</code></pre>
 
-<p>OSX:</p>
+<p>In Mac OSX:</p>
 
-<p>With MacPorts (<a href="http://www.macports.org">http://www.macports.org</a>) and python2.5</p>
+<p><strong>Warning:</strong> Mac install instructions are rather old, and we don't have a Mac to test with, but would be happy to help. 
+You will need MacPorts (<a href="http://www.macports.org">http://www.macports.org</a>) and Python 2.5.</p>
 
 <pre><code>sudo port install py25-numpy -atlas
 sudo port install pango +quartz
 sudo port install librsvg py25-pil py25-cairo py25-gtk
 </code></pre>
 
-<p>MacPorts does not have the python-rsvg package, so svg output won't work.
-TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.</p>
+<p><em>MacPorts does not have the python-rsvg package, so svg output won't work.</em></p>
 
 <h2>
-<a name="installing-shoebot" class="anchor" href="#installing-shoebot"><span class="octicon octicon-link"></span></a>Installing Shoebot</h2>
+<a name="installing-shoebot" class="anchor" href="#installing-shoebot"><span class="octicon octicon-link"></span></a>Install Shoebot</h2>
 
-<p>For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:</p>
+<p>You can get the latest flavor of Shoebot <a href="http://">from GitHub</a>, or using these direct links:</p>
 
-<p>Ubuntu/Debian:</p>
 
-<pre><code>sudo apt-get install git
-</code></pre>
-
-<p>Fedora:</p>
-
-<pre><code>sudo yum install git
-</code></pre>
-
-<p>Gentoo:</p>
-
-<pre><code>emerge git
-</code></pre>
-
-<p>OSX:</p>
-
-<pre><code>sudo port install git-core
-</code></pre>
-
-<p>Make a temporary directory to download all source files into, and then get the source itself.</p>
+You can also clone the repository using Git from the command-line.
 
 <pre><code>mkdir ~/src
 cd ~/src
-git clone git@github.com:shoebot/shoebot.git
-</code></pre>
+git clone https://github.com/shoebot/shoebot.git</code></pre>
 
 <p>You should now see a new shoebot/ directory. The only remaining step is to install it proper:</p>
 
@@ -107,33 +85,23 @@ git clone git@github.com:shoebot/shoebot.git
 sudo python setup.py install
 </code></pre>
 
-<p>OSX:</p>
-
-<pre><code>cd shoebot
-sudo /opt/local/bin/python2.5 setup.py install
-</code></pre>
-
 <h2>
 <a name="running-shoebot-from-the-console" class="anchor" href="#running-shoebot-from-the-console"><span class="octicon octicon-link"></span></a>Running Shoebot from the console</h2>
 
 <p>Using the Shoebot console runner is straightforward:</p>
 
-<pre><code>sbot inputfile.bot
-</code></pre>
+<pre><code>sbot inputfile.bot</code></pre>
 
-<p>This command will run the 'inputfile.bot' script, and create an output image
-file (output.svg). You'll want to specify your own filename, which can be
-done like so:</p>
+<p>This command will run the <code>inputfile.bot</code> script, and create an output image file &ndash; <code>output.svg</code> by default. You'll want to specify your own filename, and for this there's the <code>-o</code> or <code>--output</code> option:</p>
 
-<pre><code>sbot inputfile.bot -o image.png
-</code></pre>
+<pre><code>sbot inputfile.bot -o image.png</code></pre>
 
 <p>The allowed extensions for the output filename are .svg, .ps, .pdf and .png.</p>
 
 <p>You can find many example Shoebot scripts in <code>/usr/share/shoebot/examples</code>.</p>
 
 <p>Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the window flag:</p>
+as realtime manipulation of parameters. For this, just use the <code>--window</code> or <code>-w</code> option:</p>
 
 <pre><code>sbot -w inputfile.bot
 </code></pre>
