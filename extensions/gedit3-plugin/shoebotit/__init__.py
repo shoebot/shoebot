@@ -383,9 +383,15 @@ class ShoebotWindowHelper:
             self.started = True
 
     def on_run_activate(self, action):
-        return self.start_shoebot()
+        self.start_shoebot()
 
     def start_shoebot(self):
+        if not which('sbot'):
+            textbuffer = self.output_widget.get_buffer()
+            textbuffer.set_text('Cannot find sbot in path.')
+            while Gtk.events_pending():
+               Gtk.main_iteration()
+            
         if self.bot and self.bot.process.poll() == None:
             print('Has a bot already')
             return False
