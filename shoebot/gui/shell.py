@@ -16,6 +16,12 @@ class ShoebotCmd(cmd.Cmd):
     def handler(signum, frame):
         print 'Caught CTRL-C, press enter to continue'
 
+    def do_title(self, title):
+        """
+        Change window title.
+        """
+        pass
+
     def do_speed(self, speed):
         """rewind
         """
