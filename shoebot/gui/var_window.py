@@ -8,7 +8,7 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
-ICON_FILE = next(f for f in ['/usr/share/shoebot/shoebot-ide.png', os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')] if os.path.exists(f))
+ICON_FILE = next(f for f in ['/usr/share/shoebot/shoebot-ide.png', '/usr/local/share/pixmaps/shoebot-ide.png', os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')] if os.path.exists(f))
 
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):
