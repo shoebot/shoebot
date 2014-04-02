@@ -391,6 +391,7 @@ class ShoebotWindowHelper:
             textbuffer.set_text('Cannot find sbot in path.')
             while Gtk.events_pending():
                Gtk.main_iteration()
+            return False
             
         if self.bot and self.bot.process.poll() == None:
             print('Has a bot already')
