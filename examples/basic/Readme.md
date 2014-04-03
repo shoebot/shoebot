@@ -67,6 +67,7 @@ Draw lines with different stroke widths.
 
 transforms.bot
 --------------
+Perform some basic transformations (rotation and translation) on rectangles.
 
 var_boolean.bot
 ---------------
