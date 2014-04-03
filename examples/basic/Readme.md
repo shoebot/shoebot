@@ -63,6 +63,7 @@ Draw a simple filled star.
 
 strokewidth.bot
 ---------------
+Draw lines with different stroke widths.
 
 transforms.bot
 --------------
