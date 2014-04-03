@@ -27,6 +27,7 @@ Draw different rectangles with different strokes and fills.
 
 how_curves_work.bot
 -------------------
+Demonstrate how the differnet parameters of curves work.
 
 keyboard.bot
 ------------

@@ -1,6 +1,7 @@
+# about:
+#   Demonstrate how the differnet parameters of curves work.
+
 size(200,200)
-# This boring example demonstrate how curves work, and goes a bit
-# into the different parameters for drawing curves on screen.
 import math
 
 # Setup colors: no fill is needed, and stroke the curves with black.
