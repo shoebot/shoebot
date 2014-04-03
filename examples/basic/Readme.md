@@ -35,6 +35,7 @@ Demonstrate some basic keyboard interaction. Try pressing different single keys 
 
 line.bot
 --------
+Draw a simple line.
 
 mouse.bot
 ---------
