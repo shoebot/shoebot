@@ -43,6 +43,7 @@ Fill the background of the shoebot windows with a color depending on the mouse c
 
 path_curveto.bot
 ----------------
+Draw a curve along some points and fill the space enclosed by the path.
 
 path_lineto.bot
 ---------------
