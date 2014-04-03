@@ -75,6 +75,7 @@ Switch the background color of a window by checking a box.
 
 var_number_hsb.bot
 ------------------
+Play with values in the [HSB](https://en.wikipedia.org/wiki/HSV_color_space) colorspace. Make sure you check the "show" box from time to time.
 
 var_number_rgb.bot
 ------------------
