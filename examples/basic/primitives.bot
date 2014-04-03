@@ -1,5 +1,6 @@
-# Basic primitives example
-# Taken from the Nodebox test suite
+# about:
+#   Draw different primitives (rectangles, arrows and stars) and fill them.
+#   Taken from the Nodebox test suite
 
 size(300, 300)
 colorrange(255)

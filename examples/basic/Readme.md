@@ -51,6 +51,7 @@ Draw some lines and fill the space enclosed by the path.
 
 primitives.bot
 --------------
+Draw different primitives (rectangles, arrows and stars) and fill them.
 
 rect.bot
 --------
