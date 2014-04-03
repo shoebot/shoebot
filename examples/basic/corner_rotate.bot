@@ -1,3 +1,6 @@
+# about:
+#   Rotate some text in the upper left corner.
+
 transform(CORNER)
 translate(100,100)
 oval(-5,-5,10,10)

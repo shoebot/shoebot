@@ -1,3 +1,6 @@
+# about:
+#   Draw a simple line.
+
 size(300,300)
 colorrange(255)
 
