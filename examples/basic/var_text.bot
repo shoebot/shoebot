@@ -1,3 +1,6 @@
+# about:
+#   Display unicode text and manipulate the font size.
+
 size(400,300)
 colorrange(255)
 

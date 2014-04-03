@@ -79,6 +79,8 @@ Play with values in the [HSB](https://en.wikipedia.org/wiki/HSV_color_space) col
 
 var_number_rgb.bot
 ------------------
+Play around with values in the [RGB](https://en.wikipedia.org/wiki/RGB_color_model) colorspace.
 
 var_text.bot
 ------------
+Display unicode text and manipulate the font size.
