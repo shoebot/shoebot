@@ -47,6 +47,7 @@ Draw a curve along some points and fill the space enclosed by the path.
 
 path_lineto.bot
 ---------------
+Draw some lines and fill the space enclosed by the path.
 
 primitives.bot
 --------------
