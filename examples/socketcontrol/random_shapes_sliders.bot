@@ -6,11 +6,11 @@ var('gridSize', NUMBER, 30, 20, 40)
 w, h = 180, 180
 
 def biggestFit(num, divisor):
-    return divisor * (num // divisor)
+    return  divisor * (num // divisor)
 
 def draw():
-    for i in range(0, biggestFit(w,gridSize), gridSize):
-        for j in range(0, biggestFit(h,gridSize), gridSize):
+    for i in range(0, int(biggestFit(w,gridSize)), int(gridSize) ):
+        for j in range(0, int(biggestFit(h,gridSize)), int(gridSize) ):
             c = color(random(), 0.0, 0.5)
             fill(c)
             if random() > ovalTendency:
