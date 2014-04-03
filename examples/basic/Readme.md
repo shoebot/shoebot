@@ -31,6 +31,7 @@ Demonstrate how the differnet parameters of curves work.
 
 keyboard.bot
 ------------
+Demonstrate some basic keyboard interaction. Try pressing different single keys for differnet durations.
 
 line.bot
 --------
