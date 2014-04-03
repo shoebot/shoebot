@@ -59,6 +59,7 @@ Draw a simple filled rectangle.
 
 star.bot
 --------
+Draw a simple filled star.
 
 strokewidth.bot
 ---------------

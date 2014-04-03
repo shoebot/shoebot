@@ -1,3 +1,6 @@
+# about:
+#   Draw a simple filled star.
+
 size(300,300)
 colorrange(255)
 background(49,125,123)
