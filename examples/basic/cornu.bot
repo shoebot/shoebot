@@ -1,3 +1,6 @@
+# about:
+#   Play with elegant cornu curves and tweak them with sliders.
+
 try:
     cornu = ximport("cornu")
 except:

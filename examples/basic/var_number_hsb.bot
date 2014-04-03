@@ -1,3 +1,6 @@
+# about:
+#   Play with values in the HSB colorspace. Make sure you check the "show" box from time to time.
+
 size(300,300)
 colorrange(255)
 colormode(HSB)
