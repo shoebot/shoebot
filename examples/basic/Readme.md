@@ -71,6 +71,7 @@ Perform some basic transformations (rotation and translation) on rectangles.
 
 var_boolean.bot
 ---------------
+Switch the background color of a window by checking a box.
 
 var_number_hsb.bot
 ------------------
