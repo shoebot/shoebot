@@ -29,13 +29,16 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Convenience function to run a bot'''
 
-import os.path
+import os
+import signal
 import sys
+#import thread
+import threading
 
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
 
-def create_canvas(src, format=None, outputfile=None, multifile=False, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False):
+def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False):
     '''
     Convience file to create canvas and output sink for a shoebot bot
 
@@ -64,11 +67,11 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, window=Fal
     return canvas
 
 
-def bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, server=False, port=7777, show_vars = False, vars = None):
+def bot(src = None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None):
     '''
     Convienience function to create a bot
     '''
-    canvas = create_canvas(src, format, outputfile, iterations > 1, window, title, fullscreen=fullscreen, server=server, port=port, show_vars = show_vars)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, server=server, port=port, show_vars = show_vars)
 
     from shoebot.grammar import DrawBot, NodeBot
     if grammar == DRAWBOT:
@@ -78,9 +81,50 @@ def bot(src = None, grammar = NODEBOX, format = None, outputfile = None, iterati
 
     return bot
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, args = []):
+
+class ShoebotThread(threading.Thread):
+    def __init__(self, sbot, *args, **kwargs):
+        threading.Thread.__init__(self)
+        self.sbot = sbot
+        self.args = args
+        self.setDaemon(True)
+        if 'shell' in kwargs:
+            self.shell = kwargs['shell']
+            del kwargs['shell']
+
+        self.kwargs = kwargs
+
+    def run(self):
+        #self.sbot.run(src, iterations, run_forever=window if close_window == False else False, frame_limiter = window)
+        self.sbot.run(*self.args, **self.kwargs)
+        if self.shell is not None:
+            # Send the kill
+            os.kill(os.getpid(), signal.SIGINT)
+
+
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, buff=None, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, run_shell=False, args = []):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
     sbot = bot(src, grammar, format, outputfile, iterations, window, title, fullscreen, server, port, show_vars, vars = vars)
-    sbot.run(src, iterations, run_forever = window if close_window == False else False, frame_limiter = window)
+
+    if run_shell:
+        import shoebot.gui.shell
+        shell = shoebot.gui.shell.ShoebotCmd(sbot)
+    else:
+        shell = None
+
+    # Run shoebot in a background thread so we can run a cmdline shell in the current thread
+    sbot_thread = ShoebotThread(sbot, src, iterations, run_forever=window if close_window == False else False, frame_limiter = window, shell=shell)
+    sbot_thread.start()
+    if shell is not None:
+        try:
+            shell.cmdloop()
+        except KeyboardInterrupt:
+            if not sbot._quit:
+                raise
+            else:
+                print '\nBye.'
+    else:
+        sbot_thread.join()
+
     return bot

@@ -230,3 +230,9 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
     def finish(self):
         while self.bot._quit == False and self.window_open == True:
             gtk.main_iteration()
+            ### Any snapshots that need to be taken
+            for snapshot_func in self.scheduled_snapshots:
+                snapshot_func()
+            else:
+                self.scheduled_snapshots = deque()
+
