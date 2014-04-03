@@ -390,7 +390,7 @@ class ShoebotWindowHelper:
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
-            ("ShoebotLive", None, _("Live Code"), '<control><alt>L', _("Live Code"), self.toggle_livecoding, False),
+            ("ShoebotLive", None, _("Live Code"), '<control><alt>C', _("Live Code"), self.toggle_livecoding, False),
             ])
         manager.insert_action_group(self.action_group)
         
