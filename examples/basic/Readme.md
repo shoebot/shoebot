@@ -55,6 +55,7 @@ Draw different primitives (rectangles, arrows and stars) and fill them.
 
 rect.bot
 --------
+Draw a simple filled rectangle.
 
 star.bot
 --------
