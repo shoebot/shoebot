@@ -19,3 +19,9 @@ doc/build/*
 *.bak
 *~
 *.swp
+
+# sphinx extension build files
+extensions/sphinx-doc/build/
+extensions/sphinx-doc/dist/
+extensions/sphinx-doc/sphinxcontrib_shoebot.egg-info/
+
