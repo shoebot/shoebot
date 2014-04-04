@@ -4,7 +4,7 @@ Command reference
 Drawing shapes
 --------------
 
-.. py:function:: rect(x, y, width, height, roundness=0,0, draw=True, fill=None)
+.. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
 
     Draw a rectangle on the canvas.
  
@@ -87,6 +87,15 @@ Drawing shapes
     :param y2: y-coordinate of the second point
     :param boolean draw: whether to draw the shape on the canvas or not
     
+    .. shoebot::
+        :snapshot:
+
+        stroke(0.5)
+        strokewidth(3)
+        line(20, 20, 80, 80)
+        line(20, 80, 80, 20)
+        line(50, 20, 50, 80)
+
 .. py:function:: rectmode(mode=None)
 
     Change the way rectangles are specified. Each mode alters the parameters
@@ -172,7 +181,7 @@ Transforms
 
 .. py:function:: transform(mode=None)
 
-    :param mode: the mode to  base new transformations on
+    :param mode: the mode to base new transformations on
     :type mode: CORNER or CENTER
 
 .. py:function:: translate(xt, yt, mode=None)
@@ -194,15 +203,15 @@ Colors
 ------
 
 Colors can be specified in a few ways:
-  * grayscale: (value)
-  * grayscale with alpha: (value, alpha)
-  * RGB: (red, green, blue)
-  * RGBA: (red, green, blue, alpha)
-  * hex: ('#FFFFFF')
-  * hex with alpha: ('#FFFFFFFF')
+  * grayscale: `(value)`
+  * grayscale with alpha: `(value, alpha)`
+  * RGB: `(red, green, blue)`
+  * RGBA: `(red, green, blue, alpha)`
+  * hex: `('#FFFFFF')`
+  * hex with alpha: `('#FFFFFFFF')`
 
-You can use any of these formats to specify a colour; for example, fill(1,0,0)
-and fill('#FF0000') yield the same result.
+You can use any of these formats to specify a colour; for example, `fill(1,0,0)`
+and `fill('#FF0000')` yield the same result.
 
 .. py:function:: background(*args)
 
