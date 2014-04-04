@@ -53,6 +53,11 @@ VARIANTS = {
     'source': str,
 }
 
+BOT_HEADER = """
+size(100, 100)
+background(.8)
+fill(.3)
+"""
 
 import os
 
@@ -111,14 +116,16 @@ class ShoebotDirective(Directive):
 
             outfn = os.path.join(env.app.builder.outdir, '_static', rel_filename)
             ensuredir(os.path.dirname(outfn))
+            script_to_render = BOT_HEADER + text
             try:
-                subprocess.call(['sbot', '-o', '%s' % outfn, text])
+                subprocess.call(['sbot', '-o', '%s' % outfn, script_to_render])
             except Exception, e:
                 raise ShoebotError(str(e))
 
+
             # TODO - Support other output formats
             image_node = nodes.raw('', html_img_tag(rel_filename), format='html')
-            result.append(image_node)
+            result.insert(0,image_node)
         
         return result
 

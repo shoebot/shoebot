@@ -4,7 +4,7 @@ Command reference
 Drawing shapes
 --------------
 
-.. py:function:: rect(x, y, width, height, roundness=0,0, draw=True, fill=None)
+.. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
 
     Draw a rectangle on the canvas.
  
@@ -19,9 +19,6 @@ Drawing shapes
     .. shoebot::
         :snapshot:
 
-        size(100, 100)
-        background(.8)
-        fill(.3)
         rect(10, 10, 35, 35)
         # see how roundness affects the shape
         rect(55, 10, 35, 35, 0.3)
@@ -41,9 +38,6 @@ Drawing shapes
     .. shoebot::
         :snapshot:
 
-        size(100, 100)
-        background(.8)
-        fill(.3)
         ellipse(10, 20, 30, 60)
         ellipse(50, 30, 40, 40) # circle
 
@@ -61,9 +55,6 @@ Drawing shapes
     .. shoebot::
         :snapshot:
 
-        size(100, 100)
-        background(.8)
-        fill(.3)
         arrow(50, 40, 40) # NORMAL is the default arrow type
         arrow(90, 40, 40, FORTYFIVE)
 
@@ -71,12 +62,20 @@ Drawing shapes
 
     Draw a star-like polygon on the canvas.
  
-    :param startx: top left x-coordinate
-    :param starty: top left y-coordinate
+    :param startx: center x-coordinate
+    :param starty: center y-coordinate
     :param points: amount of points
     :param outer: outer radius
     :param inner: inner radius
     :param boolean draw: whether to draw the shape on the canvas or not
+
+    .. shoebot::
+        :snapshot:
+
+        star(25, 25, 5, 20, 10)  # top left
+        star(75, 25, 10, 20, 3)  # top right
+        star(25, 75, 20, 20, 17) # bottom left
+        star(75, 75, 40, 20, 19) # bottom right
 
 .. py:function:: line(x1, y1, x2, y2, draw=True)
 
@@ -88,6 +87,15 @@ Drawing shapes
     :param y2: y-coordinate of the second point
     :param boolean draw: whether to draw the shape on the canvas or not
     
+    .. shoebot::
+        :snapshot:
+
+        stroke(0.5)
+        strokewidth(3)
+        line(20, 20, 80, 80)
+        line(20, 80, 80, 20)
+        line(50, 20, 50, 80)
+
 .. py:function:: rectmode(mode=None)
 
     Change the way rectangles are specified. Each mode alters the parameters
@@ -173,7 +181,7 @@ Transforms
 
 .. py:function:: transform(mode=None)
 
-    :param mode: the mode to  base new transformations on
+    :param mode: the mode to base new transformations on
     :type mode: CORNER or CENTER
 
 .. py:function:: translate(xt, yt, mode=None)
@@ -195,15 +203,15 @@ Colors
 ------
 
 Colors can be specified in a few ways:
-  * grayscale: (value)
-  * grayscale with alpha: (value, alpha)
-  * RGB: (red, green, blue)
-  * RGBA: (red, green, blue, alpha)
-  * hex: ('#FFFFFF')
-  * hex with alpha: ('#FFFFFFFF')
+  * grayscale: `(value)`
+  * grayscale with alpha: `(value, alpha)`
+  * RGB: `(red, green, blue)`
+  * RGBA: `(red, green, blue, alpha)`
+  * hex: `('#FFFFFF')`
+  * hex with alpha: `('#FFFFFFFF')`
 
-You can use any of these formats to specify a colour; for example, fill(1,0,0)
-and fill('#FF0000') yield the same result.
+You can use any of these formats to specify a colour; for example, `fill(1,0,0)`
+and `fill('#FF0000')` yield the same result.
 
 .. py:function:: background(*args)
 

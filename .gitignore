@@ -20,3 +20,8 @@ doc/build/*
 *~
 *.swp
 .pc
+
+# sphinx extension build files
+doc/extension/build/
+doc/extension/dist/
+doc/extension/sphinxcontrib_shoebot.egg-info/
