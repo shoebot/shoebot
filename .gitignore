@@ -21,7 +21,7 @@ doc/build/*
 *.swp
 
 # sphinx extension build files
-extensions/sphinx-doc/build/
-extensions/sphinx-doc/dist/
-extensions/sphinx-doc/sphinxcontrib_shoebot.egg-info/
+doc/extension/build/
+doc/extension/dist/
+doc/extension/sphinxcontrib_shoebot.egg-info/
 
