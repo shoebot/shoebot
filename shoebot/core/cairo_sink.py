@@ -36,7 +36,7 @@ class CairoImageSink(DrawQueueSink):
     '''
     DrawQueueSink that uses cairo contexts as the render context.
     '''
-    def __init__(self, filename = None, format = None, multifile = False, buff = None, ):
+    def __init__(self, filename=None, format=None, multifile=False, buff=None):
         """
         :param filename:  output filename
         :param format:    if filename is specified this is not needed.
@@ -77,8 +77,6 @@ class CairoImageSink(DrawQueueSink):
         """
         Called when CairoCanvas needs a cairo context to draw on
         """
-        if frame == 2:
-            raise Exception('Doh')
         if self.format == 'pdf':
             surface = cairo.PDFSurface(self._output_file(frame), *size)
         elif self.format == 'png':
