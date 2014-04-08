@@ -1,3 +1,6 @@
+# about:
+#   Play around with values in the RGB colorspace.
+
 size(300,300)
 colorrange(255)
 colormode(RGB)

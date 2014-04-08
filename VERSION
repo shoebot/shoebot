@@ -1,5 +1,5 @@
 name            Shoebot
 desc            vector graphics scripting application
-version         0.4a4
-url             http://tinkerhouse.net/shoebot
+version         1.0b
+url             http://shoebot.net
 packager        Ricardo Lafuente <r@sollec.org>

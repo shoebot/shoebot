@@ -29,11 +29,8 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Convenience function to run a bot'''
 
-import os
-import signal
+import os.path
 import sys
-#import thread
-import threading
 
 NODEBOX = 'nodebox'
 DRAWBOT = 'drawbot'
@@ -102,10 +99,22 @@ class ShoebotThread(threading.Thread):
             os.kill(os.getpid(), signal.SIGINT)
 
 
-def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, run_shell=False, args = []):
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, buff=None, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, run_shell=False, args = []):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
-    sbot = bot(src, grammar, format, outputfile, iterations, window, title, fullscreen, server, port, show_vars, vars = vars)
+    sbot = bot(src,
+               grammar,
+               format,
+               outputfile,
+               iterations,
+               None,
+               window,
+               title,
+               fullscreen,
+               server,
+               port,
+               show_vars,
+               vars = vars)
 
     if run_shell:
         import shoebot.gui.shell
@@ -114,7 +123,11 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
         shell = None
 
     # Run shoebot in a background thread so we can run a cmdline shell in the current thread
-    sbot_thread = ShoebotThread(sbot, src, iterations, run_forever=window if close_window == False else False, frame_limiter = window, shell=shell)
+    sbot_thread = ShoebotThread(sbot, 
+								src, 
+								iterations,
+					            run_forever=window if close_window is False else False,
+             					frame_limiter=window)
     sbot_thread.start()
     if shell is not None:
         try:

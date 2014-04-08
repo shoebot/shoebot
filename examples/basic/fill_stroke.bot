@@ -1,10 +1,13 @@
+# about:
+#   Draw different rectangles with different strokes and fills.
+
 size(300,300)
 colorrange(255)
 background(50,100,150)
 
 nostroke()
 nofill()
-rect(30,70,100,80) #bug: this should draw nothing...
+rect(30,70,100,80) # this should draw nothing...
 
 nostroke()
 fill(200,150,110)

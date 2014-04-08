@@ -36,42 +36,64 @@ class CairoImageSink(DrawQueueSink):
     '''
     DrawQueueSink that uses cairo contexts as the render context.
     '''
-    def __init__(self, filename, format, multifile = False):
+    def __init__(self, filename=None, format=None, multifile=False, buff=None):
+        """
+        :param filename:  output filename
+        :param format:    if filename is specified this is not needed.
+        :param multifile: If used with filename, then numbered files will be output for each froam.
+        :param buff:      optionally a file like object can be used instead of a filename
+                          this is useful for streaming output.
+
+        """
         DrawQueueSink.__init__(self)
         if format is None:
-            format = os.path.splitext(filename)[1][1:].lower()
+            if filename is not None:
+                format = os.path.splitext(filename)[1][1:].lower()
+            elif buff is not None:
+                raise AttributeError("No format specified, but using buff")
+        self.buff = buff
         self.format = format
         self.filename = filename
         self.multifile = multifile
         self.file_root, self.file_ext = os.path.splitext(filename)
 
-    def _filename(self, frame):
-        if self.multifile:
+    def _output_file(self, frame):
+        """
+        If filename was used output a filename, along with multifile
+        numbered filenames will be used.
+
+        If buff was specified it is returned.
+
+        :return: Output buff or filename.
+        """
+        if self.buff:
+            return self.buff
+        elif self.multifile:
             return self.file_root + "_%03d" % frame + self.file_ext
         else:
             return self.filename
 
     def create_rcontext(self, size, frame):
-        '''
+        """
         Called when CairoCanvas needs a cairo context to draw on
-        '''
+        """
         if self.format == 'pdf':
-            surface = cairo.PDFSurface(self._filename(frame), *size)
+            surface = cairo.PDFSurface(self._output_file(frame), *size)
         elif self.format == 'png':
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         elif self.format in ('ps', 'eps'):
-            surface = cairo.PSSurface(self._filename(frame), *size)
+            surface = cairo.PSSurface(self._output_file(frame), *size)
         if self.format == 'svg':
-            surface = cairo.SVGSurface(self._filename(frame), *size)
+            surface = cairo.SVGSurface(self._output_file(frame), *size)
         return cairo.Context(surface)
 
     def rendering_finished(self, size, frame, cairo_ctx):
-        '''
+        """
         Called when CairoCanvas has rendered a bot
-        '''
+        """
         surface = cairo_ctx.get_target()
         if self.format == 'png':
-            surface.write_to_png(self._filename(frame))
+            surface.write_to_png(self._output_file(frame))
         surface.finish()
         surface.flush()
 
