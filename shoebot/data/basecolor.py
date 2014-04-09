@@ -38,74 +38,81 @@ class Color(object):
     and at this point is quite useless, left it in place for a possible future implementation
     '''
 
-    def __init__(self, canvas, *a, **kwargs):
+    def __init__(self, canvas, color_range=1, mode="rgb", *args, **kwargs):
+        color_range = float(color_range)
         self._canvas = canvas
+
         # Values are supplied as a tuple.
-        if len(a) == 1 and isinstance(a[0], tuple):
-            a = a[0]
-            
+        if len(args) == 1 and isinstance(args[0], tuple):
+            args = args[0]
+
         # No values or None, transparent black.
-        if len(a) == 0 or (len(a) == 1 and a[0] == None):
+        if len(args) == 0 or (len(args) == 1 and args[0] is None):
             self.r, self.g, self.b, self.a = 0, 0, 0, 0
-            
+
         # One value, another color object.
-        elif len(a) == 1 and isinstance(a[0], Color):
-            self.r, self.g, self.b, self.a = a[0].r, a[0].g, a[0].b, a[0].a
-            
+        elif len(args) == 1 and isinstance(args[0], Color):
+            self.r, self.g, self.b, self.a = args[0].r, args[0].g, args[0].b, args[0].a
+
         # One value, a hexadecimal string.
-        elif len(a) == 1 and isinstance(a[0], str):
-            r, g, b, a = hex2rgb(a[0])
-            self.r, self.g, self.b, self.a = r, g, b, a
-            
+        elif len(args) == 1 and isinstance(args[0], str):
+            r, g, b, args = hex2rgb(args[0])
+            self.r, self.g, self.b, self.a = r, g, b, args
+
         # One value, grayscale.
-        elif len(a) == 1:
-            if kwargs.has_key("color_range"):
-                ra = int(kwargs["color_range"])
-            else:
-                ra = 1
-            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, 1
+        elif len(args) == 1:
+            gs = args[0]
+            self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, 1
             
         # Two values, grayscale and alpha.
-        elif len(a) == 2:
-            if kwargs.has_key("color_range"):
-                ra = int(kwargs["color_range"])
-            else:
-                ra = canvas.color_range
-            self.r, self.g, self.b, self.a = a[0]/ra, a[0]/ra, a[0]/ra, a[1]/ra
+        elif len(args) == 2:
+            gs, a = args[0], args[1]
+            self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, gs/color_range
             
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
         # depending on the mode parameter.
-        elif len(a) >= 3:
-            ra = int(kwargs.get('color_range', 1))
-            alpha, mode = 1, "rgb" 
-            if len(a) > 3: alpha = a[-1]/ra
-        
-            if kwargs.has_key("mode"):
-                mode = kwargs["mode"].lower()
+        elif len(args) >= 3:
+            alpha = 1
+            if len(args) > 3:
+                alpha = args[-1]/color_range
+
+            mode = mode.lower()
             if mode == "rgb":
-                self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
+                self.r, self.g, self.b, self.a = args[0]/color_range, args[1]/color_range, args[2]/color_range, alpha
             elif mode == "hsb":                
-                self.h, self.s, self.brightness, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha                
+                self.h, self.s, self.brightness, self.a = args[0]/color_range, args[1]/color_range, args[2]/color_range, alpha
             elif mode == "cmyk":
-                if len(a) == 4: alpha = 1
+                if len(args) == 4: alpha = 1
                 self.a = alpha
-                self.c, self.m, self.y, self.k = a[0], a[1], a[2], a[3]
-        
-
-        # Added this
-        self.red = self.r
-        self.green = self.g
-        self.blue = self.b
-        self.alpha = self.a
-
-        self.data = [self.r, self.g, self.b, self.a]
-        #end added
-
-
+                self.c, self.m, self.y, self.k = args[0], args[1], args[2], args[3]
 
     def __repr__(self):
-        return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, 
-            self.red, self.green, self.blue, self.alpha)
+        return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, self.r, self.g, self.b, self.a)
+
+    @property
+    def red(self):
+        # Added
+        return self.r
+
+    @property
+    def green(self):
+        # Added
+        return self.g
+
+    @property
+    def blue(self):
+        # Added
+        return self.a
+
+    @property
+    def alpha(self):
+        # Added
+        return self.a
+
+    @property
+    def data(self):
+        # Added
+        return [self.r, self.g, self.b, self.a]
 
     def copy(self):
         return tuple(self.data)
