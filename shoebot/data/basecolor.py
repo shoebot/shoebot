@@ -38,9 +38,9 @@ class Color(object):
     and at this point is quite useless, left it in place for a possible future implementation
     '''
 
-    def __init__(self, canvas, color_range=1, mode="rgb", *args, **kwargs):
-        color_range = float(color_range)
-        self._canvas = canvas
+    def __init__(self, *args, **kwargs):
+        color_range = float(kwargs.get("color_range", 1.0))
+        mode = kwargs.get("mode", "rgb").lower()
 
         # Values are supplied as a tuple.
         if len(args) == 1 and isinstance(args[0], tuple):
@@ -67,7 +67,7 @@ class Color(object):
         # Two values, grayscale and alpha.
         elif len(args) == 2:
             gs, a = args[0], args[1]
-            self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, gs/color_range
+            self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, a/color_range
             
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
         # depending on the mode parameter.
@@ -76,7 +76,6 @@ class Color(object):
             if len(args) > 3:
                 alpha = args[-1]/color_range
 
-            mode = mode.lower()
             if mode == "rgb":
                 self.r, self.g, self.b, self.a = args[0]/color_range, args[1]/color_range, args[2]/color_range, alpha
             elif mode == "hsb":                
@@ -515,8 +514,8 @@ def test_color():
 
     testvalues = {
         128: (0.501961,0.501961,0.501961,1.000000),
-        (127,): (0.498039, 0.498039, 0.498039, 0.498039),
-        (127, 64): (0.498039, 0.498039, 0.498039, 0.250979),
+        (127,): (0.498039, 0.498039, 0.498039, 1.000000),     # One value:  Grey Scale
+        (127, 64): (0.498039, 0.498039, 0.498039, 0.250979),  # Two values: Grey Scale, Alpha
         (0, 127, 255): (0.0, 0.498039, 1.0, 1.0),
         (0, 127, 255, 64): (0.0, 0.498039, 1.0, 0.250979),
         '#0000FF': (0.000000,0.000000,1.000000,1.000000),
