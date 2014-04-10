@@ -19,6 +19,9 @@ Debian/Ubuntu:
 Fedora:
 
     sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
+    
+SuSE
+    sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg
 
 OSX:
 
@@ -43,6 +46,10 @@ Ubuntu/Debian:
 Fedora:
 
     sudo yum install git
+
+SuSE:
+
+    sudo zypper install git
 
 Gentoo:
 
