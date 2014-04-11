@@ -4,7 +4,7 @@ if [ "$USER" = "root" ]; then
   if [ -d "/usr/lib64" ]; then
     SHARE_DIR="/usr/lib64"
   else
-    SHARE_DIR="/usr/share"
+    SHARE_DIR="/usr/lib"
   fi
   echo Install locally to $SHARE_DIR
 else
