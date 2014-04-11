@@ -63,7 +63,7 @@ Make a temporary directory to download all source files into, and then get the s
 
     mkdir ~/src
     cd ~/src
-    git clone git@github.com:shoebot/shoebot.git
+    git clone https://github.com/shoebot/shoebot.git
 
 You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
