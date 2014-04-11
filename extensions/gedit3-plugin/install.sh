@@ -1,7 +1,11 @@
 #!/bin/bash
 
 if [ "$USER" = "root" ]; then
-  SHARE_DIR="/usr/share"
+  if [ -d "/usr/lib64" ]; then
+    SHARE_DIR="/usr/lib54"
+  else
+    SHARE_DIR="/usr/share"
+  fi
   echo Install locally to $SHARE_DIR
 else
   SHARE_DIR="$HOME/.local/share"
