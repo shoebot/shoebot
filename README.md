@@ -14,14 +14,14 @@ First thing is to install the appropriate dependencies. If this is your first ti
 
 Debian/Ubuntu:
 
-    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
+    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg python-imaging
 
 Fedora:
 
-    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
+    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging
     
 SuSE
-    sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg
+    sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging
 
 OSX:
 
