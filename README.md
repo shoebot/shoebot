@@ -49,7 +49,7 @@ Fedora:
 
 SuSE:
 
-    sudo zypper install git
+    sudo zypper install git-core
 
 Gentoo:
 
