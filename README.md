@@ -14,11 +14,14 @@ First thing is to install the appropriate dependencies. If this is your first ti
 
 Debian/Ubuntu:
 
-    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
+    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg python-imaging
 
 Fedora:
 
-    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
+    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging
+    
+SuSE
+    sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging
 
 OSX:
 
@@ -44,6 +47,10 @@ Fedora:
 
     sudo yum install git
 
+SuSE:
+
+    sudo zypper install git-core
+
 Gentoo:
 
     emerge git
@@ -56,7 +63,7 @@ Make a temporary directory to download all source files into, and then get the s
 
     mkdir ~/src
     cd ~/src
-    git clone git@github.com:shoebot/shoebot.git
+    git clone https://github.com/shoebot/shoebot.git
 
 You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
