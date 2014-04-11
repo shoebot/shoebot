@@ -2,40 +2,40 @@
 
 if [ "$USER" = "root" ]; then
   if [ -d "/usr/lib64" ]; then
-    SHARE_DIR="/usr/lib64"
+    DEST_DIR="/usr/lib64"
   else
-    SHARE_DIR="/usr/lib"
+    DEST_DIR="/usr/lib"
   fi
-  echo Install locally to $SHARE_DIR
+  echo Install globally to $DEST_DIR
 else
-  SHARE_DIR="$HOME/.local/share"
-  echo Install globally to $SHARE_DIR
+  DEST_DIR="$HOME/.local/share"
+  echo Install locally to $DEST_DIR
 fi
 
 function pluginInstall {
-  cp -r -f shoebotit* $SHARE_DIR/gedit/plugins
+  cp -r -f shoebotit* $DEST_DIR/gedit/plugins
   echo 'Gedit plugin installed!'
 }
 
 function installLangSpecs {
-  cp -f shoebot.lang $SHARE_DIR/gtksourceview-3.0/language-specs
-  update-mime-database $SHARE_DIR/mime
+  cp -f shoebot.lang $DEST_DIR/gtksourceview-3.0/language-specs
+  update-mime-database $DEST_DIR/mime
   echo 'GTKSourceView language specs installed!'
 }
 
-if [ -d $SHARE_DIR/gedit/plugins ]; then
+if [ -d $DEST_DIR/gedit/plugins ]; then
   pluginInstall
 else
   echo 'Local Gedit plugin directory does not exist. Creating it.'
-  mkdir -p $SHARE_DIR/gedit/plugins
+  mkdir -p $DEST_DIR/gedit/plugins
   pluginInstall
 fi
 
-if [ -d $SHARE_DIR/gtksourceview-3.0/language-specs ]; then
+if [ -d $DEST_DIR/gtksourceview-3.0/language-specs ]; then
   installLangSpecs
 else
   echo 'Local GTKSourceView language-specs directory does not exist. Creating it.'
-  mkdir -p $SHARE_DIR/gtksourceview-3.0/language-specs
+  mkdir -p $DEST_DIR/gtksourceview-3.0/language-specs
   installLangSpecs
 fi
 
