@@ -2,7 +2,7 @@
 
 if [ "$USER" = "root" ]; then
   if [ -d "/usr/lib64" ]; then
-    SHARE_DIR="/usr/lib54"
+    SHARE_DIR="/usr/lib64"
   else
     SHARE_DIR="/usr/share"
   fi
