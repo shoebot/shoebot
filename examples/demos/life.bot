@@ -1,0 +1,79 @@
+"""
+conway's life for shoebot.
+
+created at lgm 2014 during the shoebot workshop.
+click the window to randomize the playing field. try increasing the roundness
+value in rect() below for funny effects.
+
+based on Hypnoval example by Simon Budig and life64.ck monome app by tehn.
+"""
+
+import time
+import copy, itertools
+
+LIFE_XSIZE = 8
+LIFE_YSIZE = 8
+
+class Life(object):
+    def __init__(self, xsize, ysize):
+        self.xsize = xsize
+        self.ysize = ysize
+        self.world = [[0 for j in range(self.ysize)] for i in range(self.xsize)]
+
+    def _neighbors(self, x, y):
+        result = 0
+        for dx, dy in [d for d in itertools.product([-1, 0, 1], repeat=2) if d != (0, 0)]:
+            result += self.world[(x + dx) % self.xsize][(y + dy) % self.ysize]
+        return result
+
+    def update(self):
+        new_world = copy.deepcopy(self.world)
+        for x in range(self.xsize):
+            for y in range(self.ysize):
+                neighbors = self._neighbors(x, y)
+                if neighbors == 3:
+                    new_world[x][y] = 1
+                elif (neighbors < 2 or neighbors > 3):
+                    new_world[x][y] = 0
+        self.world = copy.deepcopy(new_world)
+
+    def randomize(self):
+        import random
+
+        for x in range(self.xsize):
+            for y in range(self.ysize):
+                life.world[x][y] = random.randint(0, 1)
+
+
+
+size(LIFE_XSIZE * 80, LIFE_YSIZE * 80)
+life = Life(LIFE_XSIZE, LIFE_YSIZE)
+
+def setup():
+    global life
+    life.randomize()
+    speed(8)
+
+def draw():
+    global life
+    background(0,0,0)
+    fill(0.1,0,0)
+
+    for x in range(LIFE_XSIZE):
+        for y in range(LIFE_YSIZE):
+            push()
+            rclr = life.world[x][y]
+            scale(random(0.9,0.99))
+
+            if rclr == 1:
+                fill(0.89, 0.40, 0.01)
+            else:
+                fill(0.13, 0.27, 0.16)
+
+            rect(x * 80 + 10, y * 80 + 10, 60, 60, roundness=random(0.9,0.99))
+            pop()
+
+    life.update()
+
+    if mousedown:
+        life.randomize()
