@@ -20,7 +20,8 @@ Fedora:
 
     sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging
     
-SuSE
+SuSE:
+
     sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging
 
 OSX:
