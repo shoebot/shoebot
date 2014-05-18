@@ -1,7 +1,10 @@
 #!/bin/bash
 
+install_debian() {
+    sudo apt-get install python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
+}
+
 install_ubuntu() {
-    # Install for debian / ubuntu
     sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
 }
 
@@ -25,7 +28,10 @@ else
 fi
 
 
-if [ "Ubuntu" = "$OS" ]; then
+
+if [ "Debian" = "$OS" ]; then
+    install_debian
+elif [ "Ubuntu" = "$OS" ]; then
     install_ubuntu
 else
     echo TODO Add code for $OS
