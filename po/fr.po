@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: shoebot 0.2-i18\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-31 16:47+0100\n"
-"PO-Revision-Date: 2014-05-17 18:45+0100\n"
+"PO-Revision-Date: 2014-05-18 11:39+0100\n"
 "Last-Translator: francesco fantoni <francesco@hv-a.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -344,13 +344,11 @@ msgstr ""
 
 #: shoebot/__init__.py:429 shoebot/__init__.py:1400
 msgid "rectmode: invalid input"
-msgstr ""
-"run() ha bisogno di un file di input o una stringa di codice (se non "
-"specificato al momento della creazione dell'istanza di Bot"
+msgstr "rectmode: entrée invalide"
 
 #: shoebot/__init__.py:498 shoebot/__init__.py:1461
 msgid "arrow: available types for arrow() are NORMAL and FORTYFIVE\n"
-msgstr "arrow: i tipi supportati per arrow() sono NORMAL e FORTYFIVE\n"
+msgstr "arrow: les types supportés par arrow() sont NORMAL et FORTYFIVE\n"
 
 #: shoebot/__init__.py:597 shoebot/__init__.py:602 shoebot/__init__.py:607
 #: shoebot/__init__.py:612 shoebot/__init__.py:619 shoebot/__init__.py:646
@@ -358,92 +356,88 @@ msgstr "arrow: i tipi supportati per arrow() sono NORMAL e FORTYFIVE\n"
 #: shoebot/__init__.py:1509 shoebot/__init__.py:1514 shoebot/__init__.py:1519
 #: shoebot/__init__.py:1526
 msgid "No current path. Use beginpath() first."
-msgstr "Nessun tracciato attivo. Usare beginpath() prima"
+msgstr "Aucun chemin. Utiliser d'abord beginpath()"
 
 #: shoebot/__init__.py:793 shoebot/__init__.py:1698
 msgid "outputmode() isn't implemented yet"
-msgstr "outputmode() non implementato"
+msgstr "outputmode() n'est pas implémenté"
 
 #: shoebot/__init__.py:807 shoebot/__init__.py:1712
 msgid "Only RGB and HSB colormodes are supported."
-msgstr "Sono supportati solo i modi colore RGB e HSB"
+msgstr "Seul les modes de couleurs RGB et HSB sont supportés"
 
 #: shoebot/__init__.py:926 shoebot/__init__.py:1847
 msgid "fontoptions() isn't implemented yet"
-msgstr "fontoptions() non implementato"
+msgstr "fontoptions() n'est pas implémenté"
 
 #: shoebot/__init__.py:958
 #, python-format
 msgid "Canvas.add() - wrong argument: expecting a Grob, received %s"
-msgstr ""
-"Canvas.add() - argomento sbagliato: si aspetta un oggetto di tipo Grob, ha "
-"ricevuto %s"
+msgstr "Canvas.add() - mauvais argument : Grob attendu, reçu %s"
 
 #: shoebot/__init__.py:995 shoebot/__init__.py:1323
 msgid "setsurface(): No target specified!"
-msgstr "setsurface(): Nessun target specificato!"
+msgstr "setsurface(): Aucun but spécifié !"
 
 #: shoebot/__init__.py:1014 shoebot/__init__.py:1338
 msgid ""
 "setsurface: Argument must be a file name, a Cairo surface or a Cairo context"
 msgstr ""
-"setsurface: l'argomento deve essere un nome di file, una surface Cairo o un "
-"contesto di Cairo"
+"setsurface: l'argument doit avoir un nom de fichier, une surface Cairo ou un "
+"contexte Cairo"
 
 #: shoebot/__init__.py:1074
 #, python-format
 msgid "drawpath(): Expecting a ClippingPath, got %s"
-msgstr "drawpath(): Atteso un oggetto di tipo ClippingPath, ho ricevuto %s"
+msgstr "drawpath(): Clipping Path attendu, reçu %s"
 
 #: shoebot/__init__.py:1105 shoebot/__init__.py:1182 shoebot/__init__.py:1564
 #, python-format
 msgid "PathElement(): error parsing path element command (got '%s')"
 msgstr ""
-"PathElement(): errore nell'interpretazione del comando di un elemento "
-"tracciato (ricevuto '%s')"
+"PathElement(): erreur lors de l'interprétation de la commande d'un élément "
+"analysé (reçu '%s')"
 
 #: shoebot/__init__.py:1131 shoebot/__init__.py:1202
 msgid "Warning: Canvas object had no fill or stroke values"
-msgstr ""
-"Attenzione: l'oggetto non ha nè un riempimento nè un colore del tratto "
-"impostati"
+msgstr "Attention : l'objet n'a pas de valeur de remplissage ou de contour"
 
 #: shoebot/__init__.py:1148
 #, python-format
 msgid "drawpath(): Expecting a BezierPath, got %s"
-msgstr "drawpath(): Atteso un oggetto di tipo BezierPath, ho ricevuto %s"
+msgstr "drawpath(): BezierPath attendu, reçu %s"
 
 #: shoebot/__init__.py:1250 shoebot/__init__.py:2012
 #, python-format
 msgid "Saved snapshot to %s"
-msgstr "Salvata l'immagine su %s"
+msgstr "Sauvegarder l'image %s"
 
 #: shoebot/__init__.py:1537
 msgid "drawpath(): Input is not a valid BezierPath object"
-msgstr "drawpath(): Non è stato passato un oggetto BezierPath valido"
+msgstr "drawpath(): objet BezierPath n'est pas un objet valide"
 
 #: shoebot/__init__.py:1541
 msgid ""
 "drawpath(): Path is not properly constructed (expecting a path element, got "
 msgstr ""
-"drawpath(): Il tracciato non è costruito correttamente (atteso un elemento "
-"di tracciato, ricevuto "
+"drawpath(): le chemin n'est pas correctement tracé (attendu un élément "
+"chemin, reçu"
 
 #: shoebot/__init__.py:1610
 msgid "findpath() isn't implemented yet (sorry)"
-msgstr "findpath() non implementato, scusate"
+msgstr "findpath() n'est pas implémenté, désolé"
 
 #: shoebot/__init__.py:1631
 msgid "transform() isn't implemented yet"
-msgstr "transform() non implementato, scusate"
+msgstr "transform() n'est pas encore implementé, désolé"
 
 #: shoebot/__init__.py:1662
 msgid "Scale parameters can't be 0. Ignoring"
-msgstr "Il parametro di scala non può essere nullo. Verrà ignorato"
+msgstr "Le paramètre de mise à l'échelle ne peut être nulle. Cela sera ignoré"
 
 #: shoebot/__init__.py:1835
 msgid "lineheight() isn't implemented yet"
-msgstr "lineheight() non implementato, scusate"
+msgstr "lineheight() n'est pas encore implementé, désolé"
 
 #: shoebot/__init__.py:1842
 msgid "align() isn't implemented in Shoebot yet"
@@ -452,60 +446,60 @@ msgstr "align() non implementato, scusate"
 #: shoebot/__init__.py:2100
 #, python-format
 msgid "finish(): '%s' is an invalid extension"
-msgstr "finish(): '%s' è un estensione non valida"
+msgstr "finish(): '%s' est une extension non valide"
 
 #: shoebot/__init__.py:2113
 msgid ""
 "run() needs an input file name or code string (if none was specified when "
 "creating the Box instance)"
 msgstr ""
-"run() si aspetta un file di input o una stringa di codice (se non "
-"specificato al momento della creazione dell'istanza di Box)"
+"run() nécéssité d'un nom de fichier en entrée ou d'une chaîne de code (pour "
+"le cas où rien n'est spécifié au moment de la création d'une instance Box)"
 
 #: shoebot/gtkui.py:155
 #, python-format
 msgid "Listening on port %i..."
-msgstr "In ascolto sulla porta %i..."
+msgstr "Ecouter au port %i..."
 
 #: shoebot/gtkui.py:161
 msgid "Connected"
-msgstr "Connesso"
+msgstr "Connecté"
 
 #: shoebot/gtkui.py:169
 msgid "Connection closed."
-msgstr "Connessione chiusa"
+msgstr "Connection fermée."
 
 #: shoebot/gtkui.py:304
 msgid "_Save as"
-msgstr "_Salva come"
+msgstr "_Enregistrer sous"
 
 #: shoebot/gtkui.py:305
 msgid "Save as _SVG"
-msgstr "Salva come SV_G"
+msgstr "Enregistrer comme _SVG"
 
 #: shoebot/gtkui.py:306
 msgid "Save as _PDF"
-msgstr "Salva come _PDF"
+msgstr "Enregistrer comme _PDF"
 
 #: shoebot/gtkui.py:307
 msgid "Save as P_S"
-msgstr "Salva come P_S"
+msgstr "Enregistrer comme P_S"
 
 #: shoebot/gtkui.py:308
 msgid "Save as P_NG"
-msgstr "Salva come P_NG"
+msgstr "Enregistrer comme P_NG"
 
 #: shoebot/gtkui.py:309
 msgid "_Go fullscreen"
-msgstr "_Vai a pieno-schermo"
+msgstr "_Mode plein écran"
 
 #: shoebot/gtkui.py:310
 msgid "_Exit fullscreen"
-msgstr "_Esci da pieno-schermo"
+msgstr "_Quitter le plein écran"
 
 #: shoebot/gtkui.py:311
 msgid "_Close Window"
-msgstr "_Chiudi finestra"
+msgstr "_Fermer la fenêtre"
 
 #~ msgid "An error has been detected"
 #~ msgstr "E' stato riscontrato un errore"
