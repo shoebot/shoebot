@@ -10,30 +10,6 @@ What you need
 
 Shoebot runs on Python 2.7, which is most probably what you already have installed.
 
-First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:
-
-Debian/Ubuntu:
-
-    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg python-imaging
-
-Fedora:
-
-    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging
-    
-SuSE:
-
-    sudo zypper install libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging
-
-OSX:
-
-With MacPorts (http://www.macports.org) and python2.5
-
-    sudo port install py25-numpy -atlas
-    sudo port install pango +quartz
-    sudo port install librsvg py25-pil py25-cairo py25-gtk
-
-MacPorts does not have the python-rsvg package, so svg output won't work.
-TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
 
 Installing Shoebot
 ------------------
@@ -66,15 +42,44 @@ Make a temporary directory to download all source files into, and then get the s
     cd ~/src
     git clone https://github.com/shoebot/shoebot.git
 
-You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
-    cd shoebot
-    sudo python setup.py install
+
+
+You should now see a new shoebot/ directory. The only remaining step is to install shoebot and its dependencies:
+
+
+
+Linux and Virtualenvwrapper:
+
+Using virtualenvwrapper is the easiest way to get started. First, install the necessary dependencies for Shoebot.
+    
+    # Install Shoebot dependencies if you haven't already
+    cd install
+    ./install_dependencies.sh
+    
+    # Create a new virtualenv
+    mkvirtualenv shoebot-env
+    
+    # Link in the GTK library and install Shoebot in the virtualenv
+    ./setup_virtualenv.sh shoebot-env
+    
+    # All done -- now, switch to the new virtualenv
+    workon shoebot-env
+
 
 OSX:
 
-    cd shoebot
-    sudo /opt/local/bin/python2.5 setup.py install
+Note - OSX instructions are very out of date.
+
+With MacPorts (http://www.macports.org) and python2.5
+
+    sudo port install py25-numpy -atlas
+    sudo port install pango +quartz
+    sudo port install librsvg py25-pil py25-cairo py25-gtk
+
+MacPorts does not have the python-rsvg package, so svg output won't work.
+TODO: probably installing py27 packages and gnome-python-desktop would fix the missing python-rsvg problem.
+
 
 
 Running Shoebot from the console
