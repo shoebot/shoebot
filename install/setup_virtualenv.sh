@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-REQUIREMENTS_TXT="$SCRIPTPATH/../requirements/requirements.txt"
+REQUIREMENTS_TXT="$SCRIPTPATH/../requirements.txt"
 
 
 show_usage() {
