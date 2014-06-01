@@ -306,9 +306,6 @@ class NodeBot(Bot):
 
     def beginpath(self, x=None, y=None, **kwargs):
         self._path = self.BezierPath(**kwargs)
-        if x and y:
-            self._path.moveto(x,y)
-
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
             self._path.moveto(x,y)
