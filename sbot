@@ -29,6 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ''' Shoebot console runner '''
 
+import shlex
 import sys, os
 import locale, gettext
 import argparse
@@ -175,5 +176,5 @@ if __name__ == '__main__':
         show_vars = args.window and args.disable_vars == False,
         vars = vars or None,
         run_shell = args.shell,
-        args = args.script_args or [],
+        args = shlex.split(args.script_args) or [],
         )

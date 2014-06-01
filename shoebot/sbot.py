@@ -127,10 +127,10 @@ def run(src, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=N
 
     # Run shoebot in a background thread so we can run a cmdline shell in the current thread
     sbot_thread = ShoebotThread(sbot, 
-				src, 
-				iterations,
-		            	run_forever=window if close_window is False else False,
-				frame_limiter=window)
+                                src,
+                                iterations,
+                                run_forever=window if close_window is False else False,
+                                frame_limiter=window)
     sbot_thread.start()
     if shell is not None:
         try:
