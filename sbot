@@ -168,5 +168,5 @@ if __name__ == '__main__':
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
         vars = vars or None,
-        args = shlex.split(args.script_args) or [],
+        args = shlex.split(args.script_args or ""),
         )
