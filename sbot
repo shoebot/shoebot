@@ -132,7 +132,11 @@ parser.add_argument("-l",
                 default=False,
                 help=_("Simple shell - for IDE interaction"),
                 )
-parser.add_argument('script_args', nargs='?')
+parser.add_argument("-a",
+                "--args",
+                dest="script_args",
+                help=_("Pass to the bot"),
+                )
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -176,5 +180,5 @@ if __name__ == '__main__':
         show_vars = args.window and args.disable_vars == False,
         vars = vars or None,
         run_shell = args.shell,
-        args = shlex.split(args.script_args) or [],
+        args = shlex.split(args.script_args or ""),
         )
