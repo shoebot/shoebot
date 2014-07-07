@@ -62,9 +62,31 @@ Using virtualenvwrapper is the easiest way to get started. First, install the ne
     
     # Link in the GTK library and install Shoebot in the virtualenv
     ./setup_virtualenv.sh shoebot-env
-    
-    # All done -- now, switch to the new virtualenv
+
+
+    # To use shoebot in future remember to activate the environment first.
     workon shoebot-env
+
+
+
+Linux wih plain virtualenv:
+
+If you don't use virtualenvwrapper follow these instructions after installing the dependencies.
+
+    # make a new virtualenv environment
+    virtualenv shoebot-env
+    
+    # activate it
+    source shoebot-env/bin/activate
+    
+    # Link in the GTK library and install Shoebot in the virtualenv
+    ./setup_virtualenv.sh shoebot-env
+
+
+    # To use shoebot in future remember to activate the environment first.
+    source shoebot-env/bin/activate
+
+
 
 
 OSX:
