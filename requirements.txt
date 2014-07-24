@@ -1,8 +1,13 @@
-# pygtk needs to be installed beforehand using the OS + linked into the virtualenv.
-# rsvg  can be difficult to install + is only needed for examples that read SVG.
+# pygtk, pycairo and rsvg 
+# are hard to install in virtualenv, so install these to the system python
+# then create your virtualenv with --system-site-packages.
 #
+# e.g. 
+#      virtualenv -system-site-packages env
+# or in virtualenvwrapper
+#      mkvirtualenv --system-site-packages shoebot
+#
+#
+
 Pillow==2.4.0
 numpy==1.6.2
-pycairo
-pygtk
-rsvg
