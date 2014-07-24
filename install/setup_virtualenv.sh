@@ -48,7 +48,7 @@ setup_venv() {
 
     echo "Setup virtualenv shoebot and link dependencies at ${VIRTUAL_ENV}"
 
-    
+
     echo "Linking to system modules."
 
     # TODO - Tested on Ubuntu, probably need a better way of finding the system python.
@@ -57,6 +57,7 @@ setup_venv() {
     _PATH=$PATH
     export PATH=${PATH#*:}
 
+    # Add slashes to end of directories, for OSX find.
     PY_CODE="import site, os; print '/ '.join([ os.path.abspath(d) for d in site.getsitepackages() if os.path.exists(d) ])"
     SITE_PACKAGES=`python -c "${PY_CODE}"`
 
