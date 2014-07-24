@@ -26,12 +26,19 @@ $ setup_virtualenv.sh shoebot
 
 link_module() {
     # Bit hacky having this as well as link_sitepackage, but it works...
+    #echo ln -sf `python -c "import os, $1; print os.path.dirname($1.__file__)"` $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
     ln -sf `python -c "import os, $1; print os.path.dirname($1.__file__)"` $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
 }
 
 link_sitepackage() {
     TARGET=`find ${SITE_PACKAGES//:/ } -maxdepth 1 -name $1 -print -quit`
-    echo $TARGET
+    if [ "" == "$TARGET" ]; then
+        echo Could not find $1 in site packages:
+        echo $SITE_PACKAGES
+        echo ''
+        echo Aborting.
+        exit 1
+    fi
     ln -sf $TARGET $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
 }
 
@@ -50,7 +57,8 @@ setup_venv() {
     _PATH=$PATH
     export PATH=${PATH#*:}
 
-    SITE_PACKAGES=`python -c "import site; print ':'.join(site.getsitepackages())"`
+    PY_CODE="import site, os; print '/ '.join([ os.path.abspath(d) for d in site.getsitepackages() if os.path.exists(d) ])"
+    SITE_PACKAGES=`python -c "${PY_CODE}"`
 
     #ln -sf $SYS_MODULES/{glib,gobject,cairo,gtk-2.0,pygtk.py,pygtk.pth} $VIRTUAL_ENV/lib/python2.7/site-packages
     link_module cairo
