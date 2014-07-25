@@ -31,8 +31,9 @@ link_module() {
 }
 
 link_sitepackage() {
+    # $1 lib to find    $2 pass anything here to ignore errors
     TARGET=`find ${SITE_PACKAGES//:/ } -maxdepth 1 -name $1 -print -quit`
-    if [ "" == "$TARGET" ]; then
+    if [ "$2" == "$TARGET" ]; then
         echo Could not find $1 in site packages:
         echo $SITE_PACKAGES
         echo ''
@@ -68,6 +69,9 @@ setup_venv() {
     link_sitepackage pygtk.py
     link_sitepackage pygtk.pth
     link_sitepackage gtk-2.0
+
+    # gtksourceview2 is for the legacy ide and not needed
+    link_sitepackage gtksourceview2.so ignore_errors
 
     export PATH=$_PATH
 
