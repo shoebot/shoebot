@@ -32,9 +32,11 @@ Gentoo:
 
     emerge git
 
+
 OSX:
 
-    sudo port install git-core
+    Just make sure XCode and the Command Line Tools are installed.
+
 
 Make a temporary directory to download all source files into, and then get the source itself.
 
@@ -91,13 +93,13 @@ If you don't use virtualenvwrapper follow these instructions after installing th
 
 OSX:
 
-Note - OSX instructions are very out of date.
+Homebrew
 
 With MacPorts (http://www.macports.org) and python2.5
 
-    sudo port install py25-numpy -atlas
+    sudo port install py27-numpy -atlas
     sudo port install pango +quartz
-    sudo port install librsvg py25-pil py25-cairo py25-gtk
+    sudo port install librsvg py27-pil py27-cairo py27-gtk
 
 MacPorts does not have the python-rsvg package, so svg output won't work.
 TODO: probably installing py27 packages and gnome-python-desktop would fix the missing python-rsvg problem.
