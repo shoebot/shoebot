@@ -20,7 +20,7 @@ def find_example_dir():
     """
 
     # Needs to run in same python env as shoebot (may be different to gedits)
-    cmd = ["python", "-c", "import sys; print '{}/share/shoebot/examples/'.format(sys.prefix)"]
+    cmd = ["python", "-c", "import sys; print('{}/share/shoebot/examples/'.format(sys.prefix))"]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output, errors = p.communicate()
     if errors:
