@@ -6,6 +6,7 @@ SUSE_PACKAGES="libjpeg-devel python-pycairo python-gtk python-pygobject2 python-
 
 DEBIAN_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
 UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
+MINT_PACKAGES="python-2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
 
 # OSX
 HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+ --quartz pygtk --quartz"
@@ -17,6 +18,10 @@ confirm() {
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1
     fi
+}
+
+install_mint() {
+    sudo apt-get install ${MINT_PACKAGES}
 }
 
 install_debian() {
@@ -87,9 +92,11 @@ fi
 
 if [ "Debian" = "$OS" ]; then
     install_debian
+elif [ "LinuxMint" = "$OS" ]; then
+    install_mint
 elif [ "Ubuntu" = "$OS" ]; then
     install_ubuntu
-elif [ "Redgat" = "$OS" ]; then
+elif [ "Redhat" = "$OS" ]; then
     install_redhat
 elif [ "SuSE" = "$OS" ]; then
     install_suse
@@ -98,5 +105,4 @@ elif [ "Darwin" = "$OS" ]; then
 else
     echo TODO Add code for $OS
 fi
-
 
