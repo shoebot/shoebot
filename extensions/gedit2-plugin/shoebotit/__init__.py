@@ -167,28 +167,6 @@ class ShoebotWindowHelper:
         pass
 
 
-# class ShoebotPlugin(gedit.Plugin):
-#     def __init__(self):
-#         gedit.Plugin.__init__(self)
-#         self.instances = {}
-#         self.tempfiles = []
-# 
-#     def activate(self, window):
-#         self.instances[window] = ShoebotWindowHelper(self, window)
-# 
-#     def deactivate(self, window):
-#         self.instances[window].deactivate()
-#         del self.instances[window]
-#         for tfilename in self.tempfiles:
-#             os.remove(tfilename)
-# 
-#     def update_ui(self, window):
-#         self.instances[window].update_ui()
-
-
-
-
-
 class ShoebotPlugin(gedit.Plugin):
     def __init__(self):
         gedit.Plugin.__init__(self)
