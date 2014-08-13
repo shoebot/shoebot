@@ -8,7 +8,7 @@ if [ "$USER" = "root" ]; then
   fi
   echo Install globally to $DEST_DIR
 else
-  DEST_DIR="$HOME/.local/share"
+  DEST_DIR="$HOME/.gnome2"
   echo Install locally to $DEST_DIR
 fi
 
