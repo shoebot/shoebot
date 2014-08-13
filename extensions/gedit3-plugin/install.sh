@@ -14,6 +14,7 @@ fi
 
 function pluginInstall {
   cp -r -f shoebotit* $DEST_DIR/gedit/plugins
+  cp -r -f ../lib/* $DEST_DIR/gedit/plugins
   echo 'Gedit plugin installed!'
 }
 

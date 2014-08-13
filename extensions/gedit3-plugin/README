@@ -13,6 +13,7 @@ Run on your terminal
 or you can manualy copy the following files and folder over to '~/.local/share/gedit/plugins':
   * shoebotit.gedit-plugin
   * shoebotit
+  * ../shoebot_support
 
 Then enable the plugin from the Gedit plugins menu (Edit-Preferences-Plugins).
 
