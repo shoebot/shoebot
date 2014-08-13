@@ -1,5 +1,5 @@
 from distutils.spawn import find_executable as which
-from urllib.request import pathname2url
+from urllib import pathname2url
 
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
