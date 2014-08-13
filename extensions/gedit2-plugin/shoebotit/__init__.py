@@ -18,6 +18,9 @@ class ShoebotWindowHelper:
         self.example_bots = {}
 
         self.window = window
+        panel = window.get_bottom_panel()
+        self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
+
         self.plugin = plugin
         self.insert_menu()
 
@@ -45,21 +48,48 @@ class ShoebotWindowHelper:
         manager = self.window.get_ui_manager()
         self.action_group = gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
-            ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
+            ("Shoebot", None, _("Shoe_bot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
+            ('ShoebotOpenExampleMenu', None, _('E_xamples'), None, None, None),
             ])
+
+        for action, label in example_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, self.on_open_example)])
+
+        for action, label in submenu_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, None)])
+
         self.action_group.add_toggle_actions([
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
             ])
         manager.insert_action_group(self.action_group, -1)
+
         self.ui_id = manager.add_ui_from_string(ui_str)
+        manager.ensure_update()
+
+    def on_open_example(self, action):
+        example_dir = ide_utils.get_example_dir()
+        filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
+
+        uri = "file:///" + pathname2url(filename)
+        gio_file = Gio.file_new_for_uri(uri)
+        self.window.create_tab_from_location(
+            gio_file,
+            None,  # encoding
+            0,
+            0,     # column
+            False, # Do not create an empty file
+            True)  # Switch to the tab
 
     def remove_menu(self):
         manager = self.window.get_ui_manager()
-        manager.remove_ui(self.ui_id)
         manager.remove_action_group(self.action_group)
+        for bot, ui_id in self.example_bots.items():
+            manager.remove_ui(ui_id)
+        manager.remove_ui(self.ui_id)
+
         # Make sure the manager updates
         manager.ensure_update()
 
