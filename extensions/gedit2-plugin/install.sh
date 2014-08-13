@@ -8,41 +8,43 @@ if [ "$USER" = "root" ]; then
   else
     DEST_DIR="/usr/lib"
   fi
-  echo Install globally to $DEST_DIR
+  PLUGINS_DIR=${DEST_DIR}/gedit-2/plugins
+  echo Install globally to ${DEST_DIR}
 else
   DEST_DIR="$HOME/.gnome2"
-  echo Install locally to $DEST_DIR
+  PLUGINS_DIR=${DEST_DIR}/gedit/plugins
+  echo Install locally to ${DEST_DIR}
 fi
 
 function pluginInstall {
-  pushd $SCRIPTPATH
-  cp -r -f shoebotit* $DEST_DIR/gedit/plugins
-  cp -r -f ../lib/* $DEST_DIR/gedit/plugins
+  pushd ${SCRIPTPATH}
+  cp -r -f shoebotit* ${PLUGINS_DIR}
+  cp -r -f ../lib/* ${PLUGINS_DIR}
   echo 'Gedit plugin installed!'
   popd
 }
 
 function installLangSpecs {
-  pushd $SCRIPTPATH
-  cp -f shoebot.lang $DEST_DIR/gtksourceview-1.0/language-specs
-  update-mime-database $DEST_DIR/mime
+  pushd ${SCRIPTPATH}
+  cp -f shoebot.lang ${DEST_DIR}/gtksourceview-1.0/language-specs
+  update-mime-database ${DEST_DIR}/mime
   echo 'GTKSourceView language specs installed!'
   popd
 }
 
-if [ -d $DEST_DIR/gedit/plugins ]; then
+if [ -d ${PLUGINS_DIR} ]; then
   pluginInstall
 else
   echo 'Local Gedit plugin directory does not exist. Creating it.'
-  mkdir -p $DEST_DIR/gedit/plugins
+  mkdir -p ${PLUGINS_DIR}
   pluginInstall
 fi
 
-if [ -d $DEST_DIR/gtksourceview-1.0/language-specs ]; then
+if [ -d ${DEST_DIR}/gtksourceview-1.0/language-specs ]; then
   installLangSpecs
 else
   echo 'Local GTKSourceView language-specs directory does not exist. Creating it.'
-  mkdir -p $DEST_DIR/gtksourceview-1.0/language-specs
+  mkdir -p ${DEST_DIR}/gtksourceview-1.0/language-specs
   installLangSpecs
 fi
 
