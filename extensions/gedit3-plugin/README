@@ -11,7 +11,7 @@ Run on your terminal
   chmod +x install.sh 
   ./install.sh
 or you can manualy copy the following files and folder over to '~/.local/share/gedit/plugins':
-  * shoebotit.gedit-plugin
+  * shoebotit.plugin
   * shoebotit
   * ../shoebot_support
 
@@ -20,7 +20,10 @@ Then enable the plugin from the Gedit plugins menu (Edit-Preferences-Plugins).
 Using with Virtualenv
 =====================
 
-If you have shoebot installed in a virtualenv, run Gedit for the first time from
-within the virtualenv you want to use.
+If you have shoebot installed in a virtualenv, activate the virtualenv, then
+run gedit from there, for example:
+
+$ ~/.virtualenvs/shoebot/bin/activate
+$ gedit
 
 TODO:  UI to choose whether to use the system python or a virtualenv
