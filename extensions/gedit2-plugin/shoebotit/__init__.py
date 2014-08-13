@@ -5,6 +5,7 @@ from gettext import gettext as _
 from shoebotit import ide_utils, gtk2_utils
 
 import gedit
+import gobject
 import gtk
 import pango
 import os
@@ -19,7 +20,7 @@ class ShoebotWindowHelper:
 
         self.window = window
         panel = window.get_bottom_panel()
-        self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
+        self.output_widget = gtk2_utils.get_child_by_name(panel, 'shoebot-output')
 
         self.plugin = plugin
         self.insert_menu()
@@ -34,6 +35,8 @@ class ShoebotWindowHelper:
 
         for view in self.window.get_views():
             self.connect_view(view)
+        
+        self.bot = None
 
     def deactivate(self):
         self.remove_menu()
@@ -74,14 +77,11 @@ class ShoebotWindowHelper:
         filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
 
         uri = "file:///" + pathname2url(filename)
-        gio_file = Gio.file_new_for_uri(uri)
-        self.window.create_tab_from_location(
-            gio_file,
-            None,  # encoding
-            0,
-            0,     # column
-            False, # Do not create an empty file
-            True)  # Switch to the tab
+        self.window.create_tab_from_uri(uri,
+                gedit.encoding_get_current(), 
+                0, 
+                False,  # Do not create a new file
+                True)   # Switch to tab
 
     def remove_menu(self):
         manager = self.window.get_ui_manager()
@@ -109,8 +109,8 @@ class ShoebotWindowHelper:
         if not which('sbot'):
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
-            while Gtk.events_pending():
-               Gtk.main_iteration()
+            while gtk.events_pending():
+               gtk.main_iteration()
             return False
 
         if self.bot and self.bot.process.poll() == None:
@@ -132,12 +132,12 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
-        while Gtk.events_pending():
-           Gtk.main_iteration()
+        while gtk.events_pending():
+           gtk.main_iteration()
 
         self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
 
-        GObject.idle_add(self.update_shoebot)
+        gobject.idle_add(self.update_shoebot)
 
     def update_shoebot(self):
         if self.bot:
@@ -148,8 +148,8 @@ class ShoebotWindowHelper:
                 if stderr_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
             self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
-            while Gtk.events_pending():
-                Gtk.main_iteration()
+            while gtk.events_pending():
+                gtk.main_iteration()
 
         return self.bot.running
     
@@ -167,6 +167,28 @@ class ShoebotWindowHelper:
         pass
 
 
+# class ShoebotPlugin(gedit.Plugin):
+#     def __init__(self):
+#         gedit.Plugin.__init__(self)
+#         self.instances = {}
+#         self.tempfiles = []
+# 
+#     def activate(self, window):
+#         self.instances[window] = ShoebotWindowHelper(self, window)
+# 
+#     def deactivate(self, window):
+#         self.instances[window].deactivate()
+#         del self.instances[window]
+#         for tfilename in self.tempfiles:
+#             os.remove(tfilename)
+# 
+#     def update_ui(self, window):
+#         self.instances[window].update_ui()
+
+
+
+
+
 class ShoebotPlugin(gedit.Plugin):
     def __init__(self):
         gedit.Plugin.__init__(self)
@@ -174,15 +196,33 @@ class ShoebotPlugin(gedit.Plugin):
         self.tempfiles = []
 
     def activate(self, window):
+        self.text = gtk.TextView()
+        self.text.set_editable(False)
+        fontdesc = pango.FontDescription("Monospace")
+        self.text.modify_font(fontdesc)
+        self.text.set_name('shoebot-output')
+        self.panel = window.get_bottom_panel()
+
+        image = gtk.Image()
+        image.set_from_stock(gtk.STOCK_EXECUTE, gtk.ICON_SIZE_BUTTON)
+
+        scrolled_window = gtk.ScrolledWindow()
+        scrolled_window.add(self.text)
+        scrolled_window.show_all()
+        
+        self.panel.add_item(scrolled_window, 'Shoebot', image)   
+        self.output_widget = scrolled_window
+
         self.instances[window] = ShoebotWindowHelper(self, window)
 
     def deactivate(self, window):
+        self.panel.remove_item(self.text)
         self.instances[window].deactivate()
         del self.instances[window]
         for tfilename in self.tempfiles:
             os.remove(tfilename)
 
-    def update_ui(self, window):
+        self.panel.remove_item(self.output_widget)
+
+    def update_state(self, window):
         self.instances[window].update_ui()
-
-
