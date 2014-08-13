@@ -1,8 +1,8 @@
 from distutils.spawn import find_executable as which
-from urllib.request import pathname2url
+from urllib import pathname2url
 
 from gettext import gettext as _
-from shoebotit import ide_utils, gtk3_utils
+from shoebotit import ide_utils, gtk2_utils
 
 import gedit
 import gtk
@@ -39,6 +39,9 @@ class ShoebotWindowHelper:
         self.action_group = None
 
     def insert_menu(self):
+        examples_xml, example_actions, submenu_actions = gtk2_utils.examples_menu()
+        ui_str = gtk2_utils.gedit2_menu(examples_xml)
+
         manager = self.window.get_ui_manager()
         self.action_group = gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
