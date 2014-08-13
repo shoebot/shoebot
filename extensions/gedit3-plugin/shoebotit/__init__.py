@@ -1,76 +1,14 @@
 from distutils.spawn import find_executable as which
 from urllib.request import pathname2url
 
-import queue
-import os
-import subprocess
-
 from gi.repository import Gtk, Gio, GObject, Gedit, Pango
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
 
+import os
+
 if not which('sbot'):
     print('Shoebot executable not found.')
-
-
-class ShoebotProcess(object):
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None):
-        command = ['sbot', '-w', '-t%s' % title]
-
-        if use_socketserver:
-            command.append('-s')
-
-        if not show_varwindow:
-            command.append('-dv')
-
-        if use_fullscreen:
-            command.append('-f')
-
-        command.append(code)
-
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
-
-        # Launch the asynchronous readers of the process' stdout and stderr.
-        self.stdout_queue = queue.Queue()
-        self.stdout_reader = ide_utils.AsynchronousFileReader(self.process.stdout, self.stdout_queue)
-        self.stdout_reader.start()
-        self.stderr_queue = queue.Queue()
-        self.stderr_reader = ide_utils.AsynchronousFileReader(self.process.stderr, self.stderr_queue)
-        self.stderr_reader.start()
-
-    def _update_ui_text(self, output_widget):
-        textbuffer = output_widget.get_buffer()
-        while not (self.stdout_queue.empty() and self.stderr_queue.empty()):
-            if not self.stdout_queue.empty():
-                line = self.stdout_queue.get().decode('utf-8')
-                textbuffer.insert(textbuffer.get_end_iter(), line)
-
-            if not self.stderr_queue.empty():
-                line = self.stderr_queue.get().decode('utf-8')
-                textbuffer.insert(textbuffer.get_end_iter(), line)
-        #else:
-        output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
-        while Gtk.events_pending():
-            Gtk.main_iteration()
-
-    def update_shoebot(self, output_widget):
-        """
-        :param textbuffer: Gtk textbuffer to append shoebot output to.
-        :output_widget: Gtk widget containing the output
-        :return: True if shoebot still running, False if terminated.
-        Send any new shoebot output to a textbuffer.
-        """
-        self._update_ui_text(output_widget)
-
-        if self.process.poll() is not None:
-            # Close subprocess' file descriptors.
-            self._update_ui_text(output_widget)
-            self.process.stdout.close()
-            self.process.stderr.close()
-            return False
-
-        result = not (self.stdout_reader.eof() or self.stderr_reader.eof())
-        return result
 
 
 class ShoebotWindowHelper(object):
@@ -83,7 +21,6 @@ class ShoebotWindowHelper(object):
 
         self.plugin = plugin
         self.insert_menu()
-        self.shoebot_window = None
         self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
@@ -91,7 +28,6 @@ class ShoebotWindowHelper(object):
         self.use_fullscreen = False
 
         self.started = False
-        self.shoebot_thread = None
         
         for view in self.window.get_views():
             self.connect_view(view)
@@ -102,8 +38,6 @@ class ShoebotWindowHelper(object):
         self.remove_menu()
         self.window = None
         self.plugin = None
-        self.action_group = None
-        del self.shoebot_window
 
     def insert_menu(self):
         examples_xml, example_actions, submenu_actions = gtk3_utils.examples_menu()
@@ -116,7 +50,6 @@ class ShoebotWindowHelper(object):
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
             ('ShoebotOpenExampleMenu', None, _('E_xamples'), None, None, None)
             ])
-        
 
         for action, label in example_actions:
             self.action_group.add_actions([(action, None, (label), None, None, self.on_open_example)])
@@ -138,7 +71,7 @@ class ShoebotWindowHelper(object):
         example_dir = ide_utils.get_example_dir()
         filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
         
-        uri      = "file:///" + pathname2url(filename)
+        uri = "file:///" + pathname2url(filename)
         gio_file = Gio.file_new_for_uri(uri)
         self.window.create_tab_from_location(
             gio_file,
@@ -200,30 +133,32 @@ class ShoebotWindowHelper(object):
         while Gtk.events_pending():
            Gtk.main_iteration()
 
-
-        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
 
         GObject.idle_add(self.update_shoebot)
 
-
     def update_shoebot(self):
         if self.bot:
-            running = self.bot.update_shoebot(self.output_widget)
+            textbuffer = self.output_widget.get_buffer()
+            for stdout_line, stderr_line, running in self.bot.get_output():
+                if stdout_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
+                if stderr_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+            self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+            while Gtk.events_pending():
+                Gtk.main_iteration()
 
-            if not running:
-                 return False
-        return True
-
+        return self.bot.running
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
+
     def toggle_var_window(self, action):
         self.show_varwindow = action.get_active()
-    def toggle_fullscreen(self, action):
-        #no full screen for you!
-        #self.use_fullscreen = False
-        self.use_fullscreen = action.get_active()
 
+    def toggle_fullscreen(self, action):
+        self.use_fullscreen = action.get_active()
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
@@ -261,7 +196,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
-
     def do_deactivate(self):
         self.panel.remove_item(self.text)
         self.instances[self.window].deactivate()
@@ -270,7 +204,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
             os.remove(tfilename)
 
         self.panel.remove_item(self.output_widget)
-
 
     def do_update_state(self):
         self.instances[self.window].update_ui()

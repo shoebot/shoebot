@@ -1,55 +1,30 @@
-import os
+from distutils.spawn import find_executable as which
+from urllib.request import pathname2url
+
+from gettext import gettext as _
+from shoebotit import ide_utils, gtk3_utils
+
 import gedit
 import gtk
-import re
-from gettext import gettext as _
+import pango
+import os
 
-try:
-    from shoebot import sbot
-    import shoebot
-except ImportError:
-    print "Failed Import"
+if not which('sbot'):
+    print('Shoebot executable not found.')
 
-# regex taken from openuricontextmenu.py and slightly changed
-# to work with Python functions
-RE_DELIM = re.compile(r'[\w#/\?:%@&\=\+\.\\~-]+', re.UNICODE|re.MULTILINE)
-
-BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
-
-# function name -> quicktorial id mapping
-QUICKTORIAL_KEYWORDS = {
-        'rect': 'rect01',
-        'oval': 'ellipse01',
-        'var': 'var01'
-        }
-
-
-ui_str = """
-<ui>
-  <menubar name="MenuBar">
-    <menu name="ShoebotMenu" action="Shoebot">
-      <placeholder name="ShoebotOps_1">
-        <menuitem name="Run in Shoebot" action="ShoebotRun"/>
-        <separator/>
-        <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
-        <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
-        <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
-      </placeholder>
-    </menu>
-  </menubar>
-</ui>
-"""
 
 class ShoebotWindowHelper:
     def __init__(self, plugin, window):
+        self.example_bots = {}
+
         self.window = window
         self.plugin = plugin
         self.insert_menu()
-        self.shoebot_window = None
+
         self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
-        self.use_varwindow = False
+        self.show_varwindow = True
         self.use_fullscreen = False
 
         self.started = False
@@ -62,7 +37,6 @@ class ShoebotWindowHelper:
         self.window = None
         self.plugin = None
         self.action_group = None
-        del self.shoebot_window
 
     def insert_menu(self):
         manager = self.window.get_ui_manager()
@@ -96,107 +70,69 @@ class ShoebotWindowHelper:
             self.started = True
 
     def on_run_activate(self, action):
+        self.start_shoebot()
+
+    def start_shoebot(self):
+        if not which('sbot'):
+            textbuffer = self.output_widget.get_buffer()
+            textbuffer.set_text('Cannot find sbot in path.')
+            while Gtk.events_pending():
+               Gtk.main_iteration()
+            return False
+
+        if self.bot and self.bot.process.poll() == None:
+            print('Has a bot already')
+            return False
+
         # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
             return
+
+        title = '%s - Shoebot on gedit' % doc.get_short_name_for_display()
+        cwd = os.path.dirname(doc.get_uri_for_display()) or None
+
         start, end = doc.get_bounds()
-        code = doc.get_text(start, end)
+        code = doc.get_text(start, end, False)
         if not code:
             return False
-        # scraped if window_is_open and just render the stuff right there
-        try:
-          self.shoebot_window = sbot.run(code,
-                                        iterations = None,
-                                        window = True,
-                                        title = doc.get_short_name_for_display() + ' - Shoebot',
-                                        server = self.use_socketserver,
-                                        show_vars = self.use_varwindow)
-                                        # no more fullscreen for you!
-                                        ##close_window = True)
-        #except Error, NameError:
-        except:
-            import traceback 
-            errmsg = traceback.format_exc(limit=1)
-            err = "Error in Shoebot script:\n %s" % (errmsg)
-            # TODO: This traceback should be sent over to a
-            # log window at the bottom of Gedit
-            print err
+
+        textbuffer = self.output_widget.get_buffer()
+        textbuffer.set_text('')
+        while Gtk.events_pending():
+           Gtk.main_iteration()
+
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+
+        GObject.idle_add(self.update_shoebot)
+
+    def update_shoebot(self):
+        if self.bot:
+            textbuffer = self.output_widget.get_buffer()
+            for stdout_line, stderr_line, running in self.bot.get_output():
+                if stdout_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
+                if stderr_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+            self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
+        return self.bot.running
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
+
     def toggle_var_window(self, action):
-        self.use_varwindow = action.get_active()
+        self.show_varwindow = action.get_active()
+
     def toggle_fullscreen(self, action):
-        #no full screen for you!
-        self.use_fullscreen = False
-        #self.use_fullscreen = action.get_active()
-        
-    # Right-click menu items (for quicktorials)
+        self.use_fullscreen = action.get_active()
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
-        handler_id = view.connect('populate-popup', self.on_view_populate_popup)
-        view.set_data(self.id_name, [handler_id])
+        pass
 
-    def on_view_populate_popup(self, view, menu):
-        # taken from gedit-plugins-python-openuricontextmenu
-        doc = view.get_buffer()
-        win = view.get_window(gtk.TEXT_WINDOW_TEXT)
-        x, y, mod = win.get_pointer()
-        x, y = view.window_to_buffer_coords(gtk.TEXT_WINDOW_TEXT, x, y) 
-
-        # first try at pointer location
-        insert = view.get_iter_at_location(x, y)
-
-        # second try at cursor
-        if insert == None:
-            insert = doc.get_iter_at_mark(doc.get_insert())
-
-        while insert.forward_char():
-            if not RE_DELIM.match(insert.get_char()):
-                break
-
-        start = insert.copy()
-        while start.backward_char():
-            if not RE_DELIM.match(start.get_char()):
-                start.forward_char()
-                break
-
-        word = unicode(doc.get_text(start, insert))
-
-        if len(word) == 0:
-            return True
-
-        word = self.validate_word(word)
-        if not word:
-            return True
-
-        open_quicktorial_item = gtk.ImageMenuItem(_("Know more about '%s'") % (word))
-        open_quicktorial_item.set_image(gtk.image_new_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU))
-        open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
-        open_quicktorial_item.show()
-
-        separator = gtk.SeparatorMenuItem()
-        separator.show()
-
-        menu.prepend(separator)
-        menu.prepend(open_quicktorial_item)
-
-    def validate_word(self, word):
-        if word in QUICKTORIAL_KEYWORDS:
-            return word
-        return None
-
-    def on_open_quicktorial(self, menu_item, word):
-        self.open_quicktorial(word)
-        return True
-
-    def open_quicktorial(self, word):
-        import webbrowser
-        q_id = QUICKTORIAL_KEYWORDS[word]
-        url = BASE_QUICKTORIAL_URL % q_id
-        webbrowser.open(url)
 
 class ShoebotPlugin(gedit.Plugin):
     def __init__(self):

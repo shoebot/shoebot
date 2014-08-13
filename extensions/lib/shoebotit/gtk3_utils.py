@@ -6,6 +6,27 @@ import os
 from shoebotit import ide_utils
 
 
+MENU_UI = """
+<ui>
+  <menubar name="MenuBar">
+    <menu name="ShoebotMenu" action="Shoebot">
+      <placeholder name="ShoebotOps_1">
+        <menuitem name="Run in Shoebot" action="ShoebotRun"/>
+            <separator/>
+                 <menu name="ShoebotExampleMenu" action="ShoebotOpenExampleMenu">
+                    {}
+                </menu>
+        <separator/>
+        <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
+        <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
+        <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
+      </placeholder>
+    </menu>
+  </menubar>
+</ui>
+"""
+
+
 def examples_menu(root_dir=None, depth=0):
     """
     :return: xml for menu, [(bot_action, label), ...], [(menu_action, label), ...]
@@ -45,27 +66,6 @@ def examples_menu(root_dir=None, depth=0):
             file_actions.append((action, label))
 
     return xml, file_actions, submenu_actions
-
-
-MENU_UI = """
-<ui>
-  <menubar name="MenuBar">
-    <menu name="ShoebotMenu" action="Shoebot">
-      <placeholder name="ShoebotOps_1">
-        <menuitem name="Run in Shoebot" action="ShoebotRun"/>
-            <separator/>
-                 <menu name="ShoebotExampleMenu" action="ShoebotOpenExampleMenu">
-                    {}
-                </menu>
-        <separator/>
-        <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
-        <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
-        <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
-      </placeholder>
-    </menu>
-  </menubar>
-</ui>
-"""
 
 
 def gedit3_menu(xml):

@@ -1,28 +1,42 @@
 #!/bin/bash
 
+if [ "$USER" = "root" ]; then
+  if [ -d "/usr/lib64" ]; then
+    DEST_DIR="/usr/lib64"
+  else
+    DEST_DIR="/usr/lib"
+  fi
+  echo Install globally to $DEST_DIR
+else
+  DEST_DIR="$HOME/.local/share"
+  echo Install locally to $DEST_DIR
+fi
+
 function pluginInstall {
-  cp -r -f shoebotit* ~/.gnome2/gedit/plugins
+  cp -r -f shoebotit* $DEST_DIR/gedit/plugins
+  cp -r -f ../lib/* $DEST_DIR/gedit/plugins
   echo 'Gedit plugin installed!'
 }
 
 function installLangSpecs {
-  cp -f shoebot.lang ~/.gnome2/gtksourceview-1.0/language-specs
+  cp -f shoebot.lang $DEST_DIR/gtksourceview-1.0/language-specs
+  update-mime-database $DEST_DIR/mime
   echo 'GTKSourceView language specs installed!'
 }
 
-if [ -d ~/.gnome2/gedit/plugins ]; then
+if [ -d $DEST_DIR/gedit/plugins ]; then
   pluginInstall
 else
   echo 'Local Gedit plugin directory does not exist. Creating it.'
-  mkdir -p ~/.gnome2/gedit/plugins
+  mkdir -p $DEST_DIR/gedit/plugins
   pluginInstall
 fi
 
-if [ -d ~/.gnome2/gtksourceview-1.0/language-specs ]; then
+if [ -d $DEST_DIR/gtksourceview-1.0/language-specs ]; then
   installLangSpecs
 else
   echo 'Local GTKSourceView language-specs directory does not exist. Creating it.'
-  mkdir -p ~/.gnome2/gtksourceview-1.0/language-specs
+  mkdir -p $DEST_DIR/gtksourceview-1.0/language-specs
   installLangSpecs
 fi
 
