@@ -7,7 +7,11 @@ Functions here are expected to work not need shoebot in the library path.
 
 """
 
-import queue
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
 import os
 import subprocess
 import threading
