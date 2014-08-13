@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
 if [ "$USER" = "root" ]; then
   if [ -d "/usr/lib64" ]; then
     DEST_DIR="/usr/lib64"
@@ -13,15 +15,19 @@ else
 fi
 
 function pluginInstall {
+  pushd $SCRIPTPATH
   cp -r -f shoebotit* $DEST_DIR/gedit/plugins
   cp -r -f ../lib/* $DEST_DIR/gedit/plugins
   echo 'Gedit plugin installed!'
+  popd
 }
 
 function installLangSpecs {
+  pushd $SCRIPTPATH
   cp -f shoebot.lang $DEST_DIR/gtksourceview-3.0/language-specs
   update-mime-database $DEST_DIR/mime
   echo 'GTKSourceView language specs installed!'
+  popd
 }
 
 if [ -d $DEST_DIR/gedit/plugins ]; then
