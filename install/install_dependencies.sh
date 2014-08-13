@@ -6,7 +6,7 @@ SUSE_PACKAGES="libjpeg-devel python-pycairo python-gtk python-pygobject2 python-
 
 DEBIAN_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
 UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
-MINT_PACKAGES="python-2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
+MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
 
 # OSX
 HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+ --quartz pygtk --quartz"
