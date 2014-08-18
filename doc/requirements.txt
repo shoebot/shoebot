@@ -4,6 +4,6 @@ cairocffi
 sphinx
 # ./sphinxcontrib_shoebot
 
-git+git://github.com/shoebot/shoebot.git/doc/shinxcontrib_shoebot@readthedocs#egg=sphinxcontrib_shoebot
+-e git+https://github.com/shoebot/shoebot.git@readthedocs#egg=sphinxcontrib_shoebot&subdirectory=doc/sphinxcontrib_shoebot
 
 #-e git+https://github.com/shoebot/shoebot.git#egg=sphinx_shoebot&subdirectory=doc/extension
