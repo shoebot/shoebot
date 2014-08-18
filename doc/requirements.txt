@@ -2,7 +2,7 @@
 
 cairocffi
 sphinx
-./sphinxcontrib_shoebot
+file:../doc/sphinxcontrib_shoebot#egg=sphinxcontrib_shoebot
 
 #-e git+https://github.com/shoebot/shoebot.git
 #-e git+https://git.repo/some_repo.git#egg=sphinx_shoebot&subdirectory=doc/extension
