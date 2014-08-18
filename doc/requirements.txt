@@ -1,6 +1,8 @@
+# requirements file for readthedocs
+
 cairocffi
 sphinx
-../extension
+extension
 
 #-e git+https://github.com/shoebot/shoebot.git
 #-e git+https://git.repo/some_repo.git#egg=sphinx_shoebot&subdirectory=doc/extension
