@@ -1,4 +1,7 @@
-# keyboard interaction example
+# about:
+#   Demonstrate some basic keyboard interaction. 
+#   Try pressing different single keys for differnet
+#   durations.
 
 def setup():
     size(300,300)

@@ -6,7 +6,8 @@
 # the infered color for that category should apply to the word.
 
 colors = ximport("colors")
-en = ximport("en")
+#en = ximport("en")
+import pattern.en as en
 
 # WordNet has a set of global categories (or lexnames)
 # into which it classifies all words.

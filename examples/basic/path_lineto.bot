@@ -1,3 +1,6 @@
+# about:
+#   Draw some lines and fill the space enclosed by the path.
+
 size(300,300)
 colorrange(255)
 background(49,125,123)

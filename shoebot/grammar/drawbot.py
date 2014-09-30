@@ -24,9 +24,9 @@ CORNER = 'corner'
 
 class DrawBot(Bot):
 
-    def __init__(self, canvas, namespace = None):
+    def __init__(self, canvas, namespace = None, vars = None):
         ### TODO - Need to do whole drawbot class
-        Bot.__init__(self, canvas, namespace)
+        Bot.__init__(self, canvas, namespace = namespace, vars = None)
         self._transformmode = CORNER
         self._canvas.origin = BOTTOM_LEFT
 
@@ -81,6 +81,7 @@ class DrawBot(Bot):
         self.lineto(x2,y2)
         self.endpath(draw=draw)
         self._path = p
+        return p
 
     #### Path
     # Path functions taken from Nodebox and modified
@@ -137,10 +138,10 @@ class DrawBot(Bot):
 
     def drawpath(self,path):
         if isinstance(path, BezierPath):
-            p = self.BezierPath(path)
+            p = self.BezierPath(path=path)
             p.draw()
         elif isinstance(path, Image):
-            self._canvas.add(path)
+            path.draw() # Is this right ? - added to make test_clip_4.bot work
         elif hasattr(path, '__iter__'):
             p = self.BezierPath()
             for point in path:

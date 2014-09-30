@@ -11,16 +11,19 @@ push()
 rotate(-25)
 image("assets/hva_studio_3.jpg",200,200,120,150)
 pop()
-image("assets/test.png",300,100,400,300)
+#image("assets/test.png",300,100,400,300)
 fill(0,0.0,0,0.6)
 oval(200,280,80,80)
-image("assets/shoebot-ide.png",40,350)
+
+import sys
+SHOEBOT_ICON=sys.prefix+'/share/pixmaps/shoebot-ide.png'
+image(SHOEBOT_ICON,40,350)
 push()
 
 rotate(15)
-image("assets/shoebot-ide.png",170,350,50,50)
-image("assets/shoebot-ide.jpg",220,350)
+image(SHOEBOT_ICON,170,350,50,50)
+image(SHOEBOT_ICON,220,350)
 
 
-image("assets/shoebot-ide.jpg",350,350,50,50)
+image(SHOEBOT_ICON,350,350,50,50)
 pop()

@@ -1,1 +1,1 @@
-__all__ = ['graphics']
+__all__ = ['graphics', 'geo']

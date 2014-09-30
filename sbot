@@ -29,6 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ''' Shoebot console runner '''
 
+import shlex
 import sys, os
 import locale, gettext
 import argparse
@@ -54,6 +55,7 @@ DRAWBOT = 'drawbot'
 
 # use ArgumentParser to interpret commandline options
 parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
+parser.add_argument("script")
 parser.add_argument("-o",
                 "--outputfile",
                 dest="outputfile",
@@ -117,8 +119,13 @@ parser.add_argument("-c",
                 default=False,
                 help=_("Close window after running bot (use with -r for benchmarking)"),
                 )
-parser.add_argument("script")
-parser.add_argument('script_args', nargs=argparse.REMAINDER)
+parser.add_argument("-v",
+                "--vars",
+                dest="vars",
+                default=False,
+                help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
+                )
+parser.add_argument('script_args', nargs='?')
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -140,7 +147,15 @@ if __name__ == '__main__':
     if not args.script and not args.window:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
-    
+    vars = None
+    if args.vars:
+        try:
+            import json
+            vars = json.loads(args.vars)
+        except Exception as e:
+            error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
+            raise e
+
     run(src = args.script,
         grammar = args.grammar,
         outputfile = args.outputfile,
@@ -152,4 +167,6 @@ if __name__ == '__main__':
         server=args.socketserver,
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
-        args = args.script_args)
+        vars = vars or None,
+        args = shlex.split(args.script_args or ""),
+        )

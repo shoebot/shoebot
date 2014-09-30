@@ -34,7 +34,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.var_window = None
         self.is_fullscreen = False
 
-        sb_widget = ShoebotWidget()
+        sb_widget = ShoebotWidget(input_device=self)
 
         if title:
             self.set_title(title)
@@ -156,6 +156,11 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.var_window.window.destroy()
             self.var_window = None
 
+    def var_changed(self, name, value):
+        self.bot._namespace[name] = value
+        if self.var_window:
+            return self.var_window.update_var(name, value)
+
 
     def do_snapshot(self, format):
         bot = self.bot
@@ -224,3 +229,4 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
     def finish(self):
         while self.bot._quit == False and self.window_open == True:
             Gtk.main_iteration()
+            ### Any snapshots that need to be taken

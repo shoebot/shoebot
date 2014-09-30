@@ -22,9 +22,9 @@ size(200,200)
 #
 # NOTE that only floats are accepted for the moment
 
-addvar('one', 186., 0., 255.)
-addvar('two', 186., 0., 255.)
-addvar('three', 93., 0., 255.)
+var('one', NUMBER, 186., 0., 255.)
+var('two', NUMBER, 186., 0., 255.)
+var('three', NUMBER, 93., 0., 255.)
 
 def setup():
     # set the colour range to 255

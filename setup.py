@@ -7,7 +7,7 @@
 
 # the following libraries will not be installed
 
-EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs', 'lib/colors/aggregated']
+EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
 from distutils.core import setup
@@ -22,6 +22,7 @@ for lib in EXCLUDE_LIBS:
 datafiles = [(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('examples')]
 datafiles.append(('share/pixmaps', ['assets/shoebot-ide.png']))
+datafiles.append(('share/shoebot/data', ['assets/kant.xml']))
 #as the IDE is non functional, I'm commenting this
 #datafiles.append(('share/applications', ['assets/shoebot-ide.desktop']))
 
@@ -33,13 +34,13 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
 setup(name = "shoebot",
-    version = "0.4a4",
+    version = "1.0b",
     description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
     license = 'GPL v3',
     url = "http://shoebot.net",
-    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics"],
+    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics", "shoebot.grammar.nodebox-lib.nodebox.geo"],
     data_files = datafiles,
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """

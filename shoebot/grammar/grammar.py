@@ -2,6 +2,7 @@ import os
 import traceback
 
 from time import sleep, time
+from shoebot.data import Variable
 from shoebot.util import flushfile
 
 import sys
@@ -18,13 +19,13 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
-    def __init__(self, canvas, namespace = None):
+    def __init__(self, canvas, namespace = None, vars = None):
         self._canvas = canvas
         self._quit = False
         self._iteration = 0
         self._dynamic = True
         self._speed = None
-        self._vars = {}
+        self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
 
@@ -40,7 +41,9 @@ class Grammar(object):
 
 
     def _load_namespace(self, filename = None):
-        ''' Export namespace into the user bot '''
+        ''' Export namespace into the user bot
+        :param filename: Will be set to __file__ in the namespace
+        '''
         namespace = self._namespace
 
         from shoebot import data
@@ -51,6 +54,7 @@ class Grammar(object):
             if name[0] != '_':
                 namespace[name] = getattr(self, name)
 
+        namespace['_ctx'] = self  # Used in older nodebox scripts.
         namespace['__file__'] = filename
         self._namespace = namespace
 
@@ -69,11 +73,15 @@ class Grammar(object):
         if iterations:
             if iteration < iterations:
                 return True
+        elif len(self._vars) > 0:
+            # Vars have been added in script
+            return True
         elif iterations is None:
             if self._dynamic:
                 return True
             else:
                 return False
+            return True
         if not self._dynamic:
             ### TODO... gtk window needs to run in another thread, that will keep
             ### going until explicitly closed
@@ -95,7 +103,11 @@ class Grammar(object):
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
     def _exec_frame(self, source_or_code, limit = False):
-        ''' Run single frame of the bot '''
+        ''' Run single frame of the bot
+
+        :param source_or_code: path to code to run, or actual code.
+        :param limit: Time a frame should take to run (float - seconds)
+        '''
         namespace = self._namespace
         self._canvas.reset_canvas()
         self._set_dynamic_vars()
@@ -121,9 +133,12 @@ class Grammar(object):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
-        '''
-        source_or_code = ""
 
+        :param inputcode: path to code to run, or actual code.
+        :param iterations: maximum amount of frames to run
+        :param run_forever: if True will run until the user quits the bot
+        :param frame_limiter: Time a frame should take to run (float - seconds)
+        '''
         # is it a proper filename?
         if os.path.isfile(inputcode):
             file = open(inputcode, 'rU')
@@ -170,14 +185,22 @@ class Grammar(object):
         ## TODO: Not used when running as a bot, possibly should not be available in
         ## this case
         self._canvas.flush(self._frame)
+        self._canvas.sink.finish()
 
     #### Variables
     def _addvar(self, v):
-        ''' Sets a new accessible variable.'''
+        ''' Sets a new accessible variable.
+
+        :param v: Variable.
+        '''
         oldvar = self._oldvars.get(v.name)
         if oldvar is not None:
-            if oldvar.compliesTo(v):
-                v.value = oldvar.value
+            if isinstance(oldvar, Variable):
+                if oldvar.compliesTo(v):
+                    v.value = oldvar.value
+            else:
+                # Set from commandline
+                v.value = v.sanitize(oldvar)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
         return v

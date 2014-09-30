@@ -1,3 +1,6 @@
+# about:
+#   Perform some basic transformations (rotation and translation) on rectangles.
+
 def setup():
     size(300,500)
     background(0.2)

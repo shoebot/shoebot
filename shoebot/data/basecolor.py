@@ -86,10 +86,10 @@ class Color(object):
                 self.r, self.g, self.b, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha               
             elif mode == "hsb":                
                 self.h, self.s, self.brightness, self.a = a[0]/ra, a[1]/ra, a[2]/ra, alpha                
-            #elif mode == "cmyk":
-                #if len(a) == 4: alpha = 1
-                #self.a = alpha
-                #self.c, self.m, self.y, self.k = a[0], a[1], a[2], a[3]
+            elif mode == "cmyk":
+                if len(a) == 4: alpha = 1
+                self.a = alpha
+                self.c, self.m, self.y, self.k = a[0], a[1], a[2], a[3]
         
 
         # Added this
@@ -115,11 +115,11 @@ class Color(object):
         self.__dict__["__g"] = g
         self.__dict__["__b"] = b
     
-    #def _update_cmyk(self, c, m, y, k):
-        #self.__dict__["__c"] = c
-        #self.__dict__["__m"] = m
-        #self.__dict__["__y"] = y
-        #self.__dict__["__k"] = k
+    def _update_cmyk(self, c, m, y, k):
+        self.__dict__["__c"] = c
+        self.__dict__["__m"] = m
+        self.__dict__["__y"] = y
+        self.__dict__["__k"] = k
         
     def _update_hsb(self, h, s, b):
         self.__dict__["__h"] = h
@@ -161,7 +161,7 @@ class Color(object):
                     self.__dict__["__g"], 
                     self.__dict__["__b"]
                 )
-                #self._update_cmyk(*rgb2cmyk(r, g, b))
+                self._update_cmyk(*rgb2cmyk(r, g, b))
                 self._update_hsb(*rgb2hsb(r, g, b))
         
         # HSB changes, update RGB and CMYK accordingly.
@@ -176,21 +176,21 @@ class Color(object):
                     self.__dict__["__brightness"]
                 )
                 self._update_rgb(r, g, b)
-                #self._update_cmyk(*rgb2cmyk(r, g, b))
+                self._update_cmyk(*rgb2cmyk(r, g, b))
         
         # CMYK changes, update RGB and HSB accordingly.
-        #elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
-            #if a != "black": a = a[0]
-            #self.__dict__["__"+a] = max(0, min(v, 1))
-            #if self._hasattrs(("__c", "__m", "__y", "__k")):
-                #r, g, b = cmyk2rgb(
-                    #self.__dict__["__c"], 
-                    #self.__dict__["__m"], 
-                    #self.__dict__["__y"], 
-                    #self.__dict__["__k"]
-                #)
-                #self._update_rgb(r, g, b)
-                #self._update_hsb(*rgb2hsb(r, g, b))
+        elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
+            if a != "black": a = a[0]
+            self.__dict__["__"+a] = max(0, min(v, 1))
+            if self._hasattrs(("__c", "__m", "__y", "__k")):
+                r, g, b = cmyk2rgb(
+                    self.__dict__["__c"],
+                    self.__dict__["__m"],
+                    self.__dict__["__y"],
+                    self.__dict__["__k"]
+                )
+                self._update_rgb(r, g, b)
+                self._update_hsb(*rgb2hsb(r, g, b))
                 
         else:
             self.__dict__[a] = v
@@ -206,22 +206,23 @@ class Color(object):
         
         if self.__dict__.has_key(a):
             return a
-        #elif a == "black":
-            #return self.__dict__["__k"]        
+        elif a == "black":
+            return self.__dict__["__k"]
         elif a == "brightness":
             return self.__dict__["__brightness"]
         #CMYK
-        #elif a in ["a", "alpha",
-                   #"r", "g", "b", "red", "green", "blue",
-                   #"h", "s", "hue", "saturation",
-                   #"c", "m", "y", "k", "cyan", "magenta", "yellow"]:
-        #NO-CMYK 
+        elif a in ["a", "alpha",
+                   "r", "g", "b", "red", "green", "blue",
+                   "h", "s", "hue", "saturation",
+                   "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+            return self.__dict__["__"+a[0]]
         elif a in ["a", "alpha",
                    "r", "g", "b", "red", "green", "blue",
                    "h", "s", "hue", "saturation"]:
             return self.__dict__["__"+a[0]]
         
         raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
+
 
 
 class ColorMixin(object):
@@ -231,7 +232,7 @@ class ColorMixin(object):
 
     def __init__(self,  **kwargs):
         if 'fill' in kwargs:
-            self._fillcolor = Color(kwargs['fill'], mode='rgb', color_range=1)
+            self._fillcolor = Color(self._canvas, kwargs['fill'], mode='rgb', color_range=1)
         else:
             self._fillcolor = self._canvas.fillcolor
 

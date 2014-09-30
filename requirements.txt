@@ -1,0 +1,19 @@
+# Shoebot
+#
+# pygtk, pycairo and rsvg - do not play well with virtualenv.
+#
+# Install them into the system python, then use 
+# setup_virtualenv.sh to link them from the virtualenv.
+#
+# Alternately use --system-site-packages when creating your 
+# virtualenv.
+#
+# e.g.  
+#     virtualenv --system-site-packages shoebot-env
+#
+# or with virtualenvwrapper:
+#     mkvirtualenv --system-site-packages shoebot-env
+
+
+Pillow==2.4.0
+numpy==1.6.2

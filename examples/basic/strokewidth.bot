@@ -1,3 +1,6 @@
+# about:
+#   Draw lines with different stroke widths.
+
 size(300,300)
 colorrange(255)
 

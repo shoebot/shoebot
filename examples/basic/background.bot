@@ -1,3 +1,6 @@
+# about:
+#   Draw a blue-ish background in a window.
+
 size(300,300)
 colorrange(255)
 

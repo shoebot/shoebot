@@ -1,0 +1,68 @@
+.. -*- restructuredtext -*-
+
+=============================
+Shoebot extension for Sphinx
+=============================
+
+:author: Stuart Axon <stuaxo2@yahoo.com>
+
+
+About
+=====
+
+This extensions allows rendering of shoebot bots using python_. 
+
+This extensions adds the ``shoebot`` directive that will replace the shoebot
+commands with the image of the graphics bot. 
+
+
+Quick Example
+-------------
+
+This source::
+
+    .. shoebot::
+        :snapshot:
+
+        size(100, 100)
+        background(.8)
+        fill(.3)
+        rect(10, 10, 35, 35)
+        # see how roundness affects the shape
+        rect(55, 10, 35, 35, 0.3)
+        rect(10, 55, 35, 35, 0.7)
+        rect(55, 55, 35, 35, 1)
+
+
+will render an image of a rounded rectangle.
+
+The directive 'snapshot' specifies that it will generate a single image.
+
+
+Requirements
+------------
+
+* shoebot_.
+
+Shoebot_ should be installed and be in the current python environment.
+
+
+Installing
+----------
+
+Install the module::
+
+  $ python setup.py install
+
+
+
+Enabling the extension in Sphinx_
+---------------------------------
+
+Just add ``sphinxcontrib.shoebot`` to the list of extensions in the ``conf.py``
+file. For example::
+
+    extensions = ['sphinxcontrib.shoebot']
+
+
+

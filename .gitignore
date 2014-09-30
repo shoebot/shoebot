@@ -1,3 +1,27 @@
-dist/
 MANIFEST
-doc/build
+
+# ignore apps for now
+apps/*
+
+# ignore .orig files (leftovers from merges)
+*.orig
+
+# ignore build and dist output
+build/*
+dist/*
+# as well as sphinx output
+doc/build/*
+
+# python bytecode files
+*.pyc
+*.pyo
+# backup files
+*.bak
+*~
+*.swp
+.pc
+
+# sphinx extension build files
+doc/extension/build/
+doc/extension/dist/
+doc/extension/sphinxcontrib_shoebot.egg-info/

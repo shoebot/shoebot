@@ -15,12 +15,13 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     '''
 
     # Draw in response to an expose-event
-    def __init__(self, scale_fit = True):
+    def __init__(self, scale_fit=True, input_device=None):
         Gtk.DrawingArea.__init__(self)
         DrawQueueSink.__init__(self)
         self.connect("draw", self.draw)
 
         self.scale_fit = scale_fit
+        self.input_device = input_device
 
         # Default picture is the shoebot icon
         if os.path.isfile(ICON_FILE):
@@ -29,7 +30,7 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
             self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
         self.size = None
         self.first_run = True
-	self.last_rendering = None
+        self.last_rendering = None
 
     def draw(self, widget, cr):
         '''
@@ -43,27 +44,33 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
             size = self.get_allocation()
 
-            if size.width > source_width or size.height > source_height:
+            if self.first_run or size.width > source_width or size.height > source_height:
                 # Scale up by largest dimension
                 if size.width > source_width:
-                    xscale = float(size.width) / float(source_width)
+                    scale_x = float(size.width) / float(source_width)
                 else:
-                    xscale = 1.0
+                    scale_x = 1.0
 
                 if size.height > source_height:
-                    yscale = float(size.height) / float(source_height)
+                    scale_y = float(size.height) / float(source_height)
                 else:
-                    yscale = 1.0
+                    scale_y = 1.0
 
-                if xscale > yscale:
-                    cr.scale(xscale, xscale)
+                if scale_x > scale_y:
+                    cr.scale(scale_x, scale_x)
+                    if self.input_device:
+                        self.input_device.scale_x = scale_x
+                        self.input_device.scale_y = scale_x
                 else:
-                    cr.scale(yscale, yscale)
-
+                    cr.scale(scale_y, scale_y)
+                    if self.input_device:
+                        self.input_device.scale_x = scale_y
+                        self.input_device.scale_y = scale_y
 
         cr.set_source_surface(self.backing_store)
-        cr.rectangle(0, 0,
-                source_width, source_height)
+        # Restrict Cairo to the exposed area; avoid extra work
+        cr.rectangle(event.area.x, event.area.y,
+                event.area.width, event.area.height)
         if self.first_run:
             cr.set_operator(cairo.OPERATOR_OVER)
         else:
@@ -77,7 +84,7 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         Uses a proxy to an SVGSurface to render on so 
         it's scalable
         '''
-        if self.get_window() and not self.size:
+        if self.window and not self.size:
             self.set_size_request(*size)
             self.size = size
             while Gtk.events_pending():

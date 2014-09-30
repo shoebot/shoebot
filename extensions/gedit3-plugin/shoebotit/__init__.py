@@ -1,123 +1,26 @@
 from distutils.spawn import find_executable as which
-import os
-import subprocess
+from urllib.request import pathname2url
 
-from gi.repository import Gtk, GObject, Gedit, Pango
-import re
+from gi.repository import Gtk, Gio, GObject, Gedit, Pango
 from gettext import gettext as _
+from shoebotit import ide_utils, gtk3_utils
+
+import os
 
 if not which('sbot'):
-    print 'Shoebot executable not found.'
-
-# regex taken from openuricontextmenu.py and slightly changed
-# to work with Python functions
-RE_DELIM = re.compile(r'[\w#/\?:%@&\=\+\.\\~-]+', re.UNICODE|re.MULTILINE)
-
-BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
-
-# function name -> quicktorial id mapping
-QUICKTORIAL_KEYWORDS = {
-        'rect': 'rect01',
-        'oval': 'ellipse01',
-        'var': 'var01'
-        }
+    print('Shoebot executable not found.')
 
 
-ui_str = """
-<ui>
-  <menubar name="MenuBar">
-    <menu name="ShoebotMenu" action="Shoebot">
-      <placeholder name="ShoebotOps_1">
-        <menuitem name="Run in Shoebot" action="ShoebotRun"/>
-        <separator/>
-        <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
-        <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
-        <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
-      </placeholder>
-    </menu>
-  </menubar>
-</ui>
-"""
-
-def get_child_by_name(parent, name):
-    """
-    Iterate through a gtk container, `parent`, 
-    and return the widget with the name `name`.
-    """
-    # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
-    def iterate_children(widget, name):
-        if widget.get_name() == name:
-            return widget
-        try:
-            for w in widget.get_children():
-                result = iterate_children(w, name)
-                if result is not None:
-                    return result
-                else:
-                    continue
-        except AttributeError:
-            pass
-    return iterate_children(parent, name)
-
-
-import threading
-import subprocess
-
-class ShoebotThread(threading.Thread):
-    ''' 
-    Run shoebot in seperate thread
-    '''
-    # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-    def __init__(self, cmd, textbuffer, workingdir = None):
-        self.cmd = cmd
-        self.textbuffer = textbuffer
-        self.workingdir = workingdir
-        self.stdout = None
-        self.stderr = None
-        threading.Thread.__init__(self)
-
-    def run(self):
-        textbuffer = self.textbuffer
-        
-        try:
-            proc = subprocess.Popen(self.cmd,
-                                 shell=False,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 cwd=self.workingdir)
-        except OSError as e:
-            if e.errno == 2:
-                textbuffer.insert(textbuffer.get_end_iter(), 'Shoebot executable sbot not found in path.')
-            else:
-                textbuffer.insert(textbuffer.get_end_iter(), str(e))
-            return
-            
-
-        textbuffer.set_text('')
-        #self.stdout, self.stderr = proc.communicate()
-
-        panel = Gedit.App.get_default().get_active_window().get_bottom_panel()
-        visible = panel.get_property("visible")
-        while proc.poll() is None:
-            line = proc.stdout.readline()
-            if line:
-                # Process output here
-                textbuffer.insert(textbuffer.get_end_iter(), line)
-                if not visible:
-                    panel.set_property("visible", True)
-        if proc.returncode != 0:
-            panel.set_property("visible", True)
-
-
-class ShoebotWindowHelper:
+class ShoebotWindowHelper(object):
     def __init__(self, plugin, window):
+        self.example_bots = {}
+
         self.window = window
         panel = window.get_bottom_panel()
-        self.output_widget = get_child_by_name(panel, 'shoebot-output')
+        self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
 
         self.plugin = plugin
         self.insert_menu()
-        self.shoebot_window = None
         self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
@@ -125,37 +28,66 @@ class ShoebotWindowHelper:
         self.use_fullscreen = False
 
         self.started = False
-        self.shoebot_thread = None
-
+        
         for view in self.window.get_views():
             self.connect_view(view)
 
+        self.bot = None
+    
     def deactivate(self):
         self.remove_menu()
         self.window = None
         self.plugin = None
-        self.action_group = None
-        del self.shoebot_window
 
     def insert_menu(self):
+        examples_xml, example_actions, submenu_actions = gtk3_utils.examples_menu()
+        ui_str = gtk3_utils.gedit3_menu(examples_xml)
+
         manager = self.window.get_ui_manager()
         self.action_group = Gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
-            ("Shoebot", None, _("Shoebot"), None, _("Shoebot"), None),
+            ("Shoebot", None, _("Shoe_bot"), None, _("Shoebot"), None),
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
+            ('ShoebotOpenExampleMenu', None, _('E_xamples'), None, None, None)
             ])
+
+        for action, label in example_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, self.on_open_example)])
+
+        for action, label in submenu_actions:
+            self.action_group.add_actions([(action, None, (label), None, None, None)])
+
         self.action_group.add_toggle_actions([
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
             ])
         manager.insert_action_group(self.action_group)
+        
         self.ui_id = manager.add_ui_from_string(ui_str)
+        manager.ensure_update()
+
+    def on_open_example(self, action):
+        example_dir = ide_utils.get_example_dir()
+        filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
+        
+        uri = "file:///" + pathname2url(filename)
+        gio_file = Gio.file_new_for_uri(uri)
+        self.window.create_tab_from_location(
+            gio_file,
+            None,  # encoding
+            0,
+            0,     # column
+            False, # Do not create an empty file
+            True)  # Switch to the tab
 
     def remove_menu(self):
         manager = self.window.get_ui_manager()
-        manager.remove_ui(self.ui_id)
         manager.remove_action_group(self.action_group)
+        for bot, ui_id in self.example_bots.items():
+            manager.remove_ui(ui_id)
+        manager.remove_ui(self.ui_id)
+
         # Make sure the manager updates
         manager.ensure_update()
 
@@ -169,10 +101,28 @@ class ShoebotWindowHelper:
             self.started = True
 
     def on_run_activate(self, action):
+        self.start_shoebot()
+
+    def start_shoebot(self):
+        if not which('sbot'):
+            textbuffer = self.output_widget.get_buffer()
+            textbuffer.set_text('Cannot find sbot in path.')
+            while Gtk.events_pending():
+               Gtk.main_iteration()
+            return False
+            
+        if self.bot and self.bot.process.poll() == None:
+            print('Has a bot already')
+            return False
+        
         # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
             return
+
+        title = '%s - Shoebot on gedit' % doc.get_short_name_for_display()
+        cwd = os.path.dirname(doc.get_uri_for_display()) or None
+
         start, end = doc.get_bounds()
         code = doc.get_text(start, end, False)
         if not code:
@@ -180,98 +130,43 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
+        while Gtk.events_pending():
+           Gtk.main_iteration()
 
-        command = ['sbot', '-w', '-t%s - Shoebot on gedit' % doc.get_short_name_for_display()]
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
 
-        if self.use_socketserver:
-            command.append('-p')
+        GObject.idle_add(self.update_shoebot)
 
-        if not self.show_varwindow:
-            command.append('-dv')
+    def update_shoebot(self):
+        if self.bot:
+            textbuffer = self.output_widget.get_buffer()
+            for stdout_line, stderr_line, running in self.bot.get_output():
+                if stdout_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
+                if stderr_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+            self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+            while Gtk.events_pending():
+                Gtk.main_iteration()
 
-        if self.use_fullscreen:
-            command.append('-f')
-
-        command.append(code)
-
-        self.shoebot_thread = ShoebotThread(command, textbuffer)
-        self.shoebot_thread.start()
+        return self.bot.running
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
+
     def toggle_var_window(self, action):
         self.show_varwindow = action.get_active()
+
     def toggle_fullscreen(self, action):
-        #no full screen for you!
-        self.use_fullscreen = False
-        #self.use_fullscreen = action.get_active()
-        
-    # Right-click menu items (for quicktorials)
+        self.use_fullscreen = action.get_active()
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
-        handler_id = view.connect('populate-popup', self.on_view_populate_popup)
-        view.set_data(self.id_name, [handler_id])
+        #handler_id = view.connect('populate-popup', self.on_view_populate_popup)
+        #view.set_data(self.id_name, [handler_id])
 
+        pass
 
-    def on_view_populate_popup(self, view, menu):
-        # taken from gedit-plugins-python-openuricontextmenu
-        doc = view.get_buffer()
-        win = view.get_window(Gtk.TextWindowType.TEXT)
-        ptr_window, x, y, mod = win.get_pointer()
-        x, y = view.window_to_buffer_coords(Gtk.TextWindowType.TEXT, x, y) 
-
-        # first try at pointer location
-        insert = view.get_iter_at_location(x, y)
-
-        # second try at cursor
-        if insert == None:
-            insert = doc.get_iter_at_mark(doc.get_insert())
-
-        while insert.forward_char():
-            if not RE_DELIM.match(insert.get_char()):
-                break
-
-        start = insert.copy()
-        while start.backward_char():
-            if not RE_DELIM.match(start.get_char()):
-                start.forward_char()
-                break
-
-        word = unicode(doc.get_text(start, insert, False))
-
-        if len(word) == 0:
-            return True
-
-        word = self.validate_word(word)
-        if not word:
-            return True
-
-        open_quicktorial_item = Gtk.ImageMenuItem(_("Know more about '%s'") % (word))
-        open_quicktorial_item.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU))
-        open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
-        open_quicktorial_item.show()
-
-        separator = Gtk.SeparatorMenuItem()
-        separator.show()
-
-        menu.prepend(separator)
-        menu.prepend(open_quicktorial_item)
-
-    def validate_word(self, word):
-        if word in QUICKTORIAL_KEYWORDS:
-            return word
-        return None
-
-    def on_open_quicktorial(self, menu_item, word):
-        self.open_quicktorial(word)
-        return True
-
-    def open_quicktorial(self, word):
-        import webbrowser
-        q_id = QUICKTORIAL_KEYWORDS[word]
-        url = BASE_QUICKTORIAL_URL % q_id
-        webbrowser.open(url)
 
 class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
     window = GObject.property(type=Gedit.Window)
@@ -296,10 +191,10 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         scrolled_window.add(self.text)
         scrolled_window.show_all()
         
-        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)
+        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)   
+        self.output_widget = scrolled_window
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
-
 
     def do_deactivate(self):
         self.panel.remove_item(self.text)
@@ -308,6 +203,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         for tfilename in self.tempfiles:
             os.remove(tfilename)
 
+        self.panel.remove_item(self.output_widget)
 
     def do_update_state(self):
         self.instances[self.window].update_ui()

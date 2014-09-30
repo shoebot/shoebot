@@ -36,6 +36,7 @@ __license__   = "GPL"
 import os
 import re
 import difflib
+import zipfile
 from glob import glob
 from math import degrees, radians, sin, cos, atan2, sqrt
 from math import floor, ceil
@@ -44,7 +45,7 @@ from xml.dom.minidom import parseString
 from random import random, choice
 
 try:
-    from shoebot.core import Bot
+    from shoebot.grammar import Bot
     from shoebot.data import Grob
     from shoebot import _restore, _save    
 except ImportError:
@@ -2499,6 +2500,23 @@ class ColorTheme(_list):
         path = os.path.join(self.cache, self.name+".xml")
         if os.path.exists(path):
             self._load(self.top, self.blue)
+        elif name and zipfile.is_zipfile(os.path.join(self.cache + '.zip')):
+            # Handle colors in a zipfile... the top level folder should be named the same
+            # as the folder, e.g. 'aggregated'
+            archive = self.cache + '.zip'
+            zf = zipfile.ZipFile(archive, 'r')
+            zpath = os.path.join(os.path.basename(self.cache), self.name + ".xml")
+            try:
+                zi = zf.getinfo(zpath)
+                self.cache = zi
+                self._load(self.top, self.blue, archive=zf, member=zi.filename)
+            except KeyError:
+                for fn in zf.namelist():
+                    if os.path.basename(fn) == self.name + '.xml':
+                        zi = zf.getinfo(fn)
+                        self.cache = zi
+                        self._load(self.top, self.blue, archive=zf, member=zi.filename)
+                        break
         else:
             a = aggregated(self.cache)
             for key in a:
@@ -2649,17 +2667,23 @@ class ColorTheme(_list):
         f.write(self.xml)
         f.close()
     
-    def _load(self, top=5, blue="blue"):
+    def _load(self, top=5, blue="blue", archive=None, member=None):
 
         """ Loads a theme from aggregated web data.
        
         The data must be old-style Prism XML: <color>s consisting of <shade>s.
         Colors named "blue" will be overridden with the blue parameter.
-        
+
+        archive can be a file like object (e.g. a ZipFile)
+        and will be used along with 'member' if specified.
         """
-        
-        path = os.path.join(self.cache, self.name+".xml")
-        xml = open(path).read()
+
+        if archive is None:
+            path = os.path.join(self.cache, self.name+".xml")
+            xml = open(path).read()
+        else:
+            assert member is not None
+            xml = archive.read(member)
         dom = parseString(xml).documentElement
         
         attr = lambda e, a: e.attributes[a].value
@@ -3048,7 +3072,9 @@ def noshadow():
     shadow(alpha=0)
 
 class gradientpath(Grob):
-    
+    #
+    # This is heavily based on Core Image + will need to be reimplemented.
+    #
     def __init__(self, path, clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
         
         """ Fills a path with a smooth gradient between two colors.
@@ -3232,6 +3258,10 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
             _ctx.pop()
     
     _ctx.reset()
+
+
+#1.9.4.7-sb.2
+#Added ability to load aggregated color xml files from zip
 
 
 #1.9.4.7-sb
