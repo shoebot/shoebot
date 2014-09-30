@@ -89,14 +89,14 @@ class Text(Grob, ColorMixin):
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
         #we use a new CairoContext to pre render the text
-        self._pang_ctx = pangocairo.CairoContext(cairo.Context(RecordingSurfaceA8(0, 0)))
-        self.layout = self._pang_ctx.create_layout()
+        ctx = cairo.Context(RecordingSurfaceA8(1, 1))
+        self.layout = PangoCairo.create_layout(ctx)
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
         self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
-        self.layout.set_text(self.text)
+        self.layout.set_text(self.text, -1)
         # check if max text width is set and pass it to pango layout
         # text will wrap, meanwhile it checks if and indent has to be applied
         # indent is subordinated to width because it makes no sense on a single-line text block
@@ -128,9 +128,8 @@ class Text(Grob, ColorMixin):
         # then we create a pango layout
         
         # we update the context as we already used a null one on the pre-rendering
-        # supposedly there should not be a big performance penalty 
-        self._pang_ctx = pangocairo.CairoContext(ctx)
-        self._pang_ctx.update_layout(self.layout)
+        # supposedly there should not be a big performance penalty
+        PangoCairo.update_layout(self.layout, ctx)
 
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
@@ -141,31 +140,31 @@ class Text(Grob, ColorMixin):
             
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
-            self._pang_ctx.show_layout(self.layout)
-            self._pang_ctx.update_layout(self.layout)
+            self.layout.show_layout(ctx)
+            self.layout.update_layout(ctx)
         
 
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
-    #def _get_baseline(self):
-        #self.iter = self.layout.get_iter()
-        #baseline_y = self.iter.get_baseline()
-        #baseline_delta = baseline_y/Pango.SCALE
-        #return (baseline_delta)
-    #baseline = property(_get_baseline)
-
     def _get_baseline(self):
-        # retrieves first line of text block
-        first_line = self.layout.get_line(0)
-        # get the logical extents rectangle of first line
-        first_line_extent = first_line.get_extents()[1]
-        # get the descent value, in order to calculate baseline position
-        first_line_descent = Pango.DESCENT(first_line.get_extents()[1])
-        # gets the baseline offset from the top of thext block
-        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
+        self.iter = self.layout.get_iter()
+        baseline_y = self.iter.get_baseline()
+        baseline_delta = baseline_y/Pango.SCALE
         return (baseline_delta)
     baseline = property(_get_baseline)
+
+#    def _get_baseline(self):
+#        # retrieves first line of text block
+#        first_line = self.layout.get_line(0)
+#        # get the logical extents rectangle of first line
+#        first_line_extent = first_line.get_extents()[1]
+#        # get the descent value, in order to calculate baseline position
+#        first_line_descent = Pango.DESCENT(first_line.get_extents()[1])
+#        # gets the baseline offset from the top of thext block
+#        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
+#        return (baseline_delta)
+#    baseline = property(_get_baseline)
 
     
     def _get_metrics(self):
@@ -183,12 +182,11 @@ class Text(Grob, ColorMixin):
         tempCairoContext = cairo.Context(RecordingSurfaceA8(1, 1))
         tempCairoContext.move_to(self.x,self.y-self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
-        tempPangoCairoContext = pangocairo.CairoContext(tempCairoContext)
         
         # supposedly showlayout should work, but it fills the path instead,
         # therefore we use layout_path instead to render the layout to pangoCairoContext
         #tempPangoCairoContext.show_layout(self.layout) 
-        tempPangoCairoContext.layout_path(self.layout)
+        self.layout.layout_path(tempCairoContext)
         #here we extract the path from the temporal cairo.Context we used to draw on the previous step
         pathdata = tempCairoContext.copy_path()
         
