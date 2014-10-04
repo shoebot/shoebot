@@ -5,12 +5,11 @@ from StringIO import StringIO
 import os.path
 from sys import platform
 
-import cairo
+import cairocffi as cairo
 from PIL import Image as PILImage
-import gtk
 
 try:
-    from gi.repository import Gtk
+    from pgi.repository import Gtk, GdkPixbuf
 except:
     Gtk = None
 
