@@ -1,4 +1,4 @@
-from gi.repository import Gdk, Gtk
+from pgi.repository import Gdk, Gtk
 
 from shoebot.grammar import InputDeviceMixin
 

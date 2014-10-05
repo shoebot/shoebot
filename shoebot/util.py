@@ -35,7 +35,7 @@ import os
 import string
 # import data
 import ctypes
-import cairo
+import cairocffi as cairo
 '''
 def rgb_to_hsl(r, g, b):
     """Converts RGB values to the HSL colourspace. """
@@ -177,7 +177,7 @@ def rgb_to_hsv(r, g, b):
     #return stringImage
 
 
-from cairo import SVGSurface
+from cairocffi import SVGSurface
 
 _svg_surface = None
 

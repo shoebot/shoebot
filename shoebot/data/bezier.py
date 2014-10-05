@@ -6,7 +6,7 @@ from basecolor import ColorMixin
 from shoebot.util import RecordingSurface
 from math import pi as _pi, sqrt
 
-import cairo
+import cairocffi as cairo
 import geometry
 
 CENTER = 'center'

@@ -35,7 +35,7 @@ import sys
 import shoebot
 import locale, gettext
 import math as _math
-import cairo
+import cairocffi as cairo
 from shoebot.core.drawqueue import DrawQueue
 
 APP = 'shoebot'

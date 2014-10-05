@@ -1,7 +1,7 @@
 #from __future__ import division
 import sys, os
-from gi.repository import Gtk
-import cairo
+from pgi.repository import Gtk
+import cairocffi as cairo
 from socket_server import SocketServerMixin
 
 from shoebot.core import DrawQueueSink
@@ -69,8 +69,8 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
 
         cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
-        cr.rectangle(event.area.x, event.area.y,
-                event.area.width, event.area.height)
+        cr.rectangle(0, 0,
+                source_width, source_height)
         if self.first_run:
             cr.set_operator(cairo.OPERATOR_OVER)
         else:
@@ -84,7 +84,7 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
         Uses a proxy to an SVGSurface to render on so 
         it's scalable
         '''
-        if self.window and not self.size:
+        if self.get_window() and not self.size:
             self.set_size_request(*size)
             self.size = size
             while Gtk.events_pending():

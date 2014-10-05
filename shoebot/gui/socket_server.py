@@ -3,7 +3,7 @@ gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
 import sys
-from gi.repository import GObject
+from pgi.repository import GObject
 import socket
 import gettext, locale
 APP = 'shoebot'

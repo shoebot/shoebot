@@ -3,7 +3,7 @@
 #
 
 import sys
-import cairo
+import cairocffi as cairo
 from math import sin, cos
 from bezier import BezierPath
 from shoebot import ShoebotError

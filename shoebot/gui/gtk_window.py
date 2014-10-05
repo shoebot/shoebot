@@ -1,6 +1,6 @@
 import os
 import sys
-from gi.repository import Gtk, GObject
+from pgi.repository import Gtk, GObject
 
 from collections import deque
 from shoebot.gui import ShoebotWidget, VarWindow, SocketServerMixin

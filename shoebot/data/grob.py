@@ -1,4 +1,4 @@
-import cairo
+import cairocffi as cairo
 
 CENTER = 'center'
 CORNER = 'corner'
