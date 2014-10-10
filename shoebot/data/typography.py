@@ -64,16 +64,16 @@ class Text(Grob, ColorMixin):
         self._indent = kwargs.get("indent")
 
         # we use the pango parser instead of trying this by hand
-        self._fontface = Pango.FontDescription(self._fontfile)
+        #self._fontface = Pango.FontDescription(self._fontfile)
+        self._fontface = Pango.FontDescription.from_string(self._fontfile)
                                                       
         # then we set fontsize (multiplied by Pango.SCALE)
         self._fontface.set_absolute_size(self._fontsize*Pango.SCALE)
 
         # the style
         self._style = Pango.Style.NORMAL
-        if kwargs.has_key("style"):
-            if kwargs["style"]=="italic" or kwargs["style"]=="oblique":
-                self._style = Pango.Style.ITALIC
+        if kwargs.get("style") in ["italic", "oblique"]:
+            self._style = Pango.Style.ITALIC
         self._fontface.set_style(self._style)
         
         #we need to pre-render some stuff to enable metrics sizing
