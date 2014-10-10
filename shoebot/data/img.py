@@ -9,7 +9,7 @@ import cairocffi as cairo
 from PIL import Image as PILImage
 
 try:
-    from pgi.repository import Gtk, GdkPixbuf
+    from pgi.repository import Gtk, Gdk, GdkPixbuf
 except:
     Gtk = None
 
