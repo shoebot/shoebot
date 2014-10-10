@@ -17,5 +17,5 @@
 
 Pillow==2.6.0
 numpy==1.6.2
-pgi=0.0.9
+pgi==0.0.9
 cairocffi=0.5.4
