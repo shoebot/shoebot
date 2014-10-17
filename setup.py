@@ -12,7 +12,7 @@ EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
 from distutils.core import setup
-from setuptools import find_package
+from setuptools import find_packages
 
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
