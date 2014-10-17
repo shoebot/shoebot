@@ -1,12 +1,4 @@
-# requirements file for readthedocs
-
-cairocffi
 sphinx
-./sphinxcontrib_shoebot
-
-sphinx_rtd_theme
-
-
-## experimenting with settings to get this working on readthedocs 
-# -e git+https://github.com/shoebot/shoebot.git@readthedocs#egg=sphinxcontrib_shoebot&subdirectory=doc/sphinxcontrib_shoebot
-#-e git+https://github.com/shoebot/shoebot.git#egg=sphinx_shoebot&subdirectory=doc/extension
+sphinx-rtd-theme
+sphinxcontrib-shoebot
+shoebot
