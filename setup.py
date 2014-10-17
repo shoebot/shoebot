@@ -2,8 +2,9 @@
 
 # Shoebot setup script
 #
-# 'python setup.py install', or
-# 'python setup.py --help' for more options
+#    python setup.py install', or
+#    python setup.py --help' for more options
+#
 
 # the following libraries will not be installed
 
@@ -11,6 +12,7 @@ EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
 from distutils.core import setup
+from setuptools import find_package
 
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
@@ -40,7 +42,7 @@ setup(name = "shoebot",
     author_email = "r@sollec.org",
     license = 'GPL v3',
     url = "http://shoebot.net",
-    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics", "shoebot.grammar.nodebox-lib.nodebox.geo"],
+    packages = find_packages(),
     data_files = datafiles,
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
