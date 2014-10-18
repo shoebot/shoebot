@@ -19,7 +19,7 @@ Example::
 
 setup(
     name='sphinxcontrib-shoebot',
-    version='1.0c',
+    version='0.9.9',
     url='https://github.com/shoebot/shoebot/tree/readthedocs/doc/sphinxcontrib_shoebot',
     license='BSD',
     author='Stuart Axon',
@@ -41,6 +41,6 @@ setup(
     platforms='any',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=requires,
+    #install_requires=requires,
     namespace_packages=['sphinxcontrib'],
 )
