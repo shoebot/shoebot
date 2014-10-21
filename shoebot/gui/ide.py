@@ -634,7 +634,7 @@ class View(Gtk.Window):
         # setup syntax highlighting
         manager = GtkSource.LanguageManager()
         ##language = manager.get_language_from_mime_type("text/x-python")
-        language = manager.get_language("text/x-python")
+        language = manager.guess_language(None, "text/x-python")
         buffer.set_language(language)
         ##buffer.set_highlight(True)
 
