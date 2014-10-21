@@ -1,43 +1,56 @@
 #!/usr/bin/env python2
 # -*- coding: iso-8859-1 -*-
 
-import gi
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+    import gi
+
 gi.require_version('Gtk', '3.0')
-import sys, os, errno
+
+import errno
+import os
+import sys
+
 from gi.repository import GObject
+from gi.repository import Gdk
 from gi.repository import Gtk
+from gi.repository import GtkSource
 from gi.repository import Pango
+
 import shoebot
 
 # for gtksourceview/gtksourceview2 compatibility
-try:
-    import gtksourceview
-
-except ImportError:
-    from gi.repository import GtkSource
-
-    class gtksourceview_SourceBuffer(GtkSource.Buffer):
-        def set_highlight(self, bool):
-            return self.set_highlight_syntax(bool)
-
-    class gtksourceview_SourceLanguagesManager(GtkSource.LanguageManager):
-        def get_language_from_mime_type(self, mime_types):
-            lang_manager = GtkSource.LanguageManager.get_default()
-            lang_result = None
-            for lang_id in lang_manager.get_language_ids():
-                 lang = lang_manager.get_language(lang_id)
-                 if mime_types in lang.get_mime_types():
-                      lang_result = lang
-                      break
-
-            return lang_result
-
-    gtksourceview = gtksourceview2
-    gtksourceview.SourceBuffer = gtksourceview_SourceBuffer
-    gtksourceview.SourceView = GtkSource.View
-    gtksourceview.SourceLanguagesManager = gtksourceview_SourceLanguagesManager
-    del gtksourceview_SourceBuffer
-    del gtksourceview_SourceLanguagesManager
+# try:
+#     import gtksourceview
+#
+# except ImportError:
+#     from gi.repository import GtkSource
+#
+#     class gtksourceview_SourceBuffer(GtkSource.Buffer):
+#         def set_highlight(self, bool):
+#             return self.set_highlight_syntax(bool)
+#
+#     class gtksourceview_SourceLanguagesManager(GtkSource.LanguageManager):
+#         def get_language_from_mime_type(self, mime_types):
+#             lang_manager = GtkSource.LanguageManager.get_default()
+#             lang_result = None
+#             for lang_id in lang_manager.get_language_ids():
+#                  lang = lang_manager.get_language(lang_id)
+#                  if mime_types in lang.get_mime_types():
+#                       lang_result = lang
+#                       break
+#
+#             return lang_result
+#
+#     gtksourceview = gtksourceview2
+#     gtksourceview.SourceBuffer = gtksourceview_SourceBuffer
+#     gtksourceview.SourceView = GtkSource.View
+#     gtksourceview.SourceLanguagesManager = gtksourceview_SourceLanguagesManager
+#     del gtksourceview_SourceBuffer
+#     del gtksourceview_SourceLanguagesManager
 
 
 from shoebot import ShoebotError
@@ -102,7 +115,7 @@ def hue_to_color(hue):
     return (h*65535, s*65535, v*65535)
 
 
-class Buffer(gtksourceview.SourceBuffer):
+class Buffer(GtkSource.Buffer):
     N_COLORS = 16
     PANGO_SCALE = 1024
 
@@ -125,7 +138,7 @@ class Buffer(gtksourceview.SourceBuffer):
                                                 foreground="purple")
         self.found_text_tag = self.create_tag(foreground="red")
 
-        tabs = Pango.TabArray(4, True)
+        tabs = Pango.TabArray.new(4, True)
         tabs.set_tab(0, Pango.TabAlign.LEFT, 10)
         tabs.set_tab(1, Pango.TabAlign.LEFT, 30)
         tabs.set_tab(2, Pango.TabAlign.LEFT, 60)
@@ -407,28 +420,27 @@ class Buffer(gtksourceview.SourceBuffer):
 
 class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
 
-	CWD = None
+    CWD = None
 
-	def __init__ (self, *args, **kwargs):
-		super (ShoebotFileChooserDialog, self).__init__ (*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ShoebotFileChooserDialog, self).__init__ (*args, **kwargs)
 
-		# set some defaults
-		self.set_default_response (Gtk.ResponseType.OK)
-		self.set_property ('do-overwrite-confirmation', True)
+        # set some defaults
+        self.set_default_response (Gtk.ResponseType.OK)
+        self.set_property('do-overwrite-confirmation', True)
 
-		# set the working directory if available
-		if ShoebotFileChooserDialog.CWD is not None:
-			self.set_current_folder (ShoebotFileChooserDialog.CWD)
+        # set the working directory if available
+        if ShoebotFileChooserDialog.CWD is not None:
+            self.set_current_folder(ShoebotFileChooserDialog.CWD)
 
-	def run (self):
-		response = super (ShoebotFileChooserDialog, self).run ()
+    def run(self):
+        response = super (ShoebotFileChooserDialog, self).run()
 
-		# get the working directory if the user clicked accepted the action
-		if response == Gtk.ResponseType.ACCEPT:
-			ShoebotFileChooserDialog.CWD = self.get_current_folder ()
+        # get the working directory if the user clicked accepted the action
+        if response == Gtk.ResponseType.ACCEPT:
+            ShoebotFileChooserDialog.CWD = self.get_current_folder()
 
-		return response
-
+        return response
 
 
 class ConsoleWindow:
@@ -448,16 +460,20 @@ class ConsoleWindow:
         self.text_area.modify_text(Gtk.StateType.NORMAL, Gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
-        self.stdout_tag = Gtk.TextTag("stdout")
-        self.stdout_tag.set_property("foreground", "black")
-        self.stdout_tag.set_property("style", "normal")
+        ##self.stdout_tag = Gtk.TextTag("stdout")
+        ##self.stdout_tag.set_property("foreground", "black")
+        ##self.stdout_tag.set_property("style", "normal")
         #self.stdout_tag.set_property("weight", 600)   
-        #self.stdout_tag.set_property("size-points", 9)     
-        self.tag_table.add(self.stdout_tag)
-        self.system_message_tag = Gtk.TextTag("system")
-        self.system_message_tag.set_property("foreground", "white")
-        self.system_message_tag.set_property("style", "normal")
-        self.tag_table.add(self.system_message_tag)
+        #self.stdout_tag.set_property("size-points", 9)
+
+        self.stdout_tag = self.text_buffer.create_tag("system", foreground="black", style="normal", weight=600, size_points=9)
+        self.system_message_tag = self.text_buffer.create_tag("system", foreground="white", style="normal")
+
+        ##self.tag_table.add(self.stdout_tag)
+        ##self.system_message_tag = Gtk.TextTag("system")
+        ##self.system_message_tag.set_property("foreground", "white")
+        ##self.system_message_tag.set_property("style", "normal")
+        ##self.tag_table.add(self.system_message_tag)
         self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
 
 
@@ -480,7 +496,7 @@ class ConsoleWindow:
             self.message = ""
         # this is the trick to make gtk refresh the window                    
         while Gtk.events_pending():
-            Gtk.main_iteration(False)        
+            Gtk.main_iteration()
 
 
 class Stdout_Filter(object):
@@ -493,7 +509,7 @@ class Stdout_Filter(object):
 
     
 class View(Gtk.Window):
-    GObject.type_register (ShoebotFileChooserDialog)
+    ## Gtk3 TODO - GObject.type_register(ShoebotFileChooserDialog)
     FONT = None
     
     def __init__(self, buffer=None):
@@ -533,16 +549,17 @@ class View(Gtk.Window):
 
         buffer.ref()
 
-        if not TestText.colormap:
-            TestText.colormap = self.get_colormap()
+        ## Gtk3.TODO
+        ##if not TestText.colormap:
+        ##    TestText.colormap = self.get_colormap()
 
         self.connect("delete_event", self.delete_event_cb)
 
         self.accel_group = Gtk.AccelGroup()
-        self.item_factory = Gtk.ItemFactory(Gtk.MenuBar, "<main>",
-                                        self.accel_group)
-        self.item_factory.set_data("view", self)
-        self.item_factory.create_items(menu_items)
+        ##self.item_factory = Gtk.ItemFactory(Gtk.MenuBar, "<main>",
+        ##                                self.accel_group)
+        ##self.item_factory.set_data("view", self)
+        ##self.item_factory.create_items(menu_items)
 
         self.add_accel_group(self.accel_group)
         
@@ -551,13 +568,14 @@ class View(Gtk.Window):
         hpaned.add1(vbox)
         self.add(hpaned)
 
-        vbox.pack_start(self.item_factory.get_widget("<main>", True, True, 0),
-                        False, False, 0)
+        ##vbox.pack_start(self.item_factory.get_widget("<main>", True, True, 0),
+        ##                False, False, 0)
 
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
-        self.text_view = gtksourceview.SourceView(buffer)
+        ## self.text_view = gtksourceview.SourceView(buffer)
+        self.text_view = GtkSource.View.new_with_buffer(buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
@@ -565,25 +583,25 @@ class View(Gtk.Window):
         # FIXME: the following 2 lines don't have any effect :/
         self.text_view.tab_width = 4
         self.text_view.indent_width = 4
-        self.text_view.connect("expose_event", self.tab_stops_expose)
+        ##self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
         
         if View.FONT is None:
-             # Get font or fallback
-	     context = self.text_view.get_pango_context()
-	     fonts = context.list_families()
-	     for font in fonts:
-                 if font.get_name() == 'Bitstream Vera Sans Mono':
-                 	 View.FONT = 'Bitstream Vera Sans Mono 8'
-                 	 break
-	     else:
-	         print 'Bitstream Vera Font not found.'
-	         print 'Download and install it from here'
-	         print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
-	         View.FONT = 'Mono 8'
+            # Get font or fallback
+            context = self.text_view.get_pango_context()
+            fonts = context.list_families()
+            for font in fonts:
+                if font.get_name() == 'Bitstream Vera Sans Mono':
+                    View.FONT = 'Bitstream Vera Sans Mono 8'
+                    break
+            else:
+                print 'Bitstream Vera Font not found.'
+                print 'Download and install it from here'
+                print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
+                View.FONT = 'Mono 8'
 
-        self.text_view.modify_font(Pango.FontDescription(View.FONT))
+        ##self.text_view.modify_font(Pango.FontDescription(View.FONT))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
@@ -593,9 +611,9 @@ class View(Gtk.Window):
         # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
         # we redirect stderr
-        sys.stderr = self.console_error
+        ##sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
-        sys.stdout = self.stdout_filter
+        ##sys.stdout = self.stdout_filter
         # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
@@ -614,10 +632,11 @@ class View(Gtk.Window):
         self.go_fullscreen = False
 
         # setup syntax highlighting
-        manager = gtksourceview.SourceLanguagesManager()
-        language = manager.get_language_from_mime_type("text/x-python")
+        manager = GtkSource.LanguageManager()
+        ##language = manager.get_language_from_mime_type("text/x-python")
+        language = manager.get_language("text/x-python")
         buffer.set_language(language)
-        buffer.set_highlight(True)
+        ##buffer.set_highlight(True)
 
         self.shoebot_window = None
 
@@ -871,23 +890,23 @@ class View(Gtk.Window):
         wrap_mode = text_view.get_wrap_mode()
         menu_item = None
 
-        if direction == Gtk.TextDirection.LTR:
-            menu_item = self.item_factory.get_widget("/Settings/Left-to-Right")
-        elif direction == Gtk.TextDirection.RTL:
-            menu_item = self.item_factory.get_widget("/Settings/Right-to-Left")
+        ##if direction == Gtk.TextDirection.LTR:
+        ##    menu_item = self.item_factory.get_widget("/Settings/Left-to-Right")
+        ##elif direction == Gtk.TextDirection.RTL:
+        ##    menu_item = self.item_factory.get_widget("/Settings/Right-to-Left")
 
         if menu_item:
             menu_item.activate()
 
-        if wrap_mode == Gtk.WrapMode.NONE:
-            menu_item = self.item_factory.get_widget("/Settings/Wrap Off")
-        elif wrap_mode == Gtk.WrapMode.WORD:
-            menu_item = self.item_factory.get_widget("/Settings/Wrap Words")
-        elif wrap_mode == Gtk.WrapMode.CHAR:
-            menu_item = self.item_factory.get_widget("/Settings/Wrap Chars")
+        ##if wrap_mode == Gtk.WrapMode.NONE:
+        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Off")
+        ##elif wrap_mode == Gtk.WrapMode.WORD:
+        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Words")
+        ##elif wrap_mode == Gtk.WrapMode.CHAR:
+        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Chars")
 
-        if menu_item:
-            menu_item.activate()
+        ##if menu_item:
+        ##    menu_item.activate()
 
     def close_view(self):
         TestText.views.remove(self)
@@ -1017,6 +1036,7 @@ class View(Gtk.Window):
 
         # TODO: have a try/except that shows an error window         
 
+
 class Stack(list):
     def __init__(self):
         list.__init__(self)
@@ -1030,7 +1050,8 @@ class Stack(list):
     def get(self):
         return self[0]
 
-class TestText:
+
+class TestText(object):
     untitled_serial = 1
     colormap = None
     active_window_stack = Stack()
