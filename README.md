@@ -60,8 +60,8 @@ Using virtualenvwrapper is the easiest way to get started. First, install the ne
     cd install
     ./install_dependencies.sh
     
-    # Create a new virtualenv
-    mkvirtualenv shoebot-env
+    # Create a new virtualenv using pypy
+    mkvirtualenv shoebot-env -p `which pypy`
     
     # Install Shoebot in the virtualenv
     pip install -r requirements.txt
@@ -76,8 +76,8 @@ Linux wih plain virtualenv:
 
 If you don't use virtualenvwrapper follow these instructions after installing the dependencies.
 
-    # make a new virtualenv environment
-    virtualenv shoebot-env
+    # make a new virtualenv environment using pypy
+    virtualenv shoebot-env -p `which pypy`
     
     # activate it
     source shoebot-env/bin/activate
