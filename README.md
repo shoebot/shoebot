@@ -9,6 +9,7 @@ What you need
 -------------
 
 Shoebot runs on Python 2.7, which is most probably what you already have installed.
+To get better performance you can run using pypy, which is experimental.
 
 
 Installing Shoebot
@@ -62,9 +63,9 @@ Using virtualenvwrapper is the easiest way to get started. First, install the ne
     # Create a new virtualenv
     mkvirtualenv shoebot-env
     
-    # Link in the GTK library and install Shoebot in the virtualenv
-    ./setup_virtualenv.sh shoebot-env
-
+    # Install Shoebot in the virtualenv
+    pip install -r requirements.txt
+    python setup.py install
 
     # To use shoebot in future remember to activate the environment first.
     workon shoebot-env
@@ -80,10 +81,10 @@ If you don't use virtualenvwrapper follow these instructions after installing th
     
     # activate it
     source shoebot-env/bin/activate
-    
-    # Link in the GTK library and install Shoebot in the virtualenv
-    ./setup_virtualenv.sh shoebot-env
 
+    # Install Shoebot in the virtualenv
+    pip install -r requirements.txt
+    python setup.py install
 
     # To use shoebot in future remember to activate the environment first.
     source shoebot-env/bin/activate
