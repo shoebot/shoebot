@@ -1,20 +1,9 @@
 # Shoebot
 #
-# pygtk, pycairo and rsvg - do not play well with virtualenv.
 #
-# Install them into the system python, then use 
-# setup_virtualenv.sh to link them from the virtualenv.
+# As of December 2014, pgi doesn't work with Pango
+# so no text is available yet.
 #
-# Alternately use --system-site-packages when creating your 
-# virtualenv.
-#
-# e.g.  
-#     virtualenv --system-site-packages shoebot-env
-#
-# or with virtualenvwrapper:
-#     mkvirtualenv --system-site-packages shoebot-env
-
-
 Pillow==2.6.1
 numpy==1.9.1
 pgi==0.0.9
