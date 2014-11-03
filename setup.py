@@ -42,6 +42,10 @@ setup(name = "shoebot",
     url = "http://shoebot.net",
     packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics", "shoebot.grammar.nodebox-lib.nodebox.geo"],
     data_files = datafiles,
+    install_requires = [
+        "Pillow",
+        "numpy",
+    ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,
