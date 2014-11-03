@@ -15,5 +15,5 @@
 #     mkvirtualenv --system-site-packages shoebot-env
 
 
-Pillow==2.4.0
-numpy==1.6.2
+Pillow==2.6.1
+numpy==1.9.1
