@@ -45,6 +45,7 @@ setup(name = "shoebot",
     install_requires = [
 	"cairocffi",
         "numpy",
+	"pgi",
         "Pillow",
     ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
