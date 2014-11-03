@@ -43,8 +43,9 @@ setup(name = "shoebot",
     packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics", "shoebot.grammar.nodebox-lib.nodebox.geo"],
     data_files = datafiles,
     install_requires = [
-        "Pillow",
+	"cairocffi",
         "numpy",
+        "Pillow",
     ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
