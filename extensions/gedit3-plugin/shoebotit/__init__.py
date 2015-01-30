@@ -145,6 +145,10 @@ class ShoebotWindowHelper(object):
                     textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
                 if stderr_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+                    offset = textbuffer.get_char_count() - len(stderr_line)
+                    start_iter = textbuffer.get_iter_at_offset(offset)
+                    end_iter = textbuffer.get_end_iter()
+                    textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
             while Gtk.events_pending():
                 Gtk.main_iteration()
@@ -176,12 +180,21 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         self.instances = {}
         self.tempfiles = []
 
-    def do_activate(self):
-        self.text = Gtk.TextView()
-        self.text.set_editable(False)
+    def _create_view(self):
+        """ Create the gtk.TextView used for shell output """
+        view = Gtk.TextView()
+        view.set_editable(False)
+
         fontdesc = Pango.FontDescription("Monospace")
-        self.text.modify_font(fontdesc)
-        self.text.set_name('shoebot-output')
+        view.modify_font(fontdesc)
+        view.set_name('shoebot-output')
+
+        buff = view.get_buffer()
+        buff.create_tag('error', foreground='red')
+        return view
+
+    def do_activate(self):
+        self.text = self._create_view()
         self.panel = self.window.get_bottom_panel()
 
         image = Gtk.Image()
