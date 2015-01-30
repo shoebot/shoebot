@@ -178,7 +178,7 @@ class Grammar(object):
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
             errmsg = traceback.format_exc()
-            print errmsg
+            print >> sys.stderr, errmsg
 
     def finish(self):
         ## For use when using shoebot as a module
