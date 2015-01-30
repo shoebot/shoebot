@@ -140,7 +140,7 @@ class ShoebotWindowHelper(object):
     def update_shoebot(self):
         if self.bot:
             textbuffer = self.output_widget.get_buffer()
-            for stdout_line, stderr_line, running in self.bot.get_output():
+            for stdout_line, stderr_line in self.bot.get_output():
                 if stdout_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
                 if stderr_line is not None:
