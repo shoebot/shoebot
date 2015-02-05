@@ -25,8 +25,8 @@ class Grammar(object):
         self._iteration = 0
         self._dynamic = True
         self._speed = None
-        self._vars = vars or {}
-        self._oldvars = self._vars
+        self._vars = {}
+        self._oldvars = vars or {}
         self._namespace = namespace or {}
 
         input_device = canvas.get_input_device()
@@ -129,7 +129,30 @@ class Grammar(object):
         self._frame += 1
         self._iteration += 1
 
-    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False):
+    def _simple_traceback(self, ex, source):
+        """
+        Format traceback, showing line number and surrounding source.
+        """
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        exc = traceback.format_exception(exc_type, exc_value, exc_tb)
+        exc_location = exc[-2]
+        exc_error = exc[-1]
+        # extract line number from traceback        
+        line_number = int(exc_location.split(',')[1].replace('line', '').strip())
+
+        source_arr = source.split('\n')
+        line = source_arr[line_number-1]
+
+        # Build error messages
+        err_msgs = []
+        err_msgs.append('Error in the Shoebot script, line %d:' % line_number)
+        for i, line in enumerate(source_arr[line_number-5:line_number], start=line_number):
+            err_msgs.append('%s: %s' % (i -1, line))
+        err_msgs.append('   ^  %s' % exc[-1])
+        return '\n'.join(err_msgs)
+
+
+    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False, verbose = False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
@@ -139,45 +162,66 @@ class Grammar(object):
         :param run_forever: if True will run until the user quits the bot
         :param frame_limiter: Time a frame should take to run (float - seconds)
         '''
+        source = None
+        code = None
+        filename = None
+
         # is it a proper filename?
         if os.path.isfile(inputcode):
-            file = open(inputcode, 'rU')
-            source_or_code = file.read()
-            file.close()
-            self._load_namespace(inputcode)
+            filename = inputcode
+            with open(filename, 'rU') as f:
+                source_or_code = f.read()
+            self._load_namespace(filename)
         else:
             # if not, try parsing it as a code string
+            filename = "shoebot_code"
             source_or_code = inputcode
             self._load_namespace()
 
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
             if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + '\n\n', "shoebot_code", "exec")
-            # do the magic            
-            if not iterations:
-                if run_forever:
-                    iterations = None
-                else:
-                    iterations = 1
-
-            self._start_time = time()
-
-            # First iteration
-            self._exec_frame(source_or_code, limit = frame_limiter)
-
-            # Subsequent iterations
-            while self._should_run(iterations):
-                self._exec_frame(source_or_code, limit = frame_limiter)
-
-            if not run_forever:
-                self._quit = True
-            self._canvas.sink.finish()
-
+                source = source_or_code
+                code = compile(source_or_code + '\n\n', filename, "exec")
         except NameError:
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
             errmsg = traceback.format_exc()
+            print >> sys.stderr, errmsg
+            raise
+
+        # do the magic
+        if not iterations:
+            if run_forever:
+                iterations = None
+            else:
+                iterations = 1
+
+        self._start_time = time()
+
+        try:
+            # First iteration
+            self._exec_frame(code, limit = frame_limiter)
+
+            # Subsequent iterations
+            while self._should_run(iterations):
+                self._exec_frame(code, limit = frame_limiter)
+
+            if not run_forever:
+                self._quit = True
+            self._canvas.finished = True
+            self._canvas.sink.finish()
+
+        except Exception, e: # this makes KeyboardInterrupts still work
+            # if something goes wrong, print verbose system output
+            # maybe this is too verbose, but okay for now
+
+            import sys
+            if verbose:
+                errmsg = traceback.format_exc()
+            else:
+                errmsg = self._simple_traceback(e, source)
+                print ''
             print >> sys.stderr, errmsg
 
     def finish(self):

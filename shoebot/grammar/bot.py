@@ -361,3 +361,7 @@ class Bot(Grammar):
         else:
             return self._speed
 
+    @property
+    def FRAME(self):
+        return self._frame
+
