@@ -12,9 +12,10 @@ dist/*
 # as well as sphinx output
 doc/build/*
 
-# python bytecode files
-*.pyc
-*.pyo
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 # backup files
 *.bak
 *~
