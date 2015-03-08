@@ -5,6 +5,8 @@ Gtk3 support for shoebot in editors and IDEs
 import itertools
 import os
 from shoebotit import ide_utils
+
+from distutils.spawn import find_executable as which
 from gi.repository import Gio, Gtk, GLib
 
 
@@ -139,6 +141,50 @@ def vw_envs(filter=None):
     return sorted(venvs)
 
 
+
+def load_gsettings():
+    schema_id="apps.shoebot.gedit"
+    path="/apps/shoebot/gedit/"
+
+    here=os.path.dirname(os.path.abspath(__file__))
+    #schema_dir=os.path.abspath(os.path.join(here, '../../gedit3-plugin'))
+    schema_dir=here
+    schema_source = Gio.SettingsSchemaSource.new_from_directory(schema_dir,
+                    Gio.SettingsSchemaSource.get_default(), False)
+    schema = Gio.SettingsSchemaSource.lookup(schema_source, schema_id,False)
+    if not schema:
+        raise Exception("Cannot get GSettings  schema")
+    settings = Gio.Settings.new_full(schema, None, path)
+    return settings
+
+
+def sbot_executable():
+    """
+    Find shoebot executable
+    """
+    gsettings=load_gsettings()
+    venv = gsettings.get_string('current-virtualenv')
+    if venv == 'Default':
+        sbot = which('sbot')
+    elif venv == 'System':
+        # find system python
+        env_venv = os.environ['VIRTUAL_ENV']
+        if not env_venv:
+            return which('sbot')
+
+        # First sbot in path that is not in current venv
+        for p in os.environ['PATH'].split(os.path.pathsep):
+            sbot='%s/sbot' % p
+            if not p.startswith(env_venv) and os.path.isfile(sbot):
+                return sbot
+    else:
+        sbot = os.path.join(venv, 'bin/sbot')
+        if not os.path.isfile(sbot):
+            print('Shoebot not found, reverting to System shoebot')
+            sbot = which('sbot')
+    return sbot
+
+
 class VirtualEnvChooser(Gtk.Box):
     """
     Allow the user to choose a virtualenv.
@@ -266,26 +312,9 @@ class ShoebotPreferences(Gtk.Box):
         self.add(label)
         self.pack_start(label, True, True, 0)
 
-        gsettings=self.load_gsettings()
+        gsettings=load_gsettings()
         virtualenv_chooser=VirtualEnvChooser(gsettings=gsettings)
         self.add(virtualenv_chooser)
-
-
-    def load_gsettings(self):
-        schema_id="apps.shoebot.gedit"
-        path="/apps/shoebot/gedit/"
-
-        here=os.path.dirname(os.path.abspath(__file__))
-        #schema_dir=os.path.abspath(os.path.join(here, '../../gedit3-plugin'))
-        schema_dir=here
-        schema_source = Gio.SettingsSchemaSource.new_from_directory(schema_dir,
-                        Gio.SettingsSchemaSource.get_default(), False)
-        schema = Gio.SettingsSchemaSource.lookup(schema_source, schema_id,False)
-        if not schema:
-            raise Exception("Cannot get GSettings  schema")
-        settings = Gio.Settings.new_full(schema, None, path)
-        return settings
-
 
 
 

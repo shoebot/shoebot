@@ -7,8 +7,8 @@ from shoebotit import ide_utils, gtk3_utils
 
 import os
 
-if not which('sbot'):
-    print('Shoebot executable not found.')
+# TODO - Use shoebot from gsettings if available
+#        ide_utils.ShoebotProcess
 
 
 class ShoebotWindowHelper(object):
@@ -104,7 +104,8 @@ class ShoebotWindowHelper(object):
         self.start_shoebot()
 
     def start_shoebot(self):
-        if not which('sbot'):
+        sbot_bin=gtk3_utils.sbot_executable()
+        if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
             while Gtk.events_pending():
@@ -129,11 +130,11 @@ class ShoebotWindowHelper(object):
             return False
 
         textbuffer = self.output_widget.get_buffer()
-        textbuffer.set_text('')
+        textbuffer.set_text('running shoebot at %s\n' % sbot_bin)
         while Gtk.events_pending():
            Gtk.main_iteration()
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
 
         GObject.idle_add(self.update_shoebot)
 
