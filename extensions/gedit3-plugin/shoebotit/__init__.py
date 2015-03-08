@@ -1,7 +1,7 @@
 from distutils.spawn import find_executable as which
 from urllib.request import pathname2url
 
-from gi.repository import Gtk, Gio, GObject, Gedit, Pango
+from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
 
@@ -172,7 +172,7 @@ class ShoebotWindowHelper(object):
         pass
 
 
-class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
+class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable):
     window = GObject.property(type=Gedit.Window)
 
     def __init__(self):
@@ -221,4 +221,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
     def do_update_state(self):
         self.instances[self.window].update_ui()
 
-
+    def do_create_configure_widget(self):
+        widget = gtk3_utils.ShoebotPreferences()    
+        return widget
