@@ -56,7 +56,7 @@ class ShoebotProcess(object):
     def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         if sbot is None:
             sbot = 'sbot'
-        command = ['sbot', '-w', '-t%s' % title]
+        command = [sbot, '-w', '-t%s' % title]
 
         if use_socketserver:
             command.append('-s')
