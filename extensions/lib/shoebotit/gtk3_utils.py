@@ -182,7 +182,7 @@ def sbot_executable():
         if not os.path.isfile(sbot):
             print('Shoebot not found, reverting to System shoebot')
             sbot = which('sbot')
-    return sbot
+    return os.path.realpath(sbot)
 
 
 class VirtualEnvChooser(Gtk.Box):

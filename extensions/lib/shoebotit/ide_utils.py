@@ -56,7 +56,11 @@ class ShoebotProcess(object):
     def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         if sbot is None:
             sbot = 'sbot'
-        command = [sbot, '-w', '-t%s' % title]
+        command = [sbot, '-w', '-t"%s"' % title]
+
+        # Setup environment so shoebot directory is first
+        _env = os.environ.copy()
+        _env['PATH'] = os.path.realpath(os.path.dirname(sbot)) + os.pathsep + os.environ.get('PATH', '')
 
         if use_socketserver:
             command.append('-s')
@@ -69,7 +73,7 @@ class ShoebotProcess(object):
 
         command.append(code)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd, env=_env)
         self.running = True
 
         # Launch the asynchronous readers of the process' stdout and stderr.
