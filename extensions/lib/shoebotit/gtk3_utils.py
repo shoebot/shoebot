@@ -168,7 +168,7 @@ def sbot_executable():
         sbot = which('sbot')
     elif venv == 'System':
         # find system python
-        env_venv = os.environ['VIRTUAL_ENV']
+        env_venv = os.environ.get('VIRTUAL_ENV')
         if not env_venv:
             return which('sbot')
 
