@@ -156,7 +156,7 @@ class Grammar(object):
         err_msgs = []
         err_msgs.append('Error in the Shoebot script, line %d:' % line_number)
         for i, line in enumerate(source_arr[line_number-5:line_number], start=line_number):
-            err_msgs.append('%s: %s' % (i -1, line))
+            err_msgs.append('%s: %s' % (i, line))
         err_msgs.append('   ^  %s' % exc[-1])
         return '\n'.join(err_msgs)
 
