@@ -128,7 +128,9 @@ def find_example_dir():
     """
 
     # Needs to run in same python env as shoebot (may be different to gedits)
-    cmd = ["python", "-c", "import sys; print '{}/share/shoebot/examples/'.format(sys.prefix)"]
+
+    code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'share/shoebot/examples/')"
+    cmd = ["python", "-c", code]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output, errors = p.communicate()
     if errors:

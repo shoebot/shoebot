@@ -10,7 +10,10 @@
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setu
 
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
@@ -34,7 +37,7 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
 setup(name = "shoebot",
-    version = "1.0b",
+    version = "1.0.1",
     description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
