@@ -140,7 +140,6 @@ class Grammar(object):
         exc_location = exc[-2]
         exc_error = exc[-1]
         for i, err in enumerate(exc):
-            #print '%s: %s' % (i, err)
             if 'exec source_or_code in namespace' in err:
                 exc_location = exc[i+1]
                 exc_error = exc[i]
@@ -153,11 +152,22 @@ class Grammar(object):
         line = source_arr[line_number-1]
 
         # Build error messages
+
         err_msgs = []
-        err_msgs.append('Error in the Shoebot script, line %d:' % line_number)
-        for i, line in enumerate(source_arr[line_number-5:line_number], start=line_number):
-            err_msgs.append('%s: %s' % (i, line))
-        err_msgs.append('   ^  %s' % exc[-1])
+
+        # code around the error
+        err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
+        err_msgs.append('Error in the Shoebot script at %s:' % err_where)
+        for i, line in enumerate(source_arr[line_number-5:line_number], start=line_number-5):
+            err_msgs.append('%s: %s' % (i+1, line.rstrip()))
+        err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
+
+        err_msgs.append('')
+        # traceback
+        err_msgs.append(exc[0].rstrip())
+        for err in exc[3:]:
+            err_msgs.append(err.rstrip())
+
         return '\n'.join(err_msgs)
 
 

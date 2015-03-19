@@ -19,6 +19,12 @@ class VarWindow(object):
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
         self.window.connect("destroy", self.do_quit)
+
+
+        if os.path.isfile(ICON_FILE):
+            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
+            self.window.set_icon ( pixmap )
+
         vbox = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
