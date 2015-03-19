@@ -3,6 +3,8 @@ import sys
 import gtk
 
 from collections import deque
+from pkg_resources import resource_filename, Requirement
+
 from shoebot.gui import ShoebotWidget, VarWindow, SocketServerMixin
 from shoebot.core import DrawQueueSink
 from gtk_input_device import GtkInputDeviceMixin
@@ -17,6 +19,7 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
     '''Create a GTK+ window that contains a ShoebotWidget'''
@@ -28,6 +31,10 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
+        if os.path.isfile(ICON_FILE):
+            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
+            self.set_icon ( pixmap )
+        
         self.menu_enabled = menu_enabled
         self.has_server = server
         self.serverport = port

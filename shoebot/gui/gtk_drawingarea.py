@@ -1,4 +1,8 @@
 #from __future__ import division
+
+from pkg_resources import resource_filename, Requirement
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
 import sys, os
 import gtk
 import cairo
@@ -6,8 +10,6 @@ from socket_server import SocketServerMixin
 
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
-
-ICON_FILE = os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')
 
 class ShoebotWidget(gtk.DrawingArea, SocketServerMixin):
     '''

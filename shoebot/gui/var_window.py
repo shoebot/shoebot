@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 from pkg_resources import resource_filename, Requirement
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 import gtk
 import os.path
@@ -9,8 +10,6 @@ NUMBER = 1
 TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
-
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):

@@ -135,8 +135,17 @@ class Grammar(object):
         """
         exc_type, exc_value, exc_tb = sys.exc_info()
         exc = traceback.format_exception(exc_type, exc_value, exc_tb)
+
+        # Defaults...
         exc_location = exc[-2]
         exc_error = exc[-1]
+        for i, err in enumerate(exc):
+            #print '%s: %s' % (i, err)
+            if 'exec source_or_code in namespace' in err:
+                exc_location = exc[i+1]
+                exc_error = exc[i]
+                break
+
         # extract line number from traceback        
         line_number = int(exc_location.split(',')[1].replace('line', '').strip())
 
