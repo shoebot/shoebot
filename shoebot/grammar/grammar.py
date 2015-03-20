@@ -255,7 +255,7 @@ class Grammar(object):
         ''' Sets a new accessible variable.
 
         :param v: Variable.
-        '''
+        '''        
         oldvar = self._oldvars.get(v.name)
         if oldvar is not None:
             if isinstance(oldvar, Variable):
@@ -266,6 +266,7 @@ class Grammar(object):
                 v.value = v.sanitize(oldvar)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
+        self._oldvars[v.name] = v
         return v
 
     def _findvar(self, name):
