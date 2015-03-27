@@ -187,6 +187,10 @@ class Grammar(object):
 
         # is it a proper filename?
         if os.path.isfile(inputcode):
+            script_dir = os.path.dirname(inputcode)
+            import sys  # TODO - something is weird that this has to re-imported here
+            if not script_dir in sys.path:
+                sys.path.append(script_dir)
             filename = inputcode
             with open(filename, 'rU') as f:
                 source_or_code = f.read()

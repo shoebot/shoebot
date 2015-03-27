@@ -84,6 +84,12 @@ def bot(src = None, grammar=NODEBOX, format=None, outputfile=None, iterations=1,
 
 
 class ShoebotThread(threading.Thread):
+    """
+    Run shoebot itself in another thread
+    so stdout / stderr are free for the
+    main thread
+    """
+
     def __init__(self, sbot, *args, **kwargs):
         threading.Thread.__init__(self)
         self.sbot = sbot
