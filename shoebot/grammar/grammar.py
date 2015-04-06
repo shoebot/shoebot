@@ -5,10 +5,11 @@ from time import sleep, time
 from shoebot.data import Variable
 from shoebot.util import flushfile
 
+import linecache
 import sys
 
-sys.stdout = flushfile(sys.stdout)
-sys.stderr = flushfile(sys.stderr)
+#sys.stdout = flushfile(sys.stdout)
+#sys.stderr = flushfile(sys.stderr)
 
 class Grammar(object):
     ''' 
@@ -136,20 +137,18 @@ class Grammar(object):
         exc_type, exc_value, exc_tb = sys.exc_info()
         exc = traceback.format_exception(exc_type, exc_value, exc_tb)
 
+        source_arr = source.splitlines()
+
         # Defaults...
         exc_location = exc[-2]
-        exc_error = exc[-1]
         for i, err in enumerate(exc):
             if 'exec source_or_code in namespace' in err:
                 exc_location = exc[i+1]
-                exc_error = exc[i]
                 break
 
-        # extract line number from traceback        
+        # extract line number from traceback
+        fn=exc_location.split(',')[0][8:-1]
         line_number = int(exc_location.split(',')[1].replace('line', '').strip())
-
-        source_arr = source.split('\n')
-        line = source_arr[line_number-1]
 
         # Build error messages
 
@@ -158,7 +157,11 @@ class Grammar(object):
         # code around the error
         err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
         err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-        for i, line in enumerate(source_arr[line_number-5:line_number], start=line_number-5):
+        for i in xrange(line_number-5, line_number):
+            if fn == "shoebot_code":
+                line = source_arr[i]
+            else:
+                line = linecache.getline(fn, i-1)
             err_msgs.append('%s: %s' % (i+1, line.rstrip()))
         err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
 
@@ -188,7 +191,7 @@ class Grammar(object):
         # is it a proper filename?
         if os.path.isfile(inputcode):
             script_dir = os.path.dirname(inputcode)
-            import sys  # TODO - something is weird that this has to re-imported here
+            import sys
             if not script_dir in sys.path:
                 sys.path.append(script_dir)
             filename = inputcode
