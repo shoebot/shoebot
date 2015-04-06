@@ -161,7 +161,7 @@ class Grammar(object):
             if fn == "shoebot_code":
                 line = source_arr[i]
             else:
-                line = linecache.getline(fn, i-1)
+                line = linecache.getline(fn, i+1)
             err_msgs.append('%s: %s' % (i+1, line.rstrip()))
         err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
 
