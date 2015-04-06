@@ -3,6 +3,9 @@ MANIFEST
 # ignore apps for now
 apps/*
 
+# gedit plugin schemas (for layout in plugin)
+extensions/gedit3-plugin/gschemas.compiled
+
 # ignore .orig files (leftovers from merges)
 *.orig
 
