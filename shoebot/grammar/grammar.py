@@ -8,8 +8,8 @@ from shoebot.util import flushfile
 import linecache
 import sys
 
-#sys.stdout = flushfile(sys.stdout)
-#sys.stderr = flushfile(sys.stderr)
+sys.stdout = flushfile(sys.stdout)
+sys.stderr = flushfile(sys.stderr)
 
 class Grammar(object):
     ''' 
