@@ -222,11 +222,10 @@ class ShoebotWindowHelper(object):
 
     def toggle_livecoding(self, action):
         self.livecoding = action.get_active()
-        if self.livecoding:
+        if self.livecoding and self.bot:
             doc = self.window.get_active_document()
             source = self.get_source(doc)
-            if self.bot:
-                self.bot.live_code_load(source)
+            self.bot.live_code_load(source)
     
         
     # Right-click menu items (for quicktorials)
