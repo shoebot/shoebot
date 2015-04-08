@@ -24,6 +24,7 @@ MENU_UI = """
         <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
         <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
         <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
+        <menuitem name="Live Code" action="ShoebotLive"/>
       </placeholder>
     </menu>
   </menubar>

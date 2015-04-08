@@ -15,6 +15,14 @@ sys.stderr = flushfile(sys.stderr)
 
 
 class LiveExecution(object):
+    """
+    Live Code executor.
+
+    Code has two states, 'known good' and 'tenous'
+    
+    "known good" can have exceptions and die
+    "tenous code" exceptions attempt to revert to "known good"
+    """
     ns = {}
 
     def __init__(self, code, ns = None):
@@ -116,7 +124,6 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
-        self.source_or_code = ""
 
         #self._executor = LiveExecution(ns=self)
         self._executor = None
@@ -194,7 +201,7 @@ class Grammar(object):
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, source_or_code, limit = False):
+    def _exec_frame(self, limit = False):
         ''' Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
@@ -206,13 +213,14 @@ class Grammar(object):
         if self._iteration == 0:
             # First frame
             self._executor.run()
-            #exec source_or_code in namespace
+            # run setup and draw
             namespace['setup']()
             namespace['draw']()
         else:
             # Subsequent frames
             if self._dynamic:
                 with self._executor.run_context() as (tenuous, code, ns):
+                    # Code in main block may redefine 'draw'
                     self._executor.do_exec(code, ns)
                     ns['draw']()
                 #self._executor.run()
@@ -254,7 +262,7 @@ class Grammar(object):
         # code around the error
         err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
         err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-        for i in xrange(line_number-5, line_number):
+        for i in xrange(max(0, line_number-5), line_number):
             if fn == "shoebot_code":
                 line = source_arr[i]
             else:
@@ -285,24 +293,22 @@ class Grammar(object):
         code = None
         filename = None
 
-        # is it a proper filename?
-        if os.path.isfile(inputcode):
-            file = open(inputcode, 'rU')
-            self.source_or_code = file.read()
-            self._executor = LiveExecution(self.source_or_code, ns=self._namespace)
-            file.close()
-            self._load_namespace(inputcode)
-        else:
-            # if not, try parsing it as a code string
-            self.source_or_code = inputcode
-            self._load_namespace()
-
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
-            if isinstance(self.source_or_code, basestring):
-                self.source_or_code = compile(self.source_or_code + '\n\n', "shoebot_code", "exec")
-                self._executor = LiveExecution(self.source_or_code, ns=self._namespace)
-            # do the magic            
+            if os.path.isfile(inputcode):
+                filename = inputcode
+                with open(filename, 'rU') as f:
+                    source = f.read()
+                    code = source
+            elif isinstance(inputcode, basestring):
+                filename = 'shoebot_code'
+                source = inputcode
+                code = compile(inputcode + '\n\n', filename, "exec")
+            
+            self._executor = LiveExecution(code, ns=self._namespace)
+            self._load_namespace(filename)
+            
+            # do the magic   
             if not iterations:
                 if run_forever:
                     iterations = None
@@ -313,19 +319,20 @@ class Grammar(object):
 
             with self._executor.run_context():
                 # First iteration
-                self._exec_frame(self.source_or_code, limit = frame_limiter)
+                self._exec_frame(limit = frame_limiter)
                 self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
 
                 # Subsequent iterations
                 while self._should_run(iterations):
-                    self._exec_frame(self.source_or_code, limit = frame_limiter)
+                    self._exec_frame(limit = frame_limiter)
 
             if not run_forever:
                 self._quit = True
             self._canvas.finished = True
             self._canvas.sink.finish()
 
-        except Exception, e: # this makes KeyboardInterrupts still work
+        except Exception as e:
+            # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
 
@@ -333,8 +340,7 @@ class Grammar(object):
             if verbose:
                 errmsg = traceback.format_exc()
             else:
-                errmsg = self._simple_traceback(e, source)
-                print ''
+                errmsg = self._simple_traceback(e, source or '')
             print >> sys.stderr, errmsg
 
     def finish(self):

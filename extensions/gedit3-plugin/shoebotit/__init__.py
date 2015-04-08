@@ -1,16 +1,15 @@
-<<<<<<< HEAD
 from collections import namedtuple
-import base64
-import queue
-import time
-=======
->>>>>>> master
 from distutils.spawn import find_executable as which
 from urllib.request import pathname2url
 
 from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
+
+import base64
+import queue
+import time
+
 
 import os
 
@@ -23,6 +22,8 @@ class ShoebotWindowHelper(object):
         self.example_bots = {}
 
         self.window = window
+        self.changed_handler_id = None
+        self.idle_handler_id = None
         panel = window.get_bottom_panel()
         self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
 
@@ -122,13 +123,9 @@ class ShoebotWindowHelper(object):
             return False
             
         if self.bot and self.bot.process.poll() == None:
-            print('Has a bot already')
-            if self.bot.livecoding:
-                print('Sending quit.')
-                self.bot.send_command("quit")
-            else:
-                return False
-        
+            print('Sending quit.')
+            self.bot.send_command("quit")
+
         # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
@@ -143,29 +140,75 @@ class ShoebotWindowHelper(object):
             return False
 
         textbuffer = self.output_widget.get_buffer()
-        textbuffer.set_text('')
-                
+        textbuffer.set_text('running shoebot at %s\n' % sbot_bin)
+
         while Gtk.events_pending():
            Gtk.main_iteration()
 
+        self.disconnect_change_handler(doc)
+        self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.livecoding, title, doc, cwd=cwd)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.idle_handler_id = GObject.idle_add(self.update_shoebot)
 
-        GObject.idle_add(self.update_shoebot)
+    def disconnect_change_handler(self, doc):
+        if self.changed_handler_id is not None:
+            doc.disconnect(self.changed_handler_id)
+            self.changed_hander_id = None
+
+    def doc_changed(self, *args):
+        if self.livecoding and self.bot:
+            doc = self.window.get_active_document()
+            start_iter = doc.get_start_iter()
+            end_iter = doc.get_end_iter()
+            source = doc.get_text(start_iter, end_iter, False)
+
+            try:
+                self.bot.live_code_load(source)
+            except Exception:
+                self.bot = None
+                self.disconnect_change_handler(doc)
+                raise
+            except IOError as e:
+                self.bot = None
+                self.disconnect_change_handler()
+                if e.errno == errno.EPIPE:
+                    # EPIPE error
+                    print('FIXME: %s' % str(e))
+                else:
+                    # Something else bad happened
+                    raise
 
     def update_shoebot(self):
         if self.bot:
-            running = self.bot.update_shoebot(self.output_widget)
+            textbuffer = self.output_widget.get_buffer()
+            for stdout_line, stderr_line in self.bot.get_output():
+                if stdout_line is not None:
+                    textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
+                if stderr_line is not None:
+                    # Use the 'error' tag so text is red
+                    textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+                    offset = textbuffer.get_char_count() - len(stderr_line)
+                    start_iter = textbuffer.get_iter_at_offset(offset)
+                    end_iter = textbuffer.get_end_iter()
+                    textbuffer.apply_tag_by_name("error", start_iter, end_iter)
+            self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+            while Gtk.events_pending():
+                Gtk.main_iteration()
 
-        return self.bot.running
+            return self.bot.running
+        else:
+            return False
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
 
     def toggle_var_window(self, action):
         self.show_varwindow = action.get_active()
+
     def toggle_fullscreen(self, action):
         self.use_fullscreen = action.get_active()
+
     def toggle_livecoding(self, action):
         self.livecoding = action.get_active()
     

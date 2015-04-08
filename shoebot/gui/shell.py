@@ -49,40 +49,19 @@ class ShoebotCmd(cmd.Cmd):
         load base64=(base64 encoded)
         """
         print 'shoebot: load_base64 '
-        #ns_snapshot = copy.copy(self.bot._namespace)
         try:
-            #print line
             source = str(base64.b64decode(line))
-            #compiler.parse(source) # hopefully will barf on bad code
-            source_or_code = compile(source + '\n\n', "shoebot_code", "exec")
-            #exec source_or_code in self.bot._namespace
-            
-            #self.bot.source_or_code = source_or_code
-            self.bot._executor.load_edited_code(source_or_code)
-            #self.bot._load_namespace()
+            code = compile(source + '\n\n', "shoebot_code", "exec")
+            self.bot._executor.load_edited_code(code)
         except Exception as e:
             print 'Error Compiling'
             print e
-
-            #self.bot._namespace = ns_snapshot
-
-            # Try and re-exec the last known good code
-            #exec self.bot.source_or_code in self.bot._namespace
-
-    # def d(self, line):
-    #     if not kwargs:
-    #         return
-    #     if kwargs.get('filename'):
-    #         print 'Load from file'
-    #         pass
-    #     elif kwargs.get('base64'):
-    #         print 'Load from base64'
-    #         pass
 
     def do_bye(self, line):
         return self.do_exit(line)
 
     def do_exit(self, line):
+        print('Bye.')
         self.bot._quit = True
         return True
 

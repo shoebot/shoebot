@@ -138,7 +138,8 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
                                 src,
                                 iterations,
                                 run_forever=window if close_window is False else False,
-                                frame_limiter=window)
+                                frame_limiter=window,
+                                shell=shell)
     sbot_thread.start()
     if shell is not None:
         try:
@@ -146,8 +147,6 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
         except KeyboardInterrupt:
             if not sbot._quit:
                 raise
-            else:
-                print '\nBye.'
     else:
         sbot_thread.join()
 
