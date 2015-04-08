@@ -116,8 +116,9 @@ class ShoebotCmd(cmd.Cmd):
         print("shoebot: load_base64 ")
         try:
             source = str(base64.b64decode(line))
+            # Test compile
             code = compile(source + '\n\n', "shoebot_code", "exec")
-            self.bot._executor.load_edited_code(code)
+            self.bot._executor.load_edited_source(source)
         except Exception as e:
             # TODO Use simple traceback here
             print ("Error Compiling")
