@@ -93,8 +93,13 @@ class ShoebotProcess(object):
         self.handle_stderr = handle_stderr
         self.changed_handler_id = None
 
+        self.code = code.rstrip('\n')
+
     def live_code_load(self, source):
-        self.send_command("load_base64", source)
+        source = source.rstrip('\n')
+        if source != self.code:
+            self.code = source
+            self.send_command("load_base64", source)
 
     def send_command(self, cmd, *args):
         if args:

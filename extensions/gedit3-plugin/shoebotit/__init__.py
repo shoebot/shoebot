@@ -156,12 +156,22 @@ class ShoebotWindowHelper(object):
             doc.disconnect(self.changed_handler_id)
             self.changed_hander_id = None
 
+    def get_source(self, doc):
+        """
+        Grab contents of 'doc' and return it
+
+        :param doc: The active document
+        :return:
+        """
+        start_iter = doc.get_start_iter()
+        end_iter = doc.get_end_iter()
+        source = doc.get_text(start_iter, end_iter, False)
+        return source
+
     def doc_changed(self, *args):
         if self.livecoding and self.bot:
             doc = self.window.get_active_document()
-            start_iter = doc.get_start_iter()
-            end_iter = doc.get_end_iter()
-            source = doc.get_text(start_iter, end_iter, False)
+            source = self.get_source(doc)
 
             try:
                 self.bot.live_code_load(source)
@@ -196,6 +206,7 @@ class ShoebotWindowHelper(object):
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
+        if self.bot:
             return self.bot.running
         else:
             return False
@@ -211,6 +222,11 @@ class ShoebotWindowHelper(object):
 
     def toggle_livecoding(self, action):
         self.livecoding = action.get_active()
+        if self.livecoding:
+            doc = self.window.get_active_document()
+            source = self.get_source(doc)
+            if self.bot:
+                self.bot.live_code_load(source)
     
         
     # Right-click menu items (for quicktorials)
