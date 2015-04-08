@@ -2,15 +2,19 @@
 
 # Shoebot setup script
 #
-# 'python setup.py install', or
-# 'python setup.py --help' for more options
+#    python setup.py install', or
+#    python setup.py --help' for more options
+#
 
 # the following libraries will not be installed
 
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
@@ -34,7 +38,7 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
 setup(name = "shoebot",
-    version = "1.0b",
+    version = "1.1.1",
     description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
@@ -44,6 +48,7 @@ setup(name = "shoebot",
     data_files = datafiles,
     install_requires = [
 	"cairocffi",
+        "meta",
         "numpy",
 	"pgi",
         "Pillow",

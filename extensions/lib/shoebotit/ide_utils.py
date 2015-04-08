@@ -12,10 +12,12 @@ try:
 except ImportError:
     import Queue as queue
 
+import base64
 import os
 import subprocess
 import threading
 import time
+from gi.repository import Gtk ## TODO - seperate this again
 
 
 class AsynchronousFileReader(threading.Thread):
@@ -53,8 +55,9 @@ class AsynchronousFileReader(threading.Thread):
 
 
 class ShoebotProcess(object):
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None):
-        command = ['sbot', '-w', '-t%s' % title]
+    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
+        # start with -w for window -l for shell'
+        command = ['sbot', '-wl', '-t%s - Shoebot on gedit' % title]
 
         if use_socketserver:
             command.append('-s')
@@ -64,10 +67,18 @@ class ShoebotProcess(object):
 
         if use_fullscreen:
             command.append('-f')
-
+        
         command.append(code)
 
-        self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+        # Setup environment so shoebot directory is first
+        _env = os.environ.copy()
+        if sbot:
+            _env['PATH'] = os.path.realpath(os.path.dirname(sbot)) + os.pathsep + os.environ.get('PATH', '')
+        else:
+            print('no sbot!')
+
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+
         self.running = True
 
         # Launch the asynchronous readers of the process' stdout and stderr.
@@ -80,6 +91,23 @@ class ShoebotProcess(object):
 
         self.handle_stdout = handle_stdout
         self.handle_stderr = handle_stderr
+        self.changed_handler_id = None
+
+        self.code = code.rstrip('\n')
+
+    def live_code_load(self, source):
+        source = source.rstrip('\n')
+        if source != self.code:
+            self.code = source
+            self.send_command("load_base64", source)
+
+    def send_command(self, cmd, *args):
+        if args:
+            self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
+        else:
+            self.process.stdin.write(bytes(cmd, "utf-8"))
+        self.process.stdin.write(b"\n")
+        self.process.stdin.flush()
 
     def close(self):
         """
@@ -100,16 +128,16 @@ class ShoebotProcess(object):
 
         if self.process.poll() is not None:
             self.close()
-            yield None, None, False
+            yield None, None
 
         while not (self.stdout_queue.empty() and self.stderr_queue.empty()):
             if not self.stdout_queue.empty():
                 line = self.stdout_queue.get().decode('utf-8')
-                yield line, None, True
+                yield line, None
 
             if not self.stderr_queue.empty():
                 line = self.stderr_queue.get().decode('utf-8')
-                yield None, line, True
+                yield None, line
 
 
 def get_example_dir():
@@ -122,7 +150,9 @@ def find_example_dir():
     """
 
     # Needs to run in same python env as shoebot (may be different to gedits)
-    cmd = ["python", "-c", "import sys; print '{}/share/shoebot/examples/'.format(sys.prefix)"]
+
+    code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'share/shoebot/examples/')"
+    cmd = ["python", "-c", code]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output, errors = p.communicate()
     if errors:

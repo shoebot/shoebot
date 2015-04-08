@@ -126,9 +126,10 @@ class BezierPath(Grob):
         self._append_element(self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3), (CURVETO, x1, y1, x2, y2, x3, y3))
 
     def closepath(self):
-        start_el = self[0]
-        self._append_element(self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y))
-        self.closed = True
+        if self._elements:
+            start_el = self[0]
+            self._append_element(self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y))
+            self.closed = True
 
     def ellipse(self, x, y, w, h):
         self._append_element(self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h)) 

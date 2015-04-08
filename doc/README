@@ -1,9 +1,6 @@
 Install the sphinx and shoebot sphinx extension before generating the docs.
 
-$ pip install sphinx
-$ pushd ../extensions/sphinx-doc/
-$ python setup.py install
-$ popd
+$ pip install -r requirements.txt
 
 Generate the docs
 

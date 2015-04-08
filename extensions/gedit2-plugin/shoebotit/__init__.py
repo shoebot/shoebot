@@ -106,16 +106,19 @@ class ShoebotWindowHelper:
         self.start_shoebot()
 
     def start_shoebot(self):
-        if not which('sbot'):
+        #sbot_bin=gtk2_utils.sbot_executable()
+        sbot_bin = 'sbot' ## TODO
+
+        if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
-            while gtk.events_pending():
-               gtk.main_iteration()
+            while Gtk.events_pending():
+               Gtk.main_iteration()
             return False
 
         if self.bot and self.bot.process.poll() == None:
-            print('Has a bot already')
-            return False
+            print('Sending quit.')
+            self.bot.send_command("quit")
 
         # get the text buffer
         doc = self.window.get_active_document()
@@ -135,14 +138,14 @@ class ShoebotWindowHelper:
         while gtk.events_pending():
            gtk.main_iteration()
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
 
         gobject.idle_add(self.update_shoebot)
 
     def update_shoebot(self):
         if self.bot:
             textbuffer = self.output_widget.get_buffer()
-            for stdout_line, stderr_line, running in self.bot.get_output():
+            for stdout_line, stderr_line in self.bot.get_output():
                 if stdout_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
                 if stderr_line is not None:

@@ -55,8 +55,8 @@ VARIANTS = {
 
 BOT_HEADER = """
 size(100, 100)
-background(.8)
-fill(.3)
+background(1)
+fill(.95,.75,0)
 """
 
 import os

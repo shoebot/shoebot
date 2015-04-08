@@ -1,14 +1,20 @@
+from collections import namedtuple
 from distutils.spawn import find_executable as which
 from urllib.request import pathname2url
 
-from gi.repository import Gtk, Gio, GObject, Gedit, Pango
+from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
 
+import base64
+import queue
+import time
+
+
 import os
 
-if not which('sbot'):
-    print('Shoebot executable not found.')
+# TODO - Use shoebot from gsettings if available
+#        ide_utils.ShoebotProcess
 
 
 class ShoebotWindowHelper(object):
@@ -16,6 +22,8 @@ class ShoebotWindowHelper(object):
         self.example_bots = {}
 
         self.window = window
+        self.changed_handler_id = None
+        self.idle_handler_id = None
         panel = window.get_bottom_panel()
         self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
 
@@ -26,6 +34,7 @@ class ShoebotWindowHelper(object):
         self.use_socketserver = False
         self.show_varwindow = True
         self.use_fullscreen = False
+        self.livecoding = False
 
         self.started = False
         
@@ -61,6 +70,7 @@ class ShoebotWindowHelper(object):
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
+            ("ShoebotLive", None, _("Live Code"), '<control><alt>C', _("Live Code"), self.toggle_livecoding, False),
             ])
         manager.insert_action_group(self.action_group)
         
@@ -104,7 +114,8 @@ class ShoebotWindowHelper(object):
         self.start_shoebot()
 
     def start_shoebot(self):
-        if not which('sbot'):
+        sbot_bin=gtk3_utils.sbot_executable()
+        if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
             while Gtk.events_pending():
@@ -112,9 +123,9 @@ class ShoebotWindowHelper(object):
             return False
             
         if self.bot and self.bot.process.poll() == None:
-            print('Has a bot already')
-            return False
-        
+            print('Sending quit.')
+            self.bot.send_command("quit")
+
         # get the text buffer
         doc = self.window.get_active_document()
         if not doc:
@@ -129,27 +140,76 @@ class ShoebotWindowHelper(object):
             return False
 
         textbuffer = self.output_widget.get_buffer()
-        textbuffer.set_text('')
+        textbuffer.set_text('running shoebot at %s\n' % sbot_bin)
+
         while Gtk.events_pending():
            Gtk.main_iteration()
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd)
+        self.disconnect_change_handler(doc)
+        self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        GObject.idle_add(self.update_shoebot)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.idle_handler_id = GObject.idle_add(self.update_shoebot)
+
+    def disconnect_change_handler(self, doc):
+        if self.changed_handler_id is not None:
+            doc.disconnect(self.changed_handler_id)
+            self.changed_hander_id = None
+
+    def get_source(self, doc):
+        """
+        Grab contents of 'doc' and return it
+
+        :param doc: The active document
+        :return:
+        """
+        start_iter = doc.get_start_iter()
+        end_iter = doc.get_end_iter()
+        source = doc.get_text(start_iter, end_iter, False)
+        return source
+
+    def doc_changed(self, *args):
+        if self.livecoding and self.bot:
+            doc = self.window.get_active_document()
+            source = self.get_source(doc)
+
+            try:
+                self.bot.live_code_load(source)
+            except Exception:
+                self.bot = None
+                self.disconnect_change_handler(doc)
+                raise
+            except IOError as e:
+                self.bot = None
+                self.disconnect_change_handler()
+                if e.errno == errno.EPIPE:
+                    # EPIPE error
+                    print('FIXME: %s' % str(e))
+                else:
+                    # Something else bad happened
+                    raise
 
     def update_shoebot(self):
         if self.bot:
             textbuffer = self.output_widget.get_buffer()
-            for stdout_line, stderr_line, running in self.bot.get_output():
+            for stdout_line, stderr_line in self.bot.get_output():
                 if stdout_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
                 if stderr_line is not None:
+                    # Use the 'error' tag so text is red
                     textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+                    offset = textbuffer.get_char_count() - len(stderr_line)
+                    start_iter = textbuffer.get_iter_at_offset(offset)
+                    end_iter = textbuffer.get_end_iter()
+                    textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
-        return self.bot.running
+        if self.bot:
+            return self.bot.running
+        else:
+            return False
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
@@ -160,6 +220,16 @@ class ShoebotWindowHelper(object):
     def toggle_fullscreen(self, action):
         self.use_fullscreen = action.get_active()
 
+    def toggle_livecoding(self, action):
+        self.livecoding = action.get_active()
+        if self.livecoding and self.bot:
+            doc = self.window.get_active_document()
+            source = self.get_source(doc)
+            self.bot.live_code_load(source)
+    
+        
+    # Right-click menu items (for quicktorials)
+
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
         #handler_id = view.connect('populate-popup', self.on_view_populate_popup)
@@ -168,7 +238,7 @@ class ShoebotWindowHelper(object):
         pass
 
 
-class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
+class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable):
     window = GObject.property(type=Gedit.Window)
 
     def __init__(self):
@@ -176,12 +246,21 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         self.instances = {}
         self.tempfiles = []
 
-    def do_activate(self):
-        self.text = Gtk.TextView()
-        self.text.set_editable(False)
+    def _create_view(self):
+        """ Create the gtk.TextView used for shell output """
+        view = Gtk.TextView()
+        view.set_editable(False)
+
         fontdesc = Pango.FontDescription("Monospace")
-        self.text.modify_font(fontdesc)
-        self.text.set_name('shoebot-output')
+        view.modify_font(fontdesc)
+        view.set_name('shoebot-output')
+
+        buff = view.get_buffer()
+        buff.create_tag('error', foreground='red')
+        return view
+
+    def do_activate(self):
+        self.text = self._create_view()
         self.panel = self.window.get_bottom_panel()
 
         image = Gtk.Image()
@@ -208,4 +287,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
     def do_update_state(self):
         self.instances[self.window].update_ui()
 
-
+    def do_create_configure_widget(self):
+        widget = gtk3_utils.ShoebotPreferences()    
+        return widget

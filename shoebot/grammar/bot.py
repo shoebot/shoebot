@@ -41,11 +41,14 @@ from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
 
 from grammar import Grammar
 
+from pkg_resources import resource_filename, Requirement
 from glob import glob
 import random as r
 import traceback
 
 import locale, gettext
+
+SBOT_ROOT=resource_filename(Requirement.parse("shoebot"), "")
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -56,8 +59,8 @@ _ = gettext.gettext
 
 import sys
 LIB_DIRS = [
-    os.path.join(sys.prefix, 'local', 'share', 'shoebot', 'lib'), 
-    os.path.join(sys.prefix, 'share', 'shoebot', 'lib')]
+    os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'), 
+    os.path.join(SBOT_ROOT, 'share', 'shoebot', 'lib')]
 for LIB_DIR in LIB_DIRS:
     sys.path.append(LIB_DIR)
 
@@ -360,4 +363,8 @@ class Bot(Grammar):
             self._dynamic = True
         else:
             return self._speed
+
+    @property
+    def FRAME(self):
+        return self._frame
 

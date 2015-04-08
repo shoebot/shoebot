@@ -20,6 +20,7 @@ function pluginInstall {
   cp -r -f ../lib/* $DEST_DIR/gedit/plugins
   echo 'Gedit plugin installed!'
   popd
+  glib-compile-schemas ${DEST_DIR}/gedit/plugins/shoebotit
 }
 
 function installLangSpecs {

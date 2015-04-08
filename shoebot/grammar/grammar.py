@@ -1,3 +1,9 @@
+import ast
+import compiler.ast
+import inspect
+import meta.decompiler
+
+import contextlib
 import os
 import traceback
 
@@ -5,10 +11,123 @@ from time import sleep, time
 from shoebot.data import Variable
 from shoebot.util import flushfile
 
+import copy
+import linecache
 import sys
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
+
+
+class LiveExecution(object):
+    """
+    Live Code executor.
+
+    Code has two states, 'known good' and 'tenous'
+    
+    "known good" can have exceptions and die
+    "tenous code" exceptions attempt to revert to "known good"
+    """
+    ns = {}
+
+    def __init__(self, code, ns=None, filename=None):
+        self.edited_source = None
+        self.known_good = code
+        self.filename = filename
+        if ns is None:
+            self.ns = {}
+        else:
+            self.ns = ns
+
+    def load_edited_source(self, source):
+        """
+        Load changed code into the execution environment.
+
+        Until the code is executed correctly, it will be
+        in the 'tenuous' state.
+        """
+        self.edited_source = source
+
+    def reload_functions(self, ns=None):
+        """
+        Recompile functions
+
+        :param code:
+        :param ns:
+        :return:
+        """
+        #
+        if self.edited_source:
+            code = self.edited_source
+            tree = ast.parse(code)
+            for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
+                meta.decompiler.compile_func(f, self.filename, self.ns)
+
+            self.do_exec(self.edited_source, ns)
+
+    def do_exec(self, code, ns, tenuous = False):
+        """
+        Override if you want to do something other than exec in ns
+
+        tenuous is True if the code has just been edited and may fail
+        """
+        exec code in ns
+
+    def run_tenuous(self):
+        """
+        Run edited code, if no exceptions occur then it
+        graduates to known good.
+        """
+        ns_snapshot = copy.copy(self.ns)
+        try:
+            code = self.edited_source
+            self.edited_source = None
+            self.do_exec(code, ns_snapshot, True)
+            self.known_good = code
+            return True, None
+        except Exception as e:
+            self.ns.clear()
+            self.ns.update(ns_snapshot)
+            return False, e
+
+    def run(self):
+        """
+        Attempt to known good or tenuous code.
+        """
+        if self.edited_source:
+            success, ex = self.run_tenuous()
+            if success:
+                return
+
+        self.do_exec(self.known_good, self.ns)
+
+    @contextlib.contextmanager
+    def run_context(self):
+        """
+        Context in which the user can run the code in a custom manner.
+
+        If no exceptions occur then the code will move from 'tenuous'
+        to 'known good'.
+
+        >>> with run_context() as (tenuous, code, ns):
+        >>> ...  exec code in ns
+        >>> ...  ns['draw']()
+
+        """
+        if self.edited_source is None:
+            yield True, self.known_good, self.ns
+            return
+
+        ns_snapshot = copy.copy(self.ns)
+        try:
+            yield False, self.edited_source, self.ns
+            self.known_good = self.edited_source
+            self.edited_source = None
+        except Exception as e:
+            self.edited_source = None
+            self.ns.clear()
+            self.ns.update(ns_snapshot)
+
 
 class Grammar(object):
     ''' 
@@ -28,6 +147,9 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
+
+        #self._executor = LiveExecution(ns=self)
+        self._executor = None
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -92,7 +214,7 @@ class Grammar(object):
     def _frame_limit(self):
         ''' Limit to framerate, should be called after
             rendering has completed '''
-        if self._speed is not None:
+        if self._speed:
             completion_time = time()
             exc_time = completion_time - self._start_time
             sleep_for = (1.0 / self._speed) - exc_time
@@ -102,7 +224,7 @@ class Grammar(object):
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, source_or_code, limit = False):
+    def _exec_frame(self, limit = False):
         ''' Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
@@ -113,23 +235,79 @@ class Grammar(object):
         self._set_dynamic_vars()
         if self._iteration == 0:
             # First frame
-            exec source_or_code in namespace
+            self._executor.run()
+            # run setup and draw
+            # (assume user hasn't live edited already)
             namespace['setup']()
             namespace['draw']()
         else:
             # Subsequent frames
             if self._dynamic:
-                namespace['draw']()
+                with self._executor.run_context() as (tenuous, code, ns):
+                    # Code in main block may redefine 'draw'
+                    self._executor.reload_functions(ns)
+                    ns['draw']()
             else:
-                exec source_or_code in namespace
+                self._executor.run()
         
         self._canvas.flush(self._frame)
         if limit:
             self._frame_limit()
-        self._frame += 1
+
+        # Can set speed to go backwards using the shell if you really want
+        # or pause by setting speed == 0
+        if self._speed > 0:
+            self._frame += 1
+        elif self._speed < 0:
+            self._frame -= 1
+
         self._iteration += 1
 
-    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False):
+    def _simple_traceback(self, ex, source):
+        """
+        Format traceback, showing line number and surrounding source.
+        """
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        exc = traceback.format_exception(exc_type, exc_value, exc_tb)
+
+        source_arr = source.splitlines()
+
+        # Defaults...
+        exc_location = exc[-2]
+        for i, err in enumerate(exc):
+            if 'exec source_or_code in namespace' in err:
+                exc_location = exc[i+1]
+                break
+
+        # extract line number from traceback
+        fn=exc_location.split(',')[0][8:-1]
+        line_number = int(exc_location.split(',')[1].replace('line', '').strip())
+
+        # Build error messages
+
+        err_msgs = []
+
+        # code around the error
+        err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
+        err_msgs.append('Error in the Shoebot script at %s:' % err_where)
+        for i in xrange(max(0, line_number-5), line_number):
+            if fn == "shoebot_code":
+                line = source_arr[i]
+            else:
+                line = linecache.getline(fn, i+1)
+            err_msgs.append('%s: %s' % (i+1, line.rstrip()))
+        err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
+
+        err_msgs.append('')
+        # traceback
+        err_msgs.append(exc[0].rstrip())
+        for err in exc[3:]:
+            err_msgs.append(err.rstrip())
+
+        return '\n'.join(err_msgs)
+
+
+    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False, verbose = False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
@@ -139,22 +317,26 @@ class Grammar(object):
         :param run_forever: if True will run until the user quits the bot
         :param frame_limiter: Time a frame should take to run (float - seconds)
         '''
-        # is it a proper filename?
-        if os.path.isfile(inputcode):
-            file = open(inputcode, 'rU')
-            source_or_code = file.read()
-            file.close()
-            self._load_namespace(inputcode)
-        else:
-            # if not, try parsing it as a code string
-            source_or_code = inputcode
-            self._load_namespace()
+        source = None
+        code = None
+        filename = None
 
         try:
             # if it's a string, it needs compiling first; if it's a file, no action needed
-            if isinstance(source_or_code, basestring):
-                source_or_code = compile(source_or_code + '\n\n', "shoebot_code", "exec")
-            # do the magic            
+            if os.path.isfile(inputcode):
+                filename = inputcode
+                with open(filename, 'rU') as f:
+                    source = f.read()
+                    code = source
+            elif isinstance(inputcode, basestring):
+                filename = 'shoebot_code'
+                source = inputcode
+                code = compile(inputcode + '\n\n', filename, "exec")
+            
+            self._executor = LiveExecution(code, ns=self._namespace, filename=filename)
+            self._load_namespace(filename)
+            
+            # do the magic   
             if not iterations:
                 if run_forever:
                     iterations = None
@@ -163,22 +345,31 @@ class Grammar(object):
 
             self._start_time = time()
 
-            # First iteration
-            self._exec_frame(source_or_code, limit = frame_limiter)
+            with self._executor.run_context():
+                # First iteration
+                self._exec_frame(limit = frame_limiter)
+                self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
 
-            # Subsequent iterations
-            while self._should_run(iterations):
-                self._exec_frame(source_or_code, limit = frame_limiter)
+                # Subsequent iterations
+                while self._should_run(iterations):
+                    self._exec_frame(limit = frame_limiter)
 
             if not run_forever:
                 self._quit = True
+            self._canvas.finished = True
             self._canvas.sink.finish()
 
-        except NameError:
+        except Exception as e:
+            # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-            errmsg = traceback.format_exc()
-            print errmsg
+
+            import sys
+            if verbose:
+                errmsg = traceback.format_exc()
+            else:
+                errmsg = self._simple_traceback(e, source or '')
+            print >> sys.stderr, errmsg
 
     def finish(self):
         ## For use when using shoebot as a module
@@ -203,6 +394,7 @@ class Grammar(object):
                 v.value = v.sanitize(oldvar)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
+        self._oldvars[v.name] = v
         return v
 
     def _findvar(self, name):

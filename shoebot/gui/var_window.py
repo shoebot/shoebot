@@ -1,17 +1,15 @@
 #!/usr/bin/env python2
 import sys
+
 from pgi.repository import Gtk
+from pkg_resources import resource_filename, Requirement
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
 
 NUMBER = 1
 TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
-
-if sys.platform != 'win32':
-    ICON_FILE = '/usr/share/shoebot/icon.png'
-else:
-    import os.path
-    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
 
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):
@@ -21,6 +19,11 @@ class VarWindow(object):
         self.window = Gtk.Window()
         self.window.set_destroy_with_parent(True)
         self.window.connect("destroy", self.do_quit)
+
+        if os.path.isfile(ICON_FILE):
+            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
+            self.window.set_icon ( pixmap )
+
         vbox = Gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders

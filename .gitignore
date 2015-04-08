@@ -3,6 +3,9 @@ MANIFEST
 # ignore apps for now
 apps/*
 
+# gedit plugin schemas (for layout in plugin)
+extensions/gedit3-plugin/gschemas.compiled
+
 # ignore .orig files (leftovers from merges)
 *.orig
 
@@ -12,9 +15,10 @@ dist/*
 # as well as sphinx output
 doc/build/*
 
-# python bytecode files
-*.pyc
-*.pyo
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 # backup files
 *.bak
 *~
