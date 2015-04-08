@@ -237,6 +237,7 @@ class Grammar(object):
             # First frame
             self._executor.run()
             # run setup and draw
+            # (assume user hasn't live edited already)
             namespace['setup']()
             namespace['draw']()
         else:
@@ -244,7 +245,6 @@ class Grammar(object):
             if self._dynamic:
                 with self._executor.run_context() as (tenuous, code, ns):
                     # Code in main block may redefine 'draw'
-                    #self._executor.do_exec(code, ns)
                     self._executor.reload_functions(ns)
                     ns['draw']()
             else:
