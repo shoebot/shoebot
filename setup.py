@@ -48,7 +48,8 @@ setup(name = "shoebot",
     data_files = datafiles,
     install_requires = [
         "Pillow",
-        "numpy" 
+        "meta",
+        "numpy",
     ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """

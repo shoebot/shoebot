@@ -1,3 +1,8 @@
+import ast
+import compiler.ast
+import inspect
+import meta.decompiler
+
 import contextlib
 import os
 import traceback
@@ -25,22 +30,40 @@ class LiveExecution(object):
     """
     ns = {}
 
-    def __init__(self, code, ns = None):
-        self.edited_code = None
+    def __init__(self, code, ns=None, filename=None):
+        self.edited_source = None
         self.known_good = code
+        self.filename = filename
         if ns is None:
             self.ns = {}
         else:
             self.ns = ns
 
-    def load_edited_code(self, code):
+    def load_edited_source(self, source):
         """
         Load changed code into the execution environment.
 
         Until the code is executed correctly, it will be
         in the 'tenuous' state.
         """
-        self.edited_code = code
+        self.edited_source = source
+
+    def reload_functions(self, ns=None):
+        """
+        Recompile functions
+
+        :param code:
+        :param ns:
+        :return:
+        """
+        #
+        if self.edited_source:
+            code = self.edited_source
+            tree = ast.parse(code)
+            for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
+                meta.decompiler.compile_func(f, self.filename, self.ns)
+
+            self.do_exec(self.edited_source, ns)
 
     def do_exec(self, code, ns, tenuous = False):
         """
@@ -57,8 +80,8 @@ class LiveExecution(object):
         """
         ns_snapshot = copy.copy(self.ns)
         try:
-            code = self.edited_code
-            self.edited_code = None
+            code = self.edited_source
+            self.edited_source = None
             self.do_exec(code, ns_snapshot, True)
             self.known_good = code
             return True, None
@@ -71,7 +94,7 @@ class LiveExecution(object):
         """
         Attempt to known good or tenuous code.
         """
-        if self.edited_code:
+        if self.edited_source:
             success, ex = self.run_tenuous()
             if success:
                 return
@@ -91,17 +114,17 @@ class LiveExecution(object):
         >>> ...  ns['draw']()
 
         """
-        if self.edited_code is None:
+        if self.edited_source is None:
             yield True, self.known_good, self.ns
             return
 
         ns_snapshot = copy.copy(self.ns)
         try:
-            yield False, self.edited_code, self.ns
-            self.known_good = self.edited_code
-            self.edited_code = None
+            yield False, self.edited_source, self.ns
+            self.known_good = self.edited_source
+            self.edited_source = None
         except Exception as e:
-            self.edited_code = None
+            self.edited_source = None
             self.ns.clear()
             self.ns.update(ns_snapshot)
 
@@ -191,7 +214,7 @@ class Grammar(object):
     def _frame_limit(self):
         ''' Limit to framerate, should be called after
             rendering has completed '''
-        if self._speed is not None:
+        if self._speed:
             completion_time = time()
             exc_time = completion_time - self._start_time
             sleep_for = (1.0 / self._speed) - exc_time
@@ -221,18 +244,23 @@ class Grammar(object):
             if self._dynamic:
                 with self._executor.run_context() as (tenuous, code, ns):
                     # Code in main block may redefine 'draw'
-                    self._executor.do_exec(code, ns)
+                    #self._executor.do_exec(code, ns)
+                    self._executor.reload_functions(ns)
                     ns['draw']()
-                #self._executor.run()
-                #namespace['draw']()
             else:
                 self._executor.run()
-                #exec source_or_code in namespace
         
         self._canvas.flush(self._frame)
         if limit:
             self._frame_limit()
-        self._frame += 1
+
+        # Can set speed to go backwards using the shell if you really want
+        # or pause by setting speed == 0
+        if self._speed > 0:
+            self._frame += 1
+        elif self._speed < 0:
+            self._frame -= 1
+
         self._iteration += 1
 
     def _simple_traceback(self, ex, source):
@@ -305,7 +333,7 @@ class Grammar(object):
                 source = inputcode
                 code = compile(inputcode + '\n\n', filename, "exec")
             
-            self._executor = LiveExecution(code, ns=self._namespace)
+            self._executor = LiveExecution(code, ns=self._namespace, filename=filename)
             self._load_namespace(filename)
             
             # do the magic   
