@@ -1,4 +1,8 @@
 #from __future__ import division
+
+from pkg_resources import resource_filename, Requirement
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
 import sys, os
 import gtk
 import cairo
@@ -7,9 +11,7 @@ from socket_server import SocketServerMixin
 from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
-ICON_FILE = os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')
-
-class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
+class ShoebotWidget(gtk.DrawingArea, SocketServerMixin):
     '''
     Create a double buffered GTK+ widget on which we will draw using Cairo        
     '''
@@ -18,7 +20,6 @@ class ShoebotWidget(gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     __gsignals__ = { "expose-event": "override" }
     def __init__(self, scale_fit=True, input_device=None):
         gtk.DrawingArea.__init__(self)
-        DrawQueueSink.__init__(self)
 
         self.scale_fit = scale_fit
         self.input_device = input_device

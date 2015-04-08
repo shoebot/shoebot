@@ -276,14 +276,20 @@ Utility functions
 
 .. py:function:: files(path="*")
 
+    You can use wildcards to specify which files to pick, e.g.
+    >>> f = files('*.gif')
+
+    :param path: wildcard to use in file list.
+
+
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
 
     Save the contents of current surface into a file or cairo surface/context.
 
     :param filename: File name to output to. The file type will be deduced from the extension.
-    :param surface: Cairo surface to output to
+    :param surface:  If specified will output snapshot to the supplied cairo surface.
     :param boolean defer: Decides whether the action needs to happen now or can happen later. When set to False, it ensures that a file is written before returning, but can hamper performance. Usually you won't want to do this.  For files defer defaults to True, and for Surfaces to False, this means writing files won't stop execution, while the surface will be ready when snapshot returns. The drawqueue will have to stop and render everything up until this point.
-    :param boolean autonumber: TODO
+    :param boolean autonumber: If true then a number will be appended to the filename.
 
 
 
@@ -291,6 +297,13 @@ Core
 ----
 
 .. py:function:: ximport(libName)
+
+    Import nodebox libraries.
+
+    The libraries get _ctx, which provides
+    them with the nodebox API.
+
+    :param libName: Library name to import
 
 .. py:function:: size(w=None, h=None)
 

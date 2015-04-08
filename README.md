@@ -10,26 +10,6 @@ What you need
 
 Shoebot runs on Python 2.7, which is most probably what you already have installed.
 
-First thing is to install the appropriate dependencies. If this is your first time using Shoebot, you'll want to install all of them:
-
-Debian/Ubuntu:
-
-    sudo apt-get install libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg
-
-Fedora:
-
-    sudo yum install libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg
-
-OSX:
-
-With MacPorts (http://www.macports.org) and python2.5
-
-    sudo port install py25-numpy -atlas
-    sudo port install pango +quartz
-    sudo port install librsvg py25-pil py25-cairo py25-gtk
-
-MacPorts does not have the python-rsvg package, so svg output won't work.
-TODO: probably installing py26 packages and gnome-python-desktop would fix the missing python-rsvg problem.
 
 Installing Shoebot
 ------------------
@@ -44,29 +24,86 @@ Fedora:
 
     sudo yum install git
 
+SuSE:
+
+    sudo zypper install git-core
+
 Gentoo:
 
     emerge git
 
+
 OSX:
 
-    sudo port install git-core
+    Just make sure XCode and the Command Line Tools are installed.
+
 
 Make a temporary directory to download all source files into, and then get the source itself.
 
     mkdir ~/src
     cd ~/src
-    git clone git@github.com:shoebot/shoebot.git
+    git clone https://github.com/shoebot/shoebot.git
 
-You should now see a new shoebot/ directory. The only remaining step is to install it proper:
 
-    cd shoebot
-    sudo python setup.py install
+
+
+You should now see a new shoebot/ directory. The only remaining step is to install shoebot and its dependencies:
+
+
+
+Linux and Virtualenvwrapper:
+
+Using virtualenvwrapper is the easiest way to get started. First, install the necessary dependencies for Shoebot.
+    
+    # Install Shoebot dependencies if you haven't already
+    cd install
+    ./install_dependencies.sh
+    
+    # Create a new virtualenv
+    mkvirtualenv shoebot-env
+    
+    # Link in the GTK library and install Shoebot in the virtualenv
+    ./setup_virtualenv.sh shoebot-env
+
+
+    # To use shoebot in future remember to activate the environment first.
+    workon shoebot-env
+
+
+
+Linux wih plain virtualenv:
+
+If you don't use virtualenvwrapper follow these instructions after installing the dependencies.
+
+    # make a new virtualenv environment
+    virtualenv shoebot-env
+    
+    # activate it
+    source shoebot-env/bin/activate
+    
+    # Link in the GTK library and install Shoebot in the virtualenv
+    ./setup_virtualenv.sh shoebot-env
+
+
+    # To use shoebot in future remember to activate the environment first.
+    source shoebot-env/bin/activate
+
+
+
 
 OSX:
 
-    cd shoebot
-    sudo /opt/local/bin/python2.5 setup.py install
+Homebrew
+
+With MacPorts (http://www.macports.org) and python2.5
+
+    sudo port install py27-numpy -atlas
+    sudo port install pango +quartz
+    sudo port install librsvg py27-pil py27-cairo py27-gtk
+
+MacPorts does not have the python-rsvg package, so svg output won't work.
+TODO: probably installing py27 packages and gnome-python-desktop would fix the missing python-rsvg problem.
+
 
 
 Running Shoebot from the console
@@ -138,7 +175,7 @@ Links
 License
 -------
 
-Copyright (C) 2007-2012 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
+Copyright (C) 2007-2015 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
 Originally developed by Ricardo Lafuente with the support of the Piet Zwart Institute, Rotterdam.
 
     This program is free software: you can redistribute it and/or modify

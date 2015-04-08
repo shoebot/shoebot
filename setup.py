@@ -11,8 +11,10 @@
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
 import os
-from distutils.core import setup
-from setuptools import find_packages
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
@@ -36,14 +38,18 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
 setup(name = "shoebot",
-    version = "1.0b",
+    version = "1.0.1",
     description = "Vector graphics scripting application",
     author = "Ricardo Lafuente",
     author_email = "r@sollec.org",
     license = 'GPL v3',
     url = "http://shoebot.net",
-    packages = find_packages(),
+    packages = ["shoebot", "shoebot.core", "shoebot.data", "shoebot.gui", "shoebot.grammar", "shoebot.grammar.nodebox-lib", "shoebot.grammar.nodebox-lib.nodebox", "shoebot.grammar.nodebox-lib.nodebox.graphics", "shoebot.grammar.nodebox-lib.nodebox.geo"],
     data_files = datafiles,
+    install_requires = [
+        "Pillow",
+        "numpy" 
+    ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
  Shoebot is a pure Python graphics robot: It takes a Python script as input,

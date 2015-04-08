@@ -1,4 +1,7 @@
 #!/usr/bin/env python2
+from pkg_resources import resource_filename, Requirement
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
 import gtk
 import os.path
 import sys
@@ -8,8 +11,6 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
-ICON_FILE = next(f for f in ['/usr/share/shoebot/shoebot-ide.png', '/usr/local/share/pixmaps/shoebot-ide.png', os.path.join(sys.prefix, 'share', 'pixmaps', 'shoebot-ide.png')] if os.path.exists(f))
-
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):
         self.parent = parent
@@ -18,6 +19,12 @@ class VarWindow(object):
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
         self.window.connect("destroy", self.do_quit)
+
+
+        if os.path.isfile(ICON_FILE):
+            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
+            self.window.set_icon ( pixmap )
+
         vbox = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders

@@ -1,352 +1,33 @@
+<<<<<<< HEAD
 from collections import namedtuple
 import base64
 import queue
 import time
+=======
+>>>>>>> master
 from distutils.spawn import find_executable as which
-import os
-import subprocess
 from urllib.request import pathname2url
 
-from gi.repository import Gtk, Gio, GObject, Gedit, Pango
-import re
+from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
+from shoebotit import ide_utils, gtk3_utils
 
+import os
 
-def find_example_dir():
-    """
-    Find examples dir .. a little bit ugly..
+# TODO - Use shoebot from gsettings if available
+#        ide_utils.ShoebotProcess
 
-    # TODO - Move to extensions lib
-    """
 
-    # Needs to run in same python env as shoebot (may be different to gedits)
-    cmd = ["python", "-c", "import sys; print('{}/share/shoebot/examples/'.format(sys.prefix))"]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output, errors = p.communicate()
-    if errors:
-        print('Could not find shoebot examples')
-        print('Errors: {}'.format(errors))
-        return None
-    else:
-        examples_dir = output.decode('utf-8').strip()
-        if os.path.isdir(examples_dir):
-            return examples_dir
-        else:
-            print('Could not find shoebot examples at {}'.format(examples_dir))
-
-
-if not which('sbot'):
-    print('Shoebot executable not found.')
-
-_example_dir = find_example_dir()
-
-# regex taken from openuricontextmenu.py and slightly changed
-# to work with Python functions
-RE_DELIM = re.compile(r'[\w#/\?:%@&\=\+\.\\~-]+', re.UNICODE|re.MULTILINE)
-
-BASE_QUICKTORIAL_URL = "http://www.quicktorials.org/id/org.shoebot=en=0.3=%s"
-
-# function name -> quicktorial id mapping
-QUICKTORIAL_KEYWORDS = {
-        'rect': 'rect01',
-        'oval': 'ellipse01',
-        'var': 'var01'
-        }
-
-
-def get_example_dir():
-    return _example_dir
-
-
-def make_readable_filename(fn):
-    return os.path.splitext(fn)[0].replace('_', ' ').capitalize()
-
-
-def examples_menu(root_dir=None, depth=0):
-    """
-    :return: xml for menu, [(bot_action, label), ...], [(menu_action, label), ...]
-    """
-    examples_dir = get_example_dir()
-    if not examples_dir:
-        return "", [], []
-    
-    root_dir = root_dir or examples_dir
-
-    file_tmpl = '<menuitem name="{name}" action="{action}"/>'
-    dir_tmpl = '<menu name="{name}" action="{action}">{menu}</menu>'
-
-    file_actions = []
-    submenu_actions = []
-    
-    xml = ""
-
-    for fn in sorted(os.listdir(root_dir)):
-        path = os.path.join(root_dir, fn)
-        rel_path = path[len(examples_dir):]
-        if os.path.isdir(path):            
-            action = 'ShoebotExampleMenu {}'.format(rel_path)
-            label = fn.capitalize()
-
-            sm_xml, sm_file_actions, sm_menu_actions = examples_menu(os.path.join(root_dir, fn), depth+1)
-
-            submenu_actions.extend(sm_menu_actions)
-            file_actions.extend(sm_file_actions)
-            submenu_actions.append((action, label))
-            xml += dir_tmpl.format(name=fn, action=action, menu=sm_xml)
-        elif os.path.splitext(path)[1] in ['.bot', '.py'] and not fn.startswith('_'):
-            action = 'ShoebotExampleOpen {}'.format(rel_path)
-            label = make_readable_filename(fn)
-
-            xml += file_tmpl.format(name=fn, action=action)
-            file_actions.append((action, label))
-
-    return xml, file_actions, submenu_actions
-
-examples_xml, example_actions, submenu_actions = examples_menu()
-
-ui_str = """
-<ui>
-  <menubar name="MenuBar">
-    <menu name="ShoebotMenu" action="Shoebot">
-      <placeholder name="ShoebotOps_1">
-        <menuitem name="Run in Shoebot" action="ShoebotRun"/>
-            <separator/>
-                 <menu name="ShoebotExampleMenu" action="ShoebotOpenExampleMenu">
-                    {}
-                </menu>
-        <separator/>
-        <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
-        <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
-        <menuitem name="Fullscreen" action="ShoebotFullscreen"/>
-        <menuitem name="Live Code" action="ShoebotLive"/>
-      </placeholder>
-    </menu>
-  </menubar>
-</ui>
-""".format(examples_xml) # Splice in the examples menu
-
-
-def get_child_by_name(parent, name):
-    """
-    Iterate through a gtk container, `parent`, 
-    and return the widget with the name `name`.
-    """
-    # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
-    def iterate_children(widget, name):
-        if widget.get_name() == name:
-            return widget
-        try:
-            for w in widget.get_children():
-                result = iterate_children(w, name)
-                if result is not None:
-                    return result
-                else:
-                    continue
-        except AttributeError:
-            pass
-    return iterate_children(parent, name)
-
-
-import threading
-import subprocess
-
-
-class AsynchronousFileReader(threading.Thread):
-    '''
-    Helper class to implement asynchronous reading of a file
-    in a separate thread. Pushes read lines on a queue to
-    be consumed in another thread.
-    '''
-
-    def __init__(self, fd, q):
-        assert isinstance(q, queue.Queue)
-        assert callable(fd.readline)
-        threading.Thread.__init__(self)
-        self._fd = fd
-        self._queue = q
-
-    def run(self):
-        '''The body of the tread: read lines and put them on the queue.'''
-        try:
-            for line in iter(self._fd.readline, False):
-                self._queue.put(line)
-                if not line:
-                    time.sleep(0.1)
-        except ValueError:  # This can happen if we are closed during readline - TODO - better fix.
-            if not self._fd.closed:
-                raise
-
-    def eof(self):
-        '''Check whether there is no more content to expect.'''
-        return (not self.is_alive()) and self._queue.empty() or self._fd.closed
-
-
-
-#class ShoebotThread(threading.Thread):
-#    ''' 
-#    Run shoebot in seperate thread
-#    '''
-#    # http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-#    def __init__(self, cmd, textbuffer, workingdir = None):
-#        self.cmd = cmd
-#        self.textbuffer = textbuffer
-#        self.workingdir = workingdir
-#        self.stdout = None
-#        self.stderr = None
-#        threading.Thread.__init__(self)
-
-#    def run(self):
-#        textbuffer = self.textbuffer
-#        
-#        try:
-#            proc = subprocess.Popen(self.cmd,
-#                                 shell=False,
-#                                 stdout=subprocess.PIPE,
-#                                 stderr=subprocess.PIPE,
-#                                 cwd=self.workingdir)
-#        except OSError as e:
-#            if e.errno == 2:
-#                textbuffer.insert(textbuffer.get_end_iter(), 'Shoebot executable sbot not found in path.')
-#            else:
-#                textbuffer.insert(textbuffer.get_end_iter(), str(e))
-#            return
-#            
-
-#        textbuffer.set_text('')
-#        #self.stdout, self.stderr = proc.communicate()
-
-#        panel = Gedit.App.get_default().get_active_window().get_bottom_panel()
-#        visible = panel.get_property("visible")
-#        while proc.poll() is None:
-#            line = proc.stdout.readline()
-#            if line:
-#                # Process output here
-#                textbuffer.insert(textbuffer.get_end_iter(), line)
-#                while Gtk.events_pending():
-#                            Gtk.main_iteration()
-#                if not visible:
-#                    panel.set_property("visible", True)
-#        if proc.returncode != 0:
-#            panel.set_property("visible", True)
-
-
-class ShoebotProcess(object):
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, livecoding, title, textbuffer, cwd=None):
-        self.livecoding = livecoding
-        self.textbuffer = textbuffer
-        
-        command = ['sbot', '-w', '-t%s - Shoebot on gedit' % title]
-
-        if use_socketserver:
-            command.append('-s')
-
-        if not show_varwindow:
-            command.append('-dv')
-
-        if use_fullscreen:
-            command.append('-f')
-
-        if livecoding:
-            self.livecoding = livecoding
-            command.append('-l')
-
-        command.append(code)
-
-        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
-
-        if livecoding:
-            self.changed_handler_id = textbuffer.connect("changed", self.doc_changed)
-        else:
-            self.changed_handler_id = None
-
-        # Launch the asynchronous readers of the process' stdout and stderr.
-        self.stdout_queue = queue.Queue()
-        self.stdout_reader = AsynchronousFileReader(self.process.stdout, self.stdout_queue)
-        self.stdout_reader.start()
-        self.stderr_queue = queue.Queue()
-        self.stderr_reader = AsynchronousFileReader(self.process.stderr, self.stderr_queue)
-        self.stderr_reader.start()
-
-        self.changed_handler_id = None
-
-
-
-    def doc_changed(self, *args):
-        if self.livecoding:
-            start_iter = self.textbuffer.get_start_iter()
-            end_iter = self.textbuffer.get_end_iter()
-            source = self.textbuffer.get_text(start_iter, end_iter, False)
-
-            #self.send_command("load_base64", source)
-            #b64_source = str(base64.b64encode(bytes(source, "utf-8")))
-            try:
-                self.send_command("load_base64", source)
-            except Exception as e:
-                print('FIXME')
-                print(e)
-                if self.changed_handler_id is not None:
-                    self.textbuffer.disconnect(self.changed_handler_id)
-
-    def send_command(self, cmd, *args):
-        if args:
-            self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
-        else:
-            self.process.stdin.write(bytes(cmd, "utf-8"))
-        self.process.stdin.write(b"\n")
-        self.process.stdin.flush()
-
-    
-    def _update_ui_text(self, output_widget):
-        textbuffer = output_widget.get_buffer()
-        while False == (self.stdout_queue.empty() and self.stderr_queue.empty()):
-            if not self.stdout_queue.empty():
-                line = self.stdout_queue.get().decode('utf-8')
-                textbuffer.insert(textbuffer.get_end_iter(), line)
-
-            if not self.stderr_queue.empty():
-                line = self.stderr_queue.get().decode('utf-8')
-                textbuffer.insert(textbuffer.get_end_iter(), line)
-        #else:
-        output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
-        while Gtk.events_pending():
-            Gtk.main_iteration()
-
-    def update_shoebot(self, output_widget):
-        """
-        :param textbuffer: Gtk textbuffer to append shoebot output to.
-        :output_widget: Gtk widget containing the output
-        :return: True if shoebot still running, False if terminated.
-        Send any new shoebot output to a textbuffer.
-        """
-        self._update_ui_text(output_widget)
-
-        if self.process.poll() is not None:
-            # Close subprocess' file descriptors.
-            self._update_ui_text(output_widget)
-            self.process.stdin.close()
-            self.process.stdout.close()
-            self.process.stderr.close()
-            print('Quit...')
-
-            if self.changed_handler_id is not None:
-                self.textbuffer.disconnect(self.changed_handler_id)
-            return False
-
-        result = not (self.stdout_reader.eof() or self.stderr_reader.eof())
-        return result
-
-
-class ShoebotWindowHelper:
+class ShoebotWindowHelper(object):
     def __init__(self, plugin, window):
         self.example_bots = {}
 
         self.window = window
         panel = window.get_bottom_panel()
-        self.output_widget = get_child_by_name(panel, 'shoebot-output')
+        self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
 
         self.plugin = plugin
         self.insert_menu()
-        self.shoebot_window = None
         self.id_name = 'ShoebotPluginID'
 
         self.use_socketserver = False
@@ -355,22 +36,21 @@ class ShoebotWindowHelper:
         self.livecoding = False
 
         self.started = False
-        self.shoebot_thread = None
         
         for view in self.window.get_views():
             self.connect_view(view)
 
         self.bot = None
-
     
     def deactivate(self):
         self.remove_menu()
         self.window = None
         self.plugin = None
-        self.action_group = None
-        del self.shoebot_window
 
     def insert_menu(self):
+        examples_xml, example_actions, submenu_actions = gtk3_utils.examples_menu()
+        ui_str = gtk3_utils.gedit3_menu(examples_xml)
+
         manager = self.window.get_ui_manager()
         self.action_group = Gtk.ActionGroup("ShoebotPluginActions")
         self.action_group.add_actions([
@@ -378,7 +58,6 @@ class ShoebotWindowHelper:
             ("ShoebotRun", None, _("Run in Shoebot"), '<control>R', _("Run in Shoebot"), self.on_run_activate),
             ('ShoebotOpenExampleMenu', None, _('E_xamples'), None, None, None)
             ])
-        
 
         for action, label in example_actions:
             self.action_group.add_actions([(action, None, (label), None, None, self.on_open_example)])
@@ -398,10 +77,10 @@ class ShoebotWindowHelper:
         manager.ensure_update()
 
     def on_open_example(self, action):
-        example_dir = get_example_dir()
+        example_dir = ide_utils.get_example_dir()
         filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
         
-        uri      = "file:///" + pathname2url(filename)
+        uri = "file:///" + pathname2url(filename)
         gio_file = Gio.file_new_for_uri(uri)
         self.window.create_tab_from_location(
             gio_file,
@@ -410,7 +89,6 @@ class ShoebotWindowHelper:
             0,     # column
             False, # Do not create an empty file
             True)  # Switch to the tab
-
 
     def remove_menu(self):
         manager = self.window.get_ui_manager()
@@ -435,7 +113,8 @@ class ShoebotWindowHelper:
         self.start_shoebot()
 
     def start_shoebot(self):
-        if not which('sbot'):
+        sbot_bin=gtk3_utils.sbot_executable()
+        if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
             while Gtk.events_pending():
@@ -455,7 +134,7 @@ class ShoebotWindowHelper:
         if not doc:
             return
 
-        title = doc.get_short_name_for_display()
+        title = '%s - Shoebot on gedit' % doc.get_short_name_for_display()
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
@@ -470,22 +149,19 @@ class ShoebotWindowHelper:
            Gtk.main_iteration()
 
 
-        self.bot = ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.livecoding, title, doc, cwd=cwd)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.livecoding, title, doc, cwd=cwd)
 
         GObject.idle_add(self.update_shoebot)
-
 
     def update_shoebot(self):
         if self.bot:
             running = self.bot.update_shoebot(self.output_widget)
 
-            if not running:
-                 return False
-        return True
-
+        return self.bot.running
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()
+
     def toggle_var_window(self, action):
         self.show_varwindow = action.get_active()
     def toggle_fullscreen(self, action):
@@ -504,66 +180,7 @@ class ShoebotWindowHelper:
         pass
 
 
-    def on_view_populate_popup(self, view, menu):
-        # taken from gedit-plugins-python-openuricontextmenu
-        doc = view.get_buffer()
-        win = view.get_window(Gtk.TextWindowType.TEXT)
-        ptr_window, x, y, mod = win.get_pointer()
-        x, y = view.window_to_buffer_coords(Gtk.TextWindowType.TEXT, x, y) 
-
-        # first try at pointer location
-        insert = view.get_iter_at_location(x, y)
-
-        # second try at cursor
-        if insert == None:
-            insert = doc.get_iter_at_mark(doc.get_insert())
-
-        while insert.forward_char():
-            if not RE_DELIM.match(insert.get_char()):
-                break
-
-        start = insert.copy()
-        while start.backward_char():
-            if not RE_DELIM.match(start.get_char()):
-                start.forward_char()
-                break
-
-        word = unicode(doc.get_text(start, insert, False))
-
-        if len(word) == 0:
-            return True
-
-        word = self.validate_word(word)
-        if not word:
-            return True
-
-        open_quicktorial_item = Gtk.ImageMenuItem(_("Know more about '%s'") % (word))
-        open_quicktorial_item.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU))
-        open_quicktorial_item.connect('activate', self.on_open_quicktorial, word)
-        open_quicktorial_item.show()
-
-        separator = Gtk.SeparatorMenuItem()
-        separator.show()
-
-        menu.prepend(separator)
-        menu.prepend(open_quicktorial_item)
-
-    def validate_word(self, word):
-        if word in QUICKTORIAL_KEYWORDS:
-            return word
-        return None
-
-    def on_open_quicktorial(self, menu_item, word):
-        self.open_quicktorial(word)
-        return True
-
-    def open_quicktorial(self, word):
-        import webbrowser
-        q_id = QUICKTORIAL_KEYWORDS[word]
-        url = BASE_QUICKTORIAL_URL % q_id
-        webbrowser.open(url)
-
-class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
+class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable):
     window = GObject.property(type=Gedit.Window)
 
     def __init__(self):
@@ -571,12 +188,21 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
         self.instances = {}
         self.tempfiles = []
 
-    def do_activate(self):
-        self.text = Gtk.TextView()
-        self.text.set_editable(False)
+    def _create_view(self):
+        """ Create the gtk.TextView used for shell output """
+        view = Gtk.TextView()
+        view.set_editable(False)
+
         fontdesc = Pango.FontDescription("Monospace")
-        self.text.modify_font(fontdesc)
-        self.text.set_name('shoebot-output')
+        view.modify_font(fontdesc)
+        view.set_name('shoebot-output')
+
+        buff = view.get_buffer()
+        buff.create_tag('error', foreground='red')
+        return view
+
+    def do_activate(self):
+        self.text = self._create_view()
         self.panel = self.window.get_bottom_panel()
 
         image = Gtk.Image()
@@ -600,8 +226,9 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable):
 
         self.panel.remove_item(self.output_widget)
 
-
     def do_update_state(self):
         self.instances[self.window].update_ui()
 
-
+    def do_create_configure_widget(self):
+        widget = gtk3_utils.ShoebotPreferences()    
+        return widget

@@ -29,7 +29,8 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Convenience function to run a bot'''
 
-import os.path
+import os
+import signal
 import sys
 import threading
 
@@ -71,16 +72,23 @@ def bot(src = None, grammar=NODEBOX, format=None, outputfile=None, iterations=1,
     '''
     canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, server=server, port=port, show_vars = show_vars)
 
-    from shoebot.grammar import DrawBot, NodeBot
     if grammar == DRAWBOT:
+        from shoebot.grammar import DrawBot
         bot = DrawBot(canvas, vars = vars)
     else:
+        from shoebot.grammar import NodeBot
         bot = NodeBot(canvas, vars = vars)
 
     return bot
 
 
 class ShoebotThread(threading.Thread):
+    """
+    Run shoebot itself in another thread
+    so stdout / stderr are free for the
+    main thread
+    """
+
     def __init__(self, sbot, *args, **kwargs):
         threading.Thread.__init__(self)
         self.sbot = sbot
@@ -102,7 +110,7 @@ class ShoebotThread(threading.Thread):
             os.kill(os.getpid(), signal.SIGINT)
 
 
-def run(src, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, close_window=False, server=False, port=7777, show_vars=False, vars=None, run_shell=False, args = []):
+def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1, buff=None, window = False, title = None, fullscreen = None, close_window = False, server=False, port=7777, show_vars = False, vars = None, run_shell=False, args = [], verbose = False):
     # Munge shoebot sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
     sbot = bot(src,

@@ -15,13 +15,12 @@ Example::
       
 '''
 
-requires = ['shoebot>=0.4a4']
+#requires = ['shoebot==1.0b']
 
 setup(
     name='sphinxcontrib-shoebot',
-    version='0.1',
-    url='http://bitbucket.org/birkenfeld/sphinx-contrib',
-    download_url='http://pypi.python.org/pypi/sphinxcontrib-shoebot',
+    version='0.9.9',
+    url='https://github.com/shoebot/shoebot/tree/readthedocs/doc/sphinxcontrib_shoebot',
     license='BSD',
     author='Stuart Axon',
     author_email='stuaxo2@yahoo.com',
@@ -42,6 +41,6 @@ setup(
     platforms='any',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=requires,
+    #install_requires=requires,
     namespace_packages=['sphinxcontrib'],
 )

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-REQUIREMENTS_TXT="$SCRIPTPATH/../requirements/requirements.txt"
+REQUIREMENTS_TXT="$SCRIPTPATH/../requirements.txt"
 
 
 show_usage() {
@@ -24,13 +24,57 @@ $ setup_virtualenv.sh shoebot
 "
 }
 
+link_module() {
+    # Bit hacky having this as well as link_sitepackage, but it works...
+    #echo ln -sf `python -c "import os, $1; print os.path.dirname($1.__file__)"` $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
+    ln -sf `python -c "import os, $1; print os.path.dirname($1.__file__)"` $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
+}
+
+link_sitepackage() {
+    # $1 lib to find    $2 pass anything here to ignore errors
+    TARGET=`find ${SITE_PACKAGES//:/ } -maxdepth 1 -name $1 -print -quit`
+    if [ "$2" == "$TARGET" ]; then
+        echo Could not find $1 in site packages:
+        echo $SITE_PACKAGES
+        echo ''
+        echo Aborting.
+        exit 1
+    fi
+    ln -sf $TARGET $VIRTUAL_ENV/lib/python$PYTHON_VERSION/site-packages
+}
+
 setup_venv() {
     VIRTUAL_ENV=$1
+    PYTHON_VERSION=`python -c "import sys;print sys.version[0:3]"`
+
     echo "Setup virtualenv shoebot and link dependencies at ${VIRTUAL_ENV}"
 
-    # TODO - Only tested on Ubuntu, probably need a better way of finding the system python.
+
+    echo "Linking to system modules."
+
+    # TODO - Tested on Ubuntu, probably need a better way of finding the system python.
     echo Link Glib, Gtk from system python etc
-    ln -sf /usr/lib/python2.7/dist-packages/{glib,gobject,cairo,gtk-2.0,pygtk.py,pygtk.pth} $VIRTUAL_ENV/lib/python2.7/site-packages
+
+    _PATH=$PATH
+    export PATH=${PATH#*:}
+
+    # Add slashes to end of directories, for OSX find.
+    PY_CODE="import site, os; print '/ '.join([ os.path.abspath(d) for d in site.getsitepackages() if os.path.exists(d) ])"
+    SITE_PACKAGES=`python -c "${PY_CODE}"`
+
+    #ln -sf $SYS_MODULES/{glib,gobject,cairo,gtk-2.0,pygtk.py,pygtk.pth} $VIRTUAL_ENV/lib/python2.7/site-packages
+    link_module cairo
+    link_sitepackage glib
+    link_sitepackage gobject
+    link_sitepackage pygtk.py
+    link_sitepackage pygtk.pth
+    link_sitepackage gtk-2.0
+
+    # gtksourceview2 is for the legacy ide and not needed
+    link_sitepackage gtksourceview2.so ignore_errors
+
+    export PATH=$_PATH
+
     echo Install requirements...
     # Install packages except pygtk, rsvg, pycairo which need to be manually linked.
     sed -e '/^#/d' -e '/gtk/d' -e '/rsvg/d' -e '/pycairo/d' $REQUIREMENTS_TXT | echo
@@ -47,11 +91,12 @@ if [ $# -ne 1 ]; then
     exit
 else
     if [ "-c" = "$1" ]; then
-        setup_current_venv
         if [ "" = "$VIRTUAL_ENV" ]; then
             echo "Activate virtualenv before specifying -c"
             exit 1
         else
+            # Remove virtualenv from the path.
+            echo $PATH
             setup_venv "${VIRTUAL_ENV}"
         fi
     elif [ -f "${1}/bin/activate" ]; then

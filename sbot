@@ -137,6 +137,14 @@ parser.add_argument("-a",
                 dest="script_args",
                 help=_("Pass to the bot"),
                 )
+parser.add_argument("-V",
+                "--verbose",
+                action="store_true",
+                dest="verbose",
+                default=False,
+                help=_("Show internal shoebot error information in traceback"),
+                )
+parser.add_argument('script_args', nargs='?')
 
 def error(message):
     '''Prints an error message, the help message and quits'''
@@ -181,4 +189,5 @@ if __name__ == '__main__':
         vars = vars or None,
         run_shell = args.shell,
         args = shlex.split(args.script_args or ""),
+        verbose = args.verbose
         )
