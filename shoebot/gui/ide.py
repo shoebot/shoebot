@@ -852,7 +852,7 @@ class View(gtk.Window):
         self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         gtk.about_dialog_set_url_hook(self.on_url, self.website)
-        dlg.set_version("0.4")
+        dlg.set_version("1.1.1")
         dlg.set_name("shoebot")
         # TODO: add license text
         dlg.set_license("GPLv3")
