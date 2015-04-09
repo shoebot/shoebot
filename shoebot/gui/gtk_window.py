@@ -31,8 +31,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         GtkInputDeviceMixin.__init__(self)
 
         if os.path.isfile(ICON_FILE):
-            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
-            self.set_icon ( pixmap )
+            self.set_icon_from_file( ICON_FILE )
         
         self.menu_enabled = menu_enabled
         self.has_server = server
@@ -43,6 +42,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         sb_widget = ShoebotWidget(input_device=self)
 
+        self.title = title
         if title:
             self.set_title(title)
         if fullscreen:

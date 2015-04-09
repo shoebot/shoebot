@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-import sys
+import os
 
 from pgi.repository import Gtk
 from pkg_resources import resource_filename, Requirement
@@ -21,8 +21,7 @@ class VarWindow(object):
         self.window.connect("destroy", self.do_quit)
 
         if os.path.isfile(ICON_FILE):
-            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
-            self.window.set_icon ( pixmap )
+            self.window.set_icon_from_file( ICON_FILE )
 
         vbox = Gtk.VBox(homogeneous=True, spacing=20)
 
@@ -30,7 +29,6 @@ class VarWindow(object):
         self.widgets = {}
 
         for item in sorted(bot._vars.values()):
-            self.variables.append(item)
             if item.type is NUMBER:
                 self.widgets[item.name] = self.add_number(vbox, item)
             elif item.type is TEXT:
@@ -61,8 +59,8 @@ class VarWindow(object):
         else:
             adj = Gtk.Adjustment(v.value, v.min, v.max, .1)
         adj.connect("value_changed", self.widget_changed, v)
-        hscale = Gtk.HScale(adj)
-        hscale.set_value_pos(gtk.POS_RIGHT)
+        hscale = Gtk.HScale(adjustment=adj)
+        #hscale.set_value_pos(Gtk.POS_RIGHT)
         hscale.set_value(v.value)
         sliderbox.pack_start(hscale, True, True, 0)
         container.pack_start(sliderbox, True, True, 0)
@@ -141,8 +139,8 @@ class VarWindow(object):
         ''' Called when a slider is adjusted. '''
         # set the appropriate bot var
         if v.type is NUMBER:
-            self.bot._namespace[v.name] = widget.value
-            self.bot._vars[v.name].value = widget.value  ## Not sure if this is how to do this - stu
+            self.bot._namespace[v.name] = widget.get_value()
+            self.bot._vars[v.name].value = widget.get_value()  ## Not sure if this is how to do this - stu
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
             self.bot._vars[v.name].value = widget.get_active()  ## Not sure if this is how to do this - stu
