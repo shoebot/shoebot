@@ -57,7 +57,7 @@ class AsynchronousFileReader(threading.Thread):
 class ShoebotProcess(object):
     def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         # start with -w for window -l for shell'
-        command = ['sbot', '-wl', '-t%s - Shoebot on gedit' % title]
+        command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
 
         if use_socketserver:
             command.append('-s')
