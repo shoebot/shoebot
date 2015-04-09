@@ -19,4 +19,4 @@ vext.pygtk
 setuptools>=7.0.0
 Pillow==2.6.1
 numpy==1.9.1
-meta=0.4.1
+meta==0.4.1
