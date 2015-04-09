@@ -22,6 +22,7 @@ import base64
 import cmd
 import shlex
 
+
 class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
 
@@ -41,7 +42,7 @@ class ShoebotCmd(cmd.Cmd):
             bot
         self.pause_speed = None
         cmd.Cmd.__init__(self, **kwargs)
-        self.intro = 'Experimental Feature - for ide integration.'
+        self.intro = 'Shoebot Shell'
         self.prompt = '(bot) '
         self.use_rawinput = False
 
