@@ -15,8 +15,8 @@
 #     mkvirtualenv --system-site-packages shoebot-env
 
 
-vext.pygtk
-setuptools>=7.0.0
-Pillow==2.8.1
-numpy==1.9.1
 meta==0.4.1
+numpy==1.9.1
+Pillow==2.8.1
+setuptools>=7.0.0
+vext.pygtk
