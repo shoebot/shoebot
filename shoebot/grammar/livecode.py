@@ -1,3 +1,4 @@
+import ast
 import copy
 import contextlib
 import compiler.ast
@@ -15,9 +16,9 @@ class LiveExecution(object):
     """
     ns = {}
 
-    def __init__(self, code, ns=None, filename=None):
+    def __init__(self, source, ns=None, filename=None):
         self.edited_source = None
-        self.known_good = code
+        self.known_good = source
         self.filename = filename
         if ns is None:
             self.ns = {}
@@ -33,42 +34,37 @@ class LiveExecution(object):
         """
         self.edited_source = source
 
-    def reload_functions(self, ns=None):
+    def reload_functions(self):
         """
         Recompile functions
-
-        :param code:
-        :param ns:
-        :return:
         """
-        #
         if self.edited_source:
-            code = self.edited_source
-            tree = ast.parse(code)
+            source = self.edited_source
+            tree = ast.parse(source)
             for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                meta.decompiler.compile_func(f, self.filename, self.ns)
+                # TODO - Could modify __code__ etc of functions, but this info will
+                # need to be saved if thats the case
+                self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
 
-            self.do_exec(self.edited_source, ns)
-
-    def do_exec(self, code, ns, tenuous = False):
+    def do_exec(self, source, ns, tenuous = False):
         """
         Override if you want to do something other than exec in ns
 
-        tenuous is True if the code has just been edited and may fail
+        tenuous is True if the source has just been edited and may fail
         """
-        exec code in ns
+        exec source in ns
 
     def run_tenuous(self):
         """
-        Run edited code, if no exceptions occur then it
+        Run edited source, if no exceptions occur then it
         graduates to known good.
         """
         ns_snapshot = copy.copy(self.ns)
         try:
-            code = self.edited_source
+            source = self.edited_source
             self.edited_source = None
-            self.do_exec(code, ns_snapshot, True)
-            self.known_good = code
+            self.do_exec(source, ns_snapshot, True)
+            self.known_good = source
             return True, None
         except Exception as e:
             self.ns.clear()
@@ -77,7 +73,7 @@ class LiveExecution(object):
 
     def run(self):
         """
-        Attempt to known good or tenuous code.
+        Attempt to known good or tenuous source.
         """
         if self.edited_source:
             success, ex = self.run_tenuous()
@@ -89,12 +85,12 @@ class LiveExecution(object):
     @contextlib.contextmanager
     def run_context(self):
         """
-        Context in which the user can run the code in a custom manner.
+        Context in which the user can run the source in a custom manner.
 
-        If no exceptions occur then the code will move from 'tenuous'
+        If no exceptions occur then the source will move from 'tenuous'
         to 'known good'.
 
-        >>> with run_context() as (tenuous, code, ns):
+        >>> with run_context() as (tenuous, source, ns):
         >>> ...  exec code in ns
         >>> ...  ns['draw']()
 

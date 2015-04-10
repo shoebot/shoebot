@@ -130,7 +130,7 @@ class Grammar(object):
             if self._dynamic:
                 with self._executor.run_context() as (tenuous, code, ns):
                     # Code in main block may redefine 'draw'
-                    self._executor.reload_functions(ns)
+                    self._executor.reload_functions()
                     ns['draw']()
             else:
                 self._executor.run()
@@ -253,7 +253,7 @@ class Grammar(object):
             if verbose:
                 errmsg = traceback.format_exc()
             else:
-                errmsg = self._simple_traceback(e, source or '')
+                errmsg = self._simple_traceback(e, self._executor.known_good or '')
             print >> sys.stderr, errmsg
 
     def finish(self):
