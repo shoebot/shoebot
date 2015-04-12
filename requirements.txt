@@ -13,10 +13,8 @@
 # or with virtualenvwrapper:
 #     mkvirtualenv --system-site-packages shoebot-env
 cairocffi==0.6
-Pillow==2.8.1
 numpy==1.9.1
+Pillow==2.8.1
 meta==0.4.1
 pgi==0.0.9
 setuptools>=7.0.0
-
-
