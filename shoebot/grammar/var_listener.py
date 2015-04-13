@@ -71,8 +71,16 @@ class VarListener(object):
 
         added_vars = set(oldvars.keys()) - set(snapshot_vars.keys())
         deleted_vars = set(snapshot_vars.keys()) - set(oldvars.keys())
+        existing_vars = set(vars.keys()) - added_vars - deleted_vars
+        for name in existing_vars:
+            old_var = snapshot_vars[name]
+            new_var = vars[name]
+            if old_var.type != new_var.type:
+                deleted_vars.add(name)
+                added_vars.add(name)
+
         for listener in listeners or []:
-            for name in added_vars:
-                listener.var_added(vars[name])
             for name in deleted_vars:
                 listener.var_deleted(snapshot_vars[name])
+            for name in added_vars:
+                listener.var_added(vars[name])

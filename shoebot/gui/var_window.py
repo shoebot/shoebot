@@ -194,7 +194,6 @@ class VarWindow(object):
         self.window.set_size_request(400, 35*len(self.widgets.keys()))
         self.window.show_all()
 
-
     def var_updated(self, v):
         pass
 
