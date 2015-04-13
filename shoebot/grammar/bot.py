@@ -352,13 +352,13 @@ class Bot(Grammar):
         self.WIDTH = w  # Added to make evolution example work
         self.HEIGHT = h # Added to make evolution example work
 
-    def speed(self, framerate):
+    def speed(self, framerate=None):
         '''Set animation framerate.
 
         :param framerate: Frames per second to run bot.
         :return: Current framerate of animation.
         '''
-        if framerate:
+        if framerate is not None:
             self._speed = framerate
             self._dynamic = True
         else:

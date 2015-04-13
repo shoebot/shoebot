@@ -29,7 +29,7 @@ class Grammar(object):
         self._quit = False
         self._iteration = 0
         self._dynamic = True
-        self._speed = None
+        self._speed = 60.0
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
@@ -117,7 +117,8 @@ class Grammar(object):
         :param limit: Time a frame should take to run (float - seconds)
         '''
         namespace = self._namespace
-        self._canvas.reset_canvas()
+        if self._speed != 0:
+            self._canvas.reset_canvas()
         self._set_dynamic_vars()
         if self._iteration == 0:
             # First frame
@@ -128,7 +129,7 @@ class Grammar(object):
             namespace['draw']()
         else:
             # Subsequent frames
-            if self._dynamic:
+            if self._dynamic and self._speed != 0:
                 with self._executor.run_context() as (known_good, source, ns):
                     # Code in main block may redefine 'draw'
                     self._executor.reload_functions()

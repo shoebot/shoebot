@@ -61,25 +61,25 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
 
-        actiongroup = gtk.ActionGroup('Canvas')
+        self.action_group = gtk.ActionGroup('Canvas')
 
-        actiongroup.add_actions([('Save as', None, _('_Save as')),
-                                 ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
-                                 ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
-                                 ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
-                                 ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
-                                 ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
-                                ])
+        self.action_group.add_actions([('Save as', None, _('_Save as')),
+                                     ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
+                                     ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
+                                     ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
+                                     ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
+                                     ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
+                                    ])
 
-        actiongroup.add_toggle_actions([('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables, self.show_vars),
-                                        ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False)])
-
-
-
-
+        self.action_group.add_toggle_actions([
+                ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables, self.show_vars),
+                ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
+                ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
+            ])
 
         menuxml = '''
         <popup action="Save as">
+            <menuitem action="play"/>
             <menuitem action="vars"/>
             <menuitem action="fullscreen"/>
             <separator/>
@@ -93,7 +93,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         </popup>
         '''
 
-        self.uimanager.insert_action_group(actiongroup, 0)
+        self.uimanager.insert_action_group(self.action_group, 0)
         self.uimanager.add_ui_from_string(menuxml)
 
         sb_widget.show()
@@ -109,7 +109,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.server('', self.serverport)
 
         self.window_open = True
-
+        self.pause_speed = None # TODO - factor out bot controller stuff
 
     def gtk_mouse_button_down(self, widget, event):
         ''' Handle right mouse button clicks '''
@@ -157,6 +157,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         '''
         if self.var_window is None and self.bot._vars:
             self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
+            self.var_window.window.connect("destroy", self.var_window_closed)
 
     def hide_variables_window(self):
         '''
@@ -166,11 +167,21 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.var_window.window.destroy()
             self.var_window = None
 
+    def var_window_closed(self, widget):
+        """
+        Called if user clicked close button on var window
+        :param widget:
+        :return:
+        """
+        # TODO - Clean up the menu handling stuff its a bit spagetti right now
+        self.action_group.get_action('vars').set_active(False)
+        self.show_vars = False
+        self.var_window = None
+
     def var_changed(self, name, value):
         self.bot._namespace[name] = value
         if self.var_window:
             return self.var_window.update_var(name, value)
-
 
     def do_snapshot(self, format):
         bot = self.bot
@@ -225,7 +236,16 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.fullscreen()
         else:
             self.unfullscreen()
-                
+
+    def do_toggle_play(self, action):
+        # TODO - move this into bot controller
+        # along with stuff in socketserver and shell
+        if self.pause_speed is None and not action.get_active():
+            self.pause_speed = self.bot._speed
+            self.bot._speed = 0
+        else:
+            self.bot._speed = self.pause_speed
+            self.pause_speed = None
 
     def do_toggle_variables(self, action):
         self.show_vars = action.get_active()
@@ -233,8 +253,6 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.show_variables_window()
         else:
             self.hide_variables_window()
-
-
 
     def finish(self):
         while self.bot._quit == False and self.window_open == True:

@@ -20,11 +20,13 @@ class VarWindow(object):
     def __init__(self, parent, bot, title = None):
         self.parent = parent
         self.bot = bot
-        bot._var_listeners.append(VarListener(self))
+
+        self.var_listener = VarListener(self)
+        bot._var_listeners.append(self.var_listener)
 
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
-        self.window.connect("destroy", self.do_quit)
+        self.window.connect("destroy", self.do_destroy)
 
         if os.path.isfile(ICON_FILE):
             pixmap = gtk.gdk.pixbuf_new_from_file(ICON_FILE)
@@ -127,8 +129,8 @@ class VarWindow(object):
 
         return button
 
-    def do_quit(self, widget):
-        pass
+    def do_destroy(self, widget):
+        self.bot._var_listeners.remove(self.var_listener)
 
     def update_var(self, name, value):
         """

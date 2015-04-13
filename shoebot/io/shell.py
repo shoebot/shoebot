@@ -76,9 +76,9 @@ class ShoebotCmd(cmd.Cmd):
         self.bot._namespace.update(self.bot._initial_namespace)
 
     def do_pause(self, line):
-        if self.pause_speed is None:
+        if self.pause_speed is not None:
             self.pause_speed = self.bot._speed
-            self.bot._speed = None
+            self.bot._speed = 0
             print("Paused - \"play\" to resume")
 
     def do_play(self, line):
