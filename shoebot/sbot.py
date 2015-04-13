@@ -128,8 +128,8 @@ def run(src, grammar = NODEBOX, format = None, outputfile = None, iterations = 1
                vars=vars)
 
     if run_shell:
-        import shoebot.gui.shell
-        shell = shoebot.gui.shell.ShoebotCmd(sbot)
+        import shoebot.io.shell
+        shell = shoebot.io.shell.ShoebotCmd(sbot)
     else:
         shell = None
 

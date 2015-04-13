@@ -91,7 +91,7 @@ class LiveExecution(object):
         to 'known good'.
 
         >>> with run_context() as (tenuous, source, ns):
-        >>> ...  exec code in ns
+        >>> ...  exec source in ns
         >>> ...  ns['draw']()
 
         """

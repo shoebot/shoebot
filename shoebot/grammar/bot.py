@@ -40,6 +40,7 @@ from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          NUMBER, TEXT, BOOLEAN, BUTTON
 
 from grammar import Grammar
+from var_listener import VarListener
 
 from pkg_resources import resource_filename, Requirement
 from glob import glob
@@ -125,7 +126,6 @@ class Bot(Grammar):
         self._canvas.size = None
         self._frame = 1
         self._set_initial_defaults() ### TODO Look at these
-
         
     def _set_initial_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),

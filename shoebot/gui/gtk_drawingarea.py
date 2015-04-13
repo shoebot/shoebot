@@ -3,12 +3,11 @@
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
-import sys, os
+import os
 import gtk
 import cairo
-from socket_server import SocketServerMixin
+from shoebot.io.socket_server import SocketServerMixin
 
-from shoebot.core import DrawQueueSink
 from shoebot.util import RecordingSurface
 
 class ShoebotWidget(gtk.DrawingArea, SocketServerMixin):

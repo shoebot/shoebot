@@ -3,6 +3,7 @@ from livecode import LiveExecution
 import traceback
 
 from time import sleep, time
+from var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
 
@@ -33,7 +34,8 @@ class Grammar(object):
         self._oldvars = self._vars
         self._namespace = namespace or {}
 
-        #self._executor = LiveExecution(ns=self)
+        self._var_listeners = []
+
         self._executor = None
 
         input_device = canvas.get_input_device()
@@ -45,7 +47,6 @@ class Grammar(object):
                 mouse_button_up = self._mouse_button_up,
                 mouse_pointer_moved = self._mouse_pointer_moved)
         self._input_device = input_device
-
 
     def _load_namespace(self, filename = None):
         ''' Export namespace into the user bot
@@ -128,9 +129,18 @@ class Grammar(object):
         else:
             # Subsequent frames
             if self._dynamic:
-                with self._executor.run_context() as (tenuous, code, ns):
+                with self._executor.run_context() as (known_good, source, ns):
                     # Code in main block may redefine 'draw'
                     self._executor.reload_functions()
+                    if not known_good:
+                        with VarListener.batch(self._vars, self._oldvars, self._var_listeners):
+                            self._oldvars.clear()
+
+                            # Re-run the function body - ideally this would only
+                            # happen if the body had actually changed
+                            # - Or perhaps if the line included a variable declatation
+                            exec source in ns
+
                     ns['draw']()
             else:
                 self._executor.run()
@@ -272,6 +282,9 @@ class Grammar(object):
             else:
                 # Set from commandline
                 v.value = v.sanitize(oldvar)
+        else:
+            for listener in self._var_listeners:
+                listener.var_added(v)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
         self._oldvars[v.name] = v

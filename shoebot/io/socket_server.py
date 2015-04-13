@@ -33,6 +33,7 @@ Enter bye() or press CTRL-D to quit.
 
 """
 
+
 class SocketServerMixin(object):
     def server(self, host, port):
         '''Initialize server and start listening.'''

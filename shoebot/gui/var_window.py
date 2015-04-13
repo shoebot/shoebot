@@ -1,59 +1,75 @@
 #!/usr/bin/env python2
+from shoebot.grammar.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 import gtk
 import os.path
-import sys
 
 NUMBER = 1
 TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
+
+def pretty_name(name):
+    return (name or '').replace('_', ' ').capitalize()
+
+
 class VarWindow(object):
     def __init__(self, parent, bot, title = None):
         self.parent = parent
         self.bot = bot
+        bot._var_listeners.append(VarListener(self))
 
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
         self.window.connect("destroy", self.do_quit)
 
-
         if os.path.isfile(ICON_FILE):
-            pixmap = gtk.gdk.pixbuf_new_from_file( ICON_FILE )
-            self.window.set_icon ( pixmap )
+            pixmap = gtk.gdk.pixbuf_new_from_file(ICON_FILE)
+            self.window.set_icon(pixmap)
 
-        vbox = gtk.VBox(homogeneous=True, spacing=20)
+        self.container = gtk.VBox(homogeneous=True, spacing=20)
 
         # set up sliders
         self.widgets = {}
+        self.vars = {}
+        self.add_variables()
 
-        for item in sorted(bot._vars.values()):
-            if item.type is NUMBER:
-                self.widgets[item.name] = self.add_number(vbox, item)
-            elif item.type is TEXT:
-                self.widgets[item.name] = self.add_text(vbox, item)
-            elif item.type is BOOLEAN:
-                self.widgets[item.name] = self.add_boolean(vbox, item)
-            elif item.type is BUTTON:
-                self.widgets[item.name] = self.add_button(vbox, item)
-            else:
-                raise ValueError('Unknown variable type.')
-
-        self.window.add(vbox)
-        self.window.set_size_request(400,35*len(self.widgets.keys()))
+        self.window.add(self.container)
+        self.window.set_size_request(400, 35*len(self.widgets.keys()))
         self.window.show_all()
 
         if title:
             self.window.set_title(title)
-        ## gtk.main()
 
-    def add_number(self, container, v):
+    def add_variables(self):
+        """
+        Add all widgets to specified vbox
+        :param container:
+        :return:
+        """
+        for v in sorted(self.bot._vars.values()):
+            self.add_variable(v)
+
+    def add_variable(self, v):
+        if v.type is NUMBER:
+            self.widgets[v.name] = self.add_number(v)
+        elif v.type is TEXT:
+            self.widgets[v.name] = self.add_text(v)
+        elif v.type is BOOLEAN:
+            self.widgets[v.name] = self.add_boolean(v)
+        elif v.type is BUTTON:
+            self.widgets[v.name] = self.add_button(v)
+        else:
+            raise ValueError('Unknown variable type.')
+        self.vars[v.name] = v
+
+    def add_number(self, v):
         # create a slider for each var
         sliderbox = gtk.HBox(homogeneous=False, spacing=0)
-        label = gtk.Label(v.name)
+        label = gtk.Label(pretty_name(v.name))
         sliderbox.pack_start(label, False, True, 20)
 
         if v.max - v.min > 2:
@@ -65,37 +81,36 @@ class VarWindow(object):
         hscale.set_value_pos(gtk.POS_RIGHT)
         hscale.set_value(v.value)
         sliderbox.pack_start(hscale, True, True, 0)
-        container.pack_start(sliderbox, True, True, 0)
+        self.container.pack_start(sliderbox, True, True, 0)
 
         return hscale
 
-    def add_text(self, container, v):
+    def add_text(self, v):
         textcontainer = gtk.HBox(homogeneous=False, spacing=0)
-        label = gtk.Label(v.name)
+        label = gtk.Label(pretty_name(v.name))
         textcontainer.pack_start(label, False, True, 20)
 
         entry = gtk.Entry(max=0)
         entry.set_text(v.value)
         entry.connect("changed", self.widget_changed, v)
         textcontainer.pack_start(entry, True, True, 0)
-        container.pack_start(textcontainer, True, True, 0)
+        self.container.pack_start(textcontainer, True, True, 0)
 
         return entry
 
-    def add_boolean(self, container, v):
+    def add_boolean(self, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
-        button = gtk.CheckButton(label=v.name)
+        button = gtk.CheckButton(label=pretty_name(v.name))
         button.set_active(v.value)
         # we send the state of the button to the callback method
         button.connect("toggled", self.widget_changed, v)
 
         buttoncontainer.pack_start(button, True, True, 0)
-        container.pack_start(buttoncontainer, True, True, 0)
+        self.container.pack_start(buttoncontainer, True, True, 0)
 
         return button
 
-
-    def add_button(self, container, v):
+    def add_button(self, v):
         buttoncontainer = gtk.HBox(homogeneous=False, spacing=0)
         # in buttons, the varname is the function, so we use __name__
 
@@ -105,13 +120,12 @@ class VarWindow(object):
             func = self.bot._namespace[func_name]
             func()
 
-        button = gtk.Button(label=v.name)
+        button = gtk.Button(label=pretty_name(v.name))
         button.connect("clicked", call_func, None)
         buttoncontainer.pack_start(button, True, True, 0)
-        container.pack_start(buttoncontainer, True, True, 0)
+        self.container.pack_start(buttoncontainer, True, True, 0)
 
         return button
-
 
     def do_quit(self, widget):
         pass
@@ -149,5 +163,39 @@ class VarWindow(object):
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
             self.bot._vars[v.name].value = widget.get_text()  ## Not sure if this is how to do this - stu
+
+    def var_added(self, v):
+        """
+        var was added in the bot while it ran, possibly
+        by livecoding
+
+        :param v:
+        :return:
+        """
+        self.add_variable(v)
+
+        self.window.set_size_request(400, 35*len(self.widgets.keys()))
+        self.window.show_all()
+
+    def var_deleted(self, v):
+        """
+        var was added in the bot
+
+        :param v:
+        :return:
+        """
+        widget = self.widgets[v.name]
+
+        # widgets are all in a single container ..
+        parent = widget.get_parent()
+        self.container.remove(parent)
+        del self.widgets[v.name]
+
+        self.window.set_size_request(400, 35*len(self.widgets.keys()))
+        self.window.show_all()
+
+
+    def var_updated(self, v):
+        pass
 
 
