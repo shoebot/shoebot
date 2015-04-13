@@ -50,6 +50,7 @@ setup(name = "shoebot",
         "Pillow",
         "meta",
         "numpy",
+        "vext.pygtk",
     ],
     scripts = ['sbot', 'sbot.cmd'] if os.name == 'nt' else ['sbot'],
     long_description = """
