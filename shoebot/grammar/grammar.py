@@ -197,28 +197,23 @@ class Grammar(object):
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
 
-        :param inputcode: path to code to run, or actual code.
+        :param inputcode: path to shoebot file or whole source code
         :param iterations: maximum amount of frames to run
         :param run_forever: if True will run until the user quits the bot
         :param frame_limiter: Time a frame should take to run (float - seconds)
         '''
         source = None
-        code = None
         filename = None
 
         try:
-            # if it's a string, it needs compiling first; if it's a file, no action needed
             if os.path.isfile(inputcode):
+                source = open(inputcode)
                 filename = inputcode
-                with open(filename, 'rU') as f:
-                    source = f.read()
-                    code = source
             elif isinstance(inputcode, basestring):
                 filename = 'shoebot_code'
                 source = inputcode
-                code = compile(inputcode + '\n\n', filename, "exec")
             
-            self._executor = LiveExecution(code, ns=self._namespace, filename=filename)
+            self._executor = LiveExecution(source, ns=self._namespace, filename=filename)
             self._load_namespace(filename)
             
             # do the magic   
