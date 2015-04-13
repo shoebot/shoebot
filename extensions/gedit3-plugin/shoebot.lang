@@ -5,7 +5,8 @@
  Copyright (C) 2003 Gustavo Giráldez <gustavo.giraldez@gmx.net>
  Copyright (C) 2004 Benoît Dejean <TaZForEver@free.fr>
  Copyright (C) 2006 Steve Frécinaux <nud@apinc.org>
- Copyright (C) 2009 Ricardo Lafuente <r@sollec.org>       
+ Copyright (C) 2009 Ricardo Lafuente <r@sollec.org>
+ Copyright (C) 2015 Stuart Axon <stuaxo2@yahoo.com>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -277,6 +278,7 @@
           <keyword>HEIGHT</keyword>
           <keyword>FRAME</keyword>
           <keyword>NUMBER</keyword>
+          <keyword>TEXT</keyword>
           <keyword>BOOLEAN</keyword>
           <keyword>BUTTON</keyword>
 
