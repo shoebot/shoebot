@@ -101,6 +101,9 @@ class ShoebotProcess(object):
             self.code = source
             self.send_command("load_base64", source)
 
+    def pause(self):
+        self.send_command('pause')
+
     def send_command(self, cmd, *args):
         if args:
             self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
