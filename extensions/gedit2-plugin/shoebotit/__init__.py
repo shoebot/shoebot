@@ -47,6 +47,7 @@ class ShoebotWindowHelper:
         self.example_bots = {}
 
         self.window = window
+        self.changed_handler_id = None
         panel = window.get_bottom_panel()
         self.output_widget = gtk2_utils.get_child_by_name(panel, 'shoebot-output')
 
