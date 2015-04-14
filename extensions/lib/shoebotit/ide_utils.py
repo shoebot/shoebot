@@ -76,7 +76,7 @@ class ShoebotProcess(object):
         else:
             print('no sbot!')
 
-        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd, close_fds=os.name != 'nt')
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=os.name != 'nt', shell=False, cwd=cwd)
 
         self.running = True
 
