@@ -224,12 +224,20 @@ class ShoebotWindowHelper:
                 if stdout_line is not None:
                     textbuffer.insert(textbuffer.get_end_iter(), stdout_line)
                 if stderr_line is not None:
+                    # Use the 'error' tag so text is red
                     textbuffer.insert(textbuffer.get_end_iter(), stderr_line)
+                    offset = textbuffer.get_char_count() - len(stderr_line)
+                    start_iter = textbuffer.get_iter_at_offset(offset)
+                    end_iter = textbuffer.get_end_iter()
+                    textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
             while gtk.events_pending():
                 gtk.main_iteration()
 
-        return self.bot.running
+        if self.bot:
+            return self.bot.running
+        else:
+            return False
     
     def toggle_socket_server(self, action):
         self.use_socketserver = action.get_active()

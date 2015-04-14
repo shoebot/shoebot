@@ -105,9 +105,13 @@ class ShoebotProcess(object):
 
     def send_command(self, cmd, *args):
         if args:
-            self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
+            #self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
+            # - for py2 / 3 compatibility:
+            self.process.stdin.write(bytearray(cmd, "ascii") + b' ' + bytearray(base64.b64encode(bytearray(", ".join(args), "ascii"))))
         else:
-            self.process.stdin.write(bytes(cmd, "utf-8"))
+            #self.process.stdin.write(bytes(cmd, "utf-8"))
+            # - for py2 / 3 compatibility:
+            self.process.stdin.write(bytearray(cmd, "ascii"))
         self.process.stdin.write(b"\n")
         self.process.stdin.flush()
 
