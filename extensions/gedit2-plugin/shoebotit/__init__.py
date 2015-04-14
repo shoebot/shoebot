@@ -58,6 +58,7 @@ class ShoebotWindowHelper:
         self.use_socketserver = False
         self.show_varwindow = True
         self.use_fullscreen = False
+        self.livcoding = False
 
         self.started = False
 
@@ -94,6 +95,7 @@ class ShoebotWindowHelper:
             ("ShoebotSocket", None, _("Enable Socket Server"), '<control><alt>S', _("Enable Socket Server"), self.toggle_socket_server, False),
             ("ShoebotVarWindow", None, _("Show Variables Window"), '<control><alt>V', _("Show Variables Window"), self.toggle_var_window, False),
             ("ShoebotFullscreen", None, _("Go Fullscreen"), '<control><alt>F', _("Go Fullscreen"), self.toggle_fullscreen, False),
+            ("ShoebotLive", None, _("Live Code"), '<control><alt>C', _("Live Code"), self.toggle_livecoding, False),
             ])
         manager.insert_action_group(self.action_group, -1)
 
@@ -166,12 +168,53 @@ class ShoebotWindowHelper:
 
         textbuffer = self.output_widget.get_buffer()
         textbuffer.set_text('')
+
         while gtk.events_pending():
            gtk.main_iteration()
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.disconnect_change_handler(doc)
+        self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        gobject.idle_add(self.update_shoebot)
+        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.idle_handler_id = gobject.idle_add(self.update_shoebot)
+
+    def disconnect_change_handler(self, doc):
+        if self.changed_handler_id is not None:
+            doc.disconnect(self.changed_handler_id)
+            self.changed_hander_id = None
+
+    def get_source(self, doc):
+        """
+        Grab contents of 'doc' and return it
+
+        :param doc: The active document
+        :return:
+        """
+        start_iter = doc.get_start_iter()
+        end_iter = doc.get_end_iter()
+        source = doc.get_text(start_iter, end_iter, False)
+        return source
+
+    def doc_changed(self, *args):
+        if self.livecoding and self.bot:
+            doc = self.window.get_active_document()
+            source = self.get_source(doc)
+
+            try:
+                self.bot.live_code_load(source)
+            except Exception:
+                self.bot = None
+                self.disconnect_change_handler(doc)
+                raise
+            except IOError as e:
+                self.bot = None
+                self.disconnect_change_handler()
+                if e.errno == errno.EPIPE:
+                    # EPIPE error
+                    print('FIXME: %s' % str(e))
+                else:
+                    # Something else bad happened
+                    raise
 
     def update_shoebot(self):
         if self.bot:
@@ -195,6 +238,13 @@ class ShoebotWindowHelper:
 
     def toggle_fullscreen(self, action):
         self.use_fullscreen = action.get_active()
+
+    def toggle_livecoding(self, action):
+        self.livecoding = action.get_active()
+        if self.livecoding and self.bot:
+            doc = self.window.get_active_document()
+            source = self.get_source(doc)
+            self.bot.live_code_load(source)
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
