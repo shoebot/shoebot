@@ -76,10 +76,21 @@ class ShoebotCmd(cmd.Cmd):
         self.bot._namespace.update(self.bot._initial_namespace)
 
     def do_pause(self, line):
-        if self.pause_speed is not None:
+        """
+        Toggle pause
+        :param line:
+        :return:
+        """
+        # TODO - move this into bot controller
+        # along with stuff in socketserver and shell
+        if self.pause_speed is None:
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
-            print("Paused - \"play\" to resume")
+            print('Paused')
+        else:
+            self.bot._speed = self.pause_speed
+            self.pause_speed = None
+            print('Playing')
 
     def do_play(self, line):
         """

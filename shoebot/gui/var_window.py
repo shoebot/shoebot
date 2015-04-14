@@ -22,7 +22,6 @@ class VarWindow(object):
         self.bot = bot
 
         self.var_listener = VarListener(self)
-        bot._var_listeners.append(self.var_listener)
 
         self.window = gtk.Window()
         self.window.set_destroy_with_parent(True)
@@ -130,7 +129,8 @@ class VarWindow(object):
         return button
 
     def do_destroy(self, widget):
-        self.bot._var_listeners.remove(self.var_listener)
+        #self.bot._var_listeners.remove(self.var_listener)
+        self.var_listener.remove()
 
     def update_var(self, name, value):
         """

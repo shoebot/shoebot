@@ -40,12 +40,10 @@ from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          NUMBER, TEXT, BOOLEAN, BUTTON
 
 from grammar import Grammar
-from var_listener import VarListener
 
 from pkg_resources import resource_filename, Requirement
 from glob import glob
 import random as r
-import traceback
 
 import locale, gettext
 

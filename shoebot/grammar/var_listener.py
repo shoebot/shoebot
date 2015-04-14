@@ -9,8 +9,14 @@ class VarListener(object):
 
     active = True # set to False to temporarily disable
 
+    listeners = []
+
     def __init__(self, listener):
         self.listener = listener
+        VarListener.listeners.append(self)
+
+    def remove(self):
+        VarListener.listeners.remove(self)
 
     def var_added(self, v):
         if VarListener.active:
@@ -23,11 +29,8 @@ class VarListener(object):
     def var_deleted(self, v):
         if VarListener.active:
             self.listener.var_deleted(v)
-        else:
-            print('VarListener not active')
 
     def vars_deleted(self, vs):
-        print('>>> vars_deleted')
         for v in vs:
             self.var_deleted(v)
 
@@ -54,7 +57,7 @@ class VarListener(object):
 
     @staticmethod
     @contextmanager
-    def batch(vars, oldvars, listeners=None):
+    def batch(vars, oldvars, ns):
         """
         Context manager to only update listeners
         at the end, in the meantime it doesn't
@@ -79,8 +82,10 @@ class VarListener(object):
                 deleted_vars.add(name)
                 added_vars.add(name)
 
-        for listener in listeners or []:
+        for listener in VarListener.listeners:
             for name in deleted_vars:
                 listener.var_deleted(snapshot_vars[name])
+                if ns.get(name) is snapshot_vars[name].value:
+                    del ns[name]
             for name in added_vars:
                 listener.var_added(vars[name])

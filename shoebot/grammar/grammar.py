@@ -24,7 +24,7 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
-    def __init__(self, canvas, namespace = None, vars = None):
+    def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
         self._quit = False
         self._iteration = 0
@@ -33,8 +33,6 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
-
-        self._var_listeners = []
 
         self._executor = None
 
@@ -110,14 +108,14 @@ class Grammar(object):
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, limit = False):
+    def _exec_frame(self, limit=False):
         ''' Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
         '''
         namespace = self._namespace
-        if self._speed != 0:
+        if self._iteration != 0 and self._speed != 0:
             self._canvas.reset_canvas()
         self._set_dynamic_vars()
         if self._iteration == 0:
@@ -134,7 +132,7 @@ class Grammar(object):
                     # Code in main block may redefine 'draw'
                     self._executor.reload_functions()
                     if not known_good:
-                        with VarListener.batch(self._vars, self._oldvars, self._var_listeners):
+                        with VarListener.batch(self._vars, self._oldvars, ns):
                             self._oldvars.clear()
 
                             # Re-run the function body - ideally this would only
@@ -284,7 +282,7 @@ class Grammar(object):
                 # Set from commandline
                 v.value = v.sanitize(oldvar)
         else:
-            for listener in self._var_listeners:
+            for listener in VarListener.listeners:
                 listener.var_added(v)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
