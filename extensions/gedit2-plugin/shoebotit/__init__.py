@@ -135,13 +135,16 @@ class ShoebotWindowHelper:
 
     def start_shoebot(self):
         #sbot_bin=gtk2_utils.sbot_executable()
-        sbot_bin = 'sbot' ## TODO
+        if os.name == 'nt': ### TODO - use same mechanism as gtk3
+            sbot_bin = which('sbot.cmd')
+        else
+            sbot_bin = which('sbot')
 
         if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
             textbuffer.set_text('Cannot find sbot in path.')
-            while Gtk.events_pending():
-               Gtk.main_iteration()
+            while gtk.events_pending():
+               gtk.main_iteration(block=False)
             return False
 
         if self.bot and self.bot.process.poll() == None:

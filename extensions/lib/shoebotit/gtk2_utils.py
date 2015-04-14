@@ -14,12 +14,13 @@ MENU_UI = """
         <menuitem name="Run in Shoebot" action="ShoebotRun"/>
             <separator/>
                  <menu name="ShoebotExampleMenu" action="ShoebotOpenExampleMenu">
-                    {}
+                    {0}
                 </menu>
         <separator/>
         <menuitem name="Enable Socket Server" action="ShoebotSocket"/>
         <menuitem name="Show Variables Window" action="ShoebotVarWindow"/>
         <menuitem name="Go Fullscreen" action="ShoebotFullscreen"/>
+        <menuitem name="Live Code" action="ShoebotLive"/>
       </placeholder>
     </menu>
   </menubar>
@@ -49,7 +50,7 @@ def examples_menu(root_dir=None, depth=0):
         path = os.path.join(root_dir, fn)
         rel_path = path[len(examples_dir):]
         if os.path.isdir(path):
-            action = 'ShoebotExampleMenu {}'.format(rel_path)
+            action = 'ShoebotExampleMenu {0}'.format(rel_path)
             label = fn.capitalize()
 
             sm_xml, sm_file_actions, sm_menu_actions = examples_menu(os.path.join(root_dir, fn), depth+1)
@@ -59,7 +60,7 @@ def examples_menu(root_dir=None, depth=0):
             submenu_actions.append((action, label))
             xml += dir_tmpl.format(name=fn, action=action, menu=sm_xml)
         elif os.path.splitext(path)[1] in ['.bot', '.py'] and not fn.startswith('_'):
-            action = 'ShoebotExampleOpen {}'.format(rel_path)
+            action = 'ShoebotExampleOpen {0}'.format(rel_path)
             label = ide_utils.make_readable_filename(fn)
 
             xml += file_tmpl.format(name=fn, action=action)

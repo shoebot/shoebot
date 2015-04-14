@@ -17,7 +17,6 @@ import os
 import subprocess
 import threading
 import time
-from gi.repository import Gtk ## TODO - seperate this again
 
 
 class AsynchronousFileReader(threading.Thread):
@@ -77,7 +76,7 @@ class ShoebotProcess(object):
         else:
             print('no sbot!')
 
-        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd)
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=True, shell=False, cwd=cwd, close_fds=os.name != 'nt')
 
         self.running = True
 
@@ -160,14 +159,14 @@ def find_example_dir():
     output, errors = p.communicate()
     if errors:
         print('Could not find shoebot examples')
-        print('Errors: {}'.format(errors))
+        print('Errors: {0}'.format(errors))
         return None
     else:
         examples_dir = output.decode('utf-8').strip()
         if os.path.isdir(examples_dir):
             return examples_dir
         else:
-            print('Could not find shoebot examples at {}'.format(examples_dir))
+            print('Could not find shoebot examples at {0}'.format(examples_dir))
 
 
 def make_readable_filename(fn):
