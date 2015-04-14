@@ -1,4 +1,3 @@
-from distutils.spawn import find_executable as which
 from urllib import pathname2url
 
 from gettext import gettext as _
@@ -9,6 +8,35 @@ import gobject
 import gtk
 import pango
 import os
+
+
+def which(program):
+    # gedit2 doesn't come with distutils.spawn, at least the
+    # version I tested on windows
+    #
+    # http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python/377028#377028
+    #
+    def is_exe(fpath):
+        return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+
+    def ext_candidates(fpath):
+        yield fpath
+        for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
+            yield fpath + ext
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            for candidate in ext_candidates(exe_file):
+                if is_exe(candidate):
+                    return candidate
+
+    return None
+
 
 if not which('sbot'):
     print('Shoebot executable not found.')
