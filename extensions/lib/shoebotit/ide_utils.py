@@ -17,6 +17,9 @@ import os
 import subprocess
 import threading
 import time
+import sys
+
+PY3 = sys.version_info[0] == 3
 
 
 class AsynchronousFileReader(threading.Thread):
@@ -104,15 +107,14 @@ class ShoebotProcess(object):
         self.send_command('pause')
 
     def send_command(self, cmd, *args):
+        # This *seems* to work in python2 and 3
+        str_args = base64.b64encode(", ".join(args), "ascii")
         if args:
-            #self.process.stdin.write(bytes(cmd, "utf-8") + b" " + base64.b64encode(bytes(", ".join(args), "utf-8")))
-            # - for py2 / 3 compatibility:
-            self.process.stdin.write(bytearray(cmd, "ascii") + b' ' + bytearray(base64.b64encode(bytearray(", ".join(args), "ascii"))))
+            data = bytearray(cmd, "ascii") + b' ' + str_args + b'\n'
         else:
-            #self.process.stdin.write(bytes(cmd, "utf-8"))
-            # - for py2 / 3 compatibility:
-            self.process.stdin.write(bytearray(cmd, "ascii"))
-        self.process.stdin.write(b"\n")
+            data = bytearray(cmd, "ascii") + b'\n'
+
+        self.process.stdin.write(data)
         self.process.stdin.flush()
 
     def close(self):
