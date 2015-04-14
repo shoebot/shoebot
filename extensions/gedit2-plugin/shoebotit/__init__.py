@@ -137,7 +137,7 @@ class ShoebotWindowHelper:
         #sbot_bin=gtk2_utils.sbot_executable()
         if os.name == 'nt': ### TODO - use same mechanism as gtk3
             sbot_bin = which('sbot.cmd')
-        else
+        else:
             sbot_bin = which('sbot')
 
         if not sbot_bin:
