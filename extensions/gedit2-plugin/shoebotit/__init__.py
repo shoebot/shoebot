@@ -59,7 +59,7 @@ class ShoebotWindowHelper:
         self.use_socketserver = False
         self.show_varwindow = True
         self.use_fullscreen = False
-        self.livcoding = False
+        self.livecoding = False
 
         self.started = False
 
