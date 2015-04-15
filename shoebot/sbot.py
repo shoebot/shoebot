@@ -96,10 +96,13 @@ class ShoebotThread(threading.Thread):
     This way the commandline shell can run on the main thread
     and the GUI in a seperate thread
     """
-    def __init__(self, args, kwargs, run_args, run_kwargs, send_sigint=False):
+    def __init__(self, 
+            create_args, create_kwargs, 
+            run_args, run_kwargs, 
+            send_sigint=False):
         """
-        :param args: passed to create_bot
-        :param kwargs: passed to create_bot
+        :param create_args: passed to create_bot
+        :param create_kwargs: passed to create_bot
         :param run_args: passed to bot.run
         :param run_kwargs: passed to bot.run
         :param send_sigint: if True then SIGINT will be sent on bot completion
@@ -109,8 +112,8 @@ class ShoebotThread(threading.Thread):
         # isSet() will return True once the bot has been created
         self.bot_ready = threading.Event()
 
-        self.args = args
-        self.kwargs = kwargs
+        self.create_args = create_args
+        self.create_kwargs = create_kwargs
 
         self.run_args = run_args
         self.run_kwargs = run_kwargs
@@ -119,7 +122,7 @@ class ShoebotThread(threading.Thread):
         self._sbot = None
 
     def run(self):
-        sbot = create_bot(*self.args, **self.kwargs)
+        sbot = create_bot(*self.create_args, **self.create_kwargs)
 
         self._sbot = sbot
         self.bot_ready.set()
@@ -152,35 +155,58 @@ def run(src,
         vars=None,
         run_shell=False,
         args=[],
-        verbose=False):
-    # Munge shoebot sys.argv
+        verbose=False,
+        background_thread=True):
+    """
+    Create an run a bot, the arguments all correspond to processed
+    commandline options.
+    """
+    # Munge shoebogt sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
 
-    # Run shoebot in a background thread so we can run a cmdline shell in the current thread
-    sbot_thread = ShoebotThread(
-        args=[src,
-            grammar,
-            format,
-            outputfile,
-            iterations,
-            buff,
-            window,
-            title,
-            fullscreen,
-            server,
-            port,
-            show_vars],
-        kwargs=dict(vars=vars),
-        run_args=[src],
-        run_kwargs=dict(
-            run_forever=window if close_window is False else False,
-            frame_limiter=window,
-            verbose=verbose
-        ),
-        send_sigint=run_shell
+    # arguments for create_bot
+    create_args=[src,
+        grammar,
+        format,
+        outputfile,
+        iterations,
+        buff,
+        window,
+        title,
+        fullscreen,
+        server,
+        port,
+        show_vars],
+    create_kwargs=dict(vars=vars),
+    run_args=[src],
+    run_kwargs=dict(
+        run_forever=window if close_window is False else False,
+        frame_limiter=window,
+        verbose=verbose
     )
-    sbot_thread.start()
-    sbot = sbot_thread.sbot
+
+    # Run shoebot in a background thread so we can run a cmdline shell in the current thread
+    if background_thread:
+        sbot_thread = ShoebotThread(
+            args=args,
+            kwargs=kwargs,
+            run_args=run_args,
+            run_kwargs=run_kwargs,
+            send_sigint=run_shell
+        )
+        sbot_thread.start()
+        sbot = sbot_thread.sbot
+    else:
+        # This is a debug option, things should always work using the
+        # background thread (crosses fingers)
+        if run_shell:
+            # python readline is blocking, so ui must run in a seperate
+            # thread
+            raise ValueError('UI Must run in a seperate thread to shell and shell needs main thread')
+        
+        sbot = create_bot(*create_args, **create_kwargs)
+        sbot.run(run_args, run_kwargs)
+
 
     if run_shell:
         import shoebot.io.shell
