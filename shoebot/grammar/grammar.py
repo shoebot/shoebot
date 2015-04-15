@@ -101,7 +101,7 @@ class Grammar(object):
         if self._speed:
             completion_time = time()
             exc_time = completion_time - self._start_time
-            sleep_for = (1.0 / self._speed) - exc_time
+            sleep_for = (1.0 / abs(self._speed)) - exc_time
             if sleep_for > 0:
                 sleep(sleep_for)
             self._start_time = completion_time + sleep_for
