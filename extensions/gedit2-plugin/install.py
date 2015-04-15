@@ -88,7 +88,7 @@ def main():
 		if not is_admin:
 			try:
 				os.makedirs(dest_dir)
-			except Error:
+			except OSError:
 				pass
 
 			if not os.path.isdir(dest_dir):
