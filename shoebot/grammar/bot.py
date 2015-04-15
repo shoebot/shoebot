@@ -31,13 +31,12 @@
 
 import sys, os
 
-from shoebot import ShoebotError, \
-                    RGB, HSB, \
-                    CENTER, CORNER, CORNERS
-
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, \
-                         NUMBER, TEXT, BOOLEAN, BUTTON
+                         NUMBER, TEXT, BOOLEAN, BUTTON, \
+                         ShoebotError, \
+                         RGB, HSB, \
+                         CENTER, CORNER, CORNERS
 
 from grammar import Grammar
 

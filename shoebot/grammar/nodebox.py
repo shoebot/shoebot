@@ -2,7 +2,7 @@ import os.path
 import sys
 import cairo
 from shoebot.kgp import KantGenerator
-from shoebot import ShoebotError
+from shoebot.data import ShoebotError
 from bot import Bot
 from shoebot.data import Point, BezierPath, Image
 from shoebot.data import RGB, \

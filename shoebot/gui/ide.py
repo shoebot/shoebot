@@ -40,7 +40,7 @@ except ImportError:
     del gtksourceview_SourceLanguagesManager
 
 
-from shoebot import ShoebotError
+from shoebot.data import ShoebotError
 
 
 APP = 'shoebot'
@@ -1049,6 +1049,10 @@ class TestText:
         gtk.main()
         return 0
 
-if __name__ == "__main__":
+
+def main():
     testtext = TestText(sys.argv[1:])
     testtext.main()
+
+if __name__ == "__main__":
+    main()
