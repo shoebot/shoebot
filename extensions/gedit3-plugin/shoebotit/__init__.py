@@ -154,7 +154,7 @@ class ShoebotWindowHelper(object):
     def disconnect_change_handler(self, doc):
         if self.changed_handler_id is not None:
             doc.disconnect(self.changed_handler_id)
-            self.changed_hander_id = None
+            self.changed_handler_id = None
 
     def get_source(self, doc):
         """
