@@ -138,10 +138,7 @@ class ShoebotWindowHelper:
 
     def start_shoebot(self):
         #sbot_bin=gtk2_utils.sbot_executable()
-        if os.name == 'nt': ### TODO - use same mechanism as gtk3
-            sbot_bin = which('sbot.cmd')
-        else:
-            sbot_bin = which('sbot')
+        sbot_bin = which('sbot') ### TODO - use same mechanism as gtk3
 
         if not sbot_bin:
             textbuffer = self.output_widget.get_buffer()
