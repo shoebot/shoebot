@@ -57,9 +57,13 @@ class AsynchronousFileReader(threading.Thread):
 
 
 class ShoebotProcess(object):
-    def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
+    def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, shell=True, sbot=None):
         # start with -w for window -l for shell'
-        command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
+        command = [sbot, '-w', '-t%s - Shoebot on gedit' % title]
+
+        self.shell = shell
+        if shell:
+            command.append('-l')
 
         if use_socketserver:
             command.append('-s')
@@ -110,6 +114,8 @@ class ShoebotProcess(object):
         self.send_command('pause')
 
     def send_command(self, cmd, *args):
+        if not self.shell:
+            return
         # This *seems* to work in python2 and 3
         encoded_args = base64.b64encode(bytearray(", ".join(args), "ascii"))
         if args:
