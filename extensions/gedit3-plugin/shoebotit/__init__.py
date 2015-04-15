@@ -135,8 +135,8 @@ class ShoebotWindowHelper(object):
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
-        code = doc.get_text(start, end, False)
-        if not code:
+        source = doc.get_text(start, end, False)
+        if not source:
             return False
 
         textbuffer = self.output_widget.get_buffer()
@@ -148,7 +148,7 @@ class ShoebotWindowHelper(object):
         self.disconnect_change_handler(doc)
         self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
         self.idle_handler_id = GObject.idle_add(self.update_shoebot)
 
     def disconnect_change_handler(self, doc):
@@ -174,7 +174,7 @@ class ShoebotWindowHelper(object):
             source = self.get_source(doc)
 
             try:
-                self.bot.live_code_load(source)
+                self.bot.live_source_load(source)
             except Exception:
                 self.bot = None
                 self.disconnect_change_handler(doc)
@@ -225,7 +225,7 @@ class ShoebotWindowHelper(object):
         if self.livecoding and self.bot:
             doc = self.window.get_active_document()
             source = self.get_source(doc)
-            self.bot.live_code_load(source)
+            self.bot.live_source_load(source)
     
         
     # Right-click menu items (for quicktorials)

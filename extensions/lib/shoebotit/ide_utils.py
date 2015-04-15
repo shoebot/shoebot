@@ -57,7 +57,7 @@ class AsynchronousFileReader(threading.Thread):
 
 
 class ShoebotProcess(object):
-    def __init__(self, code, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
+    def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         # start with -w for window -l for shell'
         command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
 
@@ -70,12 +70,15 @@ class ShoebotProcess(object):
         if use_fullscreen:
             command.append('-f')
         
-        command.append(code)
+        command.append(source)
 
         # Setup environment so shoebot directory is first
         _env = os.environ.copy()
         if sbot:
-            _env['PATH'] = os.path.realpath(os.path.dirname(sbot)) + os.pathsep + os.environ.get('PATH', '')
+            _env.update(
+                PATH=os.path.realpath(os.path.dirname(sbot)) + os.pathsep + os.environ.get('PATH', ''),
+                # PYTHONUNBUFFERED='1'
+            )
         else:
             print('no sbot!')
 
@@ -95,12 +98,12 @@ class ShoebotProcess(object):
         self.handle_stderr = handle_stderr
         self.changed_handler_id = None
 
-        self.code = code.rstrip('\n')
+        self.source = source.rstrip('\n')
 
-    def live_code_load(self, source):
+    def live_source_load(self, source):
         source = source.rstrip('\n')
-        if source != self.code:
-            self.code = source
+        if source != self.source:
+            self.source = source
             self.send_command("load_base64", source)
 
     def pause(self):
@@ -108,9 +111,9 @@ class ShoebotProcess(object):
 
     def send_command(self, cmd, *args):
         # This *seems* to work in python2 and 3
-        str_args = base64.b64encode(", ".join(args), "ascii")
+        encoded_args = base64.b64encode(bytearray(", ".join(args), "ascii"))
         if args:
-            data = bytearray(cmd, "ascii") + b' ' + str_args + b'\n'
+            data = bytearray(cmd, "ascii") + b' ' + encoded_args + b'\n'
         else:
             data = bytearray(cmd, "ascii") + b'\n'
 

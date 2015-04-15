@@ -163,8 +163,8 @@ class ShoebotWindowHelper:
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
-        code = doc.get_text(start, end, False)
-        if not code:
+        source = doc.get_text(start, end, False)
+        if not source:
             return False
 
         textbuffer = self.output_widget.get_buffer()
@@ -176,7 +176,7 @@ class ShoebotWindowHelper:
         self.disconnect_change_handler(doc)
         self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        self.bot = ide_utils.ShoebotProcess(code, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
         self.idle_handler_id = gobject.idle_add(self.update_shoebot)
 
     def disconnect_change_handler(self, doc):
@@ -202,7 +202,7 @@ class ShoebotWindowHelper:
             source = self.get_source(doc)
 
             try:
-                self.bot.live_code_load(source)
+                self.bot.live_source_load(source)
             except Exception:
                 self.bot = None
                 self.disconnect_change_handler(doc)
@@ -253,7 +253,7 @@ class ShoebotWindowHelper:
         if self.livecoding and self.bot:
             doc = self.window.get_active_document()
             source = self.get_source(doc)
-            self.bot.live_code_load(source)
+            self.bot.live_source_load(source)
 
     def connect_view(self, view):
         # taken from gedit-plugins-python-openuricontextmenu
@@ -266,12 +266,21 @@ class ShoebotPlugin(gedit.Plugin):
         self.instances = {}
         self.tempfiles = []
 
-    def activate(self, window):
-        self.text = gtk.TextView()
-        self.text.set_editable(False)
+    def _create_view(self):
+        """ Create the gtk.TextView used for shell output """
+        view = gtk.TextView()
+        view.set_editable(False)
+
         fontdesc = pango.FontDescription("Monospace")
-        self.text.modify_font(fontdesc)
-        self.text.set_name('shoebot-output')
+        view.modify_font(fontdesc)
+        view.set_name('shoebot-output')
+
+        buff = view.get_buffer()
+        buff.create_tag('error', foreground='red')
+        return view
+
+    def activate(self, window):
+        self.text = self._create_view()
         self.panel = window.get_bottom_panel()
 
         image = gtk.Image()
