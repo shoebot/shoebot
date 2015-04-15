@@ -106,7 +106,10 @@ setup(name="shoebot",
           "vext.pygtk",
       ],
       entry_points={
-          "console_scripts": "sbot=shoebot.run:main",
+          "console_scripts": [
+             "sbot=shoebot.run:main",
+             "shoebot-ide=shoebot.gui:main"
+          ],
           "gui_scripts": "shoebot-ide=shoebot.gui.ide:main"
       }
 )
