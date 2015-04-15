@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: iso-8859-1 -*-
 
+from __future__ import print_function
 import pygtk
 pygtk.require('2.0')
 import sys, os, errno
@@ -248,18 +249,18 @@ class Buffer(gtksourceview.SourceBuffer):
         char_index = iter.get_offset()
         tag_name = tag.get_property("name")
         if event.type == gtk.gdk.MOTION_NOTIFY:
-            print "Motion event at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Motion event at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == gtk.gdk.BUTTON_PRESS:
-            print "Button press at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Button press at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == gtk.gdk._2BUTTON_PRESS:
-            print "Double click at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Double click at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == gtk.gdk._3BUTTON_PRESS:
-            print "Triple click at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Triple click at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == gtk.gdk.BUTTON_RELEASE:
-            print "Button release at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Button release at char %d tag `%s'\n" % (char_index, tag_name))
         elif (event.type == gtk.gdk.KEY_PRESS or
               event.type == gtk.gdk.KEY_RELEASE):
-            print "Key event at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Key event at char %d tag `%s'\n" % (char_index, tag_name))
         return False
 
     def fill_file_buffer(self, filename):
@@ -578,9 +579,9 @@ class View(gtk.Window):
                  	 View.FONT = 'Bitstream Vera Sans Mono 8'
                  	 break
 	     else:
-	         print 'Bitstream Vera Font not found.'
-	         print 'Download and install it from here'
-	         print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
+	         print('Bitstream Vera Font not found.')
+	         print('Download and install it from here')
+	         print('http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/')
 	         View.FONT = 'Mono 8'
 
         self.text_view.modify_font(pango.FontDescription(View.FONT))
@@ -789,7 +790,7 @@ class View(gtk.Window):
         start, end = dialog.buffer.get_bounds()
         search_string = start.get_text(end)
 
-        print _("Searching for `%s'\n") % search_string
+        print(_("Searching for `%s'\n") % search_string)
 
         buffer = self.text_view.get_buffer()
         if response_id == RESPONSE_FORWARD:
@@ -924,7 +925,7 @@ class View(gtk.Window):
         pass
 
     def tab_stops_expose(self, widget, event):
-        #print self, widget, event
+        #print(self, widget, event)
         text_view = widget
 
         # See if this expose is on the tab stop window
@@ -999,7 +1000,7 @@ class View(gtk.Window):
                 os.chdir(os.path.dirname(buffer.filename))
                 
                 
-            bot = shoebot.bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+            bot = shoebot.create_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever = True, iterations = None)
         except ShoebotError, NameError:
