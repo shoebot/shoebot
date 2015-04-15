@@ -108,7 +108,7 @@ setup(name="shoebot",
       entry_points={
           "console_scripts": [
              "sbot=shoebot.run:main",
-             "shoebot-ide=shoebot.gui:main"
+             "shoebot-ide=shoebot.gui.ide:main"
           ],
           "gui_scripts": "shoebot-ide=shoebot.gui.ide:main"
       }
