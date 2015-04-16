@@ -11,6 +11,8 @@ import os
 import shutil
 import textwrap
 
+here = os.path.dirname(os.path.abspath(__file__))
+
 try:
     from setuptools import setup, Command
 
