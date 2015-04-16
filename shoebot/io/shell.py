@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import re
+
 """
 Simple command shell
 
@@ -27,10 +29,6 @@ RESPONSE_PROMPT = "[o_o] "
 INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
 
 
-def print_response(*args):
-    print("\n%s" % RESPONSE_PROMPT + str(*args))
-
-
 class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
 
@@ -53,9 +51,26 @@ class ShoebotCmd(cmd.Cmd):
         self.intro = INTRO
         self.prompt = PROMPT
         self.use_rawinput = False
+        self.cookie = None
+
+    def print_response(self, *args):
+        """
+        print response, if cookie is set then print that each line
+        :param args:
+        :return:
+        """
+        lines = str(" ".join(args)).splitlines()
+        if self.cookie:
+            for line in str("".join(args)).splitlines():
+                print("%s %s" % (self.cookie, line))
+        else:
+            print(RESPONSE_PROMPT)
+            if len(lines):
+                print("\n")
+            print(str("".join(args)))
 
     def handler(signum, frame):
-        print_response('Caught CTRL-C, press enter to continue')
+        self.print_response('Caught CTRL-C, press enter to continue')
 
     def emptyline(self):
         """
@@ -65,6 +80,9 @@ class ShoebotCmd(cmd.Cmd):
         """
         print(RESPONSE_PROMPT)
         return ""
+
+    def do_prompt(self, arg):
+        self.print_response('prompt: %s' % PROMPT, '\n', 'response: %s' % RESPONSE_PROMPT)
 
     def do_title(self, title):
         """
@@ -80,9 +98,9 @@ class ShoebotCmd(cmd.Cmd):
             try:
                 self.bot._speed = float(speed)
             except Exception as e:
-                print_response('%s is not a valid framerate' % speed)
+                self.print_response('%s is not a valid framerate' % speed)
                 return
-        print_response('Speed: %s FPS' % self.bot._speed)
+        self.print_response('Speed: %s FPS' % self.bot._speed)
 
     def do_restart(self, line):
         """
@@ -103,11 +121,11 @@ class ShoebotCmd(cmd.Cmd):
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
-            print_response('Paused')
+            self.print_response('Paused')
         else:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
-            print_response('Playing')
+            self.print_response('Playing')
 
     def do_play(self, line):
         """
@@ -119,7 +137,7 @@ class ShoebotCmd(cmd.Cmd):
         if self.pause_speed is None:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
-        print_response("Play")
+        self.print_response("Play")
 
     def do_goto(self, line):
         """
@@ -127,14 +145,14 @@ class ShoebotCmd(cmd.Cmd):
         :param line:
         :return:
         """
-        print_response("Go to frame %s" % line)
+        self.print_response("Go to frame %s" % line)
         self.bot._frame = int(line)
 
     def do_rewind(self, line):
         """
         rewind
         """
-        print_response("Rewinding from frame %s to 0" % self.bot._frame)
+        self.print_response("Rewinding from frame %s to 0" % self.bot._frame)
         self.bot._frame = 0
 
     def do_load_base64(self, line):
@@ -149,14 +167,14 @@ class ShoebotCmd(cmd.Cmd):
             self.bot._executor.load_edited_source(source)
         except Exception as e:
             # TODO Use simple traceback here
-            print_response("Error Compiling")
-            print_response(e)
+            self.print_response("Error Compiling")
+            self.print_response(e)
 
     def do_bye(self, line):
         return self.do_exit(line)
 
     def do_exit(self, line):
-        print_response('Bye.')
+        self.print_response('Bye.\n')
         self.bot._quit = True
         return True
 
@@ -164,10 +182,10 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_fullscreen(self, line):
-        print_response('TODO - toggle fullscreen')
+        self.print_response('TODO - toggle fullscreen')
 
     def do_windowed(self, line):
-        print_response('TODO - set windowed mode')
+        self.print_response('TODO - set windowed mode')
 
     def do_EOF(self, line):
         return self.do_exit(line)
@@ -178,15 +196,31 @@ class ShoebotCmd(cmd.Cmd):
 
     def precmd(self, line):
         """
-        See if
+        Allow commands to have a last parameter of 'cookie=somevalue'
+
+        TODO somevalue will be prepended onto any output lines so
+        that editors can distinguish output from certain kinds
+        of events they have sent.
+
         :param line:
         :return:
         """
         args = shlex.split(line or "")
+        last_arg = args[-1]
+        if 'cookie=' in last_arg:
+            cookie_index = line.index('cookie=')
+            cookie = line[cookie_index+7:]
+            line = line[:cookie_index].strip()
+            self.cookie=cookie
         if len(args) and args[0] in self.shortcuts:
             return "%s %s" % (self.shortcuts[args[0]], " ".join(args[1:]))
         else:
             return line
+
+    def postcmd(self, stop, line):
+        """Hook method executed just after a command dispatch is finished."""
+        self.cookie = None
+        return stop
 
     def postloop(self):
         print('')
