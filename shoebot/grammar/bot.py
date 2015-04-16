@@ -57,10 +57,12 @@ _ = gettext.gettext
 
 import sys
 LIB_DIRS = [
-    os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'), 
+    os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'),
+    os.path.join(SBOT_ROOT, 'lib'),
     os.path.join(SBOT_ROOT, 'share', 'shoebot', 'lib')]
 for LIB_DIR in LIB_DIRS:
-    sys.path.append(LIB_DIR)
+    if os.path.isdir(LIB_DIR):
+        sys.path.append(LIB_DIR)
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
