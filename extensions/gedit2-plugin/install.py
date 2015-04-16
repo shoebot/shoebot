@@ -17,7 +17,7 @@ def has_admin():
         try:
             # only windows users with admin privileges can read the C:\windows\temp
             temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
-        except RuntimeError:
+        except:
             return (os.environ['USERNAME'], False)
         else:
             return (os.environ['USERNAME'], True)
