@@ -1,14 +1,15 @@
 #!/usr/bin/python
 
 from __future__ import print_function
-import glob
+
 import os
 import shutil
 import stat
+import sys
 
 here = os.path.dirname(os.path.abspath(__file__))
 source_dirs = [here, os.path.normpath(os.path.join(here, '../lib'))]
-
+plugin_name='gedit-2'
 
 def has_admin():
     import os
@@ -101,8 +102,17 @@ def main():
                 print('could not create destinaton dir %s' % dest_dir)
                 sys.exit(1)
 
-    for source_dir in source_dirs:
-        copytree(source_dir, dest_dir)
+    print('install %s plugin to %s' % (plugin_name, dest_dir))
+    source_dir = None
+    try:
+        for source_dir in source_dirs:
+            copytree(source_dir, dest_dir)
+    except Exception as e:
+        print('error attempting to copy %s' % source_dir)
+        print(e)
+        sys.exit(1)
+
+    print('success')
 
 
 if __name__ == '__main__':
