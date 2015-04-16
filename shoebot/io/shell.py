@@ -22,6 +22,14 @@ import base64
 import cmd
 import shlex
 
+PROMPT = "[^_^] "
+RESPONSE_PROMPT = "[o_o] "
+INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
+
+
+def print_response(*args):
+    print("\n%s" % RESPONSE_PROMPT + str(*args))
+
 
 class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
@@ -42,12 +50,21 @@ class ShoebotCmd(cmd.Cmd):
             bot
         self.pause_speed = None
         cmd.Cmd.__init__(self, **kwargs)
-        self.intro = 'Shoebot Shell'
-        self.prompt = '(bot) '
+        self.intro = INTRO
+        self.prompt = PROMPT
         self.use_rawinput = False
 
     def handler(signum, frame):
-        print('Caught CTRL-C, press enter to continue')
+        print_response('Caught CTRL-C, press enter to continue')
+
+    def emptyline(self):
+        """
+        Kill the default behaviour of repeating the last line.
+
+        :return:
+        """
+        print(RESPONSE_PROMPT)
+        return ""
 
     def do_title(self, title):
         """
@@ -63,9 +80,9 @@ class ShoebotCmd(cmd.Cmd):
             try:
                 self.bot._speed = float(speed)
             except Exception as e:
-                print('%s is not a valid framerate' % speed)
+                print_response('%s is not a valid framerate' % speed)
                 return
-        print('Speed: %s FPS' % self.bot._speed)
+        print_response('Speed: %s FPS' % self.bot._speed)
 
     def do_restart(self, line):
         """
@@ -86,11 +103,11 @@ class ShoebotCmd(cmd.Cmd):
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
-            print('Paused')
+            print_response('Paused')
         else:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
-            print('Playing')
+            print_response('Playing')
 
     def do_play(self, line):
         """
@@ -102,7 +119,7 @@ class ShoebotCmd(cmd.Cmd):
         if self.pause_speed is None:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
-        print("Play")
+        print_response("Play")
 
     def do_goto(self, line):
         """
@@ -110,14 +127,14 @@ class ShoebotCmd(cmd.Cmd):
         :param line:
         :return:
         """
-        print("Go to frame %s" % line)
+        print_response("Go to frame %s" % line)
         self.bot._frame = int(line)
 
     def do_rewind(self, line):
         """
         rewind
         """
-        print("Rewinding from frame %s to 0" % self.bot._frame)
+        print_response("Rewinding from frame %s to 0" % self.bot._frame)
         self.bot._frame = 0
 
     def do_load_base64(self, line):
@@ -125,7 +142,6 @@ class ShoebotCmd(cmd.Cmd):
         load filename=(file)
         load base64=(base64 encoded)
         """
-        print("shoebot: load_base64 ")
         try:
             source = str(base64.b64decode(line))
             # Test compile
@@ -133,14 +149,14 @@ class ShoebotCmd(cmd.Cmd):
             self.bot._executor.load_edited_source(source)
         except Exception as e:
             # TODO Use simple traceback here
-            print ("Error Compiling")
-            print (e)
+            print_response("Error Compiling")
+            print_response(e)
 
     def do_bye(self, line):
         return self.do_exit(line)
 
     def do_exit(self, line):
-        print('Bye.')
+        print_response('Bye.')
         self.bot._quit = True
         return True
 
@@ -148,13 +164,17 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_fullscreen(self, line):
-        print('TODO - toggle fullscreen')
+        print_response('TODO - toggle fullscreen')
 
     def do_windowed(self, line):
-        print('TODO - set windowed mode')
+        print_response('TODO - set windowed mode')
 
     def do_EOF(self, line):
         return self.do_exit(line)
+
+    def do_help(self, arg):
+        print(RESPONSE_PROMPT)
+        return cmd.Cmd.do_help(self, arg)
 
     def precmd(self, line):
         """
