@@ -127,23 +127,24 @@ class Grammar(object):
             namespace['draw']()
         else:
             # Subsequent frames
-            if self._dynamic and self._speed != 0:
-                with self._executor.run_context() as (known_good, source, ns):
-                    # Code in main block may redefine 'draw'
-                    self._executor.reload_functions()
-                    if not known_good:
-                        with VarListener.batch(self._vars, self._oldvars, ns):
-                            self._oldvars.clear()
+            if self._dynamic:
+                if self._speed != 0: # speed 0 is paused, so do nothing
+                    with self._executor.run_context() as (known_good, source, ns):
+                        # Code in main block may redefine 'draw'
+                        self._executor.reload_functions()
+                        if not known_good:
+                            with VarListener.batch(self._vars, self._oldvars, ns):
+                                self._oldvars.clear()
 
-                            # Re-run the function body - ideally this would only
-                            # happen if the body had actually changed
-                            # - Or perhaps if the line included a variable declatation
-                            exec source in ns
+                                # Re-run the function body - ideally this would only
+                                # happen if the body had actually changed
+                                # - Or perhaps if the line included a variable declaration
+                                exec source in ns
 
-                    ns['draw']()
+                        ns['draw']()
             else:
                 self._executor.run()
-        
+
         self._canvas.flush(self._frame)
         if limit:
             self._frame_limit()

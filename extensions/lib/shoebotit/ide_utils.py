@@ -167,7 +167,6 @@ def find_example_dir():
     """
 
     # Needs to run in same python env as shoebot (may be different to gedits)
-
     code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'share/shoebot/examples/')"
     cmd = ["python", "-c", code]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -180,8 +179,17 @@ def find_example_dir():
         examples_dir = output.decode('utf-8').strip()
         if os.path.isdir(examples_dir):
             return examples_dir
-        else:
-            print('Could not find shoebot examples at {0}'.format(examples_dir))
+
+        # If user is running 'setup.py develop' then examples could be right here
+        code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'examples/')"
+        cmd = ["python", "-c", code]
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, errors = p.communicate()
+        examples_dir = output.decode('utf-8').strip()
+        if os.path.isdir(examples_dir):
+            return examples_dir
+
+        print('Could not find shoebot examples at {0}'.format(examples_dir))
 
 
 def make_readable_filename(fn):
