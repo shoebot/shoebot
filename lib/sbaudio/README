@@ -1,0 +1,3 @@
+Grab audio frequencies from pysoundcard to make simple audio vis's.
+
+Requires pysoundcard to be installed.
