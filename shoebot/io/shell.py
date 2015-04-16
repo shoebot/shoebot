@@ -53,14 +53,20 @@ class ShoebotCmd(cmd.Cmd):
         self.use_rawinput = False
         self.cookie = None
 
-    def print_response(self, *args):
+    def print_response(self, *args, **kwargs):
         """
         print response, if cookie is set then print that each line
         :param args:
+        :param cookie: set a custom cookie,
+                       if set to 'None' then self.cookie will be used.
+                       if set to 'False' disables cookie output entirely
         :return:
         """
+        cookie = kwargs.get('cookie')
+        if cookie is None:
+            cookie = self.cookie
         lines = str(" ".join(args)).splitlines()
-        if self.cookie:
+        if cookie:
             for line in str("".join(args)).splitlines():
                 print("%s %s" % (self.cookie, line))
         else:
@@ -160,11 +166,20 @@ class ShoebotCmd(cmd.Cmd):
         load filename=(file)
         load base64=(base64 encoded)
         """
+
+        cookie=self.cookie
+
+        def source_good():
+            self.print_response("good", cookie=cookie)
+
+        def source_bad(ex):
+            self.print_response("bad", cookie=cookie)
+
         try:
             source = str(base64.b64decode(line))
             # Test compile
             compile(source + '\n\n', "shoebot_code", "exec")
-            self.bot._executor.load_edited_source(source)
+            self.bot._executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
         except Exception as e:
             # TODO Use simple traceback here
             self.print_response("Error Compiling")

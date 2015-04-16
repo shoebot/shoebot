@@ -25,7 +25,7 @@ class LiveExecution(object):
         else:
             self.ns = ns
 
-    def load_edited_source(self, source):
+    def load_edited_source(self, source, good_cb=None, bad_cb=None):
         """
         Load changed code into the execution environment.
 
@@ -33,6 +33,8 @@ class LiveExecution(object):
         in the 'tenuous' state.
         """
         self.edited_source = source
+        self.good_cb = good_cb
+        self.bad_cb = bad_cb
 
     def reload_functions(self):
         """
@@ -65,8 +67,14 @@ class LiveExecution(object):
             self.edited_source = None
             self.do_exec(source, ns_snapshot, True)
             self.known_good = source
+            if self.good_cb:
+                self.good_cb()
+                self.good_cb = None
             return True, None
         except Exception as e:
+            if self.bad_cb:
+                self.bad_cb()
+                self.bad_cb = None
             self.ns.clear()
             self.ns.update(ns_snapshot)
             return False, e
@@ -104,7 +112,13 @@ class LiveExecution(object):
             yield False, self.edited_source, self.ns
             self.known_good = self.edited_source
             self.edited_source = None
+            if self.good_cb:
+                self.good_cb()
+                self.good_cb = None
         except Exception as e:
+            if self.bad_cb:
+                self.bad_cb(e)
+                self.bad_cb = None
             self.edited_source = None
             self.ns.clear()
             self.ns.update(ns_snapshot)

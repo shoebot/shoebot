@@ -112,6 +112,7 @@ class ShoebotProcess(object):
 
     def send_command(self, cmd, *args):
         # This *seems* to work in python2 and 3
+        args = list(args) + [b'cookie=1234556']
         if args:
             bytes_args = []
             for arg in args:
