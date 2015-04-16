@@ -14,33 +14,35 @@ import textwrap
 here = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    from setuptools import setup, Command
-
-    class CleanCommand(Command):
-        """Custom clean command to tidy up the project root."""
-        CLEAN_FILES = './build ./dist ./*.pyc ./*.tgz ./*.egg-info'.split(' ')
-
-        user_options = []
-
-        def initialize_options(self):
-            pass
-        def finalize_options(self):
-            pass
-        def run(self):
-            global here
-
-            for path_spec in self.CLEAN_FILES:
-                # Make paths absolute and relative to this path
-                abs_paths = glob.glob(os.path.normpath(os.path.join(here, path_spec)))
-                for path in [str(p) for p in abs_paths]:
-                    if not path.startswith(here):
-                        # Die if path in CLEAN_FILES is absolute + outside this directory
-                        raise ValueError("%s is not a path inside %s" % (path, here))
-                    print('removing %s' % os.path.relpath(path))
-                    shutil.rmtree(path)
-
+    from setuptools import setup
+    from setuptools import Command as CleanBaseCommand
 except ImportError:
     from distutils.core import setup
+    from distutils.command import clean as CleanBaseCommand
+
+
+class CleanCommand(CleanBaseCommand):
+    """Custom clean command to tidy up the project root."""
+    CLEAN_FILES = './build ./dist ./*.pyc ./*.tgz ./*.egg-info'.split(' ')
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        global here
+
+        for path_spec in self.CLEAN_FILES:
+            # Make paths absolute and relative to this path
+            abs_paths = glob.glob(os.path.normpath(os.path.join(here, path_spec)))
+            for path in [str(p) for p in abs_paths]:
+                if not path.startswith(here):
+                    # Die if path in CLEAN_FILES is absolute + outside this directory
+                    raise ValueError("%s is not a path inside %s" % (path, here))
+                print('removing %s' % os.path.relpath(path))
+                shutil.rmtree(path)
 
 long_description = textwrap.dedent("""
     Shoebot is a pure Python graphics robot: It takes a Python script as input,
