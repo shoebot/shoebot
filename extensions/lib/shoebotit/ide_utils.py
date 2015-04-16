@@ -104,16 +104,22 @@ class ShoebotProcess(object):
         source = source.rstrip('\n')
         if source != self.source:
             self.source = source
-            self.send_command("load_base64", source)
+            b64_source = base64.b64encode(bytes(bytearray(source, "ascii")))
+            self.send_command("load_base64", b64_source)
 
     def pause(self):
         self.send_command('pause')
 
     def send_command(self, cmd, *args):
         # This *seems* to work in python2 and 3
-        encoded_args = base64.b64encode(bytes(bytearray(", ".join(args), "ascii")))
         if args:
-            data = bytearray(cmd, "ascii") + b' ' + encoded_args + b'\n'
+            bytes_args = []
+            for arg in args:
+                if isinstance(arg, bytes):
+                    bytes_args.append(arg)
+                else:
+                    bytes_args.append(bytes(arg))
+            data = bytearray(cmd, "ascii") + b' ' + b' '.join(bytes_args) + b'\n'
         else:
             data = bytearray(cmd, "ascii") + b'\n'
 
