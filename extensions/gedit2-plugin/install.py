@@ -118,7 +118,7 @@ def main():
         print(e)
         sys.exit(1)
 
-    dest_dir = language_dir()
+    dest_dir = language_dir(is_admin)
     if dest_dir:
         shutil.copyfile("shoebot.lang", dest_dir)
     print('success')
