@@ -1,20 +1,9 @@
-from collections import namedtuple
 from distutils.spawn import find_executable as which
-from urllib.request import pathname2url
-
 from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
 
-import base64
-import queue
-import time
-
-
 import os
-
-# TODO - Use shoebot from gsettings if available
-#        ide_utils.ShoebotProcess
 
 
 class ShoebotWindowHelper(object):
@@ -80,8 +69,9 @@ class ShoebotWindowHelper(object):
     def on_open_example(self, action):
         example_dir = ide_utils.get_example_dir()
         filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
-        
-        uri = "file:///" + pathname2url(filename)
+
+        drive, directory = os.path.splitdrive(os.path.abspath(os.path.normpath(filename)))
+        uri = "file:///%s%s" % (drive, directory)
         gio_file = Gio.file_new_for_uri(uri)
         self.window.create_tab_from_location(
             gio_file,

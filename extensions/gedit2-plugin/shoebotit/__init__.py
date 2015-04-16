@@ -1,5 +1,3 @@
-from urllib import pathname2url
-
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk2_utils
 
@@ -107,7 +105,8 @@ class ShoebotWindowHelper:
         example_dir = ide_utils.get_example_dir()
         filename = os.path.join(example_dir, action.get_name()[len('ShoebotOpenExample'):].strip())
 
-        uri = "file:///" + pathname2url(filename)
+        drive, directory = os.path.splitdrive(os.path.abspath(os.path.normpath(filename)))
+        uri = "file:///%s%s" % (drive, directory.replace(os.sep, '/'))
         self.window.create_tab_from_uri(uri,
                 gedit.encoding_get_current(), 
                 0, 
