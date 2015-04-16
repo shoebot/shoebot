@@ -11,14 +11,13 @@ here = os.path.dirname(os.path.abspath(__file__))
 source_dirs = [here, os.path.normpath(os.path.join(here, '../lib'))]
 plugin_name='gedit-2'
 
-def has_admin():
-    import os
 
+def has_admin():
     if os.name == 'nt':
         try:
             # only windows users with admin privileges can read the C:\windows\temp
             temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
-        except:
+        except RuntimeError:
             return (os.environ['USERNAME'], False)
         else:
             return (os.environ['USERNAME'], True)
@@ -33,7 +32,7 @@ def plugins_dir_nt(is_admin):
     if is_admin:
         return "C:\\Program Files\\gedit\\lib\\gedit-2\\plugins"
     else:
-        return os.path.expanduser("~/.gnome2/gedit/gedit-2/plugins")
+        return os.path.expandvars("%UserProfile%//AppData//Roaming//gedit//plugins")
 
 
 def plugins_dir_unix(is_admin):
@@ -52,6 +51,13 @@ def plugins_dir(is_admin):
     else:
         return plugins_dir_unix(is_admin)
 
+
+def language_dir(is_admin):
+    # TODO
+    if os.name == 'nt':
+        if is_admin:
+            return "C:\\Program Files\\gedit\\share\\gtksourceview-2.0\\language-specs"
+    pass
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """
@@ -112,6 +118,9 @@ def main():
         print(e)
         sys.exit(1)
 
+    dest_dir = language_dir()
+    if dest_dir:
+        shutil.copyfile("shoebot.lang", dest_dir)
     print('success')
 
 
