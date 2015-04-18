@@ -15,6 +15,7 @@ class ShoebotWindowHelper(object):
         self.idle_handler_id = None
         panel = window.get_bottom_panel()
         self.output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-output')
+        self.live_output_widget = gtk3_utils.get_child_by_name(panel, 'shoebot-live')
 
         self.plugin = plugin
         self.insert_menu()
@@ -193,6 +194,21 @@ class ShoebotWindowHelper(object):
                     end_iter = textbuffer.get_end_iter()
                     textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0)
+
+            textbuffer = self.live_output_widget.get_buffer()
+            for response in self.bot.get_command_responses():
+                if response is None:
+                    # sentinel value - clear the buffer
+                    textbuffer.delete(textbuffer.get_start_iter(), textbuffer.get_end_iter())
+                else:
+                    cmd, status, info = response.cmd, response.status, response.info
+                    if cmd == ide_utils.CMD_LOAD_BASE64:
+                        if status == ide_utils.RESPONSE_CODE_OK:
+                            textbuffer.delete(textbuffer.get_start_iter(), textbuffer.get_end_iter())
+                            # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
+                        elif status == ide_utils.RESPONSE_REVERTED:
+                            textbuffer.insert(textbuffer.get_end_iter(), '\n'.join(info).replace('\\n', '\n'))
+
             while Gtk.events_pending():
                 Gtk.main_iteration()
 
@@ -212,10 +228,17 @@ class ShoebotWindowHelper(object):
 
     def toggle_livecoding(self, action):
         self.livecoding = action.get_active()
+        panel = self.window.get_bottom_panel()
         if self.livecoding and self.bot:
             doc = self.window.get_active_document()
             source = self.get_source(doc)
             self.bot.live_source_load(source)
+
+            icon = Gtk.Image()
+            panel.add_item(self.live_output_widget, 'Shoebot Live', 'Shoebot Live', icon)
+        else:
+            panel.remove_item(self.live_output_widget)
+
     
         
     # Right-click menu items (for quicktorials)
@@ -236,36 +259,46 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.instances = {}
         self.tempfiles = []
 
-    def _create_view(self):
+    def _create_view(self, name="shoebot-output"):
         """ Create the gtk.TextView used for shell output """
         view = Gtk.TextView()
         view.set_editable(False)
 
         fontdesc = Pango.FontDescription("Monospace")
         view.modify_font(fontdesc)
-        view.set_name('shoebot-output')
+        view.set_name(name)
 
         buff = view.get_buffer()
         buff.create_tag('error', foreground='red')
         return view
 
     def do_activate(self):
-        self.text = self._create_view()
+        self.text = self._create_view("shoebot-output")
+        self.live_text = self._create_view("shoebot-live")
         self.panel = self.window.get_bottom_panel()
 
-        image = Gtk.Image()
-        image.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
+        icon = Gtk.Image()
+        icon.set_from_stock(Gtk.STOCK_EXECUTE, Gtk.IconSize.BUTTON)
 
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.add(self.text)
-        scrolled_window.show_all()
+        output_widget = Gtk.ScrolledWindow()
+        output_widget.add(self.text)
+        output_widget.show_all()
         
-        self.panel.add_item(scrolled_window, 'Shoebot', 'Shoebot', image)   
-        self.output_widget = scrolled_window
+        self.panel.add_item(output_widget, 'Shoebot', 'Shoebot', icon)
+        self.output_widget = output_widget
+
+        live_output_widget = Gtk.ScrolledWindow()
+        live_output_widget.add(self.live_text)
+        live_output_widget.show_all()
+
+        self.panel.add_item(live_output_widget, 'Shoebot Live', 'Shoebot Live', icon)
+        self.live_output_widget = live_output_widget
 
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
     def do_deactivate(self):
+        print('deactivate')
+        print(self.window.bot.responses.items())
         self.panel.remove_item(self.text)
         self.instances[self.window].deactivate()
         del self.instances[self.window]

@@ -13,13 +13,21 @@ except ImportError:
     import Queue as queue
 
 import base64
+import collections
 import os
 import subprocess
 import threading
 import time
 import sys
+import uuid
+import re
 
 PY3 = sys.version_info[0] == 3
+
+CMD_LOAD_BASE64 = 'load_base64'
+
+RESPONSE_CODE_OK = "CODE_OK"
+RESPONSE_REVERTED = "REVERTED"
 
 
 class AsynchronousFileReader(threading.Thread):
@@ -29,12 +37,13 @@ class AsynchronousFileReader(threading.Thread):
     be consumed in another thread.
     """
 
-    def __init__(self, fd, q):
+    def __init__(self, fd, q, althandler=None):
         assert isinstance(q, queue.Queue)
         assert callable(fd.readline)
         threading.Thread.__init__(self)
         self._fd = fd
         self._queue = q
+        self._althandler = althandler
 
     def run(self):
         """
@@ -42,6 +51,12 @@ class AsynchronousFileReader(threading.Thread):
         """
         try:
             for line in iter(self._fd.readline, False):
+                if line is not None:
+                    if self._althandler:
+                        if self._althandler(line):
+                            # If the althandler returns True
+                            # then don't process this as usual
+                            continue
                 self._queue.put(line)
                 if not line:
                     time.sleep(0.1)
@@ -54,6 +69,16 @@ class AsynchronousFileReader(threading.Thread):
         Check whether there is no more content to expect.
         """
         return (not self.is_alive()) and self._queue.empty() or self._fd.closed
+
+
+class CommandResponse(collections.namedtuple("CommandResponse", ['cmd', 'cookie', 'status', 'info'])):
+    __slots__ = ()
+
+    def __new__(cls, cmd, cookie, status=None, info=[]):
+        return super(CommandResponse, cls).__new__(cls, cmd, cookie, status, info)
+
+    def __str__(self):
+        return 'cmd: {0} info{1}'.format(self.cmd, self.info)
 
 
 class ShoebotProcess(object):
@@ -86,13 +111,42 @@ class ShoebotProcess(object):
 
         self.running = True
 
+        self.responses = {}
+
+        def response_handler(line):
+            line = line.decode('utf-8').rstrip()
+            for cookie, response in list(self.responses.items()):
+                if line.startswith(cookie):
+                    pattern = r"^"+cookie+"\s?(?P<status>(.*?))[\:>](?P<info>.*)"
+
+                    match = re.match(pattern, line)
+                    d = match.groupdict()
+                    status = d.get('status')
+                    info = d.get('info')
+
+                    if not response.status and status:
+                        self.responses[cookie] = response = CommandResponse(response.cmd, cookie, response.status or status, response.info)
+
+                    response.info.append(info)
+
+                    # If delimiter was '>' there are more lines
+                    # If delimiter was ':' request is complete
+                    delimiter = re.match('.*([:>])', line).group(1)
+                    if delimiter == ':':
+                        del self.responses[cookie]
+                        self.response_queue.put_nowait(response)
+
+                    break
+
         # Launch the asynchronous readers of the process' stdout and stderr.
         self.stdout_queue = queue.Queue()
-        self.stdout_reader = AsynchronousFileReader(self.process.stdout, self.stdout_queue)
+        self.stdout_reader = AsynchronousFileReader(self.process.stdout, self.stdout_queue, althandler=response_handler)
         self.stdout_reader.start()
         self.stderr_queue = queue.Queue()
         self.stderr_reader = AsynchronousFileReader(self.process.stderr, self.stderr_queue)
         self.stderr_reader.start()
+
+        self.response_queue = queue.Queue()
 
         self.handle_stdout = handle_stdout
         self.handle_stderr = handle_stderr
@@ -100,26 +154,55 @@ class ShoebotProcess(object):
 
         self.source = source.rstrip('\n')
 
-    def live_source_load(self, source):
+        #self.setup_io()
+
+    def setup_io(self):
+        # Turn off user prompts
+        self.send_command('prompt', 'off')
+        self.send_command('')
+
+        # Make responses single lines
+        self.send_command("escape_nl")
+        self.send_command('')
+
+    def live_source_load(self, source, good_cb=None, bad_cb=None):
+        """
+        Send new source code to the bot
+
+        :param source:
+        :param good_cb: callback called if code was good
+        :param bad_cb: callback called if code was bad (will get contents of exception)
+        :return:
+        """
         source = source.rstrip('\n')
         if source != self.source:
             self.source = source
             b64_source = base64.b64encode(bytes(bytearray(source, "ascii")))
-            self.send_command("load_base64", b64_source)
+            self.send_command(CMD_LOAD_BASE64, b64_source)
 
-    def pause(self):
-        self.send_command('pause')
+    def pause(self, callback=None):
+        self.send_command('pause', callback=callback)
 
     def send_command(self, cmd, *args):
-        # This *seems* to work in python2 and 3
-        args = list(args) + [b'cookie=1234556']
+        """
+        :param cmd:
+        :param args:
+        :return:
+        """
+        # Test in python 2 and 3 before modifying (gedit2 + 3)
+        if True:
+            # Create a CommandResponse using a cookie as a unique id
+            cookie = str(uuid.uuid4())
+            response = CommandResponse(cmd, cookie, None, info=[])
+            self.responses[cookie] = response
+            args = list(args) + [b'cookie=' + bytes(cookie, "ascii")]
         if args:
             bytes_args = []
             for arg in args:
                 if isinstance(arg, bytes):
                     bytes_args.append(arg)
                 else:
-                    bytes_args.append(bytes(arg))
+                    bytes_args.append(bytearray(arg, "ascii"))
             data = bytearray(cmd, "ascii") + b' ' + b' '.join(bytes_args) + b'\n'
         else:
             data = bytearray(cmd, "ascii") + b'\n'
@@ -156,6 +239,17 @@ class ShoebotProcess(object):
             if not self.stderr_queue.empty():
                 line = self.stderr_queue.get().decode('utf-8')
                 yield None, line
+
+    def get_command_responses(self):
+        """
+        Get responses to commands sent
+        """
+        if not self.response_queue.empty():
+            yield None
+        while not self.response_queue.empty():
+            line = self.response_queue.get()
+            if line is not None:
+                yield line
 
 
 def get_example_dir():

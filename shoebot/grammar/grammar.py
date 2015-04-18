@@ -131,8 +131,8 @@ class Grammar(object):
                 if self._speed != 0: # speed 0 is paused, so do nothing
                     with self._executor.run_context() as (known_good, source, ns):
                         # Code in main block may redefine 'draw'
-                        self._executor.reload_functions()
                         if not known_good:
+                            self._executor.reload_functions()
                             with VarListener.batch(self._vars, self._oldvars, ns):
                                 self._oldvars.clear()
 

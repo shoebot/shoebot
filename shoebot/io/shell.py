@@ -1,4 +1,5 @@
 from __future__ import print_function
+from contextlib import contextmanager
 
 import re
 
@@ -16,6 +17,20 @@ sbot -wl ~/examples/animation/hypnoval.bot
 For Livecoding IDEs can use the load_base64 command, simply pass
 the updated python code as the first parameter.
 
+If an editor wants to know the status of specific commands, set
+cookie=unique_value as the last parameter of any command.
+
+output will come back like this
+
+%cookie> this is an intermediate line
+%cookie>
+%cookie: this is the last line, the client can dispose of the cookie
+
+%cookie status>
+%cookie:
+
+%cookie status:
+
 Other commands are available to control playback, try 'help' to
 list them.
 """
@@ -24,9 +39,14 @@ import base64
 import cmd
 import shlex
 
-PROMPT = "[^_^] "
-RESPONSE_PROMPT = "[o_o] "
-INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
+PROMPT = ""
+#PROMPT = "[^_^] "
+#RESPONSE_PROMPT = "[o_o] "
+#INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
+INTRO = "[o_o] " + '"Shoebot Shell."'
+
+RESPONSE_CODE_OK = "CODE_OK"
+RESPONSE_REVERTED = "REVERTED"
 
 
 class ShoebotCmd(cmd.Cmd):
@@ -50,10 +70,13 @@ class ShoebotCmd(cmd.Cmd):
         cmd.Cmd.__init__(self, **kwargs)
         self.intro = INTRO
         self.prompt = PROMPT
+        self.response_prompt = ''
         self.use_rawinput = False
         self.cookie = None
+        self.escape_nl = False
+        self.live_prefix = ''
 
-    def print_response(self, *args, **kwargs):
+    def print_response(self, input='', keep=False, *args, **kwargs):
         """
         print response, if cookie is set then print that each line
         :param args:
@@ -64,18 +87,28 @@ class ShoebotCmd(cmd.Cmd):
         """
         cookie = kwargs.get('cookie')
         if cookie is None:
-            cookie = self.cookie
-        lines = str(" ".join(args)).splitlines()
-        if cookie:
-            for line in str("".join(args)).splitlines():
-                print("%s %s" % (self.cookie, line))
-        else:
-            print(RESPONSE_PROMPT)
-            if len(lines):
-                print("\n")
-            print(str("".join(args)))
+            cookie = self.cookie or ''
+        status = kwargs.get('status')
+        lines = input.splitlines()
+        if status and not lines:
+            lines = ['']
+        for i, line in enumerate(lines):
+            if i != len(lines) - 1 or keep is True:
+                cookie_char = '>'
+            else:
+                # last line
+                cookie_char = ':'
+
+            print('{cookie} {status}{cookie_char}{line}'.format(
+                cookie_char=cookie_char,
+                cookie=cookie,
+                status=status or '',
+                line=line.strip()))
+
+
 
     def handler(signum, frame):
+        ### TODO - is this right ??
         self.print_response('Caught CTRL-C, press enter to continue')
 
     def emptyline(self):
@@ -84,11 +117,30 @@ class ShoebotCmd(cmd.Cmd):
 
         :return:
         """
-        print(RESPONSE_PROMPT)
+        #if not self.cookie:
+        #    print(RESPONSE_PROMPT)
         return ""
 
+    def do_escape_nl(self, arg):
+        """
+        Escape newlines in any responses
+
+        :Return:
+        """
+        if arg.lower() == 'off':
+            self.escape_nl = False
+        else:
+            self.escape_nl = True
+
     def do_prompt(self, arg):
-        self.print_response('prompt: %s' % PROMPT, '\n', 'response: %s' % RESPONSE_PROMPT)
+        if arg.lower() == 'off':
+            self.response_prompt = ''
+            self.prompt = ''
+            return
+        elif arg.lower() == 'on':
+            self.prompt = PROMPT
+            self.response_prompt = RESPONSE_PROMPT
+        self.print_response('prompt: %s' % self.prompt, '\n', 'response: %s' % self.response_prompt)
 
     def do_title(self, title):
         """
@@ -167,23 +219,28 @@ class ShoebotCmd(cmd.Cmd):
         load base64=(base64 encoded)
         """
 
-        cookie=self.cookie
+        cookie = self.cookie
+        executor = self.bot._executor
 
         def source_good():
-            self.print_response("good", cookie=cookie)
+            self.print_response(status=RESPONSE_CODE_OK, cookie=cookie)
+            executor.clear_callbacks()
 
-        def source_bad(ex):
-            self.print_response("bad", cookie=cookie)
+        def source_bad(tb):
+            if called_good:
+                raise ValueError('GOOD WAS CALLED!')
+            print('BAD!!')
+            # TODO - get simple_trace_back of exception to send back
+            self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
+            self.print_response(tb.replace('\n', '\\n'), cookie=cookie)
+            print('BAD:  tb: ', tb)
+            print('/BAD')
+            executor.clear_callbacks()
 
-        try:
-            source = str(base64.b64decode(line))
-            # Test compile
-            compile(source + '\n\n', "shoebot_code", "exec")
-            self.bot._executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
-        except Exception as e:
-            # TODO Use simple traceback here
-            self.print_response("Error Compiling")
-            self.print_response(e)
+        called_good = False
+        source = str(base64.b64decode(line))
+        # Test compile
+        executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
 
     def do_bye(self, line):
         return self.do_exit(line)
@@ -206,7 +263,7 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_help(self, arg):
-        print(RESPONSE_PROMPT)
+        print(self.response_prompt)
         return cmd.Cmd.do_help(self, arg)
 
     def precmd(self, line):
@@ -221,12 +278,11 @@ class ShoebotCmd(cmd.Cmd):
         :return:
         """
         args = shlex.split(line or "")
-        last_arg = args[-1]
-        if 'cookie=' in last_arg:
+        if args and 'cookie=' in args[-1]:
             cookie_index = line.index('cookie=')
             cookie = line[cookie_index+7:]
             line = line[:cookie_index].strip()
-            self.cookie=cookie
+            self.cookie = cookie
         if len(args) and args[0] in self.shortcuts:
             return "%s %s" % (self.shortcuts[args[0]], " ".join(args[1:]))
         else:
