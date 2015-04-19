@@ -31,20 +31,18 @@
 
 import sys, os
 
-from shoebot import ShoebotError, \
-                    RGB, HSB, \
-                    CENTER, CORNER, CORNERS
-
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, \
-                         NUMBER, TEXT, BOOLEAN, BUTTON
+                         NUMBER, TEXT, BOOLEAN, BUTTON, \
+                         ShoebotError, \
+                         RGB, HSB, \
+                         CENTER, CORNER, CORNERS
 
 from grammar import Grammar
 
 from pkg_resources import resource_filename, Requirement
 from glob import glob
 import random as r
-import traceback
 
 import locale, gettext
 
@@ -59,10 +57,12 @@ _ = gettext.gettext
 
 import sys
 LIB_DIRS = [
-    os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'), 
+    os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'),
+    os.path.join(SBOT_ROOT, 'lib'),
     os.path.join(SBOT_ROOT, 'share', 'shoebot', 'lib')]
 for LIB_DIR in LIB_DIRS:
-    sys.path.append(LIB_DIR)
+    if os.path.isdir(LIB_DIR):
+        sys.path.append(LIB_DIR)
 
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
@@ -125,7 +125,6 @@ class Bot(Grammar):
         self._canvas.size = None
         self._frame = 1
         self._set_initial_defaults() ### TODO Look at these
-
         
     def _set_initial_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
@@ -352,13 +351,13 @@ class Bot(Grammar):
         self.WIDTH = w  # Added to make evolution example work
         self.HEIGHT = h # Added to make evolution example work
 
-    def speed(self, framerate):
+    def speed(self, framerate=None):
         '''Set animation framerate.
 
         :param framerate: Frames per second to run bot.
         :return: Current framerate of animation.
         '''
-        if framerate:
+        if framerate is not None:
             self._speed = framerate
             self._dynamic = True
         else:

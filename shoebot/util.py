@@ -181,6 +181,7 @@ from cairocffi import SVGSurface
 
 _svg_surface = None
 
+
 def get_svg_surface():
     global _svg_surface
     if _svg_surface is None:
@@ -219,7 +220,6 @@ def RecordingSurfaceA8(*size):
     '''
     svg_surface = get_svg_surface()
     return svg_surface.create_similar(cairo.CONTENT_ALPHA, *size)
-
 
 
 class flushfile(object):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: iso-8859-1 -*-
 
+from __future__ import print_function
 try:
     import gi
 except ImportError:
@@ -53,7 +54,7 @@ import shoebot
 #     del gtksourceview_SourceLanguagesManager
 
 
-from shoebot import ShoebotError
+from shoebot.data import ShoebotError
 
 
 APP = 'shoebot'
@@ -808,7 +809,7 @@ class View(Gtk.Window):
         start, end = dialog.buffer.get_bounds()
         search_string = start.get_text(end)
 
-        print _("Searching for `%s'\n") % search_string
+        print(_("Searching for `%s'\n") % search_string)
 
         buffer = self.text_view.get_buffer()
         if response_id == RESPONSE_FORWARD:
@@ -943,7 +944,7 @@ class View(Gtk.Window):
         pass
 
     def tab_stops_expose(self, widget, event):
-        #print self, widget, event
+        #print(self, widget, event)
         text_view = widget
 
         # See if this expose is on the tab stop window
@@ -1018,7 +1019,7 @@ class View(Gtk.Window):
                 os.chdir(os.path.dirname(buffer.filename))
                 
                 
-            bot = shoebot.bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+            bot = shoebot.create_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever = True, iterations = None)
         except ShoebotError, NameError:
@@ -1035,7 +1036,6 @@ class View(Gtk.Window):
             return False
 
         # TODO: have a try/except that shows an error window         
-
 
 class Stack(list):
     def __init__(self):
@@ -1070,6 +1070,10 @@ class TestText(object):
         Gtk.main()
         return 0
 
-if __name__ == "__main__":
+
+def main():
     testtext = TestText(sys.argv[1:])
     testtext.main()
+
+if __name__ == "__main__":
+    main()

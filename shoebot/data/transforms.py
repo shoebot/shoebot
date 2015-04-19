@@ -6,7 +6,6 @@ import sys
 import cairocffi as cairo
 from math import sin, cos
 from bezier import BezierPath
-from shoebot import ShoebotError
                          
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 CENTER = 'center'
@@ -21,6 +20,7 @@ gettext.bindtextdomain(APP, DIR)
 #gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
 
 class Transform:
     '''
@@ -187,12 +187,13 @@ class Transform:
         if isinstance(path, BezierPath):
             path = path.copy()
         else:
-            raise ShoebotError, "Can only transform BezierPaths"
+            raise ValueError("Can only transform BezierPaths")
          
         for point in path:
             print point   
         #path._nsBezierPath = self._nsAffineTransform.transformBezierPath_(path._nsBezierPath)
         return path
+
 
 class TransformMixin(object):
 

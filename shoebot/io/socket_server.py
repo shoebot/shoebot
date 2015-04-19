@@ -14,6 +14,27 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+
+# For now this is a bit basic, but works enough.
+
+
+BANNER = """
+############`             [Welcome to Shoebot Telnet Console.]`
+##```####```              `````````````````````````````````````
+############`
+############`
+##```````````
+############`
+`````````````
+
+Set variables with  var=value
+
+Enter dir() to view variables.
+Enter bye() or press CTRL-D to quit.
+
+"""
+
+
 class SocketServerMixin(object):
     def server(self, host, port):
         '''Initialize server and start listening.'''

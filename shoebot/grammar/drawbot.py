@@ -1,8 +1,7 @@
 import sys
 from bot import Bot
-from shoebot.data import BezierPath, Image
+from shoebot.data import BezierPath, Image, ShoebotError
 from math import radians as deg2rad
-from shoebot import ShoebotError
 
 import locale, gettext
 APP = 'shoebot'

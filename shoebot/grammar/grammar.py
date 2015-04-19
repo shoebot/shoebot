@@ -3,6 +3,7 @@ from livecode import LiveExecution
 import traceback
 
 from time import sleep, time
+from var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
 
@@ -23,17 +24,16 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
-    def __init__(self, canvas, namespace = None, vars = None):
+    def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
         self._quit = False
         self._iteration = 0
         self._dynamic = True
-        self._speed = None
+        self._speed = 60.0
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
 
-        #self._executor = LiveExecution(ns=self)
         self._executor = None
 
         input_device = canvas.get_input_device()
@@ -45,7 +45,6 @@ class Grammar(object):
                 mouse_button_up = self._mouse_button_up,
                 mouse_pointer_moved = self._mouse_pointer_moved)
         self._input_device = input_device
-
 
     def _load_namespace(self, filename = None):
         ''' Export namespace into the user bot
@@ -102,21 +101,22 @@ class Grammar(object):
         if self._speed:
             completion_time = time()
             exc_time = completion_time - self._start_time
-            sleep_for = (1.0 / self._speed) - exc_time
+            sleep_for = (1.0 / abs(self._speed)) - exc_time
             if sleep_for > 0:
                 sleep(sleep_for)
             self._start_time = completion_time + sleep_for
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, limit = False):
+    def _exec_frame(self, limit=False):
         ''' Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
         '''
         namespace = self._namespace
-        self._canvas.reset_canvas()
+        if self._iteration != 0 and self._speed != 0:
+            self._canvas.reset_canvas()
         self._set_dynamic_vars()
         if self._iteration == 0:
             # First frame
@@ -128,13 +128,23 @@ class Grammar(object):
         else:
             # Subsequent frames
             if self._dynamic:
-                with self._executor.run_context() as (tenuous, code, ns):
-                    # Code in main block may redefine 'draw'
-                    self._executor.reload_functions()
-                    ns['draw']()
+                if self._speed != 0: # speed 0 is paused, so do nothing
+                    with self._executor.run_context() as (known_good, source, ns):
+                        # Code in main block may redefine 'draw'
+                        if not known_good:
+                            self._executor.reload_functions()
+                            with VarListener.batch(self._vars, self._oldvars, ns):
+                                self._oldvars.clear()
+
+                                # Re-run the function body - ideally this would only
+                                # happen if the body had actually changed
+                                # - Or perhaps if the line included a variable declaration
+                                exec source in ns
+
+                        ns['draw']()
             else:
                 self._executor.run()
-        
+
         self._canvas.flush(self._frame)
         if limit:
             self._frame_limit()
@@ -272,6 +282,9 @@ class Grammar(object):
             else:
                 # Set from commandline
                 v.value = v.sanitize(oldvar)
+        else:
+            for listener in VarListener.listeners:
+                listener.var_added(v)
         self._vars[v.name] = v
         self._namespace[v.name] = v.value
         self._oldvars[v.name] = v

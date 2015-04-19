@@ -27,7 +27,8 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-''' Data structures for use in Shoebot
+"""
+Data structures for use in Shoebot
 
 These are 'agnostic' classes for representing primitive shapes, paths, colors,
 transforms, text and image objects, live variables and user interaction 
@@ -36,10 +37,20 @@ elements (such as pointing devices).
 The drawing objects could benefit from an actual, proper Python library to
 handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
-'''
+"""
 
-class ShoebotError(Exception): pass
-class NodeBoxError(ShoebotError): pass
+
+class ShoebotError(Exception):
+    pass
+
+
+class ShoebotScriptError(Exception):
+    pass
+
+
+class NodeBoxError(ShoebotError):
+    pass
+
 
 def _copy_attr(v):
     if v is None:
@@ -62,7 +73,7 @@ def _copy_attrs(source, target, attrs):
 import geometry as geo
 from point import Point
 from basecolor import Color, ColorMixin
-from grob import Grob 
+from grob import Grob
 from bezier import BezierPath, PathElement, ClippingPath, EndClip
 from typography import Text
 from img import Image

@@ -5,13 +5,17 @@ ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoeb
 
 import sys, os
 from pgi.repository import Gtk
-import cairocffi as cairo
-from socket_server import SocketServerMixin
 
-from shoebot.core import DrawQueueSink
+import os
+import sys
+import gtk
+import cairocffi as cairo
+from shoebot.io.socket_server import SocketServerMixin
 from shoebot.util import RecordingSurface
 
-class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
+from shoebot.util import RecordingSurface
+
+class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
     '''
     Create a double buffered GTK+ widget on which we will draw using Cairo        
     '''
@@ -19,7 +23,6 @@ class ShoebotWidget(Gtk.DrawingArea, DrawQueueSink, SocketServerMixin):
     # Draw in response to an expose-event
     def __init__(self, scale_fit=True, input_device=None):
         Gtk.DrawingArea.__init__(self)
-        DrawQueueSink.__init__(self)
         self.connect("draw", self.draw)
 
         self.scale_fit = scale_fit
