@@ -22,7 +22,6 @@ class VarWindow(object):
         self.parent = parent
         self.bot = bot
 
-<<<<<<< HEAD
         self.var_listener = VarListener(self)
 
         self.window = Gtk.Window()
@@ -101,7 +100,7 @@ class VarWindow(object):
 
         return entry
 
-    def add_boolean(self v):
+    def add_boolean(self, v):
         buttoncontainer = Gtk.HBox(homogeneous=False, spacing=0)
         button = Gtk.CheckButton(label=pretty_name(v.name))
         button.set_active(v.value)

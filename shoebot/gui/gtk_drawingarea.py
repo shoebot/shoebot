@@ -8,7 +8,6 @@ from pgi.repository import Gtk
 
 import os
 import sys
-import gtk
 import cairocffi as cairo
 from shoebot.io.socket_server import SocketServerMixin
 from shoebot.util import RecordingSurface

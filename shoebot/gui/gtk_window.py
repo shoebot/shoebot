@@ -22,12 +22,7 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
-<<<<<<< HEAD
 class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
-=======
-
-class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
->>>>>>> master
     '''Create a GTK+ window that contains a ShoebotWidget'''
 
     # Draw in response to an expose-event
@@ -64,7 +59,7 @@ class ShoebotWindow(gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
 
-        self.actiongroup = Gtk.ActionGroup('Canvas')
+        self.action_group = Gtk.ActionGroup('Canvas')
 
         self.action_group.add_actions([('Save as', None, _('_Save as')),
                                      ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
