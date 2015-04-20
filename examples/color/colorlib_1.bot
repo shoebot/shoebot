@@ -2,7 +2,7 @@ size(450,450)
 background(1,1,1)
 
 colors=ximport("colors")
-#print dir(colors)
+#print(dir(colors))
 
 clr = colors.lab(78,29,37,1)
 clr1 = colors.named_color("olive")
@@ -14,14 +14,14 @@ clr6 = colors.complement(clr5)[1]
 clr7 = colors.silver()
 
 if clr7.is_gray:
-        print "yes, it's gray"
+        print("yes, it's gray")
 else:
-        print "no, no gray here"
+        print("no, no gray here")
         
 if clr7.is_transparent:
-        print "yes, you can see through"
+        print("yes, you can see through")
 else:
-        print "no, opaque"       
+        print("no, opaque")
 
 
 clr6.swatch(200,40,20,20)
