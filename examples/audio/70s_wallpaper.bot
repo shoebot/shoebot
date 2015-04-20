@@ -1,6 +1,10 @@
 # A audio reactive bot that looks somewhat
 # like an animated version of wallpaper
 # from the 1970s
+#
+# requires pysoundcard:
+# $ pip install pysoundcard
+
 
 import numpy as np
 
