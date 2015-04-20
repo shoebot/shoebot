@@ -756,4 +756,14 @@ class NodeBot(Bot):
         k = KantGenerator(sourceFile, searchpaths=['.', ASSETS_DIR])
         return k.output()
 
+    @property
+    def canvas(self):
+        """
+        Not entirely sure compatible the Shoebot 'canvas' is with Nodebox
+        but there you go.
+        :return:
+        """
+        return self._canvas
+
+
 
