@@ -217,7 +217,7 @@ class Grammar(object):
 
         try:
             if os.path.isfile(inputcode):
-                source = open(inputcode)
+                source = open(inputcode).read()
                 filename = inputcode
             elif isinstance(inputcode, basestring):
                 filename = 'shoebot_code'

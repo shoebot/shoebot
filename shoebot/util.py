@@ -177,7 +177,7 @@ def rgb_to_hsv(r, g, b):
     #return stringImage
 
 
-from cairocffi import SVGSurface
+#from cairocffi import SVGSurface
 
 _svg_surface = None
 
@@ -194,32 +194,6 @@ def get_svg_surface():
                 fobj = '/dev/null'
             _svg_surface = SVGSurface(fobj, 0, 0)
     return _svg_surface
-
-def RecordingSurface(*size):
-    '''
-    We don't have RecordingSurfaces until cairo 1.10, so this kludge is used
-
-    SVGSurfaces are created, but to stop them ever attempting to output, they
-    are kept in a dict.
-
-    When a surface is needed, create_similar is called to get a Surface from
-    the SVGSurface of the same size
-    '''
-    svg_surface = get_svg_surface()
-    return svg_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, *size)
-
-def RecordingSurfaceA8(*size):
-    '''
-    We don't have RecordingSurfaces until cairo 1.10, so this kludge is used
-
-    SVGSurfaces are created, but to stop them ever attempting to output, they
-    are kept in a dict.
-
-    When a surface is needed, create_similar is called to get a Surface from
-    the SVGSurface of the same size
-    '''
-    svg_surface = get_svg_surface()
-    return svg_surface.create_similar(cairo.CONTENT_ALPHA, *size)
 
 
 class flushfile(object):

@@ -3,7 +3,6 @@ from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
 from grob import Grob
 from basecolor import ColorMixin
-from shoebot.util import RecordingSurface
 from math import pi as _pi, sqrt
 
 import cairocffi as cairo
@@ -174,7 +173,7 @@ class BezierPath(Grob):
         if self._bounds:
             return self._bounds
 
-        record_surface = RecordingSurface(0, 0)
+        record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1))
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
         
@@ -194,7 +193,7 @@ class BezierPath(Grob):
         if self._bounds:
             return self._bounds
 
-        record_surface = RecordingSurface(0, 0)
+        record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, 0, 0)
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
         

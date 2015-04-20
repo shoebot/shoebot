@@ -10,9 +10,7 @@ import os
 import sys
 import cairocffi as cairo
 from shoebot.io.socket_server import SocketServerMixin
-from shoebot.util import RecordingSurface
 
-from shoebot.util import RecordingSurface
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
     '''
@@ -83,17 +81,15 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
 
     def create_rcontext(self, size, frame):
         '''
-        Creates a meta surface for the bot to draw on
-
-        Uses a proxy to an SVGSurface to render on so 
-        it's scalable
+        Creates a recording surface for the bot to draw on
         '''
+        width, height = size
         if self.get_window() and not self.size:
             self.set_size_request(*size)
             self.size = size
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
-        meta_surface = RecordingSurface(*size)
+        meta_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
         return cairo.Context(meta_surface)
 
     def rendering_finished(self, size, frame, cairo_ctx):

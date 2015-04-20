@@ -10,20 +10,19 @@ from PIL import Image as PILImage
 
 try:
     from pgi.repository import Gtk, Gdk, GdkPixbuf
-except:
+except ImportError:
     Gtk = None
 
-
 try:
-	import rsvg
-except:
+    import rsvg
+except ImportError:
     rsvg = None
 
 from shoebot.data import Grob, ColorMixin
-from shoebot.util import RecordingSurface
 
 CENTER = 'center'
 CORNER = 'corner'
+
 
 class SurfaceRef(object):
     ''' Cannot have a weakref to a cairo surface, so wrapper is used '''
@@ -69,7 +68,7 @@ class Image(Grob, ColorMixin):
                 elif os.path.splitext(path)[1].lower() == '.svg' and rsvg is not None:
                     handle = rsvg.Handle(path)
                     sw, sh = handle.get_dimension_data()[:2]
-                    imagesurface = RecordingSurface(sw, sh)
+                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, 0, 0, sw, sh)
                     ctx = cairo.Context(imagesurface)
                     handle.render_cairo(ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
