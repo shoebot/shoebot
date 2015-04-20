@@ -13,7 +13,7 @@ import arc
 import xml.dom.minidom as parser
 import re
 import md5
-from shoebot import RGB, MOVETO
+from shoebot.data import RGB, MOVETO
 
 #### CACHE ###########################################################################################
 

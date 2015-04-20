@@ -204,7 +204,7 @@ class Bot(Grammar):
     def Ellipse(self, *args, **kwargs):
         return self._makeInstance(Ellipse, args, kwargs)
     def Color(self, *args, **kwargs):
-        return self._makeInstance(Color, args, kwargs)
+        return Color(*args, **kwargs)
     def Image(self, *args, **kwargs):
         return self._makeInstance(Image, args, kwargs)
     def Text(self, *args, **kwargs):
@@ -225,8 +225,7 @@ class Bot(Grammar):
 
         :return: Color object containing the color.
         '''
-        return self.Color(mode = self.color_mode, color_range = self.color_range, *args)
-        #return self.Color(*args)
+        return self.Color(mode=self.color_mode, color_range=self.color_range, *args)
 
     choice = r.choice
 
