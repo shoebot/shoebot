@@ -1,3 +1,7 @@
+# TODO - FIXME - Colors part of this probably works OK the bot
+#                 Just needs to be ported to 'pattern',
+#                 (it was origianlly for 'wordnet')
+
 # INFERENCE FUN!
 # Categorize the tags associated to each color in the context.
 # Keep a score how much each color is present in a category.
