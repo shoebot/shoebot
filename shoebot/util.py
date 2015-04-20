@@ -31,11 +31,6 @@
 
 from __future__ import division
 
-import os
-import string
-# import data
-import ctypes
-import cairocffi as cairo
 '''
 def rgb_to_hsl(r, g, b):
     """Converts RGB values to the HSL colourspace. """

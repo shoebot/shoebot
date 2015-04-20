@@ -1,8 +1,14 @@
 #!/usr/bin/env python2
 import os
 
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+from gi.repository import Gtk
 from shoebot.grammar.var_listener import VarListener
-from pgi.repository import Gtk
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 

@@ -9,7 +9,13 @@ import cairocffi as cairo
 from PIL import Image as PILImage
 
 try:
-    from pgi.repository import Gtk, Gdk, GdkPixbuf
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+try:
+    from gi.repository import Gtk, Gdk, GdkPixbuf
 except ImportError:
     Gtk = None
 

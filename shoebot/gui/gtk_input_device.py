@@ -1,9 +1,14 @@
-from pgi.repository import Gdk, Gtk
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
 
+from gi.repository import Gdk, Gtk
 from shoebot.grammar import InputDeviceMixin
 
-class GtkInputDeviceMixin(InputDeviceMixin):
 
+class GtkInputDeviceMixin(InputDeviceMixin):
 
     def __init__(self, **kwargs):
         InputDeviceMixin.__init__(self, **kwargs)

@@ -3,11 +3,15 @@
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
-import sys, os
-from pgi.repository import Gtk
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+from gi.repository import Gtk
 
 import os
-import sys
 import cairocffi as cairo
 from shoebot.io.socket_server import SocketServerMixin
 

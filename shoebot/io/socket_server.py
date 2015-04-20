@@ -2,8 +2,16 @@
 gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
+
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+from gi.repository import GObject
+
 import sys
-from pgi.repository import GObject
 import socket
 import gettext, locale
 APP = 'shoebot'

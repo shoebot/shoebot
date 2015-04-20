@@ -28,10 +28,18 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import cairocffi as cairo
-from pgi.repository import Pango, PangoCairo
+
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+from gi.repository import Pango, PangoCairo
 ## from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairocffi import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
+
 
 class Text(Grob, ColorMixin):
     

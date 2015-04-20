@@ -106,7 +106,7 @@ setup(name="shoebot",
           "cairocffi",
           "meta",
           "numpy",
-          "pgi",
+          #"pgi",
           "Pillow",
           "PySoundCard"
       ],

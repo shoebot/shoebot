@@ -1,6 +1,13 @@
 import os
 import sys
-from pgi.repository import Gtk, GObject
+
+try:
+    import gi
+except ImportError:
+    import pgi
+    pgi.install_as_gi()
+
+from gi.repository import Gtk, GObject
 
 from collections import deque
 from pkg_resources import resource_filename, Requirement
