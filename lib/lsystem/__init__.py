@@ -10,7 +10,7 @@ __license__   = "MIT"
 
 ### L-SYSTEM #########################################################################################
 
-from shoebot import CORNER, CENTER
+from shoebot.data import CORNER, CENTER
 from sys import maxint
 
 class LSystem(object):
