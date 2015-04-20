@@ -1,5 +1,8 @@
 # Audio reactive bot - graphs are displayed
 # in a tunnel, changing from yellow to red
+#
+# requires pysoundcard:
+# $ pip install pysoundcard
 
 import math
 import numpy as np
