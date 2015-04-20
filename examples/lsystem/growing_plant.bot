@@ -1,13 +1,5 @@
 # Import the library
-try: 
-    # This is the statement you normally use.
-    lsystem = ximport("lsystem")
-except:
-    # But since these examples are "inside" the library
-    # we may need to try something different when
-    # the library is not located in /Application Support
-    lsystem = ximport("__init__")
-    reload(lsystem)
+lsystem = ximport("lsystem")
 
 # Create a simple treelike pattern.
 tree = lsystem.create()
