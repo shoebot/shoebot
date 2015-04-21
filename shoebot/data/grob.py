@@ -3,6 +3,7 @@ import cairocffi as cairo
 CENTER = 'center'
 CORNER = 'corner'
 
+
 class Grob(object):
     '''A GRaphic OBject is the base class for all DrawingPrimitives.'''
 

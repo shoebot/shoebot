@@ -98,7 +98,7 @@ class VarWindow(object):
         label = Gtk.Label(pretty_name(v.name))
         textcontainer.pack_start(label, False, True, 20)
 
-        entry = Gtk.Entry(max=0)
+        entry = Gtk.Entry()
         entry.set_text(v.value)
         entry.connect("changed", self.widget_changed, v)
         textcontainer.pack_start(entry, True, True, 0)

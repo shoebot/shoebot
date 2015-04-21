@@ -11,8 +11,7 @@ from PIL import Image as PILImage
 try:
     import gi
 except ImportError:
-    import pgi
-    pgi.install_as_gi()
+    import pgi as gi
 
 try:
     from gi.repository import Gtk, Gdk, GdkPixbuf

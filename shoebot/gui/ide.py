@@ -7,7 +7,6 @@ try:
 except ImportError:
     import pgi
     pgi.install_as_gi()
-    import gi
 
 gi.require_version('Gtk', '3.0')
 

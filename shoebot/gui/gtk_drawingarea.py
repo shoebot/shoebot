@@ -9,6 +9,12 @@ except ImportError:
     import pgi
     pgi.install_as_gi()
 
+GI = not hasattr(gi, "install_as_gi")
+if GI:
+    from shoebot.cairocffi_util import _UNSAFE_pycairo_context_to_cairocffi
+else:
+    _UNSAFE_pycairo_context_to_cairocffi = None
+
 from gi.repository import Gtk
 
 import os
@@ -73,7 +79,11 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
                         self.input_device.scale_x = scale_y
                         self.input_device.scale_y = scale_y
 
-        cr.set_source_surface(self.backing_store)
+        if GI:
+            cffi_cr=_UNSAFE_pycairo_context_to_cairocffi(cr)
+            cffi_cr.set_source_surface(self.backing_store)
+        else:
+            cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(0, 0,
                 source_width, source_height)

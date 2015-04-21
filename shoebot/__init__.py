@@ -145,14 +145,18 @@ class ShoebotThread(threading.Thread):
         self._sbot = None
 
     def run(self):
-        sbot = create_bot(*self.create_args, **self.create_kwargs)
+        try:
+            sbot = create_bot(*self.create_args, **self.create_kwargs)
 
-        self._sbot = sbot
-        self.bot_ready.set()
-        sbot.run(*self.run_args, **self.run_kwargs)
-
-        if self.send_sigint:
-            os.kill(os.getpid(), signal.SIGINT)
+            self._sbot = sbot
+            self.bot_ready.set()
+            sbot.run(*self.run_args, **self.run_kwargs)
+        except Exception:
+            print('DOH')
+            raise
+        finally:
+            if self.send_sigint:
+                os.kill(os.getpid(), signal.SIGINT)
 
     @property
     def sbot(self):
@@ -221,6 +225,7 @@ def run(src,
         sbot_thread.start()
         sbot = sbot_thread.sbot
     else:
+        print('background thread disabled')
         # This is a debug option, things should always work using the
         # background thread (crosses fingers)
         if run_shell:
@@ -228,6 +233,7 @@ def run(src,
             # thread
             raise ValueError('UI Must run in a seperate thread to shell and shell needs main thread')
 
+        sbot_thread = None
         sbot = create_bot(*create_args, **create_kwargs)
         sbot.run(*run_args, **run_kwargs)
 
