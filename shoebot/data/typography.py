@@ -92,12 +92,12 @@ class Text(Grob, ColorMixin):
         #we need to pre-render some stuff to enable metrics sizing
         self._pre_render()
         
-        if (self._doRender): #this way we do not render if we only need to create metrics
-          if bool(ctx):
-              self._render(self._ctx)
-          else:
-              # Normal rendering, can be deferred
-              self._deferred_render()
+        if self._doRender: #this way we do not render if we only need to create metrics
+            if bool(ctx):
+                self._render(self._ctx)
+            else:
+                # Normal rendering, can be deferred
+                self._deferred_render()
             
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
@@ -106,9 +106,9 @@ class Text(Grob, ColorMixin):
         cr = cairo.Context(rs)
 
         if GI:
-            pycairo_cr = _UNSAFE_cairocffi_context_to_pycairo(cr)
-            self._pang_ctx = PangoCairo.create_context(pycairo_cr)
-            self.layout = PangoCairo.create_layout(pycairo_cr)
+            cr = _UNSAFE_cairocffi_context_to_pycairo(cr)
+            self._pang_ctx = PangoCairo.create_context(cr)
+            self.layout = PangoCairo.create_layout(cr)
         else:
             self._pang_ctx = PangoCairo.create_context(cr)
             self.layout = PangoCairo.create_layout(cr)
@@ -136,7 +136,6 @@ class Text(Grob, ColorMixin):
         else:
             self.layout.set_alignment(Pango.Alignment.LEFT)
 
-
     def _get_context(self):
         self._ctx = self._ctx or cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
         return self._ctx
@@ -152,7 +151,7 @@ class Text(Grob, ColorMixin):
         
         # we update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
-        self._pang_ctx = PangoCairo.CairoContext(ctx)
+        self._pang_ctx = PangoCairo.create_context(ctx)
         PangoCairo.update_layout(self._pang_ctx, self.layout)
 
         if self._fillcolor is not None:
@@ -166,7 +165,7 @@ class Text(Grob, ColorMixin):
             
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
-            PangoCairo.show_layout (ctx, self.layout)
+            PangoCairo.show_layout(ctx, self.layout)
             PangoCairo.update_layout(ctx, self.layout)
         
 
@@ -203,7 +202,7 @@ class Text(Grob, ColorMixin):
     def _get_path(self):
         if not self._pang_ctx:
             self._pre_render()
-            
+
         # here we create a new cairo.Context in order to hold the pathdata
         tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, (1, 1)))
         if GI:
@@ -213,12 +212,10 @@ class Text(Grob, ColorMixin):
         
         # supposedly showlayout should work, but it fills the path instead,
         # therefore we use layout_path instead to render the layout to pangoCairoContext
-        #tempPangoCairoContext.show_layout(self.layout)
+        #tempCairoContext.show_layout(self.layout)
         PangoCairo.layout_path(tempCairoContext, self.layout)
         #here we extract the path from the temporal cairo.Context we used to draw on the previous step
         pathdata = tempCairoContext.copy_path()
-        
-        #print tempCairoContext
         
         # creates a BezierPath instance for storing new shoebot path
         p = BezierPath(self._bot)
