@@ -1,13 +1,15 @@
-"""
-Shoebot library example, using the Nodebot grammar.
-
-Libraries using ximport get a variable called '_ctx'
-which they can use nodebox commands on.
-
-
-TODO - If we create a 'Shoebot' grammar it should 
-provide a better mechanism than '_ctx'
-"""
+# daisylib example library.
+#
+# To use this run the companion bot
+# 'using_libraries.bot'
+#
+# Libraries using ximport get a variable called '_ctx'
+# which they can use Shoebot/Nodebox commands on.
+#
+#
+# TODO - If we create a 'Shoebot' grammar it should 
+# provide a better mechanism than '_ctx'
+#
 
 from math import sin
 
