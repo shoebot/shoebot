@@ -83,19 +83,23 @@ datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, fil
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
 
+# Also requires one of 'vext.gi' or 'pgi'
 BASE_REQUIREMENTS=[
-    "cairocffi",
-    "meta",
-    "numpy",
-    "Pillow",
-    "PySoundCard",  # sbaudio
+    "setuptools>=15.0.1",  #
 
+    "cairocffi>=0.6",
+    #"meta==0.4.1",
+    "meta",
+    "numpy==1.9.1",
+    "Pillow==2.8.1",
 ]
 
+
+# requirements to run examples
 EXAMPLE_REQUIREMENTS=[
-  "fuzzywuzzy",   # sbaudio
+  "fuzzywuzzy==0.5.0",   # sbaudio
   "planar",       # examples
-  "PySoundCard",  # sbaudio
+  "PySoundCard==0.5.0",  # sbaudio
 ]
 
 def requirements(with_pgi=None, with_examples=True, debug=True):
@@ -106,7 +110,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     :param with_examples:
     :return:
     """
-    r = set(BASE_REQUIREMENTS)
+    reqs = list(BASE_REQUIREMENTS)
     if with_pgi is None:
         is_pypy = '__pypy__' in sys.builtin_module_names
         is_jython = platform.system == 'Java'
@@ -120,15 +124,21 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
         print('with_pgi:      ', 'yes' if with_pgi else 'no')
         print('with_examples: ', 'yes' if with_examples else 'no')
     if with_pgi:
-        r.add("pgi")
+        reqs.append("pgi")
         if debug:
             print("warning, as of April 2015 typography does not work with pgi")
     else:
-        r.add("vext.gi")
+        reqs.append("vext>=0.3.8")    # TODO - shouldn't be needed..
+        reqs.append("vext.gi>=0.1.3")
     if with_examples:
-        r.update(EXAMPLE_REQUIREMENTS)
+        reqs.extend(EXAMPLE_REQUIREMENTS)
 
-    return list(sorted(r))
+    if debug:
+        print('')
+        print('')
+        for req in reqs:
+            print(req)
+    return reqs
 
 
 setup(name="shoebot",
@@ -155,6 +165,7 @@ setup(name="shoebot",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
       ],
       data_files=datafiles,
+      setup_requires=["setuptools>=15.0.1"],
       install_requires=requirements(debug="install" in sys.argv),
       entry_points={
           "console_scripts": [

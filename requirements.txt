@@ -14,9 +14,11 @@
 #     mkvirtualenv --system-site-packages shoebot-env
 cairocffi==0.6
 fuzzywuzzy==0.5.0
-meta==0.4.1
+#meta==0.4.1
+meta
 numpy==1.9.1
-pgi==0.0.9
+# pgi==0.0.9
+vext.gi
 Pillow==2.8.1
 PySoundCard==0.5.0
 setuptools>=7.0.0
