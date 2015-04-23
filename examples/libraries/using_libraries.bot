@@ -1,0 +1,26 @@
+# Example creating and using a library.
+#
+# The library 'daisylib' is created and
+# used.
+#
+# By using  ximport  the library will get
+# a variable called '_ctx' through which
+# it can access the Shoebot/Nodebox API
+#
+
+daisylib = ximport("daisylib")
+
+daisies = []
+old_mousedown = None
+
+def draw():
+    background('#82FA58')
+    transform(CENTER)
+    daisylib.draw(MOUSEX, MOUSEY, color='#fefefeaa')
+
+    if mousedown and old_mousedown != mousedown:
+        daisies.append((MOUSEX, MOUSEY))
+
+    for x, y in daisies:
+        daisylib.draw(x, y)
+
