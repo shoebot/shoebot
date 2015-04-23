@@ -200,7 +200,6 @@ class BezierPath(Grob):
         in_fill = dummy_ctx.in_fill(x, y)
         return in_fill
 
-
     def _get_center(self):
         '''
         Return cached bounds of this Grob.
@@ -220,6 +219,8 @@ class BezierPath(Grob):
         ### Save the context or surface (without the bounding box strokecolor)
         ### to optimise drawing
         return center
+
+    center = property(_get_center)
 
     def _render_closure(self):
         '''Use a closure so that draw attributes can be saved'''
