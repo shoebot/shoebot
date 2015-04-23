@@ -228,13 +228,11 @@ class ShoebotCmd(cmd.Cmd):
 
         def source_bad(tb):
             if called_good:
-                raise ValueError('GOOD WAS CALLED!')
-            print('BAD!!')
+                # good and bad callbacks shouldn't both be called
+                raise ValueError('Good AND Bad callbacks called !')
             # TODO - get simple_trace_back of exception to send back
             self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
             self.print_response(tb.replace('\n', '\\n'), cookie=cookie)
-            print('BAD:  tb: ', tb)
-            print('/BAD')
             executor.clear_callbacks()
 
         called_good = False

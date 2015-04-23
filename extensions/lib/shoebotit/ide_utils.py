@@ -136,7 +136,7 @@ class ShoebotProcess(object):
                         del self.responses[cookie]
                         self.response_queue.put_nowait(response)
 
-                    break
+                    return True  # response was handled
 
         # Launch the asynchronous readers of the process' stdout and stderr.
         self.stdout_queue = queue.Queue()
