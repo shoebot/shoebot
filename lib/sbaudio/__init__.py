@@ -1,5 +1,4 @@
 from pysoundcard import Stream, continue_flag
-import procname
 
 import atexit
 import collections
@@ -108,6 +107,5 @@ class AudioThread(threading.Thread):
         self.autostart()
         return self._spectrogram
 
-procname.setprocname('looper')
 audio = AudioThread()
 
