@@ -232,14 +232,15 @@ class Text(Grob, ColorMixin):
         # cairo function for freeing path memory
         return p
 
-    @property
-    def center(self):
+    def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
         w, h = self.layout.get_pixel_size()
         x = (self.x+w/2)
         y = (self.y+h/2)
         return x, y
+
+    center = property(_get_center)
 
     def copy(self):
         new = self.__class__(self._bot, self.text)

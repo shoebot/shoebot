@@ -60,8 +60,7 @@ class Grob(object):
         else:
             return self._canvas.pathmode
 
-    @property
-    def center(self):
+    def _get_center(self):
         '''Implementations must return the x, y of their center'''
         raise NotImplementedError()
 
@@ -79,7 +78,7 @@ class Grob(object):
         Works like setupTransform of a version of java nodebox
         http://dev.nodebox.net/browser/nodebox-java/branches/rewrite/src/java/net/nodebox/graphics/Grob.java
         '''
-        dx, dy = self.center
+        dx, dy = self._get_center()
         t = cairo.Matrix()
         t.translate(dx, dy)
         t = transform * t
