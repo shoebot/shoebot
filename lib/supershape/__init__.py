@@ -33,8 +33,11 @@ except:
         t2 = abs(t2)
         if t2 != 0:
             t2 = pow(t2, n3)
-    
-        r = pow(t1 + t2, 1 / n1)
+
+        if n1 != 0:
+            r = pow(t1 + t2, 1 / n1)
+        else:
+            r = 0
         if abs(r) == 0:
             return (0,0)
         else:
