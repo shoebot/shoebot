@@ -91,7 +91,7 @@ class VarWindow(object):
             adj = Gtk.Adjustment(v.value, v.min, v.max, step)
         adj.connect("value_changed", self.widget_changed, v)
         hscale = Gtk.HScale(adjustment=adj)
-        #hscale.set_value_pos(Gtk.POS_RIGHT)
+        hscale.set_value_pos(Gtk.PositionType.RIGHT)
         hscale.set_value(v.value)
         sliderbox.pack_start(hscale, True, True, 0)
         self.container.pack_start(sliderbox, True, True, 0)
@@ -141,7 +141,6 @@ class VarWindow(object):
         return button
 
     def do_destroy(self, widget):
-        #self.bot._var_listeners.remove(self.var_listener)
         self.var_listener.remove()
 
     def do_quit(self, widget):
