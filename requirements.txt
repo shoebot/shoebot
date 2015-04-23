@@ -13,6 +13,7 @@
 # or with virtualenvwrapper:
 #     mkvirtualenv --system-site-packages shoebot-env
 cairocffi==0.6
+fuzzywuzzy==0.5.0
 meta==0.4.1
 numpy==1.9.1
 pgi==0.0.9

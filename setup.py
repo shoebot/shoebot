@@ -104,11 +104,12 @@ setup(name="shoebot",
       data_files=datafiles,
       install_requires=[
           "cairocffi",
+          "fuzzywuzzy",   # sbaudio
           "meta",
           "numpy",
           #"pgi",
           "Pillow",
-          "PySoundCard"
+          "PySoundCard",  # sbaudio
       ],
       entry_points={
           "console_scripts": [
