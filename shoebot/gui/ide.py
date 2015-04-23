@@ -261,18 +261,18 @@ class Buffer(GtkSource.Buffer):
         char_index = iter.get_offset()
         tag_name = tag.get_property("name")
         if event.type == Gdk.MOTION_NOTIFY:
-            print "Motion event at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Motion event at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == Gdk.EventType.BUTTON_PRESS:
-            print "Button press at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Button press at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == Gdk._2BUTTON_PRESS:
-            print "Double click at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Double click at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == Gdk._3BUTTON_PRESS:
-            print "Triple click at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Triple click at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == Gdk.BUTTON_RELEASE:
-            print "Button release at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Button release at char %d tag `%s'\n" % (char_index, tag_name))
         elif (event.type == Gdk.KEY_PRESS or
               event.type == Gdk.KEY_RELEASE):
-            print "Key event at char %d tag `%s'\n" % (char_index, tag_name)
+            print("Key event at char %d tag `%s'\n" % (char_index, tag_name))
         return False
 
     def fill_file_buffer(self, filename):
@@ -596,9 +596,9 @@ class View(Gtk.Window):
                     View.FONT = 'Bitstream Vera Sans Mono 8'
                     break
             else:
-                print 'Bitstream Vera Font not found.'
-                print 'Download and install it from here'
-                print 'http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/'
+                print('Bitstream Vera Font not found.')
+                print('Download and install it from here')
+                print('http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/')
                 View.FONT = 'Mono 8'
 
         ##self.text_view.modify_font(Pango.FontDescription(View.FONT))
