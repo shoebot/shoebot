@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import glob
 import os
+import platform
 import shutil
 import sys
 import textwrap
@@ -107,7 +108,9 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     """
     r = set(BASE_REQUIREMENTS)
     if with_pgi is None:
-        if os.path.basename(sys.executable) in ['pypy']:
+        is_pypy = '__pypy__' in sys.builtin_module_names
+        is_jython = platform.system == 'Java'
+        if is_pypy or is_jython:
             with_pgi = True
         else:
             with_pgi = False
@@ -152,7 +155,7 @@ setup(name="shoebot",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
       ],
       data_files=datafiles,
-      install_requires=requirements(),
+      install_requires=requirements(debug="install" in sys.argv),
       entry_points={
           "console_scripts": [
              "sbot=shoebot.run:main",
