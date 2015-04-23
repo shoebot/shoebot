@@ -12,8 +12,10 @@ except ImportError:
 GI = not hasattr(gi, "install_as_gi")
 if GI:
     from shoebot.cairocffi_util import _UNSAFE_pycairo_context_to_cairocffi
+    from shoebot.cairocffi_util import _UNSAFE_cairocffi_context_to_pycairo
 else:
     _UNSAFE_pycairo_context_to_cairocffi = None
+    _UNSAFE_cairocffi_context_to_pycairo = None
 
 from gi.repository import Gtk
 
@@ -104,7 +106,9 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
             while Gtk.events_pending():
                 Gtk.main_iteration_do(False)
         meta_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
-        return cairo.Context(meta_surface)
+
+        ctx = cairo.Context(meta_surface)
+        return ctx
 
     def rendering_finished(self, size, frame, cairo_ctx):
         '''

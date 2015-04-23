@@ -181,7 +181,7 @@ class BezierPath(Grob):
         return self._bounds
 
     def _get_dimensions(self):
-        bounds = (x1,y1,x2,y2) = self._get_bounds()
+        x1, y1, x2, y2 = self._get_bounds()
         return x1, y1
         
     def contains(self, x, y):
@@ -327,7 +327,7 @@ class BezierPath(Grob):
             the length during each iteration. 
         """
         # Originally from nodebox-gl
-        if segments == None:
+        if segments is None:
             segments = self._segment_lengths(relative=True) 
         if len(segments) == 0:
             raise PathError, "The given path is empty"
@@ -609,6 +609,7 @@ class CtrlPoint(object):
         self.y = y
     
 EMPTY_CTRL = CtrlPoint(None, None)
+
 
 class PathElement(object):
     '''

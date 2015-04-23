@@ -107,11 +107,8 @@ class Text(Grob, ColorMixin):
 
         if GI:
             cr = _UNSAFE_cairocffi_context_to_pycairo(cr)
-            self._pang_ctx = PangoCairo.create_context(cr)
-            self.layout = PangoCairo.create_layout(cr)
-        else:
-            self._pang_ctx = PangoCairo.create_context(cr)
-            self.layout = PangoCairo.create_layout(cr)
+        self._pang_ctx = PangoCairo.create_context(cr)
+        self.layout = PangoCairo.create_layout(cr)
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
         ## self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
@@ -172,14 +169,15 @@ class Text(Grob, ColorMixin):
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
-    def _get_baseline(self):
+    @property
+    def baseline(self):
         self.iter = self.layout.get_iter()
         baseline_y = self.iter.get_baseline()
         baseline_delta = baseline_y/Pango.SCALE
         return (baseline_delta)
-    baseline = property(_get_baseline)
 
-#    def _get_baseline(self):
+#    @property
+#    def baseline(self):
 #        # retrieves first line of text block
 #        first_line = self.layout.get_line(0)
 #        # get the logical extents rectangle of first line
@@ -189,22 +187,22 @@ class Text(Grob, ColorMixin):
 #        # gets the baseline offset from the top of thext block
 #        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
 #        return (baseline_delta)
-#    baseline = property(_get_baseline)
 
-    
-    def _get_metrics(self):
-        w,h = self.layout.get_pixel_size()
-        return (w,h)
-    metrics = property(_get_metrics)
+    @property
+    def metrics(self):
+        w, h = self.layout.get_pixel_size()
+        return w, h
 
     # this function is quite computational expensive 
     # there should be a way to make it faster, by not creating a new context each time it's called
-    def _get_path(self):
+
+    @property
+    def path(self):
         if not self._pang_ctx:
             self._pre_render()
 
         # here we create a new cairo.Context in order to hold the pathdata
-        tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, (1, 1)))
+        tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
         if GI:
             tempCairoContext = _UNSAFE_cairocffi_context_to_pycairo(tempCairoContext)
         tempCairoContext.move_to(self.x,self.y-self.baseline)
@@ -234,16 +232,15 @@ class Text(Grob, ColorMixin):
                 p.closepath()
         # cairo function for freeing path memory
         return p
-    path = property(_get_path)
 
-    def _get_center(self):
+    @property
+    def center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        w,h = self.layout.get_pixel_size()
+        w, h = self.layout.get_pixel_size()
         x = (self.x+w/2)
         y = (self.y+h/2)
-        return (x,y)
-    center = property(_get_center)
+        return x, y
 
     def copy(self):
         new = self.__class__(self._bot, self.text)
