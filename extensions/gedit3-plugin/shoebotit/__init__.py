@@ -297,8 +297,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
     def do_deactivate(self):
-        print('deactivate')
-        print(self.window.bot.responses.items())
+        print(self.instances[self.window].bot.responses.items())
         self.panel.remove_item(self.text)
         self.instances[self.window].deactivate()
         del self.instances[self.window]
