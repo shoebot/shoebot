@@ -43,7 +43,6 @@ class LiveExecution(object):
             compile(source + '\n\n', "shoebot_code", "exec")
         except Exception as e:
             if bad_cb:
-                print('CALL_BAD_CB ', self.bad_cb)
                 self.edited_source = None
                 tb = traceback.format_exc()
                 self.call_bad_cb(tb)
@@ -114,7 +113,6 @@ class LiveExecution(object):
         :param tb: traceback that caused exception
         :return:
         """
-        print('... call_bad_cb ', self.bad_cb)
         if self.bad_cb and not self.bad_cb(tb):
             self.bad_cb = None
 
