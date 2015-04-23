@@ -149,7 +149,6 @@ class Text(Grob, ColorMixin):
         # we update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
         self._pang_ctx = PangoCairo.create_context(ctx)
-        PangoCairo.update_layout(self._pang_ctx, self.layout)
 
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
