@@ -6,9 +6,12 @@
 #    python setup.py --help' for more options
 #
 
+from __future__ import print_function
+
 import glob
 import os
 import shutil
+import sys
 import textwrap
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -78,6 +81,53 @@ datafiles.extend([(os.path.join('share/shoebot/', root), [os.path.join(root, fil
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
+
+BASE_REQUIREMENTS=[
+    "cairocffi",
+    "meta",
+    "numpy",
+    "Pillow",
+    "PySoundCard",  # sbaudio
+
+]
+
+EXAMPLE_REQUIREMENTS=[
+  "fuzzywuzzy",   # sbaudio
+  "planar",       # examples
+  "PySoundCard",  # sbaudio
+]
+
+def requirements(with_pgi=None, with_examples=True, debug=True):
+    """
+    Build requirements based on flags
+
+    :param with_pgi: Use 'pgi' instead of 'gi' - False on CPython, True elsewhere
+    :param with_examples:
+    :return:
+    """
+    r = set(BASE_REQUIREMENTS)
+    if with_pgi is None:
+        if os.path.basename(sys.executable) in ['pypy']:
+            with_pgi = True
+        else:
+            with_pgi = False
+
+    if debug:
+        print('setup options: ')
+        print('with_pgi:      ', 'yes' if with_pgi else 'no')
+        print('with_examples: ', 'yes' if with_examples else 'no')
+    if with_pgi:
+        r.add("pgi")
+        if debug:
+            print("warning, as of April 2015 typography does not work with pgi")
+    else:
+        r.add("vext.gi")
+    if with_examples:
+        r.update(EXAMPLE_REQUIREMENTS)
+
+    return list(sorted(r))
+
+
 setup(name="shoebot",
       version="1.1.1",
       description="Vector graphics scripting application",
@@ -102,15 +152,7 @@ setup(name="shoebot",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
       ],
       data_files=datafiles,
-      install_requires=[
-          "cairocffi",
-          "fuzzywuzzy",   # sbaudio
-          "meta",
-          "numpy",
-          #"pgi",
-          "Pillow",
-          "PySoundCard",  # sbaudio
-      ],
+      install_requires=requirements(),
       entry_points={
           "console_scripts": [
              "sbot=shoebot.run:main",
