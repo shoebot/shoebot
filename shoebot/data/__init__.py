@@ -75,7 +75,11 @@ from point import Point
 from basecolor import Color, ColorMixin
 from grob import Grob
 from bezier import BezierPath, PathElement, ClippingPath, EndClip
-from typography import Text
+try:
+    from typography import Text
+except ImportError as e:
+    Text = None
+    print('Typography not available ', e)
 from img import Image
 from variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
 from transforms import Transform
