@@ -67,12 +67,16 @@ class GtkInputDeviceMixin(InputDeviceMixin):
 
         SHOEBOT_KEY_NAME, GTK_VALUE
 
-        Shoebot key names look like KEY_LEFT, whereas gtk uses keysyms.Left
+        Shoebot key names look like KEY_LEFT, whereas Gdk uses KEY_Left
+        - Shoebot key names are derived from Nodebox 1, which was a mac
+          app.
         '''
+        NODEBOX_KEYS = set(["KEY_LEFT", "KEY_RIGHT", "KEY_UP", "KEY_DOWN", "KEY_ESC", "KEY_BACKSPACE"])
         kdict = {}
-        for name in dir(Gdk):
-            if name.startswith('KEY_'):
-                kdict[name] = getattr(Gdk, name)
+        for gdk_name in dir(Gdk):
+            nb_name = gdk_name.upper()
+            if nb_name in NODEBOX_KEYS:
+                kdict[nb_name] = getattr(Gdk, gdk_name)
         return kdict
 
 

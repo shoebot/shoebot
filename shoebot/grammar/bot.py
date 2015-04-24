@@ -120,6 +120,7 @@ class Bot(Grammar):
         if self._input_device:
             # Get constants like KEY_DOWN, KEY_LEFT
             for key_name, value in self._input_device.get_key_map().items():
+                self._namespace[key_name] = value
                 setattr(self, key_name, value)
 
         self._canvas.size = None
