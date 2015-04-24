@@ -1,3 +1,9 @@
+# TODO - Attempt to remove all mention of 'canvas' and 'bot' from here,
+#        making it useable outside Shoebot
+#
+# TODO - Remove the whole 'packed elements' thing, it overcomplicates
+#        the implementation.
+#
 import sys, locale, gettext
 from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
@@ -32,7 +38,7 @@ ELLIPSE = 'ellipse'
 CLOSE = "close"
 
 
-class BezierPath(Grob):
+class BezierPath(Grob, ColorMixin):
     '''
     Represents a Bezier path as a list of PathElements.
 
@@ -52,6 +58,7 @@ class BezierPath(Grob):
         #
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
+        ColorMixin.__init__(self, fill=fill, stroke=stroke, strokewidth=strokewidth)
 
         if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
@@ -59,9 +66,6 @@ class BezierPath(Grob):
             self._elements = []
             self._render_funcs = []
 
-        self._fillcolor = fill
-        self._strokecolor = stroke
-        self._strokewidth = strokewidth
         self._pathmode = pathmode
         self.closed = False
 
@@ -78,8 +82,6 @@ class BezierPath(Grob):
             self._elements = list(path._elements)
             self._render_funcs = list(path._render_funcs)
             self.closed = path.closed
-
-
 
     def _append_element(self, render_func, pe):
         '''
@@ -224,9 +226,9 @@ class BezierPath(Grob):
 
     def _render_closure(self):
         '''Use a closure so that draw attributes can be saved'''
-        fillcolor = self._get_fillcolor()
-        strokecolor = self._get_strokecolor()
-        strokewidth = self._get_strokewidth()
+        fillcolor = self.fill
+        strokecolor = self.stroke
+        strokewidth = self.strokewidth
 
         def _render(cairo_ctx):
             '''
@@ -560,12 +562,15 @@ class BezierPath(Grob):
         return len(self._elements)
         
     def inheritFromContext(self, **kwargs):
+        # TODO - needs completion to make 'dendrite'
+        #        example work
         self._fillcolor = self._bot.fill()
         self._strokecolor = self._bot.stroke()
 
     bounds = property(_get_bounds)
     contours = property(_get_contours)
     length = property(_get_length)
+
 
 class ClippingPath(BezierPath):
     
@@ -635,6 +640,8 @@ class PathElement(object):
     '''
 
     def __init__(self, cmd = None, *args):
+        # TODO - flatten *args, so we can support pairs of tuples
+        #        syntax, e.g. ((x,y), (x1, y1))
         self.cmd = cmd
         self.values = args
         self._ctrl1 = self._ctrl2 = None
@@ -649,7 +656,7 @@ class PathElement(object):
         elif cmd == CURVETO or cmd == RCURVETO:
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
         elif cmd == CLOSE:
-            # Should pass in coordinats of beginning of path
+            # Should pass in coordinates of beginning of path
             self.x, self.y = self.values
             self.c1x, self.c1y = self.values # Possibly should be 0
             self.c2x, self.c2y = self.values # Possibly should be 0

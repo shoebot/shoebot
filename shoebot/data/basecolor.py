@@ -39,6 +39,9 @@ class Color(object):
     '''
 
     def __init__(self, *args, **kwargs):
+        if isinstance(args, Color):
+            args = args.copy()
+
         color_range = float(kwargs.get("color_range", 1.0))
         mode = kwargs.get("mode", "rgb").lower()
 
@@ -230,38 +233,52 @@ class Color(object):
         raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
 
 
-
 class ColorMixin(object):
 
-    """Mixin class for color support.
-    Adds the _fillcolor, _strokecolor and _strokewidth attributes to the class."""
+    """
+    Mixin class for color support.
+    Adds the _fillcolor, _strokecolor and _strokewidth attributes to the class.
 
-    def __init__(self,  **kwargs):
-        if 'fill' in kwargs:
-            self._fillcolor = Color(self._canvas, kwargs['fill'], mode='rgb', color_range=1)
-        else:
-            self._fillcolor = self._canvas.fillcolor
+    Setting color attributes, will convert them to Color instances, allowing
+    them to be specfied in other ways, such as   fill="#123456"
+    """
 
-        if 'stroke' in kwargs:
-            self._strokecolor = Color(kwargs['fill'], mode='rgb', color_range=1)
-        else:
-            self._strokecolor = self._canvas.strokecolor
-        self._strokewidth = kwargs.get('strokewidth', 1.0)
+    def __init__(self, fill=None, stroke=None, strokewidth=None):
+        self._set_fill(fill)
+        self._set_stroke(stroke)
+        self._set_strokewidth(strokewidth)
 
     def _get_fill(self):
         return self._fillcolor
+
     def _set_fill(self, *args):
+        if len(args) == 1:
+            if args[0] is None:
+                self._fillcolor = None
+                return
+            elif isinstance(args[0], Color):
+                self._fillcolor = Color(args[0])
+                return
         self._fillcolor = Color(mode='rgb', color_range=1, *args)
     fill = property(_get_fill, _set_fill)
 
     def _get_stroke(self):
         return self._strokecolor
+
     def _set_stroke(self, *args):
+        if len(args) == 1:
+            if args[0] is None:
+                self._strokecolor = None
+                return
+            elif isinstance(args[0], Color):
+                self._strokecolor = args[0].copy()
+                return
         self._strokecolor = Color(mode='rgb', color_range=1, *args)
     stroke = property(_get_stroke, _set_stroke)
 
     def _get_strokewidth(self):
         return self._strokewidth
+
     def _set_strokewidth(self, strokewidth):
         self._strokewidth = max(strokewidth, 0.0001)
     strokewidth = property(_get_strokewidth, _set_strokewidth)

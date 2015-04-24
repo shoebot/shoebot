@@ -1,3 +1,6 @@
+# TODO, Move 'bot' out of here, push responsibility back to 'Nodebox' and other grammars,
+#       Enabling seperation of BezierPath etc
+
 import cairocffi as cairo
 
 CENTER = 'center'
@@ -25,33 +28,6 @@ class Grob(object):
             self._call_transform_mode = self._corner_transform
         else:
             raise ValueError('mode must be CENTER or CORNER')
-
-    def _get_fillcolor(self):
-        '''Return fillcolor or get it from self._canvas'''
-        if self._fillcolor is not None:
-            return self._fillcolor
-        else:
-            return self._canvas.fillcolor
-            
-    def _set_fillcolor(self, fill):
-        self._fillcolor = fill
-
-    def _get_strokecolor(self):
-        '''Return strokecolor or get it from self._canvas'''
-        if self._strokecolor is not None:
-            return self._strokecolor
-        else:
-            return self._canvas.strokecolor
-            
-    def _set_strokecolor(self, fill):
-        self._strokecolor = fill
-
-    def _get_strokewidth(self):
-        '''Return strokewidth or get it from self._canvas'''
-        if self._strokewidth is not None:
-            return self._strokewidth
-        else:
-            return self._canvas.strokewidth
 
     def _get_pathmode(self):
         '''Return pathmode or get it from self._canvas'''
@@ -102,5 +78,3 @@ class Grob(object):
         '''For overriding by GRaphicOBjects'''
         raise NotImplementedError()
 
-    fill = property(_get_fillcolor, _set_fillcolor)
-    stroke = property(_get_strokecolor, _set_strokecolor)
