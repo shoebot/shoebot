@@ -191,24 +191,51 @@ class Bot(Grammar):
         inst = clazz(self, *args, **kwargs)
         return inst
 
+    def _makeColorableInstance(self, clazz, args, kwargs):
+        """
+        Create an object, if fill, stroke or strokewidth
+        is not specified, get them from the _canvas
+
+        :param clazz:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        kwargs = dict(kwargs)
+
+        fill = kwargs.get('fill', self._canvas.fillcolor)
+        if not isinstance(fill, Color):
+            fill = Color(fill, mode='rgb', color_range=1)
+        kwargs['fill'] = fill
+
+        stroke = kwargs.get('stroke', self._canvas.strokecolor)
+        if not isinstance(stroke, Color):
+            stroke = Color(stroke, mode='rgb', color_range=1)
+        kwargs['stroke'] = stroke
+
+        kwargs['strokewidth'] = kwargs.get('strokewidth', 1.0)
+        inst = clazz(self, *args, **kwargs)
+        return inst
+
+
     def EndClip(self, *args, **kwargs):
-        return self._makeInstance(EndClip, args, kwargs)
+        return self._makeColorableInstance(EndClip, args, kwargs)
     def BezierPath(self, *args, **kwargs):
-        return self._makeInstance(BezierPath, args, kwargs)
+        return self._makeColorableInstance(BezierPath, args, kwargs)
     def ClippingPath(self, *args, **kwargs):
-        return self._makeInstance(ClippingPath, args, kwargs)
+        return self._makeColorableInstance(ClippingPath, args, kwargs)
     def Rect(self, *args, **kwargs):
-        return self._makeInstance(Rect, args, kwargs)
+        return self._makeColorableInstance(Rect, args, kwargs)
     def Oval(self, *args, **kwargs):
-        return self._makeInstance(Oval, args, kwargs)
+        return self._makeColorableInstance(Oval, args, kwargs)
     def Ellipse(self, *args, **kwargs):
-        return self._makeInstance(Ellipse, args, kwargs)
+        return self._makeColorableInstance(Ellipse, args, kwargs)
     def Color(self, *args, **kwargs):
         return Color(*args, **kwargs)
     def Image(self, *args, **kwargs):
-        return self._makeInstance(Image, args, kwargs)
+        return self._makeColorableInstance(Image, args, kwargs)
     def Text(self, *args, **kwargs):
-        return self._makeInstance(Text, args, kwargs)
+        return self._makeColorableInstance(Text, args, kwargs)
 
     #### Variables
 
