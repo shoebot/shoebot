@@ -8,6 +8,7 @@ import sys, locale, gettext
 from shoebot.data import _copy_attrs
 ##from shoebot.data import Grob, ColorMixin, TransformMixin
 from grob import Grob
+from itertools import chain
 from basecolor import ColorMixin
 from math import pi as _pi, sqrt
 
@@ -640,10 +641,8 @@ class PathElement(object):
     '''
 
     def __init__(self, cmd = None, *args):
-        # TODO - flatten *args, so we can support pairs of tuples
-        #        syntax, e.g. ((x,y), (x1, y1))
         self.cmd = cmd
-        self.values = args
+        self.values = list(chain(args)) # flatten args, so that tuples of (x,y), (x2, y2) are supported
         self._ctrl1 = self._ctrl2 = None
 
         if cmd == MOVETO or cmd == RMOVETO:
