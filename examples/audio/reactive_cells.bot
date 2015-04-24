@@ -10,8 +10,6 @@ from random import random
 from planar.py import Vec2, Affine
 from collections import namedtuple
 
-WIDTH, HEIGHT=200, 200
-
 class Moveable(object):
     """
     Moveable object.
@@ -202,8 +200,7 @@ def setup():
     global doobries
     speed(60)
     size(800, 600)
-    device=firstfuzzydevice('loop')
-    print device
+    #device=firstfuzzydevice('loop')
     #audio.settings(input_device=device)
     #transform(mode=CENTER)
 
