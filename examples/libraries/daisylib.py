@@ -13,7 +13,7 @@
 
 from math import sin
 
-def draw(x, y, color='#fefefe'):
+def drawdaisy(x, y, color='#fefefe'):
     """
     Draw a daisy at x, y
     """
@@ -51,5 +51,4 @@ def draw(x, y, color='#fefefe'):
 
     # restore location, size etc
     _ctx.pop()
-
 
