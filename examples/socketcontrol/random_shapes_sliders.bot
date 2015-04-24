@@ -1,7 +1,8 @@
 size(180,180)
 
-var('ovalTendency', NUMBER, 0.5, 0., 2.)
-var('gridSize', NUMBER, 30, 20, 40)
+# underscores are displayed as spaces in the GUI
+var('oval_tendency', NUMBER, 0.5, 0., 2.)
+var('grid_size', NUMBER, 30, 20, 40)
 
 w, h = 180, 180
 
@@ -9,11 +10,11 @@ def biggestFit(num, divisor):
     return  divisor * (num // divisor)
 
 def draw():
-    for i in range(0, int(biggestFit(w,gridSize)), int(gridSize) ):
-        for j in range(0, int(biggestFit(h,gridSize)), int(gridSize) ):
+    for i in range(0, int(biggestFit(w,grid_size)), int(grid_size) ):
+        for j in range(0, int(biggestFit(h,grid_size)), int(grid_size) ):
             c = color(random(), 0.0, 0.5)
             fill(c)
-            if random() > ovalTendency:
-                rect(i, j, gridSize, gridSize)
+            if random() > oval_tendency:
+                rect(i, j, grid_size, grid_size)
             else:
-                oval(i, j, gridSize, gridSize)
+                oval(i, j, grid_size, grid_size)

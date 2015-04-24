@@ -4,6 +4,16 @@ socketcontrol.py
 
 simplest example possible of external vars usage in Shoebox
 
+run shoebot with socketserver enabled, then connect to it
+via telnet or some other client, via the port (default 7777)
+
+try setting variables e.g.
+
+one=1.1
+
+and watch the bars move.
+
+
 copyleft 2008 ricardo lafuente
 licensed under the GPLv3
 

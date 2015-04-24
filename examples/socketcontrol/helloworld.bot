@@ -10,6 +10,20 @@ licensed under the GPLv3
 
 this file is part of Shoebox
 
+run shoebot with socketserver enabled, then connect to it
+via telnet or some other client, via the port (default 7777)
+
+change the color of the star using numbers 0.0-255.0, e.g.
+
+red=1.1
+blue=20.0
+green=30.0
+
+the star will change color and the variable sliders move.
+
+
+There is a companion puredata file 'helloworld.pd' that
+demonstrates controling this bot from puredata.
 '''
 
 size(200,200)
@@ -22,9 +36,9 @@ size(200,200)
 #
 # NOTE that only floats are accepted for the moment
 
-var('one', NUMBER, 186., 0., 255.)
-var('two', NUMBER, 186., 0., 255.)
-var('three', NUMBER, 93., 0., 255.)
+var('red', NUMBER, 186., 0., 255.)
+var('green', NUMBER, 186., 0., 255.)
+var('blue', NUMBER, 93., 0., 255.)
 
 def setup():
     # set the colour range to 255
@@ -35,10 +49,6 @@ def draw():
     background(76,102,51)
 
     # use the outside variables to set the fill
-    red = one
-    green = two
-    blue = three
-
     fill(red, green, blue)
 
     # draw the shape
