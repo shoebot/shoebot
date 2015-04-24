@@ -257,7 +257,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
     def __init__(self):
         GObject.Object.__init__(self)
         self.instances = {}
-        self.tempfiles = []
 
     def _create_view(self, name="shoebot-output"):
         """ Create the gtk.TextView used for shell output """
@@ -297,12 +296,9 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.instances[self.window] = ShoebotWindowHelper(self, self.window)
 
     def do_deactivate(self):
-        print(self.instances[self.window].bot.responses.items())
         self.panel.remove_item(self.text)
         self.instances[self.window].deactivate()
         del self.instances[self.window]
-        for tfilename in self.tempfiles:
-            os.remove(tfilename)
 
         self.panel.remove_item(self.output_widget)
 
