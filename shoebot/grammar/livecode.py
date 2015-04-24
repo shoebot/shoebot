@@ -28,6 +28,12 @@ class LiveExecution(object):
         self.good_cb = None
         self.bad_cb = None
 
+    @property
+    def is_edited(self):
+        """
+        :return: True if source has been edited
+        """
+        return self.edited_source is not None
 
     def load_edited_source(self, source, good_cb=None, bad_cb=None, filename=None):
         """
