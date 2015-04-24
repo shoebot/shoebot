@@ -71,12 +71,10 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         - Shoebot key names are derived from Nodebox 1, which was a mac
           app.
         '''
-        NODEBOX_KEYS = set(["KEY_LEFT", "KEY_RIGHT", "KEY_UP", "KEY_DOWN", "KEY_ESC", "KEY_BACKSPACE"])
         kdict = {}
         for gdk_name in dir(Gdk):
             nb_name = gdk_name.upper()
-            if nb_name in NODEBOX_KEYS:
-                kdict[nb_name] = getattr(Gdk, gdk_name)
+            kdict[nb_name] = getattr(Gdk, gdk_name)
         return kdict
 
 
