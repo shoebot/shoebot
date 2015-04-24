@@ -24,15 +24,17 @@ def drawdaisy(x, y, color='#fefefe'):
     _fill =_ctx.fill()
     _stroke = _ctx.stroke()
 
+    sc = (1.0 / _ctx.HEIGHT) * float(y * 0.5) * 4.0
 
     # draw stalk
-    _ctx.strokewidth(3)
+    _ctx.strokewidth(sc * 2.0)
     _ctx.stroke('#3B240B')
     
     _ctx.line(x + (sin(x * 0.1) * 10.0), y + 80, x + sin(_ctx.FRAME * 0.1), y)
 
     # draw flower
     _ctx.translate(-20, 0)
+    _ctx.scale(sc)
 
     # draw petals
     _ctx.fill(color)
