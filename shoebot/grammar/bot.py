@@ -105,13 +105,13 @@ class Bot(Grammar):
     keycode = 0
     keydown = False
 
-    def __init__(self, canvas, namespace = None, vars = None):
+    def __init__(self, canvas, namespace=None, vars=None):
         '''
         :param canvas: Canvas implementation for output.
         :param namespace: Optionally specify a dict to inject as namespace
         :param vars: Optional dict containing initial values for variables
         '''
-        Grammar.__init__(self, canvas, namespace = namespace, vars = vars)
+        Grammar.__init__(self, canvas, namespace=namespace, vars=vars)
         canvas.set_bot(self)
 
         self._autoclosepath = True
@@ -131,7 +131,11 @@ class Bot(Grammar):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
         previous one.'''
-        self.WIDTH, self.HEIGHT = self._canvas.DEFAULT_SIZE
+        DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
+        self.WIDTH = self._namespace.get('WIDTH', DEFAULT_WIDTH)
+        self.HEIGHT = self._namespace.get('HEIGHT', DEFAULT_WIDTH)
+        if 'WIDTH' in self._namespace or 'HEIGHT' in self._namespace:
+            self.size(w=self._namespace.get('WIDTH'), h=self._namespace.get('HEIGHT'))
 
         self._transformmode = Bot.CENTER
 
@@ -214,7 +218,7 @@ class Bot(Grammar):
             stroke = Color(stroke, mode='rgb', color_range=1)
         kwargs['stroke'] = stroke
 
-        kwargs['strokewidth'] = kwargs.get('strokewidth', 1.0)
+        kwargs['strokewidth'] = kwargs.get('strokewidth', self._canvas.strokewidth)
         inst = clazz(self, *args, **kwargs)
         return inst
 
