@@ -39,6 +39,8 @@ import base64
 import cmd
 import shlex
 
+import pubsub
+
 PROMPT = ""
 #PROMPT = "[^_^] "
 #RESPONSE_PROMPT = "[o_o] "
@@ -104,12 +106,6 @@ class ShoebotCmd(cmd.Cmd):
                 cookie=cookie,
                 status=status or '',
                 line=line.strip()))
-
-
-
-    def handler(signum, frame):
-        ### TODO - is this right ??
-        self.print_response('Caught CTRL-C, press enter to continue')
 
     def emptyline(self):
         """
@@ -238,14 +234,15 @@ class ShoebotCmd(cmd.Cmd):
         called_good = False
         source = str(base64.b64decode(line))
         # Test compile
+        pubsub.publish("shoebot", "source-changed")
         executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
 
     def do_bye(self, line):
         return self.do_exit(line)
 
     def do_exit(self, line):
+        pubsub.publish("shoebot", "quit")
         self.print_response('Bye.\n')
-        self.bot._quit = True
         return True
 
     def do_quit(self, line):

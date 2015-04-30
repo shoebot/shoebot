@@ -1,18 +1,21 @@
 import os
-from livecode import LiveExecution
 import traceback
-
 from time import sleep, time
-from var_listener import VarListener
-from shoebot.data import Variable
-from shoebot.util import flushfile
-
 import copy
 import linecache
 import sys
+import pubsub
+
+from livecode import LiveExecution
+from shoebot.core.var_listener import VarListener
+from shoebot.data import Variable
+from shoebot.util import flushfile
+
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
+
+channel = pubsub.subscribe("shoebot")
 
 
 class Grammar(object):
@@ -79,9 +82,9 @@ class Grammar(object):
         if iterations:
             if iteration < iterations:
                 return True
-        elif len(self._vars) > 0:
-            # Vars have been added in script
-            return True
+        # elif len(self._vars) > 0:
+        #     # Vars have been added in script
+        #     return True
         elif iterations is None:
             if self._dynamic:
                 return True
@@ -143,7 +146,23 @@ class Grammar(object):
 
                         ns['draw']()
             else:
-                self._executor.run()
+                #
+                # TODO - This part is overly complex, before livecoding it
+                #        was just exec source in ns ... have to see if it
+                #        can be simplified
+                #
+                with self._executor.run_context() as (known_good, source, ns):
+                    if not known_good:
+                        self._executor.reload_functions()
+                        with VarListener.batch(self._vars, self._oldvars, ns):
+                            self._oldvars.clear()
+
+                            # Re-run the function body - ideally this would only
+                            # happen if the body had actually changed
+                            # - Or perhaps if the line included a variable declaration
+                            exec source in ns
+                    else:
+                        exec source in ns
 
         self._canvas.flush(self._frame)
         if limit:
@@ -201,8 +220,7 @@ class Grammar(object):
 
         return '\n'.join(err_msgs)
 
-
-    def run(self, inputcode, iterations = None, run_forever = False, frame_limiter = False, verbose = False):
+    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
@@ -222,30 +240,57 @@ class Grammar(object):
             elif isinstance(inputcode, basestring):
                 filename = 'shoebot_code'
                 source = inputcode
-            
+
             self._executor = LiveExecution(source, ns=self._namespace, filename=filename)
             self._load_namespace(filename)
-            
-            # do the magic   
-            if not iterations:
-                if run_forever:
-                    iterations = None
-                else:
-                    iterations = 1
-
-            self._start_time = time()
-
             with self._executor.run_context():
-                # First iteration
-                self._exec_frame(limit = frame_limiter)
-                self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
+                # run context rewinds state to last known good if something goes wrong
+                event = None
 
-                # Subsequent iterations
-                while self._should_run(iterations):
-                    self._exec_frame(limit = frame_limiter)
+                while run_forever and event != "quit":
+                    # do the magic
+                    if not iterations:
+                        if run_forever:
+                            iterations = None
+                        else:
+                            iterations = 1
 
-            if not run_forever:
-                self._quit = True
+                    self._start_time = time()
+
+                    # First iteration
+                    self._exec_frame(limit=frame_limiter)
+                    self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
+
+                    # Subsequent iterations
+                    while self._should_run(iterations):
+                        self._exec_frame(limit=frame_limiter)
+                        try:
+                            event = channel.listen(block=False).next()['data']
+                            break
+                        except StopIteration:
+                            event = None
+
+                    if run_forever:
+                        #
+                        # Running in GUI, bot has finished
+                        # Either -
+                        #   recieve quit event and quit
+                        #   recieve any other event and loop
+                        #
+                        while event is None:
+                            try:
+                                event = channel.listen(timeout=0.1).next()['data']
+                                break
+                            except StopIteration:
+                                event = None
+                                # TODO - Gtk.main_iteration should be elsewhere
+                                #        the 'sink' should have a 'main_iteration'
+                                #        which can update events + call Gtk.main_iteration
+                                #        if it's the Gtk sink
+                                from gi.repository import Gtk
+                                while Gtk.events_pending():
+                                    Gtk.main_iteration()
+
             self._canvas.finished = True
             self._canvas.sink.finish()
 

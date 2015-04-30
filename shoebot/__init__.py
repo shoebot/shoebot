@@ -90,7 +90,7 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     return canvas
 
 
-def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None):
+def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None, namespace=None):
     """
     Create a canvas and a bot with the same canvas attached to it
 
@@ -105,10 +105,10 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
 
     if grammar == DRAWBOT:
         from shoebot.grammar import DrawBot
-        bot = DrawBot(canvas, vars=vars)
+        bot = DrawBot(canvas, namespace=namespace, vars=vars)
     else:
         from shoebot.grammar import NodeBot
-        bot = NodeBot(canvas, vars=vars)
+        bot = NodeBot(canvas, namespace=namespace, vars=vars)
     return bot
 
 
@@ -181,6 +181,7 @@ def run(src,
         port=7777,
         show_vars=False,
         vars=None,
+        namespace=None,
         run_shell=False,
         args=[],
         verbose=False,
@@ -205,7 +206,7 @@ def run(src,
         server,
         port,
         show_vars]
-    create_kwargs = dict(vars=vars)
+    create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
         run_forever=window if close_window is False else False,

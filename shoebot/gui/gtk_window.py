@@ -19,6 +19,7 @@ from gtk_input_device import GtkInputDeviceMixin
 
 import locale
 import gettext
+import pubsub
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -28,6 +29,9 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
+
+
 
 class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
     '''Create a GTK+ window that contains a ShoebotWidget'''
@@ -225,7 +229,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         self.bot._screen_ratio = None
 
     def do_window_close(self, widget,data=None):
-        self.bot._quit = True
+        pubsub.publish("shoebot", "quit")
 
         if self.has_server:
             self.sock.close()
@@ -260,7 +264,9 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
             self.hide_variables_window()
 
     def finish(self):
-        while self.bot._quit == False and self.window_open == True:
+        print('finish gtk_window')
+        ## while self.bot._quit == False and self.window_open == True:
+        while self.window_open:
             Gtk.main_iteration()
             ### Any snapshots that need to be taken
             for snapshot_func in self.scheduled_snapshots:

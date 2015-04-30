@@ -42,6 +42,7 @@ _ = gettext.gettext
 sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
 sys.path.append('.') # ximport can work from current dir
 
+
 class NodeBot(Bot):
     
     NORMAL = "1"
@@ -66,7 +67,7 @@ class NodeBot(Bot):
     color_mode = RGB
     color_range = 1
 
-    def __init__(self, canvas = None, namespace = None, vars = None):
+    def __init__(self, canvas=None, namespace=None, vars=None):
         '''
         Nodebot grammar constructor
 

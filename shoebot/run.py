@@ -29,11 +29,47 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """ Shoebot console runner """
 
-import shlex
-import sys
 import locale, gettext
 import argparse
+import shlex
+import sys
+
 from __init__ import run
+
+DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
+DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
+DEFAULT_OUTPUTFILE = 'output.png'
+DEFAULT_SERVERPORT = 7777
+
+OUTPUT_EXTENSIONS = ('.png', '.svg', '.ps', '.pdf')
+APP = 'shoebot'
+DIR = sys.prefix + '/share/shoebot/locale'
+
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain(APP, DIR)
+#gettext.bindtextdomain(APP)
+gettext.textdomain(APP)
+_ = gettext.gettext
+
+NODEBOX = 'nodebox'
+DRAWBOT = 'drawbot'
+
+
+def json_arg(s):
+    #s = s.strip()
+    if s.startswith("{"):
+        # enclose in quotes
+        s = "'%s'" % s
+
+    print '...'
+    print '>>%s<<' % s
+    try:
+        import json
+        d = json.loads(s, parse_float=True, parse_int=True)
+        return d
+    except Exception as e:
+        error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
+        raise e
 
 
 def error(message):
@@ -51,23 +87,7 @@ def warn(message):
 
 
 def main():
-    DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
-    DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
-    DEFAULT_OUTPUTFILE = 'output.png'
-    DEFAULT_SERVERPORT = 7777
-
-    OUTPUT_EXTENSIONS = ('.png', '.svg', '.ps', '.pdf')
-    APP = 'shoebot'
-    DIR = sys.prefix + '/share/shoebot/locale'
-
-    locale.setlocale(locale.LC_ALL, '')
-    gettext.bindtextdomain(APP, DIR)
-    #gettext.bindtextdomain(APP)
-    gettext.textdomain(APP)
-    _ = gettext.gettext
-
-    NODEBOX = 'nodebox'
-    DRAWBOT = 'drawbot'
+    global parser
 
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
@@ -147,6 +167,12 @@ def main():
                     default=False,
                     help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
                     )
+    parser.add_argument("-ns",
+                    "--namespace",
+                    dest="namespace",
+                    default=None,
+                    help=_("Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
+                    )
     parser.add_argument("-l",
                     "--l",
                     dest="shell",
@@ -176,12 +202,23 @@ def main():
 
     vars = None
     if args.vars:
-        try:
-            import json
-            vars = json.loads(args.vars)
-        except Exception as e:
-            error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
-            raise e
+        vars = json_arg(args.vars)
+        # try:
+        #     import json
+        #     vars = json.loads(args.vars)
+        # except Exception as e:
+        #     error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
+        #     raise e
+
+    namespace = None
+    if args.namespace:
+        namespace = json_arg(args.namespace)
+        # try:
+        #     import json
+        #     namespace = json.loads(args.namespace)
+        # except Exception as e:
+        #     error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
+        #     raise e
 
     run(src = args.script,
         grammar = args.grammar,
@@ -195,6 +232,7 @@ def main():
         port=args.serverport,
         show_vars = args.window and args.disable_vars == False,
         vars = vars or None,
+        namespace = namespace,
         run_shell = args.shell,
         args = shlex.split(args.script_args or ""),
         verbose = args.verbose,
