@@ -4,9 +4,9 @@ from time import sleep, time
 import copy
 import linecache
 import sys
-import pubsub
 
 from livecode import LiveExecution
+from shoebot.core.events import next_event, QUIT_EVENT
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
@@ -14,8 +14,6 @@ from shoebot.util import flushfile
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
-
-channel = pubsub.subscribe("shoebot")
 
 
 class Grammar(object):
@@ -30,7 +28,6 @@ class Grammar(object):
     def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
         self._quit = False
-        self._iteration = 0
         self._dynamic = True
         self._speed = 60.0
         self._vars = vars or {}
@@ -49,7 +46,7 @@ class Grammar(object):
                 mouse_pointer_moved = self._mouse_pointer_moved)
         self._input_device = input_device
 
-    def _load_namespace(self, filename = None):
+    def _load_namespace(self, filename=None):
         ''' Export namespace into the user bot
         :param filename: Will be set to __file__ in the namespace
         '''
@@ -65,27 +62,23 @@ class Grammar(object):
 
         namespace['_ctx'] = self  # Used in older nodebox scripts.
         namespace['__file__'] = filename
-        self._namespace = namespace
+
+        ##self._namespace = namespace
+        return namespace
 
 
     #### Execute a single frame
 
-    def _should_run(self, iterations):
+    def _should_run(self, iteration, max_iterations):
         ''' Return False if bot should quit '''
 
-        iteration = self._iteration
         if iteration == 0:
             # First frame always runs
             return True
-        if self._quit:
-            return False
-        if iterations:
-            if iteration < iterations:
+        if max_iterations:
+            if iteration < max_iterations:
                 return True
-        # elif len(self._vars) > 0:
-        #     # Vars have been added in script
-        #     return True
-        elif iterations is None:
+        elif max_iterations is None:
             if self._dynamic:
                 return True
             else:
@@ -98,36 +91,74 @@ class Grammar(object):
 
         return False
 
-    def _frame_limit(self):
-        ''' Limit to framerate, should be called after
-            rendering has completed '''
+    def _frame_limit(self, start_time):
+        """
+        Limit to framerate, should be called after
+        rendering has completed
+
+        :param start_time: When execution started
+        """
         if self._speed:
             completion_time = time()
-            exc_time = completion_time - self._start_time
+            exc_time = completion_time - start_time
             sleep_for = (1.0 / abs(self._speed)) - exc_time
             if sleep_for > 0:
                 sleep(sleep_for)
-            self._start_time = completion_time + sleep_for
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _exec_frame(self, limit=False):
-        ''' Run single frame of the bot
+    def _run_frame(self, namespace, limit=False, iteration=0):
+        """ Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
-        '''
-        namespace = self._namespace
-        if self._iteration != 0 and self._speed != 0:
+        """
+        #
+        # Gets a bit complex here...
+        #
+        # Nodebox (which we are trying to be compatible with) supports two
+        # kinds of bot 'dynamic' which has a 'draw' function and non dynamic
+        # which doesn't have one.
+        #
+        # Dynamic bots:
+        #
+        # First run:
+        # run body and 'setup' if it exists, then 'draw'
+        #
+        # Later runs:
+        # run 'draw'
+        #
+        # Non Dynamic bots:
+        #
+        # Just have a 'body' and run once...
+        #
+        # UNLESS...  a 'var' is changed, then run it again.
+        #
+        #
+        # Livecoding:
+        #
+        # Code can be 'known_good' or 'tenous' (when it has been edited).
+        #
+        # If code is tenous and an exception occurs, attempt to roll
+        # everything back.
+        #
+        # Livecoding and vars
+        #
+        # If vars are added / removed or renamed then attempt to update
+        # the GUI
+
+        start_time = time()
+        if iteration != 0 and self._speed != 0:
             self._canvas.reset_canvas()
         self._set_dynamic_vars()
-        if self._iteration == 0:
+        if iteration == 0:
             # First frame
             self._executor.run()
             # run setup and draw
             # (assume user hasn't live edited already)
             namespace['setup']()
             namespace['draw']()
+            self._canvas.flush(self._frame)
         else:
             # Subsequent frames
             if self._dynamic:
@@ -145,11 +176,13 @@ class Grammar(object):
                                 exec source in ns
 
                         ns['draw']()
+                        self._canvas.flush(self._frame)
             else:
+                # Non "dynamic" bots
                 #
-                # TODO - This part is overly complex, before livecoding it
+                # TODO - This part is overly complex, before live-coding it
                 #        was just exec source in ns ... have to see if it
-                #        can be simplified
+                #        can be simplified again.
                 #
                 with self._executor.run_context() as (known_good, source, ns):
                     if not known_good:
@@ -164,9 +197,10 @@ class Grammar(object):
                     else:
                         exec source in ns
 
-        self._canvas.flush(self._frame)
+                    self._canvas.flush(self._frame)
+                    sleep(0.1)
         if limit:
-            self._frame_limit()
+            self._frame_limit(start_time)
 
         # Can set speed to go backwards using the shell if you really want
         # or pause by setting speed == 0
@@ -175,7 +209,6 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-        self._iteration += 1
 
     def _simple_traceback(self, ex, source):
         """
@@ -194,7 +227,7 @@ class Grammar(object):
                 break
 
         # extract line number from traceback
-        fn=exc_location.split(',')[0][8:-1]
+        fn = exc_location.split(',')[0][8:-1]
         line_number = int(exc_location.split(',')[1].replace('line', '').strip())
 
         # Build error messages
@@ -243,53 +276,51 @@ class Grammar(object):
 
             self._executor = LiveExecution(source, ns=self._namespace, filename=filename)
             self._load_namespace(filename)
-            with self._executor.run_context():
-                # run context rewinds state to last known good if something goes wrong
-                event = None
 
-                while run_forever and event != "quit":
-                    # do the magic
-                    if not iterations:
-                        if run_forever:
-                            iterations = None
-                        else:
-                            iterations = 1
+            if not iterations:
+                if run_forever:
+                    iterations = None
+                else:
+                    iterations = 1
+            iteration = 0
 
-                    self._start_time = time()
+            event = None
+            while event != QUIT_EVENT:
+                # do the magic
 
-                    # First iteration
-                    self._exec_frame(limit=frame_limiter)
-                    self._initial_namespace = copy.copy(self._namespace) # Stored so script can be rewound
+                # First iteration
+                self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
+                self._initial_namespace = copy.copy(self._namespace)  # Stored so script can be rewound
 
-                    # Subsequent iterations
-                    while self._should_run(iterations):
-                        self._exec_frame(limit=frame_limiter)
-                        try:
-                            event = channel.listen(block=False).next()['data']
-                            break
-                        except StopIteration:
-                            event = None
+                # Subsequent iterations
+                while self._should_run(iteration, iterations) and event is None:
+                    self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
+                    event = next_event()
 
-                    if run_forever:
+                if run_forever:
                         #
                         # Running in GUI, bot has finished
                         # Either -
                         #   recieve quit event and quit
                         #   recieve any other event and loop
                         #
-                        while event is None:
-                            try:
-                                event = channel.listen(timeout=0.1).next()['data']
-                                break
-                            except StopIteration:
-                                event = None
-                                # TODO - Gtk.main_iteration should be elsewhere
-                                #        the 'sink' should have a 'main_iteration'
-                                #        which can update events + call Gtk.main_iteration
-                                #        if it's the Gtk sink
-                                from gi.repository import Gtk
-                                while Gtk.events_pending():
-                                    Gtk.main_iteration()
+                    while event is None:
+                        event = next_event()
+                        if not event:
+                            # TODO - Gtk.main_iteration should be elsewhere
+                            #        the 'sink' should have a 'main_iteration'
+                            #        which can update events + call Gtk.main_iteration
+                            #        if it's the Gtk sink
+                            from gi.repository import Gtk
+                            while Gtk.events_pending():
+                                Gtk.main_iteration()
+
+                    event = None # this loop is a bit weird...
+                else:
+                    # not in GUI, just quit
+                    break
+
+                iteration += 1
 
             self._canvas.finished = True
             self._canvas.sink.finish()

@@ -209,7 +209,7 @@ def run(src,
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
-        run_forever=window if close_window is False else False,
+        run_forever=window and (not close_window),
         frame_limiter=window,
         verbose=verbose
     )

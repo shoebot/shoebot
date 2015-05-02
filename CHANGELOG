@@ -9,6 +9,9 @@ v1.2
     * Make setup.py clean actually remove all detritus
     * Support setup.py develop
     * Show shoebot icon in var window as well as main window
+    * Started event framework to control different parts of SB
+      it's pretty dumb right now, but enough to support livecoding
+      of dynamic and non dynamic bots.
 
   GEdit plugin changes
     * Installable from setup.py, supports Windows

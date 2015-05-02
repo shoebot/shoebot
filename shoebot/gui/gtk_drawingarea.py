@@ -48,7 +48,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
 
     def draw(self, widget, cr):
         '''
-        Draw just the exposed part of the backing store
+        Draw just the exposed part of the backing store, scaled to fit
         '''
 
         # Create the cairo context

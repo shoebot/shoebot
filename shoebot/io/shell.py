@@ -41,6 +41,8 @@ import shlex
 
 import pubsub
 
+from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT
+
 PROMPT = ""
 #PROMPT = "[^_^] "
 #RESPONSE_PROMPT = "[o_o] "
@@ -234,14 +236,14 @@ class ShoebotCmd(cmd.Cmd):
         called_good = False
         source = str(base64.b64decode(line))
         # Test compile
-        pubsub.publish("shoebot", "source-changed")
+        pubsub.publish("shoebot", SOURCE_CHANGED_EVENT)
         executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
 
     def do_bye(self, line):
         return self.do_exit(line)
 
     def do_exit(self, line):
-        pubsub.publish("shoebot", "quit")
+        pubsub.publish("shoebot", QUIT_EVENT)
         self.print_response('Bye.\n')
         return True
 

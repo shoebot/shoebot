@@ -140,7 +140,7 @@ class LiveExecution(object):
         If no exceptions occur then the source will move from 'tenuous'
         to 'known good'.
 
-        >>> with run_context() as (tenuous, source, ns):
+        >>> with run_context() as (known_good, source, ns):
         >>> ...  exec source in ns
         >>> ...  ns['draw']()
 
