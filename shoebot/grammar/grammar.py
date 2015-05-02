@@ -67,7 +67,6 @@ class Grammar(object):
 
     def _should_run(self, iteration, max_iterations):
         ''' Return False if bot should quit '''
-
         if iteration == 0:
             # First frame always runs
             return True
@@ -281,16 +280,18 @@ class Grammar(object):
             iteration = 0
 
             event = None
-            while event != QUIT_EVENT:
+            while event != QUIT_EVENT and iteration != iterations:
                 # do the magic
 
                 # First iteration
                 self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
                 if iteration == 0:
                     self._initial_namespace = copy.copy(self._namespace)  # Stored so script can be rewound
+                iteration += 1
 
                 # Subsequent iterations
                 while self._should_run(iteration, iterations) and event is None:
+                    iteration += 1
                     self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
                     event = next_event()
 

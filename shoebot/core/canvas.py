@@ -52,6 +52,7 @@ CORNER = 'corner'
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
+
 class Canvas(object):
     __metaclass__ = ABCMeta
     
@@ -160,13 +161,13 @@ class Canvas(object):
             self._drawqueue.append(output_func)
         else:
             self._drawqueue.append_immediate(output_func)
-            
 
     def flush(self, frame):
         '''
         Passes the drawqueue to the sink for rendering
         '''
         self.sink.render(self.size_or_default(), frame, self._drawqueue)
+        self.reset_drawqueue() ##
 
     def deferred_render(self, render_func):
         '''Add a render function to the queue for rendering later'''

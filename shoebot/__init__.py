@@ -117,7 +117,8 @@ class ShoebotThread(threading.Thread):
     Run shoebot in an alternate thread.
 
     This way the commandline shell can run on the main thread
-    and the GUI in a seperate thread
+    and the GUI in a seperate thread without readline
+    blocking it.
     """
     def __init__(self,
             create_args, create_kwargs,

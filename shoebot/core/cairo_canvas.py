@@ -37,6 +37,7 @@ from shoebot.grammar import InputDeviceMixin
 from canvas import Canvas
 from drawqueue import DrawQueue
 
+
 class CairoCanvas(Canvas):
     ''' Cairo implementation of Canvas '''
     def __init__(self, sink):
