@@ -271,7 +271,7 @@ class ColorMixin(object):
                 self._strokecolor = None
                 return
             elif isinstance(args[0], Color):
-                self._strokecolor = args[0].copy()
+                self._strokecolor = Color(args[0])
                 return
         self._strokecolor = Color(mode='rgb', color_range=1, *args)
     stroke = property(_get_stroke, _set_stroke)
