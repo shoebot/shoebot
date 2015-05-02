@@ -15,6 +15,7 @@ QUIT_EVENT = "quit"
 SOURCE_CHANGED_EVENT = "source-changed"
 EVENT_VARIABLE_UPDATED = "variable-updated"
 
+
 def next_event(timeout=None):
     try:
         return channel.listen(block=False, timeout=timeout).next()['data']
