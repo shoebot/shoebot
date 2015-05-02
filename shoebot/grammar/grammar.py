@@ -46,12 +46,12 @@ class Grammar(object):
                 mouse_pointer_moved = self._mouse_pointer_moved)
         self._input_device = input_device
 
-    def _load_namespace(self, filename=None):
-        ''' Export namespace into the user bot
-        :param filename: Will be set to __file__ in the namespace
-        '''
-        namespace = self._namespace
+    def _load_namespace(self, namespace, filename=None):
+        """
+        Initialise bot namespace with info in shoebot.data
 
+        :param filename: Will be set to __file__ in the namespace
+        """
         from shoebot import data
         for name in dir(data):
             namespace[name] = getattr(data, name)
@@ -62,10 +62,6 @@ class Grammar(object):
 
         namespace['_ctx'] = self  # Used in older nodebox scripts.
         namespace['__file__'] = filename
-
-        ##self._namespace = namespace
-        return namespace
-
 
     #### Execute a single frame
 
@@ -274,8 +270,8 @@ class Grammar(object):
                 filename = 'shoebot_code'
                 source = inputcode
 
+            self._load_namespace(self._namespace, filename)
             self._executor = LiveExecution(source, ns=self._namespace, filename=filename)
-            self._load_namespace(filename)
 
             if not iterations:
                 if run_forever:
@@ -290,7 +286,8 @@ class Grammar(object):
 
                 # First iteration
                 self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
-                self._initial_namespace = copy.copy(self._namespace)  # Stored so script can be rewound
+                if iteration == 0:
+                    self._initial_namespace = copy.copy(self._namespace)  # Stored so script can be rewound
 
                 # Subsequent iterations
                 while self._should_run(iteration, iterations) and event is None:
@@ -298,12 +295,12 @@ class Grammar(object):
                     event = next_event()
 
                 if run_forever:
-                        #
-                        # Running in GUI, bot has finished
-                        # Either -
-                        #   recieve quit event and quit
-                        #   recieve any other event and loop
-                        #
+                    #
+                    # Running in GUI, bot has finished
+                    # Either -
+                    #   recieve quit event and quit
+                    #   recieve any other event and loop
+                    #
                     while event is None:
                         event = next_event()
                         if not event:
@@ -315,7 +312,10 @@ class Grammar(object):
                             while Gtk.events_pending():
                                 Gtk.main_iteration()
 
-                    event = None # this loop is a bit weird...
+                    if event is QUIT_EVENT:
+                        break
+                    else:
+                        event = None  # this loop is a bit weird...
                 else:
                     # not in GUI, just quit
                     break
