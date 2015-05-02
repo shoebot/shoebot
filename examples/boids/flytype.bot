@@ -1,10 +1,9 @@
 # Soaring text.
 
 size(500, 500)
-speed(100)
+speed(30)
 
 boids = ximport("boids")
-reload(boids)
 
 def setup():     
        

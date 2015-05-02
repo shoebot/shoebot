@@ -10,9 +10,8 @@ var('saturation', NUMBER)
 var('brightness', NUMBER, 96)
 var('show', BOOLEAN, False)
 
-def draw():
-    background(hue, saturation, brightness)
-    if show:
-        fill(255)
-        ellipse(100, 100, 100, 100)
+background(hue, saturation, brightness)
+if show:
+    fill(255)
+    ellipse(100, 100, 100, 100)
 
