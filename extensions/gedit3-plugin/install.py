@@ -11,7 +11,7 @@ import shutil
 import stat
 import sys
 
-here = dirname(abspatb(__file__))
+here = dirname(abspath(__file__))
 source_dirs = [here, normpath(join(here, '../lib'))]
 plugin_name='gedit-3'
 
@@ -29,17 +29,16 @@ def has_admin():
         if 'SUDO_USER' in os.environ and os.geteuid() == 0:
             return (os.environ['SUDO_USER'], True)
         else:
-            return (os.environ['USERNAME'], False)
+            return (os.environ['USER'], False)
 
 
-def plugins_dir_nt(is_admin):
+def get_plugins_dir_nt(is_admin):
     if is_admin:
         return expandvars("%ProgramFiles%\\gedit\\lib\\gedit-3\\plugins")
     else:
         return expandvars("%UserProfile%//AppData//Roaming//gedit//plugins")
 
-
-def dest_dir_unix(is_admin):
+def get_dest_dir_unix(is_admin):
     # TODO - See if this can generalise to Windows too
     if is_admin:
         if isdir('/usr/lib64'):
@@ -49,22 +48,29 @@ def dest_dir_unix(is_admin):
     else:
         return expanduser("~/.local/share")
 
-def plugins_dir_unix(is_admin):
-    return join(dest_dir_unix(), "gedit/plugins")
-
-def plugins_dir(is_admin):
+def get_dest_dir(is_admin):
     if os.name == 'nt':
-        return plugins_dir_nt(is_admin)
+        # TODO - check for correctness
+        return "%ProgramFiles%\\gedit"
     else:
-        return plugins_dir_unix(is_admin)
+        return get_dest_dir_unix(is_admin)
 
-def language_dir(is_admin):
-    # TODO
+def get_plugins_dir_unix(is_admin):
+    return join(get_dest_dir_unix(is_admin), "gedit/plugins")
+
+def get_plugins_dir(is_admin):
     if os.name == 'nt':
+        return get_plugins_dir_nt(is_admin)
+    else:
+        return get_plugins_dir_unix(is_admin)
+
+def get_language_dir(is_admin):
+    if os.name == 'nt':
+        # TODO
         if is_admin:
             return expandvars("%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs")
     else:
-        return join(dest_dir_unix(), "gtksourceview-3.0/language-specs")
+        return join(get_dest_dir_unix(is_admin), "gtksourceview-3.0/language-specs")
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """
@@ -99,35 +105,40 @@ def copytree(src, dst, symlinks=False, ignore=None):
 
 def main():
     username, is_admin = has_admin()
-    dest_dir = plugins_dir(is_admin)
+    
+    dest_dir = get_dest_dir(is_admin)          # root, e.g. /lib /lib64 /.local/share
+    plugin_dir = get_plugins_dir(is_admin)     # plugin dir
+    language_dir = get_language_dir(is_admin)  # gtksourceview language specs
 
-    if is_admin and not isdir(dest_dir):
+    if is_admin and not isdir(plugin_dir):
         print('gedit not found')
         sys.exit(1)
     else:
         if not is_admin:
             try:
-                os.makedirs(dest_dir)
+                os.makedirs(plugin_dir)
             except OSError:
                 pass
 
-            if not isdir(dest_dir):
-                print('could not create destinaton dir %s' % dest_dir)
+            if not isdir(plugin_dir):
+                print('could not create destinaton dir %s' % plugin_dir)
                 sys.exit(1)
 
     print('install %s plugin to %s' % (plugin_name, dest_dir))
     source_dir = None
     try:
         for source_dir in source_dirs:
-            copytree(source_dir, dest_dir)
+            copytree(source_dir, plugin_dir)
     except Exception as e:
         print('error attempting to copy %s' % source_dir)
         print(e)
         sys.exit(1)
 
-    dest_dir = language_dir(is_admin)
-    if dest_dir:
-        shutil.copyfile("shoebot.lang", dest_dir)
+    if language_dir:
+        shutil.copyfile(join(here, "shoebot.lang"), join(language_dir, "shoebot.lang"))
+        os.system("update-mime-database %s/mime" % dest_dir)
+
+    os.system("glib-compile-schemas %s/gedit/plugins/shoebotit" % dest_dir)
     print('success')
 
 
