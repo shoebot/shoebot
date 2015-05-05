@@ -9,8 +9,6 @@ import sys
 
 here = os.path.dirname(os.path.abspath(__file__))
 source_dirs = [here, os.path.normpath(os.path.join(here, '../lib'))]
-plugin_name='gedit-2'
-
 
 def has_admin():
     if os.name == 'nt':
