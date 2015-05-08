@@ -78,9 +78,11 @@ class VarListener(object):
         for name in existing_vars:
             old_var = snapshot_vars[name]
             new_var = vars[name]
-            if old_var.type != new_var.type:
+            if old_var.type != new_var.type or old_var.min != new_var.min or old_var.max != new_var.max:
                 deleted_vars.add(name)
                 added_vars.add(name)
+                if old_var.type == new_var.type:
+                    new_var.value = old_var.value
 
         for listener in VarListener.listeners:
             for name in deleted_vars:
