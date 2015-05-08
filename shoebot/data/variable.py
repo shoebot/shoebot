@@ -9,7 +9,18 @@ def clamp(minvalue, value, maxvalue):
 class Variable(object):
     '''Taken from Nodebox'''
     def __init__(self, name, type, default=None, min=0, max=100, value=None):
+        """
+        :param name:     Name of variable
+        :param type:     NUMBER | TEXT | BOOLEAN | BUTTON
+        :param default:
+        :param min:
+        :param max:
+        :param value:
+        :return:
+        """
         self.name = name
+        if not isinstance(name, basestring):
+            raise AttributeError("Variable name must be a string")
         self.type = type or NUMBER
         self.min = None
         self.max = None
