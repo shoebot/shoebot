@@ -319,7 +319,7 @@ class Grammar(object):
                     elif event is SOURCE_CHANGED_EVENT:
                         # Debounce SOURCE_CHANGED events...
                         while event == SOURCE_CHANGED_EVENT:
-                            event = next_event(block=True, timeout=0.0025)
+                            event = next_event(block=True, timeout=0.001)
                     else:
                         event = None  # this loop is a bit weird...
                 else:
