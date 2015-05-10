@@ -321,7 +321,6 @@ class Grammar(object):
                         while event == SOURCE_CHANGED_EVENT:
                             sleep(0.0025)
                             event = next_event(block=False)
-                        print('/source changed')
                     else:
                         event = None  # this loop is a bit weird...
                 else:
