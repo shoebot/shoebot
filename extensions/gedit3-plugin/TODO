@@ -4,3 +4,6 @@ TODO list for ShoebotIt
 * proper syntax highlighting -- for now, one has to set it manually to
   'Python'; even better would be to add Shoebot specific functions so
   that they could be highlighted too
+
+* Clean up the common API for GEdit2, Gedit3  Gtk2, Gtk3.
+

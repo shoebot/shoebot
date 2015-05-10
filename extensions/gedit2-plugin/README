@@ -8,8 +8,7 @@ Installing
 ==========
 
 Run on your terminal
-  chmod +x install.sh 
-  ./install.sh
+  python install.py
 or you can manualy copy the following files and folder over to '~/.local/share/gedit/plugins':
   * shoebotit.gedit-plugin
   * shoebotit
@@ -26,4 +25,4 @@ run gedit from there, for example:
 $ ~/.virtualenvs/shoebot/bin/activate
 $ gedit
 
-TODO:  UI to choose whether to use the system python or a virtualenv
+TODO:  Port the GEdit 3s virtualenv preferences UI.
