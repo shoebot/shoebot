@@ -153,7 +153,7 @@ class ShoebotThread(threading.Thread):
             self.bot_ready.set()
             sbot.run(*self.run_args, **self.run_kwargs)
         except Exception:
-            print('DOH')
+            print('Exception in shoebot code')
             raise
         finally:
             if self.send_sigint:
