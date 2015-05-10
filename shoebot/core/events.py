@@ -16,8 +16,8 @@ SOURCE_CHANGED_EVENT = "source-changed"
 EVENT_VARIABLE_UPDATED = "variable-updated"
 
 
-def next_event(timeout=None):
+def next_event(block=False, timeout=None):
     try:
-        return channel.listen(block=False, timeout=timeout).next()['data']
+        return channel.listen(block=block, timeout=timeout).next()['data']
     except StopIteration:
         return

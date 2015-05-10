@@ -6,7 +6,7 @@ import linecache
 import sys
 
 from livecode import LiveExecution
-from shoebot.core.events import next_event, QUIT_EVENT
+from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
@@ -304,6 +304,7 @@ class Grammar(object):
                     #
                     while event is None:
                         event = next_event()
+
                         if not event:
                             # TODO - Gtk.main_iteration should be elsewhere
                             #        the 'sink' should have a 'main_iteration'
@@ -315,13 +316,17 @@ class Grammar(object):
 
                     if event is QUIT_EVENT:
                         break
+                    elif event is SOURCE_CHANGED_EVENT:
+                        # Debounce SOURCE_CHANGED events...
+                        while event == SOURCE_CHANGED_EVENT:
+                            sleep(0.0025)
+                            event = next_event(block=False)
+                        print('/source changed')
                     else:
                         event = None  # this loop is a bit weird...
                 else:
                     # not in GUI, just quit
                     break
-
-                iteration += 1
 
             self._canvas.finished = True
             self._canvas.sink.finish()
