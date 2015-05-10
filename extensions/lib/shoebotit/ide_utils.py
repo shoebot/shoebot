@@ -165,7 +165,7 @@ class ShoebotProcess(object):
         self.send_command("escape_nl")
         self.send_command('')
 
-    def live_source_load(self, source, good_cb=None, bad_cb=None):
+    def live_source_load(self, source):
         """
         Send new source code to the bot
 
