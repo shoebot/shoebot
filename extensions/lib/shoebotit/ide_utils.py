@@ -125,7 +125,8 @@ class ShoebotProcess(object):
                     info = d.get('info')
 
                     if not response.status and status:
-                        self.responses[cookie] = response = CommandResponse(response.cmd, cookie, response.status or status, response.info)
+                        self.responses[cookie] = response = \
+                            CommandResponse(response.cmd, cookie, response.status or status, response.info)
 
                     response.info.append(info)
 
