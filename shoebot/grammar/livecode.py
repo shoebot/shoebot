@@ -1,6 +1,7 @@
 import ast
 import copy
 import contextlib
+import threading
 import traceback
 import meta.decompiler
 
@@ -15,6 +16,7 @@ class LiveExecution(object):
     "tenous code" exceptions attempt to revert to "known good"
     """
     ns = {}
+    lock = threading.RLock()
 
     def __init__(self, source, ns=None, filename=None):
         self.edited_source = None
@@ -42,32 +44,34 @@ class LiveExecution(object):
         Until the code is executed correctly, it will be
         in the 'tenuous' state.
         """
-        self.good_cb = good_cb
-        self.bad_cb = bad_cb
-        try:
-            # text compile
-            compile(source + '\n\n', filename or self.filename, "exec")
-        except Exception as e:
-            if bad_cb:
-                self.edited_source = None
-                tb = traceback.format_exc()
-                self.call_bad_cb(tb)
-            return
-        if filename is not None:
-            self.filename = filename
-        self.edited_source = source
+        with LiveExecution.lock:
+            self.good_cb = good_cb
+            self.bad_cb = bad_cb
+            try:
+                # text compile
+                compile(source + '\n\n', filename or self.filename, "exec")
+            except Exception as e:
+                if bad_cb:
+                    self.edited_source = None
+                    tb = traceback.format_exc()
+                    self.call_bad_cb(tb)
+                return
+            if filename is not None:
+                self.filename = filename
+            self.edited_source = source
 
     def reload_functions(self):
         """
         Recompile functions
         """
-        if self.edited_source:
-            source = self.edited_source
-            tree = ast.parse(source)
-            for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                # TODO - Could modify __code__ etc of functions, but this info will
-                # need to be saved if thats the case
-                self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
+        with LiveExecution.lock:
+            if self.edited_source:
+                source = self.edited_source
+                tree = ast.parse(source)
+                for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
+                    # TODO - Could modify __code__ etc of functions, but this info will
+                    # need to be saved if thats the case
+                    self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
 
     def do_exec(self, source, ns, tenuous = False):
         """
@@ -82,38 +86,41 @@ class LiveExecution(object):
         Run edited source, if no exceptions occur then it
         graduates to known good.
         """
-        ns_snapshot = copy.copy(self.ns)
-        try:
-            source = self.edited_source
-            self.edited_source = None
-            self.do_exec(source, ns_snapshot, True)
-            self.known_good = source
-            self.call_good_cb()
-            return True, None
-        except Exception as ex:
-            tb = traceback.format_exc()
-            self.call_bad_cb(tb)
-            self.ns.clear()
-            self.ns.update(ns_snapshot)
-            return False, ex
+        with LiveExecution.lock:
+            ns_snapshot = copy.copy(self.ns)
+            try:
+                source = self.edited_source
+                self.edited_source = None
+                self.do_exec(source, ns_snapshot, True)
+                self.known_good = source
+                self.call_good_cb()
+                return True, None
+            except Exception as ex:
+                tb = traceback.format_exc()
+                self.call_bad_cb(tb)
+                self.ns.clear()
+                self.ns.update(ns_snapshot)
+                return False, ex
 
     def run(self):
         """
         Attempt to known good or tenuous source.
         """
-        if self.edited_source:
-            success, ex = self.run_tenuous()
-            if success:
-                return
+        with LiveExecution.lock:
+            if self.edited_source:
+                success, ex = self.run_tenuous()
+                if success:
+                    return
 
-        self.do_exec(self.known_good, self.ns)
+            self.do_exec(self.known_good, self.ns)
 
     def clear_callbacks(self):
         """
         clear the good and bad callbacks
         """
-        self.bad_cb = None
-        self.good_cb = None
+        with LiveExecution.lock:
+            self.bad_cb = None
+            self.good_cb = None
 
     def call_bad_cb(self, tb):
         """
@@ -121,16 +128,18 @@ class LiveExecution(object):
         :param tb: traceback that caused exception
         :return:
         """
-        if self.bad_cb and not self.bad_cb(tb):
-            self.bad_cb = None
+        with LiveExecution.lock:
+            if self.bad_cb and not self.bad_cb(tb):
+                self.bad_cb = None
 
     def call_good_cb(self):
         """
         If good_cb returns True then keep it
         :return:
         """
-        if self.good_cb and not self.good_cb():
-            self.good_cb = None
+        with LiveExecution.lock:
+            if self.good_cb and not self.good_cb():
+                self.good_cb = None
 
     @contextlib.contextmanager
     def run_context(self):
@@ -145,21 +154,22 @@ class LiveExecution(object):
         >>> ...  ns['draw']()
 
         """
-        if self.edited_source is None:
-            yield True, self.known_good, self.ns
-            return
+        with LiveExecution.lock:
+            if self.edited_source is None:
+                yield True, self.known_good, self.ns
+                return
 
-        ns_snapshot = copy.copy(self.ns)
-        try:
-            yield False, self.edited_source, self.ns
-            self.known_good = self.edited_source
-            self.edited_source = None
-            self.call_good_cb()
-            return
-        except Exception as ex:
-            tb = traceback.format_exc()
-            self.call_bad_cb(tb)
-            self.edited_source = None
-            self.ns.clear()
-            self.ns.update(ns_snapshot)
+            ns_snapshot = copy.copy(self.ns)
+            try:
+                yield False, self.edited_source, self.ns
+                self.known_good = self.edited_source
+                self.edited_source = None
+                self.call_good_cb()
+                return
+            except Exception as ex:
+                tb = traceback.format_exc()
+                self.call_bad_cb(tb)
+                self.edited_source = None
+                self.ns.clear()
+                self.ns.update(ns_snapshot)
 
