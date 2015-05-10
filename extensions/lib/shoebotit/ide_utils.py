@@ -82,6 +82,13 @@ class CommandResponse(collections.namedtuple("CommandResponse", ['cmd', 'cookie'
 
 
 class ShoebotProcess(object):
+    """
+    Runs an instance of Shoebot
+
+    use send_command to control the instance, CommandResponse objects
+    come back in the response_queue
+
+    """
     def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         # start with -w for window -l for shell'
         command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
