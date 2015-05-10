@@ -317,7 +317,9 @@ class Grammar(object):
                     if event is QUIT_EVENT:
                         break
                     elif event is SOURCE_CHANGED_EVENT:
-                        # Debounce SOURCE_CHANGED events...
+                        # Debounce SOURCE_CHANGED events -
+                        # If you change a digit you get a one event for
+                        # deleting a char and another for adding in GEdit.
                         while event == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
                     else:
