@@ -191,7 +191,6 @@ class Grammar(object):
                         exec source in ns
 
                     self._canvas.flush(self._frame)
-                    sleep(0.1)
         if limit:
             self._frame_limit(start_time)
 
@@ -292,6 +291,9 @@ class Grammar(object):
                     iteration += 1
                     self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
                     event = next_event()
+                    if not event:
+                        self._canvas.sink.main_iteration()  # update GUI, may generate events..
+
 
                 if run_forever:
                     #
@@ -302,7 +304,6 @@ class Grammar(object):
                     #
                     while event is None:
                         event = next_event()
-
                         if not event:
                             self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
