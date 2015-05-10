@@ -34,3 +34,12 @@ class DrawQueueSink(object):
         Called when the bot has been rendered
         '''
         pass
+
+    def main_iteration(self):
+        """
+        Called from main loop, if your sink needs to handle GUI events
+        do it here.
+
+        :return:
+        """
+        pass

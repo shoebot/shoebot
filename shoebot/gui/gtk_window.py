@@ -263,6 +263,16 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
         else:
             self.hide_variables_window()
 
+    def main_iteration(self):
+        """
+        Called from main loop, if your sink needs to handle GUI events
+        do it here.
+
+        :return:
+        """
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
     def finish(self):
         ### Any snapshots that need to be taken
         for snapshot_func in self.scheduled_snapshots:

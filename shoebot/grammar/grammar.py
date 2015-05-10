@@ -80,8 +80,6 @@ class Grammar(object):
                 return False
             return True
         if not self._dynamic:
-            ### TODO... gtk window needs to run in another thread, that will keep
-            ### going until explicitly closed
             return False
 
         return False
@@ -306,13 +304,7 @@ class Grammar(object):
                         event = next_event()
 
                         if not event:
-                            # TODO - Gtk.main_iteration should be elsewhere
-                            #        the 'sink' should have a 'main_iteration'
-                            #        which can update events + call Gtk.main_iteration
-                            #        if it's the Gtk sink
-                            from gi.repository import Gtk
-                            while Gtk.events_pending():
-                                Gtk.main_iteration()
+                            self._canvas.sink.main_iteration()  # update GUI
 
                     if event is QUIT_EVENT:
                         break
