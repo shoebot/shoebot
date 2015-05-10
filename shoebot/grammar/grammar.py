@@ -304,7 +304,7 @@ class Grammar(object):
                         event = next_event()
 
                         if not event:
-                            self._canvas.sink.main_iteration()  # update GUI
+                            self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
                     if event is QUIT_EVENT:
                         break
