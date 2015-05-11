@@ -33,7 +33,7 @@ from math import pi as _pi
 import os.path
 import cairocffi as cairo
 
-from shoebot.grammar import InputDeviceMixin
+from input_device import InputDeviceMixin
 from canvas import Canvas
 from drawqueue import DrawQueue
 

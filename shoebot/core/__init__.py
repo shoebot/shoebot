@@ -41,3 +41,5 @@ from cairo_canvas import CairoCanvas
 from drawqueue import DrawQueue
 from drawqueue_sink import DrawQueueSink
 from cairo_sink import CairoImageSink
+
+from input_device import InputDeviceMixin

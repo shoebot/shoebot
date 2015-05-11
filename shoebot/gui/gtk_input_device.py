@@ -5,7 +5,7 @@ except ImportError:
     pgi.install_as_gi()
 
 from gi.repository import Gdk, Gtk
-from shoebot.grammar import InputDeviceMixin
+from shoebot.core import InputDeviceMixin
 
 
 class GtkInputDeviceMixin(InputDeviceMixin):

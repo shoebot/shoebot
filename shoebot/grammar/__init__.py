@@ -8,5 +8,4 @@ __all__ = ['drawbot', 'nodebox', 'bot', 'input_device', 'InputDeviceMixin', 'Var
 from bot import Bot
 from nodebox import NodeBot
 from drawbot import DrawBot
-from input_device import InputDeviceMixin
 from shoebot.core.var_listener import VarListener
