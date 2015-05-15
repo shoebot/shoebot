@@ -92,6 +92,7 @@ BASE_REQUIREMENTS=[
     "meta",
     "numpy==1.9.1",
     "Pillow==2.8.1",
+    "pubsub==0.1.1",
 ]
 
 
