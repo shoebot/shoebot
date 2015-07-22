@@ -16,6 +16,37 @@ BUFF_LENGTH = 1024
 CHANNELS = 2
 NUM_SAMPLES = 512
 
+def fft_bandpassfilter(data, fs, lowcut, highcut):
+    """
+    http://www.swharden.com/blog/2009-01-21-signal-filtering-with-python/#comment-16801
+    """
+    fft = np.fft.fft(data)
+    n = len(data)
+    timestep = 1.0 / fs
+    freq = np.fft.fftfreq(n, d = timestep)
+    bp = fft.copy()
+
+    # Zero out fft coefficients
+    #bp[10:-10] = 0
+
+    # Normalise
+    #bp *= real(fft.dot(fft))/real(bp.dot(bp))
+
+    bp *= fft.dot(fft) / bp.dot(bp)
+    
+    # must multipy by 2 to get the correct amplitude
+    ibp = 12 * np.fft.ifft(bp)
+    return ibp
+
+    #for i in range(len(bp)):
+    #    if freq[i] >= highcut or freq[i] < lowcut:
+    #        bp[i] = 0
+
+    #ibp = np.fft.ifft(bp)
+    #ibp = 2.0 * np.fft.ifft(bp)
+    #print ibp
+    #return ibp
+
 def flatten_fft(scale = 1.0):
     """
     Produces a nicer graph, I'm not sure if this is correct
@@ -68,15 +99,17 @@ class AudioException(Exception):
 
 class AudioThread(threading.Thread):
     def __init__(self):
+        # TODO - This could be a bit less dumb, and only run
+        #        bandpass (or other) filters if they are actually used
         super(self.__class__, self).__init__()
-        
-        self._spectrogram = np.zeros(BUFF_LENGTH)
-        self._bandpassed = np.zeros(BUFF_LENGTH)
-        
+                
         self.daemon = True
 
         self.streams = {}
         self.running = False
+        
+        self._spectrogram = np.zeros(NUM_SAMPLES)
+        self._bandpassed = np.zeros(NUM_SAMPLES)
 
     def settings(self, **kwargs):
         if self.running:
@@ -92,14 +125,14 @@ class AudioThread(threading.Thread):
 
                 self._spectrogram = np.fft.fft(mono_vec)
 
-                #self.bandpassed = fft_bandpassfilter(self.spectrogram, 44010, 100, 20)
-                #print random()
+                self._bandpassed = fft_bandpassfilter(self.spectrogram, 44010, 100, 20)
+
 
     def autostart(self):
         if not self.running:
             self.running = True
             self.start()
-        atexit.register(self.quit)
+            atexit.register(self.quit)
 
     def quit(self):
         """
@@ -113,6 +146,11 @@ class AudioThread(threading.Thread):
     def spectrogram(self):
         self.autostart()
         return self._spectrogram
+
+    @property
+    def bandpassed(self):
+        self.autostart()
+        return self._bandpassed
 
 audio = AudioThread()
 
