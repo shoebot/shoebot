@@ -90,7 +90,7 @@ BASE_REQUIREMENTS=[
     "cairocffi>=0.6",
     #"meta==0.4.1",
     "meta",
-    "numpy==1.9.1",
+    "numpy>=1.9.1",
     "Pillow==2.8.1",
     "pubsub==0.1.1",
 ]
