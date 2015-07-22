@@ -1,4 +1,6 @@
-from os import getcwd
+from os.path import abspath, join, dirname
+
+here = dirname(abspath(__file__))
 
 size(500, 500)
 
@@ -7,7 +9,7 @@ svg = ximport("svg")
 # The parse() command will returnpaths = svg.parse(open(getcwd() + "/flower.svg").read())
 
 # a list of the shapes in the SVG file.
-paths = svg.parse(open(getcwd() + "/flower.svg").read())
+paths = svg.parse(open(join(here, "flower.svg")).read())
 
 background(color(0.1, 0.1, 0.0))
 
