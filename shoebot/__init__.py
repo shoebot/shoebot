@@ -158,6 +158,7 @@ class ShoebotThread(threading.Thread):
             sbot.run(*self.run_args, **self.run_kwargs)
         except Exception:
             print('Exception in shoebot code')
+            self.bot_ready.set()  # need to stop waiting
             raise
         finally:
             if self.send_sigint:
