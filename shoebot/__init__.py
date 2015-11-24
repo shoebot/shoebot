@@ -61,7 +61,7 @@ def _restore():
 
 ## Convenience functions to create create a bot, it's canvas and 'sink'
 
-def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False):
+def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, show_vars=False):
     """
     Create canvas and sink for attachment to a bot
 
@@ -77,7 +77,7 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
             else:
                 title = 'Untitled - Shoebot'
-        sink = ShoebotWindow(title, show_vars, server=server, port=port, fullscreen=fullscreen)
+        sink = ShoebotWindow(title, show_vars, fullscreen=fullscreen)
     else:
         if outputfile is None:
             if src and os.path.isfile(src):
@@ -101,7 +101,7 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     canvas parameters:
     ... everything else ...
     """
-    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, server=server, port=port, show_vars=show_vars)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, show_vars=show_vars)
 
     if grammar == DRAWBOT:
         from shoebot.grammar import DrawBot
@@ -109,6 +109,10 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     else:
         from shoebot.grammar import NodeBot
         bot = NodeBot(canvas, namespace=namespace, vars=vars)
+
+    if server:
+        from shoebot.io import SocketServer
+        socket_server = SocketServer(bot, "", port=port)
     return bot
 
 
