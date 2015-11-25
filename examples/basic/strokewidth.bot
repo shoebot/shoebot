@@ -12,5 +12,5 @@ line(30,20,150,20)
 strokewidth(10)
 line(30,70,150,70)
 
-strokewidth(20)
+strokewidth(40)
 line(30,120,150,120)

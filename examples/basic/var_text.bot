@@ -7,7 +7,6 @@ colorrange(255)
 var("txt", TEXT, "test")
 var("font_size", NUMBER, 100., 10., 200.)
 
-def draw():
-    background(80, 80, 80)
-    fontsize(font_size)
-    text(txt, 10, HEIGHT-30)
+background(80, 80, 80)
+fontsize(font_size)
+text(txt, 10, HEIGHT-30)

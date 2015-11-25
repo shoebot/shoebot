@@ -1,7 +1,7 @@
 # Path filter example originally from
 # http://nodebox.net/code/index.php/Path_Filters
 
-size(550, 200)
+size(550, 300)
 background(0.23, 0.21, 0.15)
  
 font("Georgia-Bold", 175)

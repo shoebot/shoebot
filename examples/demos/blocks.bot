@@ -67,19 +67,15 @@ def block(x,y,z):
     lineto(x+20, y-10)
     endpath()
 
-def setup():
-    pass
+# white background
+background(1,1,1)
 
-def draw():
-    # white background
-    background(1,1,1)
-
-    # start from 40, 40
-    translate(40, 40)
-    # and draw the blocks
-    for x, y in grid(rows, cols, 50, 60):
-        # height of each block is determined by x,y coordinates
-        z = (x+y) / 25
-        # draw it
-        block(x, y, z)
+# start from 40, 40
+translate(40, 40)
+# and draw the blocks
+for x, y in grid(rows, cols, 50, 60):
+    # height of each block is determined by x,y coordinates
+    z = (x+y) / 25
+    # draw it
+    block(x, y, z)
 
