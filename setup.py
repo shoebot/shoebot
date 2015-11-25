@@ -15,6 +15,9 @@ import shutil
 import sys
 import textwrap
 
+is_pypy = '__pypy__' in sys.builtin_module_names
+is_jython = platform.system == 'Java'
+
 here = os.path.dirname(os.path.abspath(__file__))
 
 try:
@@ -82,15 +85,19 @@ datafiles.extend([(os.path.join('share/shoebot/', root), [os.path.join(root, fil
 datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
 for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
 
+if not is_pypy:
+    NUMPY="numpy>=1.9.1"
+else:
+    NUMPY=""
 
 # Also requires one of 'vext.gi' or 'pgi'
 BASE_REQUIREMENTS=[
     "setuptools>=15.0.1",  #
 
-    "cairocffi>=0.6",
+    "cairocffi>=0.7.2",
     #"meta==0.4.1",
     "meta",
-    "numpy>=1.9.1",
+    NUMPY,
     "Pillow==2.8.1",
     "pubsub==0.1.1",
 ]
@@ -113,8 +120,6 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     """
     reqs = list(BASE_REQUIREMENTS)
     if with_pgi is None:
-        is_pypy = '__pypy__' in sys.builtin_module_names
-        is_jython = platform.system == 'Java'
         if is_pypy or is_jython:
             with_pgi = True
         else:
