@@ -18,11 +18,12 @@ def draw():
     rect(0, 0, WIDTH, HEIGHT / 2, fill="#1144ee")
     rect(0, HEIGHT / 2, WIDTH, HEIGHT / 2, fill="#82FA58")
     transform(CENTER)
-    daisylib.drawdaisy(MOUSEX, MOUSEY, color='#fefefeaa')
 
     if mousedown and old_mousedown != mousedown:
         daisies.append((MOUSEX, MOUSEY))
 
-    for x, y in daisies:
+    for x, y in sorted(daisies, key=lambda y: y):
         daisylib.drawdaisy(x, y)
+
+    daisylib.drawdaisy(MOUSEX, MOUSEY, color='#fefefeaa')
 
