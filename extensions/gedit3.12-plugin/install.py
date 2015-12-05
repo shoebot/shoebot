@@ -139,7 +139,7 @@ def main():
     
     dirs = get_dirs(is_admin)
     kwargs = dict(
-        name = "gedit-3",
+        name = "gedit-3.12",
         is_admin = is_admin,
         **dirs
     )
