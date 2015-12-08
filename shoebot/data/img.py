@@ -3,20 +3,9 @@ from shoebot.data import _copy_attrs
 import array
 from StringIO import StringIO
 import os.path
-from sys import platform
 
 import cairocffi as cairo
 from PIL import Image as PILImage
-
-try:
-    import gi
-except ImportError:
-    import pgi as gi
-
-try:
-    from gi.repository import Gtk, Gdk, GdkPixbuf
-except ImportError:
-    Gtk = None
 
 try:
     import rsvg
@@ -80,22 +69,6 @@ class Image(Grob, ColorMixin):
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                elif Gtk is not None:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
-                    sw = pixbuf.get_width()
-                    sh = pixbuf.get_height()
-
-                    ''' create a new cairo surface to place the image on '''
-                    surface = cairo.ImageSurface(0, sw, sh)
-                    ''' create a context to the new surface '''
-                    ct = cairo.Context(surface)
-                    ''' create a GDK formatted Cairo context to the new Cairo native context '''
-                    ct2 = Gdk.CairoContext(ct)
-                    ''' draw from the pixbuf to the new surface '''
-                    ct2.set_source_pixbuf(pixbuf, 0, 0)
-                    ct2.paint()
-                    ''' surface now contains the image in a Cairo surface '''
-                    imagesurface = ct2.get_target()
                 else:
                     img = PILImage.open(path)
 
