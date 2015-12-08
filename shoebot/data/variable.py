@@ -3,50 +3,54 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
+DEFAULT_STEPS = 50
+
 def clamp(minvalue, value, maxvalue):
     return max(minvalue, min(value, maxvalue))
 
 class Variable(object):
     '''Taken from Nodebox'''
-    def __init__(self, name, type, default=None, min=0, max=100, value=None):
+    def __init__(self, name, type, **kwargs):
         """
         :param name:     Name of variable
         :param type:     NUMBER | TEXT | BOOLEAN | BUTTON
-        :param default:
-        :param min:
-        :param max:
-        :param value:
+        :param default:  default value
+        :param min:      min value if number
+        :param max:      max value if number
+        :param value:    value
+        :param step:     step between values - cannot specify at same time as step
+        :param steps:    total steps
         :return:
         """
         self.name = name
         if not isinstance(name, basestring):
             raise AttributeError("Variable name must be a string")
+        if kwargs.get("step") and kwargs.get("steps"):
+            raise AttributeError("Can only set step or steps") # TODO - is this too strict
         self.type = type or NUMBER
         self.min = None
         self.max = None
+        self.step = None or kwargs.get("step")
+        self.steps = kwargs.get("steps", DEFAULT_STEPS)
         if self.type == NUMBER:
-            if default is None:
-                self.default = 50
-            else:
-                self.default = default
-            self.min = min
-            self.max = max
+            self.default = kwargs.get("default", 50.0)
+            self.min = kwargs.get("min", 0.0)
+            self.max = kwargs.get("max", 100.0)
+            self.step = kwargs.get("step")
+            if self.step is None:
+                diff = max(self.min, self.max) - min(self.min, self.max)
+                self.step = (diff / float(self.steps))
         elif self.type == TEXT:
-            if default is None:
-                self.default = "bonjour"
-            else:
-                self.default = default
+            self.default = kwargs.get("default", "bonjour")
         elif self.type == BOOLEAN:
-            if default is None:
-                self.default = True
-            else:
-                self.default = default
+            self.default = kwargs.get("default", True)
         elif self.type == BUTTON:
-            self.default = self.name
+            self.default = kwargs.get("default", self.name)
         else:
             raise AttributeError("Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON")
-        self.value = value or self.default
-
+        self.value = kwargs.get("value", self.default)
+        if self.value is None and self.default is not None:
+            self.value = self.default
 
     def sanitize(self, val):
         """Given a Variable and a value, cleans it out"""

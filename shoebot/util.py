@@ -172,25 +172,6 @@ def rgb_to_hsv(r, g, b):
     #return stringImage
 
 
-#from cairocffi import SVGSurface
-
-_svg_surface = None
-
-
-def get_svg_surface():
-    global _svg_surface
-    if _svg_surface is None:
-        try:
-            _svg_surface = SVGSurface(None, 0, 0)
-        except:
-            if os.name == 'nt':
-                fobj = 'nul'
-            else:
-                fobj = '/dev/null'
-            _svg_surface = SVGSurface(fobj, 0, 0)
-    return _svg_surface
-
-
 class flushfile(object):
     '''
     Wrapper for file that flushes - used to flush stdout
