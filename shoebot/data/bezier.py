@@ -642,6 +642,9 @@ class PathElement(object):
 
     def __init__(self, cmd = None, *args):
         self.cmd = cmd
+        if len(args) == 1:
+            while len(args) == 1:
+                args = args[0]
         self.values = list(chain(args)) # flatten args, so that tuples of (x,y), (x2, y2) are supported
         self._ctrl1 = self._ctrl2 = None
 
@@ -653,13 +656,11 @@ class PathElement(object):
             self.c1x, self.c1y = self.values # Possibly should be 0
             self.c2x, self.c2y = self.values # Possibly should be 0
         elif cmd == CURVETO or cmd == RCURVETO:
+            if len(self.values) == 3:
+                self.values = list(chain.from_iterable(self.values))
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
         elif cmd == CLOSE:
-            # Should pass in coordinates of beginning of path
-            self.x, self.y = self.values
-            self.c1x, self.c1y = self.values # Possibly should be 0
-            self.c2x, self.c2y = self.values # Possibly should be 0
-            #self.c1x = self.c1y = self.c2x = self.c2y = None
+            self.c1x = self.c1y = self.c2x = self.c2y = self.x = self.y = None
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:

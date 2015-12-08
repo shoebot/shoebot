@@ -248,8 +248,8 @@ class Bot(Grammar):
 
     #### Variables
 
-    def var(self, name, type, default=None, min=0, max=255, value=None):
-        v = Variable(name, type, default, min, max, value)
+    def var(self, name, type, default=None, min=0, max=255, value=None, step=None):
+        v = Variable(name, type, default=default, min=min, max=max, value=value, step=step)
         return self._addvar(v)
 
 

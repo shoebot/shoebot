@@ -83,7 +83,7 @@ class VarWindow(object):
         sliderbox.pack_start(label, False, True, 20)
 
         if v.min != v.max:
-            step = (max(v.min, v.max) - min(v.min, v.max)) / 50.
+            step = v.step
         else:
             step = 0
 
