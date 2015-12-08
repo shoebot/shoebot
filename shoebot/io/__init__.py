@@ -14,4 +14,4 @@ socketserver  similar to 'shell' but for remote connections, allows changing man
               socketserver is activated by passing -s and optionally --port
 """
 from shell import ShoebotCmd
-from socket_server import SocketServerMixin
+from socket_server import SocketServer

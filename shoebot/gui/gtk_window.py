@@ -14,7 +14,6 @@ from pkg_resources import resource_filename, Requirement
 
 from shoebot.gui import ShoebotWidget, VarWindow
 from shoebot.core import DrawQueueSink
-from shoebot.io import SocketServerMixin
 from gtk_input_device import GtkInputDeviceMixin
 
 import locale
@@ -31,9 +30,7 @@ _ = gettext.gettext
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 
-
-
-class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServerMixin):
+class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
     '''Create a GTK+ window that contains a ShoebotWidget'''
 
     # Draw in response to an expose-event
@@ -114,8 +111,6 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink, SocketServer
 
         while Gtk.events_pending():
             Gtk.main_iteration()
-        if server:
-            self.server('', self.serverport)
 
         self.window_open = True
         self.pause_speed = None # TODO - factor out bot controller stuff

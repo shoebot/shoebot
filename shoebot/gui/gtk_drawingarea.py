@@ -6,8 +6,8 @@ ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoeb
 try:
     import gi
 except ImportError:
-    import pgi
-    pgi.install_as_gi()
+    import pgi as gi
+    gi.install_as_gi()
 
 GI = not hasattr(gi, "install_as_gi")
 if GI:
@@ -17,14 +17,15 @@ else:
     _UNSAFE_pycairo_context_to_cairocffi = None
     _UNSAFE_cairocffi_context_to_pycairo = None
 
+
 from gi.repository import Gtk
 
 import os
 import cairocffi as cairo
-from shoebot.io.socket_server import SocketServerMixin
+from shoebot.io.socket_server import SocketServer
 
 
-class ShoebotWidget(Gtk.DrawingArea, SocketServerMixin):
+class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     '''
     Create a double buffered GTK+ widget on which we will draw using Cairo        
     '''

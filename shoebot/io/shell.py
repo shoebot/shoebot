@@ -52,6 +52,20 @@ INTRO = "[o_o] " + '"Shoebot Shell."'
 RESPONSE_CODE_OK = "CODE_OK"
 RESPONSE_REVERTED = "REVERTED"
 
+trusted_cmds = set()
+
+
+def trusted_cmd(f):
+    """
+    Trusted commands cannot be run remotely
+
+    :param f:
+    :return:
+    """
+    global trusted_cmds
+    trusted_cmds.add(f)
+    return f
+
 
 class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
@@ -67,23 +81,35 @@ class ShoebotCmd(cmd.Cmd):
         'r': 'restart'
     }
 
-    def __init__(self, bot, **kwargs):
-        self.bot =\
-            bot
-        self.pause_speed = None
+    trusted_cmds = set()
+
+    def __init__(self, bot, intro=None, trusted=False, **kwargs):
+        """
+
+        :param bot:
+        :param intro:
+        :param trusted: Only running from the commandline is trusted, not from sockets
+                        untrusted can only change variables
+        :param kwargs:
+        :return:
+        """
         cmd.Cmd.__init__(self, **kwargs)
-        self.intro = INTRO
+        self.bot = bot
+        self.pause_speed = None
+        self.intro = intro or INTRO
         self.prompt = PROMPT
         self.response_prompt = ''
         self.use_rawinput = False
         self.cookie = None
         self.escape_nl = False
         self.live_prefix = ''
+        self.trusted = trusted
 
     def print_response(self, input='', keep=False, *args, **kwargs):
         """
         print response, if cookie is set then print that each line
         :param args:
+        :param keep: if True more output is to come
         :param cookie: set a custom cookie,
                        if set to 'None' then self.cookie will be used.
                        if set to 'False' disables cookie output entirely
@@ -107,7 +133,7 @@ class ShoebotCmd(cmd.Cmd):
                 cookie_char=cookie_char,
                 cookie=cookie,
                 status=status or '',
-                line=line.strip()))
+                line=line.strip()), file=self.stdout)
 
     def emptyline(self):
         """
@@ -169,8 +195,6 @@ class ShoebotCmd(cmd.Cmd):
     def do_pause(self, line):
         """
         Toggle pause
-        :param line:
-        :return:
         """
         # TODO - move this into bot controller
         # along with stuff in socketserver and shell
@@ -186,9 +210,6 @@ class ShoebotCmd(cmd.Cmd):
     def do_play(self, line):
         """
         Resume playback if bot is paused
-
-        :param line:
-        :return:
         """
         if self.pause_speed is None:
             self.bot._speed = self.pause_speed
@@ -211,12 +232,25 @@ class ShoebotCmd(cmd.Cmd):
         self.print_response("Rewinding from frame %s to 0" % self.bot._frame)
         self.bot._frame = 0
 
+    def do_vars(self, line):
+        """
+        List bot variables and values
+        :return:
+        """
+        if self.bot._vars:
+            max_name_len = max([len(name) for name in self.bot._vars])
+            for i, (name, v) in enumerate(self.bot._vars.items()):
+                keep = i < len(self.bot._vars) - 1
+                self.print_response("%s = %s" % (name.ljust(max_name_len), v.value), keep=keep)
+        else:
+            self.print_response("No vars")
+
+    @trusted_cmd
     def do_load_base64(self, line):
         """
         load filename=(file)
         load base64=(base64 encoded)
         """
-
         cookie = self.cookie
         executor = self.bot._executor
 

@@ -3,6 +3,10 @@ gobject-based socket server from
 http://roscidus.com/desktop/node/413
 '''
 
+import sys
+import socket
+import gettext, locale
+
 try:
     import gi
 except ImportError:
@@ -10,10 +14,8 @@ except ImportError:
     pgi.install_as_gi()
 
 from gi.repository import GObject
+from shell import ShoebotCmd
 
-import sys
-import socket
-import gettext, locale
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -42,48 +44,77 @@ Enter bye() or press CTRL-D to quit.
 
 """
 
+INTRO = "[o_o] " + '"Shoebot Telnet Shell, enter "help" for help."'
 
-class SocketServerMixin(object):
-    def server(self, host, port):
+
+class SocketServer(object):
+    def __init__(self, bot, host, port):
         '''Initialize server and start listening.'''
-        self.sock = socket.socket()
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind((host, port))
-        self.sock.listen(1)
-        print _("Listening on port %i...") % (port)
-        GObject.io_add_watch(self.sock, GObject.IO_IN, self.listener)
+        self.sock = sock = socket.socket()
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        sock.bind((host, port))
+        sock.listen(1)
+
+        self.shell = None
+        self.bot = bot
+        print _("Listening on port %i..." % port)
+        GObject.io_add_watch(sock, GObject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
         '''Asynchronous connection listener. Starts a handler for each connection.'''
-        self.conn, self.addr = self.sock.accept()
-        print _("Connected")
-        GObject.io_add_watch(self.conn, GObject.IO_IN, self.handler)
-        self.conn.send(self.msg_banner())
+        conn, addr = sock.accept()
+        f = conn.makefile(conn)
+        self.shell = ShoebotCmd(self.bot, stdin=f, stdout=f, intro=INTRO)
+
+        print(_("Connected"))
+        GObject.io_add_watch(conn, GObject.IO_IN, self.handler)
+        if self.shell.intro:
+            self.shell.stdout.write(str(self.shell.intro)+"\n")
+            self.shell.stdout.flush()
         return True
 
-    def msg_banner(self):
-        return BANNER
+    #def msg_banner(self):
+    #    return BANNER
 
-    def msg_var_value(self, name):
-        variable = self.bot._vars[name]
-        return 'bot: {}={}\n'.format(name, variable.sanitize(variable.value))
+    # def msg_var_value(self, name):
+    #     variable = self.bot._vars[name]
+    #     return 'bot: {}={}\n'.format(name, variable.sanitize(variable.value))
 
-    def msg_bye(self):
-        return "See you next time.\n"
+    #def msg_bye(self):
+    #    return "See you next time.\n"
 
-    def msg_dir(self):
-        # Show variables
-        d = self.bot._vars
-        return '{}\n'.format('\n'.join(['%s = %s' % (key, var.value) for (key, var) in d.items()]))
+    #def msg_dir(self):
+    #    # Show variables
+    #    d = self.bot._vars
+    #    return '{}\n'.format('\n'.join(['%s = %s' % (key, var.value) for (key, var) in d.items()]))
 
     def handler(self, conn, *args):
-        '''Asynchronous connection handler. Processes each line from the socket.'''
-        line = conn.recv(4096)
+        '''
+        Asynchronous connection handler. Processes each line from the socket.
+        '''
+        # lines from cmd.Cmd
+        self.shell.stdout.write(self.shell.prompt)
+        line = self.shell.stdin.readline()
         if not len(line):
-            print _("Connection closed.")
+            line = 'EOF'
             return False
         else:
-            incoming = line.strip().split('\n')
+            line = line.rstrip('\r\n')
+            line = self.shell.precmd(line)
+            stop = self.shell.onecmd(line)
+            stop = self.shell.postcmd(stop, line)
+            self.shell.stdout.flush()
+            self.shell.postloop()
+            # end lines from cmd.Cmd
+            return not stop
+
+    def x(self):
+        ### TODO - Move setting variables to shell
+        incoming = None
+        if True:
+
+
             for packet in incoming:
                 if not packet or packet.startswith('#'):
                     continue
