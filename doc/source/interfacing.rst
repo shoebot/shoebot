@@ -65,8 +65,6 @@ Enter help to see which commands are available.
 Embedding
 ---------
 
-The simplest way of embedding is to pass shoebot a cairo surface to
-render to, see  shoebot.run  or  shoebot.create_bot for info.
 
 
 Pure Data
