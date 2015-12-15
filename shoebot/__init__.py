@@ -67,6 +67,8 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
 
     canvas is what draws images, 'sink' is the final consumer of the images
 
+    :param src: Defaults for title or outputfile if not specified.
+
     :param format: CairoImageSink image format, if using buff instead of outputfile
     :param buff: CairoImageSink buffer object to send output to
 
@@ -121,6 +123,9 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
 
     canvas parameters:
     ... everything else ...
+
+    See create_canvas for details on those parameters.
+    
     """
     canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, show_vars=show_vars)
 
@@ -217,8 +222,26 @@ def run(src,
     Create and run a bot, the arguments all correspond to sanitized
     commandline options.
 
-    :param src: Sourcecode
-    :param grammar: 
+    :param background_thread: If True then use a background thread.
+
+
+    Other args are split into create_args and run_args
+
+    See create_bot for details on create_args
+    
+    run_args are passed to bot.run - see Nodebot.run or Drawbot.run
+
+
+
+    Background thread:
+
+    readline in python is blocking, running the app in a background
+    thread opens up the main thread for IO on stdin/stdout, which
+    can be used for communication with shoebot when livecoding is
+    enabled.
+
+    See shoebot.io for implementation of the shell, and the gedit
+    plugin for an example of using livecoding.
     """
     # Munge shoebogt sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
