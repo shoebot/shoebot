@@ -17,7 +17,7 @@ else:
     _UNSAFE_pycairo_context_to_cairocffi = None
     _UNSAFE_cairocffi_context_to_pycairo = None
 
-
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 import os
