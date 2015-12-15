@@ -20,6 +20,9 @@ Using the live variables GUI
 
 When a script uses the var keyword, an element will appear in the live variables GUI.
 
+The following code will make a slider from 0-100 starting at 25
+
+var('a_number', NUMBER, 25., 0., 100.)
 
 Socketserver
 ------------
