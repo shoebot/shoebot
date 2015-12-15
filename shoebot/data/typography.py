@@ -45,6 +45,7 @@ if GI:
 else:
     _UNSAFE_cairocffi_context_to_pycairo = None
 
+gi.require_version('Pango', '1.0')
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import Pango, PangoCairo
 ## from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs

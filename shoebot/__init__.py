@@ -66,6 +66,27 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     Create canvas and sink for attachment to a bot
 
     canvas is what draws images, 'sink' is the final consumer of the images
+
+    :param format: CairoImageSink image format, if using buff instead of outputfile
+    :param buff: CairoImageSink buffer object to send output to
+
+    :param outputfile: CairoImageSink output filename e.g. "hello.svg"
+    :param multifile: CairoImageSink if True, 
+    
+    :param title: ShoebotWindow - set window title
+    :param fullscreen: ShoebotWindow - set window title
+    :param show_vars: ShoebotWindow - display variable window
+
+    Two kinds of sink are provided CairoImageSink and ShoebotWindow
+
+    ShoebotWindow
+
+    Displays a window to draw shoebot inside.
+
+
+    CairoImageSink
+
+    Output to a filename (or files if multifile is set), or a buffer object.    
     """
     from core import CairoCanvas, CairoImageSink
 
@@ -195,6 +216,9 @@ def run(src,
     """
     Create and run a bot, the arguments all correspond to sanitized
     commandline options.
+
+    :param src: Sourcecode
+    :param grammar: 
     """
     # Munge shoebogt sys.argv
     sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
