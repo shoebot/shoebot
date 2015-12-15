@@ -18,12 +18,12 @@ After including an import statement,
 a NodeBot object needs to be created, and all further drawing commands can be 
 called on that instance.
 
-The quickest way is to use the init_bot function, it sets up an appropriate
+The quickest way is to use the create_bot function, it sets up an appropriate
 canvas and lets us draw to it.
 
 .. code-block:: python
 
-    bot = shoebot.init_bot(outputfile="output.svg")
+    bot = shoebot.create_bot(outputfile="output.svg")
     bot.size(400,400)
     bot.rect(10,10,100,100)
 
