@@ -25,6 +25,7 @@ class ShoebotWindowHelper(object):
         self.show_varwindow = True
         self.use_fullscreen = False
         self.livecoding = False
+        self.verbose_output = False # TODO - no UI to change this currently
 
         self.started = False
         
@@ -139,7 +140,7 @@ class ShoebotWindowHelper(object):
         self.disconnect_change_handler(doc)
         self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.verbose_output, title, cwd=cwd, sbot=sbot_bin)
         self.idle_handler_id = GObject.idle_add(self.update_shoebot)
 
     def disconnect_change_handler(self, doc):

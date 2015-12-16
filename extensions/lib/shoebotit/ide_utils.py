@@ -89,7 +89,7 @@ class ShoebotProcess(object):
     come back in the response_queue
 
     """
-    def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
+    def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, title, verbose, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         # start with -w for window -l for shell'
         command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
 
@@ -101,6 +101,9 @@ class ShoebotProcess(object):
 
         if use_fullscreen:
             command.append('-f')
+
+        if verbose:
+            command.append("-V")
         
         command.append(source)
 

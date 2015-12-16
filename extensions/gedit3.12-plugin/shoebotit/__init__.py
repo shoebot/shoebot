@@ -14,7 +14,8 @@ WINDOW_TOGGLES = [  # these are accompanied by vars e.g.   window.socket_server_
     (_("Variable Window"), "var_window", True),
     (_("Socket Server"), "socket_server", False),
     (_("Live Coding"), "live_coding", False),
-    (_("Full screen"), "full_screen", False)
+    (_("Full screen"), "full_screen", False),
+    (_("Verbose output"), "verbose_output", False)
 ]
 
 WINDOW_ACCELS = [("run", "<Control>R")]
@@ -90,7 +91,6 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
 
         for _, name, default in WINDOW_TOGGLES:
             action_name = "toggle_%s" % name
-            action = Gio.SimpleAction.new(name=action_name)
             action = Gio.SimpleAction.new_stateful(
                 action_name, 
                 None, 
@@ -159,6 +159,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             self.socket_server_enabled,
             self.var_window_enabled,
             self.full_screen_enabled,
+            self.verbose_output_enabled,
             title,
             cwd=cwd,
             sbot=sbot_bin)
@@ -263,6 +264,11 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             panel.add_titled(self.live_container, 'Shoebot Live', 'Shoebot Live')
         else:
             panel.remove(self.live_container)
+
+    def toggle_verbose_output(self, action, user_data):
+        action.set_state(GLib.Variant.new_boolean(not action.get_state()))
+        self.verbose_output_enabled = action.get_state().get_boolean()
+
 
     def do_deactivate(self):
         self.panel.remove(self.live_container)

@@ -49,7 +49,7 @@ class ShoebotWindowHelper:
         self.idle_handler_id = None
         panel = window.get_bottom_panel()
         self.output_widget = gtk2_utils.get_child_by_name(panel, 'shoebot-output')
-	self.live_output_widget = gtk2_utils.get_child_by_name(panel, 'shoebot-live')
+        self.live_output_widget = gtk2_utils.get_child_by_name(panel, 'shoebot-live')
 
         self.plugin = plugin
         self.insert_menu()
@@ -60,6 +60,7 @@ class ShoebotWindowHelper:
         self.show_varwindow = True
         self.use_fullscreen = False
         self.livecoding = False
+        self.verbose_output = False # TODO - no UI to change this currently
 
         self.started = False
 
@@ -174,7 +175,7 @@ class ShoebotWindowHelper:
         self.disconnect_change_handler(doc)
         self.changed_handler_id = doc.connect("changed", self.doc_changed)
 
-        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, title, cwd=cwd, sbot=sbot_bin)
+        self.bot = ide_utils.ShoebotProcess(source, self.use_socketserver, self.show_varwindow, self.use_fullscreen, self.verbose_output, title, cwd=cwd, sbot=sbot_bin)
         self.idle_handler_id = gobject.idle_add(self.update_shoebot)
 
     def disconnect_change_handler(self, doc):
