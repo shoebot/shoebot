@@ -365,7 +365,17 @@ class NodeBot(Bot):
                 p.addpoint(point)
             p.draw()
 
-    def drawimage(self, image):
+    def drawimage(self, image, x=None, y=None):
+        """
+        :param image: Image to draw
+        :param x: optional, x coordinate (default is image.x)
+        :param y: optional, y coordinate (default is image.y)
+        :return:
+        """
+        if x is None:
+            x = image.x
+        if y is None:
+            y = image.y
         self.image(image.path, image.x, image.y, data = image.data)
 
     def autoclosepath(self, close=True):
@@ -621,7 +631,7 @@ class NodeBot(Bot):
         '''Set the stroke width.
 
         :param w: Stroke width.
-        :return: If no width was specified then it will be returned.
+        :return: If no width was specified then current width is returned.
         '''
         if w is not None:
             self._canvas.strokewidth = w
@@ -706,8 +716,10 @@ class NodeBot(Bot):
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):
-        '''Returns the width and height of a string of text as a tuple
-        (according to current font settings).
+        '''
+
+        :return: the width and height of a string of text as a tuple
+        according to current font settings.
         '''
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
@@ -715,7 +727,9 @@ class NodeBot(Bot):
         return txt.metrics
 
     def textwidth(self, txt, width=None):
-        '''Returns the width of a string of text according to the current
+        '''
+
+        :return: the width of a string of text according to the current
         font settings.
         '''
         w = width
