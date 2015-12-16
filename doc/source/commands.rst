@@ -71,7 +71,6 @@ Drawing shapes
 
     .. shoebot::
         :snapshot:
-
         star(25, 25, 5, 20, 10)  # top left
         star(75, 25, 10, 20, 3)  # top right
         star(25, 75, 20, 20, 17) # bottom left
@@ -168,8 +167,14 @@ Images
 
 .. py:function:: drawimage(image)
 
+  * image: Image to draw
+  * x: optional, x coordinate (default is image.x)
+  * y: optional, y coordinate (default is image.y)
+
+
 Clipping paths
 --------------
+
 
 .. py:function:: beginclip(path)
 
@@ -215,23 +220,57 @@ and `fill('#FF0000')` yield the same result.
 
 .. py:function:: background(*args)
 
+Set background to any valid color
+
 .. py:function:: outputmode()
+
+    Not implemented yet (Nodebox API)
 
 .. py:function:: colormode(mode=None, crange=None)
 
+Set the current colormode (can be RGB or HSB) and eventually
+the color range.
+
+If called without arguments, it returns the current colormode.
+
+  * mode: Color mode, either "rgb", or "hsb"
+  * crange: Maximum scale value for color, e.g. 1.0 or 255
+
 .. py:function:: colorrange(crange)
+
+By default colors range from 0.0 - 1.0 using colorrange
+other defaults can be used, e.g. 0.0 - 255.0
+
+  * crange: Color range of 0.0 - 255:
 
 .. py:function:: fill(*args)
 
+Sets a fill color, applying it to new paths.
+
+  * args: color in supported format
+
 .. py:function:: stroke(*args)
+Set a stroke color, applying it to new paths.
+
+  * args: color in supported format
 
 .. py:function:: nofill()
 
+Stop applying fills to new paths.
+
 .. py:function:: nostroke()
+
+Stop applying strokes to new paths.
 
 .. py:function:: strokewidth(w=None)
 
+ * w: Stroke width.
+ * return: If no width was specified then current width is returned.
+
 .. py:function:: color(*args)
+
+  * args: color in a supported format.
+  * return: Color object containing the color.
 
 
 Text
@@ -239,27 +278,80 @@ Text
 
 .. py:function:: text(txt, x, y, width=None, height=1000000, outline=False, draw=True)
 
+Draws a string of text according to current font settings.
+
+  * txt: Text to output
+  * x: x-coordinate of the top left corner
+  * y: y-coordinate of the top left corner
+  * width: text width
+  * height: text height
+  * outline: If True draws outline text (defaults to False)
+  * draw: Set to False to inhibit immediate drawing (defaults to True)
+  * return: Path object representing the text.
+
+
 .. py:function:: font(fontpath=None, fontsize=None)
+
+Set the font to be used with new text instances.
+
+Accepts TrueType and OpenType files. Depends on FreeType being
+installed.
+
+  * fontpath: path to truetype or opentype font.
+  * fontsize: size of font
+
+  * return: current current fontpath (if fontpath param not set)
 
 .. py:function:: fontsize(fontsize=None)
 
+Set or return size of current font.
+
+  * fontsize: Size of font.
+  * return: Size of font (if fontsize was not specified)
+
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
+
+Generates an outlined path of the input text.
+
+  * txt: Text to output
+  * x: x-coordinate of the top left corner
+  * y: y-coordinate of the top left corner
+  * width: text width
+  * height: text height
+  * draw: Set to False to inhibit immediate drawing (defaults to False)
+  * return: Path object representing the text.
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
+  * return: the width and height of a string of text as a tuple (according to current font settings).
+
 .. py:function:: textwidth(txt, width=None)
+
+  * return: the width of a string of text according to the current font settings.
 
 .. py:function:: textheight(txt, width=None)
 
+  * return: the height of a string of text according to the current font settings.
+
 .. py:function:: lineheight(height=None)
 
+Set text lineheight.
+
+  * height: line height.
+
 .. py:function:: align(align="LEFT")
+
+Set text alignment
+
+  * align: Text alignment (LEFT, CENTER, RIGHT)
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
     Not implemented yet.
 
 .. py:function:: autotext(sourceFile)
+
+generates mock philosophy based on a context-free grammar
 
 
 Dynamic variables
@@ -310,6 +402,11 @@ Core
     Sets the size of the canvas, and creates a Cairo surface and context. Only the first call will actually be effective.
 
 .. py:function:: speed(framerate)
+
+Set animation framerate.
+
+  * framerate: Frames per second to run bot.
+  * return: Current framerate of animation.
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 

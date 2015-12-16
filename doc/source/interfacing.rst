@@ -22,7 +22,12 @@ When a script uses the var keyword, an element will appear in the live variables
 
 The following code will make a slider from 0-100 starting at 25
 
-var('a_number', NUMBER, 25., 0., 100.)
+.. code-block:: python
+
+        var('a_number', NUMBER, 25., 0., 100.)
+        # see how roundness affects the shape
+
+.. figure::  images/live_vars.png
 
 Socketserver
 ------------
