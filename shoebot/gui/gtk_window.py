@@ -1,5 +1,6 @@
 import os
 import sys
+from shoebot.core.events import publish_event, QUIT_EVENT
 
 try:
     import gi
@@ -18,7 +19,6 @@ from gtk_input_device import GtkInputDeviceMixin
 
 import locale
 import gettext
-import pubsub
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -224,7 +224,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.bot._screen_ratio = None
 
     def do_window_close(self, widget,data=None):
-        pubsub.publish("shoebot", "quit")
+        publish_event(QUIT_EVENT)
 
         if self.has_server:
             self.sock.close()

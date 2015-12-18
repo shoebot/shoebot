@@ -263,8 +263,9 @@ def run(src,
     run_args = [src]
     run_kwargs = dict(
         run_forever=window and (not close_window),
+        iterations=iterations,
         frame_limiter=window,
-        verbose=verbose
+        verbose=verbose,
     )
 
     # Run shoebot in a background thread so we can run a cmdline shell in the current thread

@@ -71,6 +71,7 @@ class LiveExecution(object):
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
                     # TODO - Could modify __code__ etc of functions, but this info will
                     # need to be saved if thats the case
+
                     self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
 
     def do_exec(self, source, ns, tenuous = False):

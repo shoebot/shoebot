@@ -1,9 +1,10 @@
+import copy
 import os
 import traceback
-from time import sleep, time
-import copy
 import linecache
 import sys
+
+from time import sleep, time
 
 from livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT
@@ -33,8 +34,6 @@ class Grammar(object):
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
-
-        self._executor = None
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -100,7 +99,7 @@ class Grammar(object):
 
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
-    def _run_frame(self, namespace, limit=False, iteration=0):
+    def _run_frame(self, executor, limit=False, iteration=0):
         """ Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
@@ -146,20 +145,20 @@ class Grammar(object):
         self._set_dynamic_vars()
         if iteration == 0:
             # First frame
-            self._executor.run()
+            executor.run()
             # run setup and draw
             # (assume user hasn't live edited already)
-            namespace['setup']()
-            namespace['draw']()
+            executor.ns['setup']()
+            executor.ns['draw']()
             self._canvas.flush(self._frame)
         else:
             # Subsequent frames
             if self._dynamic:
                 if self._speed != 0: # speed 0 is paused, so do nothing
-                    with self._executor.run_context() as (known_good, source, ns):
+                    with executor.run_context() as (known_good, source, ns):
                         # Code in main block may redefine 'draw'
                         if not known_good:
-                            self._executor.reload_functions()
+                            executor.reload_functions()
                             with VarListener.batch(self._vars, self._oldvars, ns):
                                 self._oldvars.clear()
 
@@ -177,9 +176,9 @@ class Grammar(object):
                 #        was just exec source in ns ... have to see if it
                 #        can be simplified again.
                 #
-                with self._executor.run_context() as (known_good, source, ns):
+                with executor.run_context() as (known_good, source, ns):
                     if not known_good:
-                        self._executor.reload_functions()
+                        executor.reload_functions()
                         with VarListener.batch(self._vars, self._oldvars, ns):
                             self._oldvars.clear()
 
@@ -258,17 +257,17 @@ class Grammar(object):
         source = None
         filename = None
 
+        if os.path.isfile(inputcode):
+            source = open(inputcode).read()
+            filename = inputcode
+        elif isinstance(inputcode, basestring):
+            filename = 'shoebot_code'
+            source = inputcode
+
+        self._load_namespace(self._namespace, filename)
+        self._executor = executor = LiveExecution(source, ns=self._namespace, filename=filename)
+
         try:
-            if os.path.isfile(inputcode):
-                source = open(inputcode).read()
-                filename = inputcode
-            elif isinstance(inputcode, basestring):
-                filename = 'shoebot_code'
-                source = inputcode
-
-            self._load_namespace(self._namespace, filename)
-            self._executor = LiveExecution(source, ns=self._namespace, filename=filename)
-
             if not iterations:
                 if run_forever:
                     iterations = None
@@ -277,11 +276,12 @@ class Grammar(object):
             iteration = 0
 
             event = None
-            while event != QUIT_EVENT and iteration != iterations:
+
+            while iteration != iterations:
                 # do the magic
 
                 # First iteration
-                self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
+                self._run_frame(executor, limit=frame_limiter, iteration=iteration)
                 if iteration == 0:
                     self._initial_namespace = copy.copy(self._namespace)  # Stored so script can be rewound
                 iteration += 1
@@ -289,11 +289,10 @@ class Grammar(object):
                 # Subsequent iterations
                 while self._should_run(iteration, iterations) and event is None:
                     iteration += 1
-                    self._run_frame(self._namespace, limit=frame_limiter, iteration=iteration)
+                    self._run_frame(executor, limit=frame_limiter, iteration=iteration)
                     event = next_event()
                     if not event:
                         self._canvas.sink.main_iteration()  # update GUI, may generate events..
-
 
                 if run_forever:
                     #
@@ -307,13 +306,13 @@ class Grammar(object):
                         if not event:
                             self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
-                    if event is QUIT_EVENT:
+                    if event.type == QUIT_EVENT:
                         break
-                    elif event is SOURCE_CHANGED_EVENT:
+                    elif event.type == SOURCE_CHANGED_EVENT:
                         # Debounce SOURCE_CHANGED events -
                         # If you change a digit you get a one event for
                         # deleting a char and another for adding in GEdit.
-                        while event == SOURCE_CHANGED_EVENT:
+                        while event and event.type == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
                     else:
                         event = None  # this loop is a bit weird...
@@ -333,7 +332,7 @@ class Grammar(object):
             if verbose:
                 errmsg = traceback.format_exc()
             else:
-                errmsg = self._simple_traceback(e, self._executor.known_good or '')
+                errmsg = self._simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg
 
     def finish(self):
