@@ -7,7 +7,7 @@ import sys
 from time import sleep, time
 
 from livecode import LiveExecution
-from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT
+from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
@@ -277,7 +277,7 @@ class Grammar(object):
 
             event = None
 
-            while iteration != iterations:
+            while iteration != iterations and not event_is(event, QUIT_EVENT):
                 # do the magic
 
                 # First iteration
@@ -294,12 +294,12 @@ class Grammar(object):
                     if not event:
                         self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
-                if run_forever:
+                while run_forever:
                     #
                     # Running in GUI, bot has finished
                     # Either -
-                    #   recieve quit event and quit
-                    #   recieve any other event and loop
+                    #   receive quit event and quit
+                    #   receive any other event and loop (e.g. if var changed or source edited)
                     #
                     while event is None:
                         event = next_event()
@@ -310,15 +310,12 @@ class Grammar(object):
                         break
                     elif event.type == SOURCE_CHANGED_EVENT:
                         # Debounce SOURCE_CHANGED events -
-                        # If you change a digit you get a one event for
-                        # deleting a char and another for adding in GEdit.
+                        # gedit generates two events for changing a single character -
+                        # delete and then add
                         while event and event.type == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
                     else:
                         event = None  # this loop is a bit weird...
-                else:
-                    # not in GUI, just quit
-                    break
 
             self._canvas.finished = True
             self._canvas.sink.finish()
