@@ -23,10 +23,8 @@ class SurfaceRef(object):
     def __init__(self, surface):
         self.surface = surface
 
-from weakref import WeakValueDictionary
-
 class Image(Grob, ColorMixin):
-    _surface_cache = WeakValueDictionary() # {filename: width, height, imagesurface}
+    _surface_cache = {}   # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
 
     def __init__(self, bot, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
         Grob.__init__(self, bot)
