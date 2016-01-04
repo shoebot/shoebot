@@ -7,6 +7,7 @@ from __future__ import print_function
 from os.path import abspath, dirname, exists, expanduser, expandvars, isdir, islink, lexists, join, normpath
 from glob import glob
 
+import errno
 import os
 import shutil
 import stat
@@ -59,6 +60,15 @@ def copytree(src, dst, symlinks=False, ignore=None):
             copytree(s, d, symlinks, ignore)
         else:
             shutil.copy2(s, d)
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 def get_dirs_nt(is_admin):
     dirs = {}
@@ -127,6 +137,7 @@ def install_plugin(name=None, dest_dir=None, plugin_dir=None, language_dir=None,
         sys.exit(1)
 
     if language_dir:
+        mkdir_p(language_dir)
         shutil.copyfile(join(here, "shoebot.lang"), join(language_dir, "shoebot.lang"))
         os.system("update-mime-database %s/mime" % dest_dir)
 
