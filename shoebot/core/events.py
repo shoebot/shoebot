@@ -42,7 +42,7 @@ def next_event(block=False, timeout=None):
 def event_is(event, event_t):
     return event != None and event.type == event_t
 
-def publish_event(event_t, extra_channels=None, data=None, wait=None):
+def publish_event(event_t, data=None, extra_channels=None, wait=None):
     event = Event(event_t, data)
     pubsub.publish("shoebot", event)
     for channel_name in extra_channels or []:

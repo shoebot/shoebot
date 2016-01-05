@@ -314,8 +314,9 @@ class Grammar(object):
                         # delete and then add
                         while event and event.type == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
-                    else:
-                        event = None  # this loop is a bit weird...
+
+                    event = None  # this loop is a bit weird...
+                    break
 
             self._canvas.finished = True
             self._canvas.sink.finish()

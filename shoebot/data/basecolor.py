@@ -81,7 +81,7 @@ class Color(object):
 
             if mode == "rgb":
                 self.r, self.g, self.b, self.a = args[0]/color_range, args[1]/color_range, args[2]/color_range, alpha
-            elif mode == "hsb":                
+            elif mode == "hsb":
                 self.h, self.s, self.brightness, self.a = args[0]/color_range, args[1]/color_range, args[2]/color_range, alpha
             elif mode == "cmyk":
                 if len(args) == 4: alpha = 1

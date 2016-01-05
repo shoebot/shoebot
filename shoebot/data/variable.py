@@ -33,13 +33,15 @@ class Variable(object):
         self.step = None or kwargs.get("step")
         self.steps = kwargs.get("steps", DEFAULT_STEPS)
         if self.type == NUMBER:
-            self.default = kwargs.get("default", 50.0)
             self.min = kwargs.get("min", 0.0)
             self.max = kwargs.get("max", 100.0)
             self.step = kwargs.get("step")
             if self.step is None:
                 diff = max(self.min, self.max) - min(self.min, self.max)
                 self.step = (diff / float(self.steps))
+            self.default = kwargs.get("default")
+            if self.default is None:
+                self.default = self.min
         elif self.type == TEXT:
             self.default = kwargs.get("default", "bonjour")
         elif self.type == BOOLEAN:
