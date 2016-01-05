@@ -39,7 +39,7 @@ import base64
 import cmd
 import shlex
 
-from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event
+from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event, SET_WINDOW_TITLE
 
 PROMPT = ""
 #PROMPT = "[^_^] "
@@ -168,7 +168,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         Change window title.
         """
-        pass
+        publish_event(SET_WINDOW_TITLE, data=title)
 
     def do_speed(self, speed):
         """

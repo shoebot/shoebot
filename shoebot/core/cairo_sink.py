@@ -97,5 +97,9 @@ class CairoImageSink(DrawQueueSink):
         surface.finish()
         surface.flush()
 
+    def set_title(self, title):
+        # Does nothing, only relevant to GUI
+        pass
+
     def finish(self):
         pass

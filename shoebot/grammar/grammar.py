@@ -7,7 +7,7 @@ import sys
 from time import sleep, time
 
 from livecode import LiveExecution
-from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is
+from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
@@ -314,6 +314,8 @@ class Grammar(object):
                         # delete and then add
                         while event and event.type == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
+                    elif event.type == SET_WINDOW_TITLE:
+                        self._canvas.sink.set_title(event.data)
 
                     event = None  # this loop is a bit weird...
                     break

@@ -27,6 +27,7 @@ Event = namedtuple = namedtuple_with_defaults("Event", "type data", dict(data=No
 QUIT_EVENT = "quit"
 SOURCE_CHANGED_EVENT = "source-changed"
 EVENT_VARIABLE_UPDATED = "variable-updated"
+SET_WINDOW_TITLE = "set-window-title"
 
 def next_event(block=False, timeout=None):
     """
@@ -40,7 +41,7 @@ def next_event(block=False, timeout=None):
         return None
 
 def event_is(event, event_t):
-    return event != None and event.type == event_t
+    return event is not None and event.type == event_t
 
 def publish_event(event_t, data=None, extra_channels=None, wait=None):
     event = Event(event_t, data)
