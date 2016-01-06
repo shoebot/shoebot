@@ -1,7 +1,17 @@
-'''
+"""
 gobject-based socket server from
 http://roscidus.com/desktop/node/413
-'''
+
+Handles interaction when connecting over a socket, e.g. telnet.
+The actual handling of commands is passed to te shell module.
+
+$ sbot -ws examples/basic/vars_boolean.bot &
+$ telnet 127.0.0.1 7777
+
+# Now enter the commands below and see the bot state change
+color_switch=False
+color_switch=True
+"""
 
 import sys
 import socket
