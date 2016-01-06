@@ -3,7 +3,7 @@ TEXT = 2
 BOOLEAN = 3
 BUTTON = 4
 
-DEFAULT_STEPS = 50
+DEFAULT_STEPS = 256.0
 
 def clamp(minvalue, value, maxvalue):
     return max(minvalue, min(value, maxvalue))

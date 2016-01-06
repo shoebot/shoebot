@@ -87,9 +87,9 @@ class VarWindow(object):
             step = 0
 
         if v.max - v.min > 2:
-            adj = Gtk.Adjustment(v.value, v.min, v.max, step, 2, 1)
+            adj = Gtk.Adjustment(value=v.value, lower=v.min, upper=v.max, step_incr=step, page_incr=2, page_size=1)
         else:
-            adj = Gtk.Adjustment(v.value, v.min, v.max, step)
+            adj = Gtk.Adjustment(value=v.value, lower=v.min, upper=v.max, step_incr=step)
         adj.connect("value_changed", self.widget_changed, v)
         hscale = Gtk.HScale(adjustment=adj)
         hscale.set_value_pos(Gtk.PositionType.RIGHT)
