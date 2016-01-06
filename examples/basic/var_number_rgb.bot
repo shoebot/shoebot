@@ -9,5 +9,4 @@ var('red', NUMBER, 192., 0., 255.)
 var('green', NUMBER,128., 0., 255.)
 var('blue', NUMBER, 64., 0., 255.)
 
-def draw():
-    background(red, green, blue)
+background(red, green, blue)
