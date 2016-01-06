@@ -294,7 +294,7 @@ def run(src,
 
     if run_shell:
         import shoebot.io.shell
-        shell = shoebot.io.shell.ShoebotCmd(sbot)
+        shell = shoebot.io.shell.ShoebotCmd(sbot, trusted=True)
         try:
             shell.cmdloop()
         except KeyboardInterrupt as e:

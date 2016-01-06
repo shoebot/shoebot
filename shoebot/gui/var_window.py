@@ -156,10 +156,10 @@ class VarWindow(object):
             return False, 'No widget found matching, {}'.format(name)
 
         try:
-            if isinstance(widget, gtk.CheckButton):
+            if isinstance(widget, Gtk.CheckButton):
                 widget.set_active(value)
                 return True, widget.get_active()
-            elif isinstance(widget, gtk.Entry):
+            elif isinstance(widget, Gtk.Entry):
                 widget.set_text(value)
                 return True, widget.get_text()
             else:

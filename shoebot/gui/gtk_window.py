@@ -1,6 +1,6 @@
 import os
 import sys
-from shoebot.core.events import publish_event, QUIT_EVENT
+from shoebot.core.events import publish_event, QUIT_EVENT, EVENT_VARIABLE_UPDATED
 
 try:
     import gi
@@ -165,6 +165,10 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.bot._namespace[name] = value
         if self.var_window:
             return self.var_window.update_var(name, value)
+        else:
+            v = self.bot._vars[name]
+            publish_event(EVENT_VARIABLE_UPDATED, v)
+            return True, value
 
     def schedule_snapshot(self, format):
         """

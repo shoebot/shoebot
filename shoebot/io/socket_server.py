@@ -39,27 +39,36 @@ BANNER = """
 
 Set variables with  var=value
 
-Enter dir() to view variables.
-Enter bye() or press CTRL-D to quit.
+Enter vars to view variables.
+Enter bye or press CTRL-D to quit.
 
 """
 
 INTRO = "[o_o] " + '"Shoebot Telnet Shell, enter "help" for help."'
 
+def create_listening_socket(host, port, handler):
+    """
+    Create socket and set listening options
+    :param host:
+    :param port:
+    :param handler:
+    :return:
+    """
+    sock = socket.socket()
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    sock.bind((host, port))
+    sock.listen(1)
+
+    GObject.io_add_watch(sock, GObject.IO_IN, handler)
+    return sock
 
 class SocketServer(object):
     def __init__(self, bot, host, port):
         '''Initialize server and start listening.'''
-        self.sock = sock = socket.socket()
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        sock.bind((host, port))
-        sock.listen(1)
-
+        create_listening_socket(host, port, self.listener)
         self.shell = None
         self.bot = bot
-        print _("Listening on port %i..." % port)
-        GObject.io_add_watch(sock, GObject.IO_IN, self.listener)
 
     def listener(self, sock, *args):
         '''Asynchronous connection listener. Starts a handler for each connection.'''
@@ -73,21 +82,6 @@ class SocketServer(object):
             self.shell.stdout.write(str(self.shell.intro)+"\n")
             self.shell.stdout.flush()
         return True
-
-    #def msg_banner(self):
-    #    return BANNER
-
-    # def msg_var_value(self, name):
-    #     variable = self.bot._vars[name]
-    #     return 'bot: {}={}\n'.format(name, variable.sanitize(variable.value))
-
-    #def msg_bye(self):
-    #    return "See you next time.\n"
-
-    #def msg_dir(self):
-    #    # Show variables
-    #    d = self.bot._vars
-    #    return '{}\n'.format('\n'.join(['%s = %s' % (key, var.value) for (key, var) in d.items()]))
 
     def handler(self, conn, *args):
         '''
@@ -107,44 +101,7 @@ class SocketServer(object):
             self.shell.stdout.flush()
             self.shell.postloop()
             # end lines from cmd.Cmd
+            if stop:
+                self.shell = None
+                conn.close()
             return not stop
-
-    def x(self):
-        ### TODO - Move setting variables to shell
-        incoming = None
-        if True:
-
-
-            for packet in incoming:
-                if not packet or packet.startswith('#'):
-                    continue
-                elif packet=='dir()':
-                    conn.send(self.msg_dir())
-                elif packet in ['\x03', '\x04'] or packet.lower() in ['bye', 'quit', 'bye()', 'quit()']:
-                    conn.send(self.msg_bye())
-                    conn.close()
-                    return False
-                elif '=' in packet:
-                    name, value = [part.strip() for part in packet.split('=')]
-                    # is value in our variables list?
-                    if name in self.bot._vars:
-                        ## TODO: we're forced to convert input to floats
-                        # would be a lot nicer to have a check for the var type
-                        # self.drawingarea.bot._namespace[var] = value.strip(';')
-                        #value = float(value.strip(';'))
-                        variable = self.bot._vars[name]
-                        variable.value = variable.sanitize(value.strip(';'))
-
-                        success, msg = self.var_changed(name, variable.value)
-                        if success:
-                            conn.send(self.msg_var_value(name))
-                        else:
-                            conn.send('{}\n'.format(msg))
-                    else:
-                        conn.send('Error: Unknown variable: {}\n'.format(name))
-                elif packet in self.bot._vars:
-                    conn.send(self.msg_var_value(packet))
-                else:
-                    conn.send('Error: Unknown command: {}\n'.format(packet))
-            return True
-

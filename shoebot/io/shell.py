@@ -275,7 +275,9 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_exit(self, line):
-        publish_event(QUIT_EVENT)
+        print(self.trusted, file=self.stdout)
+        if self.trusted:
+            publish_event(QUIT_EVENT)
         self.print_response('Bye.\n')
         return True
 
@@ -292,8 +294,22 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_help(self, arg):
-        print(self.response_prompt)
+        print(self.response_prompt, file=self.stdout)
         return cmd.Cmd.do_help(self, arg)
+
+    def do_set(self, line):
+        name, value = [part.strip() for part in line.split('=')]
+        if name not in self.bot._vars:
+            self.print_response('No such variable %s enter vars to see available vars' % name)
+            return
+        variable = self.bot._vars[name]
+        variable.value = variable.sanitize(value.strip(';'))
+
+        success, msg = self.bot.canvas.sink.var_changed(name, variable.value)
+        if success:
+            print('{}={}'.format(name, variable.value), file=self.stdout)
+        else:
+            print('{}\n'.format(msg), file=self.stdout)
 
     def precmd(self, line):
         """
@@ -312,6 +328,13 @@ class ShoebotCmd(cmd.Cmd):
             cookie = line[cookie_index+7:]
             line = line[:cookie_index].strip()
             self.cookie = cookie
+        if line.startswith('#'):
+            return ''
+        elif '=' in line:
+            if not line.startswith("set "):
+                return "set " + line
+            else:
+                return line
         if len(args) and args[0] in self.shortcuts:
             return "%s %s" % (self.shortcuts[args[0]], " ".join(args[1:]))
         else:
@@ -323,5 +346,5 @@ class ShoebotCmd(cmd.Cmd):
         return stop
 
     def postloop(self):
-        print('')
+        print('', file=self.stdout)
 
