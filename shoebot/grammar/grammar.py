@@ -302,7 +302,8 @@ class Grammar(object):
                     #   receive any other event and loop (e.g. if var changed or source edited)
                     #
                     while event is None:
-                        event = next_event()
+                        self._canvas.sink.main_iteration()
+                        event = next_event(block=True, timeout=0.05)
                         if not event:
                             self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
@@ -319,9 +320,6 @@ class Grammar(object):
 
                     event = None  # this loop is a bit weird...
                     break
-
-            self._canvas.finished = True
-            self._canvas.sink.finish()
 
         except Exception as e:
             # this makes KeyboardInterrupts still work
@@ -340,7 +338,6 @@ class Grammar(object):
         ## TODO: Not used when running as a bot, possibly should not be available in
         ## this case
         self._canvas.flush(self._frame)
-        self._canvas.sink.finish()
 
     #### Variables
     def _addvar(self, v):

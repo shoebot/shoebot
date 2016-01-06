@@ -20,7 +20,7 @@ class DrawQueueSink(object):
         '''
         r_context = self.create_rcontext(size, frame)
         drawqueue.render(r_context)
-        self.rendering_finished(size, frame, r_context)
+        return r_context
 
     def create_rcontext(self, size, frame):
         '''
@@ -29,12 +29,6 @@ class DrawQueueSink(object):
         '''
         pass
     
-    def rendering_finished(self, size, frame, r_context):
-        '''
-        Called when the bot has been rendered
-        '''
-        pass
-
     def main_iteration(self):
         """
         Called from main loop, if your sink needs to handle GUI events

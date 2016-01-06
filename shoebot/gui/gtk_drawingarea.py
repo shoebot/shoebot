@@ -104,14 +104,12 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         if self.get_window() and not self.size:
             self.set_size_request(*size)
             self.size = size
-            while Gtk.events_pending():
-                Gtk.main_iteration_do(False)
         meta_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
 
         ctx = cairo.Context(meta_surface)
         return ctx
 
-    def rendering_finished(self, size, frame, cairo_ctx):
+    def do_drawing(self, size, frame, cairo_ctx):
         '''
         Update the backing store from a cairo context and
         schedule a redraw (expose event)

@@ -115,6 +115,8 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.window_open = True
         self.pause_speed = None # TODO - factor out bot controller stuff
 
+        self.last_draw_ctx = None  # Need this to save snapshots after frame is drawn
+
     def gtk_mouse_button_down(self, widget, event):
         ''' Handle right mouse button clicks '''
         if self.menu_enabled and event.button == 3:
@@ -123,37 +125,14 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         else:
             super(ShoebotWindow, self).gtk_mouse_button_down(widget, event)
 
+    def render(self, size, frame, drawqueue):
+        cairo_ctx = super(self.__class__, self).render(size, frame, drawqueue)
+        self.last_draw_ctx = cairo_ctx
+        self.sb_widget.do_drawing(size, frame, cairo_ctx)
+
     def create_rcontext(self, size, frame):
         ''' Delegates to the ShoebotWidget  '''
-
-        ### Any snapshots that need to be taken
-        for snapshot_func in self.scheduled_snapshots:
-            snapshot_func()
-        else:
-            self.scheduled_snapshots = deque()
-
         return self.sb_widget.create_rcontext(size, frame)
-
-    def rendering_finished(self, size, frame, cairo_ctx):
-        ''' Delegates to the ShoebotWidget '''
-        # A bit hacky... only show the variable window once bot has
-        # executed once and there are some variables.
-        if self.show_vars:
-            self.show_variables_window()
-        else:
-            self.hide_variables_window()
-
-        return self.sb_widget.rendering_finished(size, frame, cairo_ctx)
-
-    def schedule_snapshot(self, format):
-        '''
-        Since the right click comes in after things have been rendered
-        it's easiest to schedule snapshots for the next render.
-
-        (There is only a bitmap copy of the screen available at this
-         point...)
-        '''
-        self.scheduled_snapshots.append(lambda: self.do_snapshot(format))
 
     def show_variables_window(self):
         '''
@@ -187,14 +166,22 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         if self.var_window:
             return self.var_window.update_var(name, value)
 
-    def do_snapshot(self, format):
+    def schedule_snapshot(self, format):
+        """
+        Tell the canvas to perform a snapshot when it's finished rendering
+        :param format:
+        :return:
+        """
         bot = self.bot
+        canvas = self.bot.canvas
         script = bot._namespace['__file__']
         if script:
             filename = os.path.splitext(script)[0] + '.' + format
         else:
             filename = 'output.' + format
-        self.bot._canvas.user_snapshot(filename)
+
+        f = canvas.output_closure(filename, self.bot._frame)
+        self.scheduled_snapshots.append(f)
 
     def snapshot_svg(self, widget):
         self.schedule_snapshot('svg')
@@ -263,15 +250,19 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         Called from main loop, if your sink needs to handle GUI events
         do it here.
 
-        :return:
+        Check any GUI flags then call Gtk.main_iteration to update things.
         """
-        while Gtk.events_pending():
-            Gtk.main_iteration()
 
-    def finish(self):
-        ### Any snapshots that need to be taken
-        for snapshot_func in self.scheduled_snapshots:
-            snapshot_func()
+        if self.show_vars:
+            self.show_variables_window()
+        else:
+            self.hide_variables_window()
+
+        for snapshot_f in self.scheduled_snapshots:
+            fn = snapshot_f(self.last_draw_ctx)
+            print "Saved snapshot: %s" % fn
         else:
             self.scheduled_snapshots = deque()
 
+        while Gtk.events_pending():
+            Gtk.main_iteration()

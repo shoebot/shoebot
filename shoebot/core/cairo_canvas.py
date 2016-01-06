@@ -133,11 +133,13 @@ class CairoCanvas(Canvas):
             target_ctx = target
             target_ctx.set_source_surface(ctx.get_target())
             target_ctx.paint()
+            return target_ctx
 
         def output_surface(ctx):
             target_ctx = cairo.Context(target)
             target_ctx.set_source_surface(ctx.get_target())
             target_ctx.paint()
+            return target_ctx
 
         def output_file(ctx):
             root, extension = os.path.splitext(target)
@@ -164,6 +166,7 @@ class CairoCanvas(Canvas):
                 target_ctx = cairo.Context(cairo.SVGSurface(filename, *self.size_or_default()))
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
+            return filename
 
         if isinstance(target, cairo.Context):
             return output_context
