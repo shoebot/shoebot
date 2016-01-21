@@ -148,11 +148,11 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
 
 
 setup(name="shoebot",
-      version="1.1.1",
+      version="1.2",
       description="Vector graphics scripting application",
       long_description=long_description,
       author="Ricardo Lafuente",
-      author_email="r@sollec.org",
+      author_email="r@manufacturaindependente.org",
       license='GPL v3',
       url="http://shoebot.net",
       cmdclass={

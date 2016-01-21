@@ -1,6 +1,3 @@
-# $Id: Makefile,v 1.0 2010/01/11 16:49:35 Ricardo Lafuente Exp $
-#
-
 PYTHON=`which python`
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/shoebot
