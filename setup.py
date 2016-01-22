@@ -90,13 +90,11 @@ if not is_pypy:
 else:
     NUMPY=""
 
+
 # Also requires one of 'vext.gi' or 'pgi'
 BASE_REQUIREMENTS=[
-    "setuptools>=15.0.1",  #
-
     "cairocffi>=0.7.2",
-    #"meta==0.4.1",
-    "meta",
+    "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
     NUMPY,
     "Pillow==2.8.1",
     "pubsub==0.1.1",
@@ -106,7 +104,7 @@ BASE_REQUIREMENTS=[
 # requirements to run examples
 EXAMPLE_REQUIREMENTS=[
   "fuzzywuzzy==0.5.0",   # sbaudio
-  "planar",       # examples
+  "planar",              # examples
   "PySoundCard==0.5.0",  # sbaudio
 ]
 
@@ -134,8 +132,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
         if debug:
             print("warning, as of April 2015 typography does not work with pgi")
     else:
-        reqs.append("vext>=0.3.8")    # TODO - shouldn't be needed..
-        reqs.append("vext.gi>=0.1.3")
+        reqs.append("vext.gi>=0.5.6")
     if with_examples:
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
@@ -148,6 +145,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
 
 
 setup(name="shoebot",
+      include_package_data = True,
       version="1.1.1",
       description="Vector graphics scripting application",
       long_description=long_description,
@@ -171,7 +169,6 @@ setup(name="shoebot",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
       ],
       data_files=datafiles,
-      setup_requires=["setuptools>=15.0.1"],
       install_requires=requirements(debug="install" in sys.argv),
       entry_points={
           "console_scripts": [
