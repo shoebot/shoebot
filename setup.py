@@ -134,7 +134,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
         if debug:
             print("warning, as of April 2015 typography does not work with pgi")
     else:
-        reqs.append("vext.gi>=0.5.6")
+        reqs.append("vext.gi>=0.5.8")
     if with_examples:
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
