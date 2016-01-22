@@ -1,33 +1,34 @@
 v1.2
 ====
   
-  New features:
-    * Livecoding branch merged
-    * Shoebot shell for communication with editors / IDEs
-    * Gtk3 branch merged, along with experimental support for pypy
-    * Use 'vext' for Gtk, extra virtualenv setup scripts removed
-    * Make setup.py clean actually remove all detritus
-    * Support setup.py develop
-    * Show shoebot icon in var window as well as main window
-    * Started event framework to control different parts of SB
-      it's pretty dumb right now, but enough to support livecoding
-      of dynamic and non dynamic bots.
+New features:
 
-  GEdit plugin changes
-    * Installable from setup.py, supports Windows
-    * Made to work on python2.6, so Windows Gedit can be supported
-    * Added Virtualenv chooser
-    * Settings are persisted in DConf
-    * Removed bash setup scripts
-    * Livecoding support - seperate tab for live errors
-    * Update examples search to work with setup.py develop
+* Livecoding branch merged
+* Shoebot shell for communication with editors / IDEs
+* Gtk3 branch merged, along with experimental support for pypy
+* Use 'vext' for Gtk, extra virtualenv setup scripts removed
+* Make setup.py clean actually remove all detritus
+* Support setup.py develop
+* Show shoebot icon in var window as well as main window
+* Started event framework to control different parts of SB; it's pretty dumb right now, but enough to support livecoding of dynamic and non dynamic bots.
 
-  Examples
-    * Re-enabeled the colors examples
-    * Added Audio Examples
-    * Added other misc examples (Fat Text, Fat Lines)
+GEdit plugin changes
 
-  The main focus of 1.2 has been on making installation easier, livecoding and makng sure old branches dont go unused.
+* Installable from `setup.py`, supports Windows
+* Made to work on Python 2.6, so Windows Gedit can be supported
+* Added Virtualenv chooser
+* Settings are persisted in DConf
+* Removed bash setup scripts
+* Livecoding support - seperate tab for live errors
+* Update examples search to work with `setup.py develop`
+
+Examples
+
+* Re-enabeled the colors examples
+* Added Audio Examples
+* Added other misc examples (Fat Text, Fat Lines)
+
+The main focus of 1.2 has been on making installation easier, livecoding and making sure old branches don't go unused.
 
 v1.0
 ====

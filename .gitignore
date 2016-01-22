@@ -12,6 +12,7 @@ extensions/gedit3-plugin/gschemas.compiled
 # ignore build and dist output
 build/*
 dist/*
+shoebot.egg-info/
 # as well as sphinx output
 doc/build/*
 

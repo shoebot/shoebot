@@ -91,8 +91,10 @@ else:
     NUMPY=""
 
 
-# Also requires one of 'vext.gi' or 'pgi'
+# Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS=[
+    "setuptools>=15.0.1",  #
+
     "cairocffi>=0.7.2",
     "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
     NUMPY,
@@ -145,12 +147,11 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
 
 
 setup(name="shoebot",
-      include_package_data = True,
-      version="1.1.1",
+      version="1.2",
       description="Vector graphics scripting application",
       long_description=long_description,
       author="Ricardo Lafuente",
-      author_email="r@sollec.org",
+      author_email="r@manufacturaindependente.org",
       license='GPL v3',
       url="http://shoebot.net",
       cmdclass={
