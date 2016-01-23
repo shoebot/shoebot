@@ -1,8 +1,7 @@
-include README
+include README.md
 include AUTHORS
 include VERSION
 include COPYING-GPL-3
-include sbot
 recursive-include shoebot/data *
 recursive-include shoebot/core *
 recursive-include shoebot/gui *

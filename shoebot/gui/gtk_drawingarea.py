@@ -12,10 +12,8 @@ except ImportError:
 GI = not hasattr(gi, "install_as_gi")
 if GI:
     from shoebot.cairocffi_util import _UNSAFE_pycairo_context_to_cairocffi
-    from shoebot.cairocffi_util import _UNSAFE_cairocffi_context_to_pycairo
 else:
     _UNSAFE_pycairo_context_to_cairocffi = None
-    _UNSAFE_cairocffi_context_to_pycairo = None
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
