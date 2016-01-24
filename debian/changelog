@@ -1,49 +1,124 @@
-shoebot (0.4a4-1) lucid; urgency=low
+shoebot (1.2.1-1) unstable; urgency=medium
 
-  * Rewrite of the core code around drawing queues by Stuart Axon
+  * Better install script, should work with pip and setup.py
+
+ -- Ricardo Lafuente <rlafuente@ace> Sat, 23 Jan 2016 
+16:03:06 +0100
+
+
+shoebot (1.2-1) unstable; urgency=low
+
+  * Livecoding branch merged
+  * Shoebot shell for communication with editors / IDEs
+  * Gtk3 branch merged, along with experimental support 
+for pypy
+  * Use 'vext' for Gtk, extra virtualenv setup scripts 
+removed
+  * Make setup.py clean actually remove all detritus
+  * Support setup.py develop
+  * Show shoebot icon in var window as well as main 
+window
+  * Started event framework to control different parts 
+of SB; it's pretty dumb right now, but enough to support 
+livecoding of dynamic and non dynamic bots.
+
+  * Installable from `setup.py`, supports Windows
+  * Made to work on Python 2.6, so Windows Gedit can be 
+supported
+  * Added Virtualenv chooser
+  * Settings are persisted in DConf
+  * Removed bash setup scripts
+  * Livecoding support - seperate tab for live errors
+  * Update examples search to work with `setup.py 
+develop`
+
+  * Re-enabeled the colors examples
+  * Added Audio Examples
+  * Added other misc examples (Fat Text, Fat Lines)
+
+  The main focus of 1.2 has been on making installation 
+easier, livecoding and making sure old branches don't go 
+unused.
+
+ -- Ricardo Lafuente <r@sollec.org> Sat, 26 Mar 2011 
+03:23:11 +0000
+
+
+shoebot (0.4a4-1); urgency=low
+
+  * Rewrite of the core code around drawing queues by 
+Stuart Axon
   * Debian packaging scripts finally working
 
- -- Ricardo Lafuente <r@sollec.org>  Sat, 26 Mar 2011 03:23:11 +0000
+ -- Ricardo Lafuente <r@sollec.org> Sat, 26 Mar 2011 
+03:23:11 +0000
 
-shoebot (0.3b-1) lucid; urgency=low
+shoebot (0.3b-1); urgency=low
 
-  * Huge code refactoring, now it should be a lot easier to hack around.
+  * Huge code refactoring, now it should be a lot easier 
+to hack around.
   * Gedit and Inkscape plug-ins now included
 
- -- Ricardo Lafuente <r@sollec.org>  Mon, 11 Jan 2010 16:36:07 +0000
+ -- Ricardo Lafuente <r@sollec.org> Mon, 11 Jan 2010 
+16:36:07 +0000
 
-shoebot (0.2-1) lucid; urgency=low
+shoebot (0.2-1); urgency=low
 
-  * colors can be specified using hexcolour values (e.g. #FF00FF)
-  * fill and/or stroke values can be specified using keyword arguments (e.g. a = Rect(x,y,w,h,fill='#FF00FF'))
+  * colors can be specified using hexcolour values (e.g. 
+#FF00FF)
+  * fill and/or stroke values can be specified using 
+keyword arguments (e.g. a = 
+Rect(x,y,w,h,fill='#FF00FF'))
   * experimental animation support
   * internationalization
-  * transforms were overhauled, and are now fully consistent with Nodebox behaviour
+  * transforms were overhauled, and are now fully 
+consistent with Nodebox behaviour
   * clipping paths!
-  * a powerful text API was introduced using Pango, matching and even extending Nodebox's capabilities, and working great with transforms
+  * a powerful text API was introduced using Pango, 
+matching and even extending Nodebox's capabilities, and 
+working great with transforms
   * image support is now there, and working great!
-  * ximport() can now be used to import Nodebox's libraries
-  * many Nodebox libraries ported and included in Shoebot! Boids, Cornu, Database, Ants, Photobot, Supershape, SVG and Web are fully working (as far as we could determine! :) ; Colors and L-System are partially working.
+  * ximport() can now be used to import Nodebox's 
+libraries
+  * many Nodebox libraries ported and included in 
+Shoebot! Boids, Cornu, Database, Ants, Photobot, 
+Supershape, SVG and Web are fully working (as far as we 
+could determine! :) ; Colors and L-System are partially 
+working.
   * easteregg(x,y,size) ;)
   * GIMP colour palette import!
-  * repeat mode (-r) in commandline mode to output multiple images
+  * repeat mode (-r) in commandline mode to output 
+multiple images
   * fullscreen mode!
   * new example scripts
   * Shoebot now runs on Windows, and the IDE too!
-  * new goodies in the Shoebot IDE: error reporting console, layout dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop entry
-  * preliminary mouse events implementation in GTK mode 
+  * new goodies in the Shoebot IDE: error reporting 
+console, layout dimensions, about item, file dialogue, 
+Ctrl+F shortcut, GNOME Desktop entry
+  * preliminary mouse events implementation in GTK mode
 
   Bug fixes:
 
-  * drawpath() and findpath() are working; drawpath() can be used with images as well (load once, use many times)
+  * drawpath() and findpath() are working; drawpath() 
+can be used with images as well (load once, use many 
+times)
   * bounding box calculations for line() are fixed
-  * fixed order of buttons on quit - save file dialogue in shoebot-ide 
+  * fixed order of buttons on quit - save file dialogue 
+in shoebot-ide
 
   API changes:
 
-  * big rewrite of the code structure; now there are generic Bot and Canvas classes, equivalent to a 'context' and a 'surface', but differently named to avoid confusion with Cairo; those can be subclassed to implement new languages (see NodeBot? class for the implementation of Nodebox) and new graphical backends (see CairoCanvas?).
+  * big rewrite of the code structure; now there are 
+generic Bot and Canvas classes, equivalent to a 
+'context' and a 'surface', but differently named to 
+avoid confusion with Cairo; those can be subclassed to 
+implement new languages (see NodeBot? class for the 
+implementation of Nodebox) and new graphical backends 
+(see CairoCanvas?).
   * the 'Box' class was renamed to 'Bot'
-  * oval() deprecated and introduced ellipse(), the correct term for this operation 
+  * oval() deprecated and introduced ellipse(), the 
+correct term for this operation
 
- -- Ricardo Lafuente <r@sollec.org>  Thu, 19 Feb 2009 11:40:36 +0100
+ -- Ricardo Lafuente <r@sollec.org> Thu, 19 Feb 2009 
+11:40:36 +0100
 

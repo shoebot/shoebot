@@ -1,7 +1,7 @@
 Source: shoebot
 Section: graphics
 Priority: optional
-Maintainer: Ricardo Lafuente <r@sollec.org>
+Maintainer: Ricardo Lafuente <r@manufacturaindependente.org>
 Build-Depends: debhelper (>=7.0.0), python-support (>= 0.6), cdbs (>= 0.4.49), python-all-dev
 Standards-Version: 3.8.3
 
