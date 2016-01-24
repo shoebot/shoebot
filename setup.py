@@ -15,6 +15,16 @@ import shutil
 import sys
 import textwrap
 
+info = textwrap.dedent("""
+    Shoebot is a pure Python graphics robot: It takes a Python script as input,
+    which describes a drawing process, and outputs a graphic in a common open
+    standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor
+    GUI, and scripts can describe their own GUIs for controlling variables
+    interactively. Being pure Python, it can also be used as a Python module,
+    a plugin for Python-scriptable tools such as Inkscape, and run from the
+    command line.
+""")
+
 is_pypy = '__pypy__' in sys.builtin_module_names
 is_jython = platform.system == 'Java'
 
@@ -36,8 +46,10 @@ class CleanCommand(CleanBaseCommand):
 
     def initialize_options(self):
         pass
+
     def finalize_options(self):
         pass
+
     def run(self):
         global here
 
@@ -50,16 +62,6 @@ class CleanCommand(CleanBaseCommand):
                     raise ValueError("%s is not a path inside %s" % (path, here))
                 print('removing %s' % os.path.relpath(path))
                 shutil.rmtree(path)
-
-long_description = textwrap.dedent("""
-    Shoebot is a pure Python graphics robot: It takes a Python script as input,
-    which describes a drawing process, and outputs a graphic in a common open
-    standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor
-    GUI, and scripts can describe their own GUIs for controlling variables
-    interactively. Being pure Python, it can also be used as a Python module,
-    a plugin for Python-scriptable tools such as Inkscape, and run from the
-    command line.
-""")
 
 # the following libraries will not be installed
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
@@ -149,7 +151,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
 setup(name="shoebot",
       version="1.2",
       description="Vector graphics scripting application",
-      long_description=long_description,
+      long_description=info,
       author="Ricardo Lafuente",
       author_email="r@manufacturaindependente.org",
       license='GPL v3',
