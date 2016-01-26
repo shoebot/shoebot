@@ -29,7 +29,7 @@ Local installation is also possible using virtualenv.
 
 If you're using the handy [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/), these are the necessary commands:
 
-    mkvirtualenv shoebot -p `which pypy`
+    mkvirtualenv shoebot
     pip install -r requirements.txt
     python setup.py install
 
