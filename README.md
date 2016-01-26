@@ -5,172 +5,106 @@ Shoebot is a Python graphics robot: It takes a Python script as input, which des
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
 
-What you need
--------------
 
-Shoebot runs on Python 2.7, which is most probably what you already have installed.
-To get better performance you can run using pypy, which is experimental.
+## Installation
 
+Shoebot runs on Python 2.7, which is most probably what you already have installed. To get better performance, you can run it using PyPy, which is experimental.
 
-Installing Shoebot
-------------------
+### Dependencies
 
-For now, the only means of installing Shoebot is getting it from the source repository. Shoebot uses Git for version control. It's available on most major GNU/Linux distributions; fire up your terminal and type:
+You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you:
 
-Ubuntu/Debian:
-
-    sudo apt-get install git
-
-Fedora:
-
-    sudo yum install git
-
-SuSE:
-
-    sudo zypper install git-core
-
-Gentoo:
-
-    emerge git
-
-
-OSX:
-
-    Just make sure XCode and the Command Line Tools are installed.
-
-
-Make a temporary directory to download all source files into, and then get the source itself.
-
-    mkdir ~/src
-    cd ~/src
-    git clone https://github.com/shoebot/shoebot.git
-
-
-
-
-You should now see a new shoebot/ directory. The only remaining step is to install shoebot and its dependencies:
-
-
-
-Linux and Virtualenvwrapper:
-
-Using virtualenvwrapper is the easiest way to get started. First, install the necessary dependencies for Shoebot.
-    
-    # Install Shoebot dependencies if you haven't already
     cd install
     ./install_dependencies.sh
+
+### Installing Shoebot
+
+The quickest way to get Shoebot up and running is to install it system-wide:
+
+    sudo python setup.py install
     
-    # Create a new virtualenv using pypy
-    mkvirtualenv shoebot-env -p `which pypy`
-    
-    # Install Shoebot in the virtualenv
+Local installation is also possible using virtualenv. 
+
+#### Virtualenvwrapper
+
+If you're using the handy [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/), these are the necessary commands:
+
+    mkvirtualenv shoebot -p `which pypy`
     pip install -r requirements.txt
     python setup.py install
 
-    # To use shoebot in future remember to activate the environment first.
-    workon shoebot-env
+To use Shoebot in the future, remember to activate the environment first.
+    
+    workon shoebot
 
+In case you have PyPy installed, make sure to point to it when creating the virtualenv. Instead of the first command in the previous example, do:
 
+    mkvirtualenv shoebot -p `which pypy`
 
-Linux wih plain virtualenv:
+### Plain virtualenv
 
-If you don't use virtualenvwrapper follow these instructions after installing the dependencies.
+If you don't use virtualenvwrapper, run these commands after installing the dependencies.
 
-    # make a new virtualenv environment using pypy
+    virtualenv shoebot-env
+    source shoebot-env/bin/activate
+    pip install -r requirements.txt
+    python setup.py install
+
+To use shoebot in the future, remember to activate the environment first.
+
+    source shoebot-env/bin/activate
+
+Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need to create the Virtualenv pointing to it.
+
     virtualenv shoebot-env -p `which pypy`
-    
-    # activate it
-    source shoebot-env/bin/activate
-
-    # Install Shoebot in the virtualenv
-    pip install -r requirements.txt
-    python setup.py install
-
-    # To use shoebot in future remember to activate the environment first.
-    source shoebot-env/bin/activate
 
 
-
-
-OSX:
-
-Homebrew
-
-With MacPorts (http://www.macports.org) and python2.5
-
-    sudo port install py27-numpy -atlas
-    sudo port install pango +quartz
-    sudo port install librsvg py27-pil py27-cairo py27-gtk
-
-MacPorts does not have the python-rsvg package, so svg output won't work.
-TODO: probably installing py27 packages and gnome-python-desktop would fix the missing python-rsvg problem.
-
-
-
-Running Shoebot from the console
---------------------------------
+## Usage
 
 Using the Shoebot console runner is straightforward:
 
     sbot inputfile.bot
 
-This command will run the 'inputfile.bot' script, and create an output image
-file (output.svg). You'll want to specify your own filename, which can be
-done like so:
+This command will run the `inputfile.bot` script, and create an output image
+file (`output.svg`). You can find many example Shoebot scripts inside the `examples` dir.
+
+You'll probably want to specify your own output file name, which can be done like so:
 
     sbot inputfile.bot -o image.png
 
-The allowed extensions for the output filename are .svg, .ps, .pdf and .png.
-
-You can find many example Shoebot scripts in `/usr/share/shoebot/examples`.
+The allowed extensions for the output filename are `.svg`, `.ps`, `.pdf` and `.png`.
 
 Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the window flag:
+as realtime manipulation of parameters. For this, just use the `--window` flag or `-w`:
 
     sbot -w inputfile.bot
 
-For a list of extra options, type
+For a list of extra options, there's always `--help` or `-h`.
 
     sbot -h
 
 
-Documentation
--------------
+## Documentation
 
 You can find the current docs at [ReadTheDocs](http://shoebot.readthedocs.org/).
 
-Shoebot documentation can also be generated locally using sphinx. First, install it::
+The [Nodebox tutorials](http://nodebox.net/code/index.php/Tutorial) are an excellent intro to the language and its core concepts. Shoebot is a rewrite of Nodebox 1, so the original [Nodebox documentation](https://www.nodebox.net/code/index.php/Reference) is required reading.
 
-    pip install sphinx
+The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more information on what you can do with Shoebot. Take a look at the [wiki](https://github.com/shoebot/shoebot/wiki) for a set of hacks and advanced uses such as:
 
-The following commands will output the HTML docs::
-  
-    cd doc
-    make html 
-
-The documentation should now be available in `doc/build`.
-
-
-Further reading
----------------
-
-For a great intro to the Nodebox/Shoebot language, be sure to check the Nodebox tutorials at http://nodebox.net/code/index.php/Tutorial .
-
-The Shoebot documentation has quite a lot more information on what you can do with Shoebot, such as:
-
-  * running Shoebot as a Python module
-  * using the socketserver to have other programs control a Shoebot script
-  * using Shoebot to generate images via a CGI script
+  * import Shoebot as a Python module
+  * use the included socketserver to have other programs control a Shoebot script
+  * generate images via CGI scripts
 
 
 Links
 -----
 
-  * Website:             http://shoebot.net
-  * Documentation:       http://shoebot.readthedocs.org
-  * Mailing lists:       http://tinkerhouse.net/shoebot/devel
-  * Source browser:	     http://github.com/shoebot/shoebot
-  * Bug tracker:         http://github.com/shoebot/shoebot/issues
+  * [Website](http://shoebot.net)
+  * [Documentation](http://shoebot.readthedocs.org)
+  * [Mailing lists](http://tinkerhouse.net/shoebot/devel)
+  * [Source code](http://github.com/shoebot/shoebot)
+  * [Issue tracker](http://github.com/shoebot/shoebot/issues)
 
 
 License
