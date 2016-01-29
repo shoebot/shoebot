@@ -10,7 +10,7 @@ MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject
 
 # OSX
 HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+ --quartz pygtk --quartz"
-MACPORTS_PACKAGES=""
+MACPORTS_PACKAGES="cairo +quartz +no_x11 pango +quartz py27-pygtk +quartz +no_x11"
 
 confirm() {
     read -p "Y/N" -n 1 -r
@@ -64,7 +64,8 @@ install_darwin() {
         echo Install using macports ?
         echo - Warning - sets the default python to python27 - !
         confirm
-        source ${DIR}/OSX/macports/install_dependencies.sh
+        sudo port install python27 py27-pip py27-virtualenv
+        sudo port install $MACPORTS_PACKAGES
     fi     
 
 }
