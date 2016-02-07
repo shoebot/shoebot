@@ -59,11 +59,11 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-import sys
 LIB_DIRS = [
     os.path.join(SBOT_ROOT, 'local', 'share', 'shoebot', 'lib'),
     os.path.join(SBOT_ROOT, 'lib'),
-    os.path.join(SBOT_ROOT, 'share', 'shoebot', 'lib')]
+    os.path.join(SBOT_ROOT, 'share', 'shoebot', 'lib'),
+    os.path.join(sys.prefix, 'share', 'shoebot', 'lib')]
 for LIB_DIR in LIB_DIRS:
     if os.path.isdir(LIB_DIR):
         sys.path.append(LIB_DIR)
