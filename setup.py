@@ -95,7 +95,7 @@ else:
 
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS=[
-    "setuptools>=15.0.1",  #
+    "setuptools>=18.8",  #
 
     "cairocffi>=0.7.2",
     "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
@@ -109,7 +109,7 @@ BASE_REQUIREMENTS=[
 EXAMPLE_REQUIREMENTS=[
   "fuzzywuzzy==0.5.0",   # sbaudio
   "planar",              # examples
-  "PySoundCard==0.5.0",  # sbaudio
+  "PySoundCard>=0.5.2",  # sbaudio
 ]
 
 def requirements(with_pgi=None, with_examples=True, debug=True):
