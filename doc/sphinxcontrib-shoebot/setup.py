@@ -15,11 +15,11 @@ Example::
       
 '''
 
-#requires = ['shoebot==1.0b']
+#requires = ['shoebot>=1.2.1']
 
 setup(
     name='sphinxcontrib-shoebot',
-    version='0.9.9',
+    version='1.2.1',
     url='https://github.com/shoebot/shoebot/tree/readthedocs/doc/sphinxcontrib_shoebot',
     license='BSD',
     author='Stuart Axon',
