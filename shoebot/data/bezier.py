@@ -196,7 +196,7 @@ class BezierPath(Grob, ColorMixin):
         if self._bounds:
             return self._bounds
 
-        record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, 0, 0)
+        record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1))
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
         
