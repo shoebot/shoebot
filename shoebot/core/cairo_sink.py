@@ -78,7 +78,7 @@ class CairoImageSink(DrawQueueSink):
         Called when CairoCanvas needs a cairo context to draw on
         """
         if self.format == 'pdf':
-            surface = cairo.PDFSurface(self._output_vfile(frame), *size)
+            surface = cairo.PDFSurface(self._output_file(frame), *size)
         elif self.format == 'png':
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         elif self.format in ('ps', 'eps'):
