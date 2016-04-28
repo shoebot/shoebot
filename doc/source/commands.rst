@@ -71,6 +71,7 @@ Drawing shapes
 
     .. shoebot::
         :snapshot:
+        
         star(25, 25, 5, 20, 10)  # top left
         star(75, 25, 10, 20, 3)  # top right
         star(25, 75, 20, 20, 17) # bottom left
