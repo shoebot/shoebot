@@ -172,7 +172,7 @@ setup(name="shoebot",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
       ],
       data_files=datafiles,
-      install_requires=requirements(debug="install" in sys.argv),
+      install_requires=requirements(debug="install" in sys.argv, with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ),
       entry_points={
           "console_scripts": [
              "sbot=shoebot.run:main",
