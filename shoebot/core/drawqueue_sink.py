@@ -20,6 +20,7 @@ class DrawQueueSink(object):
         '''
         r_context = self.create_rcontext(size, frame)
         drawqueue.render(r_context)
+        self.rendering_finished(size, frame, r_context)
         return r_context
 
     def create_rcontext(self, size, frame):
