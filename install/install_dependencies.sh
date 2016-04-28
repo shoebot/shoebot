@@ -4,12 +4,12 @@
 REDHAT_PACKAGES="libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging"
 SUSE_PACKAGES="libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging"
 
-DEBIAN_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
-UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
-MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview2 python-rsvg"
+DEBIAN_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject gtksourceview3 python-rsvg"
+UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gobject gtksourceview3 python-rsvg"
+MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject gtksourceview3 python-rsvg"
 
 # OSX
-HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+ --quartz pygtk --quartz"
+HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+3 --quartz"
 MACPORTS_PACKAGES="cairo +quartz +no_x11 pango +quartz py27-pygtk +quartz +no_x11"
 
 confirm() {
