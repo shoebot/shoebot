@@ -17,7 +17,7 @@ install:
  - sudo ./install/install_dependencies.sh
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
- - $PYTHON ./setup.py install
+ - SHOEBOT_SKIP_EXAMPLES=1 $PYTHON ./setup.py install
 
 script:
  - if [ "$PYTHON" == "python2" ]; then pushd tests/unittest; $PYTHON -munittes; popd; fi
