@@ -16,6 +16,7 @@ Example::
 '''
 
 #requires = ['shoebot>=1.2.1']
+requires = ['Sphinx>=1.4.1', 'pip>=8.1.1']
 
 setup(
     name='sphinxcontrib-shoebot',
@@ -41,6 +42,6 @@ setup(
     platforms='any',
     packages=find_packages(),
     include_package_data=True,
-    #install_requires=requires,
+    install_requires=requires,
     namespace_packages=['sphinxcontrib'],
 )
