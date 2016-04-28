@@ -1,0 +1,23 @@
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: generic
+      env: PYTHON="python2" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview3 python-rsvg"
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: generic
+      env: PYTHON="pypy" PACKAGES="pypy"
+
+install:
+ - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; fi
+ - sudo apt-get update -q
+ - sudo ./install/install_dependencies.sh
+ - virtualenv --python=$PYTHON _venv
+ - source _venv/bin/activate
+ - $PYTHON ./setup.py install
+
+script:
+ - if [ "$PYTHON" == "python2" ]; then pushd tests/unittest; $PYTHON -munittes; popd; fi
