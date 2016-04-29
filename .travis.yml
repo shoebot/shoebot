@@ -21,4 +21,4 @@ install:
  - SHOEBOT_SKIP_EXAMPLES=1 $PYTHON ./setup.py install
 
 script:
- - if [ "$PYTHON" == "python2" ]; then pushd tests/unittests; $PYTHON -munittes; popd; fi
+ - if [ "$PYTHON" == "python2" ]; then pushd tests/unittests; $PYTHON bezier.py; python file_output.py; popd; fi
