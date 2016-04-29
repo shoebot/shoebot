@@ -4,7 +4,7 @@ matrix:
       sudo: required
       dist: trusty
       language: generic
-      env: PYTHON="python2" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gtk2 python-gobject python-gtksourceview3 python-rsvg"
+      env: PYTHON="python2" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gobject python-rsvg"
     - os: linux
       sudo: required
       dist: trusty
