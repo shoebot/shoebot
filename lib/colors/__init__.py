@@ -3092,7 +3092,12 @@ class gradientpath(Grob):
         You can tweak this background's opacity with the alpha parameter.
         
         """
-        
+
+        raise NotImplementedError("gradientpath not implemented yet.")
+        # gradientpath is not implemented, code below is from Nodebox
+        # and implemented with CoreImage
+        # this will need to be re-implemented in Cairo to work in Shoebot.
+
         self.path = path
         self.path.inheritFromContext()
         self.path.fillcolor = colorlist(clr1, clr2).average
@@ -3259,6 +3264,9 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
     
     _ctx.reset()
 
+
+#1.9.4.7-sb.3
+#raise NotImplementedError for parts not yet ported from CoreImage to Cairo
 
 #1.9.4.7-sb.2
 #Added ability to load aggregated color xml files from zip
