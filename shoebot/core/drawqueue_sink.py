@@ -29,7 +29,10 @@ class DrawQueueSink(object):
         frame of the bot
         '''
         pass
-    
+
+    def rendering_finished(self, size, frame, cairo_ctx):
+        pass
+
     def main_iteration(self):
         """
         Called from main loop, if your sink needs to handle GUI events
