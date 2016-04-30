@@ -43,7 +43,7 @@ class TestFileOutputMeta(type):
         
         return type.__new__(mcs, name, bases, dct)
 
-class TestSequence(unittest.TestCase):
+class TestFileOutput(unittest.TestCase):
     __metaclass__ = TestFileOutputMeta
 
 if __name__ == '__main__':
