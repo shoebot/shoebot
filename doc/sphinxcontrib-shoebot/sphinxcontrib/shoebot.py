@@ -108,8 +108,10 @@ class ShoebotDirective(Directive):
 
         result = [nodes.raw('', parsed, format='html')]
         
-        if True:  # If we want a snapshot - this should check the 'snapshot argument'# 
+        if True:
+            # If we want a snapshot - this should check the 'snapshot argument'# 
             fn = '{}.png'.format(sha(text).hexdigest())
+            print("fn: %s" % fn)
             
             env = self.state.document.settings.env
             rel_filename, filename = env.relfn2path(fn)
@@ -118,8 +120,12 @@ class ShoebotDirective(Directive):
             ensuredir(os.path.dirname(outfn))
             script_to_render = BOT_HEADER + text
             try:
-                subprocess.call(['sbot', '-o', '%s' % outfn, script_to_render])
-            except Exception, e:
+                cmd = ['sbot', '-o', '%s' % outfn, script_to_render]
+                print("run: %s" % " ".join(cmd))
+                subprocess.call(cmd)
+                print("ran")
+            except Exception as e:
+                print("oops %e" % e)
                 raise ShoebotError(str(e))
 
 
