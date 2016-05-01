@@ -33,9 +33,9 @@ here = os.path.dirname(os.path.abspath(__file__))
 try:
     from setuptools import setup
     from setuptools import Command as CleanBaseCommand
+    raise ImportError("!")
 except ImportError:
-    from distutils.core import setup
-    from distutils.command import clean as CleanBaseCommand
+    sys.exit("Install systemtools before shoebot")
 
 
 class CleanCommand(CleanBaseCommand):
