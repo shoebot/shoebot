@@ -61,6 +61,20 @@ class CleanCommand(Command):
                 print('removing %s' % os.path.relpath(path))
                 shutil.rmtree(path)
 
+
+class DiagnoseCommand(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        from shoebot.diagnose import diagnose
+        diagnose()
+
 # the following libraries will not be installed
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
@@ -156,6 +170,7 @@ setup(name="shoebot",
       url="http://shoebot.net",
       cmdclass={
           'clean': CleanCommand,
+          'diagnose': DiagnoseCommand,
       },
       packages=[
           "shoebot",
