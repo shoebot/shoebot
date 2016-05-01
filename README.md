@@ -98,6 +98,17 @@ The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more
   * generate images via CGI scripts
 
 
+## Getting help
+
+Installation can sometimes be tricky, to help use work out whats up paste the output
+of the following commands into a ticket on github
+
+    python setup.py diagnose
+    python setup.py test
+
+This will help us diagnose common issues more quickly.
+
+
 Links
 -----
 
