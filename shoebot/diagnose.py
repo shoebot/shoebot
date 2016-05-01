@@ -38,6 +38,7 @@ def diagnose():
     platform: %s
     version: %s
     mac_ver: %s
+    win32_ver: %s
     """ % (
     sys.version.split('\n'),
     str(platform.dist()),
@@ -47,6 +48,7 @@ def diagnose():
     platform.platform(),
     platform.version(),
     platform.mac_ver(),
+    platform.win32_ver(),
     ))
 
     def test_import(mn):
