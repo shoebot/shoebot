@@ -31,14 +31,12 @@ is_jython = platform.system == 'Java'
 here = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    from setuptools import setup
-    from setuptools import Command as CleanBaseCommand
-    raise ImportError("!")
+    from setuptools import setup, Command
 except ImportError:
     sys.exit("Install systemtools before shoebot")
 
 
-class CleanCommand(CleanBaseCommand):
+class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
     CLEAN_FILES = './build ./dist ./*.pyc ./*.tgz ./*.egg-info'.split(' ')
 
