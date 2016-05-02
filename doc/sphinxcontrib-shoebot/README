@@ -39,6 +39,26 @@ will render an image of a rounded rectangle.
 The directive 'snapshot' specifies that it will generate a single image.
 
 
+Options
+-------
+
+Size - change the size of the rendered bot.
+
+    .. shoebot::
+        :snapshot:
+        :size: 400, 400
+
+        # On a 400x400 canvas draw some rectangles
+        def draw():
+            nofill()
+            strokewidth(20)
+            stroke(0.75, 0., 0)
+            for i in xrange(380, 0, -40):
+                rect(200-i, 200-i, i*2, i*2)
+
+Used to change the canvas size without including 'size' in the 
+script itself.
+
 Requirements
 ------------
 
