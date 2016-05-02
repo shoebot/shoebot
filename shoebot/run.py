@@ -92,11 +92,74 @@ def main():
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
     parser.add_argument("script")
+
+    # IO - Output to file
     parser.add_argument("-o",
                     "--outputfile",
                     dest="outputfile",
                     help=_("run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)"),
                     metavar="FILE")
+
+    # Shoebot IO - Sockets
+    parser.add_argument("-s",
+                    "--socketserver",
+                    action="store_true",
+                    dest="socketserver",
+                    default=False,
+                    help=_("run a socket server for external control (will run the script in windowed mode)"))
+    parser.add_argument("-p",
+                    "--serverport",
+                    type=int,
+                    dest="serverport",
+                    default=DEFAULT_SERVERPORT,
+                    help=_("set socketserver port to listen for connections (default is 7777)"))
+
+    # IO - Variables
+    parser.add_argument("-v",
+                    "--vars",
+                    dest="vars",
+                    default=False,
+                    help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
+                    )
+    # IO - Namespace
+    parser.add_argument("-ns",
+                    "--namespace",
+                    dest="namespace",
+                    default=None,
+                    help=_("Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
+                    )
+    # IO - IDE integration Shell
+    parser.add_argument("-l",
+                    "--l",
+                    dest="shell",
+                    action="store_true",
+                    default=False,
+                    help=_("Simple shell - for IDE interaction"),
+                    )
+
+    # IO - Passing args to the bot
+    parser.add_argument("-a",
+                    "--args",
+                    dest="script_args",
+                    help=_("Pass to the bot"),
+                    )
+    parser.add_argument('script_args', nargs='?')
+
+    # Bot Lifecycle
+    parser.add_argument("-r",
+                    "--repeat",
+                    type=int,
+                    dest="repeat",
+                    default=False,
+                    help=_("set number of iteration, multiple images will be produced"))
+    parser.add_argument("-g",
+                    "--grammar",
+                    dest="grammar",
+                    default=NODEBOX,
+                    help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
+                    )
+
+    # Window Management
     parser.add_argument("-w",
                     "--window",
                     action="store_true",
@@ -118,42 +181,6 @@ def main():
                     default=None,
                     help=_("Set window title")
                     )
-    parser.add_argument("-s",
-                    "--socketserver",
-                    action="store_true",
-                    dest="socketserver",
-                    default=False,
-                    help=_("run a socket server for external control (will run the script in windowed mode)"))
-    parser.add_argument("-dv",
-                    "--disable-vars",
-                    action="store_true",
-                    dest="disable_vars",
-                    default=False,
-                    help=_("disable the variables pane when in windowed mode."))
-    parser.add_argument("-dt",
-                    "--disable-background-thread",
-                    action="store_true",
-                    dest="disable_background_thread",
-                    default=False,
-                    help=_("disable running bot code in background thread."))
-    parser.add_argument("-p",
-                    "--serverport",
-                    type=int,
-                    dest="serverport",
-                    default=DEFAULT_SERVERPORT,
-                    help=_("set socketserver port to listen for connections (default is 7777)"))
-    parser.add_argument("-r",
-                    "--repeat",
-                    type=int,
-                    dest="repeat",
-                    default=False,
-                    help=_("set number of iteration, multiple images will be produced"))
-    parser.add_argument("-g",
-                    "--grammar",
-                    dest="grammar",
-                    default=NODEBOX,
-                    help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
-                    )
     parser.add_argument("-c",
                     "--close",
                     action="store_true",
@@ -161,30 +188,20 @@ def main():
                     default=False,
                     help=_("Close window after running bot (use with -r for benchmarking)"),
                     )
-    parser.add_argument("-v",
-                    "--vars",
-                    dest="vars",
-                    default=False,
-                    help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
-                    )
-    parser.add_argument("-ns",
-                    "--namespace",
-                    dest="namespace",
-                    default=None,
-                    help=_("Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
-                    )
-    parser.add_argument("-l",
-                    "--l",
-                    dest="shell",
+    parser.add_argument("-dv",
+                    "--disable-vars",
                     action="store_true",
+                    dest="disable_vars",
                     default=False,
-                    help=_("Simple shell - for IDE interaction"),
-                    )
-    parser.add_argument("-a",
-                    "--args",
-                    dest="script_args",
-                    help=_("Pass to the bot"),
-                    )
+                    help=_("disable the variables pane when in windowed mode."))
+
+    # Debugging / dev flags
+    parser.add_argument("-dt",
+                    "--disable-background-thread",
+                    action="store_true",
+                    dest="disable_background_thread",
+                    default=False,
+                    help=_("disable running bot code in background thread."))
     parser.add_argument("-V",
                     "--verbose",
                     action="store_true",
@@ -192,7 +209,6 @@ def main():
                     default=False,
                     help=_("Show internal shoebot error information in traceback"),
                     )
-    parser.add_argument('script_args', nargs='?')
 
     # get argparse arguments and check for sanity
     args, extra = parser.parse_known_args()
