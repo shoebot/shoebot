@@ -12,8 +12,8 @@ The most evident purpose of scripting is to automate repetitive tasks; for
 example, one could create an image with 2000 randomly positioned circles with
 two lines of code:
 
-    .. shoebot::
-        :snapshot:
+.. shoebot::
+    :snapshot:
 
     for step in range(2000):
         ellipse(random(WIDTH), random(HEIGHT), 10, 10)
