@@ -133,9 +133,7 @@ class ShoebotDirective(Directive):
             script_to_render = BOT_HEADER.format(size=opt_size) + text
             try:
                 cmd = ['sbot', '-o', '%s' % outfn, script_to_render]
-                #print("run: %s" % " ".join(cmd))
                 subprocess.call(cmd)
-                #print("ran")
             except Exception as e:
                 print("oops %e" % e)
                 print("cmd: ")
