@@ -79,12 +79,12 @@ class CairoImageSink(DrawQueueSink):
         """
         if self.format == 'pdf':
             surface = cairo.PDFSurface(self._output_file(frame), *size)
-        elif self.format == 'png':
-            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         elif self.format in ('ps', 'eps'):
             surface = cairo.PSSurface(self._output_file(frame), *size)
-        if self.format == 'svg':
+        elif self.format == 'svg':
             surface = cairo.SVGSurface(self._output_file(frame), *size)
+        else:
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         return cairo.Context(surface)
 
     def rendering_finished(self, size, frame, cairo_ctx):
