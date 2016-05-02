@@ -45,9 +45,22 @@ if GI:
 else:
     _UNSAFE_cairocffi_context_to_pycairo = None
 
-gi.require_version('Pango', '1.0')
-gi.require_version('PangoCairo', '1.0')
-from gi.repository import Pango, PangoCairo
+try:
+    gi.require_version('Pango', '1.0')
+    gi.require_version('PangoCairo', '1.0')
+    from gi.repository import Pango, PangoCairo
+except ImportError as e:
+    global Pango, PangoCairo
+
+    # workaround for readthedocs where Pango is not installed
+    print("Pango not found - typography will not be available.")
+
+    class FakePango(object):
+        def __getattr__(self, item):
+            raise e
+    Pango = FakePango()
+    PangoCairo = FakePango()
+
 ## from shoebot.data import Grob, BezierPath, TransformMixin, ColorMixin, _copy_attrs
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairocffi import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
