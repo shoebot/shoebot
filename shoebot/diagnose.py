@@ -10,19 +10,18 @@ This can be complemented by running the unittests.
 """
 from __future__ import print_function
 
-def diagnose():
-    import os
-    import sys
-    import traceback
+import os
+import sys
+import platform
+import traceback
 
+def display_platform():
     # environment info
     is_virtualenv = "VIRTUAL_ENV" in os.environ
     print("sys.executable: ", sys.executable)
     print("virtualenv:", os.environ.get("VIRTUAL_ENV", "no"))
 
     # operating system info
-    import platform
-    import sys
 
     def linux_distribution():
       try:
@@ -50,54 +49,99 @@ def diagnose():
     platform.mac_ver(),
     platform.win32_ver(),
     ))
+    
 
-    def test_import(mn):
-        try:
-            m = __import__(mn)
-            print("import %s [success]" % mn, m.__file__)
-        except ImportError:
-            print("import %s [failed]" % mn)
-        except Exception as e:
-            print("import %s [failed]: %s" (mn % str(e)))
-            
-    # gtk info
-    test_import("gi")
-    test_import("pgi")
+def test_import(mn):
+    COL_WIDTH=20
+    try:
+        m = __import__(mn)
+        print("import %s [success] : %s" % (mn.ljust(COL_WIDTH), m.__file__))
+        return m
+    except ImportError:
+        print("import %s [failed]" % mn.ljust(COL_WIDTH))
+    except Exception as e:
+        print("import %s [failed] : %s\n%s" (mn % str(e)))
 
-    # vext info
-    test_import("vext")
 
-    # shoebot info
-    test_import("shoebot")
+def test_imports():
+    """
+    Attempt to import dependencies.
+    """
+    # gtk
+    gi = test_import("gi")
+    if gi:
+        test_import("gi.repository.Pango")
+    else:
+        print("Pango won't be available")
+    pgi = test_import("pgi")
+
+    # virtualenv help
+    vext = test_import("vext")
+
+    # internal dependencies
+    pubsub = test_import("pubsub")
+    meta = test_import("meta")
+    
+    # shoebot itself (if already installed)
+    return test_import("shoebot")
+
+
+def shoebot_example(**shoebot_kwargs):
+    """
+    Decorator to run some code in a bot instance.
+    """
+    def decorator(f):
+        def run():
+            print("shoebot - %s:" % f.__name__.replace("_", " "))
+            try:
+                import shoebot
+                outputfile="/tmp/shoebot-%s.png" % f.__name__
+                bot = shoebot.create_bot(outputfile=outputfile)
+                f(bot)
+                bot.finish()
+                print("[passed] : %s" % outputfile)
+            except Exception as e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_exc()
+                print("[failed]")
+        return run
+    return decorator
+
+@shoebot_example()
+def standard_module_example(bot):
+    bot.size(640, 480)
+    bot.fill(1, 0.5, 0.1)
+    bot.rect(10, 10, 100, 100)
+
+@shoebot_example()
+def module_using_text(bot):
+    bot.size(640, 480)
+    bot.stroke(0)
+    bot.text("Should work with gi not pgi", 0, 0)
+
+def diagnose():
+    display_platform()
+    test_imports()
+
+    try:
+        import shoebot
+    except ImportError as e:
+        print("Cannot 'import shoebot'")
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exc()
+        return False
+
 
 
     # shoebot itself
-    try:
-        print("shoebot - standard module example")
-        import shoebot
-        bot = shoebot.create_bot(outputfile="test-output1.png")
-        bot.size(640, 480)
-        bot.rect(10, 10, 100, 100)
-        bot.finish()
-        print("[passed]")
-    except Exception as e:
-        print("[failed]:")
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exc()
+    standard_module_example()
 
     # shoebot with text (will fail under pypy or pgi)
-    try:
-        print("shoebot - module, using test")
-        import shoebot
-        bot = shoebot.create_bot(outputfile="test-output2.png")
-        bot.size(640, 480)
-        bot.text("should work if using gi not pgi", 0, 0)
-        bot.finish()
-        print("[passed]")
-    except Exception as e:
-        print("[failed]:")
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exc()
+    module_using_text()
 
 if __name__ == '__main__':
+    import os
+    import sys
+    import traceback
+    
     diagnose()
