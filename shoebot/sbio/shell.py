@@ -298,6 +298,9 @@ class ShoebotCmd(cmd.Cmd):
         return cmd.Cmd.do_help(self, arg)
 
     def do_set(self, line):
+        if not '=' in line:
+            print('Invalid Syntax.')
+            return
         name, value = [part.strip() for part in line.split('=')]
         if name not in self.bot._vars:
             self.print_response('No such variable %s enter vars to see available vars' % name)
