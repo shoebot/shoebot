@@ -105,7 +105,6 @@ class ShoebotDirective(Directive):
 
     option_spec = {
         'snapshot': directives.flag,
-        #'size': directives.unchanged,
         'size': size_opt,
         'linenos': HtmlFormatter(noclasses=INLINESTYLES, linenos=True),
         'source': str,
