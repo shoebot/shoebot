@@ -46,13 +46,6 @@ from pygments.formatters import HtmlFormatter
 # The default formatter
 DEFAULT = HtmlFormatter(noclasses=INLINESTYLES)
 
-# Add name -> formatter pairs for every variant you want to use
-VARIANTS = {
-    'linenos': HtmlFormatter(noclasses=INLINESTYLES, linenos=True),
-    'snapshot': str,
-    'source': str,
-}
-
 BOT_HEADER = """
 size{size}
 background(1)
@@ -91,13 +84,32 @@ class ShoebotError(SphinxError):
 def html_img_tag(src):
     return '<img src="_static/{}">'.format(src)
 
+
+def align(argument):
+    """Conversion function for the "align" option."""
+    return directives.choice(argument, ('left', 'center', 'right'))
+
+def size_opt(argument):
+    if isinstance(argument, tuple):
+        return argument
+    else:
+        return tuple(map(int, argument.split(",")))
+
+
 class ShoebotDirective(Directive):
     """ Source code syntax hightlighting.
     """
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = True
-    option_spec = dict([(key, directives.flag) for key in VARIANTS])
+
+    option_spec = {
+        'snapshot': directives.flag,
+        #'size': directives.unchanged,
+        'size': size_opt,
+        'linenos': HtmlFormatter(noclasses=INLINESTYLES, linenos=True),
+        'source': str,
+    }
     has_content = True
 
     def run(self):
@@ -108,24 +120,27 @@ class ShoebotDirective(Directive):
 
         result = [nodes.raw('', parsed, format='html')]
 
+        options_dict = dict(self.options)
+        opt_size = options_dict.get("size", (100, 100))
         if True:
             # If we want a snapshot - this should check the 'snapshot argument'#
             fn = '{}.png'.format(sha(text).hexdigest())
-            print("fn: %s" % fn)
 
             env = self.state.document.settings.env
             rel_filename, filename = env.relfn2path(fn)
 
             outfn = os.path.join(env.app.builder.outdir, '_static', rel_filename)
             ensuredir(os.path.dirname(outfn))
-            script_to_render = BOT_HEADER.format(size=(100, 100)) + text
+            script_to_render = BOT_HEADER.format(size=opt_size) + text
             try:
                 cmd = ['sbot', '-o', '%s' % outfn, script_to_render]
-                print("run: %s" % " ".join(cmd))
+                #print("run: %s" % " ".join(cmd))
                 subprocess.call(cmd)
-                print("ran")
+                #print("ran")
             except Exception as e:
                 print("oops %e" % e)
+                print("cmd: ")
+                print(" ".join(cmd))
                 raise ShoebotError(str(e))
 
             # TODO - Support other output formats
