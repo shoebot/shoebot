@@ -15,12 +15,12 @@ Example::
       
 '''
 
-#requires = ['shoebot>=1.2.1']
+# Obviously requires shoebot as well
 requires = ['Sphinx>=1.4.1', 'pip>=8.1.1']
 
 setup(
     name='sphinxcontrib-shoebot',
-    version='1.2.1',
+    version='1.2.2',
     url='https://github.com/shoebot/shoebot/tree/readthedocs/doc/sphinxcontrib_shoebot',
     license='BSD',
     author='Stuart Axon',
