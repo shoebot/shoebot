@@ -20,7 +20,7 @@ from gi.repository import Gtk
 
 import os
 import cairocffi as cairo
-from shoebot.io.socket_server import SocketServer
+from shoebot.sbio.socket_server import SocketServer
 
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):

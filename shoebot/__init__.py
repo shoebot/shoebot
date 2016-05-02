@@ -137,7 +137,7 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
         bot = NodeBot(canvas, namespace=namespace, vars=vars)
 
     if server:
-        from shoebot.io import SocketServer
+        from shoebot.sbio import SocketServer
         socket_server = SocketServer(bot, "", port=port)
     return bot
 
@@ -293,8 +293,8 @@ def run(src,
         sbot.run(*run_args, **run_kwargs)
 
     if run_shell:
-        import shoebot.io.shell
-        shell = shoebot.io.shell.ShoebotCmd(sbot, trusted=True)
+        import shoebot.sbio.shell
+        shell = shoebot.sbio.shell.ShoebotCmd(sbot, trusted=True)
         try:
             shell.cmdloop()
         except KeyboardInterrupt as e:
