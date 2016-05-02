@@ -112,7 +112,7 @@ BASE_REQUIREMENTS=[
     "cairocffi>=0.7.2",
     "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
     NUMPY,
-    "Pillow==2.8.1",
+    "Pillow>=2.8.1",
     "pubsub==0.1.1",
 ]
 
