@@ -14,6 +14,7 @@ two lines of code:
 
 .. shoebot::
     :snapshot:
+    :size: 400, 400
 
     for step in range(2000):
         ellipse(random(WIDTH), random(HEIGHT), 10, 10)
