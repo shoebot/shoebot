@@ -91,23 +91,24 @@ def main():
 
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
-    parser.add_argument("script")
+    parser.add_argument("script", help="Shoebot / Nodebox script to run (filename or code)")
 
+    group = parser.add_argument_group('Input / Output')
     # IO - Output to file
-    parser.add_argument("-o",
+    group.add_argument("-o",
                     "--outputfile",
                     dest="outputfile",
-                    help=_("run script and output to FILE (accepts .svg, .ps, .pdf and .png extensions)"),
+                    help=_("run script and output to image file (accepts .png .svg .pdf and .ps extensions)"),
                     metavar="FILE")
 
     # Shoebot IO - Sockets
-    parser.add_argument("-s",
+    group.add_argument("-s",
                     "--socketserver",
                     action="store_true",
                     dest="socketserver",
                     default=False,
                     help=_("run a socket server for external control (will run the script in windowed mode)"))
-    parser.add_argument("-p",
+    group.add_argument("-p",
                     "--serverport",
                     type=int,
                     dest="serverport",
@@ -115,21 +116,21 @@ def main():
                     help=_("set socketserver port to listen for connections (default is 7777)"))
 
     # IO - Variables
-    parser.add_argument("-v",
+    group.add_argument("-v",
                     "--vars",
                     dest="vars",
                     default=False,
                     help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
                     )
     # IO - Namespace
-    parser.add_argument("-ns",
+    group.add_argument("-ns",
                     "--namespace",
                     dest="namespace",
                     default=None,
                     help=_("Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
                     )
     # IO - IDE integration Shell
-    parser.add_argument("-l",
+    group.add_argument("-l",
                     "--l",
                     dest="shell",
                     action="store_true",
@@ -138,71 +139,74 @@ def main():
                     )
 
     # IO - Passing args to the bot
-    parser.add_argument("-a",
+    group.add_argument("-a",
                     "--args",
                     dest="script_args",
                     help=_("Pass to the bot"),
                     )
-    parser.add_argument('script_args', nargs='?')
+    group.add_argument('script_args', nargs='?')
 
+    group = parser.add_argument_group('Bot Lifecycle')
     # Bot Lifecycle
-    parser.add_argument("-r",
+    group.add_argument("-r",
                     "--repeat",
                     type=int,
                     dest="repeat",
                     default=False,
                     help=_("set number of iteration, multiple images will be produced"))
-    parser.add_argument("-g",
+    group.add_argument("-g",
                     "--grammar",
                     dest="grammar",
                     default=NODEBOX,
                     help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
                     )
 
+    group = parser.add_argument_group('Window Management')
     # Window Management
-    parser.add_argument("-w",
+    group.add_argument("-w",
                     "--window",
                     action="store_true",
                     dest="window",
                     default=False,
                     help=_("run script in a GTK window")
                     )
-    parser.add_argument("-f",
+    group.add_argument("-f",
                     "--fullscreen",
                     action="store_true",
                     dest="fullscreen",
                     default=False,
                     help=_("run in fullscreen mode")
                     )
-    parser.add_argument("-t",
+    group.add_argument("-t",
                     "--title",
                     action="store",
                     dest="title",
                     default=None,
                     help=_("Set window title")
                     )
-    parser.add_argument("-c",
+    group.add_argument("-c",
                     "--close",
                     action="store_true",
                     dest="close",
                     default=False,
                     help=_("Close window after running bot (use with -r for benchmarking)"),
                     )
-    parser.add_argument("-dv",
+    group.add_argument("-dv",
                     "--disable-vars",
                     action="store_true",
                     dest="disable_vars",
                     default=False,
                     help=_("disable the variables pane when in windowed mode."))
 
+    group = parser.add_argument_group('Debugging / Dev flags')
     # Debugging / dev flags
-    parser.add_argument("-dt",
+    group.add_argument("-dt",
                     "--disable-background-thread",
                     action="store_true",
                     dest="disable_background_thread",
                     default=False,
                     help=_("disable running bot code in background thread."))
-    parser.add_argument("-V",
+    group.add_argument("-V",
                     "--verbose",
                     action="store_true",
                     dest="verbose",
