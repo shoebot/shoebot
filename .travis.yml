@@ -16,4 +16,5 @@ install:
  - SHOEBOT_SKIP_EXAMPLES=1 $PYTHON ./setup.py install
 
 script:
+ - $PYTHON setup.py diagnose
  - if [ "$PYTHON" == "python2" ]; then $PYTHON setup.py test; fi
