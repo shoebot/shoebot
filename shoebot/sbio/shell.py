@@ -305,21 +305,22 @@ class ShoebotCmd(cmd.Cmd):
         return cmd.Cmd.do_help(self, arg)
 
     def do_set(self, line):
-        if not '=' in line:
-            print('Invalid Syntax.')
-            return
-        name, value = [part.strip() for part in line.split('=')]
-        if name not in self.bot._vars:
-            self.print_response('No such variable %s enter vars to see available vars' % name)
-            return
-        variable = self.bot._vars[name]
-        variable.value = variable.sanitize(value.strip(';'))
+        try:
+            name, sep, value = [part.strip() for part in line.split('=')]
+            if name not in self.bot._vars:
+                self.print_response('No such variable %s enter vars to see available vars' % name)
+                return
+            variable = self.bot._vars[name]
+            variable.value = variable.sanitize(value.strip(';'))
 
-        success, msg = self.bot.canvas.sink.var_changed(name, variable.value)
-        if success:
-            print('{}={}'.format(name, variable.value), file=self.stdout)
-        else:
-            print('{}\n'.format(msg), file=self.stdout)
+            success, msg = self.bot.canvas.sink.var_changed(name, variable.value)
+            if success:
+                print('{}={}'.format(name, variable.value), file=self.stdout)
+            else:
+                print('{}\n'.format(msg), file=self.stdout)
+        except Exception as e:
+            print('Invalid Syntax.', e)
+            return
 
     def precmd(self, line):
         """
@@ -341,6 +342,13 @@ class ShoebotCmd(cmd.Cmd):
         if line.startswith('#'):
             return ''
         elif '=' in line:
+            # allow  somevar=somevalue
+
+            # first check if we really mean a command
+            cmdname = line.partition(" ")[0]
+            if hasattr(self, "do_%s" % cmdname):
+                return line
+
             if not line.startswith("set "):
                 return "set " + line
             else:
