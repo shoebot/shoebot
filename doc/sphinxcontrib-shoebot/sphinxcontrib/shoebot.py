@@ -54,7 +54,7 @@ VARIANTS = {
 }
 
 BOT_HEADER = """
-size(100, 100)
+size{size}
 background(1)
 fill(.95,.75,0)
 """
@@ -107,18 +107,18 @@ class ShoebotDirective(Directive):
         parsed = highlight(text, PythonLexer(), HtmlFormatter())
 
         result = [nodes.raw('', parsed, format='html')]
-        
+
         if True:
-            # If we want a snapshot - this should check the 'snapshot argument'# 
+            # If we want a snapshot - this should check the 'snapshot argument'#
             fn = '{}.png'.format(sha(text).hexdigest())
             print("fn: %s" % fn)
-            
+
             env = self.state.document.settings.env
             rel_filename, filename = env.relfn2path(fn)
 
             outfn = os.path.join(env.app.builder.outdir, '_static', rel_filename)
             ensuredir(os.path.dirname(outfn))
-            script_to_render = BOT_HEADER + text
+            script_to_render = BOT_HEADER.format(size=(100, 100)) + text
             try:
                 cmd = ['sbot', '-o', '%s' % outfn, script_to_render]
                 print("run: %s" % " ".join(cmd))
@@ -127,7 +127,6 @@ class ShoebotDirective(Directive):
             except Exception as e:
                 print("oops %e" % e)
                 raise ShoebotError(str(e))
-
 
             # TODO - Support other output formats
             image_node = nodes.raw('', html_img_tag(rel_filename), format='html')
