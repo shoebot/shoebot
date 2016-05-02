@@ -251,6 +251,7 @@ Sets a fill color, applying it to new paths.
   * args: color in supported format
 
 .. py:function:: stroke(*args)
+
 Set a stroke color, applying it to new paths.
 
   * args: color in supported format
@@ -370,7 +371,7 @@ Utility functions
 .. py:function:: files(path="*")
 
     You can use wildcards to specify which files to pick, e.g.
-    >>> f = files('*.gif')
+    ``>>> f = files('*.gif')``
 
     :param path: wildcard to use in file list.
 

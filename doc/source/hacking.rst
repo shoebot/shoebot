@@ -57,59 +57,76 @@ Command-line usage
 
 Enter sbot -h to see available options, they are split into logical groups:
 
-usage: usage: sbot [options] inputfile.bot [args] [-h] [-o FILE] [-s]
-                                                  [-p SERVERPORT] [-v VARS]
-                                                  [-ns NAMESPACE] [-l]
-                                                  [-a SCRIPT_ARGS] [-r REPEAT]
-                                                  [-g GRAMMAR] [-w] [-f]
-                                                  [-t TITLE] [-c] [-dv] [-dt]
-                                                  [-V]
-                                                  script [script_args]
+.. code:: text
 
-positional arguments:
-  script                Shoebot / Nodebox script to run (filename or code)
+    usage: usage: sbot [options] inputfile.bot [args] [-h] [-o FILE] [-s]
+                                                      [-p SERVERPORT] [-v VARS]
+                                                      [-ns NAMESPACE] [-l]
+                                                      [-a SCRIPT_ARGS] [-r REPEAT]
+                                                      [-g GRAMMAR] [-w] [-f]
+                                                      [-t TITLE] [-c] [-dv] [-dt]
+                                                      [-V]
+                                                      script [script_args]
 
-optional arguments:
-  -h, --help            show this help message and exit
+.. code:: text
+
+    positional arguments:
+      script                Shoebot / Nodebox script to run (filename or code)
+
+    optional arguments:
+      -h, --help            show this help message and exit
+
 
 Input / Output:
-  -o FILE, --outputfile FILE
-                        run script and output to image file (accepts .png .svg
-                        .pdf and .ps extensions)
-  -s, --socketserver    run a socket server for external control (will run the
-                        script in windowed mode)
-  -p SERVERPORT, --serverport SERVERPORT
-                        set socketserver port to listen for connections
-                        (default is 7777)
-  -v VARS, --vars VARS  Initial variables, in JSON (Note: Single quotes
-                        OUTSIDE, double INSIDE) --vars='{"variable1": 1}'
-  -ns NAMESPACE, --namespace NAMESPACE
-                        Initial namespace, in JSON (Note: Single quotes
-                        OUTSIDE, double INSIDE) --namespace='{"variable1": 1}'
-  -l, --l               Simple shell - for IDE interaction
-  -a SCRIPT_ARGS, --args SCRIPT_ARGS
-                        Pass to the bot
-  script_args
+
+.. code:: text
+
+      -o FILE, --outputfile FILE
+                            run script and output to image file (accepts .png .svg
+                            .pdf and .ps extensions)
+      -s, --socketserver    run a socket server for external control (will run the
+                            script in windowed mode)
+      -p SERVERPORT, --serverport SERVERPORT
+                            set socketserver port to listen for connections
+                            (default is 7777)
+      -v VARS, --vars VARS  Initial variables, in JSON (Note: Single quotes
+                            OUTSIDE, double INSIDE) --vars='{"variable1": 1}'
+      -ns NAMESPACE, --namespace NAMESPACE
+                            Initial namespace, in JSON (Note: Single quotes
+                            OUTSIDE, double INSIDE) --namespace='{"variable1": 1}'
+      -l, --l               Simple shell - for IDE interaction
+      -a SCRIPT_ARGS, --args SCRIPT_ARGS
+                            Pass to the bot
+      script_args
 
 Bot Lifecycle:
-  -r REPEAT, --repeat REPEAT
-                        set number of iteration, multiple images will be
-                        produced
-  -g GRAMMAR, --grammar GRAMMAR
-                        Select the bot grammar 'nodebox' (default) or
-                        'drawbot' languages
+
+.. code:: text
+
+      -r REPEAT, --repeat REPEAT
+                            set number of iteration, multiple images will be
+                            produced
+      -g GRAMMAR, --grammar GRAMMAR
+                            Select the bot grammar 'nodebox' (default) or
+                            'drawbot' languages
 
 Window Management:
-  -w, --window          run script in a GTK window
-  -f, --fullscreen      run in fullscreen mode
-  -t TITLE, --title TITLE
-                        Set window title
-  -c, --close           Close window after running bot (use with -r for
-                        benchmarking)
-  -dv, --disable-vars   disable the variables pane when in windowed mode.
+
+.. code:: text
+
+      -w, --window          run script in a GTK window
+      -f, --fullscreen      run in fullscreen mode
+      -t TITLE, --title TITLE
+                            Set window title
+      -c, --close           Close window after running bot (use with -r for
+                            benchmarking)
+      -dv, --disable-vars   disable the variables pane when in windowed mode.
 
 Debugging / Dev flags:
-  -dt, --disable-background-thread
-                        disable running bot code in background thread.
-  -V, --verbose         Show internal shoebot error information in traceback
+
+.. code:: text
+
+      -dt, --disable-background-thread
+                            disable running bot code in background thread.
+      -V, --verbose         Show internal shoebot error information in traceback
 
