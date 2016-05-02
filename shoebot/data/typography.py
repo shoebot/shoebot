@@ -49,7 +49,7 @@ try:
     gi.require_version('Pango', '1.0')
     gi.require_version('PangoCairo', '1.0')
     from gi.repository import Pango, PangoCairo
-except ImportError as e:
+except ValueError as e:
     global Pango, PangoCairo
 
     # workaround for readthedocs where Pango is not installed
