@@ -79,7 +79,7 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     :param fullscreen: ShoebotWindow - set window title
     :param show_vars: ShoebotWindow - display variable window
 
-    Two kinds of sink are provided CairoImageSink and ShoebotWindow
+    Two kinds of sink are provided: CairoImageSink and ShoebotWindow
 
     ShoebotWindow
 
