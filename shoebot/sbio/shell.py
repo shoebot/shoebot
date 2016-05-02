@@ -60,9 +60,16 @@ def trusted_cmd(f):
     :param f:
     :return:
     """
+
+    def run_cmd(self, line):
+        if self.trusted:
+            f(self, line)
+        else:
+            print("Sorry cannot do %s here." % f.__name__[3:])
+
     global trusted_cmds
-    trusted_cmds.add(f)
-    return f
+    trusted_cmds.add(f.__name__)
+    return run_cmd
 
 
 class ShoebotCmd(cmd.Cmd):
