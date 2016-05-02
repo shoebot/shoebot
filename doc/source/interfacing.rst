@@ -46,6 +46,34 @@ $ telnet 127.0.0.1 7777
 As well as setting and listing variables in the variables window, you can
 do things like go to a particular frame.
 
+Useful commands include:
+
+   goto  load_base64  pause  play  restart  rewind  speed  title  vars
+
+
+    Playback Commands
+
+    ==================   ======================================
+    Command              Description
+    ==================   ======================================
+    goto 100             Go to frame 100
+    pause                pause playback
+    rewind               set FRAME to 0
+    restart              set FRAME to 0 and reset all variables
+    ==================   ======================================
+
+    Using variables
+
+    ==================   ======================================
+    Command              Description
+    ==================   ======================================
+    vars                 Show content of all Shoebot Variables
+    set n=1              set variable 'n' to value 1
+    n=1                  set variable 'n' to value 1
+    ==================   ======================================
+
+
+
 Enter help to see which commands are available.
 
 
