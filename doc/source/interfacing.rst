@@ -42,12 +42,12 @@ Once it's running it's easy to connect with telnet:
 
 $ telnet 127.0.0.1 7777
 
-As well as setting and listing variables in the variables window, you can
-do things like go to a particular frame.
+This gets you into the shell, where you can use commands to list and
+set variables, rewind and go to frames.
 
-Useful commands include:
 
-   goto  load_base64  pause  play  restart  rewind  speed  title  vars
+Commands
+~~~~~~~~
 
 
     Playback Commands
@@ -72,11 +72,16 @@ Useful commands include:
     ==================   ======================================
 
 
+    Other
 
-Enter help to see which commands are available.
+    ==================   ======================================
+    Command              Description
+    ==================   ======================================
+    help                 Show list of all commands
+    ==================   ======================================
 
 
-Socket server eamples are available in  examples/socketserver
+Socket server examples are available in  examples/socketserver
 
 
 Editors/IDEs and the live shell
@@ -91,7 +96,22 @@ To experiment with the livecoding shell, run an example with the -l option
 
 $ sbot -wl examples/animation/hypnoval.bot
 
-Enter help to see which commands are available.
+This has all the commands that the socket server has, and extra commands
+that can be useful for an editor or IDE.
+
+
+Commands
+~~~~~~~~
+
+    Live Shell Commands
+
+    ==================   ==============================================
+    Command              Description
+    ==================   ==============================================
+    quit                 quit shoebot
+    load_base64          used by IDE/Editor to send new code to Shoebot
+    ==================   ==============================================
+
 
 
 Embedding
