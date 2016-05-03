@@ -117,6 +117,10 @@ Commands
 Embedding
 ---------
 
+For applications that use standard image formats, like the web it is enough to use
+create_bot and output image formats (see 'using shoebot as a module').
+
+
 
 
 Pure Data

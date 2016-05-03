@@ -1,0 +1,3 @@
+[submodule "extensions/django"]
+	path = extensions/django
+	url = https://github.com/shoebot/shoebot-django.git
