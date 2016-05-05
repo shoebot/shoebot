@@ -62,7 +62,7 @@ Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need t
 
 ## Usage
 
-See the `Getting started <http://shoebot.readthedocs.io/en/latest/getstarted.html>` docs page.
+See the [Getting started](http://shoebot.readthedocs.io/en/latest/commands.html) docs page.
 
 
 ## Documentation
