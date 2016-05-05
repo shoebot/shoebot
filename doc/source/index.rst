@@ -1,6 +1,10 @@
 Shoebot documentation
 =====================
 
+* `Main site <https://shoebot.github.io>`
+* `GitHub repository <https://github.com/shoebot/shoebot>`
+* `Issue tracker <https://github.com/shoebot/shoebot/issues>`
+
 Contents:
 
 .. toctree::
@@ -12,6 +16,7 @@ Contents:
    advanced
    interfacing
    libraries
+   extensions
    examples
    
 

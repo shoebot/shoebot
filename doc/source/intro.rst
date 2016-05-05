@@ -17,8 +17,8 @@ generative creativity:
   * Design By Numbers
 
 Shoebot is a fork/rewrite of `Nodebox 1
-<https://www.nodebox.net/code/index.php/Home>`_, which is itself based on
-`DrawBot <http://www.drawbot.com/>`_. There are slightly different syntax
+<https://www.nodebox.net/code/index.php/Home>`_ by Frederik de Bleser and Tom de Smedt, which is itself based on
+`DrawBot <http://www.drawbot.com/>`_ by Just van Rossum. There are slightly different syntax
 approaches in each language, and Shoebot tries to support both.
 
 
