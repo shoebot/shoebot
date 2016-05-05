@@ -55,7 +55,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Shoebot'
-copyright = u'2009, Ricardo Lafuente'
+import datetime
+copyright = u'2007-' + unicode(datetime.date.today().year) + u' , the Shoebot authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
