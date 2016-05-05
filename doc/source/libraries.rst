@@ -1,13 +1,7 @@
 Shoebot libraries
 =================
 
-Installing
-==========
-
-
-
-Library reference
-=================
+[TODO: How to install]
 
 OpenCV
 ------
