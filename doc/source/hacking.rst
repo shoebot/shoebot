@@ -1,61 +1,46 @@
 Hacking Shoebot
 ===============
 
-This section is for the Python hackers who want to get dirty with canvas manipulation and so on.
+This section is for the Python hackers who want to get into the more involved
+features of Shoebot.
 
 Using Shoebot as a Python module
 --------------------------------
 
-Shoebot can also be loaded as a module. For now, scripts taking advantage of
-this must be placed inside the shoebot dir.
-
-After including an import statement,
+Shoebot can be easily loaded as a module inside a Python script.
 
 .. code-block:: python
 
     import shoebot
 
-a NodeBot object needs to be created, and all further drawing commands can be 
-called on that instance.
-
-The quickest way is to use the create_bot function, it sets up an appropriate
-canvas and lets us draw to it.
-
-.. code-block:: python
-
+    # set up a canvas
     bot = shoebot.create_bot(outputfile="output.svg")
+
+    # size() needs to be called first
     bot.size(400,400)
+
+    # now we can draw!
     bot.rect(10,10,100,100)
 
-When you're finished with drawing, just call
-
-.. code-block:: python
-
+    # finish() should be called after all drawing commands
     bot.finish()
 
-and your output file should be created.
-
-Also, you can save snapshots of the current state if the Bot instance like so:
+Take a snapshot of the current state:
 
 .. code-block:: python
 
     bot.snapshot("snap.png")
 
-You can even call external Shoebot/Nodebox scripts from your Python script:
+Run a Shoebot/Nodebox script:
 
 .. code-block:: python
 
     bot.run("example.bot")
 
-
-Working directly with Cairo
----------------------------
-TODO
-
 Command-line usage
 ------------------
 
-Enter sbot -h to see available options, they are split into logical groups:
+Enter `sbot -h` to see all the available options:
 
 .. code:: text
 
@@ -129,4 +114,11 @@ Debugging / Dev flags:
       -dt, --disable-background-thread
                             disable running bot code in background thread.
       -V, --verbose         Show internal shoebot error information in traceback
+
+
+Working directly with Cairo
+---------------------------
+
+TODO
+
 

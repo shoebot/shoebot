@@ -1,6 +1,10 @@
 Command reference
 =================
 
+This documentation is still missing many parts. Refer to the [Nodebox
+documentation](https://www.nodebox.net/code/index.php/Reference) for the best
+reference in the meantime.
+
 Drawing shapes
 --------------
 
@@ -274,6 +278,12 @@ Stop applying strokes to new paths.
   * args: color in a supported format.
   * return: Color object containing the color.
 
+
+Color
+-----
+
+[TODO: Describe all the possible color syntax options, and link the above
+commands to these.]
 
 Text
 ----
