@@ -12,6 +12,7 @@ Contents:
    advanced
    interfacing
    libraries
+   examples
    
 
 .. We won't be needing these for now

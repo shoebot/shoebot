@@ -26,8 +26,8 @@ Why scripting?
 --------------
 
 The most evident purpose of scripting is to automate repetitive
-tasks; for example, one could create an image with 2000 randomly positioned
-circles with two lines of code:
+tasks. Using Shoebot, we can create an image with 2000 randomly positioned
+circles in two lines of code:
 
 .. shoebot::
     :snapshot:
