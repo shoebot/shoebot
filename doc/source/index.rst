@@ -12,6 +12,7 @@ Contents:
    
    intro
    install
+   getstarted
    commands
    advanced
    interfacing

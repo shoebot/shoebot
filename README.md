@@ -62,27 +62,7 @@ Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need t
 
 ## Usage
 
-Using the Shoebot console runner is straightforward:
-
-    sbot inputfile.bot
-
-This command will run the `inputfile.bot` script, and create an output image
-file (`output.svg`). You can find many example Shoebot scripts inside the `examples` dir.
-
-You'll probably want to specify your own output file name, which can be done like so:
-
-    sbot inputfile.bot -o image.png
-
-The allowed extensions for the output filename are `.svg`, `.ps`, `.pdf` and `.png`.
-
-Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the `--window` flag or `-w`:
-
-    sbot -w inputfile.bot
-
-For a list of extra options, there's always `--help` or `-h`.
-
-    sbot -h
+See the `Getting started <http://shoebot.readthedocs.io/en/latest/getstarted.html>` docs page.
 
 
 ## Documentation
