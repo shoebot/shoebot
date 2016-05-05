@@ -1,8 +1,8 @@
-Hacking Shoebot
-===============
+Advanced uses
+=============
 
-This section is for the Python hackers who want to get into the more involved
-features of Shoebot.
+This section is aimed at Python dabblers and hackers who want to get into the
+more involved features of Shoebot.
 
 Using Shoebot as a Python module
 --------------------------------

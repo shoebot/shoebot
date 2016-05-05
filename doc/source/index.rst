@@ -7,10 +7,11 @@ Contents:
    :maxdepth: 2
    
    intro
+   install
    commands
+   advanced
    interfacing
    libraries
-   hacking
    
 
 .. We won't be needing these for now
