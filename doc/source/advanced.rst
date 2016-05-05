@@ -1,5 +1,5 @@
-Advanced uses
-=============
+Advanced usage
+==============
 
 This section is aimed at Python dabblers and hackers who want to get into the
 more involved features of Shoebot.

@@ -16,9 +16,9 @@ generative creativity:
   * Scriptographer
   * Design By Numbers
 
-Shoebot is a fork/rewrite of [Nodebox
-1](https://www.nodebox.net/code/index.php/Home), which is itself based on
-[DrawBot](http://www.drawbot.com/); there are slightly different syntax
+Shoebot is a fork/rewrite of `Nodebox 1
+<https://www.nodebox.net/code/index.php/Home>`_, which is itself based on
+`DrawBot <http://www.drawbot.com/>`_. There are slightly different syntax
 approaches in each language, and Shoebot tries to support both.
 
 
@@ -47,18 +47,27 @@ unpredictably, from a set of initial parameters) or 'procedural' (rule-based
 systems).
 
 
-Capabilities
-------------
+Why use Shoebot
+---------------
 
-[TODO: Make links to other sections.]
+Shoebot is meant to run scripts with instructions to draw both simple shapes
+and complex compositions. The syntax is Python with a set of additional
+commands that ease the process of iterating through different options and
+designs. There are many examples showcasing the possibilities of Shoebot inside
+the ``examples/`` directory.
 
 The output of Shoebot scripts can be exported to the most widely used vector
 file formats -- SVG, PDF and PostScript -- as well as the PNG bitmap
 format.
 
-A script's variables can be accessed through an automatically generated GUI or
-even from outside applications (see the Interfacing section).
+Shoebot's distinguishing feature is that it can be run in a terminal without a
+graphical editor. Drawing without the overhead of a GUI makes Shoebot a useful
+and easy-to-grasp tool for fast, procedural image generation.
 
-There's many libraries ported from Nodebox which enable SVG importing, Spiro
-splines, image fetching and manipulation and other goodies; there's also Shoebot
-libraries to work with video and webcam input, along with computer vision (OpenCV).
+A script's variables can be accessed through an automatically generated GUI or
+even from outside applications -- see the :doc:`interfacing` section.
+
+There is also a set of libraries ported from Nodebox which enable SVG
+importing, Spiro splines, image fetching and manipulation, computer vision,
+video and webcam input, and more!
+
