@@ -14,7 +14,7 @@ import stat
 import sys
 
 here = dirname(abspath(__file__))
-source_dirs = [here, normpath(join(here, '../lib'))]
+source_dirs = [here, normpath(join(here, '../../lib'))]
 
 def has_admin():
     if os.name == 'nt':

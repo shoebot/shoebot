@@ -14,8 +14,8 @@ Installation
 
 Run the following commands to add the plugin to Gedit:
 
-    $ cd shoebot/extensions/gedit3-plugin
-    $ cp shoebotit* ~/.local/share/gedit/plugins -r
+    $ cd shoebot/extensions/gedit
+    $ python install.py
 
 Restart Gedit. Navigate to **Edit > Preferences > Plugins** and activate the
 Shoebotit plugin.

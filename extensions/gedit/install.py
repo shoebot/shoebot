@@ -28,6 +28,5 @@ def gedit_install():
 
 
 if __name__=="__main__":
-    print("Install gedit plugins")
+    print("Install gedit plugin")
     gedit_install()
-    print("TODO - installers for other plugins")
