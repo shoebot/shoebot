@@ -1,4 +1,4 @@
-from pysoundcard import Stream, continue_flag
+from pysoundcard import InputStream, continue_flag
 
 import atexit
 import collections
@@ -8,7 +8,7 @@ import math
 import numpy as np
 import struct
 
-from pysoundcard import devices
+from pysoundcard import device_info
 from fuzzywuzzy import fuzz
 
 
@@ -77,7 +77,7 @@ def triple(spectrogram):
 
 def fuzzydevices(match='', min_ratio=30):
     device_ratios = []
-    for device in devices():
+    for device in device_info():
         ratio = fuzz.partial_ratio(match, device['name'])
         if ratio > min_ratio:
             device_ratios.append((ratio, device))
@@ -116,12 +116,12 @@ class AudioThread(threading.Thread):
             raise AudioException('Audio is already running')
 
     def run(self):
-        with Stream(sample_rate=44100, block_length=16) as s:
+        with InputStream(samplerate=44100, blocksize=16) as s:
             while self.running:
                 vec = s.read(NUM_SAMPLES)
 
                 # Downsample to mono
-                mono_vec = vec.sum(-1) / float(s.input_channels)
+                mono_vec = vec.sum(-1) / float(s.channels)
 
                 self._spectrogram = np.fft.fft(mono_vec)
 
