@@ -1,5 +1,10 @@
+# 1.2.2
+
+Small fixes to `sbaudio` library after pysoundcard API changes
+
 # 1.2.1
 
+Improvements to vext which ought to work to make Shoebot installable via `pip` and `setup.py install`
 
 # 1.2
   
