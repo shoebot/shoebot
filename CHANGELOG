@@ -1,5 +1,12 @@
-v1.2
-====
+# 1.2.2
+
+Small fixes to `sbaudio` library after pysoundcard API changes
+
+# 1.2.1
+
+Improvements to vext which ought to work to make Shoebot installable via `pip` and `setup.py install`
+
+# 1.2
   
 New features:
 
@@ -12,7 +19,7 @@ New features:
 * Show shoebot icon in var window as well as main window
 * Started event framework to control different parts of SB; it's pretty dumb right now, but enough to support livecoding of dynamic and non dynamic bots.
 
-GEdit plugin changes
+## GEdit plugin changes
 
 * Installable from `setup.py`, supports Windows
 * Made to work on Python 2.6, so Windows Gedit can be supported
@@ -22,7 +29,7 @@ GEdit plugin changes
 * Livecoding support - seperate tab for live errors
 * Update examples search to work with `setup.py develop`
 
-Examples
+## Examples
 
 * Re-enabeled the colors examples
 * Added Audio Examples
@@ -30,110 +37,110 @@ Examples
 
 The main focus of 1.2 has been on making installation easier, livecoding and making sure old branches don't go unused.
 
-v1.0
-====
-  For LibreGraphics meeting we made our 1.0 release, we also previewed the
-  Livecoding branch.
+# 1.0
 
-  A number of nice examples were made by workshop attendees and added to
-  shoebot:
-  [INSERT LIST]
+For LibreGraphics meeting we made our 1.0 release, we also previewed the
+Livecoding branch.
 
-  We also got lots of good feedback which should be incorporated into
-  future versions.
+A number of nice examples were made by workshop attendees and added to
+shoebot:
+[INSERT LIST]
 
-  Note - this entry added later, by revisiting the commit log
+We also got lots of good feedback which should be incorporated into
+future versions.
 
-v1.0b
-=====
-  This was a pre-release in the runup to LibreGraphics Meeting.
-  We moved from gitorious to github in the interim.
+Note - this entry added later, by revisiting the commit log
 
-  New features:
-  * Colors library supports loading from .zip, to speed up insall
-  * Re-enabled supershape - make it buildable with cython instead of C
-  * Redirect shoebot.net to github pages + make them primary.
+# 1.0b
 
-  Note - this entry added later, by revisiting the commit log
+This was a pre-release in the runup to LibreGraphics Meeting.
+We moved from gitorious to github in the interim.
 
-  The main focus has once again been on improving compatibility
-  with nodebox, crossing a major milestone with the 'evolution'
-  example from nodebox working unmodified.
+New features:
 
-0.4.x
-=====
+* Colors library supports loading from .zip, to speed up insall
+* Re-enabled supershape - make it buildable with cython instead of C
+* Redirect shoebot.net to github pages + make them primary.
+
+Note - this entry added later, by revisiting the commit log
+
+The main focus has once again been on improving compatibility
+with nodebox, crossing a major milestone with the 'evolution'
+example from nodebox working unmodified.
+
+# 0.4.x
+
 2012-01-30
 
-  New features:
-  * Remove OS2 from setup.py.
+New features:
+* Remove OS2 from setup.py.
 
-  Compatibility:
-  * Enable importing from nodebox.* namespace
-  * Added launch script for Windows users.
-  * Change URL to shoebot.net
+Compatibility:
+* Enable importing from `nodebox.*` namespace
+* Added launch script for Windows users.
+* Change URL to shoebot.net
 
-  Note - this entry added later, by revisiting the commit log
+Note - this entry added later, by revisiting the commit log
 
-v0.3
-====
+# 0.3
 
-  0.3 included changes to make building debian packages easier.
+0.3 included changes to make building debian packages easier.
 
-  New features
-  * Many Tweaks to help build debian packages.
-  * Removed sbopencv - binary blob was stopping debian building.
-  * Removed shoebot-ide
+New features
+* Many Tweaks to help build debian packages.
+* Removed sbopencv - binary blob was stopping debian building.
+* Removed shoebot-ide
 
-  Note - this entry added later, by revisiting the commit log
+Note - this entry added later, by revisiting the commit log
 
-v0.2
-====
-  Shoebot got the love of some very talented hackers, and a truckload of lovely
-  features saw the light of day:
+# 0.2
 
-  New features:
-    * colors can be specified using hexcolour values (e.g. #FF00FF)
-    * fill and/or stroke values can be specified using keyword arguments (e.g. 
-      a = Rect(x,y,w,h,fill='#FF00FF'))
-    * experimental animation support
-    * internationalization 
-    * transforms were overhauled, and are now fully consistent with Nodebox
-      behaviour
-    * clipping paths!
-    * a powerful text API was introduced using Pango, matching and even 
-      extending Nodebox's capabilities, and working great with transforms
-    * image support is now there, and working great!
-    * ximport() can now be used to import Nodebox's libraries
-    * many Nodebox libraries ported and included in Shoebot! Boids, Cornu,
-      Database, Ants, Photobot, Supershape, SVG and Web are fully working (as
-      far as we could determine! :) ; Colors and L-System are partially working. 
-    * easteregg(x,y,size) ;)
-    * GIMP colour palette import!
-    * repeat mode (-r) in commandline mode to output multiple images
-    * fullscreen mode!
-    * new example scripts
-    * Shoebot now runs on Windows, and the IDE too! 
-    * new goodies in the Shoebot IDE: error reporting console, layout 
-      dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop
-      entry
-    * preliminary mouse events implementation in GTK mode
+Shoebot got the love of some very talented hackers, and a truckload of lovely
+features saw the light of day:
 
-  Bug fixes:
-    * drawpath() and findpath() are working; drawpath() can be used with images
-      as well (load once, use many times)
-    * bounding box calculations for line() are fixed
-    * fixed order of buttons on quit - save file dialogue in shoebot-ide
-  
-  API changes:
-    * big rewrite of the code structure; now there are generic Bot and Canvas 
-      classes, equivalent to a 'context' and a 'surface', but differently named
-      to avoid confusion with Cairo; those can be subclassed to implement new
-      languages (see NodeBot class for the implementation of Nodebox) and new
-      graphical backends (see CairoCanvas).
-    * the 'Box' class was renamed to 'Bot'
-    * oval() deprecated and introduced ellipse(), the correct term for this
-      operation
+New features:
+  * colors can be specified using hexcolour values (e.g. #FF00FF)
+  * fill and/or stroke values can be specified using keyword arguments (e.g. 
+    a = Rect(x,y,w,h,fill='#FF00FF'))
+  * experimental animation support
+  * internationalization 
+  * transforms were overhauled, and are now fully consistent with Nodebox
+    behaviour
+  * clipping paths!
+  * a powerful text API was introduced using Pango, matching and even 
+    extending Nodebox's capabilities, and working great with transforms
+  * image support is now there, and working great!
+  * ximport() can now be used to import Nodebox's libraries
+  * many Nodebox libraries ported and included in Shoebot! Boids, Cornu,
+    Database, Ants, Photobot, Supershape, SVG and Web are fully working (as
+    far as we could determine! :) ; Colors and L-System are partially working. 
+  * easteregg(x,y,size) ;)
+  * GIMP colour palette import!
+  * repeat mode (-r) in commandline mode to output multiple images
+  * fullscreen mode!
+  * new example scripts
+  * Shoebot now runs on Windows, and the IDE too! 
+  * new goodies in the Shoebot IDE: error reporting console, layout 
+    dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop
+    entry
+  * preliminary mouse events implementation in GTK mode
 
-v0.1
-====
+Bug fixes:
+  * drawpath() and findpath() are working; drawpath() can be used with images
+    as well (load once, use many times)
+  * bounding box calculations for line() are fixed
+  * fixed order of buttons on quit - save file dialogue in shoebot-ide
+
+API changes:
+  * big rewrite of the code structure; now there are generic Bot and Canvas 
+    classes, equivalent to a 'context' and a 'surface', but differently named
+    to avoid confusion with Cairo; those can be subclassed to implement new
+    languages (see NodeBot class for the implementation of Nodebox) and new
+    graphical backends (see CairoCanvas).
+  * the 'Box' class was renamed to 'Bot'
+  * oval() deprecated and introduced ellipse(), the correct term for this
+    operation
+
+# 0.1
+
   Shoebot says hello world!
