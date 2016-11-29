@@ -1,3 +1,7 @@
 Grab audio frequencies from pysoundcard to make simple audio vis's.
 
 Requires pysoundcard to be installed.
+
+
+Unlike some other libraries in this folder, 
+sbaudio is licensed under the 'library' GPL (LGPL).
