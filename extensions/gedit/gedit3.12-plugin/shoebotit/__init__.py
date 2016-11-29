@@ -294,9 +294,11 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
             item = Gio.MenuItem.new_submenu(text, menu)
 
             examples_item, examples = gtk3_utils.mk_examples_menu(_("E_xamples"))
-            if not EXAMPLES:
+            
+            if examples and not EXAMPLES:
+                # if examples is None, examples were not found.
                 EXAMPLES.extend(examples)
-            menu.append_item(examples_item)
+                menu.append_item(examples_item)
 
             for text, name in WINDOW_ACTIONS:
                 menu.append(text, "win.on_%s" % name)
