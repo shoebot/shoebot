@@ -35,104 +35,27 @@
 <a name="shoebot" class="anchor" href="#shoebot"><span class="octicon octicon-link"></span></a>Shoebot</h1>
 
 <p>Shoebot is a Python graphics robot. Instead of drawing with your mouse, you write code to create images. The syntax is simple and aimed at people without a specific programming background -- though its advanced features might be useful for code ninjas too!</p>
+
 <p>It takes a Python script as input, which describes a drawing process, and outputs a vector graphic in a common open standard format: SVG, PDF, PostScript or PNG. It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line without a GUI for automated tasks. </p>
+
 <p>Shoebot is a port/rewrite of <a href="http://nodebox.net/code/index.php/Home">Nodebox 1</a>. It was also inspired by <a href="http://drawbot.com">DrawBot</a> and <a href="http://shoesrb.com/">Shoes</a>. Thus, "Shoebot".</p>
-
-<h2>
-<a name="what-you-need" class="anchor" href="#what-you-need"><span class="octicon octicon-link"></span></a>Install dependencies</h2>
-<p>Shoebot runs on Python 2.7, which is most probably what you already have installed.</p>
-
-<p>The first step is to install the appropriate dependencies. 
-If this is your first time using Shoebot, you'll want to install all of them.</p>
-
-<p>In Debian/Ubuntu:</p>
-
-<pre><code>sudo apt-get install libjpeg-dev python-cairo python-gtk2 \
-python-gobject python-rsvg python-imaging</code></pre>
-
-<p>In Fedora:</p>
-
-<pre><code>sudo yum install libjpeg-devel pycairo pygtk2 \ 
-pygobject2 gnome-python2-rsvg python-pillow</code></pre>
-
-<h2>
-<a name="installing-shoebot" class="anchor" href="#installing-shoebot"><span class="octicon octicon-link"></span></a>Install Shoebot</h2>
-
-<p>You can get the latest flavor of Shoebot <a href="https://github.com/shoebot/shoebot">from GitHub</a>, or using these direct links:</p>
-<ul>
-  <li><a href="https://github.com/shoebot/shoebot/zipball/master">Zip file</a></li>
-  <li><a href="https://github.com/shoebot/shoebot/tarball/master">Tar.gz file</a></li>
-</ul>
-
-You can also clone the repository using Git from the command-line.
-
-<pre><code>mkdir ~/src
-cd ~/src
-git clone https://github.com/shoebot/shoebot.git</code></pre>
-
-<p>You should now see a new shoebot/ directory. The only remaining step is to install it proper:</p>
-
-<pre><code>cd shoebot
-sudo python setup.py install
-</code></pre>
-
-<h2>
-<a name="running-shoebot-from-the-console" class="anchor" href="#running-shoebot-from-the-console"><span class="octicon octicon-link"></span></a>Running Shoebot from the console</h2>
-
-<p>Using the Shoebot console runner is straightforward:</p>
-
-<pre><code>sbot inputfile.bot</code></pre>
-
-<p>This command will run the <code>inputfile.bot</code> script, and create an output image file &ndash; <code>output.svg</code> by default. You'll want to specify your own filename, and for this there's the <code>-o</code> or <code>--output</code> option:</p>
-
-<pre><code>sbot inputfile.bot -o image.png</code></pre>
-
-<p>The allowed extensions for the output filename are .svg, .ps, .pdf and .png.</p>
-
-<p>You can find many example Shoebot scripts in <code>/usr/share/shoebot/examples</code>.</p>
-
-<p>Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the <code>--window</code> or <code>-w</code> option:</p>
-
-<pre><code>sbot -w inputfile.bot
-</code></pre>
-
-<p>For a list of extra options, type</p>
-
-<pre><code>sbot -h
-</code></pre>
 
 <h2>
 <a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
-<p>For the full command reference, see the <a href="http://nodebox.net/code/index.php/Reference">Nodebox 1 reference</a>. It's the best available resource while we work on the Shoebot documentation site.</p>
+<p>You can find the current docs at <a href="http://shoebot.readthedocs.org/">ReadTheDocs</a>. The <a href="http://shoebot.readthedocs.io/en/latest/getstarted.html">Getting Started</a> page is the best entry point to get acquainted with Shoebot.</p>
 
-<p>You can find the current docs at <a href="http://shoebot.readthedocs.org/">ReadTheDocs</a>.</p>
+<p>The full command reference is an <a href="http://shoebot.readthedocs.io/en/latest/commands.html">ongoing effort</a>. For all the commands, see the <a href="http://nodebox.net/code/index.php/Reference">Nodebox 1 reference</a>. It's the best available resource while we work on the Shoebot documentation site.</p>
 
-<p>Shoebot documentation can also be generated locally using sphinx. First, install it::</p>
-
-<pre><code>pip install sphinx
-</code></pre>
-
-<p>The following commands will output the HTML docs::</p>
-
-<pre><code>cd doc
-make html 
-</code></pre>
-
-<p>The documentation should now be available in <code>doc/build</code>.</p>
-
-<h2>
-<a name="further-reading" class="anchor" href="#further-reading"><span class="octicon octicon-link"></span></a>Further reading</h2>
-
-<p>For a great intro to the Nodebox/Shoebot language, be sure to check the Nodebox tutorials at <a href="http://nodebox.net/code/index.php/Tutorial">http://nodebox.net/code/index.php/Tutorial</a> .</p>
-
-<p>The Shoebot documentation has quite a lot more information on what you can do with Shoebot, such as:</p>
+<p>The Shoebot documentation has pointers on what you can do with Shoebot, such as:</p>
 
 <ul>
 <li>running Shoebot as a Python module</li>
 <li>using the socketserver to have other programs control a Shoebot script</li>
 <li>using Shoebot to generate images via a CGI script</li>
+
+<p>For another great intro to the Nodebox/Shoebot language, be sure to check the Nodebox tutorials at <a href="http://nodebox.net/code/index.php/Tutorial">http://nodebox.net/code/index.php/Tutorial</a>.</p>
+
 </ul><h2>
 <a name="links" class="anchor" href="#links"><span class="octicon octicon-link"></span></a>Links</h2>
 
