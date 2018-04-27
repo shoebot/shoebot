@@ -116,9 +116,17 @@ Debugging / Dev flags:
       -V, --verbose         Show internal shoebot error information in traceback
 
 
-Working directly with Cairo
----------------------------
+Shoebox Virtual Machine
+-----------------------
 
-TODO
+Shoebox is a ready-to-use VirtualBox image that we use for Shoebot workshops. It's a lightweight Xubuntu-based system, with some components stripped for size. Shoebot and its Gedit plugin are installed and working out of the box.
+
+It is the easiest way to get non-GNU/Linux systems running Shoebot. Even for GNU/Linux systems, it's the best choice if you don't want to add yet another package to your system, but aren't comfortable with virtualenvs.
+
+To try this, `Download VirtualBox <https://virtualbox.org/wiki/Downloads>`_, and then get the `Shoebox appliance file <https://mega.co.nz/#!B15lxKAZ!xLqAvVzIVV6BvBmBHZhlDJGkxHLx5yhfYC_z246Fy94>`_ (1.5 GB), import it into VirtualBox through ``File > Import Appliance``, and launch your new Shoebox.
 
 
+Using with Django
+-----------------
+
+See the `shoebot-django <https://github.com/stuaxo/shoebot-django>`_ for an example of integrating Shoebot into a Django application.

@@ -19,6 +19,8 @@ Contents:
    libraries
    extensions
    examples
+   troubleshooting
+   developing
    
 
 .. We won't be needing these for now
