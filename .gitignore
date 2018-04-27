@@ -1,0 +1,4 @@
+build/*
+dist/*
+shoebot.egg-info/
+doc/build/*
