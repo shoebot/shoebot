@@ -146,17 +146,47 @@ Bézier paths
 
 .. py:function:: moveto(x, y)
 
+    Move the Bézier "pen" to the specified point without drawing; coordinates are absolute.
+
+    :param x: x-coordinate of the point to move to
+    :param y: y-coordinate of the point to move to
+    :type x: float
+    :type y: float
+
 .. py:function:: relmoveto(x, y)
+
+    Move the Bézier "pen" to the specified point without drawing; coordinates are relative to the pen's current location.
+
+    :param x: x-coordinate of the point to move to, relative to the pen's current point
+    :param y: y-coordinate of the point to move to, relative to the pen's current point
+    :type x: float
+    :type y: float
 
 .. py:function:: lineto(x, y)
 
+    Draw a line from the pen's current point; coordinates are absolute.
+
+    :param x: x-coordinate of the point to draw to, relative to the pen's current point
+    :param y: y-coordinate of the point to draw to, relative to the pen's current point
+    :type x: float
+    :type y: float
+
 .. py:function:: rellineto(x, y)
+
+    Draw a line from the pen's current point; coordinates are relative to the pen's current location.
+
+    :param x: x-coordinate of the point to draw to, relative to the pen's current point
+    :param y: y-coordinate of the point to draw to, relative to the pen's current point
+    :type x: float
+    :type y: float
 
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
 .. py:function:: arc(x, y, radius, angle1, angle2)
 
 .. py:function:: closepath()
+
+   Close the path; in case the current point is not the path's starting point, a line will be drawn between them.
 
 .. py:function:: endpath(draw=True)
 
@@ -359,7 +389,7 @@ Set text alignment
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
-    Not implemented yet.
+    Not implemented.
 
 .. py:function:: autotext(sourceFile)
 
