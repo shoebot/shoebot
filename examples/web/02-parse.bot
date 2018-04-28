@@ -1,12 +1,6 @@
 # Parsing web pages.
 
-try:
-    web = ximport("web")
-except:
-    web = ximport("__init__")
-    reload(web)
-
-reload(web.html)
+web = ximport("web")
 
 url = "http://nodebox.net"
 print web.url.is_webpage(url)

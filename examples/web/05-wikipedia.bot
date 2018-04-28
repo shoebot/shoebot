@@ -1,10 +1,6 @@
 # Wikipedia articles.
 
-try:
-    web = ximport("web")
-except:
-    web = ximport("__init__")
-    reload(web)
+web = ximport("web")
 
 web.clear_cache()
 

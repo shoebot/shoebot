@@ -22,57 +22,57 @@ REFERER = "http://nodebox.net"
 
 class URLError(Exception):
     # A fault in the URL, like a missing t in htp://
-    def __str__(self): return str(self.__class__)  
+    def __str__(self): return str(self.__class__)
 
 class URLTimeout(URLError):
     # URL took to long to load.
-    def __str__(self): return str(self.__class__)  
+    def __str__(self): return str(self.__class__)
 
 class HTTPError(URLError):
     # Error on server.
-    def __str__(self): return str(self.__class__)  
+    def __str__(self): return str(self.__class__)
 
 class HTTP401Authentication(HTTPError):
     # URL requires a login and password.
-    def __str__(self): return str(self.__class__)  
+    def __str__(self): return str(self.__class__)
 
 class HTTP403Forbidden(HTTPError):
     # No access to this URL (user-agent?)
-    def __str__(self): return str(self.__class__)  
-    
+    def __str__(self): return str(self.__class__)
+
 class HTTP404NotFound(HTTPError):
     # URL doesn't exist on the internet.
-    def __str__(self): return str(self.__class__)  
+    def __str__(self): return str(self.__class__)
 
 ### URLPARSER ########################################################################################
 
 class URLParser:
-    
+
     def __init__(self, url="", method="get"):
-        
+
         """ Splits an url string into different parts.
-        
+
         The parts are:
         protocol, domain, login, username, password, port, path, page, query, anchor.
-        
+
         The method defaults to get when the url has a query part.
         Setting it to post will submit the query by POST
         when opening the url.
-        
+
         """
-        
-        # If the url is a URLParser, copy POST parameters correctly.        
+
+        # If the url is a URLParser, copy POST parameters correctly.
         is_post_urlparser = False
         if isinstance(url, URLParser) and url.method == "post":
             is_post_urlparser = True
             url.method = "get"
-            
+
         # If the url is a URLParser, use its string representation.
         # See that the original object's method is correctly reset.
         urlstr = str(url)
         if is_post_urlparser: url.method = "post"
         url = urlstr
-        
+
         # Consider the following url:
         # http://user:pass@example.com:992/animal/bird?species=seagull#wings
         # protocol: http
@@ -80,7 +80,7 @@ class URLParser:
         url = urlparse.urlsplit(url)
         self.protocol = url[0]
         self.domain = url[1]
-        
+
         # username: user
         # password: pass
         self.username = ""
@@ -91,15 +91,15 @@ class URLParser:
                 self.username = login.split(":")[0]
                 self.password = login.split(":")[1]
             self.domain = self.domain.split("@")[1]
-        
+
         # port: 992
         self.port = ""
         if self.domain.find(":") >= 0:
             p = self.domain.split(":")
-            if p[1].isdigit(): 
+            if p[1].isdigit():
                 self.port = p[1]
                 self.domain = p[0]
-        
+
         # path: /animal/
         # page: bird
         self.path = url[2]
@@ -116,7 +116,7 @@ class URLParser:
         # query: {"species": "seagull"}
         self.query = {}
         self.method = method
-        if url[3] != "": 
+        if url[3] != "":
             self.method = "get"
         if is_post_urlparser:
             self.method = "post"
@@ -124,21 +124,21 @@ class URLParser:
             key, value = "", ""
             if param.find("=") >= 0:
                 try: (key, value) = param.split("=")
-                except: 
+                except:
                     key = param
             else:
                 key = param
             if key != "":
                 self.query[key] = value
-        
+
         # anchor: wings
         self.anchor = url[4]
-        
+
     def __str__(self):
-        
+
         """ Reforms a url string from the different parts.
         """
-        
+
         url = ""
         if self.protocol != ""  : url += self.protocol + "://"
         if self.username != ""  : url += self.username + ":" + self.password + "@"
@@ -151,14 +151,14 @@ class URLParser:
         if self.anchor   != ""  : url += "#" + self.anchor
 
         return url
-        
+
     def _address(self):
         return str(self)
     address = property(_address)
-        
+
 def parse(url):
     return URLParser(url)
-    
+
 def create(url="", method="get"):
     return URLParser(url, method)
 
@@ -179,7 +179,7 @@ def set_proxy(host, type="https"):
         PROXY = None
 
 def open(url, wait=10):
-    
+
     """ Returns a connection to a url which you can read().
 
     When the wait amount is exceeded, raises a URLTimeout.
@@ -187,20 +187,20 @@ def open(url, wait=10):
     404 errors specifically return a HTTP404NotFound.
 
     """
-    
+
     # If the url is a URLParser, get any POST parameters.
     post = None
     if isinstance(url, URLParser) and url.method == "post":
         post = urllib.urlencode(url.query)
-    
-    # If the url is a URLParser (or a YahooResult or something), 
+
+    # If the url is a URLParser (or a YahooResult or something),
     # use its string representation.
     url = str(url)
-    
+
     # Use urllib instead of urllib2 for local files.
     if os.path.exists(url):
         return urllib.urlopen(url)
- 
+
     else:
         socket.setdefaulttimeout(wait)
         try:
@@ -233,32 +233,32 @@ def open(url, wait=10):
 ### URL VALIDATION ###################################################################################
 
 def is_url(url, wait=10):
-    
+
     """ Returns False when no connection can be opened to the url.
     """
-    
+
     try: connection = open(url, wait)
     except:
         return False
-        
+
     return True
 
 def not_found(url, wait=10):
-    
+
     """ Returns True when the url generates a "404 Not Found" error.
     """
-    
+
     try: connection = open(url, wait)
     except HTTP404NotFound:
         return True
     except:
         return False
-        
+
     return False
-    
+
 #url = "http://ndoebox.net"
 #print is_url(url)
-    
+
 #print not_found("http://nodebox.net/nonexistent.html")
 #print not_found("http://nodebox.net/")
 
@@ -267,44 +267,44 @@ def not_found(url, wait=10):
 def is_type(url, types=[], wait=10):
 
     """ Determine the MIME-type of the document behind the url.
-    
+
     MIME is more reliable than simply checking the document extension.
     Returns True when the MIME-type starts with anything in the list of types.
-    
+
     """
 
     # Types can also be a single string for convenience.
     if isinstance(types, str):
         types = [types]
-    
+
     try: connection = open(url, wait)
     except:
         return False
-        
+
     type = connection.info()["Content-Type"]
     for t in types:
         if type.startswith(t): return True
-        
+
     return False
 
-def is_webpage(url, wait=10): 
+def is_webpage(url, wait=10):
     return is_type(url, "text/html", wait)
 is_page = is_webpage
-def is_stylesheet(url, wait=10): 
+def is_stylesheet(url, wait=10):
     return is_type(url, "text/css", wait)
-def is_plaintext(url, wait=10): 
+def is_plaintext(url, wait=10):
     return is_type(url, "text/plain", wait)
-def is_pdf(url, wait=10): 
+def is_pdf(url, wait=10):
     return is_type(url, "application/pdf", wait)
-def is_newsfeed(url, wait=10): 
+def is_newsfeed(url, wait=10):
     return is_type(url, ["application/rss+xml", "application/atom+xml"], wait)
-def is_image(url, wait=10): 
+def is_image(url, wait=10):
     return is_type(url, ["image/gif", "image/jpeg", "image/x-png"], wait)
-def is_audio(url, wait=10): 
+def is_audio(url, wait=10):
     return is_type(url, ["audio/mpeg", "audio/x-aiff", "audio/x-wav"], wait)
-def is_video(url, wait=10): 
+def is_video(url, wait=10):
     return is_type(url, ["video/mpeg", "video/quicktime"], wait)
-def is_archive(url, wait=10): 
+def is_archive(url, wait=10):
     return is_type(url, ["application/x-stuffit", "application/x-tar", "application/zip"], wait)
 
 #print is_webpage("http://nodebox.net")
@@ -315,27 +315,27 @@ def is_archive(url, wait=10):
 urlaccumulator_throttle = {}
 
 class URLAccumulator:
-    
+
     def __init__(self, url, wait=60, asynchronous=False, cache=None, type=".html", throttle=0):
-        
+
         """ Creates a threaded connection to a url and reads data.
-        
+
         URLAccumulator can run asynchronously which is useful for animations.
         The done property is set to True when downloading is complete.
         The error attribute contains a URLError exception when no data is found.
-        
+
         URLAccumulator data can be cached.
         Downloads that resulted in an error will write an empty file to the cache,
         the data property will be an empty string but no error is logged
         when the data is read from the cache in later calls.
-        
+
         URLAccumulator can be throttled.
         This ensures only a certain amount of requests to a domain
         will happen in a given period of time.
-        
+
         URLAccumulator data is loaded.
         It has a load() method that is called once when done.
-        
+
         """
 
         self.url = url
@@ -349,7 +349,7 @@ class URLAccumulator:
         else:
             self.cached = False
             self._cache = None
-        
+
         self._domain = URLParser(self.url).domain
         self._throttle = throttle
         global urlaccumulator_throttle
@@ -360,20 +360,20 @@ class URLAccumulator:
         self._wait = wait
         self._busy = True
         self._loaded = False
- 
+
         # Synchronous downloads wait until completed,
         # otherwise check the done property.
         thread.start_new_thread(self._retrieve, (self.url,))
         if not asynchronous:
             while not self._done():
                 time.sleep(0.1)
-    
+
     def _queued(self):
 
-        # Throttles live requests: 
+        # Throttles live requests:
         # waits until the current time is greater than
         # the time of the last request plus the throttle amount.
-        global urlaccumulator_throttle   
+        global urlaccumulator_throttle
         if self.cached and self._cache.exists(str(self.url)):
             return False
         elif time.time() < urlaccumulator_throttle[self._domain] + self._throttle:
@@ -381,7 +381,7 @@ class URLAccumulator:
         else:
             urlaccumulator_throttle[self._domain] = time.time()
             return False
-    
+
     def _retrieve(self, url):
 
         # When the url data is stored in cache, load that.
@@ -389,7 +389,7 @@ class URLAccumulator:
         if self.cached and self._cache.exists(str(url)):
             self.data = self._cache.read(str(url))
         else:
-            try: 
+            try:
                 connection = open(url)
                 self.data = connection.read()
                 self.redirect = connection.geturl()
@@ -398,11 +398,11 @@ class URLAccumulator:
             except Exception, e:
                 self.data = u""
                 self.error = e
-        
+
         self._busy = False
-            
+
     def _done(self):
-        
+
         # Will continue downloading asynchronously.
         # 1) When the time limit is exceeded, logs a Timeout error.
         # 2) Once uncached data is ready, stores it in cache.
@@ -427,25 +427,25 @@ class URLAccumulator:
             return True
         else:
             return False
-            
+
     done = property(_done)
-    
+
     def load(self, data):
-        
+
         """ Override this method in subclasses to process downloaded data.
         """
-        
+
         pass
 
 def retrieve(url, wait=60, asynchronous=False, cache=None, type=".html"):
-    
+
     ua = URLAccumulator(url, wait, asynchronous, cache, type)
     return ua
 
 #r = retrieve("http://nodebox.net")
 #print r.data
 #print r.redirect
-            
+
 #url = create("http://api.search.yahoo.com/ContentAnalysisService/V1/termExtraction", method="post")
 #url.query["appid"] = "YahooDemo"
 #url.query["context"] = "Italian sculptors and painters of the renaissance favored the Virgin Mary for inspiration"

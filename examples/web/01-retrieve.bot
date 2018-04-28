@@ -1,15 +1,6 @@
 # Working with URL's.
 
-try:
-    # This is the statement you normally use.
-    # You can also do "import web" outside of NodeBox.
-    web = ximport("web")
-except:
-    # But since these examples are "inside" the library
-    # we may need to try something different when
-    # the library is not located in /Application Support
-    web = ximport("__init__")
-    reload(web)
+web = ximport("web")
 
 # Is this a valid URL?
 print web.is_url("http://nodebox.net")
