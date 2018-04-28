@@ -13,7 +13,14 @@ To get started, clone the Shoebot repository and head over to the `examples/` di
 
 If everything went well with your installation, a window should open with an image.
 
-Shoebot reads scripts written in the Nodebox language and translates them into images. In this case, the `-w` option (short for ``--window``) displays the output in a window. You can also have the result output directly into a file if you omit the ``-w`` option:
+Shoebot reads scripts written in the Nodebox language and translates them into images or animations. In this case, the `-w` option (short for ``--window``) displays the output in a window. 
+
+You can right click anywhere on the image window to view the output in full screen or export it as an image or vector file.
+
+Headless operation
+------------------
+
+You can also have the result output directly into a file if you omit the ``-w`` option:
 
 .. code:: bash
 
@@ -22,5 +29,7 @@ Shoebot reads scripts written in the Nodebox language and translates them into i
 This will create the ``balls.png`` image file. You can also create SVG, PDF and PostScript (``.ps``) files.
 
 For a list of extra options, there's always ``--help`` or ``-h``.
+
+.. code:: bash
 
     sbot -h
