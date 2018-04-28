@@ -7,7 +7,9 @@ GNU/Linux
 
 Shoebot runs on Python 2.7. To get better performance, you can run it using PyPy, which is experimental.
 
-You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you::
+You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you:
+
+.. code:: bash
 
     cd install
     ./install_dependencies.sh
@@ -17,24 +19,32 @@ Now, the simplest way to install Shoebot is system-wide, but you can also instal
 System-wide install
 ^^^^^^^^^^^^^^^^^^^
 
-Only one command necessary::
+Only one command necessary:
+
+.. code:: bash
 
     sudo python setup.py install
     
 Local install using virtualenvwrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you're using the handy [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/), these are the necessary commands::
+If you're using the handy `virtualenvwrapper <https://virtualenvwrapper.readthedocs.org/en/latest/>`_, these are the necessary commands:
+
+.. code:: bash
 
     mkvirtualenv shoebot
     pip install -r requirements.txt
     python setup.py install
 
-To use Shoebot in the future, you will need to activate the environment first::
+To use Shoebot in the future, you will need to activate the environment first:
     
+.. code:: bash
+
     workon shoebot
 
-In case you have PyPy installed, make sure to point to it when creating the virtualenv. Instead of the first command in the previous example, do::
+In case you have PyPy installed, make sure to point to it when creating the virtualenv. Instead of the first command in the previous example, do:
+
+.. code:: bash
 
     mkvirtualenv shoebot -p `which pypy`
 
@@ -43,6 +53,8 @@ Local install using a plain virtualenv
 
 If you don't use virtualenvwrapper, run these commands after installing the dependencies.
 
+.. code:: bash
+
     virtualenv .env
     source .env/bin/activate
     pip install -r requirements.txt
@@ -50,9 +62,13 @@ If you don't use virtualenvwrapper, run these commands after installing the depe
 
 To use shoebot in the future, remember to activate the environment first.
 
+.. code:: bash
+
     source .env/bin/activate
 
-Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need to create the Virtualenv pointing to it::
+Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need to create the Virtualenv pointing to it:
+
+.. code:: bash
 
     virtualenv shoebot-env -p `which pypy`
 
