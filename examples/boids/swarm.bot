@@ -1,11 +1,6 @@
 size(500, 500)
 
-
-try:
-    boids = ximport("boids")
-except:
-    boids = ximport("__init__")
-    reload(boids)
+boids = ximport("boids")
 
 def setup():     
     

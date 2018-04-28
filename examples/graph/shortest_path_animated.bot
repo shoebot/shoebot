@@ -1,8 +1,4 @@
-try:
-    graph = ximport("graph")
-except ImportError:
-    graph = ximport("__init__")
-    reload(graph)
+graph = ximport("graph")
 
 size(500, 500)
 

@@ -1,8 +1,4 @@
-try:
-    supershape = ximport("supershape")
-except:
-    supershape = ximport("__init__")
-    reload(supershape)
+supershape = ximport("supershape")
 
 size(400, 400)
 

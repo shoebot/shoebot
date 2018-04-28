@@ -1,5 +1,6 @@
-size(750,250)
 pb = ximport("photobot")
+
+size(750,250)
 c = pb.canvas(750, 250)
 reload(pb)
  

@@ -1,8 +1,4 @@
-try:
-    db = ximport("database")
-except:
-    db = ximport("__init__")
-    reload(db)
+db = ximport("database")
 
 book = db.create("book")
 book.create_table("pages", ["title", "description", "pagenumber"])
