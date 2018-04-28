@@ -39,7 +39,7 @@ class Image(Grob, ColorMixin):
         self.data = data
         self._pathmode = pathmode
         sh = sw = None  # Surface Height and Width
-        
+
         if isinstance(self.data, cairo.ImageSurface):
             sw = self.data.get_width()
             sh = self.data.get_height()
@@ -48,7 +48,7 @@ class Image(Grob, ColorMixin):
             # checks if image data is passed in command call, in this case it wraps
             # the data in a StringIO oject in order to use it as a file
             # the data itself must contain an entire image, not just pixel data
-            # it can be useful for example to retrieve images from the web without 
+            # it can be useful for example to retrieve images from the web without
             # writing temp files (e.g. using nodebox's web library, see example 1 of the library)
             # if no data is passed the path is used to open a local file
             if self.data is None:
@@ -85,12 +85,12 @@ class Image(Grob, ColorMixin):
 
                 if img.mode != 'RGBA':
                     img = img.convert("RGBA")
-                
+
                 sw, sh = img.size
                 # Would be nice to not have to do some of these conversions :-\
-                bgra_data = img.tostring('raw', 'BGRA', 0, 1)
+                bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
                 bgra_array = array.array('B', bgra_data)
-                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4) 
+                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4)
 
             if width is not None or height is not None:
                 if width:
@@ -102,7 +102,7 @@ class Image(Grob, ColorMixin):
                 else:
                     if width:
                         hscale = wscale
-                    else:   
+                    else:
                         hscale = 1.0
                 self._transform.scale(wscale, hscale)
 
@@ -112,12 +112,12 @@ class Image(Grob, ColorMixin):
 
         self._deferred_render()
 
-    
+
     def _render(self, ctx):
         if self.width and self.height:
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
-            
+
             ctx.set_matrix(transform)
             ctx.translate(self.x, self.y)
             ctx.set_source_surface(self._imagesurface)
