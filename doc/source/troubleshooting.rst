@@ -24,3 +24,9 @@ then try installing the `gir1.2-gtksource-3.0` package::
 It might be because you're using an outdated version of Gedit. We've found this issue on Gedit 3.4.x, and it disappeared after updating to version 3.8.
 
 
+TypeError: Couldn't find foreign struct converter for 'cairo.Context'
+---------------------------------------------------------------------
+
+If you see this error, it means you're missing the Python GObject interface for cairo. On Debian/Ubuntu, this should be fixed with::
+
+    sudo apt-get install python-gi-cairo
