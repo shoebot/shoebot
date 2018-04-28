@@ -3,6 +3,7 @@ Developing
 
 This section is for anyone who is interested in contributing to the codebase, or knowing more about the internals. 
 
+
 Coding style
 ------------
 
@@ -16,3 +17,29 @@ We try to have Shoebot examples follow this specification. Here are some of the 
 * Variables and functions are in ``lowercase`` and ``underscored_lowercase``, class names are in ``CamelCase``.
 
 Be sure to read the full `PEP8 specification <http://legacy.python.org/dev/peps/pep-0008/>`_. When in doubt, be bold!
+
+
+Making a release
+----------------
+
+This is our checklist to be sure we don't miss any detail when we put out a release.
+
+  * update the version number in these files:
+    - Makefile
+    - setup.py
+    - debian/files
+
+  * update the changelogs
+    - CHANGELOG
+    - debian/changelog
+
+Building Debian packages
+------------------------
+
+There are some dependencies to look out for::
+
+    sudo apt-get install rename dh-python cdbs
+
+Be sure to go through this checklist:
+
+  * update the debian/changelog file
