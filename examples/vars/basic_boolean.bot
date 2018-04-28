@@ -1,6 +1,3 @@
-# about:
-#   Switch the background color of a window by checking a box.
-
 size(300, 300)
 colorrange(255)
 colormode(RGB)

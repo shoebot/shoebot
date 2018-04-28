@@ -1,4 +1,4 @@
-# a basic spirographics example - please help with a better code than this one...
+from math import sin, cos
 
 def singr(a):
     return sin(a * .017453289)
@@ -6,7 +6,6 @@ def singr(a):
 def cosgr(a):
     return cos(a * .017453289)
 
-from math import sin, cos
 var("step", NUMBER, 32, 32, 128)
 var("r1", NUMBER, 80, 16, 256)
 var("r2",NUMBER, 200, 16, 256)

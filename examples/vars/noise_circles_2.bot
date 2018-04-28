@@ -1,9 +1,22 @@
-xed=512;yed=256;stp=16
-size(xed,yed);colorrange(255);colormode(RGB)
-var('noise',NUMBER, 0.,0.,16.)
-def draw():
-  background(128,128,128)
-  for y in range(0,yed/(stp*2),1):
-    for x in range(0,xed/(stp*2),1):
-      fill(255,255,255);nostroke();ellipse(x*stp*2+random(0,noise),y*stp*2+random(0,noise),stp,stp)
-      stroke(0,0,0);nofill();ellipse(x*stp*2+random(0,noise),y*stp*2+random(0,noise),stp,stp)
+step = 16
+
+size(512, 256)
+colorrange(255)
+colormode(RGB)
+
+var('noise', NUMBER, 0., 0., 16.)
+
+background(128, 128, 128)
+for y in range(0, HEIGHT / (step * 2), 1):
+    for x in range(0, WIDTH / (step * 2), 1):
+        fill(255, 255, 255)
+        nostroke()
+        ellipse(x * step * 2 + random(0, noise), 
+                y * step * 2 + random(0, noise), 
+                step, step)
+
+        stroke(0, 0, 0)
+        nofill()
+        ellipse(x * step * 2 + random(0, noise), 
+                y * step * 2 + random(0, noise), 
+                step, step)

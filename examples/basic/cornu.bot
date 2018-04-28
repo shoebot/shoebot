@@ -1,13 +1,7 @@
 # about:
 #   Play with elegant cornu curves and tweak them with sliders.
 
-try:
-    cornu = ximport("cornu")
-except:
-    cornu = ximport("__init__")
-    reload(cornu)
-
-
+cornu = ximport("cornu")
 
 size(600,600)
 
