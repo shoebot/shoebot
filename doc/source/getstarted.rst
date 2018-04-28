@@ -1,33 +1,25 @@
-***************
+===============
 Getting Started
-***************
+===============
 
-[TODO: 
-- explain the language with some example scripts.
-- how to edit scripts with a GUI (Gedit)  
-]
+Running Shoebot in a window
+---------------------------
 
+To get started, clone the Shoebot repository and head over to the `examples/` directory. Once you're there, try running:
 
-Command-line usage
-------------------
+.. code:: bash
 
-Using the Shoebot console runner is straightforward:
+    sbot -w grid/balls.bot
 
-    sbot hypnoval.bot
+If everything went well with your installation, a window should open with an image.
 
-This command will run the ``hypnoval.bot`` script, and create an output image
-file -- the default filename is ``output.svg``). You can find many example Shoebot scripts inside the `examples` dir.
+Shoebot reads scripts written in the Nodebox language and translates them into images. In this case, the `-w` option (short for ``--window``) displays the output in a window. You can also have the result output directly into a file if you omit the ``-w`` option:
 
-You'll probably want to specify your own output file name:
+.. code:: bash
 
-    sbot inputfile.bot -o image.png
+    sbot grid/balls.bot -o balls.png
 
-The allowed extensions for the output filename are ``.svg``, ``.ps``, ``.pdf`` and ``.png``.
-
-Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the ``--window`` flag or ``-w``:
-
-    sbot -w inputfile.bot
+This will create the ``balls.png`` image file. You can also create SVG, PDF and PostScript (``.ps``) files.
 
 For a list of extra options, there's always ``--help`` or ``-h``.
 
