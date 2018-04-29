@@ -13,6 +13,8 @@ extensions/gedit3-plugin/gschemas.compiled
 build/*
 dist/*
 shoebot.egg-info/
+debian/files
+
 # as well as sphinx output
 doc/build/*
 
