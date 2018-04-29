@@ -10,7 +10,7 @@ UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gobject python-rsvg"
 MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject python-rsvg"
 
 # OSX
-HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+3 --quartz"
+HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+3 --quartz pygobject3"
 MACPORTS_PACKAGES="cairo +quartz +no_x11 pango +quartz py27-pygtk +quartz +no_x11"
 
 confirm() {
