@@ -27,11 +27,16 @@ This is our checklist to be sure we don't miss any detail when we put out a rele
   * update the version number in these files:
     - Makefile
     - setup.py
-    - debian/files
+    - doc/source/conf.py
 
   * update the changelogs
     - CHANGELOG
     - debian/changelog
+
+  * tag the release commit
+  * publish release on GitHub
+
+  * push to PyPI
 
 Building Debian packages
 ------------------------
