@@ -9,6 +9,8 @@ except ImportError:
     pgi.install_as_gi()
 
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
+gi.require_version('GtkSource', '3.0')
 
 import errno
 import os
@@ -628,16 +630,14 @@ class View(Gtk.Window):
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
-        ## self.text_view = gtksourceview.SourceView(buffer)
         self.text_view = GtkSource.View.new_with_buffer(buffer)
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_view.set_show_line_numbers(True)
         self.text_view.set_auto_indent(True)
         self.text_view.set_insert_spaces_instead_of_tabs(True)
-        # FIXME: the following 2 lines don't have any effect :/
-        self.text_view.tab_width = 4
-        self.text_view.indent_width = 4
-        ##self.text_view.connect("expose_event", self.tab_stops_expose)
+        self.text_view.set_tab_width(4)
+        self.text_view.set_indent_width(4)
+        # self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
 
@@ -687,10 +687,8 @@ class View(Gtk.Window):
 
         # setup syntax highlighting
         manager = GtkSource.LanguageManager()
-        ##language = manager.get_language_from_mime_type("text/x-python")
         language = manager.guess_language(None, "text/x-python")
         buffer.set_language(language)
-        ##buffer.set_highlight(True)
 
         self.shoebot_window = None
 
@@ -924,7 +922,7 @@ class View(Gtk.Window):
         self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         Gtk.about_dialog_set_url_hook(self.on_url, self.website)
-        dlg.set_version("0.4")
+        dlg.set_version("1.2.2")
         dlg.set_name("shoebot")
         # TODO: add license text
         dlg.set_license("GPLv3")
