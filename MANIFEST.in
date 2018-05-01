@@ -4,6 +4,7 @@ include VERSION
 include COPYING-GPL-3
 recursive-include shoebot/data *
 recursive-include shoebot/core *
+recursive-include shoebot/extension *
 recursive-include shoebot/gui *
 recursive-include examples *
 recursive-include lib *
