@@ -34,7 +34,7 @@ import sys
 import threading
 
 # TODO - Check if this needs importing here:
-#from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
+# from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
 
 from shoebot.core.events import publish_event, QUIT_EVENT
@@ -61,7 +61,7 @@ def _restore():
     pass
 
 
-## Convenience functions to create create a bot, its canvas and sink
+# Convenience functions to create a bot, its canvas and sink
 
 def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, show_vars=False):
     """
@@ -75,8 +75,8 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     :param buff: CairoImageSink buffer object to send output to
 
     :param outputfile: CairoImageSink output filename e.g. "hello.svg"
-    :param multifile: CairoImageSink if True, 
-    
+    :param multifile: CairoImageSink if True,
+
     :param title: ShoebotWindow - set window title
     :param fullscreen: ShoebotWindow - set window title
     :param show_vars: ShoebotWindow - display variable window
@@ -90,7 +90,7 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
 
     CairoImageSink
 
-    Output to a filename (or files if multifile is set), or a buffer object.    
+    Output to a filename (or files if multifile is set), or a buffer object.
     """
     from core import CairoCanvas, CairoImageSink
 
@@ -127,7 +127,7 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     ... everything else ...
 
     See create_canvas for details on those parameters.
-    
+
     """
     canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, show_vars=show_vars)
 
@@ -152,10 +152,9 @@ class ShoebotThread(threading.Thread):
     and the GUI in a seperate thread without readline
     blocking it.
     """
-    def __init__(self,
-            create_args, create_kwargs,
-            run_args, run_kwargs,
-            send_sigint=False):
+    def __init__(self, create_args, create_kwargs,
+                 run_args, run_kwargs,
+                 send_sigint=False):
         """
         :param create_args: passed to create_bot
         :param create_kwargs: passed to create_bot
@@ -230,7 +229,7 @@ def run(src,
     Other args are split into create_args and run_args
 
     See create_bot for details on create_args
-    
+
     run_args are passed to bot.run - see Nodebot.run or Drawbot.run
 
 
@@ -250,17 +249,17 @@ def run(src,
 
     # arguments for create_bot
     create_args = [src,
-        grammar,
-        format,
-        outputfile,
-        iterations,
-        buff,
-        window,
-        title,
-        fullscreen,
-        server,
-        port,
-        show_vars]
+                   grammar,
+                   format,
+                   outputfile,
+                   iterations,
+                   buff,
+                   window,
+                   title,
+                   fullscreen,
+                   server,
+                   port,
+                   show_vars]
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
