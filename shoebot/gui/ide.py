@@ -507,40 +507,48 @@ class Stdout_Filter(object):
         self.parent.write(self.message, True)
         self.message = None
 
+UI_INFO = """
+<ui>
+  <menubar name='MenuBar'>
+    <menu action='FileMenu'>
+      <menuitem action='FileNew' />
+      <menuitem action='FileOpen' />
+      <menuitem action='FileSave' />
+      <menuitem action='FileSaveAs' />
+      <separator />
+      <menuitem action='FileClose' />
+      <menuitem action='FileQuit' />
+    </menu>
+    <menu action='EditMenu'>
+      <menuitem action='EditUndo' />
+      <menuitem action='EditRedo' />
+      <separator />
+      <menuitem action='EditFind' />
+    </menu>
+    <menu action='RunMenu'>
+      <menuitem action='Run' />
+      <separator />
+      <menuitem action='FullScreen' />
+      <menuitem action='SocketServer' />
+    </menu>
+    <menu action='SettingsMenu'>
+      <menuitem action='WrapNone' />
+      <menuitem action='WrapWords' />
+      <menuitem action='WrapChars' />
+    </menu>
+    <menu action='HelpMenu'>
+      <menuitem action='HelpAbout' />
+    </menu>
+  </menubar>
+</ui>
+"""
+
 
 class View(Gtk.Window):
     # Gtk3 TODO - GObject.type_register(ShoebotFileChooserDialog)
     FONT = None
 
     def __init__(self, buffer=None):
-        menu_items = [
-            ( _("/_File"), None, None, 0, "<Branch>" ),
-            ( _("/File/_New"), "<control>N", self.do_new, 0, None ),
-            ( _("/File/_Open"), "<control>O", self.do_open, 0, None ),
-            ( _("/File/_Save"), "<control>S", self.do_save, 0, None ),
-            ( _("/File/Save _As..."), None, self.do_save_as, 0, None ),
-            ( _("/File/sep1"), None, None, 0, "<Separator>" ),
-            ( _("/File/_Close"), "<control>W" , self.do_close, 0, None ),
-            ( _("/File/E_xit"), "<control>Q" , self.do_exit, 0, None ),
-            ( _("/_Edit"), None, None, 0, "<Branch>" ),
-            ( _("/Edit/Undo"), "<control>Z", self.do_undo, 0, None ),
-            ( _("/Edit/Redo"), "<control><shift>Z", self.do_redo, 0, None ),
-            ( _("/Edit/sep1"), None, None, 0, "<Separator>" ),
-            ( _("/Edit/Find..."), "<control>F", self.do_search, 0, None ),
-            ( _("/_Settings"), None, None, 0, "<Branch>" ),
-            ( _("/Settings/Wrap _Off"), None, self.do_wrap_changed, Gtk.WrapMode.NONE, "<RadioItem>" ),
-            ( _("/Settings/Wrap _Words"), None, self.do_wrap_changed, Gtk.WrapMode.WORD, _("/Settings/Wrap Off") ),
-            ( _("/Settings/Wrap _Chars"), None, self.do_wrap_changed, Gtk.WrapMode.CHAR, _("/Settings/Wrap Off") ),
-            ( _("/_Run"), None, None, 0, "<Branch>" ),
-            ( _("/Run/_Run script"), "<control>R", self.run_script, False, None ),
-            ( _("/Run/sep1"), None, None, 0, "<Separator>" ),
-            ( _("/Run/Run socket server"), None, self.do_socketserver_changed, True, "<ToggleItem>"),
-            ( _("/Run/Show variables window"), None, self.do_varwindow_changed, True, "<ToggleItem>"),
-            ( _("/Run/Run fullscreen"), None, self.do_fullscreen_changed, True, "<ToggleItem>"),
-            ( _("/_Help"), None, None, 0, "<Branch>" ),
-            ( _("/Help/_About"), None, self.do_about, 0, None )  
-            ]
-
         if not buffer:
             buffer = Buffer()
         GObject.GObject.__init__(self)
@@ -555,21 +563,67 @@ class View(Gtk.Window):
 
         self.connect("delete_event", self.delete_event_cb)
 
-        self.accel_group = Gtk.AccelGroup()
-        ##self.item_factory = Gtk.ItemFactory(Gtk.MenuBar, "<main>",
-        ##                                self.accel_group)
-        ##self.item_factory.set_data("view", self)
-        ##self.item_factory.create_items(menu_items)
+        action_group = Gtk.ActionGroup("my_actions")
 
-        self.add_accel_group(self.accel_group)
-        
+        action_group.add_actions([
+            ("FileMenu", None, "File"),
+            ("FileNew", Gtk.STOCK_NEW, "_New", "<control>N", None, self.do_new),
+            ("FileOpen", Gtk.STOCK_OPEN, "_Open", "<control>O", None, self.do_open),
+            ("FileSave", Gtk.STOCK_SAVE, "_Save", "<control>S", None, self.do_save),
+            ("FileSaveAs", Gtk.STOCK_SAVE_AS, "Save _As", "<control><alt>S", None, self.do_save_as),
+            ("FileClose", Gtk.STOCK_CLOSE, "_Close", "<control>W", None, self.do_close),
+            ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.do_exit),
+        ])
+
+        action_group.add_actions([
+            ("EditMenu", None, "Edit"),
+            ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.do_undo),
+            ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.do_redo),
+            ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.do_search),
+        ])
+
+        action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
+        action_group.add_radio_actions([
+            ("WrapNone", None, "Wrap None", None, None, Gtk.WrapMode.NONE),
+            ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
+            ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR)
+        ], 1, self.do_wrap_changed)
+
+        action_group.add_actions([
+            ("RunMenu", None, "Run"),
+            ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.run_script),
+        ])
+        fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
+        fullscreen.connect("toggled", self.do_fullscreen_changed)
+        action_group.add_action(fullscreen)
+        socketserver = Gtk.ToggleAction("SocketServer", "Run socket server", None, None)
+        socketserver.connect("toggled", self.do_socketserver_changed)
+        action_group.add_action(socketserver)
+
+        action_group.add_actions([
+            ("HelpMenu", None, "Help"),
+            ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.do_about),
+        ])
+
+        uimanager = Gtk.UIManager()
+        # Throws exception if something went wrong
+        uimanager.add_ui_from_string(UI_INFO)
+        # Add the accelerator group to the toplevel window
+        accelgroup = uimanager.get_accel_group()
+        self.add_accel_group(accelgroup)
+        # Add menu actions
+        uimanager.insert_action_group(action_group)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        menubar = uimanager.get_widget("/MenuBar")
+        box.pack_start(menubar, False, False, 0)
+
         hpaned = Gtk.HPaned()
         vbox = Gtk.VBox(False, 0)
         hpaned.add1(vbox)
-        self.add(hpaned)
+        box.pack_start(hpaned, True, True, 0)
 
-        ##vbox.pack_start(self.item_factory.get_widget("<main>", True, True, 0),
-        ##                False, False, 0)
+        self.add(box)
 
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -671,7 +725,7 @@ class View(Gtk.Window):
             app = widget.get_toplevel()
             return app.get_data("view")
 
-    def do_new(self, callback_action, widget):
+    def do_new(self, widget):
         View()
 
     def open_ok_func(self, filename):
@@ -686,7 +740,7 @@ class View(Gtk.Window):
             buffer.filename_set()
             return True
 
-    def do_open(self, callback_action, widget):
+    def do_open(self, widget):
         chooser = ShoebotFileChooserDialog('Open File', None, Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
              Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
@@ -695,27 +749,26 @@ class View(Gtk.Window):
             self.open_ok_func(chooser.get_filename())
         chooser.destroy()
 
-
-    def do_save_as(self, callback_action, widget):
+    def do_save_as(self, widget):
         TestText.active_window_stack.push(self)
         self.text_view.get_buffer().save_as_buffer()
         TestText.active_window_stack.pop()
 
-    def do_save(self, callback_action, widget):
+    def do_save(self, widget):
         TestText.active_window_stack.push(self)
         buffer = self.text_view.get_buffer()
         if not buffer.filename:
-            self.do_save_as(None, callback_action)
+            self.do_save_as(widget)
         else:
             buffer.save_buffer()
             TestText.active_window_stack.pop()
 
-    def do_close(self, callback_action, widget):
+    def do_close(self, widget):
         TestText.active_window_stack.push(self)
         self.check_close_view()
         TestText.active_window_stack.pop()
 
-    def do_exit(self, callback_action, widget):
+    def do_exit(self, widget):
         TestText.active_window_stack.push(self)
         for tmp in TestText.buffers:
             if not tmp.check_buffer_saved():
@@ -747,19 +800,19 @@ class View(Gtk.Window):
     def do_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
 
-    def do_varwindow_changed(self, callback_action, widget):
-        self.use_varwindow = not self.use_varwindow
+    def do_varwindow_changed(self, widget):
+        self.use_varwindow = widget.get_active()
 
-    def do_socketserver_changed(self, callback_action, widget):
-        self.use_socketserver = not self.use_socketserver
-        
-    def do_fullscreen_changed(self, callback_action, widget):
-        self.go_fullscreen = not self.go_fullscreen
+    def do_socketserver_changed(self, widget):
+        self.use_socketserver = widget.get_active()
+
+    def do_fullscreen_changed(self, widget):
+        self.go_fullscreen = widget.get_active()
 
     def do_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
 
-    def do_apply_tabs(self, callback_action, widget):
+    def do_apply_tabs(self, widget):
         buffer = self.text_view.get_buffer()
         bounds = buffer.get_selection_bounds()
         if bounds:
@@ -818,7 +871,7 @@ class View(Gtk.Window):
 
         dialog.destroy()
 
-    def do_search(self, callback_action, widget):
+    def do_search(self, widget):
         search_text = Gtk.TextView()
         dialog = Gtk.Dialog(_("Search"), self,
                             Gtk.DialogFlags.DESTROY_WITH_PARENT,
@@ -833,16 +886,15 @@ class View(Gtk.Window):
         search_text.grab_focus()
         dialog.show_all()
 
-    def do_undo(self, callback_action, widget):
+    def do_undo(self, widget):
         buffer = self.text_view.get_buffer()
         if buffer.can_undo():
             buffer.undo()
 
-    def do_redo(self, callback_action, widget):
+    def do_redo(self, widget):
         buffer = self.text_view.get_buffer()
         if buffer.can_redo():
             buffer.redo()
-            
 
     #def do_about(self, callback_action, widget):
         #about = '''Shoebot is a pure Python graphics robot:
@@ -1009,11 +1061,11 @@ class View(Gtk.Window):
 
         return count
 
-    def run_script(self, callback_action, widget):
+    def run_script(self, widget):
         # get the buffer contents
         buffer = self.text_view.get_buffer()
         start, end = buffer.get_bounds()
-        codestring = buffer.get_text(start, end)
+        codestring = buffer.get_text(start, end, include_hidden_chars=False)
         try:
             if buffer.filename:
                 os.chdir(os.path.dirname(buffer.filename))
