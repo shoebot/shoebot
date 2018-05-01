@@ -28,6 +28,7 @@ This is our checklist to be sure we don't miss any detail when we put out a rele
     - Makefile
     - setup.py
     - doc/source/conf.py
+    - shoebot/gui/ide.py
 
   * update the changelogs
     - CHANGELOG
