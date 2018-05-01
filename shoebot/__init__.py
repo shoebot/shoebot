@@ -263,10 +263,12 @@ def run(src,
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
-        run_forever=window and (not close_window) and (not bool(outputfile)),
         iterations=iterations,
         frame_limiter=window,
         verbose=verbose,
+        # run forever except 1. windowed mode is off 2. if --close-window was specified and
+        # 3. if an output file was indicated
+        run_forever=window and (not close_window) and (not bool(outputfile)),
     )
 
     # Run shoebot in a background thread so we can run a cmdline shell in the current thread
