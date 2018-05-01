@@ -1,4 +1,3 @@
-from distutils.spawn import find_executable as which
 from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
@@ -239,17 +238,6 @@ class ShoebotWindowHelper(object):
             panel.add_item(self.live_output_widget, 'Shoebot Live', 'Shoebot Live', icon)
         else:
             panel.remove_item(self.live_output_widget)
-
-    
-        
-    # Right-click menu items (for quicktorials)
-
-    def connect_view(self, view):
-        # taken from gedit-plugins-python-openuricontextmenu
-        #handler_id = view.connect('populate-popup', self.on_view_populate_popup)
-        #view.set_data(self.id_name, [handler_id])
-
-        pass
 
 
 class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable):
