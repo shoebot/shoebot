@@ -2,25 +2,25 @@
 Getting Started
 ===============
 
-Running Shoebot in a window
----------------------------
+Running an example script
+-------------------------
 
 To get started, clone the Shoebot repository and head over to the `examples/` directory. Once you're there, try running:
 
 .. code:: bash
 
-    sbot -w grid/balls.bot
+    sbot grid/balls.bot
 
 If everything went well with your installation, a window should open with an image.
 
-Shoebot reads scripts written in the Nodebox language and translates them into images or animations. In this case, the `-w` option (short for ``--window``) displays the output in a window. 
+Shoebot reads scripts written in the Nodebox language and translates them into images or animations.
 
 You can right click anywhere on the image window to view the output in full screen or export it as an image or vector file.
 
 Headless operation
 ------------------
 
-You can also have the result output directly into a file if you omit the ``-w`` option:
+There is also a mode where the result is directly rendered into an image or vector file, without a window. We can do this with the ``-o`` option, short for ``--outputfile``:
 
 .. code:: bash
 
@@ -32,4 +32,4 @@ For a list of extra options, there's always ``--help`` or ``-h``.
 
 .. code:: bash
 
-    sbot -h
+    sbot --help
