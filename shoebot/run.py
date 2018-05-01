@@ -164,12 +164,12 @@ def main():
     group = parser.add_argument_group('Window Management')
     # Window Management
     group.add_argument("-w",
-                    "--window",
-                    action="store_true",
-                    dest="window",
-                    default=False,
-                    help=_("run script in a GTK window")
-                    )
+                       "--window",
+                       action="store_true",
+                       dest="window",
+                       default=True,
+                       help=_("run script in a GTK window")
+                       )
     group.add_argument("-f",
                     "--fullscreen",
                     action="store_true",

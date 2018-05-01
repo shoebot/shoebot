@@ -94,9 +94,10 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     """
     from core import CairoCanvas, CairoImageSink
 
-    if window or show_vars:
+    if outputfile:
+        sink = CairoImageSink(outputfile, format, multifile, buff)
+    elif window or show_vars:
         from gui import ShoebotWindow
-
         if not title:
             if src and os.path.isfile(src):
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
@@ -104,11 +105,10 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
                 title = 'Untitled - Shoebot'
         sink = ShoebotWindow(title, show_vars, fullscreen=fullscreen)
     else:
-        if outputfile is None:
-            if src and os.path.isfile(src):
-                outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
-            else:
-                outputfile = 'output.svg'
+        if src and os.path.isfile(src):
+            outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
+        else:
+            outputfile = 'output.svg'
         sink = CairoImageSink(outputfile, format, multifile, buff)
     canvas = CairoCanvas(sink)
 
@@ -207,7 +207,7 @@ def run(src,
         outputfile=None,
         iterations=1,
         buff=None,
-        window=False,
+        window=True,
         title=None,
         fullscreen=None,
         close_window=False,
@@ -264,7 +264,7 @@ def run(src,
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
-        run_forever=window and (not close_window),
+        run_forever=window and (not close_window) and (not bool(outputfile)),
         iterations=iterations,
         frame_limiter=window,
         verbose=verbose,
