@@ -8,21 +8,23 @@ except ImportError:
     import pgi
     pgi.install_as_gi()
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('GtkSource', '3.0')
-
 import errno
 import os
 import sys
 
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
+gi.require_version('GtkSource', '3.0')
 from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GtkSource
 from gi.repository import Pango
+import locale
+import gettext
 
 import shoebot
+from shoebot.data import ShoebotError
 
 # for gtksourceview/gtksourceview2 compatibility
 # try:
@@ -55,7 +57,6 @@ import shoebot
 #     del gtksourceview_SourceLanguagesManager
 
 
-from shoebot.data import ShoebotError
 
 
 APP = 'shoebot'
@@ -64,11 +65,8 @@ RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
 
-import locale
-import gettext
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -78,6 +76,7 @@ if sys.platform != 'win32':
 else:
     import os.path
     ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
+
 
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
@@ -109,12 +108,13 @@ def hsv_to_rgb(h, s, v):
         elif ihue == 5:
             return(value, p, q)
 
+
 def hue_to_color(hue):
     if hue > 1.0:
         raise ValueError
 
-    h, s, v = hsv_to_rgb (hue, 1.0, 1.0)
-    return (h*65535, s*65535, v*65535)
+    h, s, v = hsv_to_rgb(hue, 1.0, 1.0)
+    return (h * 65535, s * 65535, v * 65535)
 
 
 class Buffer(GtkSource.Buffer):
@@ -135,7 +135,7 @@ class Buffer(GtkSource.Buffer):
             tag = self.create_tag()
             self.color_tags.append(tag)
 
-        #self.invisible_tag = self.create_tag(None, invisible=True)
+        # self.invisible_tag = self.create_tag(None, invisible=True)
         self.not_editable_tag = self.create_tag(editable=False,
                                                 foreground="purple")
         self.found_text_tag = self.create_tag(foreground="red")
@@ -200,7 +200,7 @@ class Buffer(GtkSource.Buffer):
                                    Gtk.ButtonsType.OK,
                                    _('%d strings found and marked in red') % i)
 
-        dialog.connect("response", lambda x,y: dialog.destroy())
+        dialog.connect("response", lambda x, y: dialog.destroy())
 
         dialog.show()
 
@@ -248,7 +248,7 @@ class Buffer(GtkSource.Buffer):
 
         for tag in self.color_tags:
             color = apply(TestText.colormap.alloc_color,
-                          hue_to_color (hue))
+                          hue_to_color(hue))
             tag.set_property("foreground_gdk", color)
 
             hue += 1.0 / Buffer.N_COLORS
@@ -285,7 +285,7 @@ class Buffer(GtkSource.Buffer):
             view = TestText.active_window_stack.get()
             dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err);
+                                       Gtk.ButtonsType.OK, err)
             result = dialog.run()
             dialog.destroy()
             return False
@@ -317,7 +317,7 @@ class Buffer(GtkSource.Buffer):
                 view = TestText.active_window_stack.get()
                 dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
                                            Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK, err);
+                                           Gtk.ButtonsType.OK, err)
                 dialog.run()
                 dialog.destroy()
                 return False
@@ -336,7 +336,7 @@ class Buffer(GtkSource.Buffer):
             view = TestText.active_window_stack.get()
             dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err);
+                                       Gtk.ButtonsType.OK, err)
             dialog.run()
             dialog.destroy()
 
@@ -349,31 +349,31 @@ class Buffer(GtkSource.Buffer):
                 view = TestText.active_window_stack.get()
                 dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
                                            Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK, err);
+                                           Gtk.ButtonsType.OK, err)
                 dialog.run()
                 dialog.destroy()
 
         return result
 
     def confirm_overwrite_callback(self, chooser):
-      uri = chooser.get_uri()
-      if os.path.exists(self.filename):
-          if os.path.exists(self.filename):
-              if user_wants_to_replace_read_only_file (uri):
-                  return Gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
-              else:
-                  return Gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
-          else:
-              # fall back to the default dialog
-              return Gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
+        uri = chooser.get_uri()
+        if os.path.exists(self.filename):
+            if os.path.exists(self.filename):
+                if user_wants_to_replace_read_only_file(uri):
+                    return Gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
+                else:
+                    return Gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
+            else:
+                # fall back to the default dialog
+                return Gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
 
     def save_as_buffer(self):
         """
         Return True if the buffer was saved
         """
         chooser = ShoebotFileChooserDialog(_('Save File'), None, Gtk.FileChooserAction.SAVE,
-            (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
-             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+                                           (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
+                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         chooser.set_do_overwrite_confirmation(True)
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
@@ -403,7 +403,7 @@ class Buffer(GtkSource.Buffer):
             view = TestText.active_window_stack.get()
             dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.QUESTION,
-                                       Gtk.ButtonsType.YES_NO, msg);
+                                       Gtk.ButtonsType.YES_NO, msg)
             dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
             result = dialog.run()
             dialog.destroy()
@@ -425,10 +425,10 @@ class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
     CWD = None
 
     def __init__(self, *args, **kwargs):
-        super(ShoebotFileChooserDialog, self).__init__ (*args, **kwargs)
+        super(ShoebotFileChooserDialog, self).__init__(*args, **kwargs)
 
         # set some defaults
-        self.set_default_response (Gtk.ResponseType.OK)
+        self.set_default_response(Gtk.ResponseType.OK)
         self.set_property('do-overwrite-confirmation', True)
 
         # set the working directory if available
@@ -436,7 +436,7 @@ class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
             self.set_current_folder(ShoebotFileChooserDialog.CWD)
 
     def run(self):
-        response = super (ShoebotFileChooserDialog, self).run()
+        response = super(ShoebotFileChooserDialog, self).run()
 
         # get the working directory if the user clicked accepted the action
         if response == Gtk.ResponseType.ACCEPT:
@@ -462,22 +462,21 @@ class ConsoleWindow:
         self.text_area.modify_text(Gtk.StateType.NORMAL, Gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
-        ##self.stdout_tag = Gtk.TextTag("stdout")
-        ##self.stdout_tag.set_property("foreground", "black")
-        ##self.stdout_tag.set_property("style", "normal")
-        #self.stdout_tag.set_property("weight", 600)
-        #self.stdout_tag.set_property("size-points", 9)
+        # self.stdout_tag = Gtk.TextTag("stdout")
+        # self.stdout_tag.set_property("foreground", "black")
+        # self.stdout_tag.set_property("style", "normal")
+        # self.stdout_tag.set_property("weight", 600)
+        # self.stdout_tag.set_property("size-points", 9)
 
         self.stdout_tag = self.text_buffer.create_tag("system", foreground="black", weight=600, size_points=9)
         self.system_message_tag = self.text_buffer.create_tag("system", foreground="white")
 
-        ##self.tag_table.add(self.stdout_tag)
-        ##self.system_message_tag = Gtk.TextTag("system")
-        ##self.system_message_tag.set_property("foreground", "white")
-        ##self.system_message_tag.set_property("style", "normal")
-        ##self.tag_table.add(self.system_message_tag)
-        #self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
-
+        # self.tag_table.add(self.stdout_tag)
+        # self.system_message_tag = Gtk.TextTag("system")
+        # self.system_message_tag.set_property("foreground", "white")
+        # self.system_message_tag.set_property("style", "normal")
+        # self.tag_table.add(self.system_message_tag)
+        # self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
 
     def write(self, data, output=None, system=None):
         self.message = data
@@ -504,10 +503,12 @@ class ConsoleWindow:
 class Stdout_Filter(object):
     def __init__(self, parent):
         self.parent = parent
+
     def write(self, data):
         self.message = data
         self.parent.write(self.message, True)
         self.message = None
+
 
 UI_INFO = """
 <ui>
@@ -705,9 +706,9 @@ class View(Gtk.Window):
         self.check_close_view()
         TestText.active_window_stack.pop()
         return True
-    #
+
     # Menu callbacks
-    #
+
     def get_empty_view(self):
         buffer = self.text_view.get_buffer()
         if (not buffer.filename and not buffer.get_modified()):
@@ -740,8 +741,8 @@ class View(Gtk.Window):
 
     def do_open(self, widget):
         chooser = ShoebotFileChooserDialog('Open File', None, Gtk.FileChooserAction.OPEN,
-            (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
-             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+                                           (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
+                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         if chooser.run() == Gtk.ResponseType.ACCEPT:
             self.open_ok_func(chooser.get_filename())
@@ -851,8 +852,7 @@ class View(Gtk.Window):
             buffer.remove_all_tags(start, end)
 
     def dialog_response_callback(self, dialog, response_id):
-        if (response_id != RESPONSE_FORWARD and
-            response_id != RESPONSE_BACKWARD):
+        if (response_id != RESPONSE_FORWARD and response_id != RESPONSE_BACKWARD):
             dialog.destroy()
             return
 
@@ -894,46 +894,21 @@ class View(Gtk.Window):
         if buffer.can_redo():
             buffer.redo()
 
-    #def do_about(self, callback_action, widget):
-        #about = '''Shoebot is a pure Python graphics robot:
-#it takes a Python script as input, which describes a drawing process,
-#and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG).\n
-#It has a simple text editor GUI, and scripts can describe their own GUIs for
-#controlling variables interactively.\n\n
-        #Thanks to:\n
-        #Ricardo Lafuente <r AT sollec.org>
-        #Francesco Fantoni<francesco AT hv-a.com>
-        #Dave Crossland <dave AT lab6.com>
-        #Stuart Axon <stuaxo AT gmail.com>
-        #Paulo Silva <nitrofurano AT gmail.com>
-        #Tetsuya Saito <t2psyto AT gmail.com>\n
-        #http://shoebot.net/\n
-        #Version: 0.4-beta
-        #'''
-        #self.console_error.write(about)
-
-    def on_url(self, d, link, data):
-        import webbrowser
-        webbrowser.open_new(data)
-
-    def do_about(self, callback_action, widget):
-        # about dialog
+    def do_about(self, widget):
         dlg = Gtk.AboutDialog()
         self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
-        Gtk.about_dialog_set_url_hook(self.on_url, self.website)
         dlg.set_version("1.2.2")
         dlg.set_name("shoebot")
-        # TODO: add license text
         dlg.set_license("GPLv3")
         dlg.set_authors(self.authors)
         dlg.set_website(self.website)
+
         def close(w, res):
             if res == Gtk.ResponseType.CANCEL:
                     w.hide()
         dlg.connect("response", close)
         dlg.run()
-
 
     def init_menus(self):
         text_view = self.text_view
@@ -941,23 +916,23 @@ class View(Gtk.Window):
         wrap_mode = text_view.get_wrap_mode()
         menu_item = None
 
-        ##if direction == Gtk.TextDirection.LTR:
-        ##    menu_item = self.item_factory.get_widget("/Settings/Left-to-Right")
-        ##elif direction == Gtk.TextDirection.RTL:
-        ##    menu_item = self.item_factory.get_widget("/Settings/Right-to-Left")
+        # if direction == Gtk.TextDirection.LTR:
+        #     menu_item = self.item_factory.get_widget("/Settings/Left-to-Right")
+        # elif direction == Gtk.TextDirection.RTL:
+        #     menu_item = self.item_factory.get_widget("/Settings/Right-to-Left")
 
         if menu_item:
             menu_item.activate()
 
-        ##if wrap_mode == Gtk.WrapMode.NONE:
-        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Off")
-        ##elif wrap_mode == Gtk.WrapMode.WORD:
-        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Words")
-        ##elif wrap_mode == Gtk.WrapMode.CHAR:
-        ##    menu_item = self.item_factory.get_widget("/Settings/Wrap Chars")
+        # if wrap_mode == Gtk.WrapMode.NONE:
+        #     menu_item = self.item_factory.get_widget("/Settings/Wrap Off")
+        # elif wrap_mode == Gtk.WrapMode.WORD:
+        #     menu_item = self.item_factory.get_widget("/Settings/Wrap Words")
+        # elif wrap_mode == Gtk.WrapMode.CHAR:
+        #     menu_item = self.item_factory.get_widget("/Settings/Wrap Chars")
 
-        ##if menu_item:
-        ##    menu_item.activate()
+        # if menu_item:
+        #     menu_item.activate()
 
     def close_view(self):
         TestText.views.remove(self)
@@ -974,8 +949,7 @@ class View(Gtk.Window):
 
     def check_close_view(self):
         buffer = self.text_view.get_buffer()
-        if (buffer.refcount > 1 or
-            buffer.check_buffer_saved()):
+        if (buffer.refcount > 1 or buffer.check_buffer_saved()):
             self.close_view()
 
     def set_view_title(self):
@@ -994,7 +968,7 @@ class View(Gtk.Window):
         pass
 
     def tab_stops_expose(self, widget, event):
-        #print(self, widget, event)
+        # print(self, widget, event)
         text_view = widget
 
         # See if this expose is on the tab stop window
@@ -1068,10 +1042,11 @@ class View(Gtk.Window):
             if buffer.filename:
                 os.chdir(os.path.dirname(buffer.filename))
 
-
-            bot = shoebot.create_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
+            bot = shoebot.create_bot(codestring, 'NodeBox',
+                                     server=self.use_socketserver, show_vars=self.use_varwindow,
+                                     window=True)
             self.sbot_window = bot._canvas.sink
-            bot.run(codestring, run_forever = True, iterations = None)
+            bot.run(codestring, run_forever=True, iterations=None)
         except ShoebotError, NameError:
             import traceback
             import sys
@@ -1080,12 +1055,13 @@ class View(Gtk.Window):
             err = "Error in Shoebot script:\n %s" % (errmsg)
             dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err);
+                                       Gtk.ButtonsType.OK, err)
             result = dialog.run()
             dialog.destroy()
             return False
 
         # TODO: have a try/except that shows an error window
+
 
 class Stack(list):
     def __init__(self):
@@ -1124,6 +1100,7 @@ class TestText(object):
 def main():
     testtext = TestText(sys.argv[1:])
     testtext.main()
+
 
 if __name__ == "__main__":
     main()
