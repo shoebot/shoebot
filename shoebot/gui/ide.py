@@ -375,7 +375,7 @@ class Buffer(GtkSource.Buffer):
         chooser.set_do_overwrite_confirmation(True)
 
         chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
-        
+
         saved = chooser.run() == Gtk.ResponseType.ACCEPT
         if saved:
                 old_filename = self.filename
@@ -392,7 +392,7 @@ class Buffer(GtkSource.Buffer):
         """
         If the buffer was not saved then give the user the chance to save it
         or cancel.
-        
+
         Return True is the buffer was saved in the end
         """
         if self.get_modified():
@@ -445,7 +445,7 @@ class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
 
 class ConsoleWindow:
     def __init__(self):
-        # we define a scrollable window with automatic behavior for scrolling bars             
+        # we define a scrollable window with automatic behavior for scrolling bars
         self.text_window = Gtk.ScrolledWindow()
         self.text_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.text_area = Gtk.TextView()
@@ -453,7 +453,7 @@ class ConsoleWindow:
         # then we set wrap mode for text
         self.text_area.set_editable(True)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
-        self.text_buffer = self.text_area.get_buffer()        
+        self.text_buffer = self.text_area.get_buffer()
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
         self.text_area.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse("dark grey"))
@@ -463,7 +463,7 @@ class ConsoleWindow:
         ##self.stdout_tag = Gtk.TextTag("stdout")
         ##self.stdout_tag.set_property("foreground", "black")
         ##self.stdout_tag.set_property("style", "normal")
-        #self.stdout_tag.set_property("weight", 600)   
+        #self.stdout_tag.set_property("weight", 600)
         #self.stdout_tag.set_property("size-points", 9)
 
         self.stdout_tag = self.text_buffer.create_tag("system", foreground="black", weight=600, size_points=9)
@@ -480,7 +480,7 @@ class ConsoleWindow:
     def write(self, data, output=None, system=None):
         self.message = data
         if not output:
-            # no tags set for stderr messages, color will be the one set for TextView            
+            # no tags set for stderr messages, color will be the one set for TextView
             self.text_buffer.insert_at_cursor(self.message)
             self.message = ""
         elif system:
@@ -494,7 +494,7 @@ class ConsoleWindow:
             self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
             self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "stdout")
             self.message = ""
-        # this is the trick to make gtk refresh the window                    
+        # this is the trick to make gtk refresh the window
         while Gtk.events_pending():
             Gtk.main_iteration()
 
@@ -507,11 +507,11 @@ class Stdout_Filter(object):
         self.parent.write(self.message, True)
         self.message = None
 
-    
+
 class View(Gtk.Window):
-    ## Gtk3 TODO - GObject.type_register(ShoebotFileChooserDialog)
+    # Gtk3 TODO - GObject.type_register(ShoebotFileChooserDialog)
     FONT = None
-    
+
     def __init__(self, buffer=None):
         menu_items = [
             ( _("/_File"), None, None, 0, "<Branch>" ),
@@ -549,9 +549,9 @@ class View(Gtk.Window):
 
         buffer.ref()
 
-        ## Gtk3.TODO
-        ##if not TestText.colormap:
-        ##    TestText.colormap = self.get_colormap()
+        #  Gtk3.TODO
+        # if not TestText.colormap:
+        #     TestText.colormap = self.get_colormap()
 
         self.connect("delete_event", self.delete_event_cb)
 
@@ -586,7 +586,7 @@ class View(Gtk.Window):
         ##self.text_view.connect("expose_event", self.tab_stops_expose)
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
-        
+
         if View.FONT is None:
             # Get font or fallback
             context = self.text_view.get_pango_context()
@@ -601,7 +601,7 @@ class View(Gtk.Window):
                 print('http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/')
                 View.FONT = 'Mono 8'
 
-        ##self.text_view.modify_font(Pango.FontDescription(View.FONT))
+        # self.text_view.modify_font(Pango.FontDescription(View.FONT))
 
         vbox.pack_start(sw, True, True, 0)
         sw.add(self.text_view)
@@ -611,15 +611,15 @@ class View(Gtk.Window):
         # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
         # we redirect stderr
-        ##sys.stderr = self.console_error
+        # sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
-        ##sys.stdout = self.stdout_filter
+        # sys.stdout = self.stdout_filter
         # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write(_("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n"), True, True)        
-                
+        self.console_error.write(_("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n"), True, True)
+
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
 
@@ -843,8 +843,9 @@ class View(Gtk.Window):
         if buffer.can_redo():
             buffer.redo()
             
+
     #def do_about(self, callback_action, widget):
-        #about = '''Shoebot is a pure Python graphics robot: 
+        #about = '''Shoebot is a pure Python graphics robot:
 #it takes a Python script as input, which describes a drawing process,
 #and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG).\n
 #It has a simple text editor GUI, and scripts can describe their own GUIs for
@@ -857,14 +858,14 @@ class View(Gtk.Window):
         #Paulo Silva <nitrofurano AT gmail.com>
         #Tetsuya Saito <t2psyto AT gmail.com>\n
         #http://shoebot.net/\n
-        #Version: 0.4-beta                
+        #Version: 0.4-beta
         #'''
-        #self.console_error.write(about)            
+        #self.console_error.write(about)
 
     def on_url(self, d, link, data):
         import webbrowser
         webbrowser.open_new(data)
-        
+
     def do_about(self, callback_action, widget):
         # about dialog
         dlg = Gtk.AboutDialog()
@@ -882,7 +883,7 @@ class View(Gtk.Window):
                     w.hide()
         dlg.connect("response", close)
         dlg.run()
-            
+
 
     def init_menus(self):
         text_view = self.text_view
@@ -1016,8 +1017,8 @@ class View(Gtk.Window):
         try:
             if buffer.filename:
                 os.chdir(os.path.dirname(buffer.filename))
-                
-                
+
+
             bot = shoebot.create_bot(codestring, 'NodeBox', server=self.use_socketserver, show_vars=self.use_varwindow, window = True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever = True, iterations = None)
@@ -1034,7 +1035,7 @@ class View(Gtk.Window):
             dialog.destroy()
             return False
 
-        # TODO: have a try/except that shows an error window         
+        # TODO: have a try/except that shows an error window
 
 class Stack(list):
     def __init__(self):
