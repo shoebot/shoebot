@@ -35,7 +35,9 @@ import threading
 
 # TODO - Check if this needs importing here:
 #from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
+from time import sleep
 
+from shoebot.core.events import publish_event, QUIT_EVENT
 
 RGB = "rgb"
 HSB = "hsb"
@@ -59,7 +61,7 @@ def _restore():
     pass
 
 
-## Convenience functions to create create a bot, it's canvas and 'sink'
+## Convenience functions to create create a bot, its canvas and sink
 
 def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, show_vars=False):
     """
@@ -303,8 +305,14 @@ def run(src,
                 raise
             else:
                 return
+    elif background_thread:
+        try:
+            while sbot_thread.is_alive():
+                sleep(1)
+        except KeyboardInterrupt:
+            publish_event(QUIT_EVENT)
 
-    if sbot_thread is not None:
+    if background_thread is not None:
         sbot_thread.join()
 
     return sbot
