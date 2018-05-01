@@ -37,9 +37,6 @@ import sys
 
 from __init__ import run
 
-DEFAULT_SCRIPT = '/usr/share/shoebot/examples/primitives.py'
-DEFAULT_WINDOW_SCRIPT = '/usr/share/shoebot/examples/socketcontrol2.py'
-DEFAULT_OUTPUTFILE = 'output.png'
 DEFAULT_SERVERPORT = 7777
 
 OUTPUT_EXTENSIONS = ('.png', '.svg', '.ps', '.pdf')
