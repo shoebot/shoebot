@@ -6,6 +6,7 @@ The install process should copy this file to the same location as shoebot.
 Functions here are expected to work not need shoebot in the library path.
 
 """
+from .utils import AsynchronousFileReader
 
 try:
     import queue
@@ -18,8 +19,6 @@ import os
 import re
 import subprocess
 import sys
-import threading
-import time
 import uuid
 
 PY3 = sys.version_info[0] == 3
@@ -28,47 +27,6 @@ CMD_LOAD_BASE64 = 'load_base64'
 
 RESPONSE_CODE_OK = "CODE_OK"
 RESPONSE_REVERTED = "REVERTED"
-
-
-class AsynchronousFileReader(threading.Thread):
-    """
-    Helper class to implement asynchronous reading of a file
-    in a separate thread. Pushes read lines on a queue to
-    be consumed in another thread.
-    """
-
-    def __init__(self, fd, q, althandler=None):
-        assert isinstance(q, queue.Queue)
-        assert callable(fd.readline)
-        threading.Thread.__init__(self)
-        self._fd = fd
-        self._queue = q
-        self._althandler = althandler
-
-    def run(self):
-        """
-        The body of the tread: read lines and put them on the queue.
-        """
-        try:
-            for line in iter(self._fd.readline, False):
-                if line is not None:
-                    if self._althandler:
-                        if self._althandler(line):
-                            # If the althandler returns True
-                            # then don't process this as usual
-                            continue
-                self._queue.put(line)
-                if not line:
-                    time.sleep(0.1)
-        except ValueError:  # This can happen if we are closed during readline - TODO - better fix.
-            if not self._fd.closed:
-                raise
-
-    def eof(self):
-        """
-        Check whether there is no more content to expect.
-        """
-        return (not self.is_alive()) and self._queue.empty() or self._fd.closed
 
 
 class CommandResponse(collections.namedtuple("CommandResponse", ['cmd', 'cookie', 'status', 'info'])):
