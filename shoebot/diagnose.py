@@ -11,6 +11,8 @@ This can be complemented by running the unittests.
 from __future__ import print_function
 
 import platform
+import os
+import sys
 
 
 def display_platform():
@@ -68,6 +70,7 @@ def test_imports():
     # gtk
     gi = test_import("gi")
     if gi:
+        gi.require_version('Pango', '1.0')
         test_import("gi.repository.Pango")
     else:
         print("Pango won't be available")
