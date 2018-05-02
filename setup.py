@@ -75,6 +75,7 @@ class DiagnoseCommand(Command):
         from shoebot.diagnose import diagnose
         diagnose()
 
+
 # the following libraries will not be installed
 EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
 
@@ -96,33 +97,33 @@ datafiles.extend([(os.path.join('share/shoebot/', root), [os.path.join(root, fil
 
 # include all libs EXCEPT the ones mentioned in EXCLUDE_LIBS
 
-datafiles.extend([(os.path.join('share/shoebot/', root) ,[os.path.join(root, file_)
-for file_ in files]) for root,dir,files in os.walk('lib') if root not in EXCLUDE_LIBS])
+datafiles.extend([(os.path.join('share/shoebot/', root), [os.path.join(root, file_)
+                                                          for file_ in files]) for root, dir, files in os.walk('lib') if
+                  root not in EXCLUDE_LIBS])
 
 if not is_pypy:
-    NUMPY="numpy>=1.9.1"
+    NUMPY = "numpy>=1.9.1"
 else:
-    NUMPY=""
-
+    NUMPY = ""
 
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
-BASE_REQUIREMENTS=[
+BASE_REQUIREMENTS = [
     "setuptools>=18.8",  #
 
     "cairocffi>=0.7.2",
-    "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
+    "meta",  # as of meta version 0.4.1 the version is borked when installing from pypi
     NUMPY,
     "Pillow>=2.8.1",
     "pubsub==0.1.1",
 ]
 
-
 # requirements to run examples
-EXAMPLE_REQUIREMENTS=[
-  "fuzzywuzzy==0.5.0",   # sbaudio
-  "planar",              # examples
-  "PySoundCard>=0.5.2",  # sbaudio
+EXAMPLE_REQUIREMENTS = [
+    "fuzzywuzzy==0.5.0",  # sbaudio
+    "planar",  # examples
+    "PySoundCard>=0.5.2",  # sbaudio
 ]
+
 
 def requirements(with_pgi=None, with_examples=True, debug=True):
     """
@@ -189,13 +190,14 @@ setup(name="shoebot",
           "shoebot_extensions.gtk3",
       ],
       data_files=datafiles,
-      install_requires=requirements(debug="install" in sys.argv, with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ, with_pgi=is_pypy),
+      install_requires=requirements(debug="install" in sys.argv,
+                                    with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ, with_pgi=is_pypy),
       entry_points={
           "console_scripts": [
-             "sbot=shoebot.run:main",
-             "shoebot=shoebot.gui.ide:main"
+              "sbot=shoebot.run:main",
+              "shoebot=shoebot.gui.ide:main"
           ],
           "gui_scripts": "shoebot=shoebot.gui.ide:main"
       },
-      test_suite = 'tests.unittests',
-)
+      test_suite='tests.unittests',
+      )
