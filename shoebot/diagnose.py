@@ -10,10 +10,8 @@ This can be complemented by running the unittests.
 """
 from __future__ import print_function
 
-import os
-import sys
 import platform
-import traceback
+
 
 def display_platform():
     # environment info
@@ -24,10 +22,10 @@ def display_platform():
     # operating system info
 
     def linux_distribution():
-      try:
-        return platform.linux_distribution()
-      except:
-        return "N/A"
+        try:
+            return platform.linux_distribution()
+        except:
+            return "N/A"
 
     print("""Python version: %s
     dist: %s
@@ -39,20 +37,20 @@ def display_platform():
     mac_ver: %s
     win32_ver: %s
     """ % (
-    sys.version.split('\n'),
-    str(platform.dist()),
-    linux_distribution(),
-    platform.system(),
-    platform.machine(),
-    platform.platform(),
-    platform.version(),
-    platform.mac_ver(),
-    platform.win32_ver(),
+        sys.version.split('\n'),
+        str(platform.dist()),
+        linux_distribution(),
+        platform.system(),
+        platform.machine(),
+        platform.platform(),
+        platform.version(),
+        platform.mac_ver(),
+        platform.win32_ver(),
     ))
-    
+
 
 def test_import(mn):
-    COL_WIDTH=20
+    COL_WIDTH = 20
     try:
         m = __import__(mn)
         print("import %s [success] : %s" % (mn.ljust(COL_WIDTH), m.__file__))
@@ -60,7 +58,7 @@ def test_import(mn):
     except ImportError:
         print("import %s [failed]" % mn.ljust(COL_WIDTH))
     except Exception as e:
-        print("import %s [failed] : %s\n%s" (mn % str(e)))
+        print("import %s [failed] : %s\n%s"(mn % str(e)))
 
 
 def test_imports():
@@ -81,7 +79,7 @@ def test_imports():
     # internal dependencies
     pubsub = test_import("pubsub")
     meta = test_import("meta")
-    
+
     # shoebot itself (if already installed)
     return test_import("shoebot")
 
@@ -90,12 +88,13 @@ def shoebot_example(**shoebot_kwargs):
     """
     Decorator to run some code in a bot instance.
     """
+
     def decorator(f):
         def run():
             print("shoebot - %s:" % f.__name__.replace("_", " "))
             try:
                 import shoebot
-                outputfile="/tmp/shoebot-%s.png" % f.__name__
+                outputfile = "/tmp/shoebot-%s.png" % f.__name__
                 bot = shoebot.create_bot(outputfile=outputfile)
                 f(bot)
                 bot.finish()
@@ -104,8 +103,11 @@ def shoebot_example(**shoebot_kwargs):
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 traceback.print_exc()
                 print("[failed]")
+
         return run
+
     return decorator
+
 
 @shoebot_example()
 def standard_module_example(bot):
@@ -113,11 +115,13 @@ def standard_module_example(bot):
     bot.fill(1, 0.5, 0.1)
     bot.rect(10, 10, 100, 100)
 
+
 @shoebot_example()
 def module_using_text(bot):
     bot.size(640, 480)
     bot.stroke(0)
     bot.text("Should work with gi not pgi", 0, 0)
+
 
 def diagnose():
     display_platform()
@@ -131,17 +135,16 @@ def diagnose():
         traceback.print_exc()
         return False
 
-
-
     # shoebot itself
     standard_module_example()
 
     # shoebot with text (will fail under pypy or pgi)
     module_using_text()
 
+
 if __name__ == '__main__':
     import os
     import sys
     import traceback
-    
+
     diagnose()
