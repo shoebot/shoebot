@@ -21,6 +21,7 @@ Contents:
    examples
    troubleshooting
    developing
+   cli_flags
    
 
 .. We won't be needing these for now
