@@ -5,6 +5,7 @@ import subprocess
 
 here = os.path.dirname(os.path.abspath(__file__))
 
+
 def gedit_install():
     version = None
     try:
@@ -27,6 +28,6 @@ def gedit_install():
         print("Unknown gedit version %s" % version)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     print("Install gedit plugin")
     gedit_install()
