@@ -1,9 +1,8 @@
 import copy
-import os
-import traceback
 import linecache
+import os
 import sys
-
+import traceback
 from time import sleep, time
 
 from livecode import LiveExecution
@@ -11,7 +10,6 @@ from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, ev
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.util import flushfile
-
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
@@ -26,6 +24,7 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
+
     def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
         self._quit = False
@@ -38,11 +37,11 @@ class Grammar(object):
         input_device = canvas.get_input_device()
         if input_device:
             input_device.set_callbacks(
-                key_pressed = self._key_pressed,
-                key_released = self._key_released,
-                mouse_button_down = self._mouse_button_down,
-                mouse_button_up = self._mouse_button_up,
-                mouse_pointer_moved = self._mouse_pointer_moved)
+                key_pressed=self._key_pressed,
+                key_released=self._key_released,
+                mouse_button_down=self._mouse_button_down,
+                mouse_button_up=self._mouse_button_up,
+                mouse_pointer_moved=self._mouse_pointer_moved)
         self._input_device = input_device
 
     def _load_namespace(self, namespace, filename=None):
@@ -154,7 +153,7 @@ class Grammar(object):
         else:
             # Subsequent frames
             if self._dynamic:
-                if self._speed != 0: # speed 0 is paused, so do nothing
+                if self._speed != 0:  # speed 0 is paused, so do nothing
                     with executor.run_context() as (known_good, source, ns):
                         # Code in main block may redefine 'draw'
                         if not known_good:
@@ -200,7 +199,6 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-
     def _simple_traceback(self, ex, source):
         """
         Format traceback, showing line number and surrounding source.
@@ -214,7 +212,7 @@ class Grammar(object):
         exc_location = exc[-2]
         for i, err in enumerate(exc):
             if 'exec source in ns' in err:
-                exc_location = exc[i+1]
+                exc_location = exc[i + 1]
                 break
 
         # extract line number from traceback
@@ -226,14 +224,14 @@ class Grammar(object):
         err_msgs = []
 
         # code around the error
-        err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
+        err_where = ' '.join(exc[i - 1].split(',')[1:]).strip()  # 'line 37 in blah"
         err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-        for i in xrange(max(0, line_number-5), line_number):
+        for i in xrange(max(0, line_number - 5), line_number):
             if fn == "<string>":
                 line = source_arr[i]
             else:
-                line = linecache.getline(fn, i+1)
-            err_msgs.append('%s: %s' % (i+1, line.rstrip()))
+                line = linecache.getline(fn, i + 1)
+            err_msgs.append('%s: %s' % (i + 1, line.rstrip()))
         err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
 
         err_msgs.append('')

@@ -33,7 +33,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 try:
     from setuptools import setup, Command
 except ImportError:
-    sys.exit("Install systemtools before shoebot")
+    sys.exit("Install setuptools before shoebot")
 
 
 class CleanCommand(Command):
