@@ -130,6 +130,23 @@ Drawing shapes
     :py:func:`rectmode` to change the function's behaviour according to what might suit your
     script's needs.
 
+    .. shoebot::
+        :snapshot:
+
+        nofill()
+        strokewidth(2)
+
+        rectmode(CORNER)  # default, red
+        stroke(0.8, 0.1, 0.1)
+        rect(25, 25, 40, 40)
+
+        rectmode(CENTER)  # green
+        stroke(0.1, 0.8, 0.1)
+        rect(25, 25, 40, 40)
+
+        rectmode(CORNERS)  # blue
+        stroke(0.1, 0.1, 0.8)
+        rect(25, 25, 40, 40)
 
 Bézier paths
 ------------
