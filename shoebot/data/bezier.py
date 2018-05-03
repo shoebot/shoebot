@@ -174,7 +174,7 @@ class BezierPath(Grob, ColorMixin):
             self.lineto(x+curve, y+h)
             self.curveto(x, y+h, x, y+h, x, y+h-curve)
             self.closepath()
-    
+
     def _traverse(self, cairo_ctx):
         '''
         Traverse this path
@@ -194,14 +194,14 @@ class BezierPath(Grob, ColorMixin):
         record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1))
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
-        
-        self._bounds = dummy_ctx.path_extents()        
+
+        self._bounds = dummy_ctx.path_extents()
         return self._bounds
 
     def _get_dimensions(self):
         x1, y1, x2, y2 = self._get_bounds()
         return x1, y1
-        
+
     def contains(self, x, y):
         '''
         Return cached bounds of this Grob.
@@ -214,7 +214,7 @@ class BezierPath(Grob, ColorMixin):
         record_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1))
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
-        
+
         in_fill = dummy_ctx.in_fill(x, y)
         return in_fill
 
@@ -259,13 +259,13 @@ class BezierPath(Grob, ColorMixin):
             if fillcolor is None and strokecolor is None:
                 # Fixes _bug_FillStrokeNofillNostroke.bot
                 return
-                
+
             cairo_ctx.set_matrix(transform)
             # Run the path commands on the cairo context:
             self._traverse(cairo_ctx)
             ## Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
-            
+
             if fillcolor is not None and strokecolor is not None:
                 if strokecolor[3] < 1:
                     # Draw onto intermediate surface so that stroke
@@ -280,7 +280,7 @@ class BezierPath(Grob, ColorMixin):
                     cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
                     cairo_ctx.set_line_width(strokewidth)
                     cairo_ctx.stroke()
-                
+
                     cairo_ctx.pop_group_to_source ()
                     cairo_ctx.paint ()
                 else:
@@ -290,7 +290,7 @@ class BezierPath(Grob, ColorMixin):
 
                     cairo_ctx.set_source_rgba(*strokecolor)
                     cairo_ctx.set_line_width(strokewidth)
-                    cairo_ctx.stroke()                    
+                    cairo_ctx.stroke()
             elif fillcolor is not None:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
@@ -305,7 +305,7 @@ class BezierPath(Grob, ColorMixin):
         self._deferred_render(self._render_closure())
 
     def _get_contours(self):
-        """ 
+        """
         Returns a list of contours in the path, as BezierPath objects.
         A contour is a sequence of lines and curves separated from the next contour by a MOVETO.
         For example, the glyph "o" has two contours: the inner circle and the outer circle.
@@ -341,46 +341,46 @@ class BezierPath(Grob, ColorMixin):
             The returned t is the absolute time on that segment,
             in contrast to the relative t on the whole of the path.
             The returned point is the last MOVETO, any subsequent CLOSETO after i closes to that point.
-            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True), 
-            point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
-            the length during each iteration. 
+            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
+            point() works about thirty times faster in a for-loop since it doesn't need to recalculate
+            the length during each iteration.
         """
         # Originally from nodebox-gl
         if segments is None:
-            segments = self._segment_lengths(relative=True) 
+            segments = self._segment_lengths(relative=True)
         if len(segments) == 0:
             raise PathError, "The given path is empty"
         for i, el in enumerate(self._get_elements()):
             if i == 0 or el.cmd == MOVETO:
                 closeto = Point(el.x, el.y)
-            if t <= segments[i] or i == len(segments)-1: 
+            if t <= segments[i] or i == len(segments)-1:
                 break
-            else: 
+            else:
                 t -= segments[i]
         try: t /= segments[i]
-        except ZeroDivisionError: 
+        except ZeroDivisionError:
             pass
         if i == len(segments)-1 and segments[i] == 0: i -= 1
         return (i, t, closeto)
-                           
+
     def point(self, t, segments=None):
         """
             Returns the PathElement at time t (0.0-1.0) on the path.
-            
+
             Returns coordinates for point at t on the path.
             Gets the length of the path, based on the length of each curve and line in the path.
             Determines in what segment t falls. Gets the point on that segment.
-            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True), 
-            point() works about thirty times faster in a for-loop since it doesn't need to recalculate 
+            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
+            point() works about thirty times faster in a for-loop since it doesn't need to recalculate
             the length during each iteration.
         """
         # Originally from nodebox-gl
         if len(self._elements) == 0:
             raise PathError, "The given path is empty"
-            
+
         if self._segments is None:
             self._segments = self._get_length(segmented=True, precision=10)
-        
+
         i, t, closeto = self._locate(t, segments=self._segments)
         x0, y0 = self[i].x, self[i].y
         p1 = self[i+1]
@@ -400,7 +400,7 @@ class BezierPath(Grob, ColorMixin):
             return PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
         else:
             raise PathError, "Unknown cmd '%s' for p1 %s" % (p1.cmd, p1)
-            
+
     def points(self, amount=100, start=0.0, end=1.0, segments=None):
         """ Returns an iterator with a list of calculated points for the path.
             To omit the last point on closed paths: end=1-1.0/amount
@@ -410,7 +410,7 @@ class BezierPath(Grob, ColorMixin):
             raise PathError, "The given path is empty"
         n = end - start
         d = n
-        if amount > 1: 
+        if amount > 1:
             # The delta value is divided by amount-1, because we also want the last point (t=1.0)
             # If we don't use amount-1, we fall one point short of the end.
             # If amount=4, we want the point at t 0.0, 0.33, 0.66 and 1.0.
@@ -423,14 +423,14 @@ class BezierPath(Grob, ColorMixin):
         """ Returns coordinates for point at t on the line.
             Calculates the coordinates of x and y for a point at t on a straight line.
             The t parameter is a number between 0.0 and 1.0,
-            x0 and y0 define the starting point of the line, 
+            x0 and y0 define the starting point of the line,
             x1 and y1 the ending point of the line.
         """
         # Originally from nodebox-gl
         out_x = x0 + t * (x1-x0)
         out_y = y0 + t * (y1-y0)
         return (out_x, out_y)
-    
+
     def _linelength(self, x0, y0, x1, y1):
         """ Returns the length of the line.
         """
@@ -438,10 +438,10 @@ class BezierPath(Grob, ColorMixin):
         a = pow(abs(x0 - x1), 2)
         b = pow(abs(y0 - y1), 2)
         return sqrt(a+b)
-    
+
     def _curvepoint(self, t, x0, y0, x1, y1, x2, y2, x3, y3, handles=False):
         """ Returns coordinates for point at t on the spline.
-            Calculates the coordinates of x and y for a point at t on the cubic bezier spline, 
+            Calculates the coordinates of x and y for a point at t on the cubic bezier spline,
             and its control points, based on the de Casteljau interpolation algorithm.
             The t parameter is a number between 0.0 and 1.0,
             x0 and y0 define the starting point of the spline,
@@ -469,12 +469,12 @@ class BezierPath(Grob, ColorMixin):
             return (out_x, out_y, out_c1x, out_c1y, out_c2x, out_c2y)
         else:
             return (out_x, out_y, out_c1x, out_c1y, out_c2x, out_c2y, x01, y01, x23, y23)
-    
+
     def _curvelength(self, x0, y0, x1, y1, x2, y2, x3, y3, n=20):
         """ Returns the length of the spline.
-            Integrates the estimated length of the cubic bezier spline defined by x0, y0, ... x3, y3, 
+            Integrates the estimated length of the cubic bezier spline defined by x0, y0, ... x3, y3,
             by adding the lengths of lineair lines between points at t.
-            The number of points is defined by n 
+            The number of points is defined by n
             (n=10 would add the lengths of lines between 0.0 and 0.1, between 0.1 and 0.2, and so on).
             The default n=20 is fine for most cases, usually resulting in a deviation of less than 0.01.
         """
@@ -521,7 +521,7 @@ class BezierPath(Grob, ColorMixin):
             try:
                 # Relative segment lengths' sum is 1.0.
                 return map(lambda l: l / length, lengths)
-            except ZeroDivisionError: 
+            except ZeroDivisionError:
                 # If the length is zero, just return zero for all segments
                 return [0.0] * len(lengths)
         else:
@@ -552,7 +552,7 @@ class BezierPath(Grob, ColorMixin):
 
     def extend(self, pathelements):
         self._elements.extend(pathelements)
-        
+
     def __getitem__(self, item):
         '''
         el is either a PathElement or the parameters to pass
@@ -576,7 +576,7 @@ class BezierPath(Grob, ColorMixin):
 
     def __len__(self):
         return len(self._elements)
-        
+
     def inheritFromContext(self, **kwargs):
         # TODO - needs completion to make 'dendrite'
         #        example work
@@ -589,10 +589,10 @@ class BezierPath(Grob, ColorMixin):
 
 
 class ClippingPath(BezierPath):
-    
+
     # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
-    # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')    
-    
+    # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')
+
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, **kwargs)
     	self._drawn = False
@@ -603,12 +603,12 @@ class ClippingPath(BezierPath):
             # Go to initial point (CORNER or CENTER):
             transform = self._call_transform_mode(self._transform)
             cairo_ctx.set_matrix(transform)
-            
+
             # Traverse the path
             self._path._traverse(cairo_ctx)
             cairo_ctx.save()
             cairo_ctx.clip()
-            
+
         return render
 
 
@@ -629,7 +629,7 @@ class CtrlPoint(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
 EMPTY_CTRL = CtrlPoint(None, None)
 
 
@@ -689,21 +689,21 @@ class PathElement(object):
 
     def set_ctrl1(self, ctrl1):
         self._ctrl1 = ctrl1
-        
+
     def get_ctrl1(self):
         if self._ctrl1 is None:
             self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
         return self._ctrl1
-        
+
 
     def set_ctrl2(self, ctrl2):
         self._ctrl2 = ctrl2
-        
+
     def get_ctrl2(self):
         if self._ctrl2 is None:
             self._ctrl2 = CtrlPoint(self.c2x, self.c2y)
         return self._ctrl2
-            
+
     def __getitem__(self, key):
         data = list(self.values)
         data.insert(0, self.cmd)
@@ -719,7 +719,7 @@ class PathElement(object):
         if self.cmd != other.cmd: return False
         if self.values != other.values: return False
         return True
-    
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -751,7 +751,7 @@ class Point(object):
     def _set_xy(self, (x,y)):
         self.x = x
         self.y = y
-        
+
     xy = property(_get_xy, _set_xy)
 
     def __iter__(self):
@@ -759,11 +759,11 @@ class Point(object):
 
     def __repr__(self):
         return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
-        
+
     def __eq__(self, pt):
         if not isinstance(pt, Point): return False
         return self.x == pt.x \
            and self.y == pt.y
-    
+
     def __ne__(self, pt):
         return not self.__eq__(pt)

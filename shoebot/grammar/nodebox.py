@@ -22,7 +22,7 @@ from shoebot.data import RGB, \
                     LEFT, \
                     CENTER, \
                     RIGHT
-                    
+
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType
@@ -44,10 +44,10 @@ sys.path.append('.') # ximport can work from current dir
 
 
 class NodeBot(Bot):
-    
+
     NORMAL = "1"
     FORTYFIVE = "2"
-    
+
     CORNER = CORNER
     CENTER = CENTER
     MOVETO = MOVETO
@@ -62,8 +62,8 @@ class NodeBot(Bot):
 
     LEFT = LEFT
     RIGHT = RIGHT
-    
-    # Default values    
+
+    # Default values
     color_mode = RGB
     color_range = 1
 
@@ -185,8 +185,8 @@ class NodeBot(Bot):
         '''
         p = self._path
         self.beginpath()
-        self.moveto(x1,y1)
-        self.lineto(x2,y2)
+        self.moveto(x1, y1)
+        self.lineto(x2, y2)
         self.endpath(draw=draw)
         self._path = p
         return p
@@ -202,7 +202,7 @@ class NodeBot(Bot):
         :param type:  NORMAL or FORTYFIVE
         :draw:  If True draws arrow immediately
 
-        :return: Path object representing the arrow. 
+        :return: Path object representing the arrow.
         '''
         # Taken from Nodebox
         path = self.BezierPath(**kwargs)
@@ -210,25 +210,25 @@ class NodeBot(Bot):
             head = width * .4
             tail = width * .2
             path.moveto(x, y)
-            path.lineto(x-head, y+head)
-            path.lineto(x-head, y+tail)
-            path.lineto(x-width, y+tail)
-            path.lineto(x-width, y-tail)
-            path.lineto(x-head, y-tail)
-            path.lineto(x-head, y-head)
+            path.lineto(x - head, y + head)
+            path.lineto(x - head, y + tail)
+            path.lineto(x - width, y + tail)
+            path.lineto(x - width, y - tail)
+            path.lineto(x - head, y - tail)
+            path.lineto(x - head, y - head)
             path.lineto(x, y)
         elif type == self.FORTYFIVE:
-            head = .3 
+            head = .3
             tail = 1 + head
             path.moveto(x, y)
-            path.lineto(x, y+width*(1-head))
-            path.lineto(x-width*head, y+width)
-            path.lineto(x-width*head, y+width*tail*.4)
-            path.lineto(x-width*tail*.6, y+width)
-            path.lineto(x-width, y+width*tail*.6)
-            path.lineto(x-width*tail*.4, y+width*head)
-            path.lineto(x-width, y+width*head)
-            path.lineto(x-width*(1-head), y)
+            path.lineto(x, y + width * (1 - head))
+            path.lineto(x - width * head, y + width)
+            path.lineto(x - width * head, y + width * tail * .4)
+            path.lineto(x - width * tail * .6, y + width)
+            path.lineto(x - width, y + width * tail * .6)
+            path.lineto(x - width * tail * .4, y + width * head)
+            path.lineto(x - width, y + width * head)
+            path.lineto(x - width * (1 - head), y)
             path.lineto(x, y)
         else:
             raise NameError(_("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"))
@@ -253,7 +253,7 @@ class NodeBot(Bot):
                 radius = outer
             x = startx + radius * x
             y = starty + radius * y
-            self.lineto(x,y)
+            self.lineto(x, y)
 
         return self.endpath(draw)
 
@@ -653,7 +653,7 @@ class NodeBot(Bot):
 
     def background(self, *args):
         '''Set the background color.
-        
+
         :param color: See color() function for supported color formats.
         '''
         self._canvas.background = self.color(*args)
