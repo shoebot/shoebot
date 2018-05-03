@@ -148,6 +148,31 @@ Drawing shapes
         stroke(0.1, 0.1, 0.8)
         rect(25, 25, 40, 40)
 
+.. py:function:: ellipsemode(mode=None)
+
+    Change the way ellipses are specified. Each mode alters the parameters
+    necessary to draw an ellipse using the :py:func:`ellipse` function. 
+
+    It works exactly the same as the :py:func:`rectmode` command.
+
+    .. shoebot::
+        :snapshot:
+
+        nofill()
+        strokewidth(2)
+
+        ellipsemode(CORNER)  # default, red
+        stroke(0.8, 0.1, 0.1)
+        ellipse(25, 25, 40, 40)
+
+        ellipsemode(CENTER)  # green
+        stroke(0.1, 0.8, 0.1)
+        ellipse(25, 25, 40, 40)
+
+        ellipsemode(CORNERS)  # blue
+        stroke(0.1, 0.1, 0.8)
+        ellipse(25, 25, 40, 40)
+
 Bézier paths
 ------------
 
