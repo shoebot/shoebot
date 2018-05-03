@@ -200,11 +200,26 @@ Bézier paths
 Images
 ------
 
-.. py:function:: drawimage(image)
+.. py:function:: image(path, x=0, y=0, width=None, height=None, alpha=1.0, data=None, draw=True)
 
-  * image: Image to draw
-  * x: optional, x coordinate (default is image.x)
-  * y: optional, y coordinate (default is image.y)
+    Place a bitmap image on the canvas.
+
+    :param path: location of the image on disk
+    :param x: x-coordinate of the top left corner
+    :param y: y-coordinate of the top left corner
+    :param width: image width (leave blank to use its original width)
+    :param height: image height (leave blank to use its original height)
+    :param alpha: opacity
+    :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
+    :param draw: whether to place the image immediately on the canvas or not
+    :type path: str
+    :type x: float
+    :type y: float
+    :type width: float or None
+    :type height: float or None
+    :type alpha: float
+    :type data: binary data
+    :type draw: bool
 
 
 Clipping paths
@@ -243,12 +258,12 @@ Colors
 ------
 
 Colors can be specified in a few ways:
-  * grayscale: `(value)`
-  * grayscale with alpha: `(value, alpha)`
-  * RGB: `(red, green, blue)`
-  * RGBA: `(red, green, blue, alpha)`
-  * hex: `('#FFFFFF')`
-  * hex with alpha: `('#FFFFFFFF')`
+  * grayscale: ``(value)``
+  * grayscale with alpha: ``(value, alpha)``
+  * RGB: ``(red, green, blue)``
+  * RGBA: ``(red, green, blue, alpha)``
+  * hex: ``('#FFFFFF')``
+  * hex with alpha: ``('#FFFFFFFF')``
 
 You can use any of these formats to specify a colour; for example, `fill(1,0,0)`
 and `fill('#FF0000')` yield the same result.
@@ -263,138 +278,133 @@ Set background to any valid color
 
 .. py:function:: colormode(mode=None, crange=None)
 
-Set the current colormode (can be RGB or HSB) and eventually
-the color range.
+  Set the current colormode (can be RGB or HSB) and eventually
+  the color range.
 
-If called without arguments, it returns the current colormode.
+  :param mode: Color mode to use
+  :type mode: RGB or HSB
+  :param crange: Maximum value for the new color range to use. See `colorrange`_.
+  :rtype: Current color mode (if called without arguments)
 
-  * mode: Color mode, either "rgb", or "hsb"
-  * crange: Maximum scale value for color, e.g. 1.0 or 255
 
-.. py:function:: colorrange(crange)
+.. py:function:: colorrange(crange=1.0)
 
-By default colors range from 0.0 - 1.0 using colorrange
-other defaults can be used, e.g. 0.0 - 255.0
+  Set the numeric range for color values. By default colors range from 0.0 - 1.0; use this to set a different range, e.g. with ``colorrange(255)`` values will range between 0 and 255.
 
-  * crange: Color range of 0.0 - 255:
+  :param crange: Maximum value for the new color range to use
+  :type crange: float
+
 
 .. py:function:: fill(*args)
 
-Sets a fill color, applying it to new paths.
+  Sets a fill color, applying it to new paths.
 
-  * args: color in supported format
+  :param args: color in supported format
 
 .. py:function:: stroke(*args)
 
-Set a stroke color, applying it to new paths.
+  Set a stroke color, applying it to new paths.
 
-  * args: color in supported format
+  :param args: color in supported format
 
 .. py:function:: nofill()
 
-Stop applying fills to new paths.
+  Stop applying fills to new paths.
 
 .. py:function:: nostroke()
 
-Stop applying strokes to new paths.
+  Stop applying strokes to new paths.
 
 .. py:function:: strokewidth(w=None)
 
- * w: Stroke width.
- * return: If no width was specified then current width is returned.
+  :param w: Stroke width
+  :rtype: Current width (if no width was specified)
 
 .. py:function:: color(*args)
 
-  * args: color in a supported format.
-  * return: Color object containing the color.
+  :param args: color in a supported format
+  :rtype: Color object
 
-
-Color
------
-
-[TODO: Describe all the possible color syntax options, and link the above
-commands to these.]
 
 Text
 ----
 
 .. py:function:: text(txt, x, y, width=None, height=1000000, outline=False, draw=True)
 
-Draws a string of text according to current font settings.
+  Draws a string of text according to current font settings.
 
-  * txt: Text to output
-  * x: x-coordinate of the top left corner
-  * y: y-coordinate of the top left corner
-  * width: text width
-  * height: text height
-  * outline: If True draws outline text (defaults to False)
-  * draw: Set to False to inhibit immediate drawing (defaults to True)
-  * return: Path object representing the text.
+  :param txt: Text to output
+  :param x: x-coordinate of the top left corner
+  :param y: y-coordinate of the top left corner
+  :param width: text box width. When set, text will wrap to the next line if it would exceed this width. If unset, there will be no line breaks.
+  :param height: text box height
+  :param outline: whether to draw as an outline.
+  :param draw: if False, the object won't be immediately drawn to canvas.
+  :type outline: bool
+  :type draw: bool
+  :rtype: BezierPath object representing the text
 
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
-Set the font to be used with new text instances.
+  Set the font to be used with new text instances.
 
-Accepts TrueType and OpenType files. Depends on FreeType being
-installed.
+  Accepts TrueType and OpenType files. Depends on FreeType being
+  installed.
 
-  * fontpath: path to truetype or opentype font.
-  * fontsize: size of font
-
-  * return: current current fontpath (if fontpath param not set)
+  :param fontpath: path to TrueType or OpenType font
+  :param fontsize: font size in points
+  :rtype: current font path (if ``fontpath`` was not set)
 
 .. py:function:: fontsize(fontsize=None)
 
-Set or return size of current font.
+  Set or return size of current font.
 
-  * fontsize: Size of font.
-  * return: Size of font (if fontsize was not specified)
+  :param fontsize: Font size in points (pt)
+  :rtype: Font size in points (if ``fontsize`` was not specified)
 
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
-Generates an outlined path of the input text.
+  Generates an outlined path of the input text.
 
-  * txt: Text to output
-  * x: x-coordinate of the top left corner
-  * y: y-coordinate of the top left corner
-  * width: text width
-  * height: text height
-  * draw: Set to False to inhibit immediate drawing (defaults to False)
-  * return: Path object representing the text.
+  :param txt: Text to output
+  :param x: x-coordinate of the top left corner
+  :param y: y-coordinate of the top left corner
+  :param width: text width
+  :param height: text height
+  :param draw: Set to False to inhibit immediate drawing (defaults to False)
+  :rtype: Path object representing the text.
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
-  * return: the width and height of a string of text as a tuple (according to current font settings).
+  :rtype: the width and height of a string of text as a tuple (according to current font settings).
 
 .. py:function:: textwidth(txt, width=None)
 
-  * return: the width of a string of text according to the current font settings.
+  :param text: the text to test for its dimensions
+  :rtype: the width of a string of text according to the current font settings
 
 .. py:function:: textheight(txt, width=None)
 
-  * return: the height of a string of text according to the current font settings.
+  :param text: the text to test for its dimensions
+  :rtype: the height of a string of text according to the current font settings
 
 .. py:function:: lineheight(height=None)
 
-Set text lineheight.
+  Set the space between lines of text.
 
-  * height: line height.
+  :param height: line height
 
-.. py:function:: align(align="LEFT")
+.. py:function:: align(align=LEFT)
 
-Set text alignment
+  Set the way lines of text align with each other.
 
-  * align: Text alignment (LEFT, CENTER, RIGHT)
+  :param align: Text alignment rule
+  :type align: LEFT, CENTER or RIGHT
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
     Not implemented.
-
-.. py:function:: autotext(sourceFile)
-
-generates mock philosophy based on a context-free grammar
-
 
 Dynamic variables
 -----------------
@@ -414,6 +424,11 @@ Utility functions
     ``>>> f = files('*.gif')``
 
     :param path: wildcard to use in file list.
+
+.. py:function:: autotext(sourceFile)
+
+generates mock philosophy based on a context-free grammar
+
 
 
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
@@ -445,10 +460,10 @@ Core
 
 .. py:function:: speed(framerate)
 
-Set animation framerate.
+  Set the framerate on windowed mode.
 
-  * framerate: Frames per second to run bot.
-  * return: Current framerate of animation.
+  :param framerate: Frames per second
+  :rtype: Current framerate
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
