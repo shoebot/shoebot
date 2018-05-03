@@ -23,10 +23,11 @@ class SurfaceRef(object):
     def __init__(self, surface):
         self.surface = surface
 
+
 class Image(Grob, ColorMixin):
     _surface_cache = {}   # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
 
-    def __init__(self, bot, path = None, x = 0, y = 0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
+    def __init__(self, bot, path=None, x=0, y=0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
 
@@ -77,7 +78,7 @@ class Image(Grob, ColorMixin):
                     # Would be nice to not have to do some of these conversions :-\
                     bgra_data = img.tostring('raw', 'BGRA', 0, 1)
                     bgra_array = array.array('B', bgra_data)
-                    imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4)
+                    imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
 
                 self._surface_cache[path] = SurfaceRef(imagesurface)
             else:
@@ -90,7 +91,7 @@ class Image(Grob, ColorMixin):
                 # Would be nice to not have to do some of these conversions :-\
                 bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
                 bgra_array = array.array('B', bgra_data)
-                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw*4)
+                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
 
             if width is not None or height is not None:
                 if width:
@@ -112,7 +113,6 @@ class Image(Grob, ColorMixin):
 
         self._deferred_render()
 
-
     def _render(self, ctx):
         if self.width and self.height:
             # Go to initial point (CORNER or CENTER):
@@ -129,14 +129,12 @@ class Image(Grob, ColorMixin):
     def _get_center(self):
         '''Returns the center point of the path, disregarding transforms.
         '''
-        x = (self.x+self.width/2)
-        y = (self.y+self.height/2)
-        return (x,y)
+        x = (self.x + self.width / 2)
+        y = (self.y + self.height / 2)
+        return (x, y)
     center = property(_get_center)
 
     def copy(self):
         p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
         _copy_attrs(self._bot, p, self.stateAttributes)
         return p
-
-

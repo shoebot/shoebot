@@ -67,21 +67,21 @@ from cairocffi import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
 
 class Text(Grob, ColorMixin):
-    
+
     # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
 
     def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, enableRendering=True, **kwargs):
         self._canvas = canvas = bot._canvas
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
-        
-        ###self._transform = canvas.transform # TODO remove - this is in grob
+
+        # self._transform = canvas.transform # TODO remove - this is in grob
 
         self._ctx = ctx
         self._pang_ctx = None
-        
+
         self._doRender = enableRendering
-                
+
         self.text = unicode(text)
         self.x = x
         self.y = y
@@ -97,29 +97,29 @@ class Text(Grob, ColorMixin):
 
         # we use the pango parser instead of trying this by hand
         self._fontface = Pango.FontDescription.from_string(self._fontfile)
-                                                      
+
         # then we set fontsize (multiplied by Pango.SCALE)
-        self._fontface.set_absolute_size(self._fontsize*Pango.SCALE)
+        self._fontface.set_absolute_size(self._fontsize * Pango.SCALE)
 
         # the style
         self._style = Pango.Style.NORMAL
         if kwargs.get("style") in ["italic", "oblique"]:
             self._style = Pango.Style.ITALIC
         self._fontface.set_style(self._style)
-        
-        #we need to pre-render some stuff to enable metrics sizing
+
+        # we need to pre-render some stuff to enable metrics sizing
         self._pre_render()
-        
-        if self._doRender: #this way we do not render if we only need to create metrics
+
+        if self._doRender:  # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
                 # Normal rendering, can be deferred
                 self._deferred_render()
-            
+
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
-        #we use a new CairoContext to pre render the text
+        # we use a new CairoContext to pre render the text
         rs = cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         cr = cairo.Context(rs)
 
@@ -129,7 +129,7 @@ class Text(Grob, ColorMixin):
         self.layout = PangoCairo.create_layout(cr)
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
-        ## self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
+        # self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
         self.layout.set_font_description(self._fontface)
         self.layout.set_text(self.text, -1)
@@ -137,10 +137,10 @@ class Text(Grob, ColorMixin):
         # text will wrap, meanwhile it checks if and indent has to be applied
         # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
-            self.layout.set_width(int(self.width)*Pango.SCALE)
+            self.layout.set_width(int(self.width) * Pango.SCALE)
             if self._indent:
-                self.layout.set_indent(self._indent*Pango.SCALE)                
-        # set text alignment    
+                self.layout.set_indent(self._indent * Pango.SCALE)
+        # set text alignment
         if self._align == "right":
             self.layout.set_alignment(Pango.Alignment.RIGHT)
         elif self._align == "center":
@@ -163,7 +163,7 @@ class Text(Grob, ColorMixin):
             ctx = _UNSAFE_cairocffi_context_to_pycairo(ctx)
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
-        
+
         # we update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
         self._pang_ctx = PangoCairo.create_context(ctx)
@@ -175,14 +175,12 @@ class Text(Grob, ColorMixin):
                 transform = pycairo.Matrix(*transform.as_tuple())
             ctx.set_matrix(transform)
 
-            ctx.translate(self.x, self.y-self.baseline)
-            
+            ctx.translate(self.x, self.y - self.baseline)
+
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
             PangoCairo.show_layout(ctx, self.layout)
             PangoCairo.update_layout(ctx, self.layout)
-        
-
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
@@ -190,7 +188,7 @@ class Text(Grob, ColorMixin):
     def baseline(self):
         self.iter = self.layout.get_iter()
         baseline_y = self.iter.get_baseline()
-        baseline_delta = baseline_y/Pango.SCALE
+        baseline_delta = baseline_y / Pango.SCALE
         return (baseline_delta)
 
 #    @property
@@ -210,7 +208,7 @@ class Text(Grob, ColorMixin):
         w, h = self.layout.get_pixel_size()
         return w, h
 
-    # this function is quite computational expensive 
+    # this function is quite computational expensive
     # there should be a way to make it faster, by not creating a new context each time it's called
 
     @property
@@ -222,19 +220,19 @@ class Text(Grob, ColorMixin):
         tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
         if GI:
             tempCairoContext = _UNSAFE_cairocffi_context_to_pycairo(tempCairoContext)
-        tempCairoContext.move_to(self.x,self.y-self.baseline)
+        tempCairoContext.move_to(self.x, self.y - self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
-        
+
         # supposedly showlayout should work, but it fills the path instead,
         # therefore we use layout_path instead to render the layout to pangoCairoContext
-        #tempCairoContext.show_layout(self.layout)
+        # tempCairoContext.show_layout(self.layout)
         PangoCairo.layout_path(tempCairoContext, self.layout)
-        #here we extract the path from the temporal cairo.Context we used to draw on the previous step
+        # here we extract the path from the temporal cairo.Context we used to draw on the previous step
         pathdata = tempCairoContext.copy_path()
-        
+
         # creates a BezierPath instance for storing new shoebot path
         p = BezierPath(self._bot)
-       
+
         # parsing of cairo path to build a shoebot path
         for item in pathdata:
             cmd = item[0]
@@ -254,8 +252,8 @@ class Text(Grob, ColorMixin):
         '''Returns the center point of the path, disregarding transforms.
         '''
         w, h = self.layout.get_pixel_size()
-        x = (self.x+w/2)
-        y = (self.y+h/2)
+        x = (self.x + w / 2)
+        y = (self.y + h / 2)
         return x, y
 
     center = property(_get_center)
@@ -263,7 +261,6 @@ class Text(Grob, ColorMixin):
     def copy(self):
         new = self.__class__(self._bot, self.text)
         _copy_attrs(self, new,
-            ('x', 'y', 'width', 'height', '_transform', '_transformmode',
-            '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
+                    ('x', 'y', 'width', 'height', '_transform', '_transformmode',
+                     '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
         return new
-
