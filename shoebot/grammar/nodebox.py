@@ -126,9 +126,7 @@ class NodeBot(Bot):
 
         :param mode: CORNER, CENTER, CORNERS
         :return: rectmode if mode is None or valid.
-
         '''
-        ### TODO
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
             self.rectmode = mode
             return self.rectmode
@@ -137,10 +135,25 @@ class NodeBot(Bot):
         else:
             raise ShoebotError(_("rectmode: invalid input"))
 
+    def ellipsemode(self, mode=None):
+        '''
+        Set the current ellipse drawing mode.
+
+        :param mode: CORNER, CENTER, CORNERS
+        :return: ellipsemode if mode is None or valid.
+        '''
+        if mode in (self.CORNER, self.CENTER, self.CORNERS):
+            self.ellipsemode = mode
+            return self.ellipsemode
+        elif mode is None:
+            return self.ellipsemode
+        else:
+            raise ShoebotError(_("ellipsemode: invalid input"))
+
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draw an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
         path = self.BezierPath(**kwargs)
-        path.ellipse(x, y, width, height)
+        path.ellipse(x, y, width, height, self.ellipsemode)
         if draw:
             path.draw()
         return path
@@ -148,7 +161,7 @@ class NodeBot(Bot):
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draw an ellipse starting from (x,y)'''
         path = self.BezierPath(**kwargs)
-        path.ellipse(x,y,width,height)
+        path.ellipse(x,y,width,height, self.ellipsemode)
         if draw:
             path.draw()
         return path

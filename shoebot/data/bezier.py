@@ -133,8 +133,15 @@ class BezierPath(Grob, ColorMixin):
             self._append_element(self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y))
             self.closed = True
 
-    def ellipse(self, x, y, w, h):
-        self._append_element(self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h)) 
+    def ellipse(self, x, y, w, h, ellipsemode=CORNER):
+        # convert values if ellipsemode is not CORNER
+        if ellipsemode == CENTER:
+            x = x - (w / 2)
+            y = y - (h / 2)
+        elif ellipsemode == CORNERS:
+            w = w - x
+            h = h - y
+        self._append_element(self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h))
         self.closed = True
 
 
@@ -142,6 +149,14 @@ class BezierPath(Grob, ColorMixin):
         self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
     def rect(self, x, y, w, h, roundness=0.0, rectmode=CORNER):
+        # convert values if rectmode is not CORNER
+        if rectmode == CENTER:
+            x = x - (w / 2)
+            y = y - (h / 2)
+        elif rectmode == CORNERS:
+            w = w - x
+            h = h - y
+
         if not roundness:
             self.moveto(x, y)
             self.rellineto(w, 0)
