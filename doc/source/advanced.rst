@@ -116,6 +116,14 @@ Debugging / Dev flags:
       -V, --verbose         Show internal shoebot error information in traceback
 
 
+.. _shell-mode:
+
+Shell mode
+----------
+
+When run with the ``-l`` option, ``sbot`` gives you a shell inside which to control the windowed script.
+
+
 Shoebox Virtual Machine
 -----------------------
 
