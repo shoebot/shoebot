@@ -1,8 +1,8 @@
 Command reference
 =================
 
-This documentation is still missing many parts. Refer to the [Nodebox
-documentation](https://www.nodebox.net/code/index.php/Reference) for the best
+This documentation is still missing many parts. Refer to the `Nodebox
+documentation <https://www.nodebox.net/code/index.php/Reference>`_ for the best
 reference in the meantime.
 
 Drawing shapes
@@ -10,7 +10,7 @@ Drawing shapes
 
 .. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
 
-    Draw a rectangle on the canvas.
+    Draw a rectangle.
  
     :param x: top left x-coordinate
     :param y: top left y-coordinate
@@ -31,7 +31,7 @@ Drawing shapes
 
 .. py:function:: ellipse(x, y, width, height, draw=True)
 
-    Draw an ellipse on the canvas. Same as `oval()`.
+    Draw an ellipse. Same as ``oval()``.
  
     :param x: top left x-coordinate
     :param y: top left y-coordinate
@@ -47,7 +47,7 @@ Drawing shapes
 
 .. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
 
-    Draw an arrow on the canvas.
+    Draw an arrow.
  
     :param x: arrow tip x-coordinate
     :param y: arrow tip y-coordinate
@@ -64,7 +64,7 @@ Drawing shapes
 
 .. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
 
-    Draw a star-like polygon on the canvas.
+    Draw a star-like polygon.
  
     :param startx: center x-coordinate
     :param starty: center y-coordinate
@@ -462,16 +462,16 @@ Utility functions
 
 .. py:function:: files(path="*")
 
-    You can use wildcards to specify which files to pick, e.g.
-    ``>>> f = files('*.gif')``
+    You can use wildcards to specify which files to pick, e.g. ``f = files('*.gif')``
 
-    :param path: wildcard to use in file list.
+    :param path: wildcard to use in file list
 
 .. py:function:: autotext(sourceFile)
 
-generates mock philosophy based on a context-free grammar
+   Generates mock philosophy based on a context-free grammar.
 
-
+   :param sourcefile: file path to use as source
+   :rtype: the generated text
 
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
 
