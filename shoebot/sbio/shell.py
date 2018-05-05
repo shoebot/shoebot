@@ -1,7 +1,4 @@
 from __future__ import print_function
-from contextlib import contextmanager
-
-import re
 
 """
 Simple command shell
@@ -42,9 +39,9 @@ import shlex
 from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event, SET_WINDOW_TITLE
 
 PROMPT = ""
-#PROMPT = "[^_^] "
-#RESPONSE_PROMPT = "[o_o] "
-#INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
+# PROMPT = "[^_^] "
+# RESPONSE_PROMPT = "[o_o] "
+# INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
 INTRO = "[o_o] " + '"Shoebot Shell."'
 
 RESPONSE_CODE_OK = "CODE_OK"
@@ -146,7 +143,7 @@ class ShoebotCmd(cmd.Cmd):
 
         :return:
         """
-        #if not self.cookie:
+        # if not self.cookie:
         #    print(RESPONSE_PROMPT)
         return ""
 
@@ -336,7 +333,7 @@ class ShoebotCmd(cmd.Cmd):
         args = shlex.split(line or "")
         if args and 'cookie=' in args[-1]:
             cookie_index = line.index('cookie=')
-            cookie = line[cookie_index+7:]
+            cookie = line[cookie_index + 7:]
             line = line[:cookie_index].strip()
             self.cookie = cookie
         if line.startswith('#'):
@@ -365,4 +362,3 @@ class ShoebotCmd(cmd.Cmd):
 
     def postloop(self):
         print('', file=self.stdout)
-

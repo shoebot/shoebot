@@ -59,7 +59,9 @@ class VarWindow(object):
         :param container:
         :return:
         """
-        for v in sorted(self.bot._vars.values()):
+        for k, v in self.bot._vars.items():
+            if not hasattr(v, 'type'):
+                raise AttributeError('%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables' % k)
             self.add_variable(v)
 
     def add_variable(self, v):

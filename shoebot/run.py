@@ -54,16 +54,9 @@ DRAWBOT = 'drawbot'
 
 
 def json_arg(s):
-    #s = s.strip()
-    if s.startswith("{"):
-        # enclose in quotes
-        s = "'%s'" % s
-
-    print '...'
-    print '>>%s<<' % s
     try:
         import json
-        d = json.loads(s, parse_float=True, parse_int=True)
+        d = json.loads(s)
         return d
     except Exception as e:
         error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
