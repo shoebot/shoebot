@@ -1,26 +1,21 @@
 '''
+Socket control
+by Ricardo Lafuente
 
-socketcontrol.py
-=-=-=-=-=-=-=-=-
+The simplest example possible of live vars in Shoebot.
 
-simplest example possible of external vars usage in Shoebox
-
-copyleft 2008 ricardo lafuente
-licensed under the GPLv3
-
-this file is part of Shoebox
-
-run shoebot with socketserver enabled, then connect to it
+Run shoebot with socketserver enabled, then connect to it
 via telnet or some other client, via the port (default 7777)
 
-change the color of the star using numbers 0.0-255.0, e.g.
+    sbot -s helloworld.bot
 
-red=1.1
-blue=20.0
-green=30.0
+Change the color of the star using numbers 0.0-255.0, e.g.
 
-the star will change color and the variable sliders move.
+    red=1.1
+    blue=20.0
+    green=30.0
 
+the star will change color and the variable sliders will move.
 
 There is a companion puredata file 'helloworld.pd' that
 demonstrates controling this bot from puredata.
@@ -31,11 +26,8 @@ size(200,200)
 # create the variables we want to use in the script
 # and that should be accessible from outside;
 #
-# the values set here will be used if we use Shoebox
+# the values set here will be used if we use Shoebot
 # to create a still image instead of a GTK window.
-#
-# NOTE that only floats are accepted for the moment
-
 var('red', NUMBER, 186., 0., 255.)
 var('green', NUMBER, 186., 0., 255.)
 var('blue', NUMBER, 93., 0., 255.)

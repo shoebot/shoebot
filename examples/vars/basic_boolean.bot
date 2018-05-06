@@ -1,3 +1,7 @@
+"""
+Simple boolean live var example
+"""
+
 size(300, 300)
 colorrange(255)
 colormode(RGB)

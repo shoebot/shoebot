@@ -1,3 +1,8 @@
+"""
+Wobble squares 1
+by Paulo Silva
+"""
+
 step = 16
 
 size(512, 256)
