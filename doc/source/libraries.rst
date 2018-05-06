@@ -6,7 +6,7 @@ Nodebox libraries
 
 Nodebox has a rich set of external libraries to enable new tools and commands.
 
-Shoebot comes with these external libraries included. Many Nodebox libraries are supported; you can read the original Nodebox documentation to get these going:
+Shoebot comes with some of these external libraries included. Read the original Nodebox documentation to get these going:
 
 * `Boids <https://www.nodebox.net/code/index.php/Boids>`_
 * `Colors <https://www.nodebox.net/code/index.php/Colors>`_
