@@ -65,9 +65,27 @@ graphical editor. Drawing without the overhead of a GUI makes Shoebot a useful
 and easy-to-grasp tool for fast, procedural image generation.
 
 A script's variables can be accessed through an automatically generated GUI or
-even from outside applications -- see the :doc:`interfacing` section.
+even from outside applications -- see the :doc:`live` section.
 
 There is also a set of libraries ported from Nodebox which enable SVG
 importing, Spiro splines, image fetching and manipulation, computer vision,
 video and webcam input, and more!
 
+
+Read more
+---------
+
+For more about the nature of creative coding and generative design, be sure to read:
+
+* `The Nodebox 1 theoretical introduction <https://www.nodebox.net/code/index.php/Introduction>`_
+* `The Processing overview <https://processing.org/overview/>`_
+
+Related projects
+----------------
+
+* `Drawbot`_, the tool that started it all, by Just van Rossum from Letterror. It's now been reinvigorated with new features and experimental Python 3 support.
+* `Nodebox 3 <http://nodebox.net/node>`_, the current node-based incarnation of Nodebox, running on Java.
+* `Nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc>`_, an active fork of Nodebox 1, maintained by Karsten Wolf.
+
+* `Canvas.js <https://www.clips.uantwerpen.be/pages/pattern-canvas>`_ by Nodebox's co-author Tom de Smedt, allows you to create browser-based scenes and animations with JS and HTML5.
+* `Rapydbox <http://salvatore.pythonanywhere.com/RapydBox/default/editor>`_ -- A JavaScript version of Nodebox, based on `RapydScript <https://github.com/atsepkov/RapydScript>`_.
