@@ -11,7 +11,6 @@ Shoebot documentation
    :maxdepth: 2
    
    intro
-   quickstart
    install
    getstarted
    tutorial
