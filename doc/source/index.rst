@@ -1,27 +1,30 @@
 Shoebot documentation
 =====================
 
-* `Main site <https://shoebot.github.io>`
-* `GitHub repository <https://github.com/shoebot/shoebot>`
-* `Issue tracker <https://github.com/shoebot/shoebot/issues>`
+* `Main site <https://shoebot.github.io>`_
+* `GitHub repository <https://github.com/shoebot/shoebot>`_
+* `Issue tracker <https://github.com/shoebot/shoebot/issues>`_
 
-Contents:
+----
 
 .. toctree::
    :maxdepth: 2
    
    intro
+   quickstart
    install
    getstarted
-   commands
-   advanced
-   interfacing
+   tutorial
+   live
    libraries
-   extensions
    examples
+   advanced
+   extensions
    troubleshooting
-   developing
+   commands
    cli_flags
+   contributing
+   developing
    
 
 .. We won't be needing these for now
