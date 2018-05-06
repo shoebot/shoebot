@@ -1,9 +1,11 @@
 Command reference
 =================
 
-This documentation is still missing many parts. Refer to the `Nodebox
+This documentation is still missing some parts. Refer to the `Nodebox
 documentation <https://www.nodebox.net/code/index.php/Reference>`_ for the best
 reference in the meantime.
+
+.. contents:: :local:
 
 Drawing shapes
 --------------
@@ -451,7 +453,19 @@ Text
 Dynamic variables
 -----------------
 
-.. py:function:: var(name, type, default=None, min=0, max=255, value=None)
+.. py:function:: var(name, type, default=None, min=0, max=255, value=None, step=None, steps=256.0)
+
+  Create a :doc:`live variable <live>`.
+
+  :param name: Variable name
+  :param type: Variable type
+  :type type: NUMBER, TEXT, BOOLEAN or BUTTON
+  :param default: Default value
+  :param min: Minimum value (NUMBER only)
+  :param max: Maximum value (NUMBER only)
+  :param value: Initial value (if not defined, use ``default``)
+  :param step: Step length for the variables GUI (use this or ``steps``, not both)
+  :param steps: Number of steps in the variables GUI (use this or ``step``, not both)
 
 Utility functions
 -----------------
