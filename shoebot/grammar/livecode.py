@@ -65,16 +65,13 @@ class LiveExecution(object):
 
     def reload_functions(self):
         """
-        Recompile functions
+        Replace functions in namespace with functions from edited_source.
         """
         with LiveExecution.lock:
             if self.edited_source:
                 source = self.edited_source
                 tree = ast.parse(source)
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                    # TODO - Could modify __code__ etc of functions, but this info will
-                    # need to be saved if thats the case
-
                     self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
 
     def do_exec(self, source, ns, tenuous = False):
