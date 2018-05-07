@@ -12,8 +12,11 @@ class LiveExecution(object):
 
     Code has two states, 'known good' and 'tenous'
     
-    "known good" can have exceptions and die
-    "tenous code" exceptions attempt to revert to "known good"
+    Known good:  Exceptions are raised as normal
+    Tenuous: An exception will cause the code to be reverted to the last Known Good code
+
+    Initially code is known-good, new code sent to the executor is tenuous, until
+    it has been executed at least once.
     """
     ns = {}
     lock = threading.RLock()
