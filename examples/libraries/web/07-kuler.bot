@@ -1,11 +1,13 @@
-# Color themes from Kuler.
+"""
+Color themes from Kuler
+"""
 
 web = ximport("web")
 
 # Get the current most popular themes.
 themes = web.kuler.search_by_popularity()
 
-print themes
+print(themes)
 
 # Display colors from the first theme.
 for i in range(100):

@@ -1,11 +1,11 @@
-# about:
-#   Fill the background of the shoebot windows 
-#   with a color depending on the mouse cursor 
-#   position.
+"""
+Background color set by mouse position
+"""
 
-size(255,255)
+size(255, 255)
 colorrange(255)
 colormode(HSB)
+
 
 def draw():
     background(MOUSEX, MOUSEY, 180)

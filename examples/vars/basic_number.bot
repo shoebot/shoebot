@@ -1,3 +1,7 @@
+"""
+Basic number live variable example
+"""
+
 size(300, 300)
 colorrange(255)
 colormode(HSB)
@@ -11,4 +15,3 @@ background(hue, saturation, brightness)
 if show:
     fill(255)
     ellipse(100, 100, 100, 100)
-

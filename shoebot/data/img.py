@@ -76,7 +76,7 @@ class Image(Grob, ColorMixin):
 
                     sw, sh = img.size
                     # Would be nice to not have to do some of these conversions :-\
-                    bgra_data = img.tostring('raw', 'BGRA', 0, 1)
+                    bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
                     bgra_array = array.array('B', bgra_data)
                     imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
 

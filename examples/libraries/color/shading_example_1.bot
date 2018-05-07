@@ -1,4 +1,7 @@
-# SHADER
+"""
+Shading
+"""
+
 colors = ximport("colors")
 
 # Deep green gradient background.

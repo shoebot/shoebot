@@ -1,3 +1,8 @@
+"""
+Isometric blocks
+by Ricardo Lafuente
+"""
+
 from random import randint
 
 size(480, 540)
@@ -8,12 +13,13 @@ colorrange(255)
 rows = 9
 cols = 9
 
-def block(x,y,z):
+
+def block(x, y, z):
     '''
     draw an isometric square prism; x,y are the coordinates of
     the BOTTOM-CENTER corner, z is the height
     '''
-    #TODO: variables for width+depth instead of fixed value
+    # TODO: variables for width+depth instead of fixed value
 
     # no strokes in the inside
     nostroke()
@@ -27,27 +33,27 @@ def block(x,y,z):
     fill(c)
     # and draw the path
     beginpath(x, y)
-    lineto(x-20, y-10)
-    lineto(x-20, y-10-z)
-    lineto(x, y-z)
+    lineto(x - 20, y - 10)
+    lineto(x - 20, y - 10 - z)
+    lineto(x, y - z)
     endpath()
 
     # RIGHT FACE
     c = color(hue, 40, 80)
     fill(c)
     beginpath(x, y)
-    lineto(x+20, y-10)
-    lineto(x+20, y-10-z)
-    lineto(x, y-z)
+    lineto(x + 20, y - 10)
+    lineto(x + 20, y - 10 - z)
+    lineto(x, y - z)
     endpath()
 
     # TOP FACE
     c = color(hue, 40, 40)
     fill(c)
-    beginpath(x, y-z)
-    lineto(x+20, y-10-z)
-    lineto(x, y-20-z)
-    lineto(x-20, y-10-z)
+    beginpath(x, y - z)
+    lineto(x + 20, y - 10 - z)
+    lineto(x, y - 20 - z)
+    lineto(x - 20, y - 10 - z)
     endpath()
 
     # CONTOUR
@@ -60,22 +66,21 @@ def block(x,y,z):
     nofill()
     # draw the path
     beginpath(x, y)
-    lineto(x-20, y-10)
-    lineto(x-20, y-10-z)
-    lineto(x, y-20-z)
-    lineto(x+20, y-10-z)
-    lineto(x+20, y-10)
+    lineto(x - 20, y - 10)
+    lineto(x - 20, y - 10 - z)
+    lineto(x, y - 20 - z)
+    lineto(x + 20, y - 10 - z)
+    lineto(x + 20, y - 10)
     endpath()
 
-# white background
-background(1,1,1)
+
+background(1, 1, 1)
 
 # start from 40, 40
 translate(40, 40)
 # and draw the blocks
 for x, y in grid(rows, cols, 50, 60):
     # height of each block is determined by x,y coordinates
-    z = (x+y) / 25
+    z = (x + y) / 25
     # draw it
     block(x, y, z)
-

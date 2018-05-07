@@ -1,7 +1,8 @@
-# about:
-#   Perform some basic transformations (rotation and translation) on rectangles.
+"""
+Perform some basic transformations (rotation and translation) on rectangles.
+"""
 
-size(300,500)
+size(300, 500)
 background(0.2)
 
 fill(1, 0.2)
@@ -9,7 +10,7 @@ stroke(1, 0.5)
 
 transform(CENTER)
 
-translate(100,100)
+translate(100, 100)
 
 for i in range(6):
     push()
@@ -17,7 +18,7 @@ for i in range(6):
     rect(0, 0, 80, 80)
     pop()
 
-translate(0, 100) 
+translate(0, 100)
 
 for i in range(6):
     push()
@@ -25,7 +26,7 @@ for i in range(6):
     rect(0, 0, 80, 80)
     pop()
 
-translate(0, 100) 
+translate(0, 100)
 
 for i in range(6):
     push()

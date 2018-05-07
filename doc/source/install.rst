@@ -5,7 +5,7 @@ Installation
 GNU/Linux
 ---------
 
-Shoebot runs on Python 2.7. To get better performance, you can run it using PyPy, which is experimental.
+Shoebot runs on Python 2.7. 
 
 You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you:
 
@@ -42,12 +42,6 @@ To use Shoebot in the future, you will need to activate the environment first:
 
     workon shoebot
 
-In case you have PyPy installed, make sure to point to it when creating the virtualenv. Instead of the first command in the previous example, do:
-
-.. code:: bash
-
-    mkvirtualenv shoebot -p `which pypy`
-
 Local install using a plain virtualenv
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -66,22 +60,34 @@ To use shoebot in the future, remember to activate the environment first.
 
     source .env/bin/activate
 
-Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need to create the Virtualenv pointing to it:
+Installing with PyPy
+^^^^^^^^^^^^^^^^^^^^
+
+To get better performance, you can run Shoebot using PyPy, which is experimental. In case you have PyPy installed, you have to point to it when creating your virtualenv. 
+
+Instead of the first command in the Virtualenvwrapper example, do:
 
 .. code:: bash
 
-    virtualenv shoebot-env -p `which pypy`
+    mkvirtualenv shoebot -p `which pypy`
 
+For the plain virtualenv approach, try:
 
-Other systems
-=============
+.. code:: bash
+
+    virtualenv .env -p `which pypy`
+
 
 Mac OS X
 --------
 
-TODO
+Installation on Mac OS X should work the same by following the above instructions.
+
+It is however poorly tested, since the developers of Shoebot are focusing on GNU/Linux; if you run into any unexpected issue, let us know in the `issue tracker <https://github.com/shoebot/shoebot/issues>`_.
 
 Windows
 -------
 
-TODO
+Windows is currently untested. There used to be a purpose-built Windows version of Shoebot (Spryte) but it has been unmaintained for a long while.
+
+If you try your hand at running Shoebot on Windows and can get *anything* running, let us know in our `issue tracker`_ so we can improve this documentation.

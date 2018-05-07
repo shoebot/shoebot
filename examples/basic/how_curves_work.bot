@@ -1,45 +1,47 @@
-# about:
-#   Demonstrate how the differnet parameters of curves work.
+"""
+Demonstrate how the different parameters of curves work.
+"""
 
-size(200,200)
 import math
+
+size(200, 200)
 
 # Setup colors: no fill is needed, and stroke the curves with black.
 nofill()
 stroke(0)
 
 # Set the initial position
-x,y = 50, 50
-width = 50
+x, y = 50, 50
+curvewidth = 50
 
-# The dx and dy parameters are the relative control points.
+# The xdelta and ydelta parameters are the relative control points.
 # When using math.pi/2, you actually define the lower half
 # of a circle.
-dy = width/(math.pi / 2)
+ydelta = width / (math.pi / 2)
 
 # Begin drawing the path. The starting position is on the
 # given x and y coordinates.
 beginpath(x, y)
 # Calculate the control points.
-cp1 = (x, y + dy)
-cp2 = (x + width, y + dy)
+cpoint1 = (x, y + ydelta)
+cpoint2 = (x + curvewidth, y + ydelta)
 # Draw the curve. The first four parameters are the coordinates
 # of the two control curves; the last two parameters are
 # the coordinates of the destination point.
-curveto(cp1[0], cp1[1], cp2[0], cp2[1], x + width, y)
+curveto(cpoint1[0], cpoint1[1], cpoint2[0], cpoint2[1], x + curvewidth, y)
 # End the path; ending the path automatically draws it.
 endpath()
 
-# To demonstrate where the control points actually are, 
+# To demonstrate where the control points actually are,
 # we draw them using lines.
 # The first control point starts at the x,y position.
-line(x, y, cp1[0], cp1[1])
+line(x, y, cpoint1[0], cpoint1[1])
 # The second control point is the ending point.
-line(x + width, y, cp2[0], cp2[1])
+line(x + curvewidth, y, cpoint2[0], cpoint2[1])
 
 # To liven things up just a little bit, little ovals are
 # drawn in red on the position of the control points.
 nostroke()
-fill(1,0,0)
-oval(cp1[0] - 2, cp1[1] - 2, 4, 4)
-oval(cp2[0] - 2, cp2[1] - 2, 4, 4)
+fill(1, 0, 0)
+oval(cpoint1[0] - 2, cpoint1[1] - 2, 4, 4)
+oval(cpoint2[0] - 2, cpoint2[1] - 2, 4, 4)

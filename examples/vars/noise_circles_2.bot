@@ -1,3 +1,8 @@
+"""
+Noise circles 2
+by Paulo Silva
+"""
+
 step = 16
 
 size(512, 256)
@@ -11,12 +16,12 @@ for y in range(0, HEIGHT / (step * 2), 1):
     for x in range(0, WIDTH / (step * 2), 1):
         fill(255, 255, 255)
         nostroke()
-        ellipse(x * step * 2 + random(0, noise), 
-                y * step * 2 + random(0, noise), 
+        ellipse(x * step * 2 + random(0, noise),
+                y * step * 2 + random(0, noise),
                 step, step)
 
         stroke(0, 0, 0)
         nofill()
-        ellipse(x * step * 2 + random(0, noise), 
-                y * step * 2 + random(0, noise), 
+        ellipse(x * step * 2 + random(0, noise),
+                y * step * 2 + random(0, noise),
                 step, step)

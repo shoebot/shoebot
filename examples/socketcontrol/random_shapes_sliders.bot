@@ -1,4 +1,8 @@
-size(180,180)
+"""
+Random shapes and sliders
+"""
+
+size(180, 180)
 
 # underscores are displayed as spaces in the GUI
 var('oval_tendency', NUMBER, 0.5, 0., 2.)
@@ -6,12 +10,14 @@ var('grid_size', NUMBER, 30, 20, 40)
 
 w, h = 180, 180
 
+
 def biggestFit(num, divisor):
-    return  divisor * (num // divisor)
+    return divisor * (num // divisor)
+
 
 def draw():
-    for i in range(0, int(biggestFit(w,grid_size)), int(grid_size) ):
-        for j in range(0, int(biggestFit(h,grid_size)), int(grid_size) ):
+    for i in range(0, int(biggestFit(w, grid_size)), int(grid_size)):
+        for j in range(0, int(biggestFit(h, grid_size)), int(grid_size)):
             c = color(random(), 0.0, 0.5)
             fill(c)
             if random() > oval_tendency:
