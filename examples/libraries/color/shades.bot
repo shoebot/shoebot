@@ -1,5 +1,9 @@
+"""
+Color shades
+"""
+
 colors = ximport("colors")
-    
+
 var("hue", NUMBER, 0.8, 0.0, 1.0)
 clr = colors.hsb(hue, 1, 1)
 
@@ -8,7 +12,7 @@ y = 20
 for shade in colors.shades:
     fill(0)
     fontsize(12)
-    text(str(shade), x, y-5)
+    text(str(shade), x, y - 5)
     snapshot = shade.colors(clr, 10)
     snapshot.swatch(x, 20, padding=5)
     y = 20

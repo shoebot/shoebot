@@ -1,4 +1,6 @@
-# Clearing the cache.
+"""
+Clearing the cache.
+"""
 
 web = ximport("web")
 

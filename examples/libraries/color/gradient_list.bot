@@ -1,4 +1,9 @@
-# GRADIENT LIST
+"""
+Gradient list
+from the Nodebox color library examples
+
+Make a list of colors to replicate a gradient effect.
+"""
 
 colors = ximport("colors")
 
@@ -16,11 +21,11 @@ g = colors.gradient(clr1, clr2, steps=60)
 # this way we get a radial gradient.
 for i in range(len(g)):
     fill(g[i])
-    r = 700-i*10
-    oval(-75+i*5, -170+i*5, r, r)
+    r = 700 - i * 10
+    oval(-75 + i * 5, -170 + i * 5, r, r)
 
 # Some nice dropshadows.
-#colors.shadow(blur=12, alpha=0.3)
+# colors.shadow(blur=12, alpha=0.3)
 
 # Expand the gradient list, for the next element
 # we're going to need more than 60 colors.
@@ -31,18 +36,18 @@ g = g.reverse()
 
 # Draw a spiral of ovals for each of the 200 gradient steps:
 transform(CORNER)
-translate(WIDTH/2, HEIGHT/2)
+translate(WIDTH / 2, HEIGHT / 2)
 for i in range(len(g)):
     fill(g[i])
-    #fill(choice(g))
+    # fill(choice(g))
     rotate(3)
-    oval(i*0.5, i*0.5, 200-i, 200-i)
+    oval(i * 0.5, i * 0.5, 200 - i, 200 - i)
 
 reset()
-    
+
 # All of the colors in the gradient:
 i = 0
-for x, y in grid(10, len(g)/10, 10, 10):
+for x, y in grid(10, len(g) / 10, 10, 10):
     if i < len(g):
         fill(g[i])
         rect(x, y, 8, 8)

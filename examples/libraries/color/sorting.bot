@@ -1,4 +1,6 @@
-# SORTING COLOR LISTS
+"""
+Sorting color lists
+"""
 
 colors = ximport("colors")
 
