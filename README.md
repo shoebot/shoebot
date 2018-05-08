@@ -23,8 +23,8 @@ The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more
 
 ## Getting help
 
-Installation can sometimes be tricky, to help use work out whats up paste the output
-of the following commands into a ticket on github
+Installation can sometimes be tricky, to help us work out whats up paste the output
+of the following commands into an issue on github
 
     python setup.py diagnose
     python setup.py test
