@@ -22,6 +22,9 @@ value of 100, and an initial (default) value of 25.
 
 .. figure::  images/live_vars.png
 
+For readability names are capitalized and underscores replaced by spaces,
+so 'a_number' is displayed as 'A number'.
+
 
 Setting variables in the command line
 -------------------------------------
