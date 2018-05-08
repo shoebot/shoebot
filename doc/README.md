@@ -8,6 +8,9 @@ Now just
 
     make html
 
-## Pushing the docs to ReadTheDocs
 
-TODO
+## ReadTheDocs
+
+ReadTheDocs hosts Shoebots documentation here http://shoebot.readthedocs.io/en/latest/
+
+Documentation is rebuilt every time a commit is made to the master branch.
