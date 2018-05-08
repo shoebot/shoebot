@@ -3,12 +3,12 @@ import os
 import sys
 from time import sleep, time
 
-import traceback
+import format_traceback
 from livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
-from shoebot.grammar.traceback import simple_traceback
+from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import flushfile
 
 sys.stdout = flushfile(sys.stdout)
@@ -283,7 +283,7 @@ class Grammar(object):
 
             import sys
             if verbose:
-                errmsg = traceback.format_exc()
+                errmsg = format_traceback.format_exc()
             else:
                 errmsg = simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg

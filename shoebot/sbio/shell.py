@@ -38,11 +38,9 @@ import shlex
 
 from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event, SET_WINDOW_TITLE
 
-PROMPT = ""
-# PROMPT = "[^_^] "
-# RESPONSE_PROMPT = "[o_o] "
-# INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
-INTRO = "[o_o] " + '"Shoebot Shell."'
+PROMPT = "[^_^] $ "
+RESPONSE_PROMPT = "[o_o] "
+INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
 
 RESPONSE_CODE_OK = "CODE_OK"
 RESPONSE_REVERTED = "REVERTED"
@@ -57,7 +55,6 @@ def trusted_cmd(f):
     :param f:
     :return:
     """
-
     def run_cmd(self, line):
         if self.trusted:
             f(self, line)
@@ -66,6 +63,7 @@ def trusted_cmd(f):
 
     global trusted_cmds
     trusted_cmds.add(f.__name__)
+    run_cmd.__doc__ = f.__doc__
     return run_cmd
 
 
@@ -124,12 +122,13 @@ class ShoebotCmd(cmd.Cmd):
         lines = input.splitlines()
         if status and not lines:
             lines = ['']
-        for i, line in enumerate(lines):
-            if i != len(lines) - 1 or keep is True:
-                cookie_char = '>'
-            else:
-                # last line
-                cookie_char = ':'
+        if cookie:
+            for i, line in enumerate(lines):
+                if i != len(lines) - 1 or keep is True:
+                    cookie_char = '>'
+                else:
+                    # last line
+                    cookie_char = ':'
 
             print('{cookie} {status}{cookie_char}{line}'.format(
                 cookie_char=cookie_char,
@@ -150,8 +149,6 @@ class ShoebotCmd(cmd.Cmd):
     def do_escape_nl(self, arg):
         """
         Escape newlines in any responses
-
-        :Return:
         """
         if arg.lower() == 'off':
             self.escape_nl = False
@@ -159,6 +156,11 @@ class ShoebotCmd(cmd.Cmd):
             self.escape_nl = True
 
     def do_prompt(self, arg):
+        """
+        Enable or disable prompt
+        :param arg: on|off
+        :return:
+        """
         if arg.lower() == 'off':
             self.response_prompt = ''
             self.prompt = ''
@@ -237,7 +239,6 @@ class ShoebotCmd(cmd.Cmd):
     def do_vars(self, line):
         """
         List bot variables and values
-        :return:
         """
         if self.bot._vars:
             max_name_len = max([len(name) for name in self.bot._vars])
@@ -252,6 +253,12 @@ class ShoebotCmd(cmd.Cmd):
         """
         load filename=(file)
         load base64=(base64 encoded)
+
+        Send new code to shoebot.
+
+        If it does not run successfully shoebot will attempt to role back.
+
+        Editors can enable livecoding by sending new code as it is edited.
         """
         cookie = self.cookie
         executor = self.bot._executor
@@ -276,32 +283,64 @@ class ShoebotCmd(cmd.Cmd):
         self.bot._executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
 
     def do_bye(self, line):
+        """
+        Exit shell and shoebot
+
+        Alias for exit.
+        """
         return self.do_exit(line)
 
     def do_exit(self, line):
-        print(self.trusted, file=self.stdout)
+        """
+        Exit shell and shoebot
+        """
         if self.trusted:
             publish_event(QUIT_EVENT)
         self.print_response('Bye.\n')
         return True
 
     def do_quit(self, line):
+        """
+        Exit shell and shoebot
+
+        Alias for exit.
+        """
         return self.do_exit(line)
 
     def do_fullscreen(self, line):
-        self.print_response('TODO - toggle fullscreen')
+        """
+        Make the current window fullscreen
+        """
+        self.bot.canvas.sink.trigger_fullscreen_action(True)
+        print(self.response_prompt, file=self.stdout)
 
     def do_windowed(self, line):
-        self.print_response('TODO - set windowed mode')
+        """
+        Un-fullscreen the current window
+        """
+        self.bot.canvas.sink.trigger_fullscreen_action(False)
+        print(self.response_prompt, file=self.stdout)
 
     def do_EOF(self, line):
+        """
+        Exit shell and shoebot
+
+        Alias for exit.
+        """
+        print(self.response_prompt, file=self.stdout)
         return self.do_exit(line)
 
     def do_help(self, arg):
+        """
+        Show help on all commands.
+        """
         print(self.response_prompt, file=self.stdout)
         return cmd.Cmd.do_help(self, arg)
 
     def do_set(self, line):
+        """
+        Set a variable.
+        """
         try:
             name, sep, value = [part.strip() for part in line.split('=')]
             if name not in self.bot._vars:
