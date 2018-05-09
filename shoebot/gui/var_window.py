@@ -8,7 +8,7 @@ except ImportError:
     pgi.install_as_gi()
 
 from gi.repository import Gtk
-from shoebot.core.events import EVENT_VARIABLE_UPDATED, publish_event
+from shoebot.core.events import VARIABLE_UPDATED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
@@ -176,15 +176,15 @@ class VarWindow(object):
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
             self.bot._vars[v.name].value = widget.get_value()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v) # pretty dumb for now
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
             self.bot._vars[v.name].value = widget.get_active()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v) # pretty dumb for now
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
             self.bot._vars[v.name].value = widget.get_text()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v) # pretty dumb for now
 
     def var_added(self, v):
         """

@@ -209,25 +209,15 @@ def main():
     if not args.script and not args.window:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
-    vars = None
     if args.vars:
         vars = json_arg(args.vars)
-        # try:
-        #     import json
-        #     vars = json.loads(args.vars)
-        # except Exception as e:
-        #     error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
-        #     raise e
+    else:
+        vars = None
 
-    namespace = None
     if args.namespace:
         namespace = json_arg(args.namespace)
-        # try:
-        #     import json
-        #     namespace = json.loads(args.namespace)
-        # except Exception as e:
-        #     error(_('Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.'))
-        #     raise e
+    else:
+        namespace = None
 
     run(src=args.script,
         grammar=args.grammar,
