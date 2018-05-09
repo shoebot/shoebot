@@ -56,14 +56,10 @@ from shoebot.data import ShoebotError
 #     del gtksourceview_SourceBuffer
 #     del gtksourceview_SourceLanguagesManager
 
-
-
-
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
-
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
@@ -455,6 +451,7 @@ class ConsoleWindow:
         # then we set wrap mode for text
         self.text_area.set_editable(True)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
+        self.text_area.connect('size-allocate', self.on_contents_changed)
         self.text_buffer = self.text_area.get_buffer()
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
@@ -487,6 +484,12 @@ class ConsoleWindow:
         # this is the trick to make gtk refresh the window
         while Gtk.events_pending():
             Gtk.main_iteration()
+
+    def on_contents_changed(self, widget, event):
+        # scroll to bottom when there's new text
+        # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
+        adj = self.text_window.get_vadjustment()
+        adj.set_value(adj.get_upper() - adj.get_page_size())
 
 
 class Stdout_Filter(object):
