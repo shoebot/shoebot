@@ -12,6 +12,9 @@ There are many examples in the `nodebox-pyobjc <https://github.com/karstenw/node
 
 Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_.
 
+Be sure to also check the brief guidelines in :ref:`example-style` so that your efforts can be included in Shoebot.
+
+
 Help port libraries
 -------------------
 
