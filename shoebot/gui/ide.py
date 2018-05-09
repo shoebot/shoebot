@@ -462,21 +462,10 @@ class ConsoleWindow:
         self.text_area.modify_text(Gtk.StateType.NORMAL, Gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
-        # self.stdout_tag = Gtk.TextTag("stdout")
-        # self.stdout_tag.set_property("foreground", "black")
-        # self.stdout_tag.set_property("style", "normal")
-        # self.stdout_tag.set_property("weight", 600)
-        # self.stdout_tag.set_property("size-points", 9)
 
-        self.stdout_tag = self.text_buffer.create_tag("system", foreground="black", weight=600, size_points=9)
-        self.system_message_tag = self.text_buffer.create_tag("system", foreground="white")
-
-        # self.tag_table.add(self.stdout_tag)
-        # self.system_message_tag = Gtk.TextTag("system")
-        # self.system_message_tag.set_property("foreground", "white")
-        # self.system_message_tag.set_property("style", "normal")
-        # self.tag_table.add(self.system_message_tag)
-        # self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
+        self.stdout_tag = self.text_buffer.create_tag("stdout", foreground="black", weight=600, size_points=9)
+        self.system_message_tag = self.text_buffer.create_tag("system", foreground="darkgrey")
+        self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
     def write(self, data, output=None, system=None):
         self.message = data
@@ -509,6 +498,8 @@ class Stdout_Filter(object):
         self.parent.write(self.message, True)
         self.message = None
 
+    def flush(self):
+        pass
 
 UI_INFO = """
 <ui>
@@ -666,9 +657,9 @@ class View(Gtk.Window):
         # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
         # we redirect stderr
-        # sys.stderr = self.console_error
+        sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
-        # sys.stdout = self.stdout_filter
+        sys.stdout = self.stdout_filter
         # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
