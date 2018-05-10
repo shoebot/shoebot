@@ -16,7 +16,7 @@ sys.stderr = flushfile(sys.stderr)
 
 
 class Grammar(object):
-    ''' 
+    '''
     A Bot is an interface to receive user commands (through scripts or direct
     calls) and pass them to a canvas for drawing.
 
@@ -204,10 +204,10 @@ class Grammar(object):
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
 
-        :param inputcode: path to shoebot file or whole source code
-        :param iterations: maximum amount of frames to run
-        :param run_forever: if True will run until the user quits the bot
-        :param frame_limiter: Time a frame should take to run (float - seconds)
+        :param inputcode: Path to shoebot source or string containing source
+        :param iterations: None or Maximum amount of frames to run
+        :param run_forever: If True then run until user quits the bot
+        :param frame_limiter: If True then sleep between frames to respect speed() command.
         '''
         source = None
         filename = None
