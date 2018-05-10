@@ -505,6 +505,7 @@ class Stdout_Filter(object):
     def flush(self):
         pass
 
+
 UI_INFO = """
 <ui>
   <menubar name='MenuBar'>
@@ -535,6 +536,9 @@ UI_INFO = """
       <menuitem action='WrapNone' />
       <menuitem action='WrapWords' />
       <menuitem action='WrapChars' />
+      <separator />
+      <menuitem action='ThemeLight' />
+      <menuitem action='ThemeDark' />
     </menu>
     <menu action='HelpMenu'>
       <menuitem action='HelpAbout' />
@@ -589,6 +593,10 @@ class View(Gtk.Window):
             ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
             ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR)
         ], 1, self.do_wrap_changed)
+        action_group.add_radio_actions([
+            ("ThemeLight", None, "Light Theme", None, None, True),
+            ("ThemeDark", None, "Dark Theme", None, None, False),
+        ], 1, self.do_theme_changed)
 
         action_group.add_actions([
             ("RunMenu", None, "Run"),
@@ -793,6 +801,13 @@ class View(Gtk.Window):
 
         self.text_view.scroll_to_mark(mark, 0, True, 0.0, 1.0)
         buffer.delete_mark(mark)
+
+    def do_theme_changed(self, widget, current):
+        Gtk.Settings.get_default().set_property("gtk-theme-name", "Adwaita")
+        if current.get_name() == "ThemeLight":
+            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", False)
+        elif current.get_name() == "ThemeDark":
+            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
     def do_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
