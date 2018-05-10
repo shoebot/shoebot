@@ -1,9 +1,14 @@
+"""
+Aperiodic Penrose tiling
+from the Nodebox L-System library examples
+
+<http://en.wikipedia.org/wiki/Penrose_tiling>
+"""
+
 size(500, 250)
 
 lsystem = ximport("lsystem")
 
-# Aperiodic Penrose tiling.
-# http://en.wikipedia.org/wiki/Penrose_tiling
 penrose = lsystem.create()
 penrose.rules["6"] = "81++91----71[-81----61]++"
 penrose.rules["7"] = "+81--91[---61--71]+"
@@ -16,10 +21,12 @@ penrose.root = "0"
 penrose.angle = 36
 penrose.segmentlength = 100
 
+
 def segment(length, generations, time, id):
     stroke(0)
     line(0, 0, 0, -length)
-    
+
+
 penrose.segment = segment
-    
+
 penrose.draw(250, 125, 5)

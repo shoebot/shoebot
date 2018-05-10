@@ -4,19 +4,33 @@ Developing
 This section is for anyone who is interested in contributing to the codebase, or knowing more about the internals. 
 
 
-Coding style
-------------
+Coding style for the Shoebot core code
+--------------------------------------
 
-This is an adaptation of the indications proposed in PEP8 for a consistent Python coding style.
+We're not picky here, other than following `PEP8 style guidelines
+<https://www.python.org/dev/peps/pep-0008/>`_. We use `flake8
+<https://pypi.org/project/flake8/>`_ extensions in our code editors to
+keep us strict, and recommend it.
 
-We try to have Shoebot examples follow this specification. Here are some of the principles that we like to follow.
+.. _example-style:
 
-* Indent with **4 spaces**, no tabs.
-* Maximum **79 characters per line**.
-* Comments are in **English**.
-* Variables and functions are in ``lowercase`` and ``underscored_lowercase``, class names are in ``CamelCase``.
+Coding style for examples
+-------------------------
 
-Be sure to read the full `PEP8 specification <http://legacy.python.org/dev/peps/pep-0008/>`_. When in doubt, be bold!
+When creating examples for including in Shoebot, we try to adhere to a set
+of writing guidelines to make it easy for newcomers to understand what's going
+on.
+
+* Do not use one-letter variables (other than ``x`` and ``y``), and avoid
+  two-letter names as well (things like ``dx`` can be expanded to ``deltax``).
+  It will look less compact, but really helps understanding what's going on.
+* Start the example with a docstring specifying the title of the example,
+  author info and some details about the script and its workings. If you
+  want to format this text, use Markdown.
+* Use Flake8 or similar linter plugin to find necessary style fixes.
+* Comments in English.
+* Variables and functions are in ``lowercase`` and ``underscored_lowercase``,
+  class names are in ``CamelCase``.
 
 
 Making a release

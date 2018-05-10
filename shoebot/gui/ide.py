@@ -56,14 +56,10 @@ from shoebot.data import ShoebotError
 #     del gtksourceview_SourceBuffer
 #     del gtksourceview_SourceLanguagesManager
 
-
-
-
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
-
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
@@ -451,10 +447,9 @@ class ConsoleWindow:
         self.text_window = Gtk.ScrolledWindow()
         self.text_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.text_area = Gtk.TextView()
-        # set text area as editable in order to let it be cleaned by selecting and deleting
-        # then we set wrap mode for text
-        self.text_area.set_editable(True)
+        self.text_area.set_editable(False)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
+        self.text_area.connect('size-allocate', self.on_contents_changed)
         self.text_buffer = self.text_area.get_buffer()
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
@@ -462,21 +457,10 @@ class ConsoleWindow:
         self.text_area.modify_text(Gtk.StateType.NORMAL, Gdk.color_parse("red"))
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
-        # self.stdout_tag = Gtk.TextTag("stdout")
-        # self.stdout_tag.set_property("foreground", "black")
-        # self.stdout_tag.set_property("style", "normal")
-        # self.stdout_tag.set_property("weight", 600)
-        # self.stdout_tag.set_property("size-points", 9)
 
-        self.stdout_tag = self.text_buffer.create_tag("system", foreground="black", weight=600, size_points=9)
-        self.system_message_tag = self.text_buffer.create_tag("system", foreground="white")
-
-        # self.tag_table.add(self.stdout_tag)
-        # self.system_message_tag = Gtk.TextTag("system")
-        # self.system_message_tag.set_property("foreground", "white")
-        # self.system_message_tag.set_property("style", "normal")
-        # self.tag_table.add(self.system_message_tag)
-        # self.text_area.modify_font(Pango.FontDescription("monospace italic 9"))
+        self.stdout_tag = self.text_buffer.create_tag("stdout", foreground="black", weight=600, size_points=9)
+        self.system_message_tag = self.text_buffer.create_tag("system", foreground="darkgrey")
+        self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
     def write(self, data, output=None, system=None):
         self.message = data
@@ -499,6 +483,15 @@ class ConsoleWindow:
         while Gtk.events_pending():
             Gtk.main_iteration()
 
+    def clear(self):
+        self.text_buffer.set_text('')
+
+    def on_contents_changed(self, widget, event):
+        # scroll to bottom when there's new text
+        # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
+        adj = self.text_window.get_vadjustment()
+        adj.set_value(adj.get_upper() - adj.get_page_size())
+
 
 class Stdout_Filter(object):
     def __init__(self, parent):
@@ -509,6 +502,8 @@ class Stdout_Filter(object):
         self.parent.write(self.message, True)
         self.message = None
 
+    def flush(self):
+        pass
 
 UI_INFO = """
 <ui>
@@ -527,6 +522,8 @@ UI_INFO = """
       <menuitem action='EditRedo' />
       <separator />
       <menuitem action='EditFind' />
+      <separator />
+      <menuitem action='ClearConsole' />
     </menu>
     <menu action='RunMenu'>
       <menuitem action='Run' />
@@ -583,6 +580,7 @@ class View(Gtk.Window):
             ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.do_undo),
             ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.do_redo),
             ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.do_search),
+            ("ClearConsole", Gtk.STOCK_CLEAR, "_Clear console", "<control><shift>C", None, self.do_clear_console),
         ])
 
         action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
@@ -666,14 +664,14 @@ class View(Gtk.Window):
         # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
         # we redirect stderr
-        # sys.stderr = self.console_error
+        sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
-        # sys.stdout = self.stdout_filter
+        sys.stdout = self.stdout_filter
         # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write(_("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n"), True, True)
+        self.console_error.write(_("This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"), True, True)
 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
@@ -850,6 +848,9 @@ class View(Gtk.Window):
         if bounds:
             start, end = bounds
             buffer.remove_all_tags(start, end)
+
+    def do_clear_console(self, widget):
+        self.console_error.clear()
 
     def dialog_response_callback(self, dialog, response_id):
         if (response_id != RESPONSE_FORWARD and response_id != RESPONSE_BACKWARD):
