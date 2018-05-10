@@ -1,84 +1,40 @@
 Introduction
 ============
 
-Shoebot is a tool to automate the process of drawing vector graphics using a
-minimal and easy-to-understand syntax.
+Shoebot is a tool to automate the process of drawing vector graphics using a minimal and easy-to-understand syntax. It is a rewrite of `Nodebox 1 <https://www.nodebox.net/code/index.php/Home>`_ by Frederik de Bleser and Tom de Smedt, with the purpose of having an equivalent tool in GNU/Linux systems. Nodebox 1 is itself based on `DrawBot <http://www.drawbot.com/>`_ by Just van Rossum. 
 
-Using code to create and tweak shapes, colours and features is a model that
-departs from the WYSIWYG paradigm that is present in mainstream graphics
-applications. Shoebot was inspired by a rich lineage of tools dedicated to
-generative creativity:
+It follows a rich lineage of tools dedicated to generative creativity:
 
-  * Nodebox
-  * Drawbot
-  * Processing
-  * Paper.js
-  * Scriptographer
   * Design By Numbers
+  * Processing
+  * Scriptographer
+  * Paper.js
 
-Shoebot is a fork/rewrite of `Nodebox 1
-<https://www.nodebox.net/code/index.php/Home>`_ by Frederik de Bleser and Tom de Smedt, which is itself based on
-`DrawBot <http://www.drawbot.com/>`_ by Just van Rossum. There are slightly different syntax
-approaches in each language, and Shoebot tries to support both.
+For more about the nature of creative coding and generative design, be sure to read `The Nodebox 1 theoretical introduction <https://www.nodebox.net/code/index.php/Introduction>`_.
 
+Purpose
+-------
 
-Why scripting?
---------------
+Shoebot is a useful tool for many use cases:
 
-The most evident purpose of scripting is to automate repetitive
-tasks. Using Shoebot, we can create an image with 2000 randomly positioned
-circles in two lines of code:
+* creating generative and procedural works, either for screen or print output
+* teaching code to non-developers by means of immediate visual feedback
+* prototyping visualizations and design concepts
+* automatically generating sets of vector images
+* live-coding and real-time tweaking of animated graphics
 
-.. shoebot::
-    :snapshot:
-    :size: 400, 400
+Features
+--------
 
-    for step in range(2000):
-        ellipse(random(WIDTH), random(HEIGHT), 10, 10)
-      
-This is something that would be much more involved to create using the
-mouse and keyboard to draw on the canvas manually. Using scripts to control
-your output offers many new uses and possibilities for image generation and
-manipulation. 
+Originally built as a GNU/Linux version of Nodebox 1, Shoebot comes with many batteries included:
 
-One common use for this kind of approach is the creation of dynamic systems to
-generate drawings, be them 'generative' (systems that grow, often
-unpredictably, from a set of initial parameters) or 'procedural' (rule-based
-systems).
+* supports of most of Nodebox 1's functionality
+* user-friendly code editor
+* headless mode for quick execution without the GUI parts
+* it can run on a window or output files in PDF, PNG, SVG or PS formats
+* ability to tweak running scripts via a simple GUI, a socket server or a text-based shell
+* also works as a Python module to work inside existing programs
 
-
-Why use Shoebot
----------------
-
-Shoebot is meant to run scripts with instructions to draw both simple shapes
-and complex compositions. The syntax is Python with a set of additional
-commands that ease the process of iterating through different options and
-designs. There are many examples showcasing the possibilities of Shoebot inside
-the ``examples/`` directory.
-
-The output of Shoebot scripts can be exported to the most widely used vector
-file formats -- SVG, PDF and PostScript -- as well as the PNG bitmap
-format.
-
-Shoebot's distinguishing feature is that it can be run in a terminal without a
-graphical editor. Drawing without the overhead of a GUI makes Shoebot a useful
-and easy-to-grasp tool for fast, procedural image generation.
-
-A script's variables can be accessed through an automatically generated GUI or
-even from outside applications -- see the :doc:`live` section.
-
-There is also a set of libraries ported from Nodebox which enable SVG
-importing, Spiro splines, image fetching and manipulation, computer vision,
-video and webcam input, and more!
-
-
-Read more
----------
-
-For more about the nature of creative coding and generative design, be sure to read:
-
-* `The Nodebox 1 theoretical introduction <https://www.nodebox.net/code/index.php/Introduction>`_
-* `The Processing overview <https://processing.org/overview/>`_
 
 Related projects
 ----------------
