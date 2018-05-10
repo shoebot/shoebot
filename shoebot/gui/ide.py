@@ -447,9 +447,7 @@ class ConsoleWindow:
         self.text_window = Gtk.ScrolledWindow()
         self.text_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.text_area = Gtk.TextView()
-        # set text area as editable in order to let it be cleaned by selecting and deleting
-        # then we set wrap mode for text
-        self.text_area.set_editable(True)
+        self.text_area.set_editable(False)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_area.connect('size-allocate', self.on_contents_changed)
         self.text_buffer = self.text_area.get_buffer()
@@ -484,6 +482,9 @@ class ConsoleWindow:
         # this is the trick to make gtk refresh the window
         while Gtk.events_pending():
             Gtk.main_iteration()
+
+    def clear(self):
+        self.text_buffer.set_text('')
 
     def on_contents_changed(self, widget, event):
         # scroll to bottom when there's new text
@@ -521,6 +522,8 @@ UI_INFO = """
       <menuitem action='EditRedo' />
       <separator />
       <menuitem action='EditFind' />
+      <separator />
+      <menuitem action='ClearConsole' />
     </menu>
     <menu action='RunMenu'>
       <menuitem action='Run' />
@@ -577,6 +580,7 @@ class View(Gtk.Window):
             ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.do_undo),
             ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.do_redo),
             ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.do_search),
+            ("ClearConsole", Gtk.STOCK_CLEAR, "_Clear console", "<control><shift>C", None, self.do_clear_console),
         ])
 
         action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
@@ -844,6 +848,9 @@ class View(Gtk.Window):
         if bounds:
             start, end = bounds
             buffer.remove_all_tags(start, end)
+
+    def do_clear_console(self, widget):
+        self.console_error.clear()
 
     def dialog_response_callback(self, dialog, response_id):
         if (response_id != RESPONSE_FORWARD and response_id != RESPONSE_BACKWARD):
