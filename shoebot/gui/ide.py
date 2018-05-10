@@ -671,7 +671,7 @@ class View(Gtk.Window):
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write(_("This is a console window, error messages and script output are shown here,\n you can clear the window selecting and deleting the content\n\n"), True, True)
+        self.console_error.write(_("This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"), True, True)
 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
