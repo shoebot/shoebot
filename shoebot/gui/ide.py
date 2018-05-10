@@ -1047,7 +1047,7 @@ class View(Gtk.Window):
                                      server=self.use_socketserver, show_vars=self.use_varwindow,
                                      window=True)
             self.sbot_window = bot._canvas.sink
-            bot.run(codestring, run_forever=True, iterations=None)
+            bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
         except ShoebotError, NameError:
             import traceback
             import sys
