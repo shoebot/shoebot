@@ -10,9 +10,12 @@ Make new examples or port existing ones
 
 We're always eager to welcome new examples that explain a concept or show off an interesting technique.
 
-If you need inspiration, there are many examples in the `nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_ port that aren't yet ported to Shoebot. They should work mostly without modifications -- we need help testing them. 
+You can either contribute your own examples, or help port existing scripts:
 
-Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_.
+* the `nodebox-pyobjc examples <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are more current than those in the old Nodebox 1 repository
+* the scripts in the `Nodebox gallery <https://www.nodebox.net/code/index.php/Gallery>`_
+  
+They should work mostly without modifications -- we need help testing them. Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_ in case you hit a wall.
 
 Be sure to also check the brief guidelines in :ref:`example-style` so that your efforts can be included in Shoebot.
 
