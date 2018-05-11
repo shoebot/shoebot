@@ -24,18 +24,19 @@ Shoebot is a useful tool for many use cases:
 * prototyping visualizations and design concepts
 * automatically generating sets of vector images
 * live-coding and real-time tweaking of animated graphics
+* making `Cairo <http://cairographics.org>`_-based tools and experiments using a simpler language
 
 Features
 --------
 
 Originally built as a GNU/Linux version of Nodebox 1, Shoebot comes with many batteries included:
 
-* supports of most of Nodebox 1's functionality
+* supports most of Nodebox 1's functionality
 * user-friendly code editor
 * headless mode for quick execution without the GUI parts
-* it can run on a window or output files in PDF, PNG, SVG or PS formats
-* ability to tweak running scripts via a simple GUI, a socket server or a text-based shell
-* can also be loaded as a Python module to work inside existing programs
+* run on a window or output files in PDF, PNG, SVG or PS formats
+* tweak running scripts via a simple GUI, a socket server or a text-based shell
+* can be loaded as a Python module to work inside existing programs
 
 
 Links
