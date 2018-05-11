@@ -37,8 +37,8 @@ The original Nodebox tutorial pages are an excellent introduction to the concept
   - `Manipulating paths <https://www.nodebox.net/code/index.php/Manipulating_Paths>`_ -- tweaking points on a path
   - `Path Mathematics <https://www.nodebox.net/code/index.php/Path_Mathematics>`_ finding points in a path, inserting new ones
   - `Path Filters <https://www.nodebox.net/code/index.php/Path_Filters>`_ applying effects on a path
-  - `Compound paths <https://www.nodebox.net/code/index.php/Compound_Paths>`_ -- path operations (unsupported?)
-  - `Clamping paths <https://www.nodebox.net/code/index.php/Clamping_Paths>`_ -- limiting paths to a box (unsupported?)
+  - `Compound paths <https://www.nodebox.net/code/index.php/Compound_paths>`_ -- path operations (unsupported?)
+  - `Clamping paths <https://www.nodebox.net/code/index.php/Clamping_paths>`_ -- limiting paths to a box (unsupported?)
 
 * Advanced
 
