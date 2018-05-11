@@ -1,14 +1,16 @@
-Shoebot documentation
-=====================
+Shoebot
+=======
 
-Shoebot is a tool to automate the process of drawing vector graphics using a minimal and easy-to-understand syntax. It is a rewrite of `Nodebox 1 <https://www.nodebox.net/code/index.php/Home>`_ by Frederik de Bleser and Tom de Smedt, with the purpose of having an equivalent tool in GNU/Linux systems. Nodebox 1 is itself based on `DrawBot <http://www.drawbot.com/>`_ by Just van Rossum. 
+Shoebot is a tool to automate the process of drawing vector graphics using a minimal and easy-to-understand syntax.
+
+It is a rewrite of `Nodebox 1 <https://www.nodebox.net/code/index.php/Home>`_ by `Frederik de Bleser <https://www.enigmeta.com/>`_ and `Tom de Smedt <http://organisms.be/>`_, with the purpose of having an equivalent tool in GNU/Linux systems. Nodebox 1 is itself based on `DrawBot <http://www.drawbot.com/>`_ by Just van Rossum. Shoebot draws using the cross-platform `Cairo graphics engine <http://cairographics.org>`_.
 
 It follows a rich lineage of tools dedicated to generative creativity:
 
-  * Design By Numbers
-  * Processing
-  * Scriptographer
-  * Paper.js
+  * `Design By Numbers <http://dbn.media.mit.edu/>`_
+  * `Processing <http://processing.org>`_
+  * `Scriptographer <http://scriptographer.org/>`_
+  * `Paper.js <http://paperjs.org/>`_
 
 For more about the nature of creative coding and generative design, be sure to read `The Nodebox 1 theoretical introduction <https://www.nodebox.net/code/index.php/Introduction>`_.
 
@@ -33,7 +35,7 @@ Originally built as a GNU/Linux version of Nodebox 1, Shoebot comes with many ba
 * headless mode for quick execution without the GUI parts
 * it can run on a window or output files in PDF, PNG, SVG or PS formats
 * ability to tweak running scripts via a simple GUI, a socket server or a text-based shell
-* also works as a Python module to work inside existing programs
+* can also be loaded as a Python module to work inside existing programs
 
 
 Links
@@ -44,18 +46,32 @@ Links
 * `Issue tracker <https://github.com/shoebot/shoebot/issues>`_
 
 
+Authors
+-------
+
+Shoebot is currently maintained by `Stuart Axon <https://github.com/stuaxo>`_ and `Ricardo Lafuente <https://github.com/rlafuente>`_.
+
+A good part of the code has also been contributed to by `Francesco Fantoni <https://github.com/hvfrancesco>`_, `Sebastian Oliva <https://github.com/tian2992>`_, `Paulo Silva <https://github.com/nitrofurano>`_, `Dave Crossland <https://github.com/davelab6>`_, `Gabor Papp <https://github.com/gaborpapp>`_, `Julien Deswaef <https://github.com/xuv>`_ , `Pedro Ângelo <https://github.com/pangelo>`_ and Tetsuya Saito. Examples also contributed to by `Artem Popov <https://github.com/artfwo>`_, `Barak Itkin <https://lightningismyname.blogspot.pt/>`_ and `Simon Budig <https://github.com/simon-budig>`_.
+
+
 Related projects
 ----------------
 
-* `Drawbot`_, the tool that started it all, by Just van Rossum from Letterror. It's now been reinvigorated with new features and experimental Python 3 support.
+* `Drawbot`_, the tool that started it all, by `Just van Rossum <https://twitter.com/justvanrossum>`_ from `Letterror <http://letterror.com>`_. It's now been reinvigorated with new features and experimental Python 3 support.
 * `Nodebox 3 <http://nodebox.net/node>`_, the current node-based incarnation of Nodebox, running on Java.
-* `Nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc>`_, an active fork of Nodebox 1, maintained by Karsten Wolf.
+* `Nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc>`_, an active fork of Nodebox 1, maintained by `Karsten Wolf <https://github.com/karstenw>`_.
+* `Cairo DrawBot <https://github.com/eliheuer/cairo-drawbot>`_, a GNU/Linux compatible fork of Drawbot by `Eli Heuer <https://github.com/eliheuer>`_.
 
-* `Canvas.js <https://www.clips.uantwerpen.be/pages/pattern-canvas>`_ by Nodebox's co-author Tom de Smedt, allows you to create browser-based scenes and animations with JS and HTML5.
+
+* `Canvas.js <https://www.clips.uantwerpen.be/pages/pattern-canvas>`_ by Nodebox's co-author `Tom de Smedt`_, allows you to create browser-based scenes and animations with JS and HTML5.
 * `Rapydbox <http://salvatore.pythonanywhere.com/RapydBox/default/editor>`_ -- A JavaScript version of Nodebox, based on `RapydScript <https://github.com/atsepkov/RapydScript>`_.
 
 
+
 ----
+
+Documentation Index
+-------------------
 
 .. toctree::
    :maxdepth: 2
