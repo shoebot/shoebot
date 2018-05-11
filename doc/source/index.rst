@@ -71,6 +71,7 @@ Related projects
    troubleshooting
    commands
    cli_flags
+   compatibility
    contributing
    developing
    

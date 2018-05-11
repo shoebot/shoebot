@@ -23,45 +23,11 @@ Be sure to also check the brief guidelines in :ref:`example-style` so that your 
 Help port libraries
 -------------------
 
-We're missing these Nodebox libraries; can you help us port them to Shoebot?
+We're missing a few Nodebox libraries; can you help us port them to Shoebot? 
+
+See the full list of :ref:`unported-libs`.
 
 Incidentally, we're also missing documentation to explain how to port Nodebox libraries. If you're interested but stuck, file an issue and we'll help you.
-
-- Knowledge
-
-  * `WordNet <https://www.nodebox.net/code/index.php/WordNet>`_ -- the bundled wordnet should be downloadable separately
-  * `Keywords <https://www.nodebox.net/code/index.php/Keywords>`_
-  * `Linguistics <https://www.nodebox.net/code/index.php/Linguistics>`_
-
-- Bitmap
-  
-  * `Core Image <https://www.nodebox.net/code/index.php/Core_Image>`_ -- would need to be ported to PIL
-  * `iSight <https://www.nodebox.net/code/index.php/iSight>`_ -- deal with generic webcams using Pygame (`howto <https://stackoverflow.com/a/9712824/122400>`_)
-  * `Quicktime <https://www.nodebox.net/code/index.php/Quicktime>`_ -- use a Python video lib
-
-- Systems
-
-  * `Ants <https://www.nodebox.net/code/index.php/Ants>`_
-  * `Noise <https://www.nodebox.net/code/index.php/Noise>`_
-
-- Design
-
-  * `Grid <https://www.nodebox.net/code/index.php/Grid>`_
-
-- Typography
-
-  * `Pixie <https://www.nodebox.net/code/index.php/Pixie>`_
-  * `Fatpath <https://www.nodebox.net/code/index.php/Fatpath>`_
-
-- Tangible
-
-  * `WiiNode <https://www.nodebox.net/code/index.php/WiiNode>`_
-  * `OSC <https://www.nodebox.net/code/index.php/OSC>`_
-
-- Other
-
-  * `Flowerewolf <https://github.com/karstenw/Library/tree/master/flowerewolf>`_
-  * `twyg <https://github.com/karstenw/Library/tree/master/twyg>`_
 
 
 Look for 'Help Out' issues
