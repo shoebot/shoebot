@@ -1,4 +1,6 @@
-#from __future__ import division
+import os
+import cairocffi as cairo
+from shoebot.sbio.socket_server import SocketServer
 
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
@@ -18,14 +20,10 @@ else:
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import os
-import cairocffi as cairo
-from shoebot.sbio.socket_server import SocketServer
-
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     '''
-    Create a double buffered GTK+ widget on which we will draw using Cairo        
+    Create a double buffered GTK+ widget on which we will draw using Cairo
     '''
 
     # Draw in response to an expose-event
@@ -81,13 +79,12 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
                         self.input_device.scale_y = scale_y
 
         if GI:
-            cffi_cr=_UNSAFE_pycairo_context_to_cairocffi(cr)
+            cffi_cr = _UNSAFE_pycairo_context_to_cairocffi(cr)
             cffi_cr.set_source_surface(self.backing_store)
         else:
             cr.set_source_surface(self.backing_store)
         # Restrict Cairo to the exposed area; avoid extra work
-        cr.rectangle(0, 0,
-                source_width, source_height)
+        cr.rectangle(0, 0, source_width, source_height)
         if self.first_run:
             cr.set_operator(cairo.OPERATOR_OVER)
         else:
@@ -116,15 +113,14 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             backing_store = self.backing_store
         else:
             backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
-        
+
         cr = cairo.Context(backing_store)
         cr.set_source_surface(cairo_ctx.get_target())
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
-        
+
         self.backing_store = backing_store
         self.queue_draw()
-        
+
         while Gtk.events_pending():
             Gtk.main_iteration_do(False)
-
