@@ -62,7 +62,7 @@ Related projects
 * `Nodebox 3 <http://nodebox.net/node>`_, the current node-based incarnation of Nodebox, running on Java.
 * `Cairo DrawBot <https://github.com/eliheuer/cairo-drawbot>`_, a GNU/Linux compatible fork of Drawbot by `Eli Heuer <https://github.com/eliheuer>`_.
 * `Nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc>`_, an active fork of Nodebox 1 for Mac, maintained by `Karsten Wolf <https://github.com/karstenw>`_.
-* `PlotDevice <https://plotdevice.io/>`_, another fork of Nodebox 1 for Mac, maintained by `Christian Swinehart `http://samizdat.cc/`_.
+* `PlotDevice <https://plotdevice.io/>`_, another fork of Nodebox 1 for Mac, maintained by `Christian Swinehart <http://samizdat.cc/>`_.
 
 
 * `Canvas.js <https://www.clips.uantwerpen.be/pages/pattern-canvas>`_ by Nodebox's co-author `Tom de Smedt`_, allows you to create browser-based scenes and animations with JS and HTML5.
