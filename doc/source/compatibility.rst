@@ -34,6 +34,11 @@ Operations between bézier paths are not supported yet. These are:
 
 Fitting a path using ``path.fit()`` isn't supported either.
 
+Animation
+^^^^^^^^^
+
+While animations work well in a window, Shoebot does not support exporting them to GIF or video formats.
+
 .. _unported-libs:
 
 Unported libraries
