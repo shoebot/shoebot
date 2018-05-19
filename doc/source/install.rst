@@ -25,6 +25,9 @@ Only one command necessary:
 
     sudo python setup.py install
     
+
+.. _virtualenvwrapper-install:
+
 Local install using virtualenvwrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -59,23 +62,6 @@ To use shoebot in the future, remember to activate the environment first.
 .. code:: bash
 
     source .env/bin/activate
-
-Installing with PyPy
-^^^^^^^^^^^^^^^^^^^^
-
-To get better performance, you can run Shoebot using PyPy, which is experimental. In case you have PyPy installed, you have to point to it when creating your virtualenv. 
-
-Instead of the first command in the Virtualenvwrapper example, do:
-
-.. code:: bash
-
-    mkvirtualenv shoebot -p `which pypy`
-
-For the plain virtualenv approach, try:
-
-.. code:: bash
-
-    virtualenv .env -p `which pypy`
 
 
 Mac OS X
