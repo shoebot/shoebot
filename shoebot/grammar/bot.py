@@ -77,7 +77,7 @@ class Bot(Grammar):
     The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot.
     '''
     RGB = RGB
-    HSB = HSB    
+    HSB = HSB
 
     LEFT = 'left'
     RIGHT = 'right'
@@ -130,7 +130,7 @@ class Bot(Grammar):
         self._canvas.size = None
         self._frame = 1
         self._set_initial_defaults() ### TODO Look at these
-        
+
     def _set_initial_defaults(self):
         '''Set the default values. Called at __init__ and at the end of run(),
         do that new draw loop iterations don't take up values left over by the
@@ -342,8 +342,8 @@ class Bot(Grammar):
             self._canvas.snapshot(filename, defer=defer, file_number=file_number)
         else:
             raise ShoebotError('No image saved')
-            
-            
+
+
 
     def ximport(self, libName):
         '''
@@ -371,7 +371,7 @@ class Bot(Grammar):
         :param w: Width
         :param h: height
         '''
-        
+
         if not w:
             w = self._canvas.width
         if not h:
