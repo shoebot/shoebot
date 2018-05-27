@@ -38,8 +38,8 @@ import shlex
 
 from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event, SET_WINDOW_TITLE
 
-PROMPT = "[^_^] $ "
-RESPONSE_PROMPT = "[o_o] "
+PROMPT = ""
+RESPONSE_PROMPT = ""
 INTRO = RESPONSE_PROMPT + '"Shoebot Shell."'
 
 RESPONSE_CODE_OK = "CODE_OK"
