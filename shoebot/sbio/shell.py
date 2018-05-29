@@ -122,15 +122,20 @@ class ShoebotCmd(cmd.Cmd):
         lines = input.splitlines()
         if status and not lines:
             lines = ['']
-        if cookie:
-            for i, line in enumerate(lines):
-                if i != len(lines) - 1 or keep is True:
-                    cookie_char = '>'
-                else:
-                    # last line
-                    cookie_char = ':'
 
-            print('{cookie} {status}{cookie_char}{line}'.format(
+        if cookie:
+            output_template = '{cookie} {status}{cookie_char}{line}'
+        else:
+            output_template = '{line}'
+
+        for i, line in enumerate(lines):
+            if i != len(lines) - 1 or keep is True:
+                cookie_char = '>'
+            else:
+                # last line
+                cookie_char = ':'
+
+            print(output_template.format(
                 cookie_char=cookie_char,
                 cookie=cookie,
                 status=status or '',
@@ -142,8 +147,6 @@ class ShoebotCmd(cmd.Cmd):
 
         :return:
         """
-        # if not self.cookie:
-        #    print(RESPONSE_PROMPT)
         return ""
 
     def do_escape_nl(self, arg):
@@ -200,7 +203,6 @@ class ShoebotCmd(cmd.Cmd):
         """
         Toggle pause
         """
-        # TODO - move this into bot controller
         # along with stuff in socketserver and shell
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
@@ -271,7 +273,6 @@ class ShoebotCmd(cmd.Cmd):
             if called_good:
                 # good and bad callbacks shouldn't both be called
                 raise ValueError('Good AND Bad callbacks called !')
-            # TODO - get simple_trace_back of exception to send back
             self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
             self.print_response(tb.replace('\n', '\\n'), cookie=cookie)
             executor.clear_callbacks()
@@ -342,7 +343,7 @@ class ShoebotCmd(cmd.Cmd):
         Set a variable.
         """
         try:
-            name, sep, value = [part.strip() for part in line.split('=')]
+            name, value = [part.strip() for part in line.split('=')]
             if name not in self.bot._vars:
                 self.print_response('No such variable %s enter vars to see available vars' % name)
                 return
