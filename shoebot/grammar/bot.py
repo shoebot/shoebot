@@ -33,7 +33,8 @@
 Drawbot and Nodebot are similar grammars, so they both inherit from Bot
 """
 
-import sys, os
+import sys
+import os
 
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, \
@@ -48,14 +49,15 @@ from pkg_resources import resource_filename, Requirement
 from glob import glob
 import random as r
 
-import locale, gettext
+import locale
+import gettext
 
-SBOT_ROOT=resource_filename(Requirement.parse("shoebot"), "")
+SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
+# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -144,20 +146,19 @@ class Bot(Grammar):
         self._transformmode = Bot.CENTER
 
         self._canvas.settings(
-            fontfile = "assets/notcouriersans.ttf",
-            fontsize = 16,
-            align = Bot.LEFT,
-            lineheight = 1,
-            fillcolor = self.color(.2),
-            strokecolor = None,
-            strokewidth = 1.0,
-            background = self.color(1, 1, 1))
+            fontfile="assets/notcouriersans.ttf",
+            fontsize=16,
+            align=Bot.LEFT,
+            lineheight=1,
+            fillcolor=self.color(.2),
+            strokecolor=None,
+            strokewidth=1.0,
+            background=self.color(1, 1, 1))
 
     def _set_dynamic_vars(self):
         self._namespace['FRAME'] = self._frame
 
-
-    # Get input
+    # Input GUI callbacks
 
     def _mouse_button_down(self, button):
         '''GUI callback for mouse button down'''
@@ -182,7 +183,7 @@ class Bot(Grammar):
         '''GUI callback for key released'''
         self._namespace['keydown'] = self._input_device.key_down
 
-    #### Functions for override
+    # Functions for override #####
 
     def setup(self):
         """ For override by user sketch """
@@ -192,7 +193,7 @@ class Bot(Grammar):
         """ For override by user sketch """
         self._dynamic = False
 
-    #### Classes
+    # Classes #####
 
     def _makeInstance(self, clazz, args, kwargs):
         '''Creates an instance of a class defined in this document.
@@ -226,34 +227,40 @@ class Bot(Grammar):
         inst = clazz(self, *args, **kwargs)
         return inst
 
-
     def EndClip(self, *args, **kwargs):
         return self._makeColorableInstance(EndClip, args, kwargs)
+
     def BezierPath(self, *args, **kwargs):
         return self._makeColorableInstance(BezierPath, args, kwargs)
+
     def ClippingPath(self, *args, **kwargs):
         return self._makeColorableInstance(ClippingPath, args, kwargs)
+
     def Rect(self, *args, **kwargs):
         return self._makeColorableInstance(Rect, args, kwargs)
+
     def Oval(self, *args, **kwargs):
         return self._makeColorableInstance(Oval, args, kwargs)
+
     def Ellipse(self, *args, **kwargs):
         return self._makeColorableInstance(Ellipse, args, kwargs)
+
     def Color(self, *args, **kwargs):
         return Color(*args, **kwargs)
+
     def Image(self, *args, **kwargs):
         return self._makeColorableInstance(Image, args, kwargs)
+
     def Text(self, *args, **kwargs):
         return self._makeColorableInstance(Text, args, kwargs)
 
-    #### Variables
+    # Variables #####
 
     def var(self, name, type, default=None, min=0, max=255, value=None, step=None):
         v = Variable(name, type, default=default, min=min, max=max, value=value, step=step)
         return self._addvar(v)
 
-
-    #### Utility
+    # Utility #####
 
     def color(self, *args):
         '''
@@ -265,23 +272,24 @@ class Bot(Grammar):
 
     choice = r.choice
 
-    def random(self,v1=None, v2=None):
+    def random(self, v1=None, v2=None):
         # ipsis verbis from Nodebox
         if v1 is not None and v2 is None:
             if isinstance(v1, float):
                 return r.random() * v1
             else:
                 return int(r.random() * v1)
-        elif v1 != None and v2 != None:
+        elif v1 is not None and v2 is not None:
             if isinstance(v1, float) or isinstance(v2, float):
                 start = min(v1, v2)
                 end = max(v1, v2)
-                return start + r.random() * (end-start)
+                return start + r.random() * (end - start)
             else:
                 start = min(v1, v2)
                 end = max(v1, v2) + 1
-                return int(start + r.random() * (end-start))
-        else: # No values means 0.0 -> 1.0
+                return int(start + r.random() * (end - start))
+        else:
+            # No values means 0.0 -> 1.0
             return r.random()
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled=False):
@@ -300,7 +308,7 @@ class Bot(Grammar):
             shuffle(colRange)
         for y in rowRange:
             for x in colRange:
-                yield (x*colSize,y*rowSize)
+                yield (x * colSize, y * rowSize)
 
     def files(self, path="*"):
         """Returns a list of files.
@@ -312,7 +320,7 @@ class Bot(Grammar):
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
+    def snapshot(self, filename=None, surface=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file or cairo surface/context
 
         :param filename: Filename to save snapshot as, available formats include .png, .ps, .svg
@@ -321,12 +329,12 @@ class Bot(Grammar):
         :param autonumber: If true then a number will be appended to the filename.
         '''
         if autonumber:
-            file_number=self._frame
+            file_number = self._frame
         else:
-            file_number=None
+            file_number = None
         if surface:
             if defer is None:
-                defer=False
+                defer = False
             self._canvas.snapshot(surface, defer)
             return
         elif filename is None:
@@ -334,11 +342,11 @@ class Bot(Grammar):
             script_file = self._namespace.get('__file__')
             if script_file:
                 filename = os.path.splitext(script_file)[0] + '.svg'
-                file_number=True
+                file_number = True
 
         if filename:
             if defer is None:
-                defer=True
+                defer = True
             self._canvas.snapshot(filename, defer=defer, file_number=file_number)
         else:
             raise ShoebotError('No image saved')
@@ -347,7 +355,7 @@ class Bot(Grammar):
 
     def ximport(self, libName):
         '''
-        Import nodebox libraries.
+        Import Nodebox libraries.
 
         The libraries get _ctx, which provides
         them with the nodebox API.
@@ -360,10 +368,9 @@ class Bot(Grammar):
         lib._ctx = self
         return lib
 
+    # Core functions ####
 
-    #### Core functions
-
-    def size(self, w = None, h = None):
+    def size(self, w=None, h=None):
         '''Set the canvas size
 
         Only the first call will actually be effective.
@@ -379,12 +386,12 @@ class Bot(Grammar):
         if not w and not h:
             return (self._canvas.width, self._canvas.height)
 
-        # Updating in all these places seems a bit hacky
+        # FIXME: Updating in all these places seems a bit hacky
         w, h = self._canvas.set_size((w, h))
         self._namespace['WIDTH'] = w
         self._namespace['HEIGHT'] = h
         self.WIDTH = w  # Added to make evolution example work
-        self.HEIGHT = h # Added to make evolution example work
+        self.HEIGHT = h  # Added to make evolution example work
 
     def speed(self, framerate=None):
         '''Set animation framerate.
@@ -401,4 +408,3 @@ class Bot(Grammar):
     @property
     def FRAME(self):
         return self._frame
-
