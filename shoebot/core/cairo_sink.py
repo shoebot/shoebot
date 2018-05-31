@@ -37,10 +37,10 @@ class CairoImageSink(DrawQueueSink):
     '''
     DrawQueueSink that uses cairo contexts as the render context.
     '''
-    def __init__(self, filename=None, format=None, multifile=False, buff=None):
+    def __init__(self, target=None, format=None, multifile=False, buff=None):
         """
-        :param filename:  output filename
-        :param format:    if filename is specified this is not needed.
+        :param target:  output filename (or cairo surface if format is 'surface')
+        :param format:    if filename is specified this is not needed. Can be 'surface' for Cairo surfaces
         :param multifile: If used with filename, then numbered files will be output for each froam.
         :param buff:      optionally a file like object can be used instead of a filename
                           this is useful for streaming output.
@@ -48,15 +48,18 @@ class CairoImageSink(DrawQueueSink):
         """
         DrawQueueSink.__init__(self)
         if format is None:
-            if filename is not None:
-                format = os.path.splitext(filename)[1][1:].lower()
+            if target is not None and format is not 'surface':
+                format = os.path.splitext(target)[1][1:].lower()
+                self.filename = target
             elif buff is not None:
                 raise AttributeError("No format specified, but using buff")
+            else:
+                # multifile
+                self.file_root, self.file_ext = os.path.splitext(filename)
         self.buff = buff
         self.format = format
-        self.filename = filename
+        self.target = target
         self.multifile = multifile
-        self.file_root, self.file_ext = os.path.splitext(filename)
 
     def _output_file(self, frame):
         """
@@ -84,6 +87,8 @@ class CairoImageSink(DrawQueueSink):
             surface = cairo.PSSurface(self._output_file(frame), *size)
         elif self.format == 'svg':
             surface = cairo.SVGSurface(self._output_file(frame), *size)
+        elif self.format == 'surface':
+            surface = self.target
         else:
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
         return cairo.Context(surface)
