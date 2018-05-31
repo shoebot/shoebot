@@ -1,6 +1,7 @@
 import copy
 import os
 import sys
+import traceback
 from time import sleep, time
 
 import format_traceback
@@ -283,7 +284,7 @@ class Grammar(object):
 
             import sys
             if verbose:
-                errmsg = format_traceback.format_exc()
+                errmsg = traceback.format_exc()
             else:
                 errmsg = simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg
