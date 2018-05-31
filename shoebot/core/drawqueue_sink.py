@@ -1,4 +1,5 @@
 class DrawQueueSink(object):
+    
     '''
     DrawQueueSink, creates parameters for use by the draw queue.
     (the render_context).
