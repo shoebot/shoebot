@@ -227,6 +227,7 @@ class Bot(Grammar):
         inst = clazz(self, *args, **kwargs)
         return inst
 
+
     def EndClip(self, *args, **kwargs):
         return self._makeColorableInstance(EndClip, args, kwargs)
 
@@ -320,7 +321,7 @@ class Bot(Grammar):
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self, filename=None, surface=None, defer=None, autonumber=False):
+    def snapshot(self,filename=None, surface=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file or cairo surface/context
 
         :param filename: Filename to save snapshot as, available formats include .png, .ps, .svg
@@ -408,3 +409,4 @@ class Bot(Grammar):
     @property
     def FRAME(self):
         return self._frame
+
