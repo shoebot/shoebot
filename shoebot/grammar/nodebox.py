@@ -5,42 +5,31 @@ from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
 from bot import Bot
 from shoebot.data import Point, BezierPath, Image
-from shoebot.data import RGB, \
-                    HSB, \
-                    CMYK, \
-                    CORNER, \
-                    CENTER, \
-                    MOVETO, \
-                    RMOVETO, \
-                    LINETO, \
-                    RLINETO, \
-                    CURVETO, \
-                    RCURVETO, \
-                    ARC, \
-                    ELLIPSE, \
-                    CLOSE, \
-                    LEFT, \
-                    CENTER, \
-                    RIGHT
+from shoebot.data import RGB, HSB, \
+    CORNER, CENTER, \
+    MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, \
+    CLOSE, \
+    LEFT, RIGHT
 
 from math import sin, cos, pi
 from math import radians as deg2rad
 from types import TupleType
 from PIL import Image as PILImage
 
-import locale, gettext
+import locale
+import gettext
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
 ASSETS_DIR = sys.prefix + '/share/shoebot/data'
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
+# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
 # Nodebox compatibility shim
 sys.path.append(os.path.join(os.path.dirname(__file__), 'nodebox-lib'))
-sys.path.append('.') # ximport can work from current dir
+sys.path.append('.')  # ximport can work from current dir
 
 
 class NodeBot(Bot):
@@ -57,7 +46,7 @@ class NodeBot(Bot):
     CURVETO = CURVETO
     RCURVETO = RCURVETO
     ARC = ARC
-    ELLIPSE = ELLIPSE # Shoebot, not nodebox 1.x
+    ELLIPSE = ELLIPSE  # Shoebot, not nodebox 1.x
     CLOSE = CLOSE
 
     LEFT = LEFT
@@ -75,12 +64,11 @@ class NodeBot(Bot):
         :param namespace: Optionally specify a dict to inject as namespace
         :param vars: Optional dict containing initial values for variables
         '''
-        Bot.__init__(self, canvas, namespace = namespace, vars = vars)
+        Bot.__init__(self, canvas, namespace=namespace, vars=vars)
         canvas.mode = CORNER
         self._ns = self._namespace
 
-
-    #### Drawing
+    # Drawing
 
     # Image
 
@@ -161,7 +149,7 @@ class NodeBot(Bot):
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
         '''Draw an ellipse starting from (x,y)'''
         path = self.BezierPath(**kwargs)
-        path.ellipse(x,y,width,height, self.ellipsemode)
+        path.ellipse(x, y, width, height, self.ellipsemode)
         if draw:
             path.draw()
         return path
@@ -315,46 +303,46 @@ class NodeBot(Bot):
 
     easteregg = obama
 
-    #### Path
+    # Path
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None, **kwargs):
         self._path = self.BezierPath(**kwargs)
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
-            self._path.moveto(x,y)
+            self._path.moveto(x, y)
 
     def moveto(self, x, y):
         if self._path is None:
-            ## self.beginpath()
-            raise ShoebotError, _("No current path. Use beginpath() first.")
-        self._path.moveto(x,y)
+            # self.beginpath()
+            raise ShoebotError(_("No current path. Use beginpath() first."))
+        self._path.moveto(x, y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def arc(self, x, y, radius, angle1, angle2):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.arc(x, y, radius, angle1, angle2)
 
     def closepath(self):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         p = self._path
         if self._autoclosepath is True:
             self._path.closepath()
@@ -366,12 +354,12 @@ class NodeBot(Bot):
         self._path = None
         return p
 
-    def drawpath(self,path, **kwargs):
+    def drawpath(self, path, **kwargs):
         if isinstance(path, BezierPath):
             p = self.BezierPath(path=path, **kwargs)
             p.draw()
         elif isinstance(path, Image):
-            path.draw() # Is this right ? - added to make test_clip_4.bot work
+            path.draw()  # Is this right ? - added to make test_clip_4.bot work
         elif hasattr(path, '__iter__'):
             p = self.BezierPath()
             for point in path:
@@ -389,7 +377,7 @@ class NodeBot(Bot):
             x = image.x
         if y is None:
             y = image.y
-        self.image(image.path, image.x, image.y, data = image.data)
+        self.image(image.path, image.x, image.y, data=image.data)
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
@@ -397,20 +385,20 @@ class NodeBot(Bot):
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.relmoveto(x, y)
 
     def rellineto(self, x, y):
         '''Draw a line using relative coordinates.'''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
         '''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use beginpath() first.")
+            raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.relcurveto(h1x, h1y, h2x, h2y, x, y)
 
     def findpath(self, points, curvature=1.0):
@@ -434,7 +422,8 @@ class NodeBot(Bot):
             if type(pt) == TupleType:
                 points[i] = Point(pt[0], pt[1])
 
-        if len(points) == 0: return None
+        if len(points) == 0:
+            return None
         if len(points) == 1:
             path = self.BezierPath(None)
             path.moveto(points[0].x, points[0].y)
@@ -455,46 +444,44 @@ class NodeBot(Bot):
                 path.lineto(points[i].x, points[i].y)
             return path
 
-        curvature = 4 + (1.0-curvature)*40
+        curvature = 4 + (1.0 - curvature) * 40
 
-        dx = {0: 0, len(points)-1: 0}
-        dy = {0: 0, len(points)-1: 0}
+        dx = {0: 0, len(points) - 1: 0}
+        dy = {0: 0, len(points) - 1: 0}
         bi = {1: -0.25}
-        ax = {1: (points[2].x-points[0].x-dx[0]) / 4}
-        ay = {1: (points[2].y-points[0].y-dy[0]) / 4}
+        ax = {1: (points[2].x - points[0].x - dx[0]) / 4}
+        ay = {1: (points[2].y - points[0].y - dy[0]) / 4}
 
-        for i in range(2, len(points)-1):
-            bi[i] = -1 / (curvature + bi[i-1])
-            ax[i] = -(points[i+1].x-points[i-1].x-ax[i-1]) * bi[i]
-            ay[i] = -(points[i+1].y-points[i-1].y-ay[i-1]) * bi[i]
+        for i in range(2, len(points) - 1):
+            bi[i] = -1 / (curvature + bi[i - 1])
+            ax[i] = -(points[i + 1].x - points[i - 1].x - ax[i - 1]) * bi[i]
+            ay[i] = -(points[i + 1].y - points[i - 1].y - ay[i - 1]) * bi[i]
 
-        r = range(1, len(points)-1)
+        r = range(1, len(points) - 1)
         r.reverse()
         for i in r:
-            dx[i] = ax[i] + dx[i+1] * bi[i]
-            dy[i] = ay[i] + dy[i+1] * bi[i]
+            dx[i] = ax[i] + dx[i + 1] * bi[i]
+            dy[i] = ay[i] + dy[i + 1] * bi[i]
 
         path = self.BezierPath(None)
         path.moveto(points[0].x, points[0].y)
-        for i in range(len(points)-1):
+        for i in range(len(points) - 1):
             path.curveto(points[i].x + dx[i],
                          points[i].y + dy[i],
-                         points[i+1].x - dx[i+1],
-                         points[i+1].y - dy[i+1],
-                         points[i+1].x,
-                         points[i+1].y)
+                         points[i + 1].x - dx[i + 1],
+                         points[i + 1].y - dy[i + 1],
+                         points[i + 1].x,
+                         points[i + 1].y)
 
         return path
 
-    #### Transform and utility
+    # Transform and utility
 
-    def beginclip(self,path):
+    def beginclip(self, path):
         # FIXME: this save should go into Canvas
-        ### TODO
         p = self.ClippingPath(path)
         p.draw()
         return p
-
 
     def endclip(self):
         p = self.EndClip()
@@ -509,7 +496,7 @@ class NodeBot(Bot):
             self._canvas.mode = mode
         return self._canvas.mode
 
-    def translate(self, xt, yt, mode = None):
+    def translate(self, xt, yt, mode=None):
         '''
         Translate the current position by (xt, yt) and
         optionally set the transform mode.
@@ -529,7 +516,7 @@ class NodeBot(Bot):
         :param degrees: Degrees to rotate
         :param radians: Radians to rotate
         '''
-        ### TODO change canvas to use radians
+        # TODO change canvas to use radians
         if radians:
             angle = radians
         else:
@@ -555,10 +542,10 @@ class NodeBot(Bot):
         self._canvas.scale(x, y)
 
     def skew(self, x=1, y=0):
-        ### TODO bring back transform mixin
+        # TODO bring back transform mixin
         t = self._canvas.transform
-        t *= cairo.Matrix(1,0,x,1,0,0)
-        t *= cairo.Matrix(1,y,0,1,0,0)
+        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
+        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
         self._canvas.transform = t
 
     def push(self):
@@ -570,7 +557,7 @@ class NodeBot(Bot):
     def reset(self):
         self._canvas.reset_transform()
 
-    #### Color
+    # Color
 
     def outputmode(self):
         '''
@@ -595,7 +582,7 @@ class NodeBot(Bot):
             elif mode == "hsb":
                 self.color_mode = HSB
             else:
-                raise NameError, _("Only RGB and HSB colormodes are supported.")
+                raise NameError(_("Only RGB and HSB colormodes are supported."))
         if crange is not None:
             self.color_range = crange
         return self.color_mode
@@ -609,7 +596,7 @@ class NodeBot(Bot):
         '''
         self.color_range = float(crange)
 
-    def fill(self,*args):
+    def fill(self, *args):
         '''Sets a fill color, applying it to new paths.
 
         :param args: color in supported format
@@ -622,7 +609,7 @@ class NodeBot(Bot):
         ''' Stop applying fills to new paths.'''
         self._canvas.fillcolor = None
 
-    def stroke(self,*args):
+    def stroke(self, *args):
         '''Set a stroke color, applying it to new paths.
 
         :param args: color in supported format
@@ -658,7 +645,7 @@ class NodeBot(Bot):
         '''
         self._canvas.background = self.color(*args)
 
-    #### Text
+    # Text
 
     def font(self, fontpath=None, fontsize=None):
         '''Set the font to be used with new text instances.
@@ -703,12 +690,12 @@ class NodeBot(Bot):
         '''
         txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
-          path = txt.path
-          if draw:
-              path.draw()
-          return path
+            path = txt.path
+            if draw:
+                path.draw()
+            return path
         else:
-          return txt
+            return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         '''
@@ -758,7 +745,6 @@ class NodeBot(Bot):
         w = width
         return self.textmetrics(txt, width=w)[1]
 
-
     def lineheight(self, height=None):
         '''Set text lineheight.
 
@@ -792,6 +778,3 @@ class NodeBot(Bot):
         :return:
         """
         return self._canvas
-
-
-

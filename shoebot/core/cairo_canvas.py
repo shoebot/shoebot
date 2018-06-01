@@ -68,14 +68,14 @@ class CairoCanvas(Canvas):
         self.transform = self.initial_transform()
         return self.transform
 
-    ### Draw stuff
+    # Draw stuff
     def push_matrix(self):
         self.matrix_stack.append(self.transform)
         self.transform = cairo.Matrix(*self.transform)
-    
+
     def pop_matrix(self):
         self.transform = self.matrix_stack.pop()
-    
+
     def translate(self, xt, yt):
         self.transform.translate(xt, yt)
 
@@ -144,7 +144,7 @@ class CairoCanvas(Canvas):
         def output_file(ctx):
             root, extension = os.path.splitext(target)
             if file_number:
-                filename = '%s_%04d%s' % (root, file_number ,extension)
+                filename = '%s_%04d%s' % (root, file_number, extension)
             else:
                 filename = target
 
@@ -159,7 +159,7 @@ class CairoCanvas(Canvas):
             elif extension in ('.ps', '.eps'):
                 target_ctx = cairo.Context(cairo.PSSurface(filename, *self.size_or_default()))
                 if extension == '.eps':
-                    target_ctx.set_eps(extension = '.eps')
+                    target_ctx.set_eps(extension='.eps')
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             elif extension == '.svg':
@@ -179,7 +179,6 @@ class CairoCanvas(Canvas):
         '''
         Draws the background colour of the bot
         '''
-        ### TODO - rename this
+        # TODO - rename this
         cairo_ctx.set_source_rgba(*self.background)
         cairo_ctx.paint()
-
