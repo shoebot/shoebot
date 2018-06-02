@@ -359,7 +359,7 @@ class Bot(Grammar):
         else:
             raise ShoebotError('No image saved')
 
-    def show(self, format='png'):
+    def show(self, format='png', as_data=False):
         '''Returns an Image object of the current surface. Used for displaying
         output in Jupyter notebooks. Adapted from the cairo-jupyter project.'''
 
@@ -375,14 +375,20 @@ class Bot(Grammar):
             surface.write_to_png(b)
             b.seek(0)
             data = b.read()
-            return Image(data)
+            if as_data:
+                return data
+            else:
+                return Image(data)
         elif format == 'svg':
             from IPython.display import SVG
             surface = cairo.SVGSurface(b, self.WIDTH, self.HEIGHT)
             surface.finish()
             b.seek(0)
             data = b.read()
-            return SVG(data)
+            if as_data:
+                return data
+            else:
+                return SVG(data)
 
     def ximport(self, libName):
         '''
