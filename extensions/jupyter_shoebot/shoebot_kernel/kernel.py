@@ -34,12 +34,12 @@ class ShoebotKernel(Kernel):
         exc = None
         try:
             bot.run(code, break_on_error=True)
+            png_data = open('_temp.png', 'r').read()
+            # quote and encode PNG data for passing JSON response to Jupyter
+            png_string = urllib.quote_plus(base64.b64encode(png_data))
         except Exception as e:
             import traceback
             exc = traceback.format_exc(e)
-        png_data = open('_temp.png', 'r').read()
-        # quote and encode PNG data for passing JSON response to Jupyter
-        png_string = urllib.quote_plus(base64.b64encode(png_data))
 
         if not silent:
             if exc:
