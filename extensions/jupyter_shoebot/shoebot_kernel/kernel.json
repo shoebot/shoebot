@@ -1,0 +1,3 @@
+{"argv":["python","-m","shoebot_kernel", "-f", "{connection_file}"],
+ "display_name":"Shoebot"
+}
