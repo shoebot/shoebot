@@ -11,7 +11,7 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 class Color(object):
-    
+
     '''
     Taken from Nodebox colors library and modified.
     Since we have no Cocoa, we have no way to use colour management for the moment.
@@ -33,7 +33,7 @@ class Color(object):
     - RRGGBB
     - #RRGGBBAA
     - RRGGBBAA
-    
+
     The CMYK parts have been commented out, as it may slow down code execution
     and at this point is quite useless, left it in place for a possible future implementation
     '''
@@ -66,12 +66,17 @@ class Color(object):
         elif len(args) == 1:
             gs = args[0]
             self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, 1
-            
-        # Two values, grayscale and alpha.
+
+        # Two values, grayscale and alpha OR hex and alpha.
         elif len(args) == 2:
-            gs, a = args[0], args[1]
-            self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, a/color_range
-            
+            if isinstance(args[0], str):
+                alpha = args[1]
+                r, g, b, args = hex2rgb(args[0])
+                self.r, self.g, self.b, self.a = r, g, b, alpha
+            else:
+                gs, a = args[0], args[1]
+                self.r, self.g, self.b, self.a = gs/color_range, gs/color_range, gs/color_range, a/color_range
+
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
         # depending on the mode parameter.
         elif len(args) >= 3:
@@ -118,33 +123,33 @@ class Color(object):
 
     def copy(self):
         return tuple(self.data)
-        
+
     def _update_rgb(self, r, g, b):
         self.__dict__["__r"] = r
         self.__dict__["__g"] = g
         self.__dict__["__b"] = b
-    
+
     def _update_cmyk(self, c, m, y, k):
         self.__dict__["__c"] = c
         self.__dict__["__m"] = m
         self.__dict__["__y"] = y
         self.__dict__["__k"] = k
-        
+
     def _update_hsb(self, h, s, b):
         self.__dict__["__h"] = h
         self.__dict__["__s"] = s
         self.__dict__["__brightness"] = b
-    
+
     def _hasattrs(self, list):
         for a in list:
             if not self.__dict__.has_key(a):
                 return False
         return True
-    
+
     #added
     def __getitem__(self, index):
         return (self.r, self.g, self.b, self.a)[index]
-        
+
 
     def __iter__(self):
         for i in range(len(self.data)):
@@ -152,27 +157,27 @@ class Color(object):
 
     def __div__(self, other):
         value = float(other)
-        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)    
+        return (self.red/value, self.green/value, self.blue/value, self.alpha/value)
     #end added
 
 
     def __setattr__(self, a, v):
-        
+
         if a in ["a", "alpha"]:
             self.__dict__["__"+a[0]] = max(0, min(v, 1))
-        
+
         # RGB changes, update CMYK and HSB accordingly.
         elif a in ["r", "g", "b", "red", "green", "blue"]:
             self.__dict__["__"+a[0]] = max(0, min(v, 1))
             if self._hasattrs(("__r", "__g", "__b")):
                 r, g, b = (
-                    self.__dict__["__r"], 
-                    self.__dict__["__g"], 
+                    self.__dict__["__r"],
+                    self.__dict__["__g"],
                     self.__dict__["__b"]
                 )
                 self._update_cmyk(*rgb2cmyk(r, g, b))
                 self._update_hsb(*rgb2hsb(r, g, b))
-        
+
         # HSB changes, update RGB and CMYK accordingly.
         elif a in ["h", "s", "hue", "saturation", "brightness"]:
             if a != "brightness": a = a[0]
@@ -180,13 +185,13 @@ class Color(object):
             self.__dict__["__"+a] = max(0, min(v, 1))
             if self._hasattrs(("__h", "__s", "__brightness")):
                 r, g, b = hsb2rgb(
-                    self.__dict__["__h"], 
-                    self.__dict__["__s"], 
+                    self.__dict__["__h"],
+                    self.__dict__["__s"],
                     self.__dict__["__brightness"]
                 )
                 self._update_rgb(r, g, b)
                 self._update_cmyk(*rgb2cmyk(r, g, b))
-        
+
         # CMYK changes, update RGB and HSB accordingly.
         elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
             if a != "black": a = a[0]
@@ -200,19 +205,19 @@ class Color(object):
                 )
                 self._update_rgb(r, g, b)
                 self._update_hsb(*rgb2hsb(r, g, b))
-                
+
         else:
             self.__dict__[a] = v
 
     def __getattr__(self, a):
-        
+
         """ Available properties:
         r, g, b, a or red, green, blue, alpha
         c, m, y, k or cyan, magenta, yellow, black,
         h, s or hue, saturation, brightness
-        
+
         """
-        
+
         if self.__dict__.has_key(a):
             return a
         elif a == "black":
@@ -229,7 +234,7 @@ class Color(object):
                    "r", "g", "b", "red", "green", "blue",
                    "h", "s", "hue", "saturation"]:
             return self.__dict__["__"+a[0]]
-        
+
         raise AttributeError, "'"+str(self.__class__)+"' object has no attribute '"+a+"'"
 
 
@@ -365,14 +370,14 @@ def parse_color(v, color_range=1):
 # Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
 
 def hex_to_rgb(hex):
-    
+
     """ Returns RGB values for a hex color string.
     """
 
     hex = hex.lstrip("#")
     if len(hex) < 6:
         hex += hex[-1] * (6-len(hex))
-    if len(hex) == 6:    
+    if len(hex) == 6:
         r, g, b = hex[0:2], hex[2:4], hex[4:]
         r, g, b = [int(n, 16)/255.0 for n in (r, g, b)]
 	a = 1.0
@@ -380,7 +385,7 @@ def hex_to_rgb(hex):
         r, g, b, a = hex[0:2], hex[2:4], hex[4:6], hex[6:]
         r, g, b, a = [int(n, 16)/255.0 for n in (r, g, b, a)]
     return r, g, b, a
-    
+
 hex2rgb = hex_to_rgb
 
 def lab_to_rgb(l, a, b):
@@ -401,9 +406,9 @@ def lab_to_rgb(l, a, b):
     z = y - b/200.0
     v = [x,y,z]
     for i in _range(3):
-        if pow(v[i],3) > 0.008856: 
+        if pow(v[i],3) > 0.008856:
             v[i] = pow(v[i],3)
-        else: 
+        else:
             v[i] = (v[i]-16/116.0) / 7.787
 
     # Observer = 2, Illuminant = D65
@@ -427,16 +432,16 @@ def lab_to_rgb(l, a, b):
 lab2rgb = lab_to_rgb
 
 def cmyk_to_rgb(c, m, y, k):
-    
+
     """ Cyan, magenta, yellow, black to red, green, blue.
     ReportLab, http://www.koders.com/python/fid5C006F554616848C01AC7CB96C21426B69D2E5A9.aspx
     Results will differ from the way NSColor converts color spaces.
     """
-    
+
     r = 1.0 - min(1.0, c+k)
     g = 1.0 - min(1.0, m+k)
     b = 1.0 - min(1.0, y+k)
-    
+
     return r, g, b
 
 cmyk2rgb = cmyk_to_rgb
@@ -451,40 +456,40 @@ def rgb_to_cmyk(r, g, b):
     m = min(1, max(0, m-k))
     y = min(1, max(0, y-k))
     k = min(1, max(0, k))
-    
+
     return c, m, y, k
 
 rgb2cmyk = rgb_to_cmyk
 
 def hsv_to_rgb(h, s, v):
-    
+
     """ Hue, saturation, brightness to red, green, blue.
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """
-    
+
     if s == 0: return v, v, v
-        
+
     h = h / (60.0/360)
     i =  floor(h)
     f = h - i
     p = v * (1-s)
     q = v * (1-s * f)
     t = v * (1-s * (1-f))
-    
+
     if   i == 0 : r = v; g = t; b = p
     elif i == 1 : r = q; g = v; b = p
     elif i == 2 : r = p; g = v; b = t
     elif i == 3 : r = p; g = q; b = v
     elif i == 4 : r = t; g = p; b = v
     else        : r = v; g = p; b = q
-    
+
     return r, g, b
 
 hsv2rgb = hsb2rgb = hsb_to_rgb = hsv_to_rgb
 
 def rgb_to_hsv(r, g, b):
-    
+
     h = s = 0
     v = max(r, g, b)
     d = v - min(r, g, b)
@@ -498,9 +503,9 @@ def rgb_to_hsv(r, g, b):
         else        : h = 4 + (r-g) / d
 
     h = h * (60.0/360)
-    if h < 0: 
+    if h < 0:
         h = h + 1.0
-        
+
     return h, s, v
 
 rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
