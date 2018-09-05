@@ -32,6 +32,7 @@ import cairocffi as cairo
 
 from drawqueue_sink import DrawQueueSink
 
+
 class CairoImageSink(DrawQueueSink):
     '''
     DrawQueueSink that uses cairo contexts as the render context.

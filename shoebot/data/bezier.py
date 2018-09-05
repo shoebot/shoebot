@@ -4,9 +4,11 @@
 # TODO - Remove the whole 'packed elements' thing, it overcomplicates
 #        the implementation.
 #
-import sys, locale, gettext
+import sys
+import locale
+import gettext
 from shoebot.data import _copy_attrs
-##from shoebot.data import Grob, ColorMixin, TransformMixin
+# from shoebot.data import Grob, ColorMixin, TransformMixin
 from grob import Grob
 from itertools import chain
 from basecolor import ColorMixin
@@ -23,7 +25,7 @@ APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
+# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -75,7 +77,7 @@ class BezierPath(Grob, ColorMixin):
         self._center = None
         self._segments = None
 
-        if isinstance(path, (tuple,list)):
+        if isinstance(path, (tuple, list)):
             # list of path elements
             for element in path:
                 self.append(element)
@@ -94,7 +96,7 @@ class BezierPath(Grob, ColorMixin):
 
     def append(self, *args):
         if len(args) is 2:
-            ## TODO, check this against nodebox
+            # TODO, check this against nodebox
             self.moveto(*args)
         elif isinstance(args[0], PathElement):
             p = args[0]
@@ -109,7 +111,7 @@ class BezierPath(Grob, ColorMixin):
         self.append(*args)
 
     def copy(self):
-        path = BezierPath(self._bot, None, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements = (self._elements[:], self._render_funcs[:]))
+        path = BezierPath(self._bot, None, self._fillcolor, self._strokecolor, self._strokewidth, self._pathmode, packed_elements=(self._elements[:], self._render_funcs[:]))
         path.closed = self.closed
         path._center = self._center
         return path
@@ -144,7 +146,6 @@ class BezierPath(Grob, ColorMixin):
         self._append_element(self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h))
         self.closed = True
 
-
     def rellineto(self, x, y):
         self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
@@ -164,15 +165,15 @@ class BezierPath(Grob, ColorMixin):
             self.rellineto(-w, 0)
             self.closepath()
         else:
-            curve = min(w*roundness, h*roundness)
-            self.moveto(x, y+curve)
-            self.curveto(x, y, x, y, x+curve, y)
-            self.lineto(x+w-curve, y)
-            self.curveto(x+w, y, x+w, y, x+w, y+curve)
-            self.lineto(x+w, y+h-curve)
-            self.curveto(x+w, y+h, x+w, y+h, x+w-curve, y+h)
-            self.lineto(x+curve, y+h)
-            self.curveto(x, y+h, x, y+h, x, y+h-curve)
+            curve = min(w * roundness, h * roundness)
+            self.moveto(x, y + curve)
+            self.curveto(x, y, x, y, x + curve, y)
+            self.lineto(x + w - curve, y)
+            self.curveto(x + w, y, x + w, y, x + w, y + curve)
+            self.lineto(x + w, y + h - curve)
+            self.curveto(x + w, y + h, x + w, y + h, x + w - curve, y + h)
+            self.lineto(x + curve, y + h)
+            self.curveto(x, y + h, x, y + h, x, y + h - curve)
             self.closepath()
 
     def _traverse(self, cairo_ctx):
@@ -228,14 +229,14 @@ class BezierPath(Grob, ColorMixin):
             return self._center
 
         # get the center point
-        (x1,y1,x2,y2) = self._get_bounds()
+        (x1, y1, x2, y2) = self._get_bounds()
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
 
         center = self._center = x, y
-        ### TODO Cache function that draws using the RecordingSurface
-        ### Save the context or surface (without the bounding box strokecolor)
-        ### to optimise drawing
+        # TODO Cache function that draws using the RecordingSurface
+        # Save the context or surface (without the bounding box strokecolor)
+        # to optimise drawing
         return center
 
     center = property(_get_center)
@@ -263,7 +264,7 @@ class BezierPath(Grob, ColorMixin):
             cairo_ctx.set_matrix(transform)
             # Run the path commands on the cairo context:
             self._traverse(cairo_ctx)
-            ## Matrix affects stroke, so we need to reset it:
+            # Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
             if fillcolor is not None and strokecolor is not None:
@@ -281,8 +282,8 @@ class BezierPath(Grob, ColorMixin):
                     cairo_ctx.set_line_width(strokewidth)
                     cairo_ctx.stroke()
 
-                    cairo_ctx.pop_group_to_source ()
-                    cairo_ctx.paint ()
+                    cairo_ctx.pop_group_to_source()
+                    cairo_ctx.paint()
                 else:
                     # Fast path if no alpha in stroke
                     cairo_ctx.set_source_rgba(*fillcolor)
@@ -353,14 +354,16 @@ class BezierPath(Grob, ColorMixin):
         for i, el in enumerate(self._get_elements()):
             if i == 0 or el.cmd == MOVETO:
                 closeto = Point(el.x, el.y)
-            if t <= segments[i] or i == len(segments)-1:
+            if t <= segments[i] or i == len(segments) - 1:
                 break
             else:
                 t -= segments[i]
-        try: t /= segments[i]
+        try:
+            t /= segments[i]
         except ZeroDivisionError:
             pass
-        if i == len(segments)-1 and segments[i] == 0: i -= 1
+        if i == len(segments) - 1 and segments[i] == 0:
+            i -= 1
         return (i, t, closeto)
 
     def point(self, t, segments=None):
@@ -376,14 +379,14 @@ class BezierPath(Grob, ColorMixin):
         """
         # Originally from nodebox-gl
         if len(self._elements) == 0:
-            raise PathError, "The given path is empty"
+            raise PathError("The given path is empty")
 
         if self._segments is None:
             self._segments = self._get_length(segmented=True, precision=10)
 
         i, t, closeto = self._locate(t, segments=self._segments)
         x0, y0 = self[i].x, self[i].y
-        p1 = self[i+1]
+        p1 = self[i + 1]
         if p1.cmd == CLOSE:
             x, y = self._linepoint(t, x0, y0, closeto.x, closeto.y)
             return PathElement(LINETO, x, y)
@@ -399,7 +402,7 @@ class BezierPath(Grob, ColorMixin):
             x, y, c1x, c1y, c2x, c2y = self._curvepoint(t, x0, y0, x1, y1, x2, y2, x3, y3)
             return PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
         else:
-            raise PathError, "Unknown cmd '%s' for p1 %s" % (p1.cmd, p1)
+            raise PathError("Unknown cmd '%s' for p1 %s" % (p1.cmd, p1))
 
     def points(self, amount=100, start=0.0, end=1.0, segments=None):
         """ Returns an iterator with a list of calculated points for the path.
@@ -407,7 +410,7 @@ class BezierPath(Grob, ColorMixin):
         """
         # Originally from nodebox-gl
         if len(self._elements) == 0:
-            raise PathError, "The given path is empty"
+            raise PathError("The given path is empty")
         n = end - start
         d = n
         if amount > 1:
@@ -415,9 +418,9 @@ class BezierPath(Grob, ColorMixin):
             # If we don't use amount-1, we fall one point short of the end.
             # If amount=4, we want the point at t 0.0, 0.33, 0.66 and 1.0.
             # If amount=2, we want the point at t 0.0 and 1.0.
-            d = float(n) / (amount-1)
+            d = float(n) / (amount - 1)
         for i in xrange(int(amount)):
-            yield self.point(start+d*i, segments)
+            yield self.point(start + d * i, segments)
 
     def _linepoint(self, t, x0, y0, x1, y1):
         """ Returns coordinates for point at t on the line.
@@ -427,8 +430,8 @@ class BezierPath(Grob, ColorMixin):
             x1 and y1 the ending point of the line.
         """
         # Originally from nodebox-gl
-        out_x = x0 + t * (x1-x0)
-        out_y = y0 + t * (y1-y0)
+        out_x = x0 + t * (x1 - x0)
+        out_y = y0 + t * (y1 - y0)
         return (out_x, out_y)
 
     def _linelength(self, x0, y0, x1, y1):
@@ -437,7 +440,7 @@ class BezierPath(Grob, ColorMixin):
         # Originally from nodebox-gl
         a = pow(abs(x0 - x1), 2)
         b = pow(abs(y0 - y1), 2)
-        return sqrt(a+b)
+        return sqrt(a + b)
 
     def _curvepoint(self, t, x0, y0, x1, y1, x2, y2, x3, y3, handles=False):
         """ Returns coordinates for point at t on the spline.
@@ -483,10 +486,10 @@ class BezierPath(Grob, ColorMixin):
         xi = x0
         yi = y0
         for i in range(n):
-            t = 1.0 * (i+1) / n
+            t = 1.0 * (i + 1) / n
             pt_x, pt_y, pt_c1x, pt_c1y, pt_c2x, pt_c2y = \
                 self._curvepoint(t, x0, y0, x1, y1, x2, y2, x3, y3)
-            c = sqrt(pow(abs(xi-pt_x),2) + pow(abs(yi-pt_y),2))
+            c = sqrt(pow(abs(xi - pt_x), 2) + pow(abs(yi - pt_y), 2))
             length += c
             xi = pt_x
             yi = pt_y
@@ -499,7 +502,7 @@ class BezierPath(Grob, ColorMixin):
         lengths = []
         first = True
         for el in self._get_elements():
-            if first == True:
+            if first is True:
                 close_x, close_y = el.x, el.y
                 first = False
             elif el.cmd == MOVETO:
@@ -511,7 +514,7 @@ class BezierPath(Grob, ColorMixin):
                 lengths.append(self._linelength(x0, y0, el.x, el.y))
             elif el.cmd == CURVETO:
                 x3, y3, x1, y1, x2, y2 = el.x, el.y, el.c1x, el.c1y, el.c2x, el.c2y
-                #(el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
+                # (el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
                 lengths.append(self._curvelength(x0, y0, x1, y1, x2, y2, x3, y3, n))
             if el.cmd != CLOSE:
                 x0 = el.x
@@ -595,7 +598,7 @@ class ClippingPath(BezierPath):
 
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, **kwargs)
-    	self._drawn = False
+        self._drawn = False
         self._path = path
 
     def _render_closure(self):
@@ -630,6 +633,7 @@ class CtrlPoint(object):
         self.x = x
         self.y = y
 
+
 EMPTY_CTRL = CtrlPoint(None, None)
 
 
@@ -655,12 +659,12 @@ class PathElement(object):
         supposed to be a tuple.
     '''
 
-    def __init__(self, cmd = None, *args):
+    def __init__(self, cmd=None, *args):
         self.cmd = cmd
         if len(args) == 1:
             while len(args) == 1:
                 args = args[0]
-        self.values = list(chain(args)) # flatten args, so that tuples of (x,y), (x2, y2) are supported
+        self.values = list(chain(args))  # flatten args, so that tuples of (x,y), (x2, y2) are supported
         self._ctrl1 = self._ctrl2 = None
 
         if cmd == MOVETO or cmd == RMOVETO:
@@ -668,8 +672,8 @@ class PathElement(object):
             self.c1x = self.c1y = self.c2x = self.c2y = None
         elif cmd == LINETO or cmd == RLINETO:
             self.x, self.y = self.values
-            self.c1x, self.c1y = self.values # Possibly should be 0
-            self.c2x, self.c2y = self.values # Possibly should be 0
+            self.c1x, self.c1y = self.values  # Possibly should be 0
+            self.c2x, self.c2y = self.values  # Possibly should be 0
         elif cmd == CURVETO or cmd == RCURVETO:
             if len(self.values) == 3:
                 self.values = list(chain.from_iterable(self.values))
@@ -695,7 +699,6 @@ class PathElement(object):
             self._ctrl1 = CtrlPoint(self.c1x, self.c1y)
         return self._ctrl1
 
-
     def set_ctrl2(self, ctrl2):
         self._ctrl2 = ctrl2
 
@@ -715,9 +718,12 @@ class PathElement(object):
         return "PathElement" + str(tuple(data))
 
     def __eq__(self, other):
-        if other is None: return False
-        if self.cmd != other.cmd: return False
-        if self.values != other.values: return False
+        if other is None:
+            return False
+        if self.cmd != other.cmd:
+            return False
+        if self.values != other.values:
+            return False
         return True
 
     def __ne__(self, other):
@@ -730,15 +736,19 @@ class PathElement(object):
 class PathError(Exception):
     # Originally from nodebox-gl
     pass
+
+
 class NoCurrentPointForPath(Exception):
     # Originally from nodebox-gl
     pass
+
+
 class NoCurrentPath(Exception):
     # Originally from nodebox-gl
     pass
 
 
-#--- POINT -------------------------------------------------------------------------------------------
+# --- POINT -------------------------------------------------------------------------------------------
 
 class Point(object):
     # Originally from nodebox-gl
@@ -748,7 +758,8 @@ class Point(object):
 
     def _get_xy(self):
         return (self.x, self.y)
-    def _set_xy(self, (x,y)):
+
+    def _set_xy(self, (x, y)):
         self.x = x
         self.y = y
 
@@ -761,9 +772,9 @@ class Point(object):
         return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
 
     def __eq__(self, pt):
-        if not isinstance(pt, Point): return False
-        return self.x == pt.x \
-           and self.y == pt.y
+        if not isinstance(pt, Point):
+            return False
+        return self.x == pt.x and self.y == pt.y
 
     def __ne__(self, pt):
         return not self.__eq__(pt)

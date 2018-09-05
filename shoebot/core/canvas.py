@@ -32,17 +32,15 @@
 from collections import deque
 from abc import ABCMeta, abstractproperty
 import sys
-import shoebot
-import locale, gettext
-import math as _math
-import cairocffi as cairo
+import locale
+import gettext
 from shoebot.core.drawqueue import DrawQueue
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
+# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -55,10 +53,10 @@ BOTTOM_LEFT = 2
 
 class Canvas(object):
     __metaclass__ = ABCMeta
-    
+
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
-    
+
     ''' Abstract canvas class '''
     def __init__(self, sink):
         # Construct sink class:
@@ -85,7 +83,7 @@ class Canvas(object):
         Override to create use special kinds of draw queue
         '''
         return DrawQueue()
-    
+
     def initial_transform(self):
         '''
         Must be overriden to create initial transform matrix
@@ -95,11 +93,11 @@ class Canvas(object):
     @abstractproperty
     def reset_drawqueue(self):
         pass
-    
+
     @abstractproperty
     def reset_transform(self):
         pass
-    
+
     def reset_canvas(self):
         self.reset_transform()
         self.reset_drawqueue()
@@ -126,7 +124,7 @@ class Canvas(object):
     def set_size(self, size):
         '''
         Size is only set the first time it is called
-        
+
         Size that is set is returned
         '''
         if self.size is None:
@@ -134,15 +132,15 @@ class Canvas(object):
             return size
         else:
             return self.size
-    
+
     def get_width(self):
-        if self.size != None:
+        if self.size is not None:
             return self.size[0]
         else:
             return self.DEFAULT_SIZE[0]
 
     def get_height(self):
-        if self.size != None:
+        if self.size is not None:
             return self.size[1]
         else:
             return self.DEFAULT_SIZE[1]
@@ -167,7 +165,7 @@ class Canvas(object):
         Passes the drawqueue to the sink for rendering
         '''
         self.sink.render(self.size_or_default(), frame, self._drawqueue)
-        self.reset_drawqueue() ##
+        self.reset_drawqueue()
 
     def deferred_render(self, render_func):
         '''Add a render function to the queue for rendering later'''
@@ -175,4 +173,3 @@ class Canvas(object):
 
     width = property(get_width)
     height = property(get_height)
-
