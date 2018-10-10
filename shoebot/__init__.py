@@ -32,6 +32,7 @@ import os
 import signal
 import sys
 import threading
+import cairocffi as cairo
 
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
@@ -105,7 +106,10 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
                 title = 'Untitled - Shoebot'
         sink = ShoebotWindow(title, show_vars, fullscreen=fullscreen)
     else:
-        if src and os.path.isfile(src):
+        if src and isinstance(src, cairo.Surface):
+            outputfile = src
+            format = 'surface'
+        elif src and os.path.isfile(src):
             outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
         else:
             outputfile = 'output.svg'

@@ -200,7 +200,7 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False):
+    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False, break_on_error=False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
@@ -288,6 +288,8 @@ class Grammar(object):
             else:
                 errmsg = simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg
+            if break_on_error:
+                raise
 
     def finish(self):
         ## For use when using shoebot as a module

@@ -320,38 +320,75 @@ class Bot(Grammar):
         # Taken ipsis verbis from Nodebox
         return glob(path)
 
-    def snapshot(self, filename=None, surface=None, defer=None, autonumber=False):
+    def snapshot(self, target=None, defer=None, autonumber=False):
         '''Save the contents of current surface into a file or cairo surface/context
 
-        :param filename: Filename to save snapshot as, available formats include .png, .ps, .svg
-        :param surface:  If specified will output snapshot to the supplied cairo surface.
+        :param filename: Can be a filename or a Cairo surface.
         :param defer: If true, buffering/threading may be employed however output will not be immediate.
         :param autonumber: If true then a number will be appended to the filename.
         '''
         if autonumber:
-            file_number=self._frame
+            file_number = self._frame
         else:
-            file_number=None
-        if surface:
+            file_number = None
+
+        import cairocffi as cairo
+        if isinstance(target, cairo.Surface):
+            # snapshot to Cairo surface
             if defer is None:
                 self._canvas.snapshot(surface, defer)
                 defer = False
+            ctx = cairo.Context(target)
+            # this used to be self._canvas.snapshot, but I couldn't make it work.
+            # self._canvas.snapshot(target, defer)
+            # TODO: check if this breaks when taking more than 1 snapshot
+            self._canvas._drawqueue.render(ctx)
             return
-        elif filename is None:
-            # If nothing specied, we can see if a filename is available
+        elif target is None:
+            # If nothing specified, use a default filename from the script name
             script_file = self._namespace.get('__file__')
             if script_file:
-                filename = os.path.splitext(script_file)[0] + '.svg'
-                file_number=True
+                target = os.path.splitext(script_file)[0] + '.svg'
+                file_number = True
 
-        if filename:
+        if target:
+            # snapshot to file, target is a filename
             if defer is None:
-                self._canvas.snapshot(filename, defer=defer, file_number=file_number)
                 defer = True
+            self._canvas.snapshot(target, defer=defer, file_number=file_number)
         else:
             raise ShoebotError('No image saved')
 
+    def show(self, format='png', as_data=False):
+        '''Returns an Image object of the current surface. Used for displaying
+        output in Jupyter notebooks. Adapted from the cairo-jupyter project.'''
 
+        import cairocffi as cairo
+        from io import BytesIO
+
+        b = BytesIO()
+
+        if format == 'png':
+            from IPython.display import Image
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.WIDTH, self.HEIGHT)
+            self.snapshot(surface)
+            surface.write_to_png(b)
+            b.seek(0)
+            data = b.read()
+            if as_data:
+                return data
+            else:
+                return Image(data)
+        elif format == 'svg':
+            from IPython.display import SVG
+            surface = cairo.SVGSurface(b, self.WIDTH, self.HEIGHT)
+            surface.finish()
+            b.seek(0)
+            data = b.read()
+            if as_data:
+                return data
+            else:
+                return SVG(data)
 
     def ximport(self, libName):
         '''
