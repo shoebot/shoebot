@@ -196,7 +196,7 @@ setup(name="shoebot",
               "sbot=shoebot.run:main",
               "shoebot=shoebot.gui.ide:main"
           ],
-          "gui_scripts": "shoebot=shoebot.gui.ide:main"
+          "gui_scripts": "shoebot=shoebot.ide.ide:main"
       },
       test_suite='tests.unittests'
       )
