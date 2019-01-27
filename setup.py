@@ -113,7 +113,7 @@ else:
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
     "cairocffi>=0.7.2",
-    "meta",              # as of meta version 0.4.1 the version is borked when installing from pypi
+    "meta==1.0.2",
     NUMPY,
     "Pillow>=2.8.1",
     "pubsub==0.1.1",
