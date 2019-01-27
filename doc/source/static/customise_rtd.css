@@ -1,0 +1,17 @@
+/** overrides for rtd style */
+
+.function dd img {
+    float: left !important;
+}
+
+.rst-content table.field-list .field-name {
+    padding-left: 0 !important;
+}
+
+.rst-content dl dd {
+    margin-left: 0 !important;
+}
+
+.rst-content dl dt {
+    width: 100%;
+}

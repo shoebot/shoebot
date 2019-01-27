@@ -23,7 +23,8 @@ Drawing shapes
     :param fill: fill color
 
     .. shoebot::
-        :snapshot:
+        :alt: four rectangles.  The last three have increasingly round corners.
+        :filename: drawing_shapes__rect.png
 
         rect(10, 10, 35, 35)
         # see how roundness affects the shape
@@ -42,7 +43,8 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
+        :alt: Two ellipses.
+        :filename: drawing_shapes__ellipse.png
 
         ellipse(10, 20, 30, 60)
         ellipse(50, 30, 40, 40) # circle
@@ -59,7 +61,8 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
+        :alt: An arrow pointing right, and another pointing to the bottom right.
+        :filename: drawing_shapes__arrows.png
 
         arrow(50, 40, 40) # NORMAL is the default arrow type
         arrow(90, 40, 40, FORTYFIVE)
@@ -76,8 +79,9 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
-        
+        :alt: 4 stars.
+        :filename: drawing_shapes__stars.png
+
         star(25, 25, 5, 20, 10)  # top left
         star(75, 25, 10, 20, 3)  # top right
         star(25, 75, 20, 20, 17) # bottom left
@@ -94,7 +98,8 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
     
     .. shoebot::
-        :snapshot:
+        :alt: 3 crossing lines.
+        :filename: drawing_shapes__line.png
 
         stroke(0.5)
         strokewidth(3)
@@ -133,7 +138,8 @@ Drawing shapes
     script's needs.
 
     .. shoebot::
-        :snapshot:
+        :alt: green rectangle top left, blue centered and red at the bottom right.
+        :filename: drawing_shapes__rectmode.png
 
         nofill()
         strokewidth(2)
@@ -158,7 +164,8 @@ Drawing shapes
     It works exactly the same as the :py:func:`rectmode` command.
 
     .. shoebot::
-        :snapshot:
+        :alt: green ellipse top left, blue centered and red at the bottom right.
+        :filename: drawing_shapes__ellipsemode.png
 
         nofill()
         strokewidth(2)
