@@ -1,6 +1,0 @@
-[submodule "extensions/django"]
-	path = extensions/django
-	url = https://github.com/shoebot/shoebot-django.git
-[submodule "extensions/sphinxcontrib-shoebot"]
-	path = extensions/sphinxcontrib-shoebot
-	url = https://github.com/shoebot/sphinxcontrib-shoebot
