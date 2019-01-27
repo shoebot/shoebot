@@ -4,8 +4,7 @@ import cairocffi as cairo
 from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
 from bot import Bot
-from shoebot.data import Point, BezierPath, Image
-from shoebot.data import RGB, HSB, \
+from shoebot.data import geometry, Point, BezierPath, Image, RGB, HSB, \
     CORNER, CENTER, \
     MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, \
     CLOSE, \
@@ -720,3 +719,12 @@ class NodeBot(Bot):
         :return:
         """
         return self._canvas
+
+    def angle(self, x0, y0, x1, y1):
+        return geometry.angle(x0, y0, x1, y1)
+
+    def distance(self, x0, y0, x1, y1):
+        return geometry.distance(x0, y0, x1, y1)
+
+    def coordinates(self, x0, y0, distance, angle):
+        return geometry.coordinates(x0, y0, distance, angle)
