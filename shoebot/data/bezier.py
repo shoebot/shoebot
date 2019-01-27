@@ -53,6 +53,9 @@ class BezierPath(Grob, ColorMixin):
     (this last sentence is not so correct: we use a bit of Cairo
     for getting path dimensions)
     '''
+
+    _state_attributes = {'fillcolor', 'strokecolor', 'strokewidth', 'transform'}
+
     def __init__(self, bot, path=None, fill=None, stroke=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
@@ -580,12 +583,6 @@ class BezierPath(Grob, ColorMixin):
     def __len__(self):
         return len(self._elements)
 
-    def inheritFromContext(self, **kwargs):
-        # TODO - needs completion to make 'dendrite'
-        #        example work
-        self._fillcolor = self._bot.fill()
-        self._strokecolor = self._bot.stroke()
-
     bounds = property(_get_bounds)
     contours = property(_get_contours)
     length = property(_get_length)
@@ -593,8 +590,7 @@ class BezierPath(Grob, ColorMixin):
 
 class ClippingPath(BezierPath):
 
-    # stateAttributes = ('_fillcolorcolor', '_strokecolorcolor', '_strokewidth')
-    # kwargs = ('fillcolor', 'strokecolor', 'strokewidth')
+    _state_attributes = {'fillcolor', 'strokecolor', 'strokewidth'}
 
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, **kwargs)

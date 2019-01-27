@@ -26,6 +26,7 @@ class SurfaceRef(object):
 
 class Image(Grob, ColorMixin):
     _surface_cache = {}   # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
+    _state_attributes = {'transform', 'pathmode'}  # NBX uses transform and transformmode here
 
     def __init__(self, bot, path=None, x=0, y=0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
         Grob.__init__(self, bot)
@@ -136,5 +137,5 @@ class Image(Grob, ColorMixin):
 
     def copy(self):
         p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
-        _copy_attrs(self._bot, p, self.stateAttributes)
+        _copy_attrs(self._bot, p, self.state_attributes)
         return p
