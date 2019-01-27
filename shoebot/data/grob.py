@@ -6,6 +6,11 @@ import cairocffi as cairo
 CENTER = 'center'
 CORNER = 'corner'
 
+STATES = {'strokewidth': '_strokewidth', 'outputmode': '_outputmode', 'transformmode': '_transformmode',
+          'align': '_align', 'transform': '_transform', 'joinstyle': '_joinstyle', 'stroke': '_strokecolor',
+          'fontsize': '_fontsize', 'capstyle': '_capstyle', 'lineheight': '_lineheight', 'font': '_fontname',
+          'colorrange': '_colorrange', 'fill': '_fillcolor'}
+
 
 class Grob(object):
     '''A GRaphic OBject is the base class for all DrawingPrimitives.'''
@@ -77,4 +82,13 @@ class Grob(object):
     def _render(self, ctx):
         '''For overriding by GRaphicOBjects'''
         raise NotImplementedError()
+
+    def inheritFromContext(self, ignore=()):
+        try:
+            _ignore = (STATES[attr] for attr in ignore)
+        except KeyError as e:
+            raise ValueError('{} is not a state_attribute of {}'.format(e.args[0], self.__class__))
+
+        for attr in self._state_attributes - set(_ignore):
+            setattr(self, attr, getattr(self._bot))
 
