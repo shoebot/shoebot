@@ -5,7 +5,6 @@ try:
     import gi
 except ImportError:
     import pgi
-`
     pgi.install_as_gi()
 
 from gi.repository import Gtk
