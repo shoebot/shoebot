@@ -541,7 +541,7 @@ class Color(BaseColor):
                         r, g, b, a = (args)
 
 		
-	    _ctx.colormode(RGB, ra)
+	        _ctx.colormode(RGB, ra)
             BaseColor.__init__(self, r,g,b,a, mode='rgb', color_range=ra)
             
         
