@@ -546,6 +546,10 @@ class NodeBot(Bot):
             self._canvas.fillcolor = self.color(*args)
         return self._canvas.fillcolor
 
+    def filleffect(self, effect=None):
+        self._canvas.filleffect = effect
+        return self._canvas.filleffect
+
     def nofill(self):
         ''' Stop applying fills to new paths.'''
         self._canvas.fillcolor = None
@@ -567,6 +571,10 @@ class NodeBot(Bot):
         c = self._canvas.strokecolor
         self._canvas.strokecolor = None
         return c
+
+    def strokeeffect(self, effect=None):
+        self._canvas.strokeffect = effect
+        return self._canvas.strokeeffect
 
     def strokewidth(self, w=None):
         '''Set the stroke width.

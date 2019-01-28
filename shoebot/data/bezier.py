@@ -7,15 +7,13 @@
 import sys
 import locale
 import gettext
-from shoebot.data import _copy_attrs
-# from shoebot.data import Grob, ColorMixin, TransformMixin
 from grob import Grob
 from itertools import chain
 from basecolor import ColorMixin
 from math import pi as _pi, sqrt
 
 import cairocffi as cairo
-import geometry
+import effects
 
 CENTER = 'center'
 CORNER = 'corner'
@@ -56,7 +54,7 @@ class BezierPath(Grob, ColorMixin):
 
     _state_attributes = {'fillcolor', 'strokecolor', 'strokewidth', 'transform'}
 
-    def __init__(self, bot, path=None, fill=None, stroke=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, path=None, fill=None, stroke=None, strokewidth=None, filleffect=effects.OVER, strokeeffect=effects.OVER, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
@@ -65,6 +63,8 @@ class BezierPath(Grob, ColorMixin):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, fill=fill, stroke=stroke, strokewidth=strokewidth)
+        self.filleffect = filleffect
+        self.strokeeffect = strokeeffect
 
         if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
@@ -281,11 +281,12 @@ class BezierPath(Grob, ColorMixin):
 
                     e = cairo_ctx.stroke_extents()
                     cairo_ctx.set_source_rgba(*strokecolor)
-                    cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
+                    cairo_ctx.set_operator(cairo.OPERATOR_CLEAR)
                     cairo_ctx.set_line_width(strokewidth)
                     cairo_ctx.stroke()
 
                     cairo_ctx.pop_group_to_source()
+                    cairo_ctx.set_operator(self.strokeeffect)
                     cairo_ctx.paint()
                 else:
                     # Fast path if no alpha in stroke
@@ -294,13 +295,16 @@ class BezierPath(Grob, ColorMixin):
 
                     cairo_ctx.set_source_rgba(*strokecolor)
                     cairo_ctx.set_line_width(strokewidth)
+                    cairo_ctx.set_operator(self.strokeeffect)
                     cairo_ctx.stroke()
             elif fillcolor is not None:
                 cairo_ctx.set_source_rgba(*fillcolor)
+                cairo_ctx.set_operator(self.filleffect)
                 cairo_ctx.fill()
             elif strokecolor is not None:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.set_operator(self.strokeeffect)
                 cairo_ctx.stroke()
 
         return _render
