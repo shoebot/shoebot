@@ -27,11 +27,16 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from shoebot import ShoebotInstallError
+
 try:
     import cairo as pycairo
 except ImportError:
     pycairo = None
 import cairocffi as cairo
+from shoebot import ShoebotInstallError
+
 
 try:
     import gi
@@ -65,6 +70,21 @@ except ValueError as e:
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairocffi import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
+
+def pangocairo_create_context(cr):
+    """
+    If python-gi-cairo is not installed, using PangoCairo.create_context
+    dies with an unhelpful KeyError, check for that and output somethig
+    useful.
+    """
+    # TODO move this somewhere better.
+    try:
+        return PangoCairo.create_context(cr)
+    except KeyError as e:
+        if e.args == ('could not find foreign type Context',):
+            raise ShoebotInstallError("Error creating PangoCairo missing dependency: python-gi-cairo")
+        else:
+            raise
 
 class Text(Grob, ColorMixin):
 
@@ -125,7 +145,7 @@ class Text(Grob, ColorMixin):
 
         if GI:
             cr = _UNSAFE_cairocffi_context_to_pycairo(cr)
-        self._pang_ctx = PangoCairo.create_context(cr)
+        self._pang_ctx = pangocairo_create_context(cr)
         self.layout = PangoCairo.create_layout(cr)
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
@@ -166,7 +186,7 @@ class Text(Grob, ColorMixin):
 
         # we update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
-        self._pang_ctx = PangoCairo.create_context(ctx)
+        self._pang_ctx = pangocairo_create_context(ctx)
 
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
