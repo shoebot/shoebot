@@ -15,6 +15,8 @@ import sys
 import platform
 import traceback
 
+from shoebot import ShoebotInstallError
+
 def display_platform():
     # environment info
     is_virtualenv = "VIRTUAL_ENV" in os.environ
@@ -103,6 +105,8 @@ def shoebot_example(**shoebot_kwargs):
                 f(bot)
                 bot.finish()
                 print("[passed] : %s" % outputfile)
+            except ShoebotInstallError as e:
+                print("[failed]", e.args[0])
             except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 traceback.print_exc()
