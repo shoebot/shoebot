@@ -34,6 +34,7 @@ import sys
 import threading
 import cairocffi as cairo
 
+
 class ShoebotInstallError(Exception):
     pass
 

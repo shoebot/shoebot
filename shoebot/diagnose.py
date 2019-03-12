@@ -17,6 +17,7 @@ import traceback
 
 from shoebot import ShoebotInstallError
 
+
 def display_platform():
     # environment info
     is_virtualenv = "VIRTUAL_ENV" in os.environ
@@ -114,17 +115,20 @@ def shoebot_example(**shoebot_kwargs):
         return run
     return decorator
 
+
 @shoebot_example()
 def standard_module_example(bot):
     bot.size(640, 480)
     bot.fill(1, 0.5, 0.1)
     bot.rect(10, 10, 100, 100)
 
+
 @shoebot_example()
 def module_using_text(bot):
     bot.size(640, 480)
     bot.stroke(0)
     bot.text("Should work with gi not pgi", 0, 0)
+
 
 def diagnose():
     display_platform()
@@ -145,6 +149,7 @@ def diagnose():
 
     # shoebot with text (will fail under pypy or pgi)
     module_using_text()
+
 
 if __name__ == '__main__':
     import os
