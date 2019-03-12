@@ -112,7 +112,7 @@ else:
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
-    "cairocffi>=0.7.2",
+    "cairocffi<=0.9.0",
     "meta==1.0.2",
     NUMPY,
     "Pillow>=2.8.1",
