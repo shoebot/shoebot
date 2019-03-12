@@ -11,28 +11,34 @@ This can be complemented by running the unittests.
 from __future__ import print_function
 
 import os
-import sys
 import platform
+import sys
 import traceback
 
+from collections import namedtuple
+
 from shoebot import ShoebotInstallError
+
+COL_WIDTH = 10
+
+AvailableModules = namedtuple('AvailableModules', 'gi pgi meta pubsub rsvg vext')
 
 
 def display_platform():
     # environment info
     is_virtualenv = "VIRTUAL_ENV" in os.environ
-    print("sys.executable: ", sys.executable)
-    print("virtualenv:", os.environ.get("VIRTUAL_ENV", "no"))
 
     # operating system info
-
     def linux_distribution():
-      try:
-        return platform.linux_distribution()
-      except:
-        return "N/A"
+        try:
+            return platform.linux_distribution()
+        except:
+            return "N/A"
 
-    print("""Python version: %s
+    print("""Python:
+    sys.executable: %s
+    virtualenv: %s
+    version: %s
     dist: %s
     linux_distribution: %s
     system: %s
@@ -42,77 +48,106 @@ def display_platform():
     mac_ver: %s
     win32_ver: %s
     """ % (
-    sys.version.split('\n'),
-    str(platform.dist()),
-    linux_distribution(),
-    platform.system(),
-    platform.machine(),
-    platform.platform(),
-    platform.version(),
-    platform.mac_ver(),
-    platform.win32_ver(),
+        sys.executable,
+        is_virtualenv or "no",
+        ' '.join(sys.version.split('\n')),
+        str(' '.join(platform.dist())),
+        ' '.join(linux_distribution()),
+        platform.system(),
+        platform.machine(),
+        platform.platform(),
+        platform.version(),
+        platform.mac_ver(),
+        platform.win32_ver(),
     ))
 
 
-def test_import(mn, failmsg=None):
-    COL_WIDTH=20
+def import_success_message(module, name):
+    return '\n'.join([
+        "    import %s [success]:" % name.ljust(COL_WIDTH),
+        "        " + module.__file__,
+    ])
+
+
+def import_fail_message(mn, reason):
+    return '\n'.join([
+        "    import %s [failed]:" % mn.ljust(COL_WIDTH),
+        "        " + reason
+    ])
+
+
+def test_import(name, failmsg=None, gi_require=None, gi=None):
+    if all([gi_require, gi]):
+        try:
+            gi.require_version(*gi_require)
+        except ValueError as ex:
+            # import will be attempted anyway
+            err = ex.args[0]
+            print(import_fail_message(name, err))
+            return
     try:
-        m = __import__(mn)
-        print("import %s [success] : %s" % (mn.ljust(COL_WIDTH), m.__file__))
-        return m
-    except ImportError:
-        print("import %s [failed]" % mn.ljust(COL_WIDTH))
-        if failmsg:
-            print('    %s' %failmsg)
+        module = __import__(name)
+        print(import_success_message(module, name))
+        return module
+    except ImportError as e:
+        print(import_fail_message(name, failmsg or str(e)))
     except Exception as e:
-        print("import %s [failed] : %s\n%s" (mn % str(e)))
+        print(import_fail_message(name, str(e)))
 
 
 def test_imports():
     """
     Attempt to import dependencies.
     """
+    print("Test Imports:")
     # gtk
     gi = test_import("gi")
+    pgi = test_import("pgi")
+    _gi = gi or pgi
     if gi:
-        test_import("gi.repository.Pango")
+        test_import("gi.repository.Pango", gi_require=('Pango', '1.0'), gi=_gi)
     else:
         print("Pango won't be available")
-    pgi = test_import("pgi")
-
     # virtualenv help
     vext = test_import("vext")
 
     # internal dependencies
     pubsub = test_import("pubsub")
     meta = test_import("meta")
-    test_import("rsvg", "SVG Support unavailable")
+    if _gi:
+        _gi.require_version('Rsvg', '2.0')
+    rsvg = test_import("gi.repository.Rsvg", "SVG Support unavailable", gi_require=('Rsvg', '2.0'))
 
-    # shoebot itself (if already installed)
-    return test_import("shoebot")
+    return test_import("shoebot"), AvailableModules(gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext)
 
 
 def shoebot_example(**shoebot_kwargs):
     """
     Decorator to run some code in a bot instance.
     """
+
     def decorator(f):
         def run():
-            print("shoebot - %s:" % f.__name__.replace("_", " "))
+            print("    Shoebot - %s:" % f.__name__.replace("_", " "))
             try:
                 import shoebot
-                outputfile="/tmp/shoebot-%s.png" % f.__name__
+                outputfile = "/tmp/shoebot-%s.png" % f.__name__
                 bot = shoebot.create_bot(outputfile=outputfile)
                 f(bot)
                 bot.finish()
-                print("[passed] : %s" % outputfile)
+                print('        [passed] : %s' % outputfile)
+                print('')
             except ShoebotInstallError as e:
-                print("[failed]", e.args[0])
-            except Exception as e:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                traceback.print_exc()
-                print("[failed]")
+                print('        [failed]', e.args[0])
+                print('')
+            except Exception:
+                print('        [failed] - traceback:')
+                for line in traceback.format_exc().splitlines():
+                    print('    %s' % line)
+                print('')
+
         return run
+
     return decorator
 
 
@@ -132,18 +167,19 @@ def module_using_text(bot):
 
 def diagnose():
     display_platform()
-    if not test_imports():
+    shoebot_module, available_modules = test_imports()
+    if not shoebot_module:
         print('Skipping shoebot module tests.')
+        return
 
     try:
         import shoebot
     except ImportError as e:
         print("Cannot 'import shoebot'")
-        exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exc()
         return False
 
-
+    print('\nShoebot Tests:')
 
     # shoebot itself
     standard_module_example()
@@ -153,8 +189,4 @@ def diagnose():
 
 
 if __name__ == '__main__':
-    import os
-    import sys
-    import traceback
-
     diagnose()

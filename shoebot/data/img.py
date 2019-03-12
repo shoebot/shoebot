@@ -1,3 +1,4 @@
+from shoebot.cairocffi_util import _UNSAFE_cairocffi_context_to_pycairo
 from shoebot.data import _copy_attrs
 
 import array
@@ -8,9 +9,16 @@ import cairocffi as cairo
 from PIL import Image as PILImage
 
 try:
-    import rsvg
+    import gi
 except ImportError:
-    rsvg = None
+    import pgi as gi
+    gi.install_as_gi()
+
+try:
+    gi.require_version('Rsvg', '2.0')
+    from gi.repository import Rsvg
+except ImportError, ValueError:
+    Rsvg = None
 
 from shoebot.data import Grob, ColorMixin
 
@@ -59,12 +67,16 @@ class Image(Grob, ColorMixin):
                     imagesurface = surfaceref.surface
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                elif os.path.splitext(path)[1].lower() == '.svg' and rsvg is not None:
-                    handle = rsvg.Handle(path)
-                    sw, sh = handle.get_dimension_data()[:2]
-                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, 0, 0, sw, sh)
+                elif os.path.splitext(path)[1].lower() == '.svg' and Rsvg is not None:
+                    handle = Rsvg.Handle()
+                    svg = handle.new_from_file(path)
+                    dimensions = svg.get_dimensions()
+                    sw = dimensions.width
+                    sh = dimensions.height
+                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
                     ctx = cairo.Context(imagesurface)
-                    handle.render_cairo(ctx)
+                    pycairo_ctx = _UNSAFE_cairocffi_context_to_pycairo(ctx)
+                    svg.render_cairo(pycairo_ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
