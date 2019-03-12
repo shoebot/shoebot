@@ -49,9 +49,9 @@ def display_platform():
     platform.mac_ver(),
     platform.win32_ver(),
     ))
-    
 
-def test_import(mn):
+
+def test_import(mn, failmsg=None):
     COL_WIDTH=20
     try:
         m = __import__(mn)
@@ -59,6 +59,8 @@ def test_import(mn):
         return m
     except ImportError:
         print("import %s [failed]" % mn.ljust(COL_WIDTH))
+        if failmsg:
+            print('    %s' %failmsg)
     except Exception as e:
         print("import %s [failed] : %s\n%s" (mn % str(e)))
 
@@ -81,7 +83,8 @@ def test_imports():
     # internal dependencies
     pubsub = test_import("pubsub")
     meta = test_import("meta")
-    
+    test_import("rsvg", "SVG Support unavailable")
+
     # shoebot itself (if already installed)
     return test_import("shoebot")
 
@@ -143,5 +146,5 @@ if __name__ == '__main__':
     import os
     import sys
     import traceback
-    
+
     diagnose()
