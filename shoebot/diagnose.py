@@ -132,7 +132,8 @@ def module_using_text(bot):
 
 def diagnose():
     display_platform()
-    test_imports()
+    if not test_imports():
+        print('Skipping shoebot module tests.')
 
     try:
         import shoebot
