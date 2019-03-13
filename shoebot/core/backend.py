@@ -26,6 +26,9 @@ class BackendMixin:
                 pass
         raise ImportError('No %s Implementation found, tried: %s' % (impl_name, ' '.join(module_names)))
 
+    def get_imp(self):
+        return {}
+
 
 class CairoGIBackend(BackendMixin):
     """
@@ -36,6 +39,12 @@ class CairoGIBackend(BackendMixin):
         self.cairo_impl, self.cairo_module = self.import_impl(['cairo', 'cairocffi'],
                                                                'Cairo')
         self.gi_impl, self.gi_module = self.setup_gi()
+
+    def get_imp(self):
+        return {
+            "gi": self.gi_impl,
+            "cairo": self.cairo_impl,
+        }
 
     def setup_gi(self):
         name, gi_module = self.import_impl(['gi', 'pgi'], 'gi')
