@@ -1,21 +1,10 @@
 import os
-import cairocffi as cairo
+
+from shoebot.core.backend import cairo, gi, graphics_impl
 from shoebot.sbio.socket_server import SocketServer
 
 from pkg_resources import resource_filename, Requirement
 ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
-
-try:
-    import gi
-except ImportError:
-    import pgi as gi
-    gi.install_as_gi()
-
-GI = not hasattr(gi, "install_as_gi")
-if GI:
-    from shoebot.cairocffi_util import _UNSAFE_pycairo_context_to_cairocffi
-else:
-    _UNSAFE_pycairo_context_to_cairocffi = None
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -78,11 +67,9 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
                         self.input_device.scale_x = scale_y
                         self.input_device.scale_y = scale_y
 
-        if GI:
-            cffi_cr = _UNSAFE_pycairo_context_to_cairocffi(cr)
-            cffi_cr.set_source_surface(self.backing_store)
-        else:
-            cr.set_source_surface(self.backing_store)
+        cr = graphics_impl.ensure_pycairo_context(cr)
+        cr.set_source_surface(self.backing_store)
+
         # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(0, 0, source_width, source_height)
         if self.first_run:

@@ -3,10 +3,11 @@
 #
 
 import sys
-import cairocffi as cairo
+
+from shoebot.core.backend import cairo
 from math import sin, cos
 from bezier import BezierPath
-                         
+
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 CENTER = 'center'
 CORNER = 'corner'
@@ -101,8 +102,8 @@ class Transform:
         centerx =x
         centery = y
         m_archived = []
-        
-        for trans in self.stack: 
+
+        for trans in self.stack:
             if isinstance(trans, cairo.Matrix):
                 # multiply matrix
                 m *= trans
@@ -111,26 +112,26 @@ class Transform:
                 cmd = trans[0]
                 args = trans[1:]
                 t = cairo.Matrix()
-                
-                if cmd == 'translate':                    
+
+                if cmd == 'translate':
                     xt = args[0]
                     yt = args[1]
                     m.translate(xt,yt)
                 elif cmd == 'rotate':
-                    if mode == 'corner':                        
+                    if mode == 'corner':
                         # apply existing transform to cornerpoint
                         deltax,deltay = m.transform_point(0,0)
                         a = args[0]
                         ct = cos(a)
                         st = sin(a)
-                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay))
                     elif mode == 'center':
                         # apply existing transform to centerpoint
                         deltax,deltay = m.transform_point(centerx,centery)
                         a = args[0]
                         ct = cos(a)
                         st = sin(a)
-                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay)) 
+                        m *= cairo.Matrix(ct, st, -st, ct,deltax-(ct*deltax)+(st*deltay),deltay-(st*deltax)-(ct*deltay))
                 elif cmd == 'scale':
                     if mode == 'corner':
                         t.scale(args[0], args[1])
@@ -173,7 +174,7 @@ class Transform:
                 elif cmd == 'pop':
                     m = m_archived.pop()
 
-        return m        
+        return m
 
     def get_matrix(self):
         '''Returns this transform's matrix. Its centerpoint is presumed to be
@@ -183,14 +184,14 @@ class Transform:
 
 
     def transformBezierPath(self, path):
-        # From nodebox 
+        # From nodebox
         if isinstance(path, BezierPath):
             path = path.copy()
         else:
             raise ValueError("Can only transform BezierPaths")
-         
+
         for point in path:
-            print point   
+            print point
         #path._nsBezierPath = self._nsAffineTransform.transformBezierPath_(path._nsBezierPath)
         return path
 
@@ -205,7 +206,7 @@ class TransformMixin(object):
 
     def _reset(self):
         self._transform = Transform()
-        self._transformmode = CENTER        
+        self._transformmode = CENTER
 
     def _get_transform(self):
         return self._transform

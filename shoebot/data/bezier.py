@@ -9,12 +9,12 @@ import locale
 import gettext
 from shoebot.data import _copy_attrs
 # from shoebot.data import Grob, ColorMixin, TransformMixin
+from shoebot.core.backend import cairo
 from grob import Grob
 from itertools import chain
 from basecolor import ColorMixin
 from math import pi as _pi, sqrt
 
-import cairocffi as cairo
 import geometry
 
 CENTER = 'center'

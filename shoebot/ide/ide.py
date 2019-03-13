@@ -2,26 +2,24 @@
 # -*- coding: iso-8859-1 -*-
 
 from __future__ import print_function
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
 
+import gettext
 import errno
+import locale
 import os
 import sys
+
+from shoebot.backend import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('GtkSource', '3.0')
+
 from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GtkSource
 from gi.repository import Pango
-import locale
-import gettext
 
 import shoebot
 from shoebot.data import ShoebotError

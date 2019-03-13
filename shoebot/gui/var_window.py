@@ -1,12 +1,7 @@
 #!/usr/bin/env python2
 import os
 
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
-
+from shoebot.core.backend import gi
 from gi.repository import Gtk
 from shoebot.core.events import VARIABLE_UPDATED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener

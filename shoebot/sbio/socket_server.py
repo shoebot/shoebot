@@ -13,15 +13,12 @@ color_switch=False
 color_switch=True
 """
 
+import locale
 import sys
 import socket
-import gettext, locale
+import gettext
 
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
+from shoebot.core.backend import gi
 
 from gi.repository import GObject
 from shell import ShoebotCmd

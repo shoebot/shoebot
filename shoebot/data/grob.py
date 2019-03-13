@@ -1,7 +1,7 @@
 # TODO, Move 'bot' out of here, push responsibility back to 'Nodebox' and other grammars,
 #       Enabling seperation of BezierPath etc
 
-import cairocffi as cairo
+from shoebot.core.backend import cairo
 
 CENTER = 'center'
 CORNER = 'corner'
