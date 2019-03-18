@@ -29,9 +29,9 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """ Shoebot console runner """
 
-import locale
-import gettext
 import argparse
+import gettext
+import locale
 import shlex
 import sys
 
@@ -45,7 +45,6 @@ DIR = sys.prefix + '/share/shoebot/locale'
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -193,8 +192,8 @@ def main():
                        "--disable-background-thread",
                        action="store_true",
                        dest="disable_background_thread",
-                       default=False,
-                       help=_("disable running bot code in background thread."))
+                       default=sys.platform=='darwin',
+                       help=_("disable running bot code in background thread (default on OSX)."))
     group.add_argument("-V",
                        "--verbose",
                        action="store_true",
