@@ -39,6 +39,7 @@ from shoebot.core.backend import cairo
 class ShoebotInstallError(Exception):
     pass
 
+
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
@@ -69,7 +70,8 @@ def _restore():
 
 # Convenience functions to create a bot, its canvas and sink
 
-def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, show_vars=False):
+def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None,
+                  fullscreen=None, show_vars=False):
     """
     Create canvas and sink for attachment to a bot
 
@@ -124,7 +126,8 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     return canvas
 
 
-def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None, namespace=None):
+def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False,
+               title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None, namespace=None):
     """
     Create a canvas and a bot with the same canvas attached to it
 
@@ -138,7 +141,8 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     See create_canvas for details on those parameters.
 
     """
-    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, show_vars=show_vars)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen,
+                           show_vars=show_vars)
 
     if grammar == DRAWBOT:
         from shoebot.grammar import DrawBot
@@ -161,6 +165,7 @@ class ShoebotThread(threading.Thread):
     and the GUI in a seperate thread without readline
     blocking it.
     """
+
     def __init__(self, create_args, create_kwargs,
                  run_args, run_kwargs,
                  send_sigint=False):
@@ -254,7 +259,8 @@ def run(src,
     plugin for an example of using livecoding.
     """
     # Munge shoebogt sys.argv
-    sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
+    sys.argv = [sys.argv[
+                    0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
 
     # arguments for create_bot
     create_args = [src,

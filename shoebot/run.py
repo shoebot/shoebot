@@ -81,7 +81,7 @@ def main():
 
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
-    parser.add_argument("script", help="Shoebot / Nodebox script to run (filename or code)")
+    parser.add_argument("script", help="Shoebot / Nodebox script to run (filename or code)", nargs='?')
 
     group = parser.add_argument_group('Input / Output')
     # IO - Output to file
@@ -210,7 +210,12 @@ def main():
     # get argparse arguments and check for sanity
     args, extra = parser.parse_known_args()
 
-    if not args.script and not args.window:
+    if args.diagnose:
+        from .diagnose import diagnose
+        diagnose()
+        sys.exit()
+
+    if not args.script:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
     if args.vars:
@@ -222,11 +227,6 @@ def main():
         namespace = json_arg(args.namespace)
     else:
         namespace = None
-        
-    if args.diagnose:
-        from .diagnose import diagnose
-        diagnose()
-        sys.exit()
 
     run(src=args.script,
         grammar=args.grammar,
