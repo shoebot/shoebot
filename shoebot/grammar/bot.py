@@ -36,6 +36,7 @@ Drawbot and Nodebot are similar grammars, so they both inherit from Bot
 import sys
 import os
 
+from shoebot.core.backend import cairo
 from shoebot.data import BezierPath, EndClip, Color, Text, Variable, \
                          Image, ClippingPath, \
                          NUMBER, TEXT, BOOLEAN, BUTTON, \
@@ -332,7 +333,6 @@ class Bot(Grammar):
         else:
             file_number = None
 
-        import cairocffi as cairo
         if isinstance(target, cairo.Surface):
             # snapshot to Cairo surface
             if defer is None:
@@ -363,7 +363,6 @@ class Bot(Grammar):
         '''Returns an Image object of the current surface. Used for displaying
         output in Jupyter notebooks. Adapted from the cairo-jupyter project.'''
 
-        import cairocffi as cairo
         from io import BytesIO
 
         b = BytesIO()

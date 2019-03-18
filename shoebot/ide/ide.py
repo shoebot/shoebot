@@ -2,76 +2,43 @@
 # -*- coding: iso-8859-1 -*-
 
 from __future__ import print_function
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
 
+import gettext
 import errno
+import locale
 import os
 import sys
+
+import shoebot
+from shoebot.data import ShoebotError
+from shoebot.core.backend import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('GtkSource', '3.0')
-from gi.repository import GObject
-from gi.repository import Gdk
-from gi.repository import Gtk
-from gi.repository import GtkSource
-from gi.repository import Pango
-import locale
-import gettext
 
-import shoebot
-from shoebot.data import ShoebotError
-
-# for gtksourceview/gtksourceview2 compatibility
-# try:
-#     import gtksourceview
-#
-# except ImportError:
-#     from gi.repository import GtkSource
-#
-#     class gtksourceview_SourceBuffer(GtkSource.Buffer):
-#         def set_highlight(self, bool):
-#             return self.set_highlight_syntax(bool)
-#
-#     class gtksourceview_SourceLanguagesManager(GtkSource.LanguageManager):
-#         def get_language_from_mime_type(self, mime_types):
-#             lang_manager = GtkSource.LanguageManager.get_default()
-#             lang_result = None
-#             for lang_id in lang_manager.get_language_ids():
-#                  lang = lang_manager.get_language(lang_id)
-#                  if mime_types in lang.get_mime_types():
-#                       lang_result = lang
-#                       break
-#
-#             return lang_result
-#
-#     gtksourceview = gtksourceview2
-#     gtksourceview.SourceBuffer = gtksourceview_SourceBuffer
-#     gtksourceview.SourceView = GtkSource.View
-#     gtksourceview.SourceLanguagesManager = gtksourceview_SourceLanguagesManager
-#     del gtksourceview_SourceBuffer
-#     del gtksourceview_SourceLanguagesManager
+from gi.repository import (
+    GObject,
+    Gdk,
+    Gtk,
+    GtkSource,
+    Pango
+)
 
 APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
+LOCALE_DIR = sys.prefix + '/share/shoebot/locale'
 RESPONSE_FORWARD = 0
 RESPONSE_BACKWARD = 1
 
 locale.setlocale(locale.LC_ALL, '')
-gettext.bindtextdomain(APP, DIR)
+gettext.bindtextdomain(APP, LOCALE_DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
-
 
 if sys.platform != 'win32':
     ICON_FILE = '/usr/share/shoebot/icon.png'
 else:
-    import os.path
-    ICON_FILE = os.path.join(sys.prefix, 'share', 'shoebot', 'icon.png')
+    ICON_FILE = os.path.join(sys.prefix, r'share\shoebot\icon.png')
 
 
 def hsv_to_rgb(h, s, v):
@@ -92,17 +59,17 @@ def hsv_to_rgb(h, s, v):
 
         ihue = int(hue)
         if ihue == 0:
-            return(value, t, p)
+            return (value, t, p)
         elif ihue == 1:
-                return(q, value, p)
+            return (q, value, p)
         elif ihue == 2:
-                return(p, value, t)
+            return (p, value, t)
         elif ihue == 3:
-            return(p, q, value)
+            return (p, q, value)
         elif ihue == 4:
-            return(t, p, value)
+            return (t, p, value)
         elif ihue == 5:
-            return(value, p, q)
+            return (value, p, q)
 
 
 def hue_to_color(hue):
@@ -376,13 +343,13 @@ class Buffer(GtkSource.Buffer):
 
         saved = chooser.run() == Gtk.ResponseType.ACCEPT
         if saved:
-                old_filename = self.filename
+            old_filename = self.filename
+            self.filename = chooser.get_filename()
+            if self.save_buffer():
                 self.filename = chooser.get_filename()
-                if self.save_buffer():
-                    self.filename = chooser.get_filename()
-                    self.filename_set()
-                else:
-                    self.filename = old_filename
+                self.filename_set()
+            else:
+                self.filename = old_filename
         chooser.destroy()
         return saved
 
@@ -416,8 +383,7 @@ class Buffer(GtkSource.Buffer):
             return True
 
 
-class ShoebotFileChooserDialog (Gtk.FileChooserDialog):
-
+class ShoebotFileChooserDialog(Gtk.FileChooserDialog):
     CWD = None
 
     def __init__(self, *args, **kwargs):
@@ -504,6 +470,7 @@ class Stdout_Filter(object):
 
     def flush(self):
         pass
+
 
 UI_INFO = """
 <ui>
@@ -671,7 +638,9 @@ class View(Gtk.Window):
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write(_("This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"), True, True)
+        self.console_error.write(_(
+            "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"),
+                                 True, True)
 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
@@ -898,7 +867,10 @@ class View(Gtk.Window):
     def do_about(self, widget):
         dlg = Gtk.AboutDialog()
         self.website = "http://shoebot.net/"
-        self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>", "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>", "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>", "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
+        self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>",
+                        "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>",
+                        "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>",
+                        "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
         dlg.set_version("1.2.2")
         dlg.set_name("shoebot")
         dlg.set_license("GPLv3")
@@ -907,7 +879,8 @@ class View(Gtk.Window):
 
         def close(w, res):
             if res == Gtk.ResponseType.CANCEL:
-                    w.hide()
+                w.hide()
+
         dlg.connect("response", close)
         dlg.run()
 

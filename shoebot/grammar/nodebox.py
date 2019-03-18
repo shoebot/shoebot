@@ -1,6 +1,7 @@
 import os.path
 import sys
-import cairocffi as cairo
+
+from shoebot.core.backend import cairo
 from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
 from bot import Bot

@@ -4,7 +4,6 @@ import sys
 import traceback
 from time import sleep, time
 
-import format_traceback
 from livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
@@ -200,7 +199,8 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False, break_on_error=False):
+    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False,
+            break_on_error=False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.

@@ -32,7 +32,8 @@ import os
 import signal
 import sys
 import threading
-import cairocffi as cairo
+
+from shoebot.core.backend import cairo
 
 
 class ShoebotInstallError(Exception):

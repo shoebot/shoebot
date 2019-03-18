@@ -28,14 +28,14 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Cairo implementation of the canvas'''
+import os.path
 
 from math import pi as _pi
-import os.path
-import cairocffi as cairo
 
-from input_device import InputDeviceMixin
-from canvas import Canvas
-from drawqueue import DrawQueue
+from .backend import cairo
+from .input_device import InputDeviceMixin
+from .canvas import Canvas
+from .drawqueue import DrawQueue
 
 
 class CairoCanvas(Canvas):

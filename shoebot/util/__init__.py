@@ -112,7 +112,7 @@ def hsl_to_rgb (h, s, l):
 
 '''
 def rgb_to_hsv(r, g, b):
-    
+
     h = s = 0
     v = max(r, g, b)
     d = v - min(r, g, b)
@@ -133,43 +133,40 @@ def rgb_to_hsv(r, g, b):
 '''
 
 """def hsv_to_rgb(h, s, v):
-    
+
     ''' Hue, saturation, brightness to red, green, blue.
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     '''
-    
+
     if s == 0: return v, v, v
-        
+
     h = h / (60.0/360)
     i =  floor(h)
     f = h - i
     p = v * (1-s)
     q = v * (1-s * f)
     t = v * (1-s * (1-f))
-    
+
     if   i == 0 : r = v; g = t; b = p
     elif i == 1 : r = q; g = v; b = p
     elif i == 2 : r = p; g = v; b = t
     elif i == 3 : r = p; g = q; b = v
     elif i == 4 : r = t; g = p; b = v
     else        : r = v; g = p; b = q
-    
+
     return list(r, g, b)
 """
 
 
-
-
-
-#def rgba_to_argb(stringImage):
-    #tempBuffer = [None]*len(stringImage) # Create an empty array of the same size as stringImage
-    #tempBuffer[0::4] = stringImage[3::4]
-    #tempBuffer[1::4] = stringImage[0::4]
-    #tempBuffer[2::4] = stringImage[1::4]
-    #tempBuffer[3::4] = stringImage[2::4]
-    #stringImage = ''.join(tempBuffer)
-    #return stringImage
+# def rgba_to_argb(stringImage):
+# tempBuffer = [None]*len(stringImage) # Create an empty array of the same size as stringImage
+# tempBuffer[0::4] = stringImage[3::4]
+# tempBuffer[1::4] = stringImage[0::4]
+# tempBuffer[2::4] = stringImage[1::4]
+# tempBuffer[3::4] = stringImage[2::4]
+# stringImage = ''.join(tempBuffer)
+# return stringImage
 
 
 class flushfile(object):
@@ -178,16 +175,17 @@ class flushfile(object):
 
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
     '''
+
     def __init__(self, fd):
         self.fd = fd
 
     def write(self, x):
-        ret=self.fd.write(x)
+        ret = self.fd.write(x)
         self.fd.flush()
         return ret
 
     def writelines(self, lines):
-        ret=self.writelines(line)
+        ret = self.writelines(line)
         self.fd.flush()
         return ret
 
@@ -199,4 +197,3 @@ class flushfile(object):
 
     def fileno(self):
         return self.fd.fileno()
-

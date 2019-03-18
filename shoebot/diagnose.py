@@ -165,6 +165,16 @@ def module_using_text(bot):
     bot.text("Should work with gi not pgi", 0, 0)
 
 
+def display_graphics_implementation():
+    print("Graphics Implementation:")
+    try:
+        from shoebot.core.backend import driver
+        for k, v in driver.get_libs().items():
+            print("    %s: %s" % (k, v))
+    except Exception as e:
+        raise
+
+
 def diagnose():
     display_platform()
     shoebot_module, available_modules = test_imports()
@@ -172,6 +182,7 @@ def diagnose():
         print('Skipping shoebot module tests.')
         return
 
+    display_graphics_implementation()
     try:
         import shoebot
     except ImportError as e:

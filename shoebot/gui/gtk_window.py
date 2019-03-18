@@ -1,13 +1,8 @@
 import os
 import sys
+
+from shoebot.core.backend import gi
 from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
-
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
-
 from gi.repository import Gdk, Gtk, GObject
 
 from collections import deque

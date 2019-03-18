@@ -1,18 +1,11 @@
-from shoebot.cairocffi_util import _UNSAFE_cairocffi_context_to_pycairo
+from shoebot.core.backend import cairo, gi, driver
 from shoebot.data import _copy_attrs
 
 import array
 from StringIO import StringIO
 import os.path
 
-import cairocffi as cairo
 from PIL import Image as PILImage
-
-try:
-    import gi
-except ImportError:
-    import pgi as gi
-    gi.install_as_gi()
 
 try:
     gi.require_version('Rsvg', '2.0')
@@ -75,7 +68,7 @@ class Image(Grob, ColorMixin):
                     sh = dimensions.height
                     imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
                     ctx = cairo.Context(imagesurface)
-                    pycairo_ctx = _UNSAFE_cairocffi_context_to_pycairo(ctx)
+                    pycairo_ctx = driver.ensure_pycairo_context(ctx)
                     svg.render_cairo(pycairo_ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
                     imagesurface = cairo.ImageSurface.create_from_png(path)
