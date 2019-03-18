@@ -1,4 +1,4 @@
-from shoebot.core.backend import cairo, gi, graphics_impl
+from shoebot.core.backend import cairo, gi, driver
 from shoebot.data import _copy_attrs
 
 import array
@@ -68,7 +68,7 @@ class Image(Grob, ColorMixin):
                     sh = dimensions.height
                     imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
                     ctx = cairo.Context(imagesurface)
-                    pycairo_ctx = graphics_impl.ensure_pycairo_context(ctx)
+                    pycairo_ctx = driver.ensure_pycairo_context(ctx)
                     svg.render_cairo(pycairo_ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
                     imagesurface = cairo.ImageSurface.create_from_png(path)

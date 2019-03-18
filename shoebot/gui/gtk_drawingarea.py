@@ -1,13 +1,16 @@
 import os
 
-from shoebot.core.backend import cairo, gi, graphics_impl
-from shoebot.sbio.socket_server import SocketServer
-
 from pkg_resources import resource_filename, Requirement
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+
+from shoebot.core.backend import cairo, gi, driver
+from shoebot.sbio.socket_server import SocketServer
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+pycairo = driver.cairo
+
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):
@@ -24,50 +27,69 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         self.input_device = input_device
 
         # Default picture is the shoebot icon
-        if os.path.isfile(ICON_FILE):
-            self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
-        else:
-            self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
+        # if os.path.isfile(ICON_FILE):
+        #     self.backing_store = cairo.ImageSurface.create_from_png(ICON_FILE)
+        # else:
+        #     self.backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
+        self.backing_store = None
         self.size = None
         self.first_run = True
         self.last_rendering = None
+
+    def create_initial_backing_store(self):
+        if os.path.isfile(ICON_FILE):
+            backing_store = pycairo.ImageSurface.create_from_png(ICON_FILE)
+        else:
+            backing_store = pycairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
+        return backing_store
+
+    def get_backing_store(self, ctx):
+        if self.backing_store is None:
+            self.backing_store = self.create_initial_backing_store()
+
+        return self.backing_store
+
+    def scale_context(self, cr):
+        source_width = self.backing_store.get_width()
+        source_height = self.backing_store.get_height()
+
+        size = self.get_allocation()
+
+        if self.first_run or size.width > source_width or size.height > source_height:
+            # Scale up by largest dimension
+            if size.width > source_width:
+                scale_x = float(size.width) / float(source_width)
+            else:
+                scale_x = 1.0
+
+            if size.height > source_height:
+                scale_y = float(size.height) / float(source_height)
+            else:
+                scale_y = 1.0
+
+            if scale_x > scale_y:
+                cr.scale(scale_x, scale_x)
+                if self.input_device:
+                    self.input_device.scale_x = scale_x
+                    self.input_device.scale_y = scale_x
+            else:
+                cr.scale(scale_y, scale_y)
+                if self.input_device:
+                    self.input_device.scale_x = scale_y
+                    self.input_device.scale_y = scale_y
 
     def draw(self, widget, cr):
         '''
         Draw just the exposed part of the backing store, scaled to fit
         '''
+        source_width = self.backing_store.get_width()
+        source_height = self.backing_store.get_height()
 
         # Create the cairo context
         if self.scale_fit:
-            source_width = self.backing_store.get_width()
-            source_height = self.backing_store.get_height()
+            self.scale_context(cr)
 
-            size = self.get_allocation()
-
-            if self.first_run or size.width > source_width or size.height > source_height:
-                # Scale up by largest dimension
-                if size.width > source_width:
-                    scale_x = float(size.width) / float(source_width)
-                else:
-                    scale_x = 1.0
-
-                if size.height > source_height:
-                    scale_y = float(size.height) / float(source_height)
-                else:
-                    scale_y = 1.0
-
-                if scale_x > scale_y:
-                    cr.scale(scale_x, scale_x)
-                    if self.input_device:
-                        self.input_device.scale_x = scale_x
-                        self.input_device.scale_y = scale_x
-                else:
-                    cr.scale(scale_y, scale_y)
-                    if self.input_device:
-                        self.input_device.scale_x = scale_y
-                        self.input_device.scale_y = scale_y
-
-        cr = graphics_impl.ensure_pycairo_context(cr)
+        cr = driver.ensure_pycairo_context(cr)
         cr.set_source_surface(self.backing_store)
 
         # Restrict Cairo to the exposed area; avoid extra work
@@ -96,12 +118,14 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         Update the backing store from a cairo context and
         schedule a redraw (expose event)
         '''
-        if (self.backing_store.get_width(), self.backing_store.get_height()) == size:
-            backing_store = self.backing_store
-        else:
-            backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
+        backing_store = self.get_backing_store(cairo_ctx)
+        # if (self.backing_store.get_width(), self.backing_store.get_height()) == size:
+        #     backing_store = self.backing_store
+        # else:
+        #     backing_store = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
 
-        cr = cairo.Context(backing_store)
+        cr = pycairo.Context(backing_store)
+        cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
         cr.set_source_surface(cairo_ctx.get_target())
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()

@@ -29,7 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from shoebot import ShoebotInstallError
-from shoebot.core.backend import cairo, gi, graphics_impl
+from shoebot.core.backend import cairo, gi, driver
 
 
 try:
@@ -124,7 +124,7 @@ class Text(Grob, ColorMixin):
         # we use a new CairoContext to pre render the text
         rs = cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         cr = cairo.Context(rs)
-        cr = graphics_impl.ensure_pycairo_context(cr)
+        cr = driver.ensure_pycairo_context(cr)
         self._pang_ctx = pangocairo_create_context(cr)
         self.layout = PangoCairo.create_layout(cr)
         # layout line spacing
@@ -159,13 +159,13 @@ class Text(Grob, ColorMixin):
         if not self._doRender:
             return
         ctx = ctx or self._get_context()
-        ctx = graphics_impl.ensure_pycairo_context(ctx)
+        pycairo_ctx = driver.ensure_pycairo_context(ctx)
         # we build a PangoCairo context linked to cairo context
         # then we create a pango layout
 
         # we update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
-        self._pang_ctx = pangocairo_create_context(ctx)
+        self._pang_ctx = pangocairo_create_context(pycairo_ctx)
 
         if self._fillcolor is not None:
             # Go to initial point (CORNER or CENTER):
@@ -176,8 +176,8 @@ class Text(Grob, ColorMixin):
 
             if self._outline is False:
                 ctx.set_source_rgba(*self._fillcolor)
-            PangoCairo.show_layout(ctx, self.layout)
-            PangoCairo.update_layout(ctx, self.layout)
+            PangoCairo.show_layout(pycairo_ctx, self.layout)
+            PangoCairo.update_layout(pycairo_ctx, self.layout)
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
@@ -215,7 +215,7 @@ class Text(Grob, ColorMixin):
 
         # here we create a new cairo.Context in order to hold the pathdata
         tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
-        tempCairoContext = graphics_impl.ensure_pycairo_context(tempCairoContext)
+        tempCairoContext = driver.ensure_pycairo_context(tempCairoContext)
         tempCairoContext.move_to(self.x, self.y - self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
 

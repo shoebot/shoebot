@@ -164,7 +164,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
 
 
 setup(name="shoebot",
-      version="1.2.2",
+      version="1.2.3",
       description="Vector graphics scripting application",
       long_description=info,
       author="Ricardo Lafuente",

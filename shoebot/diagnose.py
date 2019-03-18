@@ -168,8 +168,8 @@ def module_using_text(bot):
 def display_graphics_implementation():
     print("Graphics Implementation:")
     try:
-        from shoebot.core.backend import graphics_impl
-        for k, v in graphics_impl.get_imp().items():
+        from shoebot.core.backend import driver
+        for k, v in driver.get_libs().items():
             print("    %s: %s" % (k, v))
     except Exception as e:
         raise
