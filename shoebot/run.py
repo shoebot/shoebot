@@ -188,6 +188,11 @@ def main():
                        help=_("disable the variables pane when in windowed mode."))
 
     group = parser.add_argument_group('Debugging / Dev flags')
+    group.add_argument("-dn",
+                       "--diagnose",
+                       action="store_true",
+                       default=False,
+                       help=_("Output information for debugging installation / graphics issues."))
     group.add_argument("-dt",
                        "--disable-background-thread",
                        action="store_true",
@@ -217,6 +222,11 @@ def main():
         namespace = json_arg(args.namespace)
     else:
         namespace = None
+        
+    if args.diagnose:
+        from .diagnose import diagnose
+        diagnose()
+        sys.exit()
 
     run(src=args.script,
         grammar=args.grammar,
