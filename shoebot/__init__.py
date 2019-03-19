@@ -329,7 +329,7 @@ def run(src,
         except KeyboardInterrupt:
             publish_event(QUIT_EVENT)
 
-    if background_thread is not None:
+    if all((background_thread, sbot_thread)):
         sbot_thread.join()
 
     return sbot
