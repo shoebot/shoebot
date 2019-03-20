@@ -149,9 +149,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     if with_pgi:
         reqs.append("pgi")
         if debug:
-            print("warning, as of April 2015 typography does not work with pgi")
-    else:
-        reqs.append("vext.gi>=0.5.11")
+            print("warning, as of March 2019 typography does not work with pgi")
     if with_examples:
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
@@ -180,12 +178,14 @@ setup(name="shoebot",
           "shoebot.core",
           "shoebot.data",
           "shoebot.gui",
-          "shoebot.sbio",
           "shoebot.grammar",
           "shoebot.grammar.nodebox-lib",
           "shoebot.grammar.nodebox-lib.nodebox",
           "shoebot.grammar.nodebox-lib.nodebox.graphics",
           "shoebot.grammar.nodebox-lib.nodebox.geo"
+          "shoebot.sbio",
+          "shoebot.util",
+          "shoebot.util.cairocffi"
       ],
       data_files=datafiles,
       install_requires=requirements(debug="install" in sys.argv,

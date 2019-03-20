@@ -2,10 +2,10 @@
 
 # Linux
 REDHAT_PACKAGES="libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging"
-SUSE_PACKAGES="libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging"
+SUSE_PACKAGES="gcc libjpeg62-devel python-pycairo python2-gobject python2-gobject-cairo python2-Pillow"
 
 DEB_PACKAGES="build-essential libjpeg-dev python-cairo python2.7-dev python-gi-cairo python-gobject"
-OPTIONAL_DEB_PACKAGES="python-rsvg"
+OPTIONAL_DEB_PACKAGES="gir1.2-rsvg-2.0"
 
 DEBIAN_PACKAGES=${DEB_PACKAGES}
 OPTIONAL_DEBIAN_PACKAGES=${OPTIONAL_DEB_PACKAGES}
@@ -13,7 +13,7 @@ OPTIONAL_DEBIAN_PACKAGES=${OPTIONAL_DEB_PACKAGES}
 UBUNTU_PACKAGES=${DEB_PACKAGES}
 OPTIONAL_UBUNTU_PACKAGES=${OPTIONAL_DEB_PACKAGES}
 
-MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject"
+MINT_PACKAGES=${DEB_PACKAGES}
 OPTIONAL_MINT_PACKAGES=${OPTIONAL_DEB_PACKAGES}
 
 # OSX
@@ -110,8 +110,6 @@ else
     VER=$(uname -r)
 fi
 
-
-
 if [ "Debian" = "$OS" ]; then
     install_debian
 elif [ "LinuxMint" = "$OS" ]; then
@@ -125,5 +123,12 @@ elif [ "SuSE" = "$OS" ]; then
 elif [ "Darwin" = "$OS" ]; then
     install_darwin
 else
-    echo TODO Add code for $OS
+    if [ -z "$OS" ]; then
+        echo $OS
+    fi
+    echo "Shoebot does not directly support $OS/$VER at the moment."
+    echo ''
+    echo 'Get started by looking at "Add support for another operating system".'
+    echo 'in the installation documentation.'
+    echo ''
 fi
