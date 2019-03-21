@@ -15,7 +15,8 @@ import shutil
 import sys
 import textwrap
 
-info = textwrap.dedent("""
+info = textwrap.dedent(
+    """
     Shoebot is a pure Python graphics robot: It takes a Python script as input,
     which describes a drawing process, and outputs a graphic in a common open
     standard format (SVG, PDF, PostScript, or PNG). It has a simple text editor
@@ -23,25 +24,27 @@ info = textwrap.dedent("""
     interactively. Being pure Python, it can also be used as a Python module,
     a plugin for Python-scriptable tools such as Inkscape, and run from the
     command line.
-""")
+"""
+)
 
 # the following libraries will not be installed
-EXCLUDE_LIBS = ['lib/sbopencv', 'lib/sbopencv/blobs']
+EXCLUDE_LIBS = ["lib/sbopencv", "lib/sbopencv/blobs"]
 
-is_pypy = '__pypy__' in sys.builtin_module_names
-is_jython = platform.system == 'Java'
+is_pypy = "__pypy__" in sys.builtin_module_names
+is_jython = platform.system == "Java"
 
 here = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    from setuptools import setup, Command
+    from setuptools import find_packages, setup, Command
 except ImportError:
     sys.exit("Install setuptools before shoebot")
 
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
-    CLEAN_FILES = './build ./dist ./*.pyc ./*.tgz ./*.egg-info'.split(' ')
+
+    CLEAN_FILES = "./build ./dist ./*.pyc ./*.tgz ./*.egg-info".split(" ")
 
     user_options = []
 
@@ -61,7 +64,7 @@ class CleanCommand(Command):
                 if not path.startswith(here):
                     # Die if path in CLEAN_FILES is absolute + outside this directory
                     raise ValueError("%s is not a path inside %s" % (path, here))
-                print('removing %s' % os.path.relpath(path))
+                print("removing %s" % os.path.relpath(path))
                 shutil.rmtree(path)
 
 
@@ -76,33 +79,52 @@ class DiagnoseCommand(Command):
 
     def run(self):
         from shoebot.diagnose import diagnose
+
         diagnose()
 
 
 # dir globbing approach taken from Mercurial's setup.py
 datafiles = [
-    (os.path.join('share/shoebot/', root), [os.path.join(root, file_) for file_ in files])
-    for root, dir, files in os.walk('examples')
+    (
+        os.path.join("share/shoebot/", root),
+        [os.path.join(root, file_) for file_ in files],
+    )
+    for root, dir, files in os.walk("examples")
 ]
-datafiles.extend([
-    ('share/pixmaps', ['assets/shoebot-ide.png']),
-    ('share/shoebot/data', ['assets/kant.xml']),
-    ('share/applications', ['assets/shoebot-ide.desktop'])
-])
+datafiles.extend(
+    [
+        ("share/pixmaps", ["assets/shoebot-ide.png"]),
+        ("share/shoebot/data", ["assets/kant.xml"]),
+        ("share/applications", ["assets/shoebot-ide.desktop"]),
+    ]
+)
 
-datafiles.extend([(os.path.join('share/shoebot/', root), [os.path.join(root, file_)
-                                                          for file_ in files]) for root, dir, files in
-                  os.walk('locale')])
+datafiles.extend(
+    [
+        (
+            os.path.join("share/shoebot/", root),
+            [os.path.join(root, file_) for file_ in files],
+        )
+        for root, dir, files in os.walk("locale")
+    ]
+)
 
 # include all libs EXCEPT the ones mentioned in EXCLUDE_LIBS
 for lib in EXCLUDE_LIBS:
     # get subdirs of excluded libs
     for root, dir, files in list(os.walk(lib))[1:]:
         EXCLUDE_LIBS.append(root)
-datafiles.extend([
-    (os.path.join('share/shoebot/', root), [os.path.join(root, file_)
-     for file_ in files]) for root, dir, files in os.walk('lib') if root not in EXCLUDE_LIBS
-])
+
+datafiles.extend(
+    [
+        (
+            os.path.join("share/shoebot/", root),
+            [os.path.join(root, file_) for file_ in files],
+        )
+        for root, dir, files in os.walk("lib")
+        if root not in EXCLUDE_LIBS
+    ]
+)
 
 if not is_pypy:
     NUMPY = "numpy>=1.9.1"
@@ -121,8 +143,8 @@ BASE_REQUIREMENTS = [
 
 # Requirements to run examples
 EXAMPLE_REQUIREMENTS = [
-    "fuzzywuzzy==0.5.0",   # sbaudio
-    "planar",              # examples
+    "fuzzywuzzy==0.5.0",  # sbaudio
+    "planar",  # examples
     "PySoundCard>=0.5.2",  # sbaudio
 ]
 
@@ -143,9 +165,9 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
             with_pgi = False
 
     if debug:
-        print('setup options: ')
-        print('with_pgi:      ', 'yes' if with_pgi else 'no')
-        print('with_examples: ', 'yes' if with_examples else 'no')
+        print("setup options: ")
+        print("with_pgi:      ", "yes" if with_pgi else "no")
+        print("with_examples: ", "yes" if with_examples else "no")
     if with_pgi:
         reqs.append("pgi")
         if debug:
@@ -154,49 +176,33 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
     if debug:
-        print('')
-        print('')
+        print("")
+        print("")
         for req in reqs:
             print(req)
     return reqs
 
 
-setup(name="shoebot",
-      version="1.2.3",
-      description="Vector graphics scripting application",
-      long_description=info,
-      author="Ricardo Lafuente",
-      author_email="r@manufacturaindependente.org",
-      license='GPL v3',
-      url="http://shoebot.net",
-      cmdclass={
-          'clean': CleanCommand,
-          'diagnose': DiagnoseCommand,
-      },
-      packages=[
-          "shoebot",
-          "shoebot.core",
-          "shoebot.data",
-          "shoebot.gui",
-          "shoebot.grammar",
-          "shoebot.grammar.nodebox-lib",
-          "shoebot.grammar.nodebox-lib.nodebox",
-          "shoebot.grammar.nodebox-lib.nodebox.graphics",
-          "shoebot.grammar.nodebox-lib.nodebox.geo"
-          "shoebot.sbio",
-          "shoebot.util",
-          "shoebot.util.cairocffi"
-      ],
-      data_files=datafiles,
-      install_requires=requirements(debug="install" in sys.argv,
-                                    with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ,
-                                    with_pgi=is_pypy),
-      entry_points={
-          "console_scripts": [
-              "sbot=shoebot.run:main",
-              "shoebot=shoebot.gui.ide:main"
-          ],
-          "gui_scripts": "shoebot=shoebot.ide.ide:main"
-      },
-      test_suite='tests.unittests'
-      )
+setup(
+    name="shoebot",
+    version="1.2.3",
+    description="Vector graphics scripting application",
+    long_description=info,
+    author="Ricardo Lafuente",
+    author_email="r@manufacturaindependente.org",
+    license="GPL v3",
+    url="http://shoebot.net",
+    cmdclass={"clean": CleanCommand, "diagnose": DiagnoseCommand},
+    packages=find_packages(exclude=["tests*", "extensions"]),
+    data_files=datafiles,
+    install_requires=requirements(
+        debug="install" in sys.argv,
+        with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ,
+        with_pgi=is_pypy,
+    ),
+    entry_points={
+        "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.gui.ide:main"],
+        "gui_scripts": "shoebot=shoebot.ide.ide:main",
+    },
+    test_suite="tests.unittests",
+)
