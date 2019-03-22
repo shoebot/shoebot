@@ -570,7 +570,6 @@ class ShoebotEditorWindow(Gtk.Window):
             if not view.confirm_quit_or_save():
                 return
         if self.sbot_window is not None:
-            self.sbot_window.finish()
             self.sbot_window.destroy()
 
         Gtk.main_quit()
