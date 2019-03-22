@@ -9,6 +9,7 @@
 from __future__ import print_function
 
 import glob
+import itertools
 import os
 import platform
 import shutil
@@ -89,23 +90,13 @@ datafiles = [
         os.path.join("share/shoebot/", root),
         [os.path.join(root, file_) for file_ in files],
     )
-    for root, dir, files in os.walk("examples")
+    for root, dir, files in itertools.chain(os.walk("examples"), os.walk("locale"))
 ]
 datafiles.extend(
     [
         ("share/pixmaps", ["assets/shoebot-ide.png"]),
         ("share/shoebot/data", ["assets/kant.xml"]),
         ("share/applications", ["assets/shoebot-ide.desktop"]),
-    ]
-)
-
-datafiles.extend(
-    [
-        (
-            os.path.join("share/shoebot/", root),
-            [os.path.join(root, file_) for file_ in files],
-        )
-        for root, dir, files in os.walk("locale")
     ]
 )
 
