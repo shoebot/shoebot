@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+import errno
 import gettext
 import errno
 import locale
@@ -27,8 +28,8 @@ from gi.repository import (
 
 APP = 'shoebot'
 LOCALE_DIR = sys.prefix + '/share/shoebot/locale'
-RESPONSE_FORWARD = 0
-RESPONSE_BACKWARD = 1
+SEARCH_FORWARD = 0
+SEARCH_BACKWARD = 1
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, LOCALE_DIR)
@@ -77,24 +78,26 @@ def hue_to_color(hue):
         raise ValueError
 
     h, s, v = hsv_to_rgb(hue, 1.0, 1.0)
-    return (h * 65535, s * 65535, v * 65535)
+    return h * 65535, s * 65535, v * 65535
 
 
-class Buffer(GtkSource.Buffer):
+class SourceBuffer(GtkSource.Buffer):
     N_COLORS = 16
     PANGO_SCALE = 1024
 
-    def __init__(self):
+    def __init__(self, filename=None):
         GObject.GObject.__init__(self)
-        tt = self.get_tag_table()
         self.refcount = 0
-        self.filename = None
-        self.untitled_serial = -1
+        if filename is None:
+            self.filename = ShoebotIDE.get_next_untitled_filename()
+        else:
+            self.open_file(filename)
+            self.filename = filename
         self.color_tags = []
         self.color_cycle_timeout_id = 0
         self.start_hue = 0.0
 
-        for i in range(Buffer.N_COLORS):
+        for i in range(SourceBuffer.N_COLORS):
             tag = self.create_tag()
             self.color_tags.append(tag)
 
@@ -109,69 +112,40 @@ class Buffer(GtkSource.Buffer):
         tabs.set_tab(2, Pango.TabAlign.LEFT, 60)
         tabs.set_tab(3, Pango.TabAlign.LEFT, 120)
         self.custom_tabs_tag = self.create_tag(tabs=tabs, foreground="green")
-        TestText.buffers.push(self)
+        ShoebotIDE.add_buffer(self)
 
     def pretty_name(self):
-        if self.filename:
-            return os.path.basename(self.filename)
-        else:
-            if self.untitled_serial == -1:
-                self.untitled_serial = TestText.untitled_serial
-                TestText.untitled_serial += 1
+        return os.path.basename(self.filename)
 
-            if self.untitled_serial == 1:
-                return _('Untitled')
-            else:
-                return _('Untitled #%d') % self.untitled_serial
-
-    def filename_set(self):
-        for view in TestText.views:
-            if view.text_view.get_buffer() == self:
-                view.set_view_title()
-
-    def search(self, str, view, forward):
+    def search(self, text, view, direction=SEARCH_FORWARD):
+        if not text:
+            return
         # remove tag from whole buffer
         start, end = self.get_bounds()
         self.remove_tag(self.found_text_tag, start, end)
 
-        iter = self.get_iter_at_mark(self.get_insert())
+        it = self.get_iter_at_mark(self.get_insert())
 
-        i = 0
-        if str:
-            if forward:
-                while 1:
-                    res = iter.forward_search(str, Gtk.TextSearchFlags.TEXT_ONLY)
-                    if not res:
-                        break
-                    match_start, match_end = res
-                    i += 1
-                    self.apply_tag(self.found_text_tag, match_start, match_end)
-                    iter = match_end
+        total_matches = 0
+        while True:
+            if direction == SEARCH_FORWARD:
+                res = it.forward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
             else:
-                while 1:
-                    res = iter.backward_search(str, Gtk.TextSearchFlags.TEXT_ONLY)
-                    if not res:
-                        break
-                    match_start, match_end = res
-                    i += 1
-                    self.apply_tag(self.found_text_tag, match_start, match_end)
-                    iter = match_start
+                res = it.backward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
+            if not res:
+                break
+            match_start, match_end = res
+            total_matches += 1
+            self.apply_tag(self.found_text_tag, match_start, match_end)
+            it = match_end
 
         dialog = Gtk.MessageDialog(view,
                                    Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                    Gtk.MessageType.INFO,
                                    Gtk.ButtonsType.OK,
-                                   _('%d strings found and marked in red') % i)
-
+                                   _('%d strings found and marked in red') % total_matches)
         dialog.connect("response", lambda x, y: dialog.destroy())
-
         dialog.show()
-
-    def search_forward(self, str, view):
-        self.search(str, view, True)
-
-    def search_backward(self, str, view):
-        self.search(str, view, False)
 
     def ref(self):
         self.refcount += 1
@@ -180,7 +154,7 @@ class Buffer(GtkSource.Buffer):
         self.refcount -= 1
         if self.refcount == 0:
             self.set_colors(False)
-            TestText.buffers.remove(self)
+            ShoebotIDE.remove_buffer(self)
             del self
 
     def color_cycle_timeout(self):
@@ -190,35 +164,35 @@ class Buffer(GtkSource.Buffer):
     def set_colors(self, enabled):
         hue = 0.0
 
-        if (enabled and self.color_cycle_timeout_id == 0):
+        if enabled and self.color_cycle_timeout_id == 0:
             self.color_cycle_timeout_id = Gtk.timeout_add(
                 200, self.color_cycle_timeout)
-        elif (not enabled and self.color_cycle_timeout_id != 0):
+        elif not enabled and self.color_cycle_timeout_id != 0:
             Gtk.timeout_remove(self.color_cycle_timeout_id)
             self.color_cycle_timeout_id = 0
 
         for tag in self.color_tags:
             if enabled:
-                color = apply(TestText.colormap.alloc_color,
+                color = apply(ShoebotIDE.colormap.alloc_color,
                               hue_to_color(hue))
                 tag.set_property("foreground_gdk", color)
             else:
                 tag.set_property("foreground_set", False)
-            hue += 1.0 / Buffer.N_COLORS
+            hue += 1.0 / SourceBuffer.N_COLORS
 
     def cycle_colors(self):
         hue = self.start_hue
 
         for tag in self.color_tags:
-            color = apply(TestText.colormap.alloc_color,
+            color = apply(ShoebotIDE.colormap.alloc_color,
                           hue_to_color(hue))
             tag.set_property("foreground_gdk", color)
 
-            hue += 1.0 / Buffer.N_COLORS
+            hue += 1.0 / SourceBuffer.N_COLORS
             if hue > 1.0:
                 hue = 0.0
 
-        self.start_hue += 1.0 / Buffer.N_COLORS
+        self.start_hue += 1.0 / SourceBuffer.N_COLORS
         if self.start_hue > 1.0:
             self.start_hue = 0.0
 
@@ -240,147 +214,12 @@ class Buffer(GtkSource.Buffer):
             print("Key event at char %d tag `%s'\n" % (char_index, tag_name))
         return False
 
-    def fill_file_buffer(self, filename):
-        try:
-            f = open(filename, "r")
-        except IOError, (errnum, errmsg):
-            err = "Cannot open file '%s': %s" % (filename, errmsg)
-            view = TestText.active_window_stack.get()
-            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err)
-            result = dialog.run()
-            dialog.destroy()
-            return False
-
-        iter = self.get_iter_at_offset(0)
-        buf = f.read()
-        f.close()
-        self.set_text(buf)
-        self.set_modified(False)
-
-        return True
-
-    def save_buffer(self):
-        result = False
-        have_backup = False
-        if not self.filename:
-            return False
-
-        bak_filename = self.filename + "~"
-        try:
-            if os.path.isfile(bak_filename):
-                os.remove(bak_filename)
-            os.rename(self.filename, bak_filename)
-        except (OSError, IOError), (errnum, errmsg):
-            if errnum != errno.ENOENT:
-                err = "Cannot back up '%s' to '%s': %s" % (self.filename,
-                                                           bak_filename,
-                                                           errmsg)
-                view = TestText.active_window_stack.get()
-                dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
-                                           Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK, err)
-                dialog.run()
-                dialog.destroy()
-                return False
-
-        have_backup = True
-        start, end = self.get_bounds()
-        chars = self.get_slice(start, end, False)
-        try:
-            file = open(self.filename, "w")
-            file.write(chars)
-            file.close()
-            result = True
+    def open_file(self, filename):
+        with open(filename, "r") as f:
+            content = f.read()
+            self.set_text(content)
             self.set_modified(False)
-        except IOError, (errnum, errmsg):
-            err = "Error writing to '%s': %s" % (self.filename, errmsg)
-            view = TestText.active_window_stack.get()
-            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err)
-            dialog.run()
-            dialog.destroy()
-
-        if not result and have_backup:
-            try:
-                os.rename(bak_filename, self.filename)
-            except OSError, (errnum, errmsg):
-                err = "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'" % (
-                    self.filename, bak_filename, errmsg, bak_filename)
-                view = TestText.active_window_stack.get()
-                dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
-                                           Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK, err)
-                dialog.run()
-                dialog.destroy()
-
-        return result
-
-    def confirm_overwrite_callback(self, chooser):
-        uri = chooser.get_uri()
-        if os.path.exists(self.filename):
-            if os.path.exists(self.filename):
-                if user_wants_to_replace_read_only_file(uri):
-                    return Gtk.FILE_CHOOSER_CONFIRMATION_ACCEPT_FILENAME
-                else:
-                    return Gtk.FILE_CHOOSER_CONFIRMATION_SELECT_AGAIN
-            else:
-                # fall back to the default dialog
-                return Gtk.FILE_CHOOSER_CONFIRMATION_CONFIRM
-
-    def save_as_buffer(self):
-        """
-        Return True if the buffer was saved
-        """
-        chooser = ShoebotFileChooserDialog(_('Save File'), None, Gtk.FileChooserAction.SAVE,
-                                           (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
-                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
-        chooser.set_do_overwrite_confirmation(True)
-
-        chooser.connect("confirm-overwrite", self.confirm_overwrite_callback)
-
-        saved = chooser.run() == Gtk.ResponseType.ACCEPT
-        if saved:
-            old_filename = self.filename
-            self.filename = chooser.get_filename()
-            if self.save_buffer():
-                self.filename = chooser.get_filename()
-                self.filename_set()
-            else:
-                self.filename = old_filename
-        chooser.destroy()
-        return saved
-
-    def check_buffer_saved(self):
-        """
-        If the buffer was not saved then give the user the chance to save it
-        or cancel.
-
-        Return True is the buffer was saved in the end
-        """
-        if self.get_modified():
-            pretty_name = self.pretty_name()
-            msg = _("Save changes to '%s'?") % pretty_name
-            view = TestText.active_window_stack.get()
-            dialog = Gtk.MessageDialog(view, Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.QUESTION,
-                                       Gtk.ButtonsType.YES_NO, msg)
-            dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-            result = dialog.run()
-            dialog.destroy()
-            if result == Gtk.ResponseType.YES:
-                if self.filename:
-                    return self.save_buffer()
-                else:
-                    return self.save_as_buffer()
-            elif result == Gtk.ResponseType.NO:
-                return True
-            else:
-                return False
-        else:
-            return True
+            self.filename = filename
 
 
 class ShoebotFileChooserDialog(Gtk.FileChooserDialog):
@@ -416,7 +255,6 @@ class ConsoleWindow:
         self.text_area.set_editable(False)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
         self.text_area.connect('size-allocate', self.on_contents_changed)
-        self.text_buffer = self.text_area.get_buffer()
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
         self.text_area.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse("dark grey"))
@@ -457,6 +295,10 @@ class ConsoleWindow:
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
         adj = self.text_window.get_vadjustment()
         adj.set_value(adj.get_upper() - adj.get_page_size())
+
+    @property
+    def text_buffer(self):
+        return self.text_area.get_buffer()
 
 
 class Stdout_Filter(object):
@@ -514,43 +356,40 @@ UI_INFO = """
 """
 
 
-class View(Gtk.Window):
-    # Gtk3 TODO - GObject.type_register(ShoebotFileChooserDialog)
+class ShoebotEditorWindow(Gtk.Window):
     FONT = None
 
-    def __init__(self, buffer=None):
-        if not buffer:
-            buffer = Buffer()
+    def __init__(self, filename=None):
         GObject.GObject.__init__(self)
 
-        TestText.views.push(self)
-
+        buffer = SourceBuffer(filename)
         buffer.ref()
+        ShoebotIDE.add_view(self)
 
         #  Gtk3.TODO
         # if not TestText.colormap:
         #     TestText.colormap = self.get_colormap()
 
-        self.connect("delete_event", self.delete_event_cb)
+        self.connect("delete_event", self.on_close_window)
 
         action_group = Gtk.ActionGroup("my_actions")
 
         action_group.add_actions([
             ("FileMenu", None, "File"),
-            ("FileNew", Gtk.STOCK_NEW, "_New", "<control>N", None, self.do_new),
-            ("FileOpen", Gtk.STOCK_OPEN, "_Open", "<control>O", None, self.do_open),
-            ("FileSave", Gtk.STOCK_SAVE, "_Save", "<control>S", None, self.do_save),
-            ("FileSaveAs", Gtk.STOCK_SAVE_AS, "Save _As", "<control><alt>S", None, self.do_save_as),
-            ("FileClose", Gtk.STOCK_CLOSE, "_Close", "<control>W", None, self.do_close),
-            ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.do_exit),
+            ("FileNew", Gtk.STOCK_NEW, "_New", "<control>N", None, self.on_new_file),
+            ("FileOpen", Gtk.STOCK_OPEN, "_Open", "<control>O", None, self.on_open_file),
+            ("FileSave", Gtk.STOCK_SAVE, "_Save", "<control>S", None, self.on_save_file),
+            ("FileSaveAs", Gtk.STOCK_SAVE_AS, "Save _As", "<control><alt>S", None, self.on_save_file_as),
+            ("FileClose", Gtk.STOCK_CLOSE, "_Close", "<control>W", None, self.on_close_file),
+            ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.on_quit),
         ])
 
         action_group.add_actions([
             ("EditMenu", None, "Edit"),
-            ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.do_undo),
-            ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.do_redo),
-            ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.do_search),
-            ("ClearConsole", Gtk.STOCK_CLEAR, "_Clear console", "<control><shift>C", None, self.do_clear_console),
+            ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.on_undo),
+            ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.on_redo),
+            ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.on_find),
+            ("ClearConsole", Gtk.STOCK_CLEAR, "_Clear console", "<control><shift>C", None, self.on_clear_console),
         ])
 
         action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
@@ -558,26 +397,26 @@ class View(Gtk.Window):
             ("WrapNone", None, "Wrap None", None, None, Gtk.WrapMode.NONE),
             ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
             ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR)
-        ], 1, self.do_wrap_changed)
+        ], 1, self.on_wrap_changed)
         action_group.add_radio_actions([
             ("ThemeLight", None, "Light Theme", None, None, True),
             ("ThemeDark", None, "Dark Theme", None, None, False),
-        ], 1, self.do_theme_changed)
+        ], 1, self.on_theme_changed)
 
         action_group.add_actions([
             ("RunMenu", None, "Run"),
-            ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.run_script),
+            ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.on_run_script),
         ])
         fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
-        fullscreen.connect("toggled", self.do_fullscreen_changed)
+        fullscreen.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(fullscreen)
         socketserver = Gtk.ToggleAction("SocketServer", "Run socket server", None, None)
-        socketserver.connect("toggled", self.do_socketserver_changed)
+        socketserver.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socketserver)
 
         action_group.add_actions([
             ("HelpMenu", None, "Help"),
-            ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.do_about),
+            ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.on_about),
         ])
 
         uimanager = Gtk.UIManager()
@@ -614,19 +453,19 @@ class View(Gtk.Window):
 
         self.bhid = buffer.connect("mark_set", self.cursor_set_callback)
 
-        if View.FONT is None:
+        if ShoebotEditorWindow.FONT is None:
             # Get font or fallback
             context = self.text_view.get_pango_context()
             fonts = context.list_families()
             for font in fonts:
                 if font.get_name() == 'Bitstream Vera Sans Mono':
-                    View.FONT = 'Bitstream Vera Sans Mono 8'
+                    ShoebotEditorWindow.FONT = 'Bitstream Vera Sans Mono 8'
                     break
             else:
                 print('Bitstream Vera Font not found.')
                 print('Download and install it from here')
                 print('http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/')
-                View.FONT = 'Mono 8'
+                ShoebotEditorWindow.FONT = 'Mono 8'
 
         # self.text_view.modify_font(Pango.FontDescription(View.FONT))
 
@@ -647,7 +486,7 @@ class View(Gtk.Window):
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
         self.console_error.write(_(
             "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"),
-                                 True, True)
+            True, True)
 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
@@ -655,7 +494,9 @@ class View(Gtk.Window):
         self.set_view_title()
         self.init_menus()
 
-        # options toggle
+        self.sbot_window = None
+
+        # option toggles
         self.use_varwindow = False
         self.use_socketserver = False
         self.go_fullscreen = False
@@ -675,88 +516,68 @@ class View(Gtk.Window):
 
         self.show_all()
 
-    def delete_event_cb(self, window, event, data=None):
-        TestText.active_window_stack.push(self)
-        self.check_close_view()
-        TestText.active_window_stack.pop()
+    @staticmethod
+    def open_file(filename):
+        try:
+            ShoebotEditorWindow(filename)
+            return True
+        except IOError, (errnum, errmsg):
+            dialog = Gtk.MessageDialog(None,
+                                       Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK,
+                                       "Cannot open file '%s': %s" % (filename, errmsg))
+            dialog.run()
+            dialog.destroy()
+            return False
+
+    def on_close_file(self, widget):
+        if self.confirm_quit_or_save():
+            self.close_view()
+            return False
         return True
 
-    # Menu callbacks
-
-    def get_empty_view(self):
-        buffer = self.text_view.get_buffer()
-        if (not buffer.filename and not buffer.get_modified()):
-            return self
-        else:
-            return View(Buffer())
-
-    def view_from_widget(widget):
-        if isinstance(widget, Gtk.MenuItem):
-            item_factory = Gtk.item_factory_from_widget(widget)
-            return item_factory.get_data("view")
-        else:
-            app = widget.get_toplevel()
-            return app.get_data("view")
-
-    def do_new(self, widget):
-        View()
-
-    def open_ok_func(self, filename):
-        new_view = self.get_empty_view()
-        buffer = new_view.text_view.get_buffer()
-        if not buffer.fill_file_buffer(filename):
-            if new_view != self:
-                new_view.close_view()
-            return False
-        else:
-            buffer.filename = filename
-            buffer.filename_set()
+    def on_close_window(self, window, event, data=None):
+            if self.confirm_quit_or_save():
+                self.close_view()
+                return False
             return True
 
-    def do_open(self, widget):
+    def on_new_file(self, widget):
+        ShoebotEditorWindow()
+
+    def on_open_file(self, widget):
         chooser = ShoebotFileChooserDialog('Open File', None, Gtk.FileChooserAction.OPEN,
                                            (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
                                             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         if chooser.run() == Gtk.ResponseType.ACCEPT:
-            self.open_ok_func(chooser.get_filename())
+            self.open_file(chooser.get_filename())
         chooser.destroy()
 
-    def do_save_as(self, widget):
-        TestText.active_window_stack.push(self)
-        self.text_view.get_buffer().save_as_buffer()
-        TestText.active_window_stack.pop()
+    def on_save_file_as(self, widget):
+        self.save_as()
 
-    def do_save(self, widget):
-        TestText.active_window_stack.push(self)
+    def on_save_file(self, widget):
         buffer = self.text_view.get_buffer()
         if not buffer.filename:
-            self.do_save_as(widget)
+            self.save_as()
         else:
-            buffer.save_buffer()
-            TestText.active_window_stack.pop()
+            self.save()
 
-    def do_close(self, widget):
-        TestText.active_window_stack.push(self)
-        self.check_close_view()
-        TestText.active_window_stack.pop()
-
-    def do_exit(self, widget):
-        TestText.active_window_stack.push(self)
-        for tmp in TestText.buffers:
-            if not tmp.check_buffer_saved():
+    def on_quit(self, widget):
+        for view in ShoebotIDE.views:
+            if not view.confirm_quit_or_save():
                 return
-        if hasattr(self, 'sbot_window'):
+        if self.sbot_window is not None:
             self.sbot_window.finish()
             self.sbot_window.destroy()
 
         Gtk.main_quit()
-        TestText.active_window_stack.pop()
-        import sys
         sys.exit()
 
-    def do_insert_and_scroll(self, callback_action, widget):
-        buffer = self.text_view.get_buffer()
+    def on_insert_and_scroll(self, callback_action, widget):
+        buffer = self.source_buffer
 
         start, end = buffer.get_bounds()
         mark = buffer.create_mark(None, end, False)
@@ -770,30 +591,30 @@ class View(Gtk.Window):
         self.text_view.scroll_to_mark(mark, 0, True, 0.0, 1.0)
         buffer.delete_mark(mark)
 
-    def do_theme_changed(self, widget, current):
+    def on_theme_changed(self, widget, current):
         Gtk.Settings.get_default().set_property("gtk-theme-name", "Adwaita")
         if current.get_name() == "ThemeLight":
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", False)
         elif current.get_name() == "ThemeDark":
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
-    def do_wrap_changed(self, callback_action, widget):
+    def on_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
 
-    def do_varwindow_changed(self, widget):
+    def on_varwindow_changed(self, widget):
         self.use_varwindow = widget.get_active()
 
-    def do_socketserver_changed(self, widget):
+    def on_socketserver_changed(self, widget):
         self.use_socketserver = widget.get_active()
 
-    def do_fullscreen_changed(self, widget):
+    def on_fullscreen_changed(self, widget):
         self.go_fullscreen = widget.get_active()
 
-    def do_color_cycle_changed(self, callback_action, widget):
+    def on_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
 
-    def do_apply_tabs(self, widget):
-        buffer = self.text_view.get_buffer()
+    def on_apply_tabs(self, widget):
+        buffer = self.source_buffer
         bounds = buffer.get_selection_bounds()
         if bounds:
             start, end = bounds
@@ -802,8 +623,8 @@ class View(Gtk.Window):
             else:
                 buffer.apply_tag(buffer.custom_tabs_tag, start, end)
 
-    def do_apply_colors(self, callback_action, widget):
-        buffer = self.text_view.get_buffer()
+    def on_apply_colors(self, callback_action, widget):
+        buffer = self.source_buffer
         bounds = buffer.get_selection_bounds()
         if bounds:
             start, end = bounds
@@ -825,60 +646,56 @@ class View(Gtk.Window):
                         i = 0
                     start = next.copy()
 
-    def do_remove_tags(self, callback_action, widget):
-        buffer = self.text_view.get_buffer()
+    def on_remove_tags(self, callback_action, widget):
+        buffer = self.source_buffer
         bounds = buffer.get_selection_bounds()
         if bounds:
             start, end = bounds
             buffer.remove_all_tags(start, end)
 
-    def do_clear_console(self, widget):
+    def on_clear_console(self, widget):
         self.console_error.clear()
 
-    def dialog_response_callback(self, dialog, response_id):
-        if (response_id != RESPONSE_FORWARD and response_id != RESPONSE_BACKWARD):
+    def search_dialog_handler(self, dialog, search_direction):
+        if search_direction not in [SEARCH_FORWARD, SEARCH_BACKWARD]:
             dialog.destroy()
             return
 
-        start, end = dialog.buffer.get_bounds()
+        start, end = dialog.source_buffer.get_bounds()
         search_string = start.get_text(end)
 
         print(_("Searching for `%s'\n") % search_string)
 
-        buffer = self.text_view.get_buffer()
-        if response_id == RESPONSE_FORWARD:
-            buffer.search_forward(search_string, self)
-        elif response_id == RESPONSE_BACKWARD:
-            buffer.search_backward(search_string, self)
-
+        buffer = self.source_buffer
+        buffer.search(search_string, self, search_direction)
         dialog.destroy()
 
-    def do_search(self, widget):
+    def on_find(self, widget):
         search_text = Gtk.TextView()
         dialog = Gtk.Dialog(_("Search"), self,
                             Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                            (_("Forward"), RESPONSE_FORWARD,
-                             _("Backward"), RESPONSE_BACKWARD,
+                            (_("Forward"), SEARCH_FORWARD,
+                             _("Backward"), SEARCH_BACKWARD,
                              Gtk.STOCK_CANCEL, Gtk.ResponseType.NONE))
         dialog.vbox.pack_end(search_text, True, True, 0)
-        dialog.buffer = search_text.get_buffer()
-        dialog.connect("response", self.dialog_response_callback)
+        dialog.source_buffer = search_text.get_buffer()
+        dialog.connect("response", self.search_dialog_handler)
 
         search_text.show()
         search_text.grab_focus()
         dialog.show_all()
 
-    def do_undo(self, widget):
-        buffer = self.text_view.get_buffer()
+    def on_undo(self, widget):
+        buffer = self.source_buffer
         if buffer.can_undo():
             buffer.undo()
 
-    def do_redo(self, widget):
-        buffer = self.text_view.get_buffer()
+    def on_redo(self, widget):
+        buffer = self.source_buffer
         if buffer.can_redo():
             buffer.redo()
 
-    def do_about(self, widget):
+    def on_about(self, widget):
         dlg = Gtk.AboutDialog()
         self.website = "http://shoebot.net/"
         self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>",
@@ -923,8 +740,8 @@ class View(Gtk.Window):
         #     menu_item.activate()
 
     def close_view(self):
-        TestText.views.remove(self)
-        buffer = self.text_view.get_buffer()
+        ShoebotIDE.remove_view(self)
+        buffer = self.source_buffer
         # buffer.unref()
         buffer.disconnect(self.bhid)
         self.text_view.destroy()
@@ -932,18 +749,117 @@ class View(Gtk.Window):
         self.text_view = None
         self.destroy()
         del self
-        if not TestText.views:
+        if not ShoebotIDE.views:
             Gtk.main_quit()
 
-    def check_close_view(self):
-        buffer = self.text_view.get_buffer()
-        if (buffer.refcount > 1 or buffer.check_buffer_saved()):
-            self.close_view()
+    def confirm_quit_or_save(self):
+        if self.source_buffer.get_modified():
+            dialog = Gtk.MessageDialog(self,
+                                       Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.QUESTION,
+                                       Gtk.ButtonsType.YES_NO,
+                                       _("Save changes to '%s'?") % self.source_buffer.pretty_name())
+            dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+            result = dialog.run()
+            dialog.destroy()
+            if result == Gtk.ResponseType.YES:
+                if self.filename:
+                    print("Save ", self.filename)
+                    return self.save()
+                else:
+                    print("Save as... ", self.filename)
+                    return self.save_as()
+            else:
+                return result == Gtk.ResponseType.NO
+        else:
+            return True
+
+    def save(self):
+        result = False
+        have_backup = False
+        if not self.filename:
+            return self.save_as()
+
+        bak_filename = self.filename + "~"
+        try:
+            if os.path.isfile(bak_filename):
+                os.remove(bak_filename)
+            os.rename(self.filename, bak_filename)
+        except (OSError, IOError), (errnum, errmsg):
+            if errnum != errno.ENOENT:
+                err = "Cannot back up '%s' to '%s': %s" % (self.filename,
+                                                           bak_filename,
+                                                           errmsg)
+                dialog = Gtk.MessageDialog(self,
+                                           Gtk.DialogFlags.MODAL,
+                                           Gtk.MessageType.INFO,
+                                           Gtk.ButtonsType.OK, err)
+                dialog.run()
+                dialog.destroy()
+                return False
+
+        have_backup = True
+        buffer = self.source_buffer
+        start, end = buffer.get_bounds()
+        chars = self.get_slice(start, end, False)
+        try:
+            with open(self.filename, "w") as f:
+                f.write(chars)
+            result = True
+            self.source_buffer.set_modified(False)
+        except IOError, (errnum, errmsg):
+            err = "Error writing to '%s': %s" % (self.filename, errmsg)
+            dialog = Gtk.MessageDialog(self,
+                                       Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, err)
+            dialog.run()
+            dialog.destroy()
+
+        if not result and have_backup:
+            try:
+                os.rename(bak_filename, self.filename)
+            except OSError, (errnum, errmsg):
+                err = "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'" % (
+                    self.filename, bak_filename, errmsg, bak_filename)
+                dialog = Gtk.MessageDialog(self,
+                                           Gtk.DialogFlags.MODAL,
+                                           Gtk.MessageType.INFO,
+                                           Gtk.ButtonsType.OK,
+                                           err)
+                dialog.run()
+                dialog.destroy()
+
+        return result
+
+    def save_as(self):
+        """
+        Return True if the buffer was saved
+        """
+        chooser = ShoebotFileChooserDialog(_('Save File'), None, Gtk.FileChooserAction.SAVE,
+                                           (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
+                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        chooser.set_do_overwrite_confirmation(True)
+        chooser.set_transient_for(self)
+        saved = chooser.run() == Gtk.ResponseType.ACCEPT
+        if saved:
+            old_filename = self.filename
+            self.filename = chooser.get_filename()
+            if self.save():
+                self.filename = chooser.get_filename()
+                self.filename_set()
+            else:
+                self.filename = old_filename
+        chooser.destroy()
+        return saved
+
+    @property
+    def window_title(self):
+        pretty_name = self.text_view.get_buffer().pretty_name()
+        return "Shoebot - {}".format(pretty_name)
 
     def set_view_title(self):
-        pretty_name = self.text_view.get_buffer().pretty_name()
-        title = "Shoebot - " + pretty_name
-        self.set_title(title)
+        self.set_title(self.window_title)
 
     def cursor_set_callback(self, buffer, location, mark):
 
@@ -1007,7 +923,6 @@ class View(Gtk.Window):
         # For each iter, get its location and add it to the arrays.
         # Stop when we pass last_y
         count = 0
-        size = 0
 
         while not iter.is_end():
             y, height = text_view.get_line_yrange(iter)
@@ -1021,17 +936,20 @@ class View(Gtk.Window):
 
         return count
 
-    def run_script(self, widget):
+    def on_run_script(self, widget):
         # get the buffer contents
         buffer = self.text_view.get_buffer()
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end, include_hidden_chars=False)
         try:
-            if buffer.filename:
-                os.chdir(os.path.dirname(buffer.filename))
+            buffer_dir = os.path.dirname(buffer.filename or '')
+            if buffer_dir:
+                os.chdir(buffer_dir)
 
             bot = shoebot.create_bot(codestring, 'NodeBox',
-                                     server=self.use_socketserver, show_vars=self.use_varwindow,
+                                     server=self.use_socketserver,
+                                     show_vars=self.use_varwindow,
+                                     title=self.window_title,
                                      window=True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
@@ -1044,50 +962,76 @@ class View(Gtk.Window):
             dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.INFO,
                                        Gtk.ButtonsType.OK, err)
-            result = dialog.run()
+            dialog.run()
             dialog.destroy()
+            self.sbot_window = None
             return False
 
         # TODO: have a try/except that shows an error window
 
+    @property
+    def source_buffer(self):
+        buffer = self.text_view.get_buffer()
+        return buffer
 
-class Stack(list):
-    def __init__(self):
-        list.__init__(self)
-
-    def push(self, item):
-        self.insert(-1, item)
-
-    def pop(self):
-        del self[0]
-
-    def get(self):
-        return self[0]
+    @property
+    def filename(self):
+        return self.source_buffer.filename
 
 
-class TestText(object):
-    untitled_serial = 1
+class ShoebotIDE(object):
+    untitled_file_counter = 0
     colormap = None
-    active_window_stack = Stack()
-    buffers = Stack()
-    views = Stack()
+    buffers = list()
+    views = list()
 
     def __init__(self, filelist):
-        view = View()
-        self.active_window_stack.push(view)
-        for fname in filelist:
-            filename = os.path.abspath(fname)
-            view.open_ok_func(filename)
-        self.active_window_stack.pop()
+        if not filelist:
+            ShoebotEditorWindow()
+        else:
+            self.open_filelist(filelist)
+
+    @classmethod
+    def open_filelist(cls, filelist):
+        files_were_opened = False
+        for filename in filelist:
+            filename = os.path.abspath(filename)
+            files_were_opened |= ShoebotEditorWindow.open_file(filename)
+        if not files_were_opened:
+            sys.exit(1)
+
+    @classmethod
+    def add_buffer(cls, buffer):
+        cls.buffers.append(buffer)
+
+    @classmethod
+    def add_view(cls, view):
+        cls.views.append(view)
+
+    @classmethod
+    def remove_buffer(cls, buffer):
+        cls.buffers.remove(buffer)
+
+    @classmethod
+    def remove_view(cls, view):
+        cls.views.remove(view)
 
     def main(self):
         Gtk.main()
         return 0
 
+    @classmethod
+    def get_next_untitled_filename(cls):
+        cls.untitled_file_counter += 1
+        if cls.untitled_file_counter is 1:
+            return _('Untitled')
+        else:
+            return _('Untitled #%d') % cls.untitled_file_counter
+
 
 def main():
-    testtext = TestText(sys.argv[1:])
-    testtext.main()
+    app = ShoebotIDE(sys.argv[1:])
+    app.main()
 
 
 if __name__ == "__main__":
