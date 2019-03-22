@@ -1,25 +1,9 @@
-# Shoebot
-#
-#
-# As of December 2014, pgi doesn't work with Pango
-# so no text is available yet.
-#
-# Alternately use --system-site-packages when creating your 
-# virtualenv.
-#
-# e.g.  
-#     virtualenv --system-site-packages shoebot-env
-#
-# or with virtualenvwrapper:
-#     mkvirtualenv --system-site-packages shoebot-env
-cairocffi==0.7.2
+cairo>=1.17.0
 fuzzywuzzy==0.5.0
-#meta==0.4.1
-meta
+meta==1.0.2
 numpy>=1.9.1
-# pgi==0.0.9
-vext.gi
 Pillow>=2.8.1
 pubsub==0.1.1
+pygobject>=1.17.0
 PySoundCard==0.5.2
 setuptools>=7.0.0

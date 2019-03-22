@@ -29,13 +29,11 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """ Shoebot console runner """
 
-import locale
-import gettext
 import argparse
+import gettext
+import locale
 import shlex
 import sys
-
-from __init__ import run
 
 DEFAULT_SERVERPORT = 7777
 
@@ -45,7 +43,6 @@ DIR = sys.prefix + '/share/shoebot/locale'
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -82,7 +79,7 @@ def main():
 
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
-    parser.add_argument("script", help="Shoebot / Nodebox script to run (filename or code)")
+    parser.add_argument("script", help="Shoebot / Nodebox script to run (filename or code)", nargs='?')
 
     group = parser.add_argument_group('Input / Output')
     # IO - Output to file
@@ -189,12 +186,17 @@ def main():
                        help=_("disable the variables pane when in windowed mode."))
 
     group = parser.add_argument_group('Debugging / Dev flags')
+    group.add_argument("-dn",
+                       "--diagnose",
+                       action="store_true",
+                       default=False,
+                       help=_("Output information for debugging installation / graphics issues."))
     group.add_argument("-dt",
                        "--disable-background-thread",
                        action="store_true",
                        dest="disable_background_thread",
-                       default=False,
-                       help=_("disable running bot code in background thread."))
+                       default=sys.platform=='darwin',
+                       help=_("disable running bot code in background thread (default on OSX)."))
     group.add_argument("-V",
                        "--verbose",
                        action="store_true",
@@ -206,7 +208,12 @@ def main():
     # get argparse arguments and check for sanity
     args, extra = parser.parse_known_args()
 
-    if not args.script and not args.window:
+    if args.diagnose:
+        from diagnose import diagnose
+        diagnose()
+        sys.exit()
+
+    if not args.script:
         error(_('Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)'))
 
     if args.vars:
@@ -219,6 +226,7 @@ def main():
     else:
         namespace = None
 
+    from . import run  # https://github.com/shoebot/shoebot/issues/206
     run(src=args.script,
         grammar=args.grammar,
         outputfile=args.outputfile,

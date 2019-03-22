@@ -2,12 +2,19 @@
 
 # Linux
 REDHAT_PACKAGES="libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging"
-SUSE_PACKAGES="libjpeg-devel python-pycairo python-gtk python-pygobject2 python-rsvg python-imaging"
+SUSE_PACKAGES="gcc libjpeg62-devel python-pycairo python2-gobject python2-gobject-cairo python2-Pillow"
 
-DEBIAN_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject python-rsvg"
-UBUNTU_PACKAGES="libjpeg-dev python-cairo python-gobject python-rsvg"
+DEB_PACKAGES="build-essential libjpeg-dev python-cairo python2.7-dev python-gi-cairo python-gobject"
+OPTIONAL_DEB_PACKAGES="gir1.2-rsvg-2.0"
 
-MINT_PACKAGES="python2.7-dev libjpeg-dev python-cairo python-gobject python-rsvg"
+DEBIAN_PACKAGES=${DEB_PACKAGES}
+OPTIONAL_DEBIAN_PACKAGES=${OPTIONAL_DEB_PACKAGES}
+
+UBUNTU_PACKAGES=${DEB_PACKAGES}
+OPTIONAL_UBUNTU_PACKAGES=${OPTIONAL_DEB_PACKAGES}
+
+MINT_PACKAGES=${DEB_PACKAGES}
+OPTIONAL_MINT_PACKAGES=${OPTIONAL_DEB_PACKAGES}
 
 # OSX
 HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+3 --quartz pygobject3"
@@ -21,24 +28,37 @@ confirm() {
     fi
 }
 
+deb_install() {
+    # $0 packages
+    # $1 optional packages
+    sudo apt-get install -y $1
+    if [ -z "$1" ]; then
+        exit
+    fi
+    sudo apt-get install -y $2
+    hash -r
+}
+
 install_mint() {
-    sudo apt-get install ${MINT_PACKAGES}
+    deb_install "$MINT_PACKAGES" "$OPTIONAL_DEBIAN_PACKAGES"
 }
 
 install_debian() {
-    sudo apt-get install ${DEBIAN_PACKAGES}
+    deb_install "$DEBIAN_PACKAGES" "$OPTIONAL_DEBIAN_PACKAGES"
 }
 
 install_ubuntu() {
-    sudo apt-get install ${UBUNTU_PACKAGES}
+    deb_install "$UBUNTU_PACKAGES" "$OPTIONAL_UBUNTU_PACKAGES"
 }
 
 install_redhat() {
-    sudo yum install ${REDHAT_PACKAGES}
+    sudo yum install "$REDHAT_PACKAGES"
+    hash -r
 }
 
 install_suse() {
-    sudo zypper install ${SUSE_PACKAGES}
+    sudo zypper install "$SUSE_PACKAGES"
+    hash -r
 }
 
 install_darwin() {
@@ -46,14 +66,14 @@ install_darwin() {
 
     command -v port > /dev/null
     MACPORTS=$?
-    
+
     command -v brew
     HOMEBREW=$? > /dev/null
-    
+
     echo 'Install on OSX...'
     echo brew ${HOMEBREW}
     echo port ${MACPORTS}
-    
+
     if [ "${HOMEBREW}" = "0" ]; then
         echo Install using homebrew ?
         confirm
@@ -67,8 +87,8 @@ install_darwin() {
         confirm
         sudo port install python27 py27-pip py27-virtualenv
         sudo port install $MACPORTS_PACKAGES
-    fi     
-
+    fi
+    hash -r
 }
 
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
@@ -90,8 +110,6 @@ else
     VER=$(uname -r)
 fi
 
-
-
 if [ "Debian" = "$OS" ]; then
     install_debian
 elif [ "LinuxMint" = "$OS" ]; then
@@ -105,6 +123,12 @@ elif [ "SuSE" = "$OS" ]; then
 elif [ "Darwin" = "$OS" ]; then
     install_darwin
 else
-    echo TODO Add code for $OS
+    if [ -z "$OS" ]; then
+        echo $OS
+    fi
+    echo "Shoebot does not directly support $OS/$VER at the moment."
+    echo ''
+    echo 'Get started by looking at "Add support for another operating system".'
+    echo 'in the installation documentation.'
+    echo ''
 fi
-

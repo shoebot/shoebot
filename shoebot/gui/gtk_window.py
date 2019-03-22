@@ -1,13 +1,8 @@
 import os
 import sys
+
+from shoebot.core.backend import gi
 from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
-
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
-
 from gi.repository import Gdk, Gtk, GObject
 
 from collections import deque
@@ -22,25 +17,26 @@ import gettext
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 
 class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
-    '''Create a GTK+ window that contains a ShoebotWidget'''
-
+    """
+    Create a GTK+ window that contains a ShoebotWidget
+    """
     # Draw in response to an expose-event
-    def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, port=7777, fullscreen=False):
+    def __init__(self, title=None, show_vars=False, menu_enabled=True, server=False, port=7777, fullscreen=False):
         Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
         if os.path.isfile(ICON_FILE):
-            self.set_icon_from_file( ICON_FILE )
-        
+            self.set_icon_from_file(ICON_FILE)
+
         self.menu_enabled = menu_enabled
         self.has_server = server
         self.serverport = port
@@ -68,18 +64,20 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.action_group = Gtk.ActionGroup('Canvas')
 
         self.action_group.add_actions([('Save as', None, _('_Save as')),
-                                     ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
-                                     ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
-                                     ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
-                                     ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
-                                     ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
-                                    ])
+                                       ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
+                                       ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
+                                       ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
+                                       ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
+                                       ('close', 'Close window', _('_Close Window'), "<Control>w", None,
+                                        self.do_window_close)
+                                       ])
 
         self.action_group.add_toggle_actions([
-                ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables, self.show_vars),
-                ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
-                ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
-            ])
+            ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables,
+             self.show_vars),
+            ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
+            ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
+        ])
 
         menuxml = '''
         <popup action="Save as">
@@ -111,7 +109,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             Gtk.main_iteration()
 
         self.window_open = True
-        self.pause_speed = None # TODO - factor out bot controller stuff
+        self.pause_speed = None  # TODO - factor out bot controller stuff
 
         self.last_draw_ctx = None  # Need this to save snapshots after frame is drawn
 
@@ -242,7 +240,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.is_fullscreen = False
         self.bot._screen_ratio = None
 
-    def do_window_close(self, widget,data=None):
+    def do_window_close(self, widget, data=None):
         """
         Widget Action to Close the window, triggering the quit event.
         """

@@ -10,9 +10,12 @@ Make new examples or port existing ones
 
 We're always eager to welcome new examples that explain a concept or show off an interesting technique.
 
-If you need inspiration, there are many examples in the `nodebox-pyobjc <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_ port that aren't yet ported to Shoebot. They should work mostly without modifications -- we need help testing them. 
+You can either contribute your own examples, or help port existing scripts:
 
-Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_.
+* the `nodebox-pyobjc examples <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are more current than those in the old Nodebox 1 repository
+* the scripts in the `Nodebox gallery <https://www.nodebox.net/code/index.php/Gallery>`_
+  
+They should work mostly without modifications -- we need help testing them. Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_ in case you hit a wall.
 
 Be sure to also check the brief guidelines in :ref:`example-style` so that your efforts can be included in Shoebot.
 
@@ -20,45 +23,11 @@ Be sure to also check the brief guidelines in :ref:`example-style` so that your 
 Help port libraries
 -------------------
 
-We're missing these Nodebox libraries; can you help us port them to Shoebot?
+We're missing a few Nodebox libraries; can you help us port them to Shoebot? 
+
+See the full list of :ref:`unported-libs`.
 
 Incidentally, we're also missing documentation to explain how to port Nodebox libraries. If you're interested but stuck, file an issue and we'll help you.
-
-- Knowledge
-
-  * `WordNet <https://www.nodebox.net/code/index.php/WordNet>`_ -- the bundled wordnet should be downloadable separately
-  * `Keywords <https://www.nodebox.net/code/index.php/Keywords>`_
-  * `Linguistics <https://www.nodebox.net/code/index.php/Linguistics>`_
-
-- Bitmap
-  
-  * `Core Image <https://www.nodebox.net/code/index.php/Core_Image>`_ -- would need to be ported to PIL
-  * `iSight <https://www.nodebox.net/code/index.php/iSight>`_ -- deal with generic webcams using Pygame (`howto <https://stackoverflow.com/a/9712824/122400>`_)
-  * `Quicktime <https://www.nodebox.net/code/index.php/Quicktime>`_ -- use a Python video lib
-
-- Systems
-
-  * `Ants <https://www.nodebox.net/code/index.php/Ants>`_
-  * `Noise <https://www.nodebox.net/code/index.php/Noise>`_
-
-- Design
-
-  * `Grid <https://www.nodebox.net/code/index.php/Grid>`_
-
-- Typography
-
-  * `Pixie <https://www.nodebox.net/code/index.php/Pixie>`_
-  * `Fatpath <https://www.nodebox.net/code/index.php/Fatpath>`_
-
-- Tangible
-
-  * `WiiNode <https://www.nodebox.net/code/index.php/WiiNode>`_
-  * `OSC <https://www.nodebox.net/code/index.php/OSC>`_
-
-- Other
-
-  * `Flowerewolf <https://github.com/karstenw/Library/tree/master/flowerewolf>`_
-  * `twyg <https://github.com/karstenw/Library/tree/master/twyg>`_
 
 
 Look for 'Help Out' issues
@@ -99,3 +68,67 @@ Try installing on Windows or Mac OS X
 
 Just knowing what happens on these platforms would be really useful for us so we can provide support for them. Try it out and post an issue for any problem that you find.
 
+
+
+Tips for Developers
+===================
+
+Coding style for the Shoebot core code
+--------------------------------------
+
+We're not picky here, other than following `PEP8 style guidelines
+<https://www.python.org/dev/peps/pep-0008/>`_. We use `flake8
+<https://pypi.org/project/flake8/>`_ extensions in our code editors to
+keep us strict, and recommend it.
+
+.. _example-style:
+
+Coding style for examples
+-------------------------
+
+When creating examples for including in Shoebot, we try to adhere to a set
+of writing guidelines to make it easy for newcomers to understand what's going
+on.
+
+* Do not use one-letter variables (other than ``x`` and ``y``), and avoid
+  two-letter names as well (things like ``dx`` can be expanded to ``deltax``).
+  It will look less compact, but really helps understanding what's going on.
+* Start the example with a docstring specifying the title of the example,
+  author info and some details about the script and its workings. If you
+  want to format this text, use Markdown.
+* Use Flake8 or similar linter plugin to find necessary style fixes.
+* Comments in English.
+* Variables and functions are in ``lowercase`` and ``underscored_lowercase``,
+  class names are in ``CamelCase``.
+
+
+Making a release
+----------------
+
+This is our checklist to be sure we don't miss any detail when we put out a release.
+
+  * update the version number in these files:
+    - Makefile
+    - setup.py
+    - doc/source/conf.py
+    - shoebot/gui/ide.py
+
+  * update the changelogs
+    - CHANGELOG
+    - debian/changelog
+
+  * tag the release commit
+  * publish release on GitHub
+
+  * push to PyPI
+
+Building Debian packages
+------------------------
+
+There are some dependencies to look out for::
+
+    sudo apt-get install rename dh-python cdbs
+
+Be sure to go through this checklist:
+
+  * update the debian/changelog file

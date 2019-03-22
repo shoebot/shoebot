@@ -1,8 +1,4 @@
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
+from shoebot.core.backend import gi
 
 from gi.repository import Gdk, Gtk
 from shoebot.core import InputDeviceMixin
@@ -14,7 +10,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         InputDeviceMixin.__init__(self, **kwargs)
         self.scale_x = 1.0
         self.scale_y = 1.0
-    
+
     def attach_gtk(self, widget):
         # necessary for catching keyboard events
         widget.set_can_focus(True)

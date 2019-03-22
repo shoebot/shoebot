@@ -13,8 +13,11 @@ install:
  - sudo ./install/install_dependencies.sh
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
+ - pip install vext.gi
  - SHOEBOT_SKIP_EXAMPLES=1 $PYTHON ./setup.py install
+ - pip freeze
 
 script:
+ - PYTHON: $PYTHON
  - $PYTHON setup.py diagnose
  - if [ "$PYTHON" == "python2" ]; then $PYTHON setup.py test; fi

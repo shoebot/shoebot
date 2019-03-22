@@ -4,58 +4,61 @@ Example scripts
 
 This is a set of example scripts from the ``examples`` directory.
 
-[Work-in-progress!]
-
-
 How curves work
 ===============
 
 .. shoebot::
-    :snapshot:
-    :size: 200,200
+    :size: 250,250
 
-    # about:
-    #   Demonstrate how the different parameters of curves work.
+    """
+    Simple path curve example
+    Adapted from the Cairo samples page <https://www.cairographics.org/samples/>
+    and annotated based on the Nodebox "How curves work" example
+    """
+    size(250, 250)
 
-    size(200,200)
-    import math
-
-    # Setup colors: no fill is needed, and stroke the curves with black.
+    # Set up the canvas
+    # Don't close paths when we call endpath()
+    autoclosepath(False)
+    # Don't fill any path
     nofill()
-    stroke(0)
 
-    # Set the initial position
-    x,y = 50, 50
-    width = 50
+    # First, let's set the point coordinates.
 
-    # The dx and dy parameters are the relative control points.
-    # When using math.pi/2, you actually define the lower half
-    # of a circle.
-    dy = width/(math.pi / 2)
+    # Start curve point
+    x, y = 20, 125
+    # Left control point
+    x1, y1 = 100, 230
+    # Right control point
+    x2, y2 = 150, 20
+    # End curve point
+    x3, y3 = 230, 125
 
-    # Begin drawing the path. The starting position is on the
-    # given x and y coordinates.
-    beginpath(x, y)
-    # Calculate the control points.
-    cp1 = (x, y + dy)
-    cp2 = (x + width, y + dy)
-    # Draw the curve. The first four parameters are the coordinates
-    # of the two control curves; the last two parameters are
-    # the coordinates of the destination point.
-    curveto(cp1[0], cp1[1], cp2[0], cp2[1], x + width, y)
-    # End the path; ending the path automatically draws it.
+    # Note that 
+    #     x, y = 25, 125
+    # is equivalent to
+    #     x = 25
+    #     y = 125
+    # but this way it's somewhat more elegant.
+
+    # Draw the curve
+    strokewidth(12)
+    stroke(0.1)
+    # Start drawing the bezier path
+    beginpath()
+    # Move to the starting point
+    moveto(x, y)
+    # For curveto(), the first 4 parameters are the coordinates of the two control
+    # points; the last two parameters are the coordinates of the destination point.
+    curveto(x1, y1, x2, y2, x3, y3)
+    # We're done, stop path drawing and render it
     endpath()
 
-    # To demonstrate where the control points actually are, 
-    # we draw them using lines.
-    # The first control point starts at the x,y position.
-    line(x, y, cp1[0], cp1[1])
-    # The second control point is the ending point.
-    line(x + width, y, cp2[0], cp2[1])
-
-    # To liven things up just a little bit, little ovals are
-    # drawn in red on the position of the control points.
-    nostroke()
-    fill(1,0,0)
-    oval(cp1[0] - 2, cp1[1] - 2, 4, 4)
-    oval(cp2[0] - 2, cp2[1] - 2, 4, 4)
+    # To show where the control points are,
+    # we draw helper lines
+    strokewidth(6)
+    stroke(1, 0.2, 0.2, 0.6)
+    # The first control point starts at the x, y position
+    line(x, y, x1, y1)
+    # And the second control point is the end curve point
+    line(x2, y2, x3, y3)

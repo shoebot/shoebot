@@ -1,16 +1,17 @@
+from shoebot.core.backend import cairo, gi, driver
 from shoebot.data import _copy_attrs
 
 import array
 from StringIO import StringIO
 import os.path
 
-import cairocffi as cairo
 from PIL import Image as PILImage
 
 try:
-    import rsvg
-except ImportError:
-    rsvg = None
+    gi.require_version('Rsvg', '2.0')
+    from gi.repository import Rsvg
+except ImportError, ValueError:
+    Rsvg = None
 
 from shoebot.data import Grob, ColorMixin
 
@@ -26,6 +27,7 @@ class SurfaceRef(object):
 
 class Image(Grob, ColorMixin):
     _surface_cache = {}   # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
+    _state_attributes = {'transform', 'pathmode'}  # NBX uses transform and transformmode here
 
     def __init__(self, bot, path=None, x=0, y=0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
         Grob.__init__(self, bot)
@@ -58,12 +60,16 @@ class Image(Grob, ColorMixin):
                     imagesurface = surfaceref.surface
                     sw = imagesurface.get_width()
                     sh = imagesurface.get_height()
-                elif os.path.splitext(path)[1].lower() == '.svg' and rsvg is not None:
-                    handle = rsvg.Handle(path)
-                    sw, sh = handle.get_dimension_data()[:2]
-                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, 0, 0, sw, sh)
+                elif os.path.splitext(path)[1].lower() == '.svg' and Rsvg is not None:
+                    handle = Rsvg.Handle()
+                    svg = handle.new_from_file(path)
+                    dimensions = svg.get_dimensions()
+                    sw = dimensions.width
+                    sh = dimensions.height
+                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
                     ctx = cairo.Context(imagesurface)
-                    handle.render_cairo(ctx)
+                    pycairo_ctx = driver.ensure_pycairo_context(ctx)
+                    svg.render_cairo(pycairo_ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
                     imagesurface = cairo.ImageSurface.create_from_png(path)
                     sw = imagesurface.get_width()
@@ -136,5 +142,5 @@ class Image(Grob, ColorMixin):
 
     def copy(self):
         p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
-        _copy_attrs(self._bot, p, self.stateAttributes)
+        _copy_attrs(self._bot, p, self.state_attributes)
         return p

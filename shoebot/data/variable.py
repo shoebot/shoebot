@@ -38,7 +38,6 @@ class Variable(object):
         if self.type == NUMBER:
             self.min = kwargs.get("min", 0.0)
             self.max = kwargs.get("max", 100.0)
-            self.step = kwargs.get("step")
             if self.step is None:
                 diff = max(self.min, self.max) - min(self.min, self.max)
                 self.step = (diff / float(self.steps))

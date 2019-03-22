@@ -9,6 +9,12 @@ Now just
     make html
 
 
+## Upgrading
+
+These docs have custom styles in css/static if upgrading any packages in the
+docs make sure they still apply.
+
+
 ## ReadTheDocs
 
 ReadTheDocs hosts Shoebots documentation here http://shoebot.readthedocs.io/en/latest/

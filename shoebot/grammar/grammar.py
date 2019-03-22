@@ -1,9 +1,9 @@
 import copy
 import os
 import sys
+import traceback
 from time import sleep, time
 
-import format_traceback
 from livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
@@ -16,7 +16,7 @@ sys.stderr = flushfile(sys.stderr)
 
 
 class Grammar(object):
-    ''' 
+    '''
     A Bot is an interface to receive user commands (through scripts or direct
     calls) and pass them to a canvas for drawing.
 
@@ -199,15 +199,16 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False):
+    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False,
+            break_on_error=False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
 
-        :param inputcode: path to shoebot file or whole source code
-        :param iterations: maximum amount of frames to run
-        :param run_forever: if True will run until the user quits the bot
-        :param frame_limiter: Time a frame should take to run (float - seconds)
+        :param inputcode: Path to shoebot source or string containing source
+        :param iterations: None or Maximum amount of frames to run
+        :param run_forever: If True then run until user quits the bot
+        :param frame_limiter: If True then sleep between frames to respect speed() command.
         '''
         source = None
         filename = None
@@ -283,10 +284,12 @@ class Grammar(object):
 
             import sys
             if verbose:
-                errmsg = format_traceback.format_exc()
+                errmsg = traceback.format_exc()
             else:
                 errmsg = simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg
+            if break_on_error:
+                raise
 
     def finish(self):
         ## For use when using shoebot as a module

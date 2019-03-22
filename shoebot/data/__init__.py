@@ -31,7 +31,7 @@
 Data structures for use in Shoebot
 
 These are 'agnostic' classes for representing primitive shapes, paths, colors,
-transforms, text and image objects, live variables and user interaction 
+transforms, text and image objects, live variables and user interaction
 elements (such as pointing devices).
 
 The drawing objects could benefit from an actual, proper Python library to
@@ -66,9 +66,11 @@ def _copy_attr(v):
     else:
         raise NodeBoxError, _("Don't know how to copy '%s'.") % v
 
+
 def _copy_attrs(source, target, attrs):
     for attr in attrs:
         setattr(target, attr, _copy_attr(getattr(source, attr)))
+
 
 import geometry as geo
 from point import Point

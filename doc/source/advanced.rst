@@ -38,6 +38,24 @@ Run a Shoebot/Nodebox script:
     bot.run("example.bot")
 
 
+Running with PyPy
+-----------------
+
+To get better performance, you can run Shoebot using PyPy, which is experimental. 
+
+When installing Shoebot, you have to point to PyPy when creating your virtualenv. Instead of the first command in the :ref:`Virtualenvwrapper install example <virtualenvwrapper-install>`, do:
+
+.. code:: bash
+
+    mkvirtualenv shoebot -p `which pypy`
+
+For the plain virtualenv approach, try:
+
+.. code:: bash
+
+    virtualenv .env -p `which pypy`
+
+
 Using with Django
 -----------------
 
