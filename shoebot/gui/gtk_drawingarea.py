@@ -82,8 +82,9 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         '''
         Draw just the exposed part of the backing store, scaled to fit
         '''
-        source_width = self.backing_store.get_width()
-        source_height = self.backing_store.get_height()
+        backing_store = self.get_backing_store(cr)
+        source_width = backing_store.get_width()
+        source_height =backing_store.get_height()
 
         # Create the cairo context
         if self.scale_fit:

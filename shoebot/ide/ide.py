@@ -946,7 +946,8 @@ class ShoebotEditorWindow(Gtk.Window):
             if buffer_dir:
                 os.chdir(buffer_dir)
 
-            bot = shoebot.create_bot(codestring, 'NodeBox',
+            bot = shoebot.create_bot(codestring,
+                                     shoebot.NODEBOX,
                                      server=self.use_socketserver,
                                      show_vars=self.use_varwindow,
                                      title=self.window_title,
