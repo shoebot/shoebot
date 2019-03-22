@@ -17,8 +17,6 @@ import traceback
 
 from collections import namedtuple
 
-from shoebot import ShoebotInstallError
-
 COL_WIDTH = 10
 
 AvailableModules = namedtuple('AvailableModules', 'gi pgi meta pubsub rsvg vext')
@@ -107,7 +105,7 @@ def test_imports():
     if gi:
         test_import("gi.repository.Pango", gi_require=('Pango', '1.0'), gi=_gi)
     else:
-        print("Pango won't be available")
+        print("    No gi implementation, text will not be available")
     # virtualenv help
     vext = test_import("vext")
 
@@ -128,6 +126,7 @@ def shoebot_example(**shoebot_kwargs):
 
     def decorator(f):
         def run():
+            from shoebot import ShoebotInstallError  # https://github.com/shoebot/shoebot/issues/206
             print("    Shoebot - %s:" % f.__name__.replace("_", " "))
             try:
                 import shoebot
