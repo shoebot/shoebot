@@ -5,6 +5,7 @@ import subprocess
 
 here = os.path.dirname(os.path.abspath(__file__))
 
+
 def gedit_install():
     version = None
     try:
@@ -16,17 +17,17 @@ def gedit_install():
     major, minor, patch = map(int, v_str.split("."))
 
     if major == 2:
-        subprocess.call("gedit2-plugin/install.py", shell=True)
+        subprocess.call("%s/gedit2-plugin/install.py" % here, shell=True)
     elif major == 3:
         if minor < 12:
-            subprocess.call("gedit3-plugin/install.py", shell=True)
+            subprocess.call("%s/gedit3-plugin/install.py" % here, shell=True)
         else:
             cwd = os.path.join(here, "gedit3.12-plugin")
-            subprocess.call("gedit3.12-plugin/install.py", shell=True)
+            subprocess.call("%s/gedit3.12-plugin/install.py" % here, shell=True)
     else:
         print("Unknown gedit version %s" % version)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     print("Install gedit plugin")
     gedit_install()
