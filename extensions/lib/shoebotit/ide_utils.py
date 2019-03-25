@@ -92,7 +92,7 @@ class ShoebotProcess(object):
     """
     def __init__(self, source, use_socketserver, show_varwindow, use_fullscreen, verbose, title, cwd=None, handle_stdout=None, handle_stderr=None, sbot=None):
         # start with -w for window -l for shell'
-        command = [sbot, '-wl', '-t%s - Shoebot on gedit' % title]
+        command = [sbot, '-wl', '-t%s' % title]
 
         if use_socketserver:
             command.append('-s')
@@ -105,7 +105,7 @@ class ShoebotProcess(object):
 
         if verbose:
             command.append("-V")
-        
+
         command.append(source)
 
         # Setup environment so shoebot directory is first
@@ -285,7 +285,7 @@ def find_example_dir():
 
     # Needs to run in same python env as shoebot (may be different to gedits)
     code = code_stub % 'share/shoebot/examples'
-    cmd = ["python", "-c", code]    
+    cmd = ["python", "-c", code]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, errors = p.communicate()
     if errors:
