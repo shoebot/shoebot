@@ -226,7 +226,7 @@ def main():
     else:
         namespace = None
 
-    from . import run  # https://github.com/shoebot/shoebot/issues/206
+    from __init__ import run  # https://github.com/shoebot/shoebot/issues/206
     run(src=args.script,
         grammar=args.grammar,
         outputfile=args.outputfile,
