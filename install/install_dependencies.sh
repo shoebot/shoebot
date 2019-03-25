@@ -1,20 +1,16 @@
 #!/bin/bash
 
 # Linux
-REDHAT_PACKAGES="libjpeg-devel pycairo pygtk2 pygobject2 gnome-python2-rsvg python-imaging"
+REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel pycairo python2-gobject cairo-gobject python2-pillow"
+# Fedora == Redhat, these are not detected separately.
+
 SUSE_PACKAGES="gcc libjpeg62-devel python-pycairo python2-gobject python2-gobject-cairo python2-Pillow"
 
-DEB_PACKAGES="build-essential libjpeg-dev python-cairo python2.7-dev python-gi-cairo python-gobject"
-OPTIONAL_DEB_PACKAGES="gir1.2-rsvg-2.0"
-
+DEB_PACKAGES="build-essential libjpeg-dev python-cairo python2.7-dev python-gi-cairo python-gobject gir1.2-rsvg-2.0"
 DEBIAN_PACKAGES=${DEB_PACKAGES}
-OPTIONAL_DEBIAN_PACKAGES=${OPTIONAL_DEB_PACKAGES}
-
 UBUNTU_PACKAGES=${DEB_PACKAGES}
-OPTIONAL_UBUNTU_PACKAGES=${OPTIONAL_DEB_PACKAGES}
-
 MINT_PACKAGES=${DEB_PACKAGES}
-OPTIONAL_MINT_PACKAGES=${OPTIONAL_DEB_PACKAGES}
+
 
 # OSX
 HOMEBREW_PACKAGES="cairo --quartz pango --quartz gtk+3 --quartz pygobject3"
@@ -29,35 +25,29 @@ confirm() {
 }
 
 deb_install() {
-    # $0 packages
-    # $1 optional packages
-    sudo apt-get install -y $1
-    if [ -z "$1" ]; then
-        exit
-    fi
-    sudo apt-get install -y $2
+    sudo apt-get install -y $*
     hash -r
 }
 
 install_mint() {
-    deb_install "$MINT_PACKAGES" "$OPTIONAL_DEBIAN_PACKAGES"
+    deb_install $MINT_PACKAGES
 }
 
 install_debian() {
-    deb_install "$DEBIAN_PACKAGES" "$OPTIONAL_DEBIAN_PACKAGES"
+    deb_install $DEBIAN_PACKAGES
 }
 
 install_ubuntu() {
-    deb_install "$UBUNTU_PACKAGES" "$OPTIONAL_UBUNTU_PACKAGES"
+    deb_install $UBUNTU_PACKAGES
 }
 
 install_redhat() {
-    sudo yum install "$REDHAT_PACKAGES"
+    sudo yum install -y $REDHAT_PACKAGES
     hash -r
 }
 
 install_suse() {
-    sudo zypper install "$SUSE_PACKAGES"
+    sudo zypper install $SUSE_PACKAGES
     hash -r
 }
 
