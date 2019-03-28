@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Linux
-REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel pycairo python2-gobject cairo-gobject python2-pillow"
+REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel pycairo python2-devel python2-gobject cairo-gobject python2-pillow"
 # Fedora == Redhat, these are not detected separately.
 
 SUSE_PACKAGES="gcc libjpeg62-devel python-pycairo python2-gobject python2-gobject-cairo python2-Pillow"
