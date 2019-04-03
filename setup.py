@@ -139,7 +139,6 @@ EXAMPLE_REQUIREMENTS = [
     "PySoundCard>=0.5.2",  # sbaudio
 ]
 
-
 def requirements(with_pgi=None, with_examples=True, debug=True):
     """
     Build requirements based on flags
@@ -150,10 +149,7 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     """
     reqs = list(BASE_REQUIREMENTS)
     if with_pgi is None:
-        if is_pypy or is_jython:
-            with_pgi = True
-        else:
-            with_pgi = False
+        with_pgi = is_jython
 
     if debug:
         print("setup options: ")
@@ -162,7 +158,9 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
     if with_pgi:
         reqs.append("pgi")
         if debug:
-            print("warning, as of March 2019 typography does not work with pgi")
+            print("warning, as of April 2019 typography does not work with pgi")
+    else:
+        reqs.append("pygobject==3.30")
     if with_examples:
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
@@ -189,7 +187,7 @@ setup(
     install_requires=requirements(
         debug="install" in sys.argv,
         with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ,
-        with_pgi=is_pypy,
+        with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
     entry_points={
         "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.gui.ide:main"],

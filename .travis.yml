@@ -14,9 +14,10 @@ install:
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
  - pip install vext.gi
- - SHOEBOT_SKIP_EXAMPLES=1 $PYTHON ./setup.py install
+ - pip install setuptools>=18.8 pycairo>=1.17.0 meta==1.0.2 Pillow>=2.8.1 pubsub==0.1.1
+ - pip install --no-deps .
  - pip freeze
 
 script:
  - $PYTHON setup.py diagnose
- - if [ "$PYTHON" == "python2" ]; then $PYTHON setup.py test; fi
+ - if [ "$PYTHON" == "python2" ]; then SHOEBOT_GI=pgi $PYTHON setup.py test; fi
