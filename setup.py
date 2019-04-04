@@ -45,7 +45,7 @@ except ImportError:
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
 
-    CLEAN_FILES = "./build ./dist ./*.pyc ./*.tgz ./*.egg-info".split(" ")
+    CLEAN_FILES = "./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./.eggs".split()
 
     user_options = []
 
@@ -117,17 +117,13 @@ datafiles.extend(
     ]
 )
 
-if not is_pypy:
-    NUMPY = "numpy>=1.9.1"
-else:
-    NUMPY = ""
-
+PYCAIRO = "pycairo>=1.17.0"
+PYGOBJECT = "pybobject>=3.32"
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
-    "pycairo>=1.17.0",
+    PYCAIRO,
     "meta==1.0.2",
-    NUMPY,
     "Pillow>=2.8.1",
     "pubsub==0.1.1",
 ]
@@ -138,8 +134,11 @@ EXAMPLE_REQUIREMENTS = [
     "planar",  # examples
     "PySoundCard>=0.5.2",  # sbaudio
 ]
+if not is_pypy:
+    EXAMPLE_REQUIREMENTS.append("numpy>=1.9.1")
 
-def requirements(with_pgi=None, with_examples=True, debug=True):
+
+def requirements(debug=True, with_examples=True, with_pgi=None):
     """
     Build requirements based on flags
 
@@ -160,7 +159,8 @@ def requirements(with_pgi=None, with_examples=True, debug=True):
         if debug:
             print("warning, as of April 2019 typography does not work with pgi")
     else:
-        reqs.append("pygobject==3.30")
+        reqs.append(PYGOBJECT)
+
     if with_examples:
         reqs.extend(EXAMPLE_REQUIREMENTS)
 
@@ -184,6 +184,7 @@ setup(
     cmdclass={"clean": CleanCommand, "diagnose": DiagnoseCommand},
     packages=find_packages(exclude=["tests*", "extensions"]),
     data_files=datafiles,
+    setup_requires=[PYCAIRO],
     install_requires=requirements(
         debug="install" in sys.argv,
         with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ,
