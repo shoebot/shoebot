@@ -174,7 +174,7 @@ def requirements(debug=True, with_examples=True, with_pgi=None):
 
 setup(
     name="shoebot",
-    version="1.2.3",
+    version="1.3",
     description="Vector graphics scripting application",
     long_description=info,
     author="Ricardo Lafuente",
@@ -191,7 +191,7 @@ setup(
         with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
     entry_points={
-        "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.gui.ide:main"],
+        "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.ide.ide:main"],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",
     },
     test_suite="tests.unittests",

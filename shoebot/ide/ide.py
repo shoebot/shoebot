@@ -701,7 +701,7 @@ class ShoebotEditorWindow(Gtk.Window):
                         "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>",
                         "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>",
                         "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
-        dlg.set_version("1.2.2")
+        dlg.set_version("1.3")
         dlg.set_name("shoebot")
         dlg.set_license("GPLv3")
         dlg.set_authors(self.authors)

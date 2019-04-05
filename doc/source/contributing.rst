@@ -108,14 +108,15 @@ Making a release
 This is our checklist to be sure we don't miss any detail when we put out a release.
 
   * update the version number in these files:
-    - Makefile
-    - setup.py
-    - doc/source/conf.py
-    - shoebot/gui/ide.py
+    - `Makefile`
+    - `VERSION`
+    - `setup.py`
+    - `doc/source/conf.py`
+    - `shoebot/ide/ide.py`
 
   * update the changelogs
-    - CHANGELOG
-    - debian/changelog
+    - `CHANGELOG`
+    - `debian/changelog`
 
   * tag the release commit
   * publish release on GitHub
@@ -132,3 +133,5 @@ There are some dependencies to look out for::
 Be sure to go through this checklist:
 
   * update the debian/changelog file
+
+Then, generate the Debian packages with the `make builddeb` command.
