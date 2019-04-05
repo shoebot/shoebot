@@ -122,6 +122,12 @@ This is our checklist to be sure we don't miss any detail when we put out a rele
   * publish release on GitHub
 
   * push to PyPI
+    - register on PyPI and place your credentials in `~/.pypirc`
+    - install Twine
+    - make a source build with `python setup.py sdist`
+    - make a test upload to TestPyPI with `twine upload --repository-url https://test.pypi.org/legacy/ dist/shoebot-1.3.tar.gz`
+    - if all is good, upload to PyPI with `twine upload dist/shoebot-1.3.tar.gz`
+    - be sure to change the version numbers in the previous commands according to the current Shoebot version
 
 Building Debian packages
 ------------------------
