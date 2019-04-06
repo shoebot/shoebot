@@ -13,9 +13,7 @@ install:
  - sudo ./install/install_dependencies.sh
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
- - pip install vext.gi
- - pip install setuptools>=18.8 pycairo>=1.17.0 meta==1.0.2 Pillow>=2.8.1 pubsub==0.1.1
- - pip install --no-deps .
+ - pip install .
  - pip freeze
 
 script:
