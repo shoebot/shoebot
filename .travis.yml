@@ -13,7 +13,7 @@ install:
  - sudo ./install/install_dependencies.sh
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
- - pip install --no-binary .
+ - python setup.py install
  - pip freeze
 
 script:
