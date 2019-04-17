@@ -118,7 +118,7 @@ datafiles.extend(
 )
 
 PYCAIRO = "pycairo>=1.17.0"
-PYGOBJECT = "pybobject>=3.32"
+PYGOBJECT = "pygobject>=3.32"
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
