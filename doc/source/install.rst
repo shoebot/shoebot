@@ -39,7 +39,6 @@ If you're using the handy `virtualenvwrapper <https://virtualenvwrapper.readthed
 .. code:: bash
 
     mkvirtualenv shoebot
-    pip install -r requirements.txt
     python setup.py install
 
 To use Shoebot in the future, you will need to activate the environment first:
@@ -57,7 +56,6 @@ If you don't use virtualenvwrapper, run these commands after installing the depe
 
     virtualenv .env
     source .env/bin/activate
-    pip install -r requirements.txt
     python setup.py install
 
 To use shoebot in the future, remember to activate the environment first.
