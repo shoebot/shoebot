@@ -20,6 +20,7 @@ from util import TestSequence
 FORMATS = ["png", "ps", "pdf", "svg"]
 BOT_CODE = "background(0)"
 
+
 def run_shoebot_code(code, outputfile):
     bot = shoebot.create_bot(outputfile=outputfile)
     bot.run(code)
@@ -34,13 +35,15 @@ def create_output_test(fmt):
         size_not_zero = stat(fn).st_size != 0
         self.assertTrue(size_not_zero, "%s is zero bytes." % fn)
         unlink(fn)
+
     return test
 
 
 class TestFileOutput(unittest.TestCase):
     __metaclass__ = TestSequence
 
-    test_create = ("test_create_%s", create_output_test, FORMATS) 
+    test_create = ("test_create_%s", create_output_test, FORMATS)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
