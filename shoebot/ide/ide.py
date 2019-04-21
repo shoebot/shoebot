@@ -800,7 +800,7 @@ class ShoebotEditorWindow(Gtk.Window):
         have_backup = True
         buffer = self.source_buffer
         start, end = buffer.get_bounds()
-        chars = self.get_slice(start, end, False)
+        chars = buffer.get_slice(start, end, False)
         try:
             with open(self.filename, "w") as f:
                 f.write(chars)
