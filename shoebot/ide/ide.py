@@ -843,11 +843,8 @@ class ShoebotEditorWindow(Gtk.Window):
         saved = chooser.run() == Gtk.ResponseType.ACCEPT
         if saved:
             old_filename = self.filename
-            self.filename = chooser.get_filename()
-            if self.save():
-                self.filename = chooser.get_filename()
-                self.filename_set()
-            else:
+            self.source_buffer.filename = chooser.get_filename()
+            if not self.save():
                 self.filename = old_filename
         chooser.destroy()
         return saved
