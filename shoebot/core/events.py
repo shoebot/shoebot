@@ -27,6 +27,7 @@ QUIT_EVENT = "quit"
 SOURCE_CHANGED_EVENT = "source-changed"
 VARIABLE_UPDATED_EVENT = "variable-updated"
 SET_WINDOW_TITLE = "set-window-title"
+REDRAW = "redraw"
 
 
 def next_event(block=False, timeout=None):

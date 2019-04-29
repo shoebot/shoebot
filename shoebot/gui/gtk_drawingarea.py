@@ -4,6 +4,7 @@ from math import radians
 from pkg_resources import resource_filename, Requirement
 
 from shoebot.core.backend import cairo, gi, driver
+from shoebot.core.events import REDRAW, publish_event
 from shoebot.sbio.socket_server import SocketServer
 
 gi.require_version('Gtk', '3.0')
@@ -72,6 +73,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     def on_resize(self, widget, dimensions):
         self.width = dimensions.width
         self.height = dimensions.height
+        publish_event(REDRAW)
 
     def scale_context_and_center(self, cr):
         """
@@ -105,7 +107,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             return
 
         cr = driver.ensure_pycairo_context(cr)
-
+        
         surface = self.backing_store.surface
         cr.set_source_surface(surface)
         cr.paint()
