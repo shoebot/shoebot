@@ -73,7 +73,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         self.width = dimensions.width
         self.height = dimensions.height
 
-    def scale_context(self, cr):
+    def scale_context_and_center(self, cr):
         """
         Scale context based on difference between bot size and widget
         """
@@ -83,9 +83,11 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             if self.width < self.height:
                 scale_x = float(self.width) / float(bot_width)
                 scale_y = scale_x
+                cr.translate(0, (self.height - (bot_height * scale_y)) / 2.0)
             elif self.width > self.height:
                 scale_y = float(self.height) / float(bot_height)
                 scale_x = scale_y
+                cr.translate((self.width - (bot_width * scale_x)) / 2.0, 0)
             else:
                 scale_x = 1.0
                 scale_y = 1.0
@@ -104,12 +106,8 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
 
         cr = driver.ensure_pycairo_context(cr)
 
-        cr.set_source_rgb(1, 1, 1)
-        cr.paint()
-
         surface = self.backing_store.surface
         cr.set_source_surface(surface)
-
         cr.paint()
 
     def create_rcontext(self, size, frame):
@@ -143,7 +141,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
 
         cr = pycairo.Context(self.backing_store.surface)
         if self.scale_fit:
-            self.scale_context(cr)
+            self.scale_context_and_center(cr)
 
         cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
         cr.set_source_surface(cairo_ctx.get_target())
