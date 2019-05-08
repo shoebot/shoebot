@@ -375,7 +375,7 @@ class ShoebotEditorWindow(Gtk.Window):
         action_group = Gtk.ActionGroup("my_actions")
 
         action_group.add_actions([
-            ("FileMenu", None, "File"),
+            ("FileMenu", None, "_File"),
             ("FileNew", Gtk.STOCK_NEW, "_New", "<control>N", None, self.on_new_file),
             ("FileOpen", Gtk.STOCK_OPEN, "_Open", "<control>O", None, self.on_open_file),
             ("FileSave", Gtk.STOCK_SAVE, "_Save", "<control>S", None, self.on_save_file),
@@ -385,7 +385,7 @@ class ShoebotEditorWindow(Gtk.Window):
         ])
 
         action_group.add_actions([
-            ("EditMenu", None, "Edit"),
+            ("EditMenu", None, "_Edit"),
             ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.on_undo),
             ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.on_redo),
             ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.on_find),
@@ -404,7 +404,7 @@ class ShoebotEditorWindow(Gtk.Window):
         ], 1, self.on_theme_changed)
 
         action_group.add_actions([
-            ("RunMenu", None, "Run"),
+            ("RunMenu", None, "_Run"),
             ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.on_run_script),
         ])
         fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
@@ -415,7 +415,7 @@ class ShoebotEditorWindow(Gtk.Window):
         action_group.add_action(socketserver)
 
         action_group.add_actions([
-            ("HelpMenu", None, "Help"),
+            ("HelpMenu", None, "_Help"),
             ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.on_about),
         ])
 
