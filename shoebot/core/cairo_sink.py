@@ -73,7 +73,8 @@ class CairoImageSink(DrawQueueSink):
         if self.buff:
             return self.buff
         elif self.multifile:
-            return self.file_root + "_%03d" % frame + self.file_ext
+            file_root, file_ext = os.path.splitext(self.filename)
+            return file_root + "_%03d" % frame + file_ext
         else:
             return self.filename
 
