@@ -13,7 +13,6 @@ from shoebot.data import geometry, Point, BezierPath, Image, RGB, HSB, \
 
 from math import sin, cos, pi
 from math import radians as deg2rad
-from types import TupleType
 from PIL import Image as PILImage
 
 import locale
@@ -361,7 +360,7 @@ class NodeBot(Bot):
         # as someone supplying a list of (x,y)-tuples.
 
         for i, pt in enumerate(points):
-            if type(pt) == TupleType:
+            if type(pt) == tuple:
                 points[i] = Point(pt[0], pt[1])
 
         if len(points) == 0:

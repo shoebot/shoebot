@@ -39,7 +39,7 @@ def next_event(block=False, timeout=None):
     :return: None or (event, data)
     """
     try:
-        return channel.listen(block=block, timeout=timeout).next()['data']
+        return next(channel.listen(block=block, timeout=timeout))['data']
     except StopIteration:
         return None
 
