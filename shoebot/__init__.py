@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # This file is part of Shoebot.
 # Copyright (C) 2007-2009 the Shoebot authors
@@ -141,7 +141,15 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     See create_canvas for details on those parameters.
 
     """
-    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen,
+    multifile = True if iterations and iterations > 1 else False
+    canvas = create_canvas(src=src,
+                           format=format,
+                           outputfile=outputfile,
+                           multifile=multifile,
+                           buff=buff,
+                           window=window,
+                           title=title,
+                           fullscreen=fullscreen,
                            show_vars=show_vars)
 
     if grammar == DRAWBOT:
