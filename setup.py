@@ -117,15 +117,15 @@ datafiles.extend(
     ]
 )
 
-PYCAIRO = "pycairo>=1.17.0"
-PYGOBJECT = "pygobject>=3.32"
+PYCAIRO = "pycairo>=1.18.1"
+PYGOBJECT = "pygobject>=3.32.1"
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
     PYCAIRO,
     "meta==1.0.2",
-    "Pillow>=2.8.1",
-    "pubsub==0.1.1",
+    "Pillow>=6.0.0",
+    "pubsub==0.1.2",
 ]
 
 # Requirements to run examples
@@ -135,7 +135,7 @@ EXAMPLE_REQUIREMENTS = [
     "PySoundCard>=0.5.2",  # sbaudio
 ]
 if not is_pypy:
-    EXAMPLE_REQUIREMENTS.append("numpy>=1.9.1")
+    EXAMPLE_REQUIREMENTS.append("numpy>=1.16.4")
 
 
 def requirements(debug=True, with_examples=True, with_pgi=None):
