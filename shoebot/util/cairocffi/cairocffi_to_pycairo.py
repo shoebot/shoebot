@@ -1,5 +1,5 @@
 # From cairocffi
-from pycairo_capi import get_capi
+from .pycairo_capi import get_capi
 
 
 def _UNSAFE_cairocffi_context_to_pycairo(ctx):

@@ -26,7 +26,7 @@ class Variable(object):
         :return:
         """
         self.name = name
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise AttributeError("Variable name must be a string")
         if kwargs.get("step") and kwargs.get("steps"):
             raise AttributeError("Can only set step or steps")  # TODO - is this too strict
@@ -65,11 +65,11 @@ class Variable(object):
                 return 0.0
         elif self.type == TEXT:
             try:
-                return unicode(str(val), "utf_8", "replace")
+                return str(str(val), "utf_8", "replace")
             except:
                 return ""
         elif self.type == BOOLEAN:
-            if unicode(val).lower() in ("true", "1", "yes"):
+            if str(val).lower() in ("true", "1", "yes"):
                 return True
             else:
                 return False

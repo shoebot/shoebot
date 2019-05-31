@@ -51,9 +51,7 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 
-class Canvas(object):
-    __metaclass__ = ABCMeta
-
+class Canvas(object, metaclass=ABCMeta):
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
 
@@ -107,7 +105,7 @@ class Canvas(object):
         '''
         Pass a load of settings into the canvas
         '''
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             setattr(self, k, v)
 
     def size_or_default(self):

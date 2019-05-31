@@ -84,7 +84,7 @@ class Text(Grob, ColorMixin):
 
         self._doRender = enableRendering
 
-        self.text = unicode(text)
+        self.text = str(text)
         self.x = x
         self.y = y
         self.width = width

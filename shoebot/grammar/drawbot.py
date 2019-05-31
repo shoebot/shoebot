@@ -1,5 +1,5 @@
 import sys
-from bot import Bot
+from .bot import Bot
 from shoebot.data import BezierPath, Image, ShoebotError
 from math import radians as deg2rad
 
@@ -98,34 +98,34 @@ class DrawBot(Bot):
     def moveto(self, x, y):
         if self._path is None:
             ## self.newpath()
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.moveto(x,y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def arcto(self, x, y, radius, angle1, angle2):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.arc(x, y, radius, angle1, angle2)
 
     def closepath(self):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -151,20 +151,20 @@ class DrawBot(Bot):
     def relmoveto(self, x, y):
         '''Move relatively to the last point.'''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.relmoveto(x,y)
 
     def rellineto(self, x, y):
         '''Draw a line using relative coordinates.'''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.rellineto(x,y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
         '''Draws a curve relatively to the last point.
         '''
         if self._path is None:
-            raise ShoebotError, _("No current path. Use newpath() first.")
+            raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.relcurveto(x,y)
 
     def autoclosepath(self, close=True): 
@@ -239,7 +239,7 @@ class DrawBot(Bot):
             elif mode == "hsb":
                 self.color_mode = Bot.HSB
             else:
-                raise NameError, _("Only RGB and HSB colormodes are supported.")
+                raise NameError(_("Only RGB and HSB colormodes are supported."))
         if crange is not None:
             self.color_range = crange
         return self.color_mode

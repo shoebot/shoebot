@@ -63,7 +63,7 @@ def json_arg(s):
 def error(message):
     '''Prints an error message, the help message and quits'''
     global parser
-    print (_("Error: ") + message)
+    print((_("Error: ") + message))
     print ()
     parser.print_help()
     sys.exit()
@@ -71,7 +71,7 @@ def error(message):
 
 def warn(message):
     '''Print a warning message'''
-    print (_("Warning: ") + message)
+    print((_("Warning: ") + message))
 
 
 def main():
@@ -209,7 +209,7 @@ def main():
     args, extra = parser.parse_known_args()
 
     if args.diagnose:
-        from diagnose import diagnose
+        from .diagnose import diagnose
         diagnose()
         sys.exit()
 
@@ -226,7 +226,7 @@ def main():
     else:
         namespace = None
 
-    from __init__ import run  # https://github.com/shoebot/shoebot/issues/206
+    from .__init__ import run  # https://github.com/shoebot/shoebot/issues/206
     run(src=args.script,
         grammar=args.grammar,
         outputfile=args.outputfile,

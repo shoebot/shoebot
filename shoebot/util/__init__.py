@@ -29,7 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Assorted utility functions, mainly for color and font handling'''
 
-from __future__ import division
+
 
 '''
 def rgb_to_hsl(r, g, b):

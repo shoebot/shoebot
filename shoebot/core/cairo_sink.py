@@ -30,7 +30,7 @@
 import os
 
 from .backend import cairo
-from drawqueue_sink import DrawQueueSink
+from .drawqueue_sink import DrawQueueSink
 
 
 class CairoImageSink(DrawQueueSink):

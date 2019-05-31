@@ -15,5 +15,5 @@ socketserver  similar to 'shell' but for remote connections, allows changing man
 """
 # NOTE - Called 'sbio' not 'io', since calling a module 'io' can break
 #        the stdlib and ability to install things with pip :/
-from shell import ShoebotCmd
-from socket_server import SocketServer
+from .shell import ShoebotCmd
+from .socket_server import SocketServer

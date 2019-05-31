@@ -4,7 +4,7 @@ import sys
 import traceback
 from time import sleep, time
 
-from livecode import LiveExecution
+from .livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
@@ -164,7 +164,7 @@ class Grammar(object):
                                 # Re-run the function body - ideally this would only
                                 # happen if the body had actually changed
                                 # - Or perhaps if the line included a variable declaration
-                                exec source in ns
+                                exec(source, ns)
 
                         ns['draw']()
                         self._canvas.flush(self._frame)
@@ -184,9 +184,9 @@ class Grammar(object):
                             # Re-run the function body - ideally this would only
                             # happen if the body had actually changed
                             # - Or perhaps if the line included a variable declaration
-                            exec source in ns
+                            exec(source, ns)
                     else:
-                        exec source in ns
+                        exec(source, ns)
 
                     self._canvas.flush(self._frame)
         if limit:
@@ -216,7 +216,7 @@ class Grammar(object):
         if os.path.isfile(inputcode):
             source = open(inputcode).read()
             filename = inputcode
-        elif isinstance(inputcode, basestring):
+        elif isinstance(inputcode, str):
             filename = 'shoebot_code'
             source = inputcode
 
@@ -287,7 +287,7 @@ class Grammar(object):
                 errmsg = traceback.format_exc()
             else:
                 errmsg = simple_traceback(e, executor.known_good or '')
-            print >> sys.stderr, errmsg
+            print(errmsg, file=sys.stderr)
             if break_on_error:
                 raise
 

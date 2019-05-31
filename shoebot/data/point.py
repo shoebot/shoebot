@@ -13,7 +13,7 @@ class Point(object):
         elif len(args) == 0:
             self.x = self.y = 0.0
         else:
-            raise ValueError, _("Wrong initializer for Point object")
+            raise ValueError(_("Wrong initializer for Point object"))
 
     def __repr__(self):
         return (self.x, self.y)

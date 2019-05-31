@@ -29,7 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''GTK front-end for Shoebot'''
 
-from gtk_drawingarea import ShoebotWidget
-from var_window import VarWindow
-from gtk_window import ShoebotWindow
-from gtk_input_device import GtkInputDeviceMixin
+from .gtk_drawingarea import ShoebotWidget
+from .var_window import VarWindow
+from .gtk_window import ShoebotWindow
+from .gtk_input_device import GtkInputDeviceMixin

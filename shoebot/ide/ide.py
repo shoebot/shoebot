@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: iso-8859-1 -*-
 
-from __future__ import print_function
+
 
 import errno
 import gettext
@@ -173,8 +173,7 @@ class SourceBuffer(GtkSource.Buffer):
 
         for tag in self.color_tags:
             if enabled:
-                color = apply(ShoebotIDE.colormap.alloc_color,
-                              hue_to_color(hue))
+                color = ShoebotIDE.colormap.alloc_color(*hue_to_color(hue))
                 tag.set_property("foreground_gdk", color)
             else:
                 tag.set_property("foreground_set", False)
@@ -184,8 +183,7 @@ class SourceBuffer(GtkSource.Buffer):
         hue = self.start_hue
 
         for tag in self.color_tags:
-            color = apply(ShoebotIDE.colormap.alloc_color,
-                          hue_to_color(hue))
+            color = ShoebotIDE.colormap.alloc_color(*hue_to_color(hue))
             tag.set_property("foreground_gdk", color)
 
             hue += 1.0 / SourceBuffer.N_COLORS
@@ -521,7 +519,8 @@ class ShoebotEditorWindow(Gtk.Window):
         try:
             ShoebotEditorWindow(filename)
             return True
-        except IOError, (errnum, errmsg):
+        except IOError as xxx_todo_changeme1:
+            (errnum, errmsg) = xxx_todo_changeme1.args
             dialog = Gtk.MessageDialog(None,
                                        Gtk.DialogFlags.MODAL,
                                        Gtk.MessageType.INFO,
@@ -784,7 +783,8 @@ class ShoebotEditorWindow(Gtk.Window):
             if os.path.isfile(bak_filename):
                 os.remove(bak_filename)
             os.rename(self.filename, bak_filename)
-        except (OSError, IOError), (errnum, errmsg):
+        except (OSError, IOError) as xxx_todo_changeme2:
+            (errnum, errmsg) = xxx_todo_changeme2.args
             if errnum != errno.ENOENT:
                 err = "Cannot back up '%s' to '%s': %s" % (self.filename,
                                                            bak_filename,
@@ -806,7 +806,8 @@ class ShoebotEditorWindow(Gtk.Window):
                 f.write(chars)
             result = True
             self.source_buffer.set_modified(False)
-        except IOError, (errnum, errmsg):
+        except IOError as xxx_todo_changeme3:
+            (errnum, errmsg) = xxx_todo_changeme3.args
             err = "Error writing to '%s': %s" % (self.filename, errmsg)
             dialog = Gtk.MessageDialog(self,
                                        Gtk.DialogFlags.MODAL,
@@ -818,7 +819,8 @@ class ShoebotEditorWindow(Gtk.Window):
         if not result and have_backup:
             try:
                 os.rename(bak_filename, self.filename)
-            except OSError, (errnum, errmsg):
+            except OSError as xxx_todo_changeme:
+                (errnum, errmsg) = xxx_todo_changeme.args
                 err = "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'" % (
                     self.filename, bak_filename, errmsg, bak_filename)
                 dialog = Gtk.MessageDialog(self,
@@ -950,7 +952,7 @@ class ShoebotEditorWindow(Gtk.Window):
                                      window=True)
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
-        except ShoebotError, NameError:
+        except ShoebotError as NameError:
             import traceback
             import sys
 

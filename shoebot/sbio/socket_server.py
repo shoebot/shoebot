@@ -21,7 +21,7 @@ import gettext
 from shoebot.core.backend import gi
 
 from gi.repository import GObject
-from shell import ShoebotCmd
+from .shell import ShoebotCmd
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
@@ -83,7 +83,7 @@ class SocketServer(object):
         f = conn.makefile(conn)
         self.shell = ShoebotCmd(self.bot, stdin=f, stdout=f, intro=INTRO)
 
-        print(_("Connected"))
+        print((_("Connected")))
         GObject.io_add_watch(conn, GObject.IO_IN, self.handler)
         if self.shell.intro:
             self.shell.stdout.write(str(self.shell.intro)+"\n")

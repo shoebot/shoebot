@@ -100,12 +100,12 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
 
     Output to a filename (or files if multifile is set), or a buffer object.
     """
-    from core import CairoCanvas, CairoImageSink # https://github.com/shoebot/shoebot/issues/206
+    from .core import CairoCanvas, CairoImageSink # https://github.com/shoebot/shoebot/issues/206
 
     if outputfile:
         sink = CairoImageSink(outputfile, format, multifile, buff)
     elif window or show_vars:
-        from gui import ShoebotWindow
+        from .gui import ShoebotWindow
         if not title:
             if src and os.path.isfile(src):
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'

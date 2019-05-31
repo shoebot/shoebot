@@ -41,7 +41,7 @@ class VarWindow(object):
         self.add_variables()
 
         self.window.add(self.container)
-        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(list(self.widgets.keys())))
         self.window.show_all()
 
         if title:
@@ -53,7 +53,7 @@ class VarWindow(object):
         :param container:
         :return:
         """
-        for k, v in self.bot._vars.items():
+        for k, v in list(self.bot._vars.items()):
             if not hasattr(v, 'type'):
                 raise AttributeError(
                     '%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables' % k)
@@ -191,7 +191,7 @@ class VarWindow(object):
         """
         self.add_variable(v)
 
-        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(list(self.widgets.keys())))
         self.window.show_all()
 
     def var_deleted(self, v):
@@ -208,7 +208,7 @@ class VarWindow(object):
         self.container.remove(parent)
         del self.widgets[v.name]
 
-        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(list(self.widgets.keys())))
         self.window.show_all()
 
     def var_updated(self, v):

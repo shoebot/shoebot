@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 import string
 from math import floor
@@ -146,7 +146,7 @@ class Color(object):
 
     def _hasattrs(self, list):
         for a in list:
-            if not self.__dict__.has_key(a):
+            if a not in self.__dict__:
                 return False
         return True
 
@@ -222,7 +222,7 @@ class Color(object):
 
         """
 
-        if self.__dict__.has_key(a):
+        if a in self.__dict__:
             return a
         elif a == "black":
             return self.__dict__["__k"]
@@ -239,7 +239,7 @@ class Color(object):
                    "h", "s", "hue", "saturation"]:
             return self.__dict__["__" + a[0]]
 
-        raise AttributeError, "'" + str(self.__class__) + "' object has no attribute '" + a + "'"
+        raise AttributeError("'" + str(self.__class__) + "' object has no attribute '" + a + "'")
 
 
 class ColorMixin(object):
@@ -358,7 +358,7 @@ def parse_color(v, color_range=1):
             blue = color[2]
             alpha = color[3]
 
-    elif isinstance(v, basestring):
+    elif isinstance(v, str):
         # got a hexstring: first remove hash character, if any
         v = v.strip('#')
         if len(data) == 6:
@@ -544,7 +544,7 @@ def rgba_to_argb(stringImage):
 
 
 def parse_hsb_color(v, color_range=1):
-    if isinstance(v, basestring):
+    if isinstance(v, str):
         # hexstrings aren't hsb
         return parse_color(v)
     hue, saturation, brightness, alpha = parse_color(v, color_range)

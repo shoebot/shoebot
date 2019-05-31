@@ -299,7 +299,8 @@ class Point(object):
 
     def _get_xy(self):
         return (self.x, self.y)
-    def _set_xy(self, (x,y)):
+    def _set_xy(self, xxx_todo_changeme):
+        (x,y) = xxx_todo_changeme
         self.x = x
         self.y = y
 

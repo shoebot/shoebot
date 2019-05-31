@@ -2,7 +2,7 @@ from shoebot.core.backend import cairo, gi, driver
 from shoebot.data import _copy_attrs
 
 import array
-from StringIO import StringIO
+from io import StringIO
 import os.path
 
 from PIL import Image as PILImage
@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 try:
     gi.require_version('Rsvg', '2.0')
     from gi.repository import Rsvg
-except ImportError, ValueError:
+except ImportError as ValueError:
     Rsvg = None
 
 from shoebot.data import Grob, ColorMixin

@@ -30,7 +30,7 @@ def simple_traceback(ex, source):
     # code around the error
     err_where = ' '.join(exc[i - 1].split(',')[1:]).strip()  # 'line 37 in blah"
     err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-    for i in xrange(max(0, line_number - 5), line_number):
+    for i in range(max(0, line_number - 5), line_number):
         if fn == "<string>":
             line = source_arr[i]
         else:

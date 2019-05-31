@@ -10,7 +10,7 @@ from pkg_resources import resource_filename, Requirement
 
 from shoebot.gui import ShoebotWidget, VarWindow
 from shoebot.core import DrawQueueSink
-from gtk_input_device import GtkInputDeviceMixin
+from .gtk_input_device import GtkInputDeviceMixin
 
 import locale
 import gettext
@@ -301,7 +301,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
         for snapshot_f in self.scheduled_snapshots:
             fn = snapshot_f(self.last_draw_ctx)
-            print("Saved snapshot: %s" % fn)
+            print(("Saved snapshot: %s" % fn))
         else:
             self.scheduled_snapshots = deque()
 

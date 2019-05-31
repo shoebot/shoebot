@@ -61,10 +61,10 @@ def _copy_attr(v):
         return list(v)
     elif isinstance(v, tuple):
         return tuple(v)
-    elif isinstance(v, (int, str, unicode, float, bool, long)):
+    elif isinstance(v, (int, str, float, bool)):
         return v
     else:
-        raise NodeBoxError, _("Don't know how to copy '%s'.") % v
+        raise NodeBoxError(_("Don't know how to copy '%s'.") % v)
 
 
 def _copy_attrs(source, target, attrs):
@@ -72,19 +72,19 @@ def _copy_attrs(source, target, attrs):
         setattr(target, attr, _copy_attr(getattr(source, attr)))
 
 
-import geometry as geo
-from point import Point
-from basecolor import Color, ColorMixin
-from grob import Grob
-from bezier import BezierPath, PathElement, ClippingPath, EndClip
+from . import geometry as geo
+from .point import Point
+from .basecolor import Color, ColorMixin
+from .grob import Grob
+from .bezier import BezierPath, PathElement, ClippingPath, EndClip
 try:
-    from typography import Text
+    from .typography import Text
 except ImportError as e:
     Text = None
-    print('Typography not available ', e)
-from img import Image
-from variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
-from transforms import Transform
+    print(('Typography not available ', e))
+from .img import Image
+from .variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
+from .transforms import Transform
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"

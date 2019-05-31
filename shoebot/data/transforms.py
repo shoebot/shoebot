@@ -6,7 +6,7 @@ import sys
 
 from shoebot.core.backend import cairo
 from math import sin, cos
-from bezier import BezierPath
+from .bezier import BezierPath
 
 TRANSFORMS = ['translate', 'scale', 'rotate', 'skew', 'push', 'pop']
 CENTER = 'center'
@@ -42,7 +42,7 @@ class Transform:
         elif isinstance(transform, cairo.Matrix):
             self.append(transform)
         else:
-            raise ValueError, _("Transform: Don't know how to handle transform %s.") % transform
+            raise ValueError(_("Transform: Don't know how to handle transform %s.") % transform)
 
     def translate(self, x, y):
         t = ('translate', x, y)
@@ -191,7 +191,7 @@ class Transform:
             raise ValueError("Can only transform BezierPaths")
 
         for point in path:
-            print point
+            print(point)
         #path._nsBezierPath = self._nsAffineTransform.transformBezierPath_(path._nsBezierPath)
         return path
 

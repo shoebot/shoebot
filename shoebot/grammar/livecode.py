@@ -79,7 +79,7 @@ class LiveExecution(object):
 
         tenuous is True if the source has just been edited and may fail
         """
-        exec source in ns
+        exec(source, ns)
 
     def run_tenuous(self):
         """

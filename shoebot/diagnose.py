@@ -8,7 +8,7 @@ Currently shows
 
 This can be complemented by running the unittests.
 """
-from __future__ import print_function
+
 
 import os
 import platform
@@ -168,7 +168,7 @@ def display_graphics_implementation():
     print("Graphics Implementation:")
     try:
         from shoebot.core.backend import driver
-        for k, v in driver.get_libs().items():
+        for k, v in list(driver.get_libs().items()):
             print("    %s: %s" % (k, v))
     except Exception as e:
         raise
