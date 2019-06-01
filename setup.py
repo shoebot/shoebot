@@ -28,6 +28,8 @@ info = textwrap.dedent(
 """
 )
 
+IS_PYTHON2 = sys.version_info < (3, 0)
+
 # the following libraries will not be installed
 EXCLUDE_LIBS = ["lib/sbopencv", "lib/sbopencv/blobs"]
 
@@ -117,8 +119,12 @@ datafiles.extend(
     ]
 )
 
-PYCAIRO = "pycairo>=1.18.1"
-PYGOBJECT = "pygobject>=3.32.1"
+if IS_PYTHON2:
+    PYCAIRO = "pycairo>=1.17.0"
+    PYGOBJECT = "pygobject>=3.32"
+else:
+    PYCAIRO = "pycairo>=1.18.1"
+    PYGOBJECT = "pygobject>=3.32.1"
 # Also requires one of 'vext.gi' or 'pgi' to run in GUI
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
