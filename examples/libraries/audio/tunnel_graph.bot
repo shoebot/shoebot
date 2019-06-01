@@ -4,14 +4,16 @@ by Stuart Axon
 
 Audio reactive bot - graphs are displayed in a tunnel, changing from
 yellow to red
-
-Requires the pysoundcard Python module:
-    $ pip install pysoundcard
 """
 
 import math
-import numpy as np
+import sys
 from sbaudio import audio, scaled_fft
+try:
+    import numpy as np
+except ImportError:
+    print("You need to install the numpy module (pip install numpy).")
+    sys.exit()
 
 
 def setup():
