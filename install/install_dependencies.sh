@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Linux
-REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel pycairo python2-devel python2-gobject cairo-gobject python2-pillow"
+REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
 # Fedora == Redhat, these are not detected separately.
 
-SUSE_PACKAGES="gcc libjpeg62-devel python-pycairo python2-gobject python2-gobject-cairo python2-Pillow"
+SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
 
-DEB_PACKAGES="build-essential libjpeg-dev python-cairo python2.7-dev python-gi-cairo python-gobject gir1.2-rsvg-2.0"
+DEB_PACKAGES="build-essential libjpeg-dev python3-dev python-gi-cairo python-gobject gir1.2-rsvg-2.0"
 DEBIAN_PACKAGES=${DEB_PACKAGES}
 UBUNTU_PACKAGES=${DEB_PACKAGES}
 MINT_PACKAGES=${DEB_PACKAGES}
