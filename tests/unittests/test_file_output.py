@@ -15,7 +15,7 @@ from shoebot.core import CairoCanvas, CairoImageSink
 from shoebot.data import BezierPath
 from shoebot.grammar import NodeBot
 
-from util import TestSequence
+from .util import TestSequence
 
 FORMATS = ["png", "ps", "pdf", "svg"]
 BOT_CODE = "background(0)"
@@ -40,7 +40,7 @@ def create_output_test(fmt):
 class TestFileOutput(unittest.TestCase):
     __metaclass__ = TestSequence
 
-    test_create = ("test_create_%s", create_output_test, FORMATS) 
+    test_create = ("test_create_%s", create_output_test, FORMATS)
 
 if __name__ == '__main__':
     unittest.main()
