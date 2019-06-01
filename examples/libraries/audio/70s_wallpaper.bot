@@ -1,0 +1,58 @@
+"""
+A audio reactive bot that looks somewhat like an animated version of
+wallpaper from the 1970s
+by Stuart Axon
+
+Requires the pysoundcard Python module:
+    $ pip install pysoundcard
+"""
+
+from sbaudio import audio, scaled_fft, triple
+from math import sin
+
+
+def draw_pyra(r, box_size):
+    stroke(0)
+    strokewidth(5)
+    nostroke()
+    push()
+    half_box = box_size / 2
+    for a in range(0, half_box, half_box / 10):
+        rotate(r / 10)
+        c = sin(20 / float(a + 1))
+        fill(c, c, 0.2 + (c / 2))
+        stroke(r - a)
+        rect(-half_box + a + (sin(r / 100) * 4.0), -half_box + a, box_size - a * 2, box_size - a * 2)
+    pop()
+
+
+r = 0
+
+
+def draw():
+    global NUM_SAMPLES
+    global r
+
+    spectrogram = scaled_fft(audio.spectrogram, scale=80)
+    # freqs = len(spectrogram)
+
+    bass, mid, treble = triple(spectrogram)
+
+    fill(1, 1, 1)
+    r += float(sum(bass) / len(bass) * 10.0)
+
+    if r > 1:
+        r -= (r / 2.0)
+    elif r < 1:
+        r -= (r / 2.0)
+
+    # draw grid of boxes
+    box_size = int(200 + (sin(float(FRAME) / 30.0) * 20))
+    # translate(-box_size / 2, -box_size / 2)
+    for y in range(0, (HEIGHT / box_size) + 2):
+        push()
+        for x in range(0, (WIDTH / box_size) + 2):
+            draw_pyra(r, box_size)
+            translate(box_size, 0)
+        pop()
+        translate(0, box_size)

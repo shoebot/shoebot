@@ -5,11 +5,14 @@ BUTTON = 4
 
 DEFAULT_STEPS = 256.0
 
+
 def clamp(minvalue, value, maxvalue):
     return max(minvalue, min(value, maxvalue))
 
+
 class Variable(object):
     '''Taken from Nodebox'''
+
     def __init__(self, name, type, **kwargs):
         """
         :param name:     Name of variable
@@ -26,7 +29,7 @@ class Variable(object):
         if not isinstance(name, basestring):
             raise AttributeError("Variable name must be a string")
         if kwargs.get("step") and kwargs.get("steps"):
-            raise AttributeError("Can only set step or steps") # TODO - is this too strict
+            raise AttributeError("Can only set step or steps")  # TODO - is this too strict
         self.type = type or NUMBER
         self.min = None
         self.max = None
@@ -35,7 +38,6 @@ class Variable(object):
         if self.type == NUMBER:
             self.min = kwargs.get("min", 0.0)
             self.max = kwargs.get("max", 100.0)
-            self.step = kwargs.get("step")
             if self.step is None:
                 diff = max(self.min, self.max) - min(self.min, self.max)
                 self.step = (diff / float(self.steps))
@@ -85,5 +87,5 @@ class Variable(object):
         return False
 
     def __repr__(self):
-        return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (self.name, self.type, self.default, self.min, self.max, self.value)
-
+        return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % \
+               (self.name, self.type, self.default, self.min, self.max, self.value)

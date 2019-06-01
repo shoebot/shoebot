@@ -30,13 +30,15 @@
 
 from collections import deque
 
+
 class DrawQueue(object):
     '''
     A list of draw commands, stored as callables that, are
     passed a set of parameters to draw on from the canvas
     implementation.
     '''
-    def __init__(self, render_funcs = None):
+
+    def __init__(self, render_funcs=None):
         self.render_funcs = render_funcs or deque()
 
     def append_immediate(self, render_func):

@@ -1,0 +1,82 @@
+"""
+Tunnel graph
+by Stuart Axon
+
+Audio reactive bot - graphs are displayed in a tunnel, changing from
+yellow to red
+
+Requires the pysoundcard Python module:
+    $ pip install pysoundcard
+"""
+
+import math
+import numpy as np
+from sbaudio import audio, scaled_fft
+
+
+def setup():
+    global spectrograms, bandpassed
+    speed(50)
+    size(1920, 1080)
+    background(0)
+    spectrograms = []
+    bandpassed = []
+
+
+def draw_freqs(freqs):
+    s = 4
+    for i, a in enumerate(freqs[0:128]):
+        h = s * a
+        rect(i * s, HEIGHT - h - 40, s, h)
+
+
+def draw_freqs2(freqs):
+    s = 4
+    for i, a in enumerate(freqs[0:128]):
+        h = s * a
+        rect(i * s, HEIGHT - h - 40, s, s)
+
+
+def spectro_circle(spectrogram, step=1, rot=1.0):
+    angle = (float(len(spectrogram)) / 360.0 / step) * rot
+    for i, s in enumerate(spectrogram):
+        rotate(angle)
+        translate(2, 0)
+        s = abs(s)
+        if s > 0.25:
+            rect(-1, -1, 2, s * 2.0, roundness=0.5)
+
+
+def draw():
+    global spectrograms, bandpassed
+
+    nofill()
+    reset()
+    amount = 25
+
+    spectrograms.append(np.abs(scaled_fft(audio.spectrogram)))
+    spectrograms = spectrograms[-amount:]
+
+    # bandpassed.append(np.abs(audio.bandpassed))
+    # bandpassed = bandpassed[-amount:]
+
+    # f = FRAME / 4.0
+
+    for i, spectrogram in enumerate(spectrograms):
+        c = (float(i) / len(spectrograms))
+        # fill(c, c, 0)
+        # fill(c)
+        stroke(c)
+        reset()
+        translate(WIDTH * 0.5, HEIGHT * 0.85)
+        # rotate(FRAME + i * 10)
+        scale(8 + i * 0.5)
+        fi = (FRAME + i) * 0.1
+        # rotate(-fi)
+        translate(math.sin(fi) * 16 + math.sin(FRAME * 0.3), (math.cos(fi) + 0.8) * 8)
+
+        if i > len(spectrograms) - 5:
+            fill(0.9, math.cos(fi) * 0.9, 0, 0.5)
+        else:
+            nofill()
+        spectro_circle(spectrogram, step=2, rot=4.0)

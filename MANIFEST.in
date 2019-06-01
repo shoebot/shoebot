@@ -5,6 +5,7 @@ include COPYING-GPL-3
 recursive-include shoebot/data *
 recursive-include shoebot/core *
 recursive-include shoebot/gui *
+recursive-include shoebot/util *
 recursive-include examples *
 recursive-include lib *
 prune shoebot/lib/sbopencv

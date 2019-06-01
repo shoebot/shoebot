@@ -1,38 +1,43 @@
+"""
+Draft text effect with path filters
+Originally from <http://nodebox.net/code/index.php/Path_Filters>
+"""
+
 # Path filter example originally from
 # http://nodebox.net/code/index.php/Path_Filters
 
 size(750, 300)
 background(0.23, 0.21, 0.15)
- 
+
 font("Cantarell", 150)
 path = textpath("Cantarell", 40, 200)
- 
-m = 15
 
-for i in range(m):
-    m -= 1
- 
-    for contour in path.contours:    
+amount = 15
+
+for i in range(amount):
+    amount -= 1
+
+    for contour in path.contours:
         prev = None
-        n = contour.length    
-        for pt in contour.points(n/80*i): 
-           
+        number_of_points = contour.length
+        for pt in contour.points(number_of_points / 80 * i):
+
             nofill()
             stroke(1, 0.75)
             strokewidth(0.25)
- 
-            if prev != None:
+
+            if prev is not None:
                 line(
-                    pt.x, 
-                    pt.y, 
-                    prev.x + random(-m, 0), 
-                    prev.y + random(-m, 0)
+                    pt.x,
+                    pt.y,
+                    prev.x + random(-amount, 0),
+                    prev.y + random(-amount, 0)
                 )
                 line(
-                    pt.x + random(-m, 0), 
-                    pt.y + random(-m, 0), 
-                    prev.x, 
+                    pt.x + random(-amount, 0),
+                    pt.y + random(-amount, 0),
+                    prev.x,
                     prev.y
                 )
- 
+
             prev = pt

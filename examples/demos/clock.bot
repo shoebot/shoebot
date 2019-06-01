@@ -1,6 +1,8 @@
-# Shoebot example program to draw an on-screen Clock
-# Written during LGM 2014 as part of the Shoebot Hackathon
-# Created by (C) Barak Itkin <lightningismyname <at> gmail <dot> com>
+"""
+Clock
+by Barak Itkin <lightningismyname <at> gmail <dot> com>
+written during LGM 2014 as part of the Shoebot workshop
+"""
 
 from time import localtime
 from math import sin, cos, pi
@@ -18,13 +20,13 @@ CIRCLE_MARGIN = 4
 # The thickness of each circle
 CIRCLE_THICKNESS = 4
 
-### Colors ###
+# Colors ###
 BLACK = (0, 0, 0)
 RED = (1, 0, 0)
 DARK_GREY = (0.2, 0.2, 0.2)
 
 # The starting color for the outter circle (from the Tango paletter)
-CIRCLE_START = (32 / 255.0, 74 / 255.0, 135 / 255.0) 
+CIRCLE_START = (32 / 255.0, 74 / 255.0, 135 / 255.0)
 # The finishing color for the inner circle (from the Tango paletter)
 CIRCLE_END = (114 / 255.0, 159 / 255.0, 207 / 255.0)
 
@@ -39,20 +41,27 @@ speed(1)
 # And a black background
 background(*BLACK)
 
-# Interpolate two colors
-# - The colors are assumed to be of the same length
-# - fraction is between 0.0 (start) to 1.0 (end)
-def color_interpolate(start, end, fraction = 0.5):
-    n = len(start)
-    return list(map(lambda i: start[i] * (1 - fraction) + end[i] * fraction, range(0,n)))
 
-# Compute the fraction (between 0.0 to 1.0) for a step
-# (from 0 to total_steps - 1) where the first step is 0.0
-# and the last step is 1.0
+def color_interpolate(start, end, fraction=0.5):
+    """
+    Interpolate two colors
+    - The colors are assumed to be of the same length
+    - fraction is between 0.0 (start) to 1.0 (end)
+    """
+    n = len(start)
+    return list(map(lambda i: start[i] * (1 - fraction) + end[i] * fraction, range(0, n)))
+
+
 def calc_fraction(step_index, total_steps):
+    """
+    Compute the fraction (between 0.0 to 1.0) for a step
+    (from 0 to total_steps - 1) where the first step is 0.0
+    and the last step is 1.0
+    """
     return step_index / (total_steps - 1.0) if total_steps > 1 else 0.5
-    
-def draw_hand(length, frac, color = RED):
+
+
+def draw_hand(length, frac, color=RED):
     # Note that we need to rotate by -90 degrees (90 CCW) because
     # the hands begin pointing upwards and not as a line pointing
     # to the left
@@ -67,7 +76,7 @@ def draw_hand(length, frac, color = RED):
     # Draw a drop-shadow by doing a dark line offsetted one pixel
     push()
     translate(1, 1)
-    stroke(*color_interpolate (color, BLACK, 0.8))
+    stroke(*color_interpolate(color, BLACK, 0.8))
     line(0, 0, x, y)
     pop()
 
@@ -77,11 +86,12 @@ def draw_hand(length, frac, color = RED):
 
     pop()
 
+
 def draw():
     strokewidth(3)
     fill(*DARK_GREY)
     for i in range(0, CIRCLE_COUNT):
-    	stroke(*color_interpolate(CIRCLE_START, CIRCLE_END, calc_fraction (i, CIRCLE_COUNT)))
+        stroke(*color_interpolate(CIRCLE_START, CIRCLE_END, calc_fraction(i, CIRCLE_COUNT)))
         shrink = 20 + CIRCLE_MARGIN * i
         oval(shrink, shrink, WIDTH - 2 * shrink, HEIGHT - 2 * shrink)
 

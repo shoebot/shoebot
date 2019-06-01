@@ -1,12 +1,18 @@
 Command reference
 =================
 
+This documentation is still missing some parts. Refer to the `Nodebox
+documentation <https://www.nodebox.net/code/index.php/Reference>`_ for the best
+reference in the meantime.
+
+.. contents:: :local:
+
 Drawing shapes
 --------------
 
 .. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
 
-    Draw a rectangle on the canvas.
+    Draw a rectangle.
  
     :param x: top left x-coordinate
     :param y: top left y-coordinate
@@ -17,7 +23,8 @@ Drawing shapes
     :param fill: fill color
 
     .. shoebot::
-        :snapshot:
+        :alt: four rectangles.  The last three have increasingly round corners.
+        :filename: drawing_shapes__rect.png
 
         rect(10, 10, 35, 35)
         # see how roundness affects the shape
@@ -27,7 +34,7 @@ Drawing shapes
 
 .. py:function:: ellipse(x, y, width, height, draw=True)
 
-    Draw an ellipse on the canvas. Same as `oval()`.
+    Draw an ellipse. Same as ``oval()``.
  
     :param x: top left x-coordinate
     :param y: top left y-coordinate
@@ -36,14 +43,15 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
+        :alt: Two ellipses.
+        :filename: drawing_shapes__ellipse.png
 
         ellipse(10, 20, 30, 60)
         ellipse(50, 30, 40, 40) # circle
 
 .. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
 
-    Draw an arrow on the canvas.
+    Draw an arrow.
  
     :param x: arrow tip x-coordinate
     :param y: arrow tip y-coordinate
@@ -53,14 +61,15 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
+        :alt: An arrow pointing right, and another pointing to the bottom right.
+        :filename: drawing_shapes__arrows.png
 
         arrow(50, 40, 40) # NORMAL is the default arrow type
         arrow(90, 40, 40, FORTYFIVE)
 
 .. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
 
-    Draw a star-like polygon on the canvas.
+    Draw a star-like polygon.
  
     :param startx: center x-coordinate
     :param starty: center y-coordinate
@@ -70,7 +79,9 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
 
     .. shoebot::
-        :snapshot:
+        :alt: 4 stars.
+        :filename: drawing_shapes__stars.png
+
         star(25, 25, 5, 20, 10)  # top left
         star(75, 25, 10, 20, 3)  # top right
         star(25, 75, 20, 20, 17) # bottom left
@@ -87,7 +98,8 @@ Drawing shapes
     :param boolean draw: whether to draw the shape on the canvas or not
     
     .. shoebot::
-        :snapshot:
+        :alt: 3 crossing lines.
+        :filename: drawing_shapes__line.png
 
         stroke(0.5)
         strokewidth(3)
@@ -125,6 +137,50 @@ Drawing shapes
     :py:func:`rectmode` to change the function's behaviour according to what might suit your
     script's needs.
 
+    .. shoebot::
+        :alt: green rectangle top left, blue centered and red at the bottom right.
+        :filename: drawing_shapes__rectmode.png
+
+        nofill()
+        strokewidth(2)
+
+        rectmode(CORNER)  # default, red
+        stroke(0.8, 0.1, 0.1)
+        rect(25, 25, 40, 40)
+
+        rectmode(CENTER)  # green
+        stroke(0.1, 0.8, 0.1)
+        rect(25, 25, 40, 40)
+
+        rectmode(CORNERS)  # blue
+        stroke(0.1, 0.1, 0.8)
+        rect(25, 25, 40, 40)
+
+.. py:function:: ellipsemode(mode=None)
+
+    Change the way ellipses are specified. Each mode alters the parameters
+    necessary to draw an ellipse using the :py:func:`ellipse` function. 
+
+    It works exactly the same as the :py:func:`rectmode` command.
+
+    .. shoebot::
+        :alt: green ellipse top left, blue centered and red at the bottom right.
+        :filename: drawing_shapes__ellipsemode.png
+
+        nofill()
+        strokewidth(2)
+
+        ellipsemode(CORNER)  # default, red
+        stroke(0.8, 0.1, 0.1)
+        ellipse(25, 25, 40, 40)
+
+        ellipsemode(CENTER)  # green
+        stroke(0.1, 0.8, 0.1)
+        ellipse(25, 25, 40, 40)
+
+        ellipsemode(CORNERS)  # blue
+        stroke(0.1, 0.1, 0.8)
+        ellipse(25, 25, 40, 40)
 
 Bézier paths
 ------------
@@ -141,17 +197,47 @@ Bézier paths
 
 .. py:function:: moveto(x, y)
 
+    Move the Bézier "pen" to the specified point without drawing; coordinates are absolute.
+
+    :param x: x-coordinate of the point to move to
+    :param y: y-coordinate of the point to move to
+    :type x: float
+    :type y: float
+
 .. py:function:: relmoveto(x, y)
+
+    Move the Bézier "pen" to the specified point without drawing; coordinates are relative to the pen's current location.
+
+    :param x: x-coordinate of the point to move to, relative to the pen's current point
+    :param y: y-coordinate of the point to move to, relative to the pen's current point
+    :type x: float
+    :type y: float
 
 .. py:function:: lineto(x, y)
 
+    Draw a line from the pen's current point; coordinates are absolute.
+
+    :param x: x-coordinate of the point to draw to, relative to the pen's current point
+    :param y: y-coordinate of the point to draw to, relative to the pen's current point
+    :type x: float
+    :type y: float
+
 .. py:function:: rellineto(x, y)
+
+    Draw a line from the pen's current point; coordinates are relative to the pen's current location.
+
+    :param x: x-coordinate of the point to draw to, relative to the pen's current point
+    :param y: y-coordinate of the point to draw to, relative to the pen's current point
+    :type x: float
+    :type y: float
 
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
 .. py:function:: arc(x, y, radius, angle1, angle2)
 
 .. py:function:: closepath()
+
+   Close the path; in case the current point is not the path's starting point, a line will be drawn between them.
 
 .. py:function:: endpath(draw=True)
 
@@ -165,11 +251,26 @@ Bézier paths
 Images
 ------
 
-.. py:function:: drawimage(image)
+.. py:function:: image(path, x=0, y=0, width=None, height=None, alpha=1.0, data=None, draw=True)
 
-  * image: Image to draw
-  * x: optional, x coordinate (default is image.x)
-  * y: optional, y coordinate (default is image.y)
+    Place a bitmap image on the canvas.
+
+    :param path: location of the image on disk
+    :param x: x-coordinate of the top left corner
+    :param y: y-coordinate of the top left corner
+    :param width: image width (leave blank to use its original width)
+    :param height: image height (leave blank to use its original height)
+    :param alpha: opacity
+    :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
+    :param draw: whether to place the image immediately on the canvas or not
+    :type path: str
+    :type x: float
+    :type y: float
+    :type width: float or None
+    :type height: float or None
+    :type alpha: float
+    :type data: binary data
+    :type draw: bool
 
 
 Clipping paths
@@ -208,12 +309,12 @@ Colors
 ------
 
 Colors can be specified in a few ways:
-  * grayscale: `(value)`
-  * grayscale with alpha: `(value, alpha)`
-  * RGB: `(red, green, blue)`
-  * RGBA: `(red, green, blue, alpha)`
-  * hex: `('#FFFFFF')`
-  * hex with alpha: `('#FFFFFFFF')`
+  * grayscale: ``(value)``
+  * grayscale with alpha: ``(value, alpha)``
+  * RGB: ``(red, green, blue)``
+  * RGBA: ``(red, green, blue, alpha)``
+  * hex: ``('#FFFFFF')``
+  * hex with alpha: ``('#FFFFFFFF')``
 
 You can use any of these formats to specify a colour; for example, `fill(1,0,0)`
 and `fill('#FF0000')` yield the same result.
@@ -228,49 +329,52 @@ Set background to any valid color
 
 .. py:function:: colormode(mode=None, crange=None)
 
-Set the current colormode (can be RGB or HSB) and eventually
-the color range.
+  Set the current colormode (can be RGB or HSB) and eventually
+  the color range.
 
-If called without arguments, it returns the current colormode.
+  :param mode: Color mode to use
+  :type mode: RGB or HSB
+  :param crange: Maximum value for the new color range to use. See `colorrange`_.
+  :rtype: Current color mode (if called without arguments)
 
-  * mode: Color mode, either "rgb", or "hsb"
-  * crange: Maximum scale value for color, e.g. 1.0 or 255
 
-.. py:function:: colorrange(crange)
+.. py:function:: colorrange(crange=1.0)
 
-By default colors range from 0.0 - 1.0 using colorrange
-other defaults can be used, e.g. 0.0 - 255.0
+  Set the numeric range for color values. By default colors range from 0.0 - 1.0; use this to set a different range, e.g. with ``colorrange(255)`` values will range between 0 and 255.
 
-  * crange: Color range of 0.0 - 255:
+  :param crange: Maximum value for the new color range to use
+  :type crange: float
+
 
 .. py:function:: fill(*args)
 
-Sets a fill color, applying it to new paths.
+  Sets a fill color, applying it to new paths.
 
-  * args: color in supported format
+  :param args: color in supported format
 
 .. py:function:: stroke(*args)
-Set a stroke color, applying it to new paths.
 
-  * args: color in supported format
+  Set a stroke color, applying it to new paths.
+
+  :param args: color in supported format
 
 .. py:function:: nofill()
 
-Stop applying fills to new paths.
+  Stop applying fills to new paths.
 
 .. py:function:: nostroke()
 
-Stop applying strokes to new paths.
+  Stop applying strokes to new paths.
 
 .. py:function:: strokewidth(w=None)
 
- * w: Stroke width.
- * return: If no width was specified then current width is returned.
+  :param w: Stroke width
+  :rtype: Current width (if no width was specified)
 
 .. py:function:: color(*args)
 
-  * args: color in a supported format.
-  * return: Color object containing the color.
+  :param args: color in a supported format
+  :rtype: Color object
 
 
 Text
@@ -278,86 +382,97 @@ Text
 
 .. py:function:: text(txt, x, y, width=None, height=1000000, outline=False, draw=True)
 
-Draws a string of text according to current font settings.
+  Draws a string of text according to current font settings.
 
-  * txt: Text to output
-  * x: x-coordinate of the top left corner
-  * y: y-coordinate of the top left corner
-  * width: text width
-  * height: text height
-  * outline: If True draws outline text (defaults to False)
-  * draw: Set to False to inhibit immediate drawing (defaults to True)
-  * return: Path object representing the text.
+  :param txt: Text to output
+  :param x: x-coordinate of the top left corner
+  :param y: y-coordinate of the top left corner
+  :param width: text box width. When set, text will wrap to the next line if it would exceed this width. If unset, there will be no line breaks.
+  :param height: text box height
+  :param outline: whether to draw as an outline.
+  :param draw: if False, the object won't be immediately drawn to canvas.
+  :type outline: bool
+  :type draw: bool
+  :rtype: BezierPath object representing the text
 
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
-Set the font to be used with new text instances.
+  Set the font to be used with new text instances.
 
-Accepts TrueType and OpenType files. Depends on FreeType being
-installed.
+  Accepts TrueType and OpenType files. Depends on FreeType being
+  installed.
 
-  * fontpath: path to truetype or opentype font.
-  * fontsize: size of font
-
-  * return: current current fontpath (if fontpath param not set)
+  :param fontpath: path to TrueType or OpenType font
+  :param fontsize: font size in points
+  :rtype: current font path (if ``fontpath`` was not set)
 
 .. py:function:: fontsize(fontsize=None)
 
-Set or return size of current font.
+  Set or return size of current font.
 
-  * fontsize: Size of font.
-  * return: Size of font (if fontsize was not specified)
+  :param fontsize: Font size in points (pt)
+  :rtype: Font size in points (if ``fontsize`` was not specified)
 
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
-Generates an outlined path of the input text.
+  Generates an outlined path of the input text.
 
-  * txt: Text to output
-  * x: x-coordinate of the top left corner
-  * y: y-coordinate of the top left corner
-  * width: text width
-  * height: text height
-  * draw: Set to False to inhibit immediate drawing (defaults to False)
-  * return: Path object representing the text.
+  :param txt: Text to output
+  :param x: x-coordinate of the top left corner
+  :param y: y-coordinate of the top left corner
+  :param width: text width
+  :param height: text height
+  :param draw: Set to False to inhibit immediate drawing (defaults to False)
+  :rtype: Path object representing the text.
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
-  * return: the width and height of a string of text as a tuple (according to current font settings).
+  :rtype: the width and height of a string of text as a tuple (according to current font settings).
 
 .. py:function:: textwidth(txt, width=None)
 
-  * return: the width of a string of text according to the current font settings.
+  :param text: the text to test for its dimensions
+  :rtype: the width of a string of text according to the current font settings
 
 .. py:function:: textheight(txt, width=None)
 
-  * return: the height of a string of text according to the current font settings.
+  :param text: the text to test for its dimensions
+  :rtype: the height of a string of text according to the current font settings
 
 .. py:function:: lineheight(height=None)
 
-Set text lineheight.
+  Set the space between lines of text.
 
-  * height: line height.
+  :param height: line height
 
-.. py:function:: align(align="LEFT")
+.. py:function:: align(align=LEFT)
 
-Set text alignment
+  Set the way lines of text align with each other.
 
-  * align: Text alignment (LEFT, CENTER, RIGHT)
+  :param align: Text alignment rule
+  :type align: LEFT, CENTER or RIGHT
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
-    Not implemented yet.
-
-.. py:function:: autotext(sourceFile)
-
-generates mock philosophy based on a context-free grammar
-
+    Not implemented.
 
 Dynamic variables
 -----------------
 
-.. py:function:: var(name, type, default=None, min=0, max=255, value=None)
+.. py:function:: var(name, type, default=None, min=0, max=255, value=None, step=None, steps=256.0)
+
+  Create a :doc:`live variable <live>`.
+
+  :param name: Variable name
+  :param type: Variable type
+  :type type: NUMBER, TEXT, BOOLEAN or BUTTON
+  :param default: Default value
+  :param min: Minimum value (NUMBER only)
+  :param max: Maximum value (NUMBER only)
+  :param value: Initial value (if not defined, use ``default``)
+  :param step: Step length for the variables GUI (use this or ``steps``, not both)
+  :param steps: Number of steps in the variables GUI (use this or ``step``, not both)
 
 Utility functions
 -----------------
@@ -368,11 +483,16 @@ Utility functions
 
 .. py:function:: files(path="*")
 
-    You can use wildcards to specify which files to pick, e.g.
-    >>> f = files('*.gif')
+    You can use wildcards to specify which files to pick, e.g. ``f = files('*.gif')``
 
-    :param path: wildcard to use in file list.
+    :param path: wildcard to use in file list
 
+.. py:function:: autotext(sourceFile)
+
+   Generates mock philosophy based on a context-free grammar.
+
+   :param sourcefile: file path to use as source
+   :rtype: the generated text
 
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
 
@@ -403,10 +523,10 @@ Core
 
 .. py:function:: speed(framerate)
 
-Set animation framerate.
+  Set the framerate on windowed mode.
 
-  * framerate: Frames per second to run bot.
-  * return: Current framerate of animation.
+  :param framerate: Frames per second
+  :rtype: Current framerate
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 

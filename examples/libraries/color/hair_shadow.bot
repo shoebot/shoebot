@@ -1,0 +1,47 @@
+"""
+Alternative to hair.bot so that the shadow works
+"""
+
+colors = ximport("colors")
+
+size(800, 800)
+nofill()
+stroke(0.4, 0.5, 0)
+strokewidth(0.1)
+autoclosepath(False)
+
+clr = colors.rgb(0.6, 0.4, 0, 0.5)
+
+background(colors.dark(clr).darken(0.1))
+# colors.shadow(alpha=0.05, blur=0.2)
+
+for i in range(50):
+
+    # Each strand of curves has an analogous color
+    # (i.e. hues that are next to each other on the color wheel).
+    # This yields a very natural effect.
+    clr1 = (clr.analog(angle=10, d=0.3))
+
+    x0 = WIDTH / 2
+    y0 = HEIGHT / 2
+    vx0 = random(-200, 200)
+    vy0 = random(-200, 200)
+    vx1 = random(-200, 200)
+    vy1 = random(-200, 200)
+    x1 = choice((-10, WIDTH))
+    y1 = random(HEIGHT)
+    for j in range(100):
+        beginpath(x0, y0)
+        curveto(
+            x0 + vx0 + random(80), y0 + vy0 + random(80),
+            x1 + vx1, y1 + vy1,
+            x1, y1
+        )
+        p = endpath(draw=False)
+        push()
+        translate(8, 8)
+        stroke(0, 0, 0, 0.3)
+        drawpath(p.copy())
+        pop()
+        stroke(clr1)
+        drawpath(p.copy())

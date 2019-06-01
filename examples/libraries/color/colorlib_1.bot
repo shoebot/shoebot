@@ -1,0 +1,102 @@
+"""
+Colors library showcase 1
+from the Nodebox colors library example (is it?)
+"""
+
+size(450, 450)
+background(1, 1, 1)
+
+colors=ximport("colors")
+
+clr = colors.lab(78, 29, 37, 1)
+clr1 = colors.named_color("olive")
+clr2 = colors.mediumorchid()
+clr3 = colors.named_color("#DD7100")
+clr4 = colors.named_color("yellowy")
+clr5 = clr3.blend(clr4, 0.5)
+clr6 = colors.complement(clr5)[1]
+clr7 = colors.silver()
+
+if clr7.is_gray:
+        print("yes, it's gray")
+else:
+        print("no, no gray here")
+
+if clr7.is_transparent:
+        print("yes, you can see through")
+else:
+        print("no, opaque")
+
+clr6.swatch(200, 40, 20, 20)
+clr5.swatch(222, 40, 20, 20)
+
+colori = colors.list(clr, clr1, clr2, clr3, clr4, clr5, clr6, clr7)
+print(colori)
+
+# draw test
+fill(clr)
+circle(50, 40, 40)
+fill(colors.complement(clr)[1])
+circle(90, 40, 40)
+fill(clr1)
+circle(90, 80, 40)
+fill(colors.complement(clr1)[1])
+circle(130, 80, 40)
+fill(clr2)
+circle(130, 120, 40)
+fill(colors.complement(clr2)[1])
+circle(170, 120, 40)
+fill(clr3)
+circle(170, 160, 40)
+fill(colors.complement(clr3)[1])
+circle(210, 160, 40)
+fill(clr4)
+circle(210, 200, 40)
+fill(colors.complement(clr4)[1])
+circle(250, 200, 40)
+fill(clr5)
+circle(250, 240, 40)
+fill(colors.complement(clr5)[1])
+circle(290, 240, 40)
+fill(clr6)
+circle(290, 280, 40)
+fill(colors.complement(clr6)[1])
+circle(330, 280, 40)
+fill(clr7)
+circle(330, 320, 40)
+fill(clr7.darken(step=0.4))
+circle(370, 320, 40)
+
+x = 0
+for colore in colori:
+        fill(colore)
+        rect(x, 0, 20, 20)
+        x += 20
+x += 20
+for colore in colori.darken(step=0.1):
+        fill(colore)
+        rect(x, 0, 20, 20)
+        x += 20
+x += 20
+fill(colori.average)
+rect(x, 0, 20, 20)
+x += 20
+fill(colori.darken(step=0.1).average)
+rect(x, 0, 20, 20)
+
+# color triad
+triade = colors.triad(clr3, angle=120)
+x = 200
+for colore in triade:
+        fill(colore)
+        rect(x, 80, 20, 20)
+        x += 20
+
+triade = colors.triad(clr4, angle=120)
+x = 260
+for colore in triade:
+        fill(colore)
+        rect(x, 120, 20, 20)
+        x += 20
+
+# colori.swarm(100, 50)

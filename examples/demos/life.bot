@@ -1,18 +1,19 @@
 """
-conway's life for shoebot.
-
-created at lgm 2014 during the shoebot workshop.
-click the window to randomize the playing field. try increasing the roundness
-value in rect() below for funny effects.
-
+Conway's Game of Life
+by Artem Popov
+created at Libre Graphics Meeting 2014 during the Shoebot workshop.
 based on Hypnoval example by Simon Budig and life64.ck monome app by tehn.
+
+Click the window to randomize the playing field.
+Try increasing the roundness value in rect() below for funny effects.
 """
 
-import time
-import copy, itertools
+import copy
+import itertools
 
 LIFE_XSIZE = 8
 LIFE_YSIZE = 8
+
 
 class Life(object):
     def __init__(self, xsize, ysize):
@@ -45,32 +46,33 @@ class Life(object):
                 life.world[x][y] = random.randint(0, 1)
 
 
-
 size(LIFE_XSIZE * 80, LIFE_YSIZE * 80)
 life = Life(LIFE_XSIZE, LIFE_YSIZE)
+
 
 def setup():
     global life
     life.randomize()
     speed(8)
 
+
 def draw():
     global life
-    background(0,0,0)
-    fill(0.1,0,0)
+    background(0, 0, 0)
+    fill(0.1, 0, 0)
 
     for x in range(LIFE_XSIZE):
         for y in range(LIFE_YSIZE):
             push()
             rclr = life.world[x][y]
-            scale(random(0.9,0.99))
+            scale(random(0.9, 0.99))
 
             if rclr == 1:
                 fill(0.89, 0.40, 0.01)
             else:
                 fill(0.13, 0.27, 0.16)
 
-            rect(x * 80 + 10, y * 80 + 10, 60, 60, roundness=random(0.9,0.99))
+            rect(x * 80 + 10, y * 80 + 10, 60, 60, roundness=random(0.9, 0.99))
             pop()
 
     life.update()

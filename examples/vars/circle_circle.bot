@@ -1,0 +1,20 @@
+"""
+Circle Circle
+"""
+
+from math import sin, cos
+
+size(512, 512)
+colorrange(255)
+
+var("step", NUMBER, 32, 3, 64)
+var("rv", NUMBER, 200, 16, 256)
+var("radius", NUMBER, 16, 2, 64)
+
+background(128, 128, 128)
+fill(255, 255, 255)
+nostroke()
+for i in range(0, int(step) + 1, 1):
+    i2 = i * (360 / step) * .017453289
+    ellipse(WIDTH / 2 + rv * sin(i2) - radius / 2,
+            HEIGHT / 2 + rv * cos(i2) - radius / 2, radius, radius)

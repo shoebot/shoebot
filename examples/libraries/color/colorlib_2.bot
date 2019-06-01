@@ -1,0 +1,18 @@
+"""
+Colors lib visual showcase
+"""
+
+colors = ximport("colors")
+
+size(450, 450)
+background(1, 1, 1)
+
+
+clr8 = colors.rgb(0.0, 0.4, 0.6)
+x = 10
+for name in colors.rules:
+    scheme = colors.rule(name, clr8)
+    scheme.swatch(x, 10)
+    x += 40
+fill(0.0, 0.4, 0.6)
+rect(300, 200, 70, 70)

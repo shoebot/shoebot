@@ -11,9 +11,12 @@ class LiveExecution(object):
     Live Code executor.
 
     Code has two states, 'known good' and 'tenous'
-    
-    "known good" can have exceptions and die
-    "tenous code" exceptions attempt to revert to "known good"
+
+    Known good:  Exceptions are raised as normal
+    Tenuous: An exception will cause the code to be reverted to the last Known Good code
+
+    Initially code is known-good, new code sent to the executor is tenuous, until
+    it has been executed at least once.
     """
     ns = {}
     lock = threading.RLock()
@@ -50,6 +53,7 @@ class LiveExecution(object):
             try:
                 # text compile
                 compile(source + '\n\n', filename or self.filename, "exec")
+                self.edited_source = source
             except Exception as e:
                 if bad_cb:
                     self.edited_source = None
@@ -58,23 +62,18 @@ class LiveExecution(object):
                 return
             if filename is not None:
                 self.filename = filename
-            self.edited_source = source
 
     def reload_functions(self):
         """
-        Recompile functions
+        Replace functions in namespace with functions from edited_source.
         """
         with LiveExecution.lock:
             if self.edited_source:
-                source = self.edited_source
-                tree = ast.parse(source)
+                tree = ast.parse(self.edited_source)
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                    # TODO - Could modify __code__ etc of functions, but this info will
-                    # need to be saved if thats the case
+                    self.ns[f.name].__code__ = meta.decompiler.compile_func(f, self.filename, self.ns).__code__
 
-                    self.ns[f.name] = meta.decompiler.compile_func(f, self.filename, self.ns)
-
-    def do_exec(self, source, ns, tenuous = False):
+    def do_exec(self, source, ns):
         """
         Override if you want to do something other than exec in ns
 
@@ -92,7 +91,7 @@ class LiveExecution(object):
             try:
                 source = self.edited_source
                 self.edited_source = None
-                self.do_exec(source, ns_snapshot, True)
+                self.do_exec(source, ns_snapshot)
                 self.known_good = source
                 self.call_good_cb()
                 return True, None

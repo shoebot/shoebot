@@ -1,18 +1,13 @@
 #!/usr/bin/env python2
 import os
 
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
-
+from shoebot.core.backend import gi
 from gi.repository import Gtk
-from shoebot.core.events import EVENT_VARIABLE_UPDATED, publish_event
+from shoebot.core.events import VARIABLE_UPDATED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 NUMBER = 1
 TEXT = 2
@@ -25,7 +20,7 @@ def pretty_name(name):
 
 
 class VarWindow(object):
-    def __init__(self, parent, bot, title = None):
+    def __init__(self, parent, bot, title=None):
         self.parent = parent
         self.bot = bot
 
@@ -36,7 +31,7 @@ class VarWindow(object):
         self.window.connect("destroy", self.do_quit)
 
         if os.path.isfile(ICON_FILE):
-            self.window.set_icon_from_file( ICON_FILE )
+            self.window.set_icon_from_file(ICON_FILE)
 
         self.container = Gtk.VBox(homogeneous=True, spacing=20)
 
@@ -46,12 +41,11 @@ class VarWindow(object):
         self.add_variables()
 
         self.window.add(self.container)
-        self.window.set_size_request(400, 35*len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
         self.window.show_all()
 
         if title:
             self.window.set_title(title)
-        ## Gtk.main()
 
     def add_variables(self):
         """
@@ -59,7 +53,10 @@ class VarWindow(object):
         :param container:
         :return:
         """
-        for v in sorted(self.bot._vars.values()):
+        for k, v in self.bot._vars.items():
+            if not hasattr(v, 'type'):
+                raise AttributeError(
+                    '%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables' % k)
             self.add_variable(v)
 
     def add_variable(self, v):
@@ -84,19 +81,19 @@ class VarWindow(object):
         if v.min != v.max:
             step = v.step
         else:
-            step = 0
+            step = 0.0
 
         if v.max - v.min > 2:
-            adj = Gtk.Adjustment(value=v.value, lower=v.min, upper=v.max, step_incr=step, page_incr=2, page_size=1)
+            adj = Gtk.Adjustment(v.value, v.min, v.max, step, page_incr=2, page_size=1)
         else:
-            adj = Gtk.Adjustment(value=v.value, lower=v.min, upper=v.max, step_incr=step)
+            adj = Gtk.Adjustment(v.value, v.min, v.max, step)
         adj.connect("value_changed", self.widget_changed, v)
-        hscale = Gtk.HScale(adjustment=adj)
+        hscale = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adj)
         hscale.set_value_pos(Gtk.PositionType.RIGHT)
-        hscale.set_value(v.value)
+        if (v.max - v.min) / (step or 0.1) > 10:
+            hscale.set_digits(2)
         sliderbox.pack_start(hscale, True, True, 0)
         self.container.pack_start(sliderbox, True, True, 0)
-
         return hscale
 
     def add_text(self, v):
@@ -174,15 +171,15 @@ class VarWindow(object):
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
             self.bot._vars[v.name].value = widget.get_value()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
             self.bot._vars[v.name].value = widget.get_active()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
             self.bot._vars[v.name].value = widget.get_text()  ## Not sure if this is how to do this - stu
-            publish_event(EVENT_VARIABLE_UPDATED, v) # pretty dumb for now
+            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
 
     def var_added(self, v):
         """
@@ -194,7 +191,7 @@ class VarWindow(object):
         """
         self.add_variable(v)
 
-        self.window.set_size_request(400, 35*len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
         self.window.show_all()
 
     def var_deleted(self, v):
@@ -211,10 +208,8 @@ class VarWindow(object):
         self.container.remove(parent)
         del self.widgets[v.name]
 
-        self.window.set_size_request(400, 35*len(self.widgets.keys()))
+        self.window.set_size_request(400, 35 * len(self.widgets.keys()))
         self.window.show_all()
 
     def var_updated(self, v):
         pass
-
-

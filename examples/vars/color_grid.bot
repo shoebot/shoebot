@@ -1,0 +1,22 @@
+"""
+Color grid
+by Paulo Silva
+"""
+
+step = 16
+
+size(512, 256)
+colorrange(255)
+colormode(HSB)
+
+var('hue1', NUMBER, 85., 0, 255)
+var('hue2', NUMBER, 170., 0, 255)
+var('sat1', NUMBER, 85., 0, 255)
+var('sat2', NUMBER, 170., 0, 255)
+var('bri1', NUMBER, 85., 0, 255)
+var('bri2', NUMBER, 170., 0, 255)
+
+for y in range(0, HEIGHT / step, 1):
+    for x in range(0, WIDTH / step, 1):
+        fill(random(hue1, hue2), random(sat1, sat2), random(bri1, bri2))
+        rect(x * step, y * step, step, step)

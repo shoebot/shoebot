@@ -1,0 +1,51 @@
+"""
+Spirograph
+by Paulo Silva
+"""
+
+from math import sin, cos
+
+
+def singr(a):
+    return sin(a * .017453289)
+
+
+def cosgr(a):
+    return cos(a * .017453289)
+
+
+var("step", NUMBER, 32, 32, 128)
+var("r1", NUMBER, 80, 16, 256)
+var("r2", NUMBER, 200, 16, 256)
+
+rl = r1
+
+if r2 > rl:
+    rl = r2
+rd = r2 - r1
+
+if rd < 0:
+    rd = rd * -1
+
+sts = rd * 45 / rl
+
+size(512, 512)
+colorrange(255)
+
+
+def draw():
+    background(224, 224, 224)
+    stroke(0, 0, 0)
+    nofill()
+    strokewidth(2)
+    beginpath(WIDTH / 2 + r1 * singr(0), HEIGHT / 2 + r1 * cosgr(0))
+    for i in range(360 / int(step), 360, 360 / int(step)):
+        curveto(WIDTH / 2 + r1 * singr(i + 360 / sts), (HEIGHT / 2) + r1 * cosgr(i + 360 / sts),
+                WIDTH / 2 + r2 * singr(i + 360 / sts * 1.5), HEIGHT / 2 + r2 * cosgr(i + 360 / sts * 1.5),
+                WIDTH / 2 + r2 * singr(i + 360 / sts * .5), HEIGHT / 2 + r2 * cosgr(i + 360 / sts * .5)
+                )
+        curveto(WIDTH / 2 + r2 * singr(i - 360 / sts * .5), HEIGHT / 2 + r2 * cosgr(i - 360 / sts * .5),
+                WIDTH / 2 + r1 * singr(i), HEIGHT / 2 + r1 * cosgr(i),
+                WIDTH / 2 + r1 * singr(i + 360 / sts), HEIGHT / 2 + r1 * cosgr(i + 360 / sts)
+                )
+    endpath()

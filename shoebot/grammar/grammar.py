@@ -1,24 +1,22 @@
 import copy
 import os
-import traceback
-import linecache
 import sys
-
+import traceback
 from time import sleep, time
 
 from livecode import LiveExecution
 from shoebot.core.events import next_event, QUIT_EVENT, SOURCE_CHANGED_EVENT, event_is, SET_WINDOW_TITLE
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
+from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import flushfile
-
 
 sys.stdout = flushfile(sys.stdout)
 sys.stderr = flushfile(sys.stderr)
 
 
 class Grammar(object):
-    ''' 
+    '''
     A Bot is an interface to receive user commands (through scripts or direct
     calls) and pass them to a canvas for drawing.
 
@@ -26,6 +24,7 @@ class Grammar(object):
     grammars, it has only the private API and nothing else, except for
     run which is called to actually run the Bot.
     '''
+
     def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
         self._quit = False
@@ -38,11 +37,11 @@ class Grammar(object):
         input_device = canvas.get_input_device()
         if input_device:
             input_device.set_callbacks(
-                key_pressed = self._key_pressed,
-                key_released = self._key_released,
-                mouse_button_down = self._mouse_button_down,
-                mouse_button_up = self._mouse_button_up,
-                mouse_pointer_moved = self._mouse_pointer_moved)
+                key_pressed=self._key_pressed,
+                key_released=self._key_released,
+                mouse_button_down=self._mouse_button_down,
+                mouse_button_up=self._mouse_button_up,
+                mouse_pointer_moved=self._mouse_pointer_moved)
         self._input_device = input_device
 
     def _load_namespace(self, namespace, filename=None):
@@ -154,7 +153,7 @@ class Grammar(object):
         else:
             # Subsequent frames
             if self._dynamic:
-                if self._speed != 0: # speed 0 is paused, so do nothing
+                if self._speed != 0:  # speed 0 is paused, so do nothing
                     with executor.run_context() as (known_good, source, ns):
                         # Code in main block may redefine 'draw'
                         if not known_good:
@@ -200,59 +199,16 @@ class Grammar(object):
         elif self._speed < 0:
             self._frame -= 1
 
-
-    def _simple_traceback(self, ex, source):
-        """
-        Format traceback, showing line number and surrounding source.
-        """
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        exc = traceback.format_exception(exc_type, exc_value, exc_tb)
-
-        source_arr = source.splitlines()
-
-        # Defaults...
-        exc_location = exc[-2]
-        for i, err in enumerate(exc):
-            if 'exec source_or_code in namespace' in err:
-                exc_location = exc[i+1]
-                break
-
-        # extract line number from traceback
-        fn = exc_location.split(',')[0][8:-1]
-        line_number = int(exc_location.split(',')[1].replace('line', '').strip())
-
-        # Build error messages
-
-        err_msgs = []
-
-        # code around the error
-        err_where = ' '.join(exc[i-1].split(',')[1:]).strip()   # 'line 37 in blah"
-        err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-        for i in xrange(max(0, line_number-5), line_number):
-            if fn == "<string>":
-                line = source_arr[i]
-            else:
-                line = linecache.getline(fn, i+1)
-            err_msgs.append('%s: %s' % (i+1, line.rstrip()))
-        err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
-
-        err_msgs.append('')
-        # traceback
-        err_msgs.append(exc[0].rstrip())
-        for err in exc[3:]:
-            err_msgs.append(err.rstrip())
-
-        return '\n'.join(err_msgs)
-
-    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False):
+    def run(self, inputcode, iterations=None, run_forever=False, frame_limiter=False, verbose=False,
+            break_on_error=False):
         '''
         Executes the contents of a Nodebox/Shoebot script
         in current surface's context.
 
-        :param inputcode: path to shoebot file or whole source code
-        :param iterations: maximum amount of frames to run
-        :param run_forever: if True will run until the user quits the bot
-        :param frame_limiter: Time a frame should take to run (float - seconds)
+        :param inputcode: Path to shoebot source or string containing source
+        :param iterations: None or Maximum amount of frames to run
+        :param run_forever: If True then run until user quits the bot
+        :param frame_limiter: If True then sleep between frames to respect speed() command.
         '''
         source = None
         filename = None
@@ -330,8 +286,10 @@ class Grammar(object):
             if verbose:
                 errmsg = traceback.format_exc()
             else:
-                errmsg = self._simple_traceback(e, executor.known_good or '')
+                errmsg = simple_traceback(e, executor.known_good or '')
             print >> sys.stderr, errmsg
+            if break_on_error:
+                raise
 
     def finish(self):
         ## For use when using shoebot as a module

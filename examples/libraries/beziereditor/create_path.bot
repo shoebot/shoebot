@@ -1,0 +1,12 @@
+beziereditor = ximport("beziereditor")
+
+speed(100)
+size(400, 400)
+
+def setup():
+    global editor
+    editor = beziereditor.start(filename="path")
+
+def draw():
+    global editor
+    editor.draw()

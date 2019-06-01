@@ -1,0 +1,23 @@
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: generic
+      env: PYTHON="python2" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gobject gir1.2-rsvg-2.0"
+
+install:
+ - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; fi
+ - sudo apt-get update -q
+ - sudo apt-get install --no-install-recommends -y xvfb gir1.2-gtk-3.0 gobject-introspection libcairo2-dev libglib2.0-dev libgirepository1.0-dev build-essential libcairo2-dbg libglib2.0-0-dbg $(echo $PACKAGES)
+ - sudo ./install/install_dependencies.sh
+ - virtualenv --python=$PYTHON _venv
+ - source _venv/bin/activate
+ - pip install vext.gi
+ - pip install setuptools>=18.8 pycairo>=1.17.0 meta==1.0.2 Pillow>=2.8.1 pubsub==0.1.1
+ - pip install --no-deps .
+ - pip freeze
+
+script:
+ - $PYTHON setup.py diagnose
+ - if [ "$PYTHON" == "python2" ]; then SHOEBOT_GI=pgi $PYTHON setup.py test; fi

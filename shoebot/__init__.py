@@ -33,9 +33,18 @@ import signal
 import sys
 import threading
 
-# TODO - Check if this needs importing here:
-#from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
+from shoebot.core.backend import cairo
 
+
+class ShoebotInstallError(Exception):
+    pass
+
+
+# TODO - Check if this needs importing here:
+# from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
+from time import sleep
+
+from shoebot.core.events import publish_event, QUIT_EVENT
 
 RGB = "rgb"
 HSB = "hsb"
@@ -59,9 +68,10 @@ def _restore():
     pass
 
 
-## Convenience functions to create create a bot, it's canvas and 'sink'
+# Convenience functions to create a bot, its canvas and sink
 
-def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None, fullscreen=None, show_vars=False):
+def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None, window=False, title=None,
+                  fullscreen=None, show_vars=False):
     """
     Create canvas and sink for attachment to a bot
 
@@ -73,13 +83,13 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
     :param buff: CairoImageSink buffer object to send output to
 
     :param outputfile: CairoImageSink output filename e.g. "hello.svg"
-    :param multifile: CairoImageSink if True, 
-    
+    :param multifile: CairoImageSink if True,
+
     :param title: ShoebotWindow - set window title
     :param fullscreen: ShoebotWindow - set window title
     :param show_vars: ShoebotWindow - display variable window
 
-    Two kinds of sink are provided CairoImageSink and ShoebotWindow
+    Two kinds of sink are provided: CairoImageSink and ShoebotWindow
 
     ShoebotWindow
 
@@ -88,13 +98,14 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
 
     CairoImageSink
 
-    Output to a filename (or files if multifile is set), or a buffer object.    
+    Output to a filename (or files if multifile is set), or a buffer object.
     """
-    from core import CairoCanvas, CairoImageSink
+    from core import CairoCanvas, CairoImageSink # https://github.com/shoebot/shoebot/issues/206
 
-    if window or show_vars:
+    if outputfile:
+        sink = CairoImageSink(outputfile, format, multifile, buff)
+    elif window or show_vars:
         from gui import ShoebotWindow
-
         if not title:
             if src and os.path.isfile(src):
                 title = os.path.splitext(os.path.basename(src))[0] + ' - Shoebot'
@@ -102,18 +113,21 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
                 title = 'Untitled - Shoebot'
         sink = ShoebotWindow(title, show_vars, fullscreen=fullscreen)
     else:
-        if outputfile is None:
-            if src and os.path.isfile(src):
-                outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
-            else:
-                outputfile = 'output.svg'
+        if src and isinstance(src, cairo.Surface):
+            outputfile = src
+            format = 'surface'
+        elif src and os.path.isfile(src):
+            outputfile = os.path.splitext(os.path.basename(src))[0] + '.' + (format or 'svg')
+        else:
+            outputfile = 'output.svg'
         sink = CairoImageSink(outputfile, format, multifile, buff)
     canvas = CairoCanvas(sink)
 
     return canvas
 
 
-def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False, title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None, namespace=None):
+def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iterations=1, buff=None, window=False,
+               title=None, fullscreen=None, server=False, port=7777, show_vars=False, vars=None, namespace=None):
     """
     Create a canvas and a bot with the same canvas attached to it
 
@@ -125,9 +139,10 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     ... everything else ...
 
     See create_canvas for details on those parameters.
-    
+
     """
-    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen, show_vars=show_vars)
+    canvas = create_canvas(src, format, outputfile, iterations > 1, buff, window, title, fullscreen=fullscreen,
+                           show_vars=show_vars)
 
     if grammar == DRAWBOT:
         from shoebot.grammar import DrawBot
@@ -137,7 +152,7 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
         bot = NodeBot(canvas, namespace=namespace, vars=vars)
 
     if server:
-        from shoebot.io import SocketServer
+        from shoebot.sbio import SocketServer
         socket_server = SocketServer(bot, "", port=port)
     return bot
 
@@ -150,10 +165,10 @@ class ShoebotThread(threading.Thread):
     and the GUI in a seperate thread without readline
     blocking it.
     """
-    def __init__(self,
-            create_args, create_kwargs,
-            run_args, run_kwargs,
-            send_sigint=False):
+
+    def __init__(self, create_args, create_kwargs,
+                 run_args, run_kwargs,
+                 send_sigint=False):
         """
         :param create_args: passed to create_bot
         :param create_kwargs: passed to create_bot
@@ -205,7 +220,7 @@ def run(src,
         outputfile=None,
         iterations=1,
         buff=None,
-        window=False,
+        window=True,
         title=None,
         fullscreen=None,
         close_window=False,
@@ -228,7 +243,7 @@ def run(src,
     Other args are split into create_args and run_args
 
     See create_bot for details on create_args
-    
+
     run_args are passed to bot.run - see Nodebot.run or Drawbot.run
 
 
@@ -244,28 +259,31 @@ def run(src,
     plugin for an example of using livecoding.
     """
     # Munge shoebogt sys.argv
-    sys.argv = [sys.argv[0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
+    sys.argv = [sys.argv[
+                    0]] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
 
     # arguments for create_bot
     create_args = [src,
-        grammar,
-        format,
-        outputfile,
-        iterations,
-        buff,
-        window,
-        title,
-        fullscreen,
-        server,
-        port,
-        show_vars]
+                   grammar,
+                   format,
+                   outputfile,
+                   iterations,
+                   buff,
+                   window,
+                   title,
+                   fullscreen,
+                   server,
+                   port,
+                   show_vars]
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
-        run_forever=window and (not close_window),
         iterations=iterations,
         frame_limiter=window,
         verbose=verbose,
+        # run forever except 1. windowed mode is off 2. if --close-window was specified and
+        # 3. if an output file was indicated
+        run_forever=window and not (close_window or bool(outputfile)),
     )
 
     # Run shoebot in a background thread so we can run a cmdline shell in the current thread
@@ -293,18 +311,25 @@ def run(src,
         sbot.run(*run_args, **run_kwargs)
 
     if run_shell:
-        import shoebot.io.shell
-        shell = shoebot.io.shell.ShoebotCmd(sbot, trusted=True)
+        import shoebot.sbio.shell
+        shell = shoebot.sbio.shell.ShoebotCmd(sbot, trusted=True)
         try:
             shell.cmdloop()
         except KeyboardInterrupt as e:
+            publish_event(QUIT_EVENT)  # Handle Ctrl-C
             # KeyboardInterrupt is generated by os.kill from the other thread
             if verbose:
                 raise
             else:
                 return
+    elif background_thread:
+        try:
+            while sbot_thread.is_alive():
+                sleep(1)
+        except KeyboardInterrupt:
+            publish_event(QUIT_EVENT)
 
-    if sbot_thread is not None:
+    if all((background_thread, sbot_thread)):
         sbot_thread.join()
 
     return sbot

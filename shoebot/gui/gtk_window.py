@@ -1,14 +1,9 @@
 import os
 import sys
-from shoebot.core.events import publish_event, QUIT_EVENT, EVENT_VARIABLE_UPDATED
 
-try:
-    import gi
-except ImportError:
-    import pgi
-    pgi.install_as_gi()
-
-from gi.repository import Gtk, GObject
+from shoebot.core.backend import gi
+from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
+from gi.repository import Gdk, Gtk, GObject
 
 from collections import deque
 from pkg_resources import resource_filename, Requirement
@@ -22,26 +17,26 @@ import gettext
 
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
+ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
 
 
 class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
-    '''Create a GTK+ window that contains a ShoebotWidget'''
-
+    """
+    Create a GTK+ window that contains a ShoebotWidget
+    """
     # Draw in response to an expose-event
-    def __init__(self, title = None, show_vars = False, menu_enabled = True, server=False, port=7777, fullscreen=False):
+    def __init__(self, title=None, show_vars=False, menu_enabled=True, server=False, port=7777, fullscreen=False):
         Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
 
         if os.path.isfile(ICON_FILE):
-            self.set_icon_from_file( ICON_FILE )
-        
+            self.set_icon_from_file(ICON_FILE)
+
         self.menu_enabled = menu_enabled
         self.has_server = server
         self.serverport = port
@@ -58,7 +53,6 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             self.is_fullscreen = True
             self.fullscreen()
         self.connect("delete-event", self.do_window_close)
-        #self.connect("destroy", )
 
         self.sb_widget = sb_widget
         self.attach_gtk(self)
@@ -70,18 +64,20 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.action_group = Gtk.ActionGroup('Canvas')
 
         self.action_group.add_actions([('Save as', None, _('_Save as')),
-                                     ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
-                                     ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
-                                     ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
-                                     ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
-                                     ('close', 'Close window', _('_Close Window'), "<Control>w", None, self.do_window_close)
-                                    ])
+                                       ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
+                                       ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
+                                       ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
+                                       ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
+                                       ('close', 'Close window', _('_Close Window'), "<Control>w", None,
+                                        self.do_window_close)
+                                       ])
 
         self.action_group.add_toggle_actions([
-                ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables, self.show_vars),
-                ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
-                ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
-            ])
+            ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables,
+             self.show_vars),
+            ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
+            ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
+        ])
 
         menuxml = '''
         <popup action="Save as">
@@ -113,7 +109,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             Gtk.main_iteration()
 
         self.window_open = True
-        self.pause_speed = None # TODO - factor out bot controller stuff
+        self.pause_speed = None  # TODO - factor out bot controller stuff
 
         self.last_draw_ctx = None  # Need this to save snapshots after frame is drawn
 
@@ -131,21 +127,23 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.sb_widget.do_drawing(size, frame, cairo_ctx)
 
     def create_rcontext(self, size, frame):
-        ''' Delegates to the ShoebotWidget  '''
+        """
+        Delegates to the sb_widget
+        """
         return self.sb_widget.create_rcontext(size, frame)
 
     def show_variables_window(self):
-        '''
-        If bot has variables and var window not visible then create it
-        '''
+        """
+        Show the variables window.
+        """
         if self.var_window is None and self.bot._vars:
             self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
             self.var_window.window.connect("destroy", self.var_window_closed)
 
     def hide_variables_window(self):
-        '''
-        Hide the var window
-        '''
+        """
+        Hide the variables window
+        """
         if self.var_window is not None:
             self.var_window.window.destroy()
             self.var_window = None
@@ -167,7 +165,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             return self.var_window.update_var(name, value)
         else:
             v = self.bot._vars[name]
-            publish_event(EVENT_VARIABLE_UPDATED, v)
+            publish_event(VARIABLE_UPDATED_EVENT, v)
             return True, value
 
     def schedule_snapshot(self, format):
@@ -188,33 +186,64 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.scheduled_snapshots.append(f)
 
     def snapshot_svg(self, widget):
+        """
+        Save an SVG file after drawing is complete.
+        """
         self.schedule_snapshot('svg')
 
     def snapshot_ps(self, widget):
+        """
+        Save an Postscript file after drawing is complete.
+        """
         self.schedule_snapshot('ps')
 
     def snapshot_pdf(self, widget):
+        """
+        Save a PDF file after drawing is complete.
+        """
         self.schedule_snapshot('pdf')
 
     def snapshot_png(self, widget):
+        """
+        Save an PNG file after drawing is complete.
+        """
         self.schedule_snapshot('png')
 
+    def trigger_fullscreen_action(self, fullscreen):
+        """
+        Toggle fullscreen from outside the GUI,
+        causes the GUI to updated and run all its actions.
+        """
+        action = self.action_group.get_action('fullscreen')
+        action.set_active(fullscreen)
+
     def do_fullscreen(self, widget):
+        """
+        Widget Action to Make the window fullscreen and update the bot.
+        """
         self.fullscreen()
+        self.is_fullscreen = True
         # next lines seem to be needed for window switching really to
         # fullscreen mode before reading it's size values
         while Gtk.events_pending():
-            Gtk.main_iteration(block=False)
+            Gtk.main_iteration()
         # we pass informations on full-screen size to bot
         self.bot._screen_width = Gdk.Screen.width()
         self.bot._screen_height = Gdk.Screen.height()
         self.bot._screen_ratio = self.bot._screen_width / self.bot._screen_height
 
     def do_unfullscreen(self, widget):
+        """
+        Widget Action to set Windowed Mode.
+        """
         self.unfullscreen()
+        self.is_fullscreen = False
         self.bot._screen_ratio = None
 
-    def do_window_close(self, widget,data=None):
+    def do_window_close(self, widget, data=None):
+        """
+        Widget Action to Close the window, triggering the quit event.
+        """
         publish_event(QUIT_EVENT)
 
         if self.has_server:
@@ -226,13 +255,19 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.window_open = False
 
     def do_toggle_fullscreen(self, action):
-        self.is_fullscreen = action.get_active()
-        if self.is_fullscreen:
+        """
+        Widget Action to Toggle fullscreen from the GUI
+        """
+        is_fullscreen = action.get_active()
+        if is_fullscreen:
             self.fullscreen()
         else:
             self.unfullscreen()
 
     def do_toggle_play(self, action):
+        """
+        Widget Action to toggle play / pause.
+        """
         # TODO - move this into bot controller
         # along with stuff in socketserver and shell
         if self.pause_speed is None and not action.get_active():
@@ -243,6 +278,9 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             self.pause_speed = None
 
     def do_toggle_variables(self, action):
+        """
+        Widget Action to toggle showing the variables window.
+        """
         self.show_vars = action.get_active()
         if self.show_vars:
             self.show_variables_window()
@@ -256,7 +294,6 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
         Check any GUI flags then call Gtk.main_iteration to update things.
         """
-
         if self.show_vars:
             self.show_variables_window()
         else:
@@ -264,7 +301,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
         for snapshot_f in self.scheduled_snapshots:
             fn = snapshot_f(self.last_draw_ctx)
-            print "Saved snapshot: %s" % fn
+            print("Saved snapshot: %s" % fn)
         else:
             self.scheduled_snapshots = deque()
 

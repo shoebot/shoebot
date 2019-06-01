@@ -1,0 +1,29 @@
+"""
+Copying and manipulating SVG paths
+from the Nodebox SVG library examples
+"""
+
+from os.path import abspath, join, dirname
+
+here = dirname(abspath(__file__))
+
+svg = ximport("svg")
+
+size(600, 600)
+
+# The parse() command will return
+# a list of the shapes in the SVG file.
+paths = svg.parse(open(join(here, "circles.svg")).read())
+
+background(color(1, 1, 0))
+# nofill()
+for path in paths:
+        # Use copies of the paths
+        # that adhere to the transformations
+        # (translate, scale, rotate) we defined.
+        # scale(random(0.1, 1))
+        strokewidth(path.strokewidth)
+        # strokewidth(random(0.5, 25))
+        stroke(random(), random(), random(), random())
+        fill(random(), random(), random(), random())
+        drawpath(path.copy())

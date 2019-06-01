@@ -1,5 +1,4 @@
 class DrawQueueSink(object):
-    
     '''
     DrawQueueSink, creates parameters for use by the draw queue.
     (the render_context).
@@ -20,6 +19,7 @@ class DrawQueueSink(object):
         '''
         r_context = self.create_rcontext(size, frame)
         drawqueue.render(r_context)
+        self.rendering_finished(size, frame, r_context)
         return r_context
 
     def create_rcontext(self, size, frame):
@@ -28,7 +28,10 @@ class DrawQueueSink(object):
         frame of the bot
         '''
         pass
-    
+
+    def rendering_finished(self, size, frame, cairo_ctx):
+        pass
+
     def main_iteration(self):
         """
         Called from main loop, if your sink needs to handle GUI events

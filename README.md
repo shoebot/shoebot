@@ -1,88 +1,13 @@
-Shoebot
-=======
+# Shoebot
 
 Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. 
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
 
+[![Build Status](https://travis-ci.org/shoebot/shoebot.svg?branch=master)](https://travis-ci.org/shoebot/shoebot)
 
-## Installation
-
-Shoebot runs on Python 2.7, which is most probably what you already have installed. To get better performance, you can run it using PyPy, which is experimental.
-
-### Dependencies
-
-You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you:
-
-    cd install
-    ./install_dependencies.sh
-
-### Installing Shoebot
-
-The quickest way to get Shoebot up and running is to install it system-wide:
-
-    sudo python setup.py install
-    
-Local installation is also possible using virtualenv. 
-
-#### Virtualenvwrapper
-
-If you're using the handy [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/), these are the necessary commands:
-
-    mkvirtualenv shoebot
-    pip install -r requirements.txt
-    python setup.py install
-
-To use Shoebot in the future, remember to activate the environment first.
-    
-    workon shoebot
-
-In case you have PyPy installed, make sure to point to it when creating the virtualenv. Instead of the first command in the previous example, do:
-
-    mkvirtualenv shoebot -p `which pypy`
-
-### Plain virtualenv
-
-If you don't use virtualenvwrapper, run these commands after installing the dependencies.
-
-    virtualenv shoebot-env
-    source shoebot-env/bin/activate
-    pip install -r requirements.txt
-    python setup.py install
-
-To use shoebot in the future, remember to activate the environment first.
-
-    source shoebot-env/bin/activate
-
-Like in the Virtualenvwrapper instructions, to take advantage of PyPy you need to create the Virtualenv pointing to it.
-
-    virtualenv shoebot-env -p `which pypy`
-
-
-## Usage
-
-Using the Shoebot console runner is straightforward:
-
-    sbot inputfile.bot
-
-This command will run the `inputfile.bot` script, and create an output image
-file (`output.svg`). You can find many example Shoebot scripts inside the `examples` dir.
-
-You'll probably want to specify your own output file name, which can be done like so:
-
-    sbot inputfile.bot -o image.png
-
-The allowed extensions for the output filename are `.svg`, `.ps`, `.pdf` and `.png`.
-
-Shoebot can also run in a window, which is useful for quick previews, as well
-as realtime manipulation of parameters. For this, just use the `--window` flag or `-w`:
-
-    sbot -w inputfile.bot
-
-For a list of extra options, there's always `--help` or `-h`.
-
-    sbot -h
-
+* [How to install](http://shoebot.readthedocs.io/en/latest/install.html)
+* [Getting started](http://shoebot.readthedocs.io/en/latest/commands.html) 
 
 ## Documentation
 
@@ -95,6 +20,16 @@ The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more
   * import Shoebot as a Python module
   * use the included socketserver to have other programs control a Shoebot script
   * generate images via CGI scripts
+
+## Getting help
+
+Installation can sometimes be tricky, to help us work out whats up paste the output
+of the following commands into an issue on github
+
+    python setup.py diagnose
+    python setup.py test
+
+This will help us diagnose common issues more quickly.
 
 
 Links
@@ -110,7 +45,7 @@ Links
 License
 -------
 
-Copyright (C) 2007-2016 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
+Copyright &copy; 2007-2018 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
 Originally developed by Ricardo Lafuente with the support of the Piet Zwart Institute, Rotterdam.
 
     This program is free software: you can redistribute it and/or modify

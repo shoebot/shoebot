@@ -1,0 +1,26 @@
+"""
+Wobble squares 2
+by Paulo Silva
+"""
+
+step = 32
+
+size(512, 256)
+colorrange(255)
+colormode(RGB)
+
+var('noise', NUMBER, 16., 0., 32.)
+
+background(128, 128, 128)
+for y in range(0, HEIGHT / step, 1):
+    for x in range(0, WIDTH / step, 1):
+        fill(255, 255, 255, 128)
+        beginpath(x * step + random(0, noise),
+                  y * step + random(0, noise))
+        lineto(step + x * step + random(0, noise),
+               y * step + random(0, noise))
+        lineto(step + x * step + random(0, noise),
+               step + y * step + random(0, noise))
+        lineto(x * step + random(0, noise),
+               step + y * step + random(0, noise))
+        endpath()

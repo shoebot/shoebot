@@ -1,0 +1,20 @@
+"""
+Noise circles 1
+by Paulo Silva
+"""
+
+step = 16
+
+size(512, 256)
+colorrange(255)
+colormode(RGB)
+
+var('noise', NUMBER, 0., 0., 16.)
+
+background(128, 128, 128)
+for y in range(0, HEIGHT / (step * 2), 1):
+    for x in range(0, WIDTH / (step * 2), 1):
+        fill(255, 255, 255)
+        ellipse(x * step * 2 +random(0, noise),
+                y * step * 2 +random(0, noise),
+                step, step)

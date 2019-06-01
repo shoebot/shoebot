@@ -1,0 +1,40 @@
+pb = ximport("photobot")
+
+size(750,250)
+c = pb.canvas(750, 250)
+reload(pb)
+ 
+tiles = ["images/mount1.jpg", "images/mount2.jpg", "images/mount3.jpg", "images/mount4.jpg", "images/castle.jpg"]
+ 
+c.fill((255,255,255))
+c.layer(choice(tiles))  
+n = 3
+ 
+for i in range(6):
+ 
+  c.layer(choice(tiles))
+  c.layers[n+i].contrast(1.1)
+  w, h = c.layers[i+n].bounds()
+ 
+  c.gradient(pb.LINEAR, w/2, h)
+  c.layers[n+i+1].flip()
+  c.layers[n+i+1].translate(w/2, 0)
+  c.gradient(pb.LINEAR, w/2, h)
+  c.merge([n+i+1, n+i+2])
+  c.layers[n+i+1].brightness(1.4)
+  c.layers[n+i+1].mask()
+ 
+  c.layers[n+i].translate(i*w/3, 0)
+ 
+  if random() > 0.5: c.layers[n+i].flip()
+  if random() > 0.5: c.layers[n+i].blur()
+ 
+c.fill((200,100,0))
+c.layers[n+i+1].opacity(60)
+c.layers[n+i+1].hue()
+ 
+#c.layer("photobot/paint.jpg")
+#c.layers[n+i+1].opacity(20)
+#c.layers[n+i+1].overlay()
+ 
+c.draw(0,0)

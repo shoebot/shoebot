@@ -86,9 +86,9 @@ def mk_examples_menu(text, root_dir=None, depth=0):
     # 3.12+ menus
     examples_dir = ide_utils.get_example_dir()
     if not examples_dir:
-        return "", [], []
+        return None, []
 
-    root_dir = root_dir or examples_dir
+    root_dir = root_dir or examples_dir    
 
     file_actions = []
     
