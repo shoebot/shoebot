@@ -56,7 +56,7 @@ class BezierPath(Grob, ColorMixin):
 
     _state_attributes = {'fillcolor', 'strokecolor', 'strokewidth', 'transform'}
 
-    def __init__(self, bot, path=None, fill=None, stroke=None, strokewidth=None, pathmode=CORNER, packed_elements=None):
+    def __init__(self, bot, path=None, fill=None, stroke=None, strokewidth=0, pathmode=CORNER, packed_elements=None):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
         # _render_funcs contain functions that do the rendering
         # _elements contains either a PathElement or the arguments that need
