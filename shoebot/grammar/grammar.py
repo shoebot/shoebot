@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import copy
 import os
 import sys
@@ -164,7 +166,7 @@ class Grammar(object):
                                 # Re-run the function body - ideally this would only
                                 # happen if the body had actually changed
                                 # - Or perhaps if the line included a variable declaration
-                                exec(source, ns)
+                                exec (source, ns)
 
                         ns['draw']()
                         self._canvas.flush(self._frame)
@@ -184,9 +186,9 @@ class Grammar(object):
                             # Re-run the function body - ideally this would only
                             # happen if the body had actually changed
                             # - Or perhaps if the line included a variable declaration
-                            exec(source, ns)
+                            exec (source, ns)
                     else:
-                        exec(source, ns)
+                        exec (source, ns)
 
                     self._canvas.flush(self._frame)
         if limit:

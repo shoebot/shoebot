@@ -1,5 +1,3 @@
-
-
 """
 Simple command shell
 
@@ -32,6 +30,7 @@ Other commands are available to control playback, try 'help' to
 list them.
 """
 
+from __future__ import print_function
 import base64
 import cmd
 import shlex
@@ -55,6 +54,7 @@ def trusted_cmd(f):
     :param f:
     :return:
     """
+
     def run_cmd(self, line):
         if self.trusted:
             f(self, line)

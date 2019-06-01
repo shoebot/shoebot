@@ -30,7 +30,7 @@
 '''Abstract canvas class'''
 
 from collections import deque
-from abc import ABCMeta, abstractproperty
+import abc, six
 import sys
 import locale
 import gettext
@@ -51,7 +51,8 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 
-class Canvas(object, metaclass=ABCMeta):
+@six.add_metaclass(abc.ABCMeta)
+class Canvas(object):
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
 
@@ -88,11 +89,11 @@ class Canvas(object, metaclass=ABCMeta):
         '''
         pass
 
-    @abstractproperty
+    @abc.abstractproperty
     def reset_drawqueue(self):
         pass
 
-    @abstractproperty
+    @abc.abstractproperty
     def reset_transform(self):
         pass
 
