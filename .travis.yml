@@ -12,7 +12,7 @@ install:
  - sudo apt-get update -q
  - sudo apt-get install --no-install-recommends -y xvfb gir1.2-gtk-3.0 gobject-introspection libcairo2-dev libglib2.0-dev libgirepository1.0-dev build-essential libcairo2-dbg libglib2.0-0-dbg $(echo $PACKAGES)
  - sudo ./install/install_dependencies.sh
- # - pip install vext.gi
+ - pip install vext.gi
  - pip install setuptools>=18.8 pycairo>=1.18.1 meta==1.0.2 Pillow>=6.0.0 pubsub==0.1.2
  - pip install --no-deps .
  - pip freeze
