@@ -41,10 +41,10 @@ Run a Shoebot/Nodebox script:
 Running in Jupyter
 ------------------
 
-[Jupyter notebooks](https://jupyter.org) are fantastic, and Shoebot runs pretty well inside them!
+`Jupyter notebooks <https://jupyter.org>_` are fantastic, and Shoebot runs pretty well inside them!
 
 First, you need to have Jupyter installed, as well as the development version
-of Shoebot. Using `virtualenvwrapper` for this is heavily recommended.
+of Shoebot. Using ``virtualenvwrapper`` for this is heavily recommended.
 
 .. code-block:: bash
 
@@ -58,7 +58,7 @@ of Shoebot. Using `virtualenvwrapper` for this is heavily recommended.
     python setup.py install
 
 After ensuring both packages are available, install the extension after cloning
-the [jupyter-shoebot](https://github.com/shoebot/jupyter-shoebot/) repository:
+the `jupyter-shoebot <https://github.com/shoebot/jupyter-shoebot/>`_ repository:
 
 .. code-block:: bash
 
@@ -69,17 +69,16 @@ the [jupyter-shoebot](https://github.com/shoebot/jupyter-shoebot/) repository:
     cd jupyter-shoebot
     python setup.py install
 
-And finally, while still on the `jupyter-shoebot/` directory, run
+And finally, while still on the ``jupyter-shoebot/`` directory, run
 
 .. code-block:: bash
 
     jupyter kernelspec install shoebot_kernel --sys-prefix
 
-All done! Now you can run `jupyter notebook`, go to the `Kernel` menu, select
-`Change kernel` and select `Shoebot`.
+All done! Now you can run ``jupyter notebook``, go to the ``Kernel`` menu, select
+``Change kernel`` and select ``Shoebot``.
 
-Be sure to try the [notebook
-examples](https://github.com/shoebot/jupyter-shoebot/tree/master/example-notebooks)
+Be sure to try the `notebook examples <https://github.com/shoebot/jupyter-shoebot/tree/master/example-notebooks>_`
 in the Jupyter Shoebot repository.
 
 
