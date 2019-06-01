@@ -4,7 +4,7 @@ matrix:
       sudo: required
       dist: trusty
       language: generic
-      env: PYTHON="python2" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gobject gir1.2-rsvg-2.0"
+      env: PYTHON="python3" PACKAGES="pep8 pyflakes python-gi python-gi-cairo python-faulthandler libpython-dev libjpeg-dev python-cairo python-gobject gir1.2-rsvg-2.0"
 
 install:
  - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; fi
@@ -14,10 +14,10 @@ install:
  - virtualenv --python=$PYTHON _venv
  - source _venv/bin/activate
  - pip install vext.gi
- - pip install setuptools>=18.8 pycairo>=1.17.0 meta==1.0.2 Pillow>=2.8.1 pubsub==0.1.1
+ - pip install setuptools>=18.8 pycairo>=1.18.1 meta==1.0.2 Pillow>=6.0.0 pubsub==0.1.2
  - pip install --no-deps .
  - pip freeze
 
 script:
  - $PYTHON setup.py diagnose
- - if [ "$PYTHON" == "python2" ]; then SHOEBOT_GI=pgi $PYTHON setup.py test; fi
+ - if [ "$PYTHON" == "python3" ]; then SHOEBOT_GI=pgi $PYTHON setup.py test; fi
