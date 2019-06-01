@@ -8,3 +8,4 @@ python:
   install:
   - method: setuptools
     path: .
+  - requirements: doc/requirements.txt
