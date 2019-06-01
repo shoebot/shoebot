@@ -176,6 +176,10 @@ def vw_envs(filter=None):
     >>> vw_envs(filter=venv_has_script('pip'))
     """
     vw_root=os.path.abspath(os.path.expanduser(os.path.expandvars('~/.virtualenvs')))
+    try:
+        directories = os.listdir(vw_root)
+    except OSError:
+        return []
     venvs=[]
     for directory in os.listdir(vw_root):
         venv=os.path.join(vw_root, directory)
