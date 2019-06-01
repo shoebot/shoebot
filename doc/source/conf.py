@@ -47,7 +47,7 @@ copyright = u'2007-' + unicode(datetime.date.today().year) + u' , the Shoebot au
 # The short X.Y version.
 version = '1.3'
 # The full version, including alpha/beta/rc tags.
-release = '1.3'
+release = '1.3.1'
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
