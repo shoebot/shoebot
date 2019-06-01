@@ -338,6 +338,7 @@ UI_INFO = """
       <menuitem action='Run' />
       <separator />
       <menuitem action='VarWindow' />
+      <menuitem action='LiveCoding' />
       <menuitem action='FullScreen' />
       <menuitem action='SocketServer' />
     </menu>
@@ -411,6 +412,9 @@ class ShoebotEditorWindow(Gtk.Window):
         varwindow = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
         varwindow.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(varwindow)
+        livecoding = Gtk.ToggleAction("LiveCoding", "Live Coding mode", None, None)
+        livecoding.connect("toggled", self.on_livecoding_changed)
+        action_group.add_action(livecoding)
         fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
         fullscreen.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(fullscreen)
@@ -481,9 +485,9 @@ class ShoebotEditorWindow(Gtk.Window):
         # we create an instance for stdout filter
         self.stdout_filter = Stdout_Filter(self.console_error)
         # we redirect stderr
-        sys.stderr = self.console_error
+        # sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
-        sys.stdout = self.stdout_filter
+        # sys.stdout = self.stdout_filter
         # error-console window is added to container as second child
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
@@ -612,6 +616,21 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def on_fullscreen_changed(self, widget):
         self.go_fullscreen = widget.get_active()
+
+    def on_livecoding_changed(self, widget):
+        self.livecoding = widget.get_active()
+        # panel = self.get_bottom_panel()
+        if self.livecoding and self.sbot_window:
+            buffer = self.text_view.get_buffer()
+            start, end = buffer.get_bounds()
+            source = buffer.get_text(start, end, include_hidden_chars=False)
+            self.sbot_window.bot.live_source_load(source)
+
+            # icon = Gtk.Image()
+            # panel.add_item(self.live_text, 'Shoebot Live', icon)
+        else:
+            # panel.remove_item(self.live_text)
+            pass
 
     def on_color_cycle_changed(self, callback_action, widget):
         self.text_view.get_buffer().set_colors(callback_action)
