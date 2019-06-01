@@ -337,6 +337,7 @@ UI_INFO = """
     <menu action='RunMenu'>
       <menuitem action='Run' />
       <separator />
+      <menuitem action='VarWindow' />
       <menuitem action='FullScreen' />
       <menuitem action='SocketServer' />
     </menu>
@@ -407,6 +408,9 @@ class ShoebotEditorWindow(Gtk.Window):
             ("RunMenu", None, "_Run"),
             ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.on_run_script),
         ])
+        varwindow = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
+        varwindow.connect("toggled", self.on_varwindow_changed)
+        action_group.add_action(varwindow)
         fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
         fullscreen.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(fullscreen)
