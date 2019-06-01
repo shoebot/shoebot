@@ -18,5 +18,5 @@ install:
  - pip freeze
 
 script:
- - $PYTHON setup.py diagnose
  - if [ "$PYTHON" == "python3" ]; then SHOEBOT_GI=pgi $PYTHON setup.py test; fi
+ - $PYTHON setup.py diagnose
