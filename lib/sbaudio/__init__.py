@@ -1,9 +1,21 @@
 import atexit
 import threading
-import numpy as np
-from pysoundcard import InputStream
-from pysoundcard import device_info
-from fuzzywuzzy import fuzz
+try:
+    import numpy as np
+except ImportError:
+    print("The Audio library requires the numpy module (pip install numpy).")
+    raise
+try:
+    from pysoundcard import InputStream
+    from pysoundcard import device_info
+except ImportError:
+    print("The Audio library requires the pysoundcard module (pip install pysoundcard).")
+    raise
+try:
+    from fuzzywuzzy import fuzz
+except ImportError:
+    print("The Audio library requires the fuzzywuzzy module (pip install fuzzywuzzy).")
+    raise
 
 
 BUFF_LENGTH = 1024

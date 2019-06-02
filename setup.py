@@ -134,22 +134,12 @@ BASE_REQUIREMENTS = [
     "pubsub==0.1.2",
 ]
 
-# Requirements to run examples
-EXAMPLE_REQUIREMENTS = [
-    "fuzzywuzzy==0.5.0",  # sbaudio
-    "planar",  # examples
-    "PySoundCard>=0.5.2",  # sbaudio
-]
-if not is_pypy:
-    EXAMPLE_REQUIREMENTS.append("numpy>=1.16.4")
 
-
-def requirements(debug=True, with_examples=True, with_pgi=None):
+def requirements(debug=True, with_pgi=None):
     """
     Build requirements based on flags
 
     :param with_pgi: Use 'pgi' instead of 'gi' - False on CPython, True elsewhere
-    :param with_examples:
     :return:
     """
     reqs = list(BASE_REQUIREMENTS)
@@ -159,16 +149,12 @@ def requirements(debug=True, with_examples=True, with_pgi=None):
     if debug:
         print("setup options: ")
         print("with_pgi:      ", "yes" if with_pgi else "no")
-        print("with_examples: ", "yes" if with_examples else "no")
     if with_pgi:
         reqs.append("pgi")
         if debug:
             print("warning, as of April 2019 typography does not work with pgi")
     else:
         reqs.append(PYGOBJECT)
-
-    if with_examples:
-        reqs.extend(EXAMPLE_REQUIREMENTS)
 
     if debug:
         print("")
@@ -180,7 +166,7 @@ def requirements(debug=True, with_examples=True, with_pgi=None):
 
 setup(
     name="shoebot",
-    version="1.3",
+    version="1.3.1",
     description="Vector graphics scripting application",
     long_description=info,
     author="Ricardo Lafuente",
@@ -193,7 +179,6 @@ setup(
     setup_requires=[PYCAIRO],
     install_requires=requirements(
         debug="install" in sys.argv,
-        with_examples="SHOEBOT_SKIP_EXAMPLES" not in os.environ,
         with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
     entry_points={

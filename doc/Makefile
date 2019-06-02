@@ -41,6 +41,9 @@ pickle:
 
 web: pickle
 
+serve:
+	cd build/html; python -m SimpleHTTPServer
+
 json:
 	mkdir -p build/json build/doctrees
 	$(SPHINXBUILD) -b json $(ALLSPHINXOPTS) build/json

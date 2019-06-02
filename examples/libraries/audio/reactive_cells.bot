@@ -2,14 +2,16 @@
 Cells move across the screen propelled by particles that react to audio
 from the microphone.
 by Stuart Axon
-
-Requires the pysoundcard Python module:
-    $ pip install pysoundcard
 """
 
 from random import random
+import sys
 from sbaudio import audio, scaled_fft
-from planar.py import Vec2
+try:
+    from planar.py import Vec2
+except ImportError:
+    print("You need to install the planar module (pip install planar).")
+    raise
 
 
 class Moveable(object):

@@ -13,7 +13,7 @@ MINT_PACKAGES=${DEB_PACKAGES}
 
 
 # OSX
-HOMEBREW_PACKAGES="gtk+3 pygobject jpeg librsvg"
+HOMEBREW_PACKAGES="gtk+3 pygobject jpeg librsvg libffi cairo py2cairo gobject-introspection gtksourceview3"
 MACPORTS_PACKAGES="gtk3 cairo cairo-devel gobject-introspection py27-gobject jpeg librsvg"
 
 confirm() {

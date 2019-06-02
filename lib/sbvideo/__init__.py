@@ -2,9 +2,17 @@
 # Copyright: HVA - Hermanitos Verdes Architetti, 2009
 # licenSe: LGPL
 import cairo
-import numpy
-import opencv
-from opencv import highgui as hg
+try:
+    import numpy as np
+except ImportError:
+    print("The Video library requires the numpy module (pip install numpy).")
+    raise
+try:
+    import opencv
+    from opencv import highgui as hg
+except ImportError:
+    print("The Video library requires the OpenCV module (pip install opencv).")
+    raise
 import os
 
 __author__ = "Francesco Fantoni"

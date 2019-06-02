@@ -91,7 +91,6 @@ Documentation Index
    cli_flags
    compatibility
    contributing
-   developing
    
 
 .. We won't be needing these for now
