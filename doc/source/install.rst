@@ -68,16 +68,22 @@ To use shoebot in the future, remember to activate the environment first.
 Mac OS X
 --------
 
-Installation on Mac OS X should work the same by following the above instructions.
+Installation on Mac OS X is identical to GNU/Linux based distributions. 
 
-It is however poorly tested, since the developers of Shoebot are focusing on GNU/Linux; if you run into any unexpected issue, let us know in the `issue tracker <https://github.com/shoebot/shoebot/issues>`_.
+Dependencies are installed via `Homebrew <https://brew.sh/>_` through the
+``install_dependencies.sh`` script.
+
 
 Windows
 -------
 
-Windows is currently untested. There used to be a purpose-built Windows version of Shoebot (Spryte) but it has been unmaintained for a long while.
+Windows is currently untested. There used to be a purpose-built Windows version
+of Shoebot (Spryte) but it has been unmaintained for a long while.
 
-If you try your hand at running Shoebot on Windows and can get *anything* running, let us know in our `issue tracker`_ so we can improve this documentation.
+If you try your hand at running Shoebot on Windows and can get *anything*
+running, let us know in our `issue tracker
+<https://github.com/shoebot/shoebot/issues>`_ so we can improve this
+documentation.
 
 
 Add support for another operating system
