@@ -13,8 +13,8 @@ MINT_PACKAGES=${DEB_PACKAGES}
 
 
 # OSX
-HOMEBREW_PACKAGES="gtk+3 pygobject jpeg librsvg libffi cairo py2cairo gobject-introspection gtksourceview3"
-MACPORTS_PACKAGES="gtk3 cairo cairo-devel gobject-introspection py27-gobject jpeg librsvg"
+HOMEBREW_PACKAGES="gtk+3 pygobject gobject-introspection jpeg librsvg libffi cairo py3cairo gtksourceview3"
+MACPORTS_PACKAGES="gtk3 py37-gobject gobject-introspection jpeg librsvg cairo cairo-devel py37-cairo gtksourceview3"
 
 confirm() {
     read -p "Y/N" -n 1 -r
