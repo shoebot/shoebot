@@ -1,0 +1,20 @@
+'''
+Little Arrows demo by ppsilva
+https://github.com/shoebot/shoebot/issues/236
+'''
+
+littlearrows = [
+        ("quarentaecinco", 40),
+        ("noventa", 90),
+        ("sessenta", 60)
+]
+
+for name, angle in littlearrows:
+    i=0
+    rotate(angle, angle)
+    translate(-angle, angle*i, CENTER)
+    arrow(90, 40, 40, FORTYFIVE)
+    myprettymap= map(0,10,0,1)
+    # map does not work I need to figure it out and make it more interesting
+    fill( 10*i, 2*i, 3*i, myprettymap)
+    i=i+1
