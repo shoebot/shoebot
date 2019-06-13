@@ -1,4 +1,4 @@
-from objects import *
+from .objects import *
 
 class TuioProfile(object):
     """An abstract profile as defined in the TUIO protocol"""
@@ -40,7 +40,7 @@ class TuioProfile(object):
         Returns a generator list of tracked objects which are recognized with
         this profile and are in the current session.
         """
-        for obj in self.objects.itervalues():
+        for obj in self.objects.values():
             if obj.sessionid in self.sessions:
                 yield obj
 
@@ -61,7 +61,7 @@ class Tuio2DcurProfile(TuioProfile):
     def alive(self, client, message):
         if client.refreshed():
             self.sessions = message[3:]
-            for obj in self.objects.keys():
+            for obj in list(self.objects.keys()):
                 if obj not in self.sessions:
                     del self.objects[obj]
 

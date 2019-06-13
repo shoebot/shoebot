@@ -46,20 +46,20 @@ def intersection(a, b):
     """ Returns the intersection of lists.
     a & b -> elements that appear in a as well as in b.
     """
-    return filter(lambda x: x in a, b)
+    return [x for x in b if x in a]
     
     
 def union(a, b):
     """ Returns the union of lists.
     a | b -> all elements from a and all the elements from b.
     """     
-    return a + filter(lambda x: x not in a, b)
+    return a + [x for x in b if x not in a]
 
 def difference(a, b):
     """ Returns the difference of lists.
     a - b -> elements that appear in a but not in b.
     """
-    return filter(lambda x: x not in b, a)
+    return [x for x in a if x not in b]
     
 #--- SUBGRAPH ----------------------------------------------------------------------------------------
 
@@ -82,8 +82,8 @@ def subgraph(graph, id, distance=1):
             g.add_node(n.id, n.r, n.style, n.category, n.label, (n==graph.root), n.__dict__)
         
     for e in graph.edges:
-        if g.has_key(e.node1.id) and \
-           g.has_key(e.node2.id):
+        if e.node1.id in g and \
+           e.node2.id in g:
             g.add_edge(e.node1.id, e.node2.id, e.weight, e.length, e.label, e.__dict__)
     
     # Should we look for shortest paths between nodes here?

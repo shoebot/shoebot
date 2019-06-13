@@ -102,7 +102,7 @@ class MovieFrame:
         try:
             self.cascade = opencv.cvLoadHaarClassifierCascade(os.path.join(os.path.dirname(__file__), classifier+".xml"),opencv.cvSize(1, 1))
         except:
-            raise AttributeError, "could not load classifier file"
+            raise AttributeError("could not load classifier file")
 
         self.objects = opencv.cvHaarDetectObjects(self.grayscale, self.cascade, self.storage, 1.2, 2, opencv.CV_HAAR_DO_CANNY_PRUNING, opencv.cvSize(50, 50))
 

@@ -31,12 +31,12 @@ __license__   = "GPL"
 ######################################################################################################
 
 import os
-import cache
-import url
-import html
-import page
-import simplejson
-import json # wrapper for simplejson, backward compatibility.
+from . import cache
+from . import url
+from . import html
+from . import page
+from . import simplejson
+from . import json # wrapper for simplejson, backward compatibility.
 
 packages = [
     "yahoo", "google", 

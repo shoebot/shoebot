@@ -1,7 +1,7 @@
-from url import URLAccumulator
-from urllib import quote
-from cache import Cache
-import simplejson
+from .url import URLAccumulator
+from urllib.parse import quote
+from .cache import Cache
+from . import simplejson
 
 def clear_cache():
     Cache("colr").clear()
@@ -27,8 +27,8 @@ class ColrTheme(list):
     def __init__(self):
         
         self.id = 0
-        self.author = u""
-        self.label = u""
+        self.author = ""
+        self.label = ""
         self.tags = []
     
     def _darkest(self):
@@ -175,7 +175,7 @@ def preview(theme):
     r,g,b = theme.lightest
     _ctx.fontsize(18)
     _ctx.fill(r,g,b)
-    _ctx.text(theme.label + u" | " + str(theme.id), 20, 540)
+    _ctx.text(theme.label + " | " + str(theme.id), 20, 540)
     _ctx.fontsize(_ctx.fontsize()/2)
     _ctx.text(", ".join(theme.tags), 20, 555, width=400)
 

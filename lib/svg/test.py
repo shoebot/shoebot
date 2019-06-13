@@ -1,8 +1,9 @@
 # This script tests if the SVG library works correctly.
 import unittest
+import importlib
 
 svg = ximport("__init__")
-reload(svg)
+importlib.reload(svg)
 
 BLACK = Color()
 WHITE = Color(1)
@@ -73,11 +74,11 @@ class SVGTest(unittest.TestCase):
         self.assertEqual(width, path.strokewidth)
         
     def assertColorEquals(self, c1, c2):
-        self.assertEquals(c1.red, c1.red)
-        self.assertEquals(c1.green, c1.green)
-        self.assertEquals(c1.blue, c1.blue)
-        self.assertEquals(c1.alpha, c1.alpha)
+        self.assertEqual(c1.red, c1.red)
+        self.assertEqual(c1.green, c1.green)
+        self.assertEqual(c1.blue, c1.blue)
+        self.assertEqual(c1.alpha, c1.alpha)
         
 suite = unittest.TestLoader().loadTestsFromTestCase(SVGTest)
 suite.debug()
-print "All tests passed."
+print("All tests passed.")

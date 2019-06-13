@@ -434,7 +434,7 @@ def print_pt(x, y, cmd):
     elif (cmd == 'lineto'):
         _ctx.lineto(x, y)
     else:
-        print cmd, x, y
+        print(cmd, x, y)
 
 def print_crv(x1, y1, x2, y2, x3, y3):
     x1 *= 100

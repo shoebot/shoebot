@@ -10,9 +10,9 @@ import os
 
 from feedparser import feedparser
 
-from url import URLAccumulator
-from html import strip_tags
-from cache import Cache
+from .url import URLAccumulator
+from .html import strip_tags
+from .cache import Cache
 
 def clear_cache():
     Cache("newsfeed").clear()
@@ -30,7 +30,7 @@ except:
 
 def favorite_url(name):
 
-    if favorites.has_key(name):
+    if name in favorites:
         return favorites[name]
 
     for key in favorites:
@@ -54,12 +54,12 @@ class Newsfeed:
     
     """
     
-    def __init__(self, feed, none=u""):
+    def __init__(self, feed, none=""):
         self._feed = feed
         self._none = none
 
     def __call__(self, *args):
-        raise TypeError, "Newsfeed object not callable"
+        raise TypeError("Newsfeed object not callable")
 
     def __repr__(self):
         return strip_tags(self._feed.__repr__())
@@ -80,7 +80,7 @@ class Newsfeed:
             return Newsfeed(self._none)
     
     def has_key(self, key):
-        return self._feed.has_key(key)
+        return key in self._feed
     
     def __iter__(self):
         return self._feed.__iter__()

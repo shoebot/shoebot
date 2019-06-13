@@ -178,7 +178,7 @@ class Canvas:
         #(=time consuming).
         
         if layers == []: 
-            layers = range(1, len(self.layers))
+            layers = list(range(1, len(self.layers)))
         background = self.layers._get_bg()
         background.name = "Background"
         

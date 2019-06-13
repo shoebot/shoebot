@@ -1,8 +1,8 @@
-from urllib import quote_plus
-from url import URLAccumulator
+from urllib.parse import quote_plus
+from .url import URLAccumulator
 from xml.dom.minidom import parseString
 import os
-from cache import Cache
+from .cache import Cache
 
 API_KEY = "787081027f43b0412ba41142d4540480"
 

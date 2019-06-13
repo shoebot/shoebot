@@ -11,7 +11,7 @@ __license__   = "MIT"
 ### L-SYSTEM #########################################################################################
 
 from shoebot.data import CORNER, CENTER
-from sys import maxint
+from sys import maxsize
 
 class LSystem(object):
     
@@ -61,7 +61,7 @@ class LSystem(object):
 		self._segments = 0
 		self._duration = 0
 
-    def _grow(self, generation, rule, angle, length, time=maxint, draw=True):
+    def _grow(self, generation, rule, angle, length, time=maxsize, draw=True):
 
         """ Recurse through the system.
         
@@ -79,11 +79,11 @@ class LSystem(object):
 
         if generation == 0: 
         	# We are at the bottom of the system so now we now the total time needed.
-        	self._duration = 1 + maxint-time
+        	self._duration = 1 + maxsize-time
         
         if length <= self.threshold: 
         	# Segment length has fallen below the threshold, stop recursing.
-        	self._duration = 1 + maxint-time
+        	self._duration = 1 + maxsize-time
         	return
 
         if rule in self.commands: 
@@ -171,7 +171,7 @@ class LSystem(object):
     	self._timed = True
     	if not time:
     		self._timed = False
-    		time = maxint        
+    		time = maxsize        
 
     	mode = _ctx.transform()
         _ctx.transform(CORNER)
@@ -196,7 +196,7 @@ class LSystem(object):
     	"""
     	
     	if not time: 
-    		time = maxint
+    		time = maxsize
     	_ctx.push()
         self._reset()
         self._grow(generation, self.root, self.angle, self.d, time, draw=False)

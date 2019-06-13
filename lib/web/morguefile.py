@@ -6,11 +6,11 @@
 # See LICENSE.txt for details.
 
 import os
-from urllib import quote_plus
+from urllib.parse import quote_plus
 from xml.dom.minidom import parseString
 
-from url import URLAccumulator
-from cache import Cache
+from .url import URLAccumulator
+from .cache import Cache
 
 def clear_cache():
     Cache("morguefile").clear()

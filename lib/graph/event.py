@@ -142,7 +142,7 @@ class events:
         
         if self.popup == False: return
         if self.popup == True or self.popup.node != node:
-            if self.popup_text.has_key(node.id):
+            if node.id in self.popup_text:
                 texts = self.popup_text[node.id]
             else:
                 texts = None

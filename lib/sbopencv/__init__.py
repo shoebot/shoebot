@@ -14,8 +14,8 @@ __license__ = "lgpl"
 
 # this imports cvBlobsLib
 try:
-    from blobs.BlobResult import CBlobResult
-    from blobs.Blob import CBlob  # Note: This must be imported in order to destroy blobs and use other methods
+    from .blobs.BlobResult import CBlobResult
+    from .blobs.Blob import CBlob  # Note: This must be imported in order to destroy blobs and use other methods
 except:
     print("Could not load blobs extension, some of the library features will not be available")
     pass
@@ -80,7 +80,7 @@ class Image:
         try:
             self.iplimage = hg.cvLoadImage(self.path)
         except:
-            raise AttributeError, "could not load image file"
+            raise AttributeError("could not load image file")
 
     def _data(self):
         return ipl2cairo(self.iplimage)
@@ -188,7 +188,7 @@ def detectHaar(iplimage, classifier):
     try:
         cascade = opencv.cvLoadHaarClassifierCascade(os.path.join(os.path.dirname(__file__), classifier + ".xml"), opencv.cvSize(1, 1))
     except:
-        raise AttributeError, "could not load classifier file"
+        raise AttributeError("could not load classifier file")
     objs = opencv.cvHaarDetectObjects(grayscale, cascade, storage, 1.2, 2, opencv.CV_HAAR_DO_CANNY_PRUNING, opencv.cvSize(50, 50))
     objects = []
     for obj in objs:

@@ -7,8 +7,8 @@
 
 import sgmllib
 import re
-from htmlentitydefs import name2codepoint
-from BeautifulSoup import UnicodeDammit
+from html.entities import name2codepoint
+from .BeautifulSoup import UnicodeDammit
 
 def clear_cache():
     Cache("html").clear()
@@ -19,33 +19,33 @@ def clear_cache():
 # used by default in the legacy components of Microsoft Windows.
 # List taken from Mark Pilgrim's feedparser.py
 cp1252 = {
-  unichr(128): unichr(8364), # euro sign
-  unichr(130): unichr(8218), # single low-9 quotation mark
-  unichr(131): unichr( 402), # latin small letter f with hook
-  unichr(132): unichr(8222), # double low-9 quotation mark
-  unichr(133): unichr(8230), # horizontal ellipsis
-  unichr(134): unichr(8224), # dagger
-  unichr(135): unichr(8225), # double dagger
-  unichr(136): unichr( 710), # modifier letter circumflex accent
-  unichr(137): unichr(8240), # per mille sign
-  unichr(138): unichr( 352), # latin capital letter s with caron
-  unichr(139): unichr(8249), # single left-pointing angle quotation mark
-  unichr(140): unichr( 338), # latin capital ligature oe
-  unichr(142): unichr( 381), # latin capital letter z with caron
-  unichr(145): unichr(8216), # left single quotation mark
-  unichr(146): unichr(8217), # right single quotation mark
-  unichr(147): unichr(8220), # left double quotation mark
-  unichr(148): unichr(8221), # right double quotation mark
-  unichr(149): unichr(8226), # bullet
-  unichr(150): unichr(8211), # en dash
-  unichr(151): unichr(8212), # em dash
-  unichr(152): unichr( 732), # small tilde
-  unichr(153): unichr(8482), # trade mark sign
-  unichr(154): unichr( 353), # latin small letter s with caron
-  unichr(155): unichr(8250), # single right-pointing angle quotation mark
-  unichr(156): unichr( 339), # latin small ligature oe
-  unichr(158): unichr( 382), # latin small letter z with caron
-  unichr(159): unichr( 376)  # latin capital letter y with diaeresis
+  chr(128): chr(8364), # euro sign
+  chr(130): chr(8218), # single low-9 quotation mark
+  chr(131): chr( 402), # latin small letter f with hook
+  chr(132): chr(8222), # double low-9 quotation mark
+  chr(133): chr(8230), # horizontal ellipsis
+  chr(134): chr(8224), # dagger
+  chr(135): chr(8225), # double dagger
+  chr(136): chr( 710), # modifier letter circumflex accent
+  chr(137): chr(8240), # per mille sign
+  chr(138): chr( 352), # latin capital letter s with caron
+  chr(139): chr(8249), # single left-pointing angle quotation mark
+  chr(140): chr( 338), # latin capital ligature oe
+  chr(142): chr( 381), # latin capital letter z with caron
+  chr(145): chr(8216), # left single quotation mark
+  chr(146): chr(8217), # right single quotation mark
+  chr(147): chr(8220), # left double quotation mark
+  chr(148): chr(8221), # right double quotation mark
+  chr(149): chr(8226), # bullet
+  chr(150): chr(8211), # en dash
+  chr(151): chr(8212), # em dash
+  chr(152): chr( 732), # small tilde
+  chr(153): chr(8482), # trade mark sign
+  chr(154): chr( 353), # latin small letter s with caron
+  chr(155): chr(8250), # single right-pointing angle quotation mark
+  chr(156): chr( 339), # latin small ligature oe
+  chr(158): chr( 382), # latin small letter z with caron
+  chr(159): chr( 376)  # latin capital letter y with diaeresis
 }
 
 def replace_entities(ustring, placeholder=" "):
@@ -60,16 +60,16 @@ def replace_entities(ustring, placeholder=" "):
     def _repl_func(match):
         try:
             if match.group(1): # Numeric character reference
-                return unichr( int(match.group(2)) ) 
+                return chr( int(match.group(2)) ) 
             else:
-                try: return cp1252[ unichr(int(match.group(3))) ].strip()
-                except: return unichr( name2codepoint[match.group(3)] )
+                try: return cp1252[ chr(int(match.group(3))) ].strip()
+                except: return chr( name2codepoint[match.group(3)] )
         except:
             return placeholder
 
     # Force to Unicode.
-    if not isinstance(ustring, unicode):
-        ustring = UnicodeDammit(ustring).unicode
+    if not isinstance(ustring, str):
+        ustring = UnicodeDammit(ustring).str
     
     # Don't want some weird unicode character here
     # that truncate_spaces() doesn't know of:

@@ -18,11 +18,11 @@ __license__   = "GPL"
 
 ######################################################################################################
 
-import cluster
-import event
-import layout
-import proximity
-import style
+from . import cluster
+from . import event
+from . import layout
+from . import proximity
+from . import style
 
 #### GRAPH NODE ######################################################################################
 
@@ -52,12 +52,12 @@ class node:
         self._betweenness = None
         self._eigenvalue = None
         
-        for k, v in properties.items():
+        for k, v in list(properties.items()):
             if not k in self.__dict__:
                 self.__dict__[k] = v
 
     def _edges(self):
-        return self.links._edges.values()
+        return list(self.links._edges.values())
 
     edges = property(_edges)
     
@@ -158,7 +158,7 @@ class links(list):
         list.append(self, node)
 
     def remove(self, node):
-        if self._edges.has_key(node.id): del self._edges[node.id]
+        if node.id in self._edges: del self._edges[node.id]
         list.remove(self, node)
 
     def edge(self, id): 
@@ -177,7 +177,7 @@ class edge(object):
         self.length = length
         self.label  = label
         
-        for k, v in properties.items():
+        for k, v in list(properties.items()):
             if not k in self.__dict__:
                 self.__dict__[k] = v
     
@@ -275,7 +275,7 @@ class graph(dict):
         """ Add node from id and return the node object.
         """
         
-        if self.has_key(id): 
+        if id in self: 
             return self[id]
             
         if not isinstance(style, str) and style.__dict__.has_key["name"]:
@@ -303,8 +303,8 @@ class graph(dict):
         
         if id1 == id2: return None
         
-        if not self.has_key(id1): self.add_node(id1)
-        if not self.has_key(id2): self.add_node(id2)
+        if id1 not in self: self.add_node(id1)
+        if id2 not in self: self.add_node(id2)
         n1 = self[id1]
         n2 = self[id2]
         
@@ -328,7 +328,7 @@ class graph(dict):
         """ Remove node with given id.
         """
  
-        if self.has_key(id):
+        if id in self:
             n = self[id]
             self.nodes.remove(n)
             del self[id]
@@ -357,7 +357,7 @@ class graph(dict):
     def node(self, id):
         """ Returns the node in the graph associated with the given id.
         """
-        if self.has_key(id):
+        if id in self:
             return self[id]
         return None
     
@@ -374,9 +374,9 @@ class graph(dict):
         
         """ Returns the node in the graph associated with the given id.
         """
-        if self.has_key(a): 
+        if a in self: 
             return self[a]
-        raise AttributeError, "graph object has no attribute '"+str(a)+"'"
+        raise AttributeError("graph object has no attribute '"+str(a)+"'")
     
     def update(self, iterations=10):
         
@@ -514,7 +514,7 @@ class graph(dict):
         Node betweenness weights are updated in the process.
         """
         bc = proximity.brandes_betweenness_centrality(self, normalized)
-        for id, w in bc.iteritems(): self[id]._betweenness = w
+        for id, w in bc.items(): self[id]._betweenness = w
         return bc
         
     def eigenvector_centrality(self, normalized=True, reversed=True, rating={},
@@ -525,7 +525,7 @@ class graph(dict):
         ec = proximity.eigenvector_centrality(
             self, normalized, reversed, rating, start, iterations, tolerance
         )
-        for id, w in ec.iteritems(): self[id]._eigenvalue = w
+        for id, w in ec.items(): self[id]._eigenvalue = w
         return ec
     
     def nodes_by_betweenness(self, treshold=0.0):

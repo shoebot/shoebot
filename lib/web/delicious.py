@@ -1,4 +1,4 @@
-import urllib2, libxml2, xml.utils.iso8601, md5, re, RDF, datetime, urllib
+import urllib.request, urllib.error, urllib.parse, libxml2, xml.utils.iso8601, md5, re, RDF, datetime, urllib.request, urllib.parse, urllib.error
 from sets import Set
 
 def get_url_contents(url):
@@ -6,13 +6,13 @@ def get_url_contents(url):
         import httpcache
         return httpcache.HTTPCache(url).content()
     except ImportError:
-        return urllib.urlopen(url).read()
+        return urllib.request.urlopen(url).read()
 
 def _set_auth(username,password):
-    authinfo = urllib2.HTTPBasicAuthHandler()
+    authinfo = urllib.request.HTTPBasicAuthHandler()
     authinfo.add_password('del.icio.us API', 'http://del.icio.us', username, password)
-    opener = urllib2.build_opener(authinfo)
-    urllib2.install_opener(opener)
+    opener = urllib.request.build_opener(authinfo)
+    urllib.request.install_opener(opener)
 
 def my_tags(username,password):
     _set_auth(username,password)
@@ -48,8 +48,8 @@ def add_post(username,password,url=None,description="",extended="",tags="",dt=No
       'dt' : date,
       }
 
-    posturl = "http://del.icio.us/api/posts/add?"+urllib.urlencode(data)
-    urllib2.urlopen(posturl).read()
+    posturl = "http://del.icio.us/api/posts/add?"+urllib.parse.urlencode(data)
+    urllib.request.urlopen(posturl).read()
 
 def my_posts(username,password):
     _set_auth(username,password)
@@ -198,7 +198,7 @@ class PostIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.idx<len(self.posts):
             self.idx += 1
             return self.posts[self.idx-1]
@@ -285,7 +285,7 @@ if __name__ == '__main__':
     tags = Set()
     users = {}
 
-    print "Reading "+username+" posts..."
+    print("Reading "+username+" posts...")
     for post in user:
         for tag in post.tags:
             tags.add(tag)
@@ -305,27 +305,27 @@ if __name__ == '__main__':
                         other_tags.add(str(tag))
 
         if count>0:
-            print post.description+" ("+str(post.href)+")..."
-            print "  "+username+" tagged thus: "+",".join([str(t) for t in post.tags])
+            print(post.description+" ("+str(post.href)+")...")
+            print("  "+username+" tagged thus: "+",".join([str(t) for t in post.tags]))
             if len(other_tags)>0:
-                print "  "+str(count)+" others tagged further: "+",".join(other_tags)
+                print("  "+str(count)+" others tagged further: "+",".join(other_tags))
             else:
-                print "  "+str(count)+" others had no further tags to add"
-            print
+                print("  "+str(count)+" others had no further tags to add")
+            print()
 
-    print "users who posted the same stuff"
-    print "-------------------------------"
-    print
+    print("users who posted the same stuff")
+    print("-------------------------------")
+    print()
 
     for founduser in users:
         if founduser == username: continue
         if len(users[founduser])>2:
-            print founduser.url(),"also posted:"
+            print(founduser.url(),"also posted:")
             for post in users[founduser]:
-                print " ",post.description
-                print "    ("+str(post.href)+")",
+                print(" ",post.description)
+                print("    ("+str(post.href)+")", end=' ')
                 if len(post.tags)>0:
-                    print "- "+",".join([str(tag) for tag in post.tags])
+                    print("- "+",".join([str(tag) for tag in post.tags]))
                 else:
-                    print
-            print
+                    print()
+            print()

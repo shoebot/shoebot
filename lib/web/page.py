@@ -6,11 +6,11 @@
 # Copyright (c) 2007 by Tom De Smedt.
 # See LICENSE.txt for details.
 
-from BeautifulSoup import BeautifulSoup, Tag
+from .BeautifulSoup import BeautifulSoup, Tag
 
-from url import URLAccumulator, URLParser
-from html import replace_entities, plain
-from cache import Cache
+from .url import URLAccumulator, URLParser
+from .html import replace_entities, plain
+from .cache import Cache
 
 def clear_cache():
     Cache("html").clear()
@@ -86,10 +86,10 @@ class Page(BeautifulSoup, URLAccumulator):
 
         meta = self.find("meta", {"name":"description"})
         if isinstance(meta, dict) and \
-           meta.has_key("content"):
+           "content" in meta:
             return meta["content"]
         else:
-            return u""
+            return ""
             
     description = property(_description)
 
@@ -100,7 +100,7 @@ class Page(BeautifulSoup, URLAccumulator):
         
         meta = self.find("meta", {"name":"keywords"})
         if isinstance(meta, dict) and \
-           meta.has_key("content"):
+           "content" in meta:
             keywords = [k.strip() for k in meta["content"].split(",")]
         else:
             keywords = []

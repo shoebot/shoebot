@@ -194,10 +194,10 @@ class Database:
         for table in self:
             data += "<table name=\""+table._name+"\" key=\""+table._key+"\">\n"
             for row in table.all():
-                data += "\t<row id=\""+unicode(row[table._fields.index(table._key)])+"\">\n"
+                data += "\t<row id=\""+str(row[table._fields.index(table._key)])+"\">\n"
                 i = 0
                 for field in table._fields:
-                    r = unicode(row[i])
+                    r = str(row[i])
                     if row[i] == None: r = ""
                     data += "\t\t<"+field+">"+r+"</"+field+">\n"
                     i += 1
@@ -271,7 +271,7 @@ class Table:
         
         if key == None: key = self._key
         if fields != "*": fields = ", ".join(fields)
-        try: q = unicode(q)
+        try: q = str(q)
         except: pass
         if q != "*" and (q[0] == "*" or q[-1] == "*"):
             if q[0]  == "*": q = "%"+q.lstrip("*")
@@ -353,7 +353,7 @@ class Table:
             fields = [k for k in kw]
             v = [kw[k] for k in kw]
         
-        sql  = "update "+self._name+" set "+"=?, ".join(fields)+"=? where "+self._key+"="+unicode(id)
+        sql  = "update "+self._name+" set "+"=?, ".join(fields)+"=? where "+self._key+"="+str(id)
         self._db._cur.execute(sql, v)
         self._db._i += 1
         if self._db._i >= self._db._commit:
@@ -366,7 +366,7 @@ class Table:
         """
 
         if key == None: key = self._key
-        try: id = unicode(id)
+        try: id = str(id)
         except: pass        
         sql = "delete from "+self._name+" where "+key+" "+operator+" ?"
         self._db._cur.execute(sql, (id,))

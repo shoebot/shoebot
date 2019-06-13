@@ -6,12 +6,12 @@
 # Copyright (c) 2008 by Tom De Smedt.
 # See LICENSE.txt for details.
 
-import urllib
-import simplejson
+import urllib.request, urllib.parse, urllib.error
+from . import simplejson
 
-from url import URLAccumulator
-from html import replace_entities, strip_tags, collapse_spaces
-from cache import Cache
+from .url import URLAccumulator
+from .html import replace_entities, strip_tags, collapse_spaces
+from .cache import Cache
 
 def clear_cache():
     Cache("google").clear()
@@ -190,7 +190,7 @@ class GoogleSearch(GoogleResults, URLAccumulator):
             url += "images?"
         if service == GOOGLE_NEWS   : url += "news?"
         if service == GOOGLE_BLOGS  : url += "blogs?"
-        arg = urllib.urlencode((("v", 1.0),
+        arg = urllib.parse.urlencode((("v", 1.0),
                                 ("q", q),
                                 ("start", start),
                                 ("rsz", "large"),

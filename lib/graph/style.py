@@ -36,7 +36,7 @@ class styles(dict):
         k = kwargs.get("template", "default")
         s = self[stylename] = self[k].copy(stylename)
         for attr in kwargs:
-            if s.__dict__.has_key(attr):
+            if attr in s.__dict__:
                 s.__dict__[attr] = kwargs[attr]
         return s
     
@@ -46,27 +46,27 @@ class styles(dict):
     def __getattr__(self, a):
         """ Keys in the dictionaries are accessible as attributes.
         """
-        if self.has_key(a): 
+        if a in self: 
             return self[a]
-        raise AttributeError, "'styles' object has no attribute '"+a+"'"
+        raise AttributeError("'styles' object has no attribute '"+a+"'")
         
     def __setattr__(self, a, v):
         """ Setting an attribute is like setting it in all of the contained styles.
         """
         if a == "guide":
             self.__dict__["guide"] = v
-        elif len(self) > 0 and self.values()[0].__dict__.has_key(a):
-            for style in self.values(): 
+        elif len(self) > 0 and a in list(self.values())[0].__dict__:
+            for style in list(self.values()): 
                 style.__dict__[a] = v
         else:
-            raise AttributeError, "'style' object has no attribute '"+a+"'"
+            raise AttributeError("'style' object has no attribute '"+a+"'")
             
     def copy(self, graph):
         """ Returns a copy of all styles and a copy of the styleguide.
         """
         s = styles(graph)
         s.guide = self.guide.copy(graph)
-        dict.__init__(s, [(v.name, v.copy()) for v in self.values()])
+        dict.__init__(s, [(v.name, v.copy()) for v in list(self.values())])
         return s
 
 #### GRAPH STYLE GUIDE ###############################################################################
@@ -94,11 +94,11 @@ class styleguide(dict):
     def apply(self):
         """ Check the rules for each node in the graph and apply the style.
         """
-        sorted = self.order + self.keys()
+        sorted = self.order + list(self.keys())
         unique = []; [unique.append(x) for x in sorted if x not in unique]
         for node in self.graph.nodes:
             for s in unique:
-                if self.has_key(s) and self[s](self.graph, node): 
+                if s in self and self[s](self.graph, node): 
                     node.style = s
 
     def copy(self, graph):
@@ -106,7 +106,7 @@ class styleguide(dict):
         """
         g = styleguide(graph)
         g.order = self.order
-        dict.__init__(g, [(k, v) for k, v in self.iteritems()])
+        dict.__init__(g, [(k, v) for k, v in self.items()])
         return g
 
 #### GRAPH STYLE #####################################################################################
@@ -154,7 +154,7 @@ class style:
         
         # Each of the attributes is an optional named parameter in __init__().
         for attr in kwargs:
-            if self.__dict__.has_key(attr):
+            if attr in self.__dict__:
                 self.__dict__[attr] = kwargs[attr]
 
         # Use the Colors library for gradients and shadows?
@@ -273,7 +273,7 @@ def node_label(s, node, alpha=1.0):
         try: p = node._textpath
         except: 
             txt = node.label
-            try: txt = unicode(txt)
+            try: txt = str(txt)
             except:
                 try: txt = txt.decode("utf-8")
                 except:
@@ -457,7 +457,7 @@ def edge_label(s, edge, alpha=1.0):
         # This enhances the speed and avoids wiggling text.
         try: p = edge._textpath
         except:
-            try: txt = unicode(edge.label)
+            try: txt = str(edge.label)
             except:
                 try: txt = edge.label.decode("utf-8")
                 except:

@@ -1,4 +1,4 @@
-import simplejson
+from . import simplejson
 
 def read(str):
 	return simplejson.loads(str)

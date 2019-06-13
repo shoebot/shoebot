@@ -53,7 +53,7 @@ except ImportError:
         pass
 
 try:
-    import favorites as _favorites
+    from . import favorites as _favorites
 except ImportError:
     pass
 
@@ -500,7 +500,7 @@ class Color(BaseColor):
         # either hexadecimal color key
         # or a named color or descriptive word.
         if len(args) == 1 \
-                and isinstance(args[0], (str, unicode)):
+                and isinstance(args[0], str):
             if args[0].startswith("#"):
                 r, g, b = hex_to_rgb(args[0])
                 a = 1.0
@@ -524,11 +524,11 @@ class Color(BaseColor):
             BaseColor.__init__(self, args[0].r, args[0].g, args[0].b, args[0].a, mode='rgb', color_range=1.0)
 
         # Lab color values.
-        elif kwargs.has_key("mode") \
+        elif "mode" in kwargs \
                 and kwargs["mode"].lower() == "lab":
-            if kwargs.has_key("l") and \
-                    kwargs.has_key("a") and \
-                    kwargs.has_key("b"):
+            if "l" in kwargs and \
+                    "a" in kwargs and \
+                    "b" in kwargs:
                 r, g, b = lab_to_rgb(kwargs["l"], kwargs["a"], kwargs["b"])
             else:
                 r, g, b = lab_to_rgb(*args)
@@ -538,28 +538,28 @@ class Color(BaseColor):
 
 
         # RGB, HSB or CMYK color values.
-        elif (kwargs.has_key("mode") \
+        elif ("mode" in kwargs \
               and kwargs["mode"].lower() in modes) \
                 or mode in modes:
             m, ra = mode, range
-            if kwargs.has_key("mode"): m = kwargs["mode"]
-            if kwargs.has_key("color_range"):
+            if "mode" in kwargs: m = kwargs["mode"]
+            if "color_range" in kwargs:
                 ra = kwargs["color_range"]
             else:
                 ra = 1.0
 
             if m == "hsb":
-                if kwargs.has_key("h") and \
-                        kwargs.has_key("s") and \
-                        kwargs.has_key("v"):
+                if "h" in kwargs and \
+                        "s" in kwargs and \
+                        "v" in kwargs:
                     r, g, b = hsv_to_rgb(kwargs["h"], kwargs["s"], kwargs["v"])
                 else:
                     h, s, l, a = (args)
                     r, g, b = hsv_to_rgb(h, s, l)
             elif m == "rgb":
-                if kwargs.has_key("r") and \
-                        kwargs.has_key("g") and \
-                        kwargs.has_key("b"):
+                if "r" in kwargs and \
+                        "g" in kwargs and \
+                        "b" in kwargs:
                     r, g, b = kwargs["r"], kwargs["g"], kwargs["b"]
                 else:
                     if len(args) == 3:
@@ -571,7 +571,7 @@ class Color(BaseColor):
                 _ctx.colormode(RGB, ra)
                 BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=ra)
 
-        if kwargs.has_key("name") and kwargs["name"] != "":
+        if "name" in kwargs and kwargs["name"] != "":
             self.name = kwargs["name"]
         elif self.name == "":
             self.name = self.nearest_hue()
@@ -601,7 +601,7 @@ class Color(BaseColor):
         #    clr = color(named_hues[str], 1, 1, mode="hsb")
         #    return clr.r, clr.g, clr.b
 
-        if named_colors.has_key(str):
+        if str in named_colors:
             return named_colors[str]
 
         for suffix in ["ish", "ed", "y", "like"]:
@@ -794,7 +794,7 @@ class Color(BaseColor):
         if primary:
             hues = primary_hues
         else:
-            hues = named_hues.keys()
+            hues = list(named_hues.keys())
         nearest, d = "", 1.0
         for hue in hues:
             if abs(self.hue - named_hues[hue]) % 1 < d:
@@ -952,10 +952,10 @@ class ColorList(_list):
                         self.append(color(clr))
 
             # From a string (image/name/context).
-            if isinstance(arg, (str, unicode)):
+            if isinstance(arg, str):
                 if os.path.exists(arg):
                     n = 10
-                    if "n" in kwargs.keys(): n = kwargs["n"]
+                    if "n" in list(kwargs.keys()): n = kwargs["n"]
                     self.image_to_rgb(arg, n)
                 else:
                     clr = Color(arg)
@@ -966,9 +966,9 @@ class ColorList(_list):
                         self.extend(self.context_to_rgb(arg))
                         self.tags = arg
 
-        if "name" in kwargs.keys():
+        if "name" in list(kwargs.keys()):
             self.name = kwargs["name"]
-        if "tags" in kwargs.keys():
+        if "tags" in list(kwargs.keys()):
             self.tags = kwargs["tags"]
 
     def image_to_rgb(self, path, n=10):
@@ -1749,13 +1749,13 @@ class Gradient(ColorList):
         self._colors = [color(clr) for clr in self._colors]
 
         self._steps = 100
-        if kwargs.has_key("steps"):
+        if "steps" in kwargs:
             self._steps = kwargs["steps"]
-        if kwargs.has_key("steps"):
+        if "steps" in kwargs:
             self._steps = kwargs["steps"]
 
         self._spread = 0.5
-        if kwargs.has_key("spread"):
+        if "spread" in kwargs:
             self._spread = kwargs["spread"]
 
         self._cache()
@@ -1940,9 +1940,9 @@ class Favorites:
             return self
 
         candidate = None
-        if _favorites.data.has_key(q):
+        if q in _favorites.data:
             candidate = q
-        for name, (tags, colors) in _favorites.data.iteritems():
+        for name, (tags, colors) in _favorites.data.items():
             if q in tags:
                 candidate = name
 
@@ -2617,7 +2617,7 @@ class ColorTheme(_list):
         weights = []
         for clr, rng, weight in self.ranges:
             h = clr.nearest_hue(primary=False)
-            if grouped.has_key(h):
+            if h in grouped:
                 ranges, total_weight = grouped[h]
                 ranges.append((clr, rng, weight))
                 total_weight += weight
@@ -2627,7 +2627,7 @@ class ColorTheme(_list):
 
         # Calculate the normalized (0.0-1.0) weight for each hue,
         # and transform the dictionary to a list.
-        s = 1.0 * sum([w for r, w in grouped.values()])
+        s = 1.0 * sum([w for r, w in list(grouped.values())])
         grouped = [(grouped[h][1], grouped[h][1] / s, h, grouped[h][0]) for h in grouped]
         grouped.sort()
         grouped.reverse()
@@ -3239,7 +3239,7 @@ def gradientbackground(clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=
 ######################################################################################################
 
 def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
-    keys = named_hues.keys()
+    keys = list(named_hues.keys())
 
     def cmp(a, b):
         if named_hues[a] < named_hues[b]: return 1

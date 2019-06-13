@@ -371,7 +371,7 @@ class BezierPathEditor:
                not self.drag_handle1 and \
                not self.drag_handle2:
                 self.editing = False
-                indices = range(len(self._points))
+                indices = list(range(len(self._points)))
                 indices.reverse()
                 for i in indices:
                     pt = self._points[i]

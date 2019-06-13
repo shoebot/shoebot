@@ -4,7 +4,7 @@
 # Don't modify this file, modify the SWIG interface instead.
 # This file is compatible with both classic and new-style classes.
 
-import _BlobResult
+from . import _BlobResult
 import new
 new_instancemethod = new.instancemethod
 try:
@@ -31,7 +31,7 @@ def _swig_getattr(self,class_type,name):
     if (name == "thisown"): return self.this.own()
     method = class_type.__swig_getmethods__.get(name,None)
     if method: return method(self)
-    raise AttributeError,name
+    raise AttributeError(name)
 
 def _swig_repr(self):
     try: strthis = "proxy of " + self.this.__repr__()
@@ -40,7 +40,7 @@ def _swig_repr(self):
 
 import types
 try:
-    _object = types.ObjectType
+    _object = object
     _newclass = 1
 except AttributeError:
     class _object : pass

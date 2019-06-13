@@ -5,9 +5,9 @@
 # Copyright (c) 2007 by Tom De Smedt.
 # See LICENSE.txt for details.
 
-from url import URLAccumulator
-from urllib import quote
-from cache import Cache
+from .url import URLAccumulator
+from urllib.parse import quote
+from .cache import Cache
 
 def clear_cache():
     Cache("mimetex").clear()

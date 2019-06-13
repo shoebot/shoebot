@@ -13,8 +13,8 @@ import math
 import socket
 import inspect
 
-import OSC
-import profiles
+from . import OSC
+from . import profiles
 
 class CallbackError(Exception):
     pass
@@ -81,7 +81,7 @@ class Tracking(object):
     def get_helpers(self):
         """Returns a list of helper functions that provide access to the
         objects of each profile."""
-        return list([profile.list_label for profile in self.profiles.values()])
+        return list([profile.list_label for profile in list(self.profiles.values())])
 
     def update(self):
         """
