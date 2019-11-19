@@ -194,7 +194,7 @@ class NS:
     STMAP_R     = invertDict(STMAP)
 
     def __init__(self):
-        raise Error, "Don't instantiate this"
+        raise Error("Don't instantiate this")
 
 ################################################################################
 # Configuration class
@@ -208,8 +208,7 @@ class SOAPConfig:
 
         if config:
             if not isinstance(config, SOAPConfig):
-                raise AttributeError, \
-                    "initializer must be SOAPConfig instance"
+                raise AttributeError("initializer must be SOAPConfig instance")
 
             s = config.__dict__
 
@@ -240,7 +239,7 @@ class SOAPConfig:
 
     def __setattr__(self, name, value):
         if name in self.__readonly:
-            raise AttributeError, "readonly configuration setting"
+            raise AttributeError("readonly configuration setting")
 
         d = self.__dict__
 
@@ -258,14 +257,14 @@ class SOAPConfig:
                 elif NS.NSMAP_R.has_key(value):
                     n = (NS.NSMAP_R[value], value)
                 else:
-                    raise AttributeError, "unknown namespace"
+                    raise AttributeError("unknown namespace")
             elif type(value) in (ListType, TupleType):
                 if uri:
                     n = (value[1], value[0])
                 else:
                     n = (value[0], value[1])
             else:
-                raise AttributeError, "unknown namespace type"
+                raise AttributeError("unknown namespace type")
 
             d[base], d[base + 'URI'] = n
 
@@ -279,7 +278,7 @@ class SOAPConfig:
             value = str(value)
 
             if not NS.STMAP.has_key(value):
-                raise AttributeError, "unknown namespace style"
+                raise AttributeError("unknown namespace style")
 
             d[name] = value
             n = d['typesNamespace'] = NS.STMAP[value][0]
@@ -310,7 +309,7 @@ class anyType:
 
     def __init__(self, data = None, name = None, typed = 1, attrs = None):
         if self.__class__ == anyType:
-            raise Error, "anyType can't be instantiated directly"
+            raise Error("anyType can't be instantiated directly")
 
         if type(name) in (ListType, TupleType):
             self._ns, self._name = name
@@ -356,13 +355,13 @@ class anyType:
         elif type(attr) == ListType:
             attr = tuple(attr)
         elif type(attr) != TupleType:
-            raise AttributeError, "invalid attribute type"
+            raise AttributeError("invalid attribute type")
 
         if len(attr) != 2:
-            raise AttributeError, "invalid attribute length"
+            raise AttributeError("invalid attribute length")
 
         if type(attr[0]) not in (NoneType, StringType, UnicodeType):
-            raise AttributeError, "invalid attribute namespace URI type"
+            raise AttributeError("invalid attribute namespace URI type")
 
         return attr
 
@@ -391,7 +390,7 @@ class anyType:
         elif isinstance(attrs, anyType):
             d = attrs._attrs
         else:
-            raise AttributeError, "invalid attribute type"
+            raise AttributeError("invalid attribute type")
 
         for attr, value in d.items():
             self._setAttr(attr, value)
@@ -418,8 +417,7 @@ class anyType:
             return URI
         if not strict:
             return self._ns
-        raise AttributeError, \
-            "not a valid namespace for type %s" % self._type
+        raise AttributeError("not a valid namespace for type %s" % self._type)
 
 class voidType(anyType):
     pass
@@ -861,7 +859,7 @@ class dateType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return tuple(data)
 
@@ -904,7 +902,7 @@ class gYearMonthType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return tuple(data)
 
@@ -950,7 +948,7 @@ class gYearType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return data[0]
 
@@ -996,7 +994,7 @@ class centuryType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return data[0]
 
@@ -1042,7 +1040,7 @@ class gMonthDayType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return tuple(data)
 
@@ -1089,7 +1087,7 @@ class gMonthType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return data[0]
 
@@ -1136,7 +1134,7 @@ class gDayType(anyType):
             else:
                 raise Exception, "invalid type"
         except Exception, e:
-            raise ValueError, "invalid %s value - %s" % (self._type, e)
+            raise ValueError("invalid %s value - %s" % (self._type, e))
 
         return data[0]
 
@@ -1154,10 +1152,10 @@ class hexBinaryType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (StringType, UnicodeType):
-            raise AttributeError, "invalid %s type" % self._type
+            raise AttributeError("invalid %s type" % self._type)
 
         return data
 
@@ -1172,10 +1170,10 @@ class base64BinaryType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (StringType, UnicodeType):
-            raise AttributeError, "invalid %s type" % self._type
+            raise AttributeError("invalid %s type" % self._type)
 
         return data
 
@@ -1209,10 +1207,10 @@ class binaryType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (StringType, UnicodeType):
-            raise AttributeError, "invalid %s type" % self._type
+            raise AttributeError("invalid %s type" % self._type)
 
         return data
 
@@ -1221,7 +1219,7 @@ class binaryType(anyType):
 
         if attr[1] == 'encoding':
             if attr[0] != None or value not in ('base64', 'hex'):
-                raise AttributeError, "invalid encoding"
+                raise AttributeError("invalid encoding")
 
             self._cache = None
 
@@ -1233,10 +1231,10 @@ class anyURIType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (StringType, UnicodeType):
-            raise AttributeError, "invalid %s type" % self._type
+            raise AttributeError("invalid %s type" % self._type)
 
         return data
 
@@ -1256,21 +1254,21 @@ class NOTATIONType(anyType):
     def __init__(self, data, name = None, typed = 1, attrs = None):
 
         if self.__class__ == NOTATIONType:
-            raise Error, "a NOTATION can't be instantiated directly"
+            raise Error("a NOTATION can't be instantiated directly")
 
         anyType.__init__(self, data, name, typed, attrs)
 
 class ENTITIESType(anyType):
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) in (StringType, UnicodeType):
             return (data,)
 
         if type(data) not in (ListType, TupleType) or \
             filter (lambda x: type(x) not in (StringType, UnicodeType), data):
-            raise AttributeError, "invalid %s type" % self._type
+            raise AttributeError("invalid %s type" % self._type)
 
         return data
 
@@ -1283,10 +1281,10 @@ class NMTOKENSType(ENTITIESType): pass
 class integerType(anyType):
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType):
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1295,10 +1293,10 @@ class nonPositiveIntegerType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or data > 0:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1313,10 +1311,10 @@ class negativeIntegerType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or data >= 0:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1331,12 +1329,12 @@ class longType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < -9223372036854775808L or \
             data >  9223372036854775807L:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1345,12 +1343,12 @@ class intType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < -2147483648L or \
             data >  2147483647:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1359,12 +1357,12 @@ class shortType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < -32768 or \
             data >  32767:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1373,12 +1371,12 @@ class byteType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < -128 or \
             data >  127:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1387,10 +1385,10 @@ class nonNegativeIntegerType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or data < 0:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1405,12 +1403,12 @@ class unsignedLongType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < 0 or \
             data > 18446744073709551615L:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1419,12 +1417,12 @@ class unsignedIntType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < 0 or \
             data > 4294967295L:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1433,12 +1431,12 @@ class unsignedShortType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < 0 or \
             data > 65535:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1447,12 +1445,12 @@ class unsignedByteType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or \
             data < 0 or \
             data > 255:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1461,10 +1459,10 @@ class positiveIntegerType(anyType):
 
     def _checkValueSpace(self, data):
         if data == None:
-            raise ValueError, "must supply initial %s value" % self._type
+            raise ValueError("must supply initial %s value" % self._type)
 
         if type(data) not in (IntType, LongType) or data <= 0:
-            raise ValueError, "invalid %s value" % self._type
+            raise ValueError("invalid %s value" % self._type)
 
         return data
 
@@ -1479,7 +1477,7 @@ class positive_IntegerType(positiveIntegerType):
 class compoundType(anyType):
     def __init__(self, data = None, name = None, typed = 1, attrs = None):
         if self.__class__ == compoundType:
-            raise Error, "a compound can't be instantiated directly"
+            raise Error("a compound can't be instantiated directly")
 
         anyType.__init__(self, data, name, typed, attrs)
         self._aslist    = []
@@ -1560,7 +1558,7 @@ class arrayType(UserList.UserList, compoundType):
 
         if data:
             if type(data) not in (ListType, TupleType):
-                raise Error, "Data must be a sequence"
+                raise Error("Data must be a sequence")
 
         UserList.UserList.__init__(self, data)
         compoundType.__init__(self, data, name, 0, attrs)
@@ -1595,7 +1593,7 @@ class arrayType(UserList.UserList, compoundType):
             for i in range(len(self._dims)):
                 if self._dims[i] < 0 or \
                     self._dims[i] == 0 and len(self._dims) > 1:
-                    raise TypeError, "invalid Array dimensions"
+                    raise TypeError("invalid Array dimensions")
 
                 if offset > 0:
                     self._poss[i] = offset % self._dims[i]
@@ -1604,7 +1602,7 @@ class arrayType(UserList.UserList, compoundType):
                 # Don't break out of the loop if offset is 0 so we test all the
                 # dimensions for > 0.
             if offset:
-                raise AttributeError, "invalid Array offset"
+                raise AttributeError("invalid Array offset")
 
             a = [None] * self._dims[0]
 
@@ -1620,15 +1618,13 @@ class arrayType(UserList.UserList, compoundType):
 
     def _addItem(self, name, value, attrs):
         if self._full:
-            raise ValueError, "Array is full"
+            raise ValueError("Array is full")
 
         pos = attrs.get((NS.ENC, 'position'))
 
         if pos != None:
             if self._posstate == 0:
-                raise AttributeError, \
-                    "all elements in a sparse Array must have a " \
-                    "position attribute"
+                raise AttributeError("all elements in a sparse Array must have a position attribute")
 
             self._posstate = 1
 
@@ -1662,13 +1658,10 @@ class arrayType(UserList.UserList, compoundType):
                 else:
                     raise Exception
             except:
-                raise AttributeError, \
-                    "invalid Array element position %s" % str(pos)
+                raise AttributeError("invalid Array element position %s" % str(pos))
         else:
             if self._posstate == 1:
-                raise AttributeError, \
-                    "only elements in a sparse Array may have a " \
-                    "position attribute"
+                raise AttributeError("only elements in a sparse Array may have a position attribute")
 
             self._posstate = 0
 
@@ -1712,7 +1705,7 @@ class arrayType(UserList.UserList, compoundType):
                 break
 
         if self._dims[i] != 0 and pos:
-            raise Error, "array index out of range"
+            raise Error("array index out of range")
 
         a = self.data
 
@@ -1798,8 +1791,7 @@ def decodeHexString(data):
         try:
             c = conv[c]
         except KeyError:
-            raise ValueError, \
-                "invalid hex string character `%s'" % c
+            raise ValueError("invalid hex string character `%s'" % c)
 
         if low:
             bin += chr(high * 16 + c)
@@ -1811,12 +1803,11 @@ def decodeHexString(data):
         i += 1
 
     if low:
-        raise ValueError, "invalid hex string length"
+        raise ValueError("invalid hex string length")
 
     while i < len(data):
         if data[i] not in string.whitespace:
-            raise ValueError, \
-                "invalid hex string character `%s'" % c
+            raise ValueError("invalid hex string character `%s'" % c)
 
         i += 1
 
@@ -1841,7 +1832,7 @@ def cleanDate(d, first = 0):
     names = ('year', 'month', 'day', 'hours', 'minutes', 'seconds')
 
     if len(d) != 6:
-        raise ValueError, "date must have 6 elements"
+        raise ValueError("date must have 6 elements")
 
     for i in range(first, 6):
         s = d[i]
@@ -1856,30 +1847,30 @@ def cleanDate(d, first = 0):
                     s = long(s)
 
                 if s != d[i]:
-                    raise ValueError, "%s must be integral" % names[i]
+                    raise ValueError("%s must be integral" % names[i])
 
                 d[i] = s
         elif type(s) == LongType:
             try: s = int(s)
             except: pass
         elif type(s) != IntType:
-            raise TypeError, "%s isn't a valid type" % names[i]
+            raise TypeError("%s isn't a valid type" % names[i])
 
         if i == first and s < 0:
             continue
 
         if ranges[i] != None and \
             (s < ranges[i][0] or ranges[i][1] < s):
-            raise ValueError, "%s out of range" % names[i]
+            raise ValueError("%s out of range" % names[i])
 
     if first < 6 and d[5] >= 61:
-        raise ValueError, "seconds out of range"
+        raise ValueError("seconds out of range")
 
     if first < 2:
         leap = first < 1 and leapMonth(d[0], d[1])
 
         if d[2] > months[d[1]] + leap:
-            raise ValueError, "day out of range"
+            raise ValueError("day out of range")
 
 class UnderflowError(exceptions.ArithmeticError):
     pass
@@ -1958,8 +1949,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
 
         if self._next == "E":
             if name[1] != 'Envelope':
-                raise Error, "expected `SOAP-ENV:Envelope', got `%s:%s'" % \
-                    (self._prem_r[name[0]], name[1])
+                raise Error("expected `SOAP-ENV:Envelope', got `%s:%s'" % (self._prem_r[name[0]], name[1]))
             if name[0] != NS.ENV:
                 raise faultType, ("%s:VersionMismatch" % NS.ENV_T,
                     "Don't understand version `%s' Envelope" % name[0])
@@ -1969,18 +1959,14 @@ class SOAPParser(xml.sax.handler.ContentHandler):
             if name[0] == NS.ENV and name[1] in ("Header", "Body"):
                 self._next = None
             else:
-                raise Error, \
-                    "expected `SOAP-ENV:Header' or `SOAP-ENV:Body', " \
-                    "got `%s'" % self._prem_r[name[0]] + ':' + name[1]
+                raise Error("expected `SOAP-ENV:Header' or `SOAP-ENV:Body', got `%s'" % self._prem_r[name[0]] + ':' + name[1])
         elif self._next == "B":
             if name == (NS.ENV, "Body"):
                 self._next = None
             else:
-                raise Error, "expected `SOAP-ENV:Body', got `%s'" % \
-                    self._prem_r[name[0]] + ':' + name[1]
+                raise Error("expected `SOAP-ENV:Body', got `%s'" % self._prem_r[name[0]] + ':' + name[1])
         elif self._next == "":
-            raise Error, "expected nothing, got `%s'" % \
-                self._prem_r[name[0]] + ':' + name[1]
+            raise Error("expected nothing, got `%s'" % self._prem_r[name[0]] + ':' + name[1])
 
         if len(self._stack) == 2:
             rules = self._rules
@@ -2022,9 +2008,9 @@ class SOAPParser(xml.sax.handler.ContentHandler):
             ns, name = tuple(name)
 
         if self._next == "E":
-            raise Error, "didn't get SOAP-ENV:Envelope"
+            raise Error("didn't get SOAP-ENV:Envelope")
         if self._next in ("HorB", "B"):
-            raise Error, "didn't get SOAP-ENV:Body"
+            raise Error("didn't get SOAP-ENV:Body")
 
         cur = self.popFrame()
         attrs = cur.attrs
@@ -2035,7 +2021,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
             idval = attrs[(None, 'id')]
 
             if self._ids.has_key(idval):
-                raise Error, "duplicate id `%s'" % idval
+                raise Error("duplicate id `%s'" % idval)
 
             del attrs[(None, 'id')]
 
@@ -2051,9 +2037,9 @@ class SOAPParser(xml.sax.handler.ContentHandler):
 
                 if root == 0:
                     if idval == None:
-                        raise Error, "non-root element must have an id"
+                        raise Error("non-root element must have an id")
                 elif root != 1:
-                    raise Error, "SOAP-ENC:root must be `0' or `1'"
+                    raise Error("SOAP-ENC:root must be `0' or `1'")
 
                 del attrs[(NS.ENC, 'root')]
 
@@ -2061,9 +2047,9 @@ class SOAPParser(xml.sax.handler.ContentHandler):
             href = attrs.get((None, 'href'))
             if href:
                 if href[0] != '#':
-                    raise Error, "only do local hrefs right now"
+                    raise Error("only do local hrefs right now")
                 if self._data != None and self._data.strip() != '':
-                    raise Error, "hrefs can't have data"
+                    raise Error("hrefs can't have data")
 
                 href = href[1:]
 
@@ -2116,7 +2102,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                 if null:
                     if len(cur) or \
                         (self._data != None and self._data.strip() != ''):
-                        raise Error, "nils can't have data"
+                        raise Error("nils can't have data")
 
                     data = None
 
@@ -2249,11 +2235,9 @@ class SOAPParser(xml.sax.handler.ContentHandler):
 
     def endDocument(self):
         if len(self._refs) == 1:
-            raise Error, \
-                "unresolved reference " + self._refs.keys()[0]
+            raise Error("unresolved reference " + self._refs.keys()[0])
         elif len(self._refs) > 1:
-            raise Error, \
-                "unresolved references " + ', '.join(self._refs.keys())
+            raise Error("unresolved references " + ', '.join(self._refs.keys()))
 
     def startPrefixMapping(self, prefix, uri):
         self._prem[prefix] = uri
@@ -2292,7 +2276,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                 else:
                     raise Exception
             except:
-                raise AttributeError, "invalid Array offset"
+                raise AttributeError("invalid Array offset")
         else:
             offset = 0
 
@@ -2315,7 +2299,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                 return typedArrayType(None, name, (None, t), attrs, offset,
                     m.group('rank'), m.group('asize'), elemsname)
         except:
-            raise AttributeError, "invalid Array type `%s'" % kind
+            raise AttributeError("invalid Array type `%s'" % kind)
 
     # Conversion
 
@@ -2591,7 +2575,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                 return s[0]
             return tuple(s)
         except Exception, e:
-            raise Error, "invalid %s value `%s' - %s" % (kind, value, e)
+            raise Error("invalid %s value `%s' - %s" % (kind, value, e))
 
     intlimits = \
     {
@@ -2640,9 +2624,9 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                 except: d = long(d)
 
                 if l[1] != None and d < l[1]:
-                    raise UnderflowError, "%s too small" % d
+                    raise UnderflowError("%s too small" % d)
                 if l[2] != None and d > l[2]:
-                    raise OverflowError, "%s too large" % d
+                    raise OverflowError("%s too large" % d)
 
                 if l[0] or len(attrs):
                     return long(d)
@@ -2660,7 +2644,7 @@ class SOAPParser(xml.sax.handler.ContentHandler):
                     return 0
                 if d in ('1', 'true'):
                     return 1
-                raise AttributeError, "invalid boolean value"
+                raise AttributeError("invalid boolean value")
             if self.floatlimits.has_key (t[1]):
                 l = self.floatlimits[t[1]]
                 s = d.strip().lower()
@@ -2680,13 +2664,13 @@ class SOAPParser(xml.sax.handler.ContentHandler):
 
                 if str (d) == 'nan':
                     if s != 'nan':
-                        raise ValueError, "invalid %s" % t[1]
+                        raise ValueError("invalid %s" % t[1])
                 elif str (d) == '-inf':
                     if s != '-inf':
-                        raise UnderflowError, "%s too small" % t[1]
+                        raise UnderflowError("%s too small" % t[1])
                 elif str (d) == 'inf':
                     if s != 'inf':
-                        raise OverflowError, "%s too large" % t[1]
+                        raise OverflowError("%s too large" % t[1])
                 elif d < 0:
                     if d < l[1]:
                         raise UnderflowError, "%s too small" % t[1]
@@ -3230,7 +3214,7 @@ class SOAPBuilder:
 
         self.out += '</%s>\n' % tag
     dump_dict = dump_dictionary # 4/18/2002 - MAP - for Python 2.2
-    
+
     def dump_instance(self, obj, tag, typed = 1, ns_map = {}):
         if not tag:
             # If it has a name use it.
@@ -3404,7 +3388,7 @@ class HTTPTransport:
         else:
             real_addr = addr.host
             real_path = addr.path
-            
+
         if addr.proto == 'https':
             r = httplib.HTTPS(real_addr)
         else:
@@ -3501,7 +3485,7 @@ class SOAPProxy:
         self.unwrap_results = unwrap_results
         self.http_proxy     = http_proxy
         self.config         = config
-        
+
 
     def __call(self, name, args, kw, ns = None, sa = None, hd = None,
         ma = None):

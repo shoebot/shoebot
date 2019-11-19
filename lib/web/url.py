@@ -211,12 +211,12 @@ def open(url, wait=10):
                 o = urllib2.build_opener(p, urllib2.HTTPHandler)
                 urllib2.install_opener(o)
             connection = urllib2.urlopen(request)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError(e):
             if e.code == 401: raise HTTP401Authentication
             if e.code == 403: raise HTTP403Forbidden
             if e.code == 404: raise HTTP404NotFound
             raise HTTPError
-        except urllib2.URLError, e:
+        except urllib2.URLError(e):
             if e.reason[0] == 36: raise URLTimeout
             raise URLError
 
@@ -395,7 +395,7 @@ class URLAccumulator:
                 self.redirect = connection.geturl()
                 if self.redirect == str(url):
                     self.redirect = None
-            except Exception, e:
+            except Exception(e):
                 self.data = u""
                 self.error = e
 
