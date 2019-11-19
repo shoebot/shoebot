@@ -255,7 +255,7 @@ def parse_path(e):
         # Absolute MOVETO.
         # Move the current point to the new coordinates.
         if command == "M":
-            for i in range(len(points)/2):
+            for i in range(int(len(points)/2)):
                 _ctx.moveto(points[i*2], points[i*2+1])
                 dx = points[i*2]
                 dy = points[i*2+1]
@@ -265,7 +265,7 @@ def parse_path(e):
         # Relative MOVETO.
         # Offset from the current point.
         elif command == "m":
-            for i in range(len(points)/2):
+            for i in range(int(len(points)/2)):
                 _ctx.moveto(dx+points[i*2], dy+points[i*2+1])
                 dx += points[i*2]
                 dy += points[i*2+1]
@@ -275,7 +275,7 @@ def parse_path(e):
         # Absolute LINETO.
         # Draw a line from the current point to the new coordinate.
         elif command == "L":
-            for i in range(len(points)/2):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(points[i*2], points[i*2+1])
                 dx = points[i*2]
                 dy = points[i*2+1]
@@ -283,7 +283,7 @@ def parse_path(e):
         # Relative LINETO.
         # Offset from the current point.
         elif command == "l":
-            for i in range(len(points)/2):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(dx+points[i*2], dy+points[i*2+1])
                 dx += points[i*2]
                 dy += points[i*2+1]
@@ -291,35 +291,35 @@ def parse_path(e):
         # Absolute horizontal LINETO.
         # Only the vertical coordinate is supplied.
         elif command == "H":
-            for i in range(len(points)):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(points[i], dy)
                 dx = points[i]
 
         # Relative horizontal LINETO.
         # Offset from the current point.
         elif command == "h":
-            for i in range(len(points)):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(dx+points[i], dy)
                 dx += points[i]
 
         # Absolute vertical LINETO.
         # Only the horizontal coordinate is supplied.
         if command == "V":
-            for i in range(len(points)):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(dx, points[i])
                 dy = points[i]
 
         # Relative vertical LINETO.
         # Offset from the current point.
         elif command == "v":
-            for i in range(len(points)):
+            for i in range(int(len(points)/2)):
                 _ctx.lineto(dx, dy+points[i])
                 dy += points[i]
 
         # Absolute CURVETO.
         # Draw a bezier with given control handles and destination.
         elif command == "C":
-            for i in range(len(points)/6):
+            for i in range(int(len(points)/6)):
                 _ctx.curveto(points[i*6],   points[i*6+1],
                              points[i*6+2], points[i*6+3],
                              points[i*6+4], points[i*6+5])
@@ -331,7 +331,7 @@ def parse_path(e):
         # Relative CURVETO.
         # Offset from the current point.
         elif command == "c":
-            for i in range(len(points)/6):
+            for i in range(int(len(points)/6)):
                 _ctx.curveto(dx+points[i*6],   dy+points[i*6+1],
                              dx+points[i*6+2], dy+points[i*6+3],
                              dx+points[i*6+4], dy+points[i*6+5])
@@ -344,7 +344,7 @@ def parse_path(e):
         # Only the second control handle is given,
         # the first is the reflexion of the previous handle.
         elif command == "S":
-            for i in range(len(points)/4):
+            for i in range(int(len(points)/4)):
                 if previous_command not in ["C", "c", "S", "s"]:
                     dhx = dx
                     dhy = dy
@@ -362,7 +362,7 @@ def parse_path(e):
         # Relative reflexive CURVETO.
         # Offset from the current point.
         elif command == "s":
-            for i in range(len(points)/4):
+            for i in range(int(len(points)/4)):
                 if previous_command not in ["C", "c", "S", "s"]:
                     dhx = dx
                     dhy = dy
