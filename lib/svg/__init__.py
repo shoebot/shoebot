@@ -291,30 +291,26 @@ def parse_path(e):
         # Absolute horizontal LINETO.
         # Only the vertical coordinate is supplied.
         elif command == "H":
-            for i in range(int(len(points)/2)):
-                _ctx.lineto(points[i], dy)
-                dx = points[i]
+            _ctx.lineto(points[0], dy)
+            dx = points[0]
 
         # Relative horizontal LINETO.
         # Offset from the current point.
         elif command == "h":
-            for i in range(int(len(points)/2)):
-                _ctx.lineto(dx+points[i], dy)
-                dx += points[i]
+            _ctx.lineto(dx+points[0], dy)
+            dx += points[0]
 
         # Absolute vertical LINETO.
         # Only the horizontal coordinate is supplied.
         if command == "V":
-            for i in range(int(len(points)/2)):
-                _ctx.lineto(dx, points[i])
-                dy = points[i]
+            _ctx.lineto(dx, points[0])
+            dy = points[0]
 
         # Relative vertical LINETO.
         # Offset from the current point.
         elif command == "v":
-            for i in range(int(len(points)/2)):
-                _ctx.lineto(dx, dy+points[i])
-                dy += points[i]
+            _ctx.lineto(dx, dy+points[0])
+            dy += points[0]
 
         # Absolute CURVETO.
         # Draw a bezier with given control handles and destination.
