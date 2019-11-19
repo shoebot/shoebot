@@ -256,7 +256,13 @@ def parse_path(e):
         # Move the current point to the new coordinates.
         if command == "M":
             for i in range(int(len(points)/2)):
-                _ctx.moveto(points[i*2], points[i*2+1])
+                # More than one value is an implicit LINETO
+                # see https://www.w3.org/TR/SVG/paths.html#PathDataMovetoCommands
+                print(i)
+                if i == 0:
+                    _ctx.moveto(points[i*2], points[i*2+1])
+                else:
+                    _ctx.lineto(points[i*2], points[i*2+1])
                 dx = points[i*2]
                 dy = points[i*2+1]
                 x0 = dx
@@ -266,7 +272,13 @@ def parse_path(e):
         # Offset from the current point.
         elif command == "m":
             for i in range(int(len(points)/2)):
-                _ctx.moveto(dx+points[i*2], dy+points[i*2+1])
+                # More than one value is an implicit LINETO
+                # see https://www.w3.org/TR/SVG/paths.html#PathDataMovetoCommands
+                print(i)
+                if i == 0:
+                    _ctx.moveto(dx+points[i*2], dy+points[i*2+1])
+                else:
+                    _ctx.lineto(dx+points[i*2], dy+points[i*2+1])
                 dx += points[i*2]
                 dy += points[i*2+1]
                 x0 = dx
