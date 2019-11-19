@@ -31,6 +31,9 @@ class Transform:
     '''
     def __init__(self, transform=None):
         self.stack = []
+        self.set_matrix(transform)
+
+    def set_matrix(self, transform=None):
         if transform is None:
             pass
         elif isinstance(transform, Transform):

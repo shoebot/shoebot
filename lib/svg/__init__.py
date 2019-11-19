@@ -420,7 +420,7 @@ def parse_transform(e, path):
             from nodebox.graphics import Transform
             t = Transform()
             if mode == "matrix":
-                t._set_matrix(v)
+                t.set_matrix(v)
             elif mode == "translate":
                 t.translate(*v)
             path = t.transformBezierPath(path)
