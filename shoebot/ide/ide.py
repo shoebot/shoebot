@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: iso-8859-1 -*-
-
-
-
+#!/usr/bin/env python3
 import errno
 import gettext
 import errno

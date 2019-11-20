@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # This file is part of Shoebot.
 # Copyright (C) 2009 the Shoebot authors
@@ -126,9 +126,9 @@ def rgb_to_hsv(r, g, b):
         else        : h = 4 + (r-g) / d
 
     h = h * (60.0/360)
-    if h < 0: 
+    if h < 0:
         h = h + 1.0
-    hsv=[h,s,v]    
+    hsv=[h,s,v]
     return hsv
 '''
 
