@@ -13,12 +13,11 @@ class Point:
 
 
 class layout(object):
-
-    """ Graph visualizer that calculates relative node positions.
+    """
+    Graph visualizer that calculates relative node positions.
     """
 
     def __init__(self, graph, iterations=1000):
-
         self.type = None
         self.graph = graph
         self.i = 0
@@ -27,23 +26,20 @@ class layout(object):
         self.__bounds = None
 
     def copy(self, graph):
-
-        """ Returns a copy of the layout for the given graph.
         """
-
+        Returns a copy of the layout for the given graph.
+        """
         l = self.__class__(graph, self.n)
         l.i = 0
         return l
 
     def prepare(self):
-
         for n in self.graph.nodes:
             n.vx = 0
             n.vy = 0
             n.force = Point(0, 0)
 
     def _bounds(self):
-
         min = Point(float("inf"), float("inf"))
         max = Point(float("-inf"), float("-inf"))
         for n in self.graph.nodes:
@@ -61,29 +57,22 @@ class layout(object):
     bounds = property(_bounds)
 
     def _get_done(self):
-
-        if self.i >= self.n:
-            return True
-        return False
+        return self.i >= self.n
 
     done = property(_get_done)
 
     def iterate(self):
-
         self.i += 1
         return self.done
 
     def solve(self):
-
         while not self.done:
             self.iterate()
 
     def reset(self):
-
         self.i = 0
 
     def refresh(self):
-
         self.i = self.n / 2
 
 
@@ -91,12 +80,11 @@ class layout(object):
 
 
 class circle_layout(layout):
-
-    """ Simple layout with nodes arranged on one or more circles.
+    """
+    Simple layout with nodes arranged on one or more circles.
     """
 
     def __init__(self, graph, iterations=100):
-
         layout.__init__(self, graph, iterations)
         self.type = "circle"
 
@@ -113,13 +101,11 @@ class circle_layout(layout):
     orbits = property(_get_orbits, _set_orbits)
 
     def copy(self, graph):
-
         l = layout.copy(self, graph)
         l.r = self.r
         return l
 
     def iterate(self):
-
         if len(self.graph.nodes) == 1:
             return
 
@@ -169,7 +155,6 @@ class circle_layout(layout):
         layout.iterate(self)
 
     def solve(self):
-
         self.i = self.n
         self.iterate()
 
@@ -178,13 +163,12 @@ class circle_layout(layout):
 
 
 class spring_layout(layout):
-
-    """ A force-based layout in which edges are regarded as springs.
+    """
+    A force-based layout in which edges are regarded as springs.
     http://snipplr.com/view/1950/graph-javascript-framework-version-001/
     """
 
     def __init__(self, graph, iterations=1000):
-
         layout.__init__(self, graph, iterations)
         self.type = "spring"
 
@@ -224,7 +208,6 @@ class spring_layout(layout):
         return l
 
     def iterate(self):
-
         # Forces on all nodes due to node-node repulsions.
         for i in range(len(self.graph.nodes)):
             n1 = self.graph.nodes[i]
@@ -248,7 +231,6 @@ class spring_layout(layout):
         return layout.iterate(self)
 
     def _distance(self, n1, n2):
-
         dx = n2.vx - n1.vx
         dy = n2.vy - n1.vy
         d2 = dx ** 2 + dy ** 2
@@ -259,11 +241,9 @@ class spring_layout(layout):
             d2 = dx ** 2 + dy ** 2
 
         d = sqrt(d2)
-
         return dx, dy, d
 
     def _repulse(self, n1, n2):
-
         dx, dy, d = self._distance(n1, n2)
 
         if d < self.r:
@@ -274,7 +254,6 @@ class spring_layout(layout):
             n1.force.y -= f * dy
 
     def _attract(self, n1, n2, k=0, length=1.0):
-
         dx, dy, d = self._distance(n1, n2)
         d = min(d, self.r)
 

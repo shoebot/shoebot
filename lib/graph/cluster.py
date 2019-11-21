@@ -7,17 +7,17 @@ from types import FunctionType, LambdaType
 
 
 def sorted(list, cmp=None, reversed=False):
-    """ Returns a sorted copy of the list.
+    """
+    Returns a sorted copy of the list.
     """
     list = [x for x in list]
-    list.sort(cmp)
-    if reversed:
-        list.reverse()
+    list.sort(cmp, reverse=reversed)
     return list
 
 
 def unique(list):
-    """ Returns a copy of the list without duplicates.
+    """
+    Returns a copy of the list without duplicates.
     """
     unique = []
     [unique.append(x) for x in list if x not in unique]
@@ -28,8 +28,8 @@ def unique(list):
 
 
 def flatten(node, distance=1):
-
-    """ Recursively lists the node and its links.
+    """
+    Recursively lists the node and its links.
     
     Distance of 0 will return the given [node].
     Distance of 1 will return a list of the node and all its links.
@@ -50,21 +50,24 @@ def flatten(node, distance=1):
 
 
 def intersection(a, b):
-    """ Returns the intersection of lists.
+    """
+    Returns the intersection of lists.
     a & b -> elements that appear in a as well as in b.
     """
     return [x for x in b if x in a]
 
 
 def union(a, b):
-    """ Returns the union of lists.
+    """
+    Returns the union of lists.
     a | b -> all elements from a and all the elements from b.
     """
     return a + [x for x in b if x not in a]
 
 
 def difference(a, b):
-    """ Returns the difference of lists.
+    """
+    Returns the difference of lists.
     a - b -> elements that appear in a but not in b.
     """
     return [x for x in a if x not in b]
@@ -74,11 +77,10 @@ def difference(a, b):
 
 
 def subgraph(graph, id, distance=1):
-
-    """ Creates the subgraph of the flattened node with given id (or list of id's).
+    """ 
+    Creates the subgraph of the flattened node with given id (or list of id's).
     Finds all the edges between the nodes that make up the subgraph.
     """
-
     g = graph.copy(empty=True)
 
     if isinstance(id, (FunctionType, LambdaType)):
@@ -106,10 +108,9 @@ def subgraph(graph, id, distance=1):
 
 
 def is_clique(graph):
-
-    """ A clique is a set of nodes in which each node is connected to all other nodes.
     """
-
+    A clique is a set of nodes in which each node is connected to all other nodes.
+    """
     # for n1 in graph.nodes:
     #    for n2 in graph.nodes:
     #        if n1 != n2 and graph.edge(n1.id, n2.id) == None:
@@ -122,10 +123,9 @@ def is_clique(graph):
 
 
 def clique(graph, id):
-
-    """ Returns the largest possible clique for the node with given id.
     """
-
+    Returns the largest possible clique for the node with given id.
+    """
     clique = [id]
     for n in graph.nodes:
         friend = True
@@ -140,10 +140,9 @@ def clique(graph, id):
 
 
 def cliques(graph, threshold=3):
-
-    """ Returns all the cliques in the graph of at least the given size.
     """
-
+    Returns all the cliques in the graph of at least the given size.
+    """
     cliques = []
     for n in graph.nodes:
         c = clique(graph, n.id)
@@ -159,8 +158,8 @@ def cliques(graph, threshold=3):
 
 
 def partition(graph):
-
-    """ Splits unconnected subgraphs.
+    """
+    Splits unconnected subgraphs.
     
     For each node in the graph, make a list of its id and all directly connected id's.
     If one of the nodes in this list intersects with a subgraph,
@@ -169,7 +168,6 @@ def partition(graph):
     Return a list of subgraphs sorted by size (biggest-first).
     
     """
-
     g = []
     for n in graph.nodes:
         c = [n.id for n in flatten(n)]

@@ -27,7 +27,8 @@ class styles(dict):
         self.guide.apply()
 
     def create(self, stylename, **kwargs):
-        """ Creates a new style which inherits from the default style,
+        """
+        Creates a new style which inherits from the default style,
         or any other style which name is supplied to the optional template parameter.
         """
         if stylename == "default":
@@ -44,14 +45,16 @@ class styles(dict):
         self[style.name] = style
 
     def __getattr__(self, a):
-        """ Keys in the dictionaries are accessible as attributes.
+        """
+        Keys in the dictionaries are accessible as attributes.
         """
         if a in self:
             return self[a]
         raise AttributeError("'styles' object has no attribute '" + a + "'")
 
     def __setattr__(self, a, v):
-        """ Setting an attribute is like setting it in all of the contained styles.
+        """
+        Setting an attribute is like setting it in all of the contained styles.
         """
         if a == "guide":
             self.__dict__["guide"] = v
@@ -62,7 +65,8 @@ class styles(dict):
             raise AttributeError("'style' object has no attribute '" + a + "'")
 
     def copy(self, graph):
-        """ Returns a copy of all styles and a copy of the styleguide.
+        """
+        Returns a copy of all styles and a copy of the styleguide.
         """
         s = styles(graph)
         s.guide = self.guide.copy(graph)
@@ -83,7 +87,8 @@ class styleguide(dict):
         self.order = []
 
     def append(self, stylename, function):
-        """ The name of a style and a function that takes a graph and a node.
+        """
+        The name of a style and a function that takes a graph and a node.
         It returns True when the style should be applied to the given node.
         """
         self[stylename] = function
@@ -93,7 +98,8 @@ class styleguide(dict):
         dict.__init__(self)
 
     def apply(self):
-        """ Check the rules for each node in the graph and apply the style.
+        """
+        Check the rules for each node in the graph and apply the style.
         """
         sorted = self.order + list(self.keys())
         unique = []
@@ -104,7 +110,8 @@ class styleguide(dict):
                     node.style = s
 
     def copy(self, graph):
-        """ Returns a copy of the styleguide for the given graph.
+        """
+        Returns a copy of the styleguide for the given graph.
         """
         g = styleguide(graph)
         g.order = self.order
@@ -117,12 +124,11 @@ class styleguide(dict):
 
 class style:
     def __init__(self, name, _ctx, **kwargs):
-
-        """ Graph styling. 
+        """
+        Graph styling. 
         The default style is used for edges.
         When text is set to None, no id label is displayed.
         """
-
         self.name = name
         self._ctx = _ctx
         if not _ctx:
@@ -169,7 +175,6 @@ class style:
                 self.depth = False
 
     def copy(self, name=None):
-
         # Copy all attributes, link all monkey patch methods.
         s = style(self.name, self._ctx)
         for attr in self.__dict__:
@@ -177,7 +182,7 @@ class style:
             if isinstance(v, self.fill.__class__):
                 v = v.copy()
             s.__dict__[attr] = v
-        if name != None:
+        if name is not None:
             s.name = name
 
         return s
@@ -187,14 +192,10 @@ class style:
 
 
 def graph_background(s):
-
-    """ Graph background color.
     """
-
-    if s.background == None:
-        s._ctx.background(None)
-    else:
-        s._ctx.background(s.background)
+    Graph background color.
+    """
+    s._ctx.background(s.background)
 
     if s.depth:
         try:
@@ -210,10 +211,9 @@ def graph_background(s):
 
 
 def graph_traffic(s, node, alpha=1.0):
-
-    """ Visualization of traffic-intensive nodes (based on their centrality).
     """
-
+    Visualization of traffic-intensive nodes (based on their centrality).
+    """
     r = node.__class__(None).r
     r += (node.weight + 0.5) * r * 5
     s._ctx.nostroke()
@@ -226,10 +226,9 @@ def graph_traffic(s, node, alpha=1.0):
 
 
 def node(s, node, alpha=1.0):
-
-    """ Visualization of a default node.
     """
-
+    Visualization of a default node.
+    """
     if s.depth:
         try:
             colors.shadow(dx=5, dy=5, blur=10, alpha=0.5 * alpha)
@@ -251,10 +250,9 @@ def node(s, node, alpha=1.0):
 
 
 def node_label(s, node, alpha=1.0):
-
-    """ Visualization of a node's id.
     """
-
+    Visualization of a node's id.
+    """
     if s.text:
         # s._ctx.lineheight(1)
         s._ctx.font(s.font)
@@ -303,10 +301,9 @@ def node_label(s, node, alpha=1.0):
 
 
 def edges(s, edges, alpha=1.0, weighted=False, directed=False):
-
-    """ Visualization of the edges in a network.
     """
-
+    Visualization of the edges in a network.
+    """
     p = s._ctx.BezierPath()
 
     if directed and s.stroke:
@@ -360,7 +357,6 @@ def edges(s, edges, alpha=1.0, weighted=False, directed=False):
         clr.a *= 1.3
 
         s._ctx.stroke(clr)
-
         s._ctx.drawpath(pd.copy())
 
     for e in edges:
@@ -376,10 +372,9 @@ def edges(s, edges, alpha=1.0, weighted=False, directed=False):
 
 
 def edge(s, path, edge, alpha=1.0):
-
-    """ Visualization of a single edge between two nodes.
     """
-
+    Visualization of a single edge between two nodes.
+    """
     path.moveto(edge.node1.x, edge.node1.y)
     if edge.node2.style == BACK:
         path.curveto(
@@ -432,10 +427,9 @@ def edge_arrow(s, path, edge, radius):
 
 
 def edge_label(s, edge, alpha=1.0):
-
-    """ Visualization of the label accompanying an edge.
     """
-
+    Visualization of the label accompanying an edge.
+    """
     if s.text and edge.label != "":
         s._ctx.nostroke()
         s._ctx.fill(s.text.r, s.text.g, s.text.b, s.text.a * alpha * 0.75)
@@ -489,8 +483,8 @@ def edge_label(s, edge, alpha=1.0):
 
 
 def path(s, graph, path):
-
-    """ Visualization of a shortest path between two nodes.
+    """
+    Visualization of a shortest path between two nodes.
     """
 
     def end(n):

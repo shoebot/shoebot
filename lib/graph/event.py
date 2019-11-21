@@ -36,22 +36,19 @@ class events:
         self.popup_text = {}
 
     def copy(self, graph):
-
-        """ Returns a copy of the event handler, remembering the last node clicked.
         """
-
+        Returns a copy of the event handler, remembering the last node clicked.
+        """
         e = events(graph, self._ctx)
         e.clicked = self.clicked
         return e
 
     def _mouse(self):
-
         return Point(self._ctx._ns["MOUSEX"], self._ctx._ns["MOUSEY"])
 
     mouse = property(_mouse)
 
     def _mousedown(self):
-
         if self._ctx._ns["mousedown"]:
             return True
         else:
@@ -60,14 +57,12 @@ class events:
     mousedown = property(_mousedown)
 
     def update(self):
-
-        """ Interacts with the graph by clicking or dragging nodes.
+        """
+        Interacts with the graph by clicking or dragging nodes.
         Hovering a node fires the callback function events.hover().
         Clicking a node fires the callback function events.click().
         """
-
         if self.mousedown:
-
             # When not pressing or dragging, check each node.
             if not self.pressed and not self.dragged:
                 for n in self.graph.nodes:
@@ -106,10 +101,9 @@ class events:
                     break
 
     def drag(self, node):
-
-        """ Drags given node to mouse location.
         """
-
+        Drags given node to mouse location.
+        """
         dx = self.mouse.x - self.graph.x
         dy = self.mouse.y - self.graph.y
 
@@ -133,10 +127,9 @@ class events:
         node.vy = dy / self.graph.d
 
     def hover(self, node):
-
-        """ Displays a popup when hovering over a node.
         """
-
+        Displays a popup when hovering over a node.
+        """
         if self.popup == False:
             return
         if self.popup == True or self.popup.node != node:
@@ -148,7 +141,6 @@ class events:
         self.popup.draw()
 
     def click(self, node):
-
         pass
 
 
@@ -156,8 +148,8 @@ class events:
 
 
 class popup:
-
-    """ An information box used when hovering over a node.
+    """
+    An information box used when hovering over a node.
     It takes a list of alternating texts to display.
     """
 
@@ -202,10 +194,9 @@ class popup:
         self.mf = 50  # minimum frame count
 
     def textpath(self, i):
-
-        """ Returns a cached textpath of the given text in queue.
         """
-
+        Returns a cached textpath of the given text in queue.
+        """
         if len(self._textpaths) == i:
             self._ctx.font(self.font, self.fontsize)
             txt = self.q[i]
@@ -219,10 +210,9 @@ class popup:
         return self._textpaths[i]
 
     def update(self):
-
-        """ Rotates the queued texts and determines display time.
         """
-
+        Rotates the queued texts and determines display time.
+        """
         if self.delay > 0:
             # It takes a while for the popup to appear.
             self.delay -= 1
@@ -244,10 +234,9 @@ class popup:
             self.i = (self.i + 1) % len(self.q)
 
     def draw(self):
-
-        """ Draws a popup rectangle with a rotating text queue.        
         """
-
+        Draws a popup rectangle with a rotating text queue.        
+        """
         if len(self.q) > 0:
             self.update()
 

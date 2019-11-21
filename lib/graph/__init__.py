@@ -38,7 +38,8 @@ class node:
         label=None,
         properties={},
     ):
-        """ A node with a unique id in the graph.
+        """ 
+        A node with a unique id in the graph.
         Its position is calculated by graph.layout.
         The node's radius and style define how it looks onscreen.
         """
@@ -74,10 +75,10 @@ class node:
     is_leaf = property(_is_leaf)
 
     def can_reach(self, node, traversable=lambda node, edge: True):
-        """ Returns True if given node can be reached over traversable edges.
+        """ 
+        Returns True if given node can be reached over traversable edges.
         To enforce edge direction, use a node==edge.node1 traversable.
         """
-
         if isinstance(node, str):
             node = self.graph[node]
         for n in self.graph.nodes:
@@ -115,14 +116,10 @@ class node:
         """
         True if pt.x, pt.y is inside the node's absolute position.
         """
-
-        if (
+        return (
             abs(self.graph.x + self.x - pt.x) < self.r * 2
             and abs(self.graph.y + self.y - pt.y) < self.r * 2
-        ):
-            return True
-        else:
-            return False
+        )
 
     def flatten(self, distance=1):
         return cluster.flatten(self, distance)
@@ -162,6 +159,7 @@ class links(list):
     A list in which each node has an associated edge.
     The edge() method returns the edge for a given node id.
     """
+
     def __init__(self):
         self._edges = dict()
 

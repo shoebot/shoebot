@@ -26,8 +26,8 @@ class priorityqueue(dict):
 def depth_first_search(
     root, visit=lambda node: False, traversable=lambda node, edge: True
 ):
-
-    """ Simple, multi-purpose depth-first search.
+    """
+    Simple, multi-purpose depth-first search.
     
     Visits all the nodes connected to the root, depth-first.
     The visit function is called on each node.
@@ -57,8 +57,8 @@ def depth_first_search(
 
 
 def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic=None):
-
-    """ An edge weight map indexed by node id's.
+    """
+    An edge weight map indexed by node id's.
     
     A dictionary indexed by node id1's in which each value is a
     dictionary of connected node id2's linking to the edge weight.
@@ -103,14 +103,12 @@ def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic
 
 
 def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
-
-    """ Dijkstra algorithm for finding shortest paths.
+    """
+    Dijkstra algorithm for finding shortest paths.
     
     Connelly Barnes, http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/119466
     Raises an IndexError between nodes on unconnected graphs.
-    
     """
-
     G = adjacency(graph, heuristic=heuristic)
     start = id1
     end = id2
@@ -139,8 +137,8 @@ def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
 
 
 def brandes_betweenness_centrality(graph, normalized=True):
-
-    """ Betweenness centrality for nodes in the graph.
+    """
+    Betweenness centrality for nodes in the graph.
     
     Betweenness centrality is a measure of the number of shortests paths that pass through a node.
     Nodes in high-density areas will get a good score.
@@ -149,9 +147,7 @@ def brandes_betweenness_centrality(graph, normalized=True):
     from NetworkX 0.35.1: Aric Hagberg, Dan Schult and Pieter Swart,
     based on Dijkstra's algorithm for shortest paths modified from Eppstein.
     https://networkx.lanl.gov/wiki
-    
     """
-
     G = list(graph.keys())
     W = adjacency(graph)
 
@@ -226,8 +222,8 @@ def eigenvector_centrality(
     iterations=100,
     tolerance=0.0001,
 ):
-
-    """ Eigenvector centrality for nodes in the graph (like Google's PageRank).
+    """
+    Eigenvector centrality for nodes in the graph (like Google's PageRank).
     
     Eigenvector centrality is a measure of the importance of a node in a directed network. 
     It rewards nodes with a high potential of (indirectly) connecting to high-scoring nodes.
@@ -245,7 +241,6 @@ def eigenvector_centrality(
     https://networkx.lanl.gov/attachment/ticket/119/eigenvector_centrality.py
 
     """
-
     G = list(graph.keys())
     W = adjacency(graph, directed=True, reversed=reversed)
 
