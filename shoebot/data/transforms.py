@@ -193,8 +193,8 @@ class Transform:
         else:
             raise ValueError("Can only transform BezierPaths")
 
-        for point in path:
-            print(point)
+        # for point in path:
+            # print(point)
         #path._nsBezierPath = self._nsAffineTransform.transformBezierPath_(path._nsBezierPath)
         return path
 
