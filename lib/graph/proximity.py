@@ -1,26 +1,31 @@
 import heapq
-from sets import Set
 from random import random
 from warnings import warn
 
-#--- PRIORITY QUEUE ----------------------------------------------------------------------------------
+# --- PRIORITY QUEUE ----------------------------------------------------------------------------------
 # Currently not in use.
 
+
 class priorityqueue(dict):
-    
-    def push(self, e, w): 
+    def push(self, e, w):
         self[e] = w
-    
+
     def pop(self):
         p, w = None, float("inf")
         for e in self:
-            if self[e] <= w: p, w = e, self[e]
-        if p: del self[p]
+            if self[e] <= w:
+                p, w = e, self[e]
+        if p:
+            del self[p]
         return p
 
-#--- DEPTH-FIRST SEARCH ------------------------------------------------------------------------------
 
-def depth_first_search(root, visit=lambda node: False, traversable=lambda node, edge: True):
+# --- DEPTH-FIRST SEARCH ------------------------------------------------------------------------------
+
+
+def depth_first_search(
+    root, visit=lambda node: False, traversable=lambda node, edge: True
+):
 
     """ Simple, multi-purpose depth-first search.
     
@@ -39,16 +44,20 @@ def depth_first_search(root, visit=lambda node: False, traversable=lambda node, 
     stop = visit(root)
     root._visited = True
     for node in root.links:
-        if stop: return True
-        if not traversable(root, root.links.edge(node)): continue
+        if stop:
+            return True
+        if not traversable(root, root.links.edge(node)):
+            continue
         if not node._visited:
             stop = depth_first_search(node, visit, traversable)
     return stop
 
-#--- ADJACENCY LIST ----------------------------------------------------------------------------------
+
+# --- ADJACENCY LIST ----------------------------------------------------------------------------------
+
 
 def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic=None):
-    
+
     """ An edge weight map indexed by node id's.
     
     A dictionary indexed by node id1's in which each value is a
@@ -59,37 +68,39 @@ def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic
     and additional cost for movement between the two nodes.
     
     """
-    
+
     v = {}
     for n in graph.nodes:
         v[n.id] = {}
-    
+
     for e in graph.edges:
-        
+
         id1 = e.node1.id
         id2 = e.node2.id
         if reversed:
             id1, id2 = id2, id1
-            
-        #if not v.has_key(id1): v[id1] = {}
-        #if not v.has_key(id2): v[id2] = {}
-        v[id1][id2] = 1.0 - e.weight*0.5
-        
+
+        # if not v.has_key(id1): v[id1] = {}
+        # if not v.has_key(id2): v[id2] = {}
+        v[id1][id2] = 1.0 - e.weight * 0.5
+
         if heuristic:
             v[id1][id2] += heuristic(id1, id2)
-        
-        if not directed: 
+
+        if not directed:
             v[id2][id1] = v[id1][id2]
-        
+
     if stochastic:
         for id1 in v:
             d = sum(v[id1].values())
-            for id2 in v[id1]: 
+            for id2 in v[id1]:
                 v[id1][id2] /= d
-    
+
     return v
 
-#--- DIJKSTRA SHORTEST PATH --------------------------------------------------------------------------
+
+# --- DIJKSTRA SHORTEST PATH --------------------------------------------------------------------------
+
 
 def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
 
@@ -99,19 +110,19 @@ def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
     Raises an IndexError between nodes on unconnected graphs.
     
     """
-    
+
     G = adjacency(graph, heuristic=heuristic)
     start = id1
     end = id2
-    
+
     # Flatten linked list of form [0,[1,[2,[]]]]
-    def flatten(L):       
+    def flatten(L):
         while len(L) > 0:
             yield L[0]
             L = L[1]
 
     q = [(0, start, ())]  # Heap of (cost, path_head, path_rest).
-    visited = Set()       # Visited vertices.
+    visited = set()  # Visited vertices.
     while True:
         (cost1, v1, path) = heapq.heappop(q)
         if v1 not in visited:
@@ -123,7 +134,9 @@ def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
             if v2 not in visited:
                 heapq.heappush(q, (cost1 + cost2, v2, path))
 
-#--- BRANDES BETWEENNESS CENTRALITY ------------------------------------------------------------------
+
+# --- BRANDES BETWEENNESS CENTRALITY ------------------------------------------------------------------
+
 
 def brandes_betweenness_centrality(graph, normalized=True):
 
@@ -141,62 +154,78 @@ def brandes_betweenness_centrality(graph, normalized=True):
 
     G = list(graph.keys())
     W = adjacency(graph)
-    
-    betweenness = dict.fromkeys(G, 0.0) # b[v]=0 for v in G
-    for s in G: 
-        S = [] 
-        P = {} 
-        for v in G: P[v] = [] 
-        sigma = dict.fromkeys(G, 0) # sigma[v]=0 for v in G 
-        D = {} 
+
+    betweenness = dict.fromkeys(G, 0.0)  # b[v]=0 for v in G
+    for s in G:
+        S = []
+        P = {}
+        for v in G:
+            P[v] = []
+        sigma = dict.fromkeys(G, 0)  # sigma[v]=0 for v in G
+        D = {}
         sigma[s] = 1
-        seen = { s: 0 }  
-        Q = [] # use Q as heap with (distance, node id) tuples 
-        heapq.heappush(Q, (0, s, s)) 
-        while Q:    
-            (dist, pred, v) = heapq.heappop(Q) 
-            if v in D: continue # already searched this node
-            sigma[v] = sigma[v] + sigma[pred] # count paths 
-            S.append(v) 
-            D[v] = seen[v] 
+        seen = {s: 0}
+        Q = []  # use Q as heap with (distance, node id) tuples
+        heapq.heappush(Q, (0, s, s))
+        while Q:
+            (dist, pred, v) = heapq.heappop(Q)
+            if v in D:
+                continue  # already searched this node
+            sigma[v] = sigma[v] + sigma[pred]  # count paths
+            S.append(v)
+            D[v] = seen[v]
             for w in graph[v].links:
-                
+
                 w = w.id
                 vw_dist = D[v] + W[v][w]
-                
-                if w not in D and (w not in seen or vw_dist < seen[w]): 
-                    seen[w] = vw_dist 
-                    heapq.heappush(Q, (vw_dist, v, w)) 
-                    P[w] = [v] 
-                elif vw_dist == seen[w]: # handle equal paths 
-                    sigma[w] = sigma[w] + sigma[v] 
+
+                if w not in D and (w not in seen or vw_dist < seen[w]):
+                    seen[w] = vw_dist
+                    heapq.heappush(Q, (vw_dist, v, w))
+                    P[w] = [v]
+                elif vw_dist == seen[w]:  # handle equal paths
+                    sigma[w] = sigma[w] + sigma[v]
                     P[w].append(v)
-                    
-        delta = dict.fromkeys(G,0)  
-        while S: 
-            w = S.pop() 
-            for v in P[w]: 
-                delta[v] = delta[v] + (float(sigma[v]) / float(sigma[w])) * (1.0 + delta[w]) 
-            if w != s: 
+
+        delta = dict.fromkeys(G, 0)
+        while S:
+            w = S.pop()
+            for v in P[w]:
+                delta[v] = delta[v] + (float(sigma[v]) / float(sigma[w])) * (
+                    1.0 + delta[w]
+                )
+            if w != s:
                 betweenness[w] = betweenness[w] + delta[w]
 
-        #-----------------------------------
+        # -----------------------------------
         if normalized:
             # Normalize between 0.0 and 1.0.
             m = max(betweenness.values())
-            if m == 0: m = 1
+            if m == 0:
+                m = 1
         else:
             m = 1
-            
-        betweenness = dict([(id, w/m) for id, w in betweenness.items()])
+
+        betweenness = dict([(id, w / m) for id, w in betweenness.items()])
         return betweenness
 
-#--- EIGENVECTOR CENTRALITY --------------------------------------------------------------------------
 
-class NoConvergenceError(Exception): pass
+# --- EIGENVECTOR CENTRALITY --------------------------------------------------------------------------
 
-def eigenvector_centrality(graph, normalized=True, reversed=True, rating={},
-                           start=None, iterations=100, tolerance=0.0001):
+
+class NoConvergenceError(Exception):
+    pass
+
+
+def eigenvector_centrality(
+    graph,
+    normalized=True,
+    reversed=True,
+    rating={},
+    start=None,
+    iterations=100,
+    tolerance=0.0001,
+):
 
     """ Eigenvector centrality for nodes in the graph (like Google's PageRank).
     
@@ -217,15 +246,16 @@ def eigenvector_centrality(graph, normalized=True, reversed=True, rating={},
 
     """
 
-    G = list(graph.keys())     
-    W = adjacency (graph, directed=True, reversed=reversed)
+    G = list(graph.keys())
+    W = adjacency(graph, directed=True, reversed=reversed)
 
     def _normalize(x):
         s = sum(x.values())
-        if s != 0: s = 1.0 / s
-        for k in x: 
+        if s != 0:
+            s = 1.0 / s
+        for k in x:
             x[k] *= s
-    
+
     x = start
     if x is None:
         x = dict([(n, random()) for n in G])
@@ -238,18 +268,20 @@ def eigenvector_centrality(graph, normalized=True, reversed=True, rating={},
         for n in x:
             for nbr in W[n]:
                 r = 1
-                if n in rating: r = rating[n]
+                if n in rating:
+                    r = rating[n]
                 x[n] += 0.01 + x0[nbr] * W[n][nbr] * r
-        _normalize(x)          
-        e = sum([abs(x[n]-x0[n]) for n in x])
+        _normalize(x)
+        e = sum([abs(x[n] - x0[n]) for n in x])
         if e < len(graph.nodes) * tolerance:
             if normalized:
                 # Normalize between 0.0 and 1.0.
                 m = max(x.values())
-                if m == 0: m = 1
-                x = dict([(id, w/m) for id, w in x.items()])
+                if m == 0:
+                    m = 1
+                x = dict([(id, w / m) for id, w in x.items()])
             return x
 
-    #raise NoConvergenceError
+    # raise NoConvergenceError
     warn("node weight is 0 because eigenvector_centrality() did not converge.", Warning)
     return dict([(n, 0) for n in G])
