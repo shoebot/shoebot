@@ -385,14 +385,15 @@ def parse_path(e):
 
         # Absolute elliptical arc.
         elif command == "A":
-            rx, ry, phi, large_arc_flag, sweep_flag, x2, y2 = points
-            for p in arc.elliptical_arc_to(dx, dy, rx, ry, phi, large_arc_flag, sweep_flag, x2, y2):
-                if len(p) == 2:
-                    _ctx.lineto(*p)
-                elif len(p) == 6:
-                    _ctx.curveto(*p)
-            dx = p[-2]
-            dy = p[-1]
+            for i in range(int(len(points)/7)):
+                rx, ry, phi, large_arc_flag, sweep_flag, x2, y2 = points[i*7:i*7+7]
+                for p in arc.elliptical_arc_to(dx, dy, rx, ry, phi, large_arc_flag, sweep_flag, x2, y2):
+                    if len(p) == 2:
+                        _ctx.lineto(*p)
+                    elif len(p) == 6:
+                        _ctx.curveto(*p)
+                dx = p[-2]
+                dy = p[-1]
 
         previous_command = command
 
