@@ -38,7 +38,6 @@ class node:
         label=None,
         properties={},
     ):
-
         """ A node with a unique id in the graph.
         Its position is calculated by graph.layout.
         The node's radius and style define how it looks onscreen.
@@ -75,7 +74,6 @@ class node:
     is_leaf = property(_is_leaf)
 
     def can_reach(self, node, traversable=lambda node, edge: True):
-
         """ Returns True if given node can be reached over traversable edges.
         To enforce edge direction, use a node==edge.node1 traversable.
         """
@@ -114,8 +112,8 @@ class node:
     y = property(_y)
 
     def __contains__(self, pt):
-
-        """ True if pt.x, pt.y is inside the node's absolute position.
+        """
+        True if pt.x, pt.y is inside the node's absolute position.
         """
 
         if (
@@ -160,11 +158,10 @@ class node:
 
 
 class links(list):
-
-    """ A list in which each node has an associated edge.
+    """
+    A list in which each node has an associated edge.
     The edge() method returns the edge for a given node id.
     """
-
     def __init__(self):
         self._edges = dict()
 
@@ -189,14 +186,13 @@ class links(list):
 
 class edge(object):
     def __init__(self, node1, node2, weight=0.0, length=1.0, label="", properties={}):
-
         self.node1 = node1
         self.node2 = node2
         self.weight = weight
         self.length = length
         self.label = label
 
-        for k, v in list(properties.items()):
+        for k, v in properties.items():
             if not k in self.__dict__:
                 self.__dict__[k] = v
 
@@ -263,8 +259,8 @@ class graph(dict):
     distance = property(_get_distance, _set_distance)
 
     def copy(self, empty=False):
-
-        """ Create a copy of the graph (by default with nodes and edges).
+        """
+        Create a copy of the graph (by default with nodes and edges).
         """
 
         g = graph(self.layout.n, self.distance, self.layout.type)
@@ -291,8 +287,8 @@ class graph(dict):
         return g
 
     def clear(self):
-
-        """ Remove nodes and edges and reset the layout.
+        """
+        Remove nodes and edges and reset the layout.
         """
 
         dict.clear(self)
@@ -313,10 +309,9 @@ class graph(dict):
         root=False,
         properties={},
     ):
-
-        """ Add node from id and return the node object.
         """
-
+        Add node from id and return the node object.
+        """
         if id in self:
             return self[id]
 
@@ -332,7 +327,8 @@ class graph(dict):
         return n
 
     def add_nodes(self, nodes):
-        """ Add nodes from a list of id's.
+        """
+        Add nodes from a list of id's.
         """
         try:
             [self.add_node(n) for n in nodes]
@@ -340,11 +336,10 @@ class graph(dict):
             pass
 
     def add_edge(self, id1, id2, weight=0.0, length=1.0, label="", properties={}):
-
-        """ Add weighted (0.0-1.0) edge between nodes, creating them if necessary.
+        """
+        Add weighted (0.0-1.0) edge between nodes, creating them if necessary.
         The weight represents the importance of the connection (not the cost).
         """
-
         if id1 == id2:
             return None
 
@@ -371,10 +366,9 @@ class graph(dict):
         return e
 
     def remove_node(self, id):
-
-        """ Remove node with given id.
         """
-
+        Remove node with given id.
+        """
         if id in self:
             n = self[id]
             self.nodes.remove(n)
@@ -390,10 +384,9 @@ class graph(dict):
                     self.edges.remove(e)
 
     def remove_edge(self, id1, id2):
-
-        """ Remove edges between nodes with given id's.
         """
-
+        Remove edges between nodes with given id's.
+        """
         for e in list(self.edges):
             if id1 in (e.node1.id, e.node2.id) and id2 in (e.node1.id, e.node2.id):
                 e.node1.links.remove(e.node2)
@@ -401,11 +394,10 @@ class graph(dict):
                 self.edges.remove(e)
 
     def node(self, id):
-        """ Returns the node in the graph associated with the given id.
         """
-        if id in self:
-            return self[id]
-        return None
+        Returns the node in the graph associated with the given id.
+        """
+        return self.get(id)
 
     def edge(self, id1, id2):
         """ Returns the edge between the nodes with given id1 and id2.
@@ -423,8 +415,8 @@ class graph(dict):
         raise AttributeError("graph object has no attribute '" + str(a) + "'")
 
     def update(self, iterations=10):
-
-        """ Iterates the graph layout and updates node positions.
+        """
+        Iterates the graph layout and updates node positions.
         """
 
         # The graph fades in when initially constructed.
@@ -441,7 +433,7 @@ class graph(dict):
         elif self.layout.i == 1:
             self.layout.iterate()
         elif self.layout.i < self.layout.n:
-            n = min(iterations, self.layout.i / 10 + 1)
+            n = min(iterations, self.layout.i // 10 + 1)
             for i in range(n):
                 self.layout.iterate()
 
@@ -455,7 +447,8 @@ class graph(dict):
         return not self.layout.done
 
     def solve(self):
-        """ Iterates the graph layout until done.
+        """
+        Iterates the graph layout until done.
         """
         self.layout.solve()
         self.alpha = 1.0
@@ -466,7 +459,8 @@ class graph(dict):
     done = property(_done)
 
     def offset(self, node):
-        """ Returns the distance from the center to the given node.
+        """
+        Returns the distance from the center to the given node.
         """
         x = self.x + node.x - _ctx.WIDTH / 2
         y = self.y + node.y - _ctx.HEIGHT / 2
@@ -475,17 +469,15 @@ class graph(dict):
     def draw(
         self, dx=0, dy=0, weighted=False, directed=False, highlight=[], traffic=None
     ):
-
-        """ Layout the graph incrementally.
+        """
+        Layout the graph incrementally.
         
         The graph is drawn at the center of the canvas.
         The weighted and directed parameters visualize edge weight and direction.
         The highlight specifies list of connected nodes. 
         The path will be colored according to the "highlight" style.
         Clicking and dragging events are monitored.
-        
         """
-
         self.update()
 
         # Draw the graph background.
@@ -548,7 +540,8 @@ class graph(dict):
         _ctx.pop()
 
     def prune(self, depth=0):
-        """ Removes all nodes with less or equal links than depth.
+        """
+        Removes all nodes with less or equal links than depth.
         """
         for n in list(self.nodes):
             if len(n.links) <= depth:
@@ -557,7 +550,8 @@ class graph(dict):
     trim = prune
 
     def shortest_path(self, id1, id2, heuristic=None):
-        """ Returns a list of node id's connecting the two nodes.
+        """
+        Returns a list of node id's connecting the two nodes.
         """
         try:
             return proximity.dijkstra_shortest_path(self, id1, id2, heuristic)
@@ -582,7 +576,8 @@ class graph(dict):
         iterations=100,
         tolerance=0.0001,
     ):
-        """ Calculates eigenvector centrality and returns an node id -> weight dictionary.
+        """
+        Calculates eigenvector centrality and returns an node id -> weight dictionary.
         Node eigenvalue weights are updated in the process.
         """
         ec = proximity.eigenvector_centrality(
@@ -593,29 +588,30 @@ class graph(dict):
         return ec
 
     def nodes_by_betweenness(self, treshold=0.0):
-        """ Returns nodes sorted by betweenness centrality.
+        """
+        Returns nodes sorted by betweenness centrality.
         Nodes with a lot of passing traffic will be at the front of the list.
         """
         nodes = [(n.betweenness, n) for n in self.nodes if n.betweenness > treshold]
-        nodes.sort()
-        nodes.reverse()
+        nodes.sort(key=lambda wn: wn[0], reverse=True)
         return [n for w, n in nodes]
 
     nodes_by_traffic = nodes_by_betweenness
 
     def nodes_by_eigenvalue(self, treshold=0.0):
-        """ Returns nodes sorted by eigenvector centrality.
+        """
+        Returns nodes sorted by eigenvector centrality.
         Nodes with a lot of incoming traffic will be at the front of the list
         """
         nodes = [(n.eigenvalue, n) for n in self.nodes if n.eigenvalue > treshold]
-        nodes.sort()
-        nodes.reverse()
+        nodes.sort(key=lambda wn: n[0], reverse=True)
         return [n for w, n in nodes]
 
     nodes_by_weight = nodes_by_eigenvalue
 
     def nodes_by_category(self, category):
-        """ Returns nodes with the given category attribute.
+        """
+        Returns nodes with the given category attribute.
         """
         return [n for n in self.nodes if n.category == category]
 
@@ -709,8 +705,8 @@ class graph(dict):
 
 
 class xgraph(graph):
-
-    """ A dynamic graph where a clicked node loads new data.
+    """
+    A dynamic graph where a clicked node loads new data.
     
     Nodes are clickable and will load a new graph based on
     the following methods (that need to be subclassed or monkey patched):
@@ -723,11 +719,9 @@ class xgraph(graph):
     and use the dynamic graph's method to describe how the data is read
     and interlinked. The graph is then automatically kept up to date
     as you browse through the connected nodes.
-    
     """
 
     def __init__(self, iterations=500, distance=1.0, layout=LAYOUT_SPRING):
-
         graph.__init__(self, iterations, distance, layout)
         self.styles = create().styles
         self.events.click = self.click
@@ -746,10 +740,9 @@ class xgraph(graph):
         return []
 
     def load(self, id):
-
-        """ Rebuilds the graph around the given node id.
         """
-
+        Rebuilds the graph around the given node id.
+        """
         self.clear()
 
         # Root node.
@@ -776,10 +769,9 @@ class xgraph(graph):
             g.add_node(self.event.clicked)
 
     def click(self, node):
-
-        """ Callback from graph.events when a node is clicked.
         """
-
+        Callback from graph.events when a node is clicked.
+        """
         if not self.has_node(node.id):
             return
         if node == self.root:
@@ -790,7 +782,6 @@ class xgraph(graph):
         self.load(node.id)
 
     def draw(self, weighted=False, directed=False, highlight=[], traffic=None):
-
         # A new graph unfolds from the position of the clicked node.
         graph.draw(self, self._dx, self._dy, weighted, directed, highlight, traffic)
         self._dx *= 0.9
@@ -801,8 +792,8 @@ class xgraph(graph):
 
 
 def create(iterations=1000, distance=1.0, layout=LAYOUT_SPRING, depth=True):
-
-    """ Returns a new graph with predefined styling.
+    """
+    Returns a new graph with predefined styling.
     """
 
     # global _ctx
@@ -888,6 +879,8 @@ def create(iterations=1000, distance=1.0, layout=LAYOUT_SPRING, depth=True):
 
     return g
 
+
+# 2019.11.29 - Convert to python 3 + reformat.
 
 # 1.9.5.3
 # Copies of nodes and edges correctly copy arbitrary attributes,
