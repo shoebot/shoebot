@@ -11,7 +11,6 @@ install:
  - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; fi
  - sudo apt-get update -q
  - sudo apt-get install --no-install-recommends -y xvfb gir1.2-gtk-3.0 gobject-introspection libcairo2-dev libglib2.0-dev libgirepository1.0-dev build-essential libcairo2-dbg libglib2.0-0-dbg $(echo $PACKAGES)
- - # sudo ./install/install_dependencies.sh
  - $PYTHON -mpip install vext.gi
  - $PYTHON -mpip install pygobject setuptools>=18.8 pycairo>=1.18.1 meta==1.0.2 Pillow>=6.0.0 pubsub==0.1.2
  - $PYTHON -mpip install --no-deps .
@@ -19,5 +18,4 @@ install:
 
 script:
  - $PYTHON setup.py test
- - $PYTHON setup.py diagnose || true
- - sbot --diagnose
+ - $PYTHON setup.py diagnose
