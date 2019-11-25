@@ -1,46 +1,35 @@
 """
-Check if shoebot can create files in all it's different output formats
+Check if shoebot can create files in it's supported output formats
 and that none are zero bytes long.
 """
-
 import tempfile
 import unittest
 
-from os import stat, unlink
-from os.path import exists
+from pathlib import Path
+from parameterized import parameterized
 
-import shoebot
+from shoebot import create_bot
 
-from shoebot.core import CairoCanvas, CairoImageSink
-from shoebot.data import BezierPath
-from shoebot.grammar import NodeBot
+class TestOutputFormats(unittest.TestCase):
 
-from .util import TestSequence
+    def assertOutputFile(self, filename):
+        """
+        Verify file exists and is more than 0 bytes.
+        """
+        self.assertTrue(Path(filename).is_file(), f"{filename} does not exist")
+        self.assertNotEqual(0, Path(filename).stat().st_size, f"{filename} is zero bytes")
 
-FORMATS = ["png", "ps", "pdf", "svg"]
-BOT_CODE = "background(0)"
+    @parameterized.expand(["png", "ps", "pdf", "svg"])
+    def test_output_formats(self, file_format):
+        """
+        Run a simple bot for each supported output format and verify the output.
+        """
+        with tempfile.NamedTemporaryFile(suffix=f".{file_format}") as f:
+            bot = create_bot(outputfile=f.name)
+            
+            bot.run("background(0)")
 
-def run_shoebot_code(code, outputfile):
-    bot = shoebot.create_bot(outputfile=outputfile)
-    bot.run(code)
-    return outputfile
-
-
-def create_output_test(fmt):
-    def test(self):
-        h, fn = tempfile.mkstemp(suffix=".%s" % fmt)
-        run_shoebot_code(BOT_CODE, outputfile=fn)
-        self.assertTrue(exists(fn), "%s was not created" % fn)
-        size_not_zero = stat(fn).st_size != 0
-        self.assertTrue(size_not_zero, "%s is zero bytes." % fn)
-        unlink(fn)
-    return test
-
-
-class TestFileOutput(unittest.TestCase):
-    __metaclass__ = TestSequence
-
-    test_create = ("test_create_%s", create_output_test, FORMATS)
+            self.assertOutputFile(f.name)
 
 if __name__ == '__main__':
     unittest.main()

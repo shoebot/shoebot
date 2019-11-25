@@ -1,4 +1,5 @@
 import unittest
+
 from shoebot.core import CairoCanvas, CairoImageSink
 from shoebot.data import BezierPath
 from shoebot.grammar import NodeBot
@@ -9,13 +10,19 @@ class BezierTest(unittest.TestCase):
         canvas = CairoCanvas(sink)
         self.bot = NodeBot(canvas=canvas)
     
-    def test_copy_len(self):
-        b1 = BezierPath(self.bot)
-        b1.lineto(4,4)
-        b1.lineto(10, 10)
-        b1.closepath()
-        b2 = b1.copy()
-        self.assertEqual(len(b1), len(b2))
+    def test_copy_path(self):
+        """
+        Verify BezierPath.copy returns a new path with copies of all the elements.
+        """
+        path = BezierPath(self.bot)
+        path.lineto(4,4)
+        path.lineto(10, 10)
+        path.closepath()
+
+        copied_path = path.copy()
+        
+        self.assertIsNot(path, copied_path)
+        self.assertCountEqual(path, copied_path)
 
 if __name__ == '__main__':
     unittest.main()
