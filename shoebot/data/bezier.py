@@ -708,6 +708,10 @@ class PathElement(object):
         data.insert(0, self.cmd)
         return data[key]
 
+    def __hash__(self):
+        # TODO - this has not been rigorously tested.
+        return hash((self.cmd, *self.values))
+
     def __repr__(self):
         data = list(self. values)
         data.insert(0, self.cmd)
