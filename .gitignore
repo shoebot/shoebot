@@ -34,3 +34,6 @@ doc/extension/build/
 doc/extension/dist/
 doc/extension/sphinxcontrib_shoebot.egg-info/
 .eggs
+
+# Test run output.
+tests/unittest/output/*actual*
