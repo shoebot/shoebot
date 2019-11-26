@@ -17,5 +17,5 @@ install:
  - $PYTHON -mpip freeze
 
 script:
- - $PYTHON setup.py test
  - $PYTHON setup.py diagnose
+ - $PYTHON setup.py test
