@@ -17,15 +17,19 @@ $ python setup.py test
 ```
 
 
-Bot API Tests
+Writing tests
 -------------
 
-These tests have 'botapi' in the name and test the bot API, e.g. ```test_botapi_bezier.py```.
-
-See "Using Shoebot as a Module" in the docs for how this is implemented.
+Tests try and follow the AAA pattern where possible.
 
 
-Shoebot Tests
--------------
+Helper functions
+----------------
 
-These test the system, e.g. "can all the backends output files" ```test_file_output.py```
+ShoebotTestCase:
+
+Extends unittest.TestCase, and provides the ability to run a bot using a known random seed, 
+making it possible to get the same output on subsequent runs.
+
+Assertions are provided to make it straightforward to check if output is as expected.
+x
