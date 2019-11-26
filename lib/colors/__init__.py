@@ -458,14 +458,18 @@ def import_palette(path=None):
 # e.g. "red" is commonly associated with passion, love, heat, etc.
 
 # __file__ = ""
-context = {}
-path = os.path.join(os.path.dirname(__file__), "context", "*.txt")
-for f in glob(path):
-    name = os.path.basename(f)[:-4]
-    tags = open(f).read()
-    tags = [tag.strip() for tag in tags.split(",")]
-    tags.sort()
-    context[name] = tags
+def _load_color_context():
+    context = {}
+    path = os.path.join(os.path.dirname(__file__), "context", "*.txt")
+    for filename in glob(path):
+        name = os.path.basename(filename)[:-4]
+        with open(filename) as _f:
+            tags = _f.read()
+            tags = [tag.strip() for tag in tags.split(",")]
+            tags.sort()
+            context[name] = tags
+    return context
+context = _load_color_context()
 
 from shoebot.data import Color as BaseColor
 
