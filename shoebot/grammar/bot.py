@@ -336,7 +336,7 @@ class Bot(Grammar):
         if isinstance(target, cairo.Surface):
             # snapshot to Cairo surface
             if defer is None:
-                self._canvas.snapshot(surface, defer)
+                self._canvas.snapshot(target, defer)
                 defer = False
             ctx = cairo.Context(target)
             # this used to be self._canvas.snapshot, but I couldn't make it work.
