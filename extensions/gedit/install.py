@@ -13,8 +13,8 @@ def gedit_install():
     except OSError:
         print("gedit not found")
         return
-    v_str = version.rpartition(" ")[-1]
-    major, minor, patch = map(int, v_str.split("."))
+    v_str = version.rpartition(b" ")[-1]
+    major, minor, patch = map(int, v_str.split(b"."))
 
     if major == 2:
         subprocess.call("%s/gedit2-plugin/install.py" % here, shell=True)

@@ -10,6 +10,7 @@ from shoebot import create_bot
 class ShoebotTestCase(TestCase):
     output_dir = Path(__file__).parent.absolute() / "output"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
+    hide_gui = True
 
     def assertOutputFilesEqual(self, file1, file2):
         """
@@ -22,18 +23,22 @@ class ShoebotTestCase(TestCase):
         """
         Verify file exists and is more than 0 bytes.
         """
-        self.assertTrue(Path(filename).is_file(), f"{filename} does not exist")
-        self.assertNotEqual(0, Path(filename).stat().st_size, f"{filename} is zero bytes")
+        self.assertTrue(Path(filename).is_file(), f"{filename} does not exist.")
+        self.assertNotEqual(
+            0, Path(filename).stat().st_size, f"{filename} is zero bytes."
+        )
 
-    def run_code(self, code, outputfile):
+    def run_code(self, code, outputfile, windowed=False):
         """
         Run shoebot code, sets random.seed to stabilize output.
         """
-        bot = create_bot(outputfile=outputfile)
+        bot = create_bot(window=windowed, outputfile=outputfile)
+
         seed(0)
+
         bot.run(code)
 
-    def run_filename(self, filename, outputfile):
+    def run_filename(self, filename, outputfile, windowed=False):
         """
         Run shoebot from filename.
 
