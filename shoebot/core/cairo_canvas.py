@@ -121,13 +121,11 @@ class CairoCanvas(Canvas):
             ctx.rel_line_to(x, y)
         return rellineto
 
-    def output_closure(self, target, file_number=None):
+    def output_closure(self, target):
         '''
         Function to output to a cairo surface
 
         target is a cairo Context or filename
-        if file_number is set, then files will be numbered
-        (this is usually set to the current frame number)
         '''
         def output_context(ctx):
             target_ctx = target
@@ -143,10 +141,7 @@ class CairoCanvas(Canvas):
 
         def output_file(ctx):
             root, extension = os.path.splitext(target)
-            if file_number:
-                filename = '%s_%04d%s' % (root, file_number, extension)
-            else:
-                filename = target
+            filename = target
 
             extension = extension.lower()
             if extension == '.png':

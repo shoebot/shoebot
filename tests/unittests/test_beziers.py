@@ -5,6 +5,7 @@ from shoebot.data import BezierPath
 from shoebot.grammar import NodeBot
 
 class BezierTest(unittest.TestCase):
+    # Test the bot API directly.
     def setUp(self):
         sink = CairoImageSink("output.png")
         canvas = CairoCanvas(sink)

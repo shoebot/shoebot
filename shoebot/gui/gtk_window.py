@@ -1,6 +1,7 @@
 import os
 import sys
 
+from pathlib import Path
 from shoebot.core.backend import gi
 from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
 from gi.repository import Gdk, Gtk, GObject
@@ -29,7 +30,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
     Create a GTK+ window that contains a ShoebotWidget
     """
     # Draw in response to an expose-event
-    def __init__(self, title=None, show_vars=False, menu_enabled=True, server=False, port=7777, fullscreen=False):
+    def __init__(self, title=None, show_vars=False, menu_enabled=True, server=False, port=7777, fullscreen=False, outputfile=None):
         Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
@@ -61,7 +62,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
 
-        self.action_group = Gtk.ActionGroup('Canvas')
+        self.action_group = Gtk.ActionGroup(name='Canvas')
 
         self.action_group.add_actions([('Save as', None, _('_Save as')),
                                        ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
@@ -103,15 +104,17 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
         self.present()
 
-        self.scheduled_snapshots = deque()
+        self.pending_snapshots = []  # list of filenames to save after rendering.
+        if outputfile:
+            # The test harness uses this to get the gui to output an image, otherwise it may not make much sense
+            # to have an output file with a GUI window ?
+            self.pending_snapshots.append(outputfile)
 
         while Gtk.events_pending():
             Gtk.main_iteration()
 
         self.window_open = True
         self.pause_speed = None  # TODO - factor out bot controller stuff
-
-        self.last_draw_ctx = None  # Need this to save snapshots after frame is drawn
 
     def gtk_mouse_button_down(self, widget, event):
         ''' Handle right mouse button clicks '''
@@ -123,8 +126,27 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
     def render(self, size, frame, drawqueue):
         cairo_ctx = super(self.__class__, self).render(size, frame, drawqueue)
-        self.last_draw_ctx = cairo_ctx
         self.sb_widget.do_drawing(size, frame, cairo_ctx)
+
+    def rendering_finished(self, size, frame, r_context):
+        """
+        Save any snapshots that were scheduled from the GUI
+
+        :param size:  width, height
+        :param frame:   frame  number
+        :param r_context:  cairo context
+        """
+
+        bot = self.bot
+        canvas = self.bot.canvas
+
+        pending_snapshots = self.pending_snapshots
+        for filename in pending_snapshots:
+            # TODO - remove many of these closures.
+            f = canvas.output_closure(filename)
+            f(r_context)
+
+        super().rendering_finished(size, frame, r_context)
 
     def create_rcontext(self, size, frame):
         """
@@ -168,46 +190,40 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             publish_event(VARIABLE_UPDATED_EVENT, v)
             return True, value
 
-    def schedule_snapshot(self, format):
+    def output_image_filename(self, format):
         """
-        Tell the canvas to perform a snapshot when it's finished rendering
-        :param format:
-        :return:
+        :param format:  Format, e.g. svg, pdf, png
+        :return:  Full image filename, based on bot name
         """
-        bot = self.bot
-        canvas = self.bot.canvas
-        script = bot._namespace['__file__']
+        script = self.bot._namespace['__file__']
         if script:
-            filename = os.path.splitext(script)[0] + '.' + format
-        else:
-            filename = 'output.' + format
+            return f'{Path(script).stem}.{format}'
 
-        f = canvas.output_closure(filename, self.bot._frame)
-        self.scheduled_snapshots.append(f)
+        return f'output.{format}'
 
     def snapshot_svg(self, widget):
         """
-        Save an SVG file after drawing is complete.
+        Request to save an SVG file after drawing is complete.
         """
-        self.schedule_snapshot('svg')
+        self.pending_snapshots.append(self.output_image_filename('svg'))
 
     def snapshot_ps(self, widget):
         """
-        Save an Postscript file after drawing is complete.
+        Request to save a Postscript file after drawing is complete.
         """
-        self.schedule_snapshot('ps')
+        self.pending_snapshots.append(self.output_image_filename('ps'))
 
     def snapshot_pdf(self, widget):
         """
-        Save a PDF file after drawing is complete.
+        Request to save a PDF file after drawing is complete.
         """
-        self.schedule_snapshot('pdf')
+        self.pending_snapshots.append(self.output_image_filename('pdf'))
 
     def snapshot_png(self, widget):
         """
-        Save an PNG file after drawing is complete.
+        Request to save a PNG file after drawing is complete.
         """
-        self.schedule_snapshot('png')
+        self.pending_snapshots.append(self.output_image_filename('png'))
 
     def trigger_fullscreen_action(self, fullscreen):
         """
@@ -298,12 +314,6 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             self.show_variables_window()
         else:
             self.hide_variables_window()
-
-        for snapshot_f in self.scheduled_snapshots:
-            fn = snapshot_f(self.last_draw_ctx)
-            print(("Saved snapshot: %s" % fn))
-        else:
-            self.scheduled_snapshots = deque()
 
         while Gtk.events_pending():
             Gtk.main_iteration()

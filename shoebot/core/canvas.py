@@ -34,6 +34,8 @@ import abc, six
 import sys
 import locale
 import gettext
+from pathlib import Path
+
 from shoebot.core.drawqueue import DrawQueue
 
 APP = 'shoebot'
@@ -144,6 +146,10 @@ class Canvas(object):
         else:
             return self.DEFAULT_SIZE[1]
 
+    def _filename_with_framenumber(self, basename, frame):
+        extension = Path(basename).suffix
+        return f'{basename}_{frame:04}.{extension}'
+
     def snapshot(self, target, defer=True, file_number=None):
         '''
         Ask the drawqueue to output to target.
@@ -153,7 +159,10 @@ class Canvas(object):
 
         If target is not supported then an exception is thrown.
         '''
-        output_func = self.output_closure(target, file_number)
+        if file_number is not None:
+            target = self._filename_with_framenumber(target, file_number)
+
+        output_func = self.output_closure(target)
         if defer:
             self._drawqueue.append(output_func)
         else:
