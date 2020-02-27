@@ -8,7 +8,7 @@ REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel p
 
 SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
 
-DEB_PACKAGES="build-essential libjpeg-dev python3-dev python-gi-cairo python-gobject gir1.2-rsvg-2.0"
+DEB_PACKAGES="build-essential libjpeg-dev python3-dev python3-gi-cairo python3-gi gir1.2-rsvg-2.0"
 DEBIAN_PACKAGES=${DEB_PACKAGES}
 UBUNTU_PACKAGES=${DEB_PACKAGES}
 MINT_PACKAGES=${DEB_PACKAGES}
