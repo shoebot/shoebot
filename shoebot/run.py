@@ -108,14 +108,16 @@ def main():
                        "--vars",
                        dest="vars",
                        default=False,
-                       help=_("Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
+                       help=_(
+                           "Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"),
                        )
     # IO - Namespace
     group.add_argument("-ns",
                     "--namespace",
                     dest="namespace",
                     default=None,
-                    help=_("Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
+                       help=_(
+                           "Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"),
                     )
     # IO - IDE integration Shell
     group.add_argument("-l",
@@ -154,8 +156,7 @@ def main():
                        "--window",
                        action="store_true",
                        dest="window",
-                       default=True,
-                       help=_("run script in a GTK window")
+                       help=_("Run script in a GTK window (default to True unless -o is used)")
                        )
     group.add_argument("-f",
                        "--fullscreen",
@@ -195,7 +196,7 @@ def main():
                        "--disable-background-thread",
                        action="store_true",
                        dest="disable_background_thread",
-                       default=sys.platform=='darwin',
+                       default=sys.platform == 'darwin',
                        help=_("disable running bot code in background thread (default on OSX)."))
     group.add_argument("-V",
                        "--verbose",
@@ -226,12 +227,17 @@ def main():
     else:
         namespace = None
 
-    from .__init__ import run  # https://github.com/shoebot/shoebot/issues/206
+    if args.window:
+        window = args.window
+    else:
+        window = not args.outputfile
+
+    from shoebot.__init__ import run  # https://github.com/shoebot/shoebot/issues/206
     run(src=args.script,
         grammar=args.grammar,
         outputfile=args.outputfile,
         iterations=args.repeat or None,
-        window=args.window or args.socketserver,
+        window=window,
         fullscreen=args.fullscreen,
         title=args.title,
         close_window=args.close,
