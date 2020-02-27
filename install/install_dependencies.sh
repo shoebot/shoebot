@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Linux
 REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
 # Fedora == Redhat, these are not detected separately.
@@ -46,11 +48,8 @@ install_suse() {
 install_darwin() {
     DIR=$(cd $(dirname "$0"); pwd)
 
-    command -v port > /dev/null
-    MACPORTS=$?
-
-    command -v brew > /dev/null
-    HOMEBREW=$?
+    MACPORTS=$(command -v port > /dev/null; echo $?)
+    HOMEBREW=$(command -v brew > /dev/null; echo $?)
     
     if [ "${HOMEBREW},${MACPORTS}" = "1,1" ]; then
         echo "Install homebrew and re-run this script"
