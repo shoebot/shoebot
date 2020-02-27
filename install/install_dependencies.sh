@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Linux
 REDHAT_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
 # Fedora == Redhat, these are not detected separately.
