@@ -1,6 +1,11 @@
 language: python
 services:
   - xvfb
+cache:
+  directories:
+    - $HOME/Library/Caches/Homebrew
+before_cache:
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew cleanup; fi
 matrix:
   allow_failures:
     - os: osx
@@ -23,7 +28,7 @@ matrix:
        - TRAVIS_PYTHON_VERSION=3.6
       before_install:
        - sudo chmod -R a+w /usr/local/Cellar
-
+       
 install:
  - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; apt-get update -y; fi
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install --no-install-recommends -y python3-pip ${PACKAGES1} ${PACKAGES}; fi
