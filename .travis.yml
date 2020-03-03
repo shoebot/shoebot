@@ -30,7 +30,7 @@ install:
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./install/install_dependencies.sh; fi
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then $PYTHON -m ensurepip; fi
  - $PYTHON -mpip install pygobject setuptools>=18.8 pycairo>=1.18.1 meta==1.0.2 Pillow>=6.0.0 pubsub==0.1.2
- - $PYTHON -mpip install --no-deps . --user
+ - $PYTHON -mpip install --no-deps .
  - $PYTHON -mpip freeze
 
 script:
