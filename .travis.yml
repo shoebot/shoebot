@@ -16,9 +16,11 @@ matrix:
        - SHOEBOT_GI="pgi"
     - os: osx
       osx_image: xcode11.3
+      language: generic
       sudo: required
       env:
        - PYTHON="python3"
+       - TRAVIS_PYTHON_VERSION=3.6
       before_install:
        - sudo chmod -R a+w /usr/local/Cellar
 
