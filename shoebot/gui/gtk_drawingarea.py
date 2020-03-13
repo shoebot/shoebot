@@ -85,15 +85,23 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             if self.width < self.height:
                 scale_x = float(self.width) / float(bot_width)
                 scale_y = scale_x
-                cr.translate(0, (self.height - (bot_height * scale_y)) / 2.0)
+                offset_x = 0.0
+                offset_y = (self.height - (bot_height * scale_y)) / 2.0
+                cr.translate(0, offset_y)
             elif self.width > self.height:
                 scale_y = float(self.height) / float(bot_height)
                 scale_x = scale_y
-                cr.translate((self.width - (bot_width * scale_x)) / 2.0, 0)
+                offset_x = (self.width - (bot_width * scale_x)) / 2.0
+                offset_y = 0.0
+                cr.translate(offset_x, 0)
             else:
                 scale_x = 1.0
                 scale_y = 1.0
+                offset_x = 0.0
+                offset_y = 0.0
             cr.scale(scale_x, scale_y)
+            self.input_device.offset_x = offset_x
+            self.input_device.offset_y = offset_y
             self.input_device.scale_x = scale_y
             self.input_device.scale_y = scale_y
 
@@ -107,7 +115,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             return
 
         cr = driver.ensure_pycairo_context(cr)
-        
+
         surface = self.backing_store.surface
         cr.set_source_surface(surface)
         cr.paint()

@@ -10,6 +10,8 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         InputDeviceMixin.__init__(self, **kwargs)
         self.scale_x = 1.0
         self.scale_y = 1.0
+        self.offset_x = 0.0
+        self.offset_y = 0.0
 
     def attach_gtk(self, widget):
         # necessary for catching keyboard events
@@ -34,7 +36,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         self.mouse_button_up(event.button)
 
     def gtk_mouse_pointer_moved(self, widget, event):
-        self.mouse_pointer_moved(event.x / self.scale_x, event.y / self.scale_y)
+        self.mouse_pointer_moved((event.x - self.offset_x) / self.scale_x, (event.y -self.offset_y) / self.scale_y)
 
     def get_mapped_key(self, keyval):
         # Horrible hack to support key values used in beziereditor2 from nodebox
