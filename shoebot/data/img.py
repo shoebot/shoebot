@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 try:
     gi.require_version('Rsvg', '2.0')
     from gi.repository import Rsvg
-except ImportError as ValueError:
+except ValueError:
     Rsvg = None
 
 from shoebot.data import Grob, ColorMixin
