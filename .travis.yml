@@ -27,8 +27,6 @@ addons:
 services:
   - xvfb
 matrix:
-  allow_failures:
-    - os: osx
   include:
     - os: linux
       sudo: required
