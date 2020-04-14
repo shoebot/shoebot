@@ -9,6 +9,12 @@ from unittest import TestCase
 from shoebot import create_bot
 
 
+def shoebot_named_testclass(base, idx, attrs):
+    attr_values = attrs[idx]
+    suffix = "Windowed" if attr_values["windowed"] else "Headless"
+    return f"{base.__name__}{suffix}"
+
+
 class ShoebotTestCase(TestCase):
     output_dir = Path(__file__).parent.absolute() / "output"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.

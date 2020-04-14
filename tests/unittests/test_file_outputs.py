@@ -7,10 +7,16 @@ import unittest
 
 from parameterized import parameterized, parameterized_class
 
-from tests.unittests.helpers import ShoebotTestCase
+from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
 
 
-@parameterized_class([{"windowed": False}, {"windowed": True}])
+@parameterized_class(
+    [
+        {"windowed": False},
+        {"windowed": True},
+    ],
+    classname_func=shoebot_named_testclass,
+)
 class TestOutputFormats(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
 

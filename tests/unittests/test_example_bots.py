@@ -4,10 +4,12 @@ import unittest
 from pathlib import Path
 from parameterized import parameterized, parameterized_class
 
-from tests.unittests.helpers import ShoebotTestCase
+from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
 
 
-@parameterized_class([{"windowed": False}, {"windowed": True}])
+@parameterized_class(
+    [{"windowed": False}, {"windowed": True}], classname_func=shoebot_named_testclass
+)
 class TestExampleOutput(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
 
@@ -27,7 +29,7 @@ class TestExampleOutput(ShoebotTestCase):
         self.run_filename(filename, outputfile=actual_output, windowed=self.windowed)
 
         self.assertOutputFile(actual_output)
-        if sys.platform == 'darwin':
+        if sys.platform == "darwin":
             # Rendering on OSX is slightly different to the original Linux renders.
             self.assertOutputImagesAlmostEqual(actual_output, expected_output)
         else:
