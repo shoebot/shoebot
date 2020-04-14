@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from pathlib import Path
@@ -18,7 +19,7 @@ class TestExampleOutput(ShoebotTestCase):
     )
     def test_static_example_bots(self, filename, output_prefix):
         """
-        Check non animated example bots against their expected output.
+        Check non animated example bots render matches the reference images.
         """
         actual_output = self.output_dir / f"{output_prefix}-actual.png"
         expected_output = self.output_dir / f"{output_prefix}-expected.png"
@@ -26,7 +27,13 @@ class TestExampleOutput(ShoebotTestCase):
         self.run_filename(filename, outputfile=actual_output, windowed=self.windowed)
 
         self.assertOutputFile(actual_output)
-        self.assertOutputFilesEqual(actual_output, expected_output)
+        if sys.platform == 'darwin':
+            # Rendering on OSX is slightly different to the original Linux renders.
+            self.assertOutputImagesAlmostEqual(actual_output, expected_output)
+        else:
+            # So far Linux output has been identical - this will probably need to
+            # change to use image comparison.
+            self.assertOutputFilesEqual(actual_output, expected_output)
 
 
 if __name__ == "__main__":

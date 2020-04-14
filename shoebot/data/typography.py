@@ -44,7 +44,7 @@ except ValueError as e:
 
     class FakePango(object):
         def __getattr__(self, item):
-            raise e
+            raise NotImplementedError("FakePango does not implement %s" % item)
     Pango = FakePango()
     PangoCairo = FakePango()
 

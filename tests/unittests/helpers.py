@@ -1,6 +1,8 @@
 import filecmp
+import math
 
 from pathlib import Path
+from PIL import Image, ImageChops
 from random import seed
 from unittest import TestCase
 
@@ -11,6 +13,23 @@ class ShoebotTestCase(TestCase):
     output_dir = Path(__file__).parent.absolute() / "output"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
+
+    def assertOutputImagesAlmostEqual(self, file1, file2, error=0.14):
+        """
+        Assert that the two images have a high level of similarity.
+
+        Linux and OSX have minor differences so this is used when
+        running under OSX to check example image output.
+        """
+        with Image.open(file1) as img1, Image.open(file2) as img2:
+            diff = ImageChops.difference(img1, img2).histogram()
+            sq = (value * (i % 256) ** 2 for i, value in enumerate(diff))
+            sum_squares = sum(sq)
+            rms = math.sqrt(sum_squares / float(img1.size[0] * img1.size[1]))
+
+            # Error is an arbitrary value, based on values when
+            # comparing 2 rotated images & 2 different images.
+            self.assertLess(rms, error)
 
     def assertOutputFilesEqual(self, file1, file2):
         """

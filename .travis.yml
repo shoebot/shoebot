@@ -1,23 +1,59 @@
 language: python
+addons:
+  apt:
+    packages:
+      - build-essential
+      - gir1.2-gtk-3.0
+      - gir1.2-rsvg-2.0
+      - gobject-introspection
+      - libgirepository1.0-dev
+      - libglib2.0-dev
+      - libjpeg-dev
+      - libpango1.0-dev
+      - python-gi-cairo
+      - python-gobject
+      - python3-dev
+  homebrew:
+    packages:
+      - cairo
+      - gtk+3
+      - gobject-introspection
+      - gtksourceview3
+      - jpeg
+      - libffi
+      - librsvg
+      - pygobject3
+      - py3cairo
 services:
   - xvfb
 matrix:
+  allow_failures:
+    - os: osx
   include:
     - os: linux
       sudo: required
       dist: xenial
       python: 3.7
-      env: PYTHON="python3" PACKAGES="python3-setuptools python3-pep8 python3-pyflakes python3-gi python3-gi-cairo libpython3-dev libjpeg-dev gir1.2-rsvg-2.0" SHOEBOT_GI="pgi"
-
+      env:
+        - PYTHON="python3"
+        - CI_PACKAGES="xvfb python3-setuptools python3-pep8"
+    - os: osx
+      osx_image: xcode11.3
+      language: generic
+      sudo: required
+      env:
+        - PYTHON="$(brew --prefix)/opt/python@3.8/bin/python3.8"
+        - PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/libffi/lib/pkgconfig"
+      before_install:
+        - TRAVIS_PYTHON_VERSION=3.8
 install:
- - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; fi
- - sudo apt-get update -q
- - sudo apt-get install --no-install-recommends -y xvfb gir1.2-gtk-3.0 gobject-introspection libcairo2-dev libglib2.0-dev libgirepository1.0-dev build-essential libcairo2-dbg libglib2.0-0-dbg $(echo $PACKAGES)
- - $PYTHON -mpip install vext.gi
- - $PYTHON -mpip install pygobject setuptools>=18.8 pycairo>=1.18.1 meta==1.0.2 Pillow>=6.0.0 pubsub==0.1.2
- - $PYTHON -mpip install --no-deps .
- - $PYTHON -mpip freeze
+  - if [ "$PYTHON" == "pypy" ]; then sudo add-apt-repository -y ppa:pypy/ppa; apt-get update -y; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install --no-install-recommends -y python3-pip ${CI_PACKAGES} ${PACKAGES}; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ${PYTHON} -m ensurepip; fi
+  - $PYTHON -mpip freeze
+  - $PYTHON -mpip install .
+  - $PYTHON -mpip freeze
 
 script:
- - $PYTHON setup.py diagnose
- - $PYTHON setup.py test
+  - $PYTHON setup.py diagnose
+  - $PYTHON setup.py test
