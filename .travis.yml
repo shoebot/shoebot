@@ -1,22 +1,11 @@
 language: python
 addons:
-  homebrew:
-    packages:
-      - cairo
-      - gtk+3
-      - gobject-introspection
-      - gtksourceview3
-      - jpeg
-      - librsvg
-      - pygobject3
-      - py3cairo
   apt:
     packages:
       - build-essential
       - gir1.2-gtk-3.0
       - gir1.2-rsvg-2.0
       - gobject-introspection
-      - libpango-1.0-0
       - libgirepository1.0-dev
       - libglib2.0-dev
       - libjpeg-dev
@@ -24,6 +13,17 @@ addons:
       - python-gi-cairo
       - python-gobject
       - python3-dev
+  homebrew:
+    packages:
+      - cairo
+      - gtk+3
+      - gobject-introspection
+      - gtksourceview3
+      - jpeg
+      - libffi
+      - librsvg
+      - pygobject3
+      - py3cairo
 services:
   - xvfb
 matrix:
