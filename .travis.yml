@@ -7,7 +7,6 @@ addons:
       - gobject-introspection
       - gtksourceview3
       - jpeg
-      - libffi
       - librsvg
       - pygobject3
       - py3cairo
@@ -41,6 +40,7 @@ matrix:
       sudo: required
       env:
         - PYTHON="$(brew --prefix)/opt/python@3.8/bin/python3.8"
+        - PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/libffi/lib/pkgconfig"
       before_install:
         - TRAVIS_PYTHON_VERSION=3.8
 install:
