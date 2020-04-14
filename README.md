@@ -45,7 +45,7 @@ Links
 License
 -------
 
-Copyright &copy; 2007-2018 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
+Copyright &copy; 2007-2020 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
 Originally developed by Ricardo Lafuente with the support of the Piet Zwart Institute, Rotterdam.
 
     This program is free software: you can redistribute it and/or modify
