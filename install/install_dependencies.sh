@@ -9,10 +9,10 @@ FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel p
 SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
 
 # Debian, Ubuntu, Mint
-DEB_PACKAGES="build-essential gir1.2-rsvg-2.0 gobject-introspection libglib2.0-dev libjpeg-dev python-gi-cairo python-gobject python3-dev"
+DEB_PACKAGES="build-essential gir1.2-rsvg-2.0 gobject-introspection libglib2.0-dev libgirepository1.0-dev libjpeg-dev python-gi-cairo python-gobject python3-dev"
 
 # Mac OSX
-HOMEBREW_PACKAGES="gtk+3 pygobject3 gobject-introspection jpeg librsvg libffi cairo py3cairo gtksourceview3"
+HOMEBREW_PACKAGES="cairo gtk+3 gobject-introspection gtksourceview3 jpeg libffi librsvg pygobject3 py3cairo"
 MACPORTS_PACKAGES="gtk3 py37-gobject gobject-introspection jpeg librsvg cairo cairo-devel py37-cairo gtksourceview3"
 
 install_apt() {
