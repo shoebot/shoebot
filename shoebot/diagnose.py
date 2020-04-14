@@ -33,6 +33,13 @@ def display_platform():
         except:
             return "N/A"
 
+    # operating system info
+    def platform_dist():
+        try:
+            return platform.dist()
+        except:
+            return "N/A"
+
     print("""Python:
     sys.executable: %s
     virtualenv: %s
@@ -49,7 +56,7 @@ def display_platform():
         sys.executable,
         is_virtualenv or "no",
         ' '.join(sys.version.split('\n')),
-        str(' '.join(platform.dist())),
+        str(' '.join(platform_dist())),
         ' '.join(linux_distribution()),
         platform.system(),
         platform.machine(),
