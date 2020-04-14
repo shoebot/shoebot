@@ -19,7 +19,7 @@ addons:
       - libgirepository1.0-dev
       - libglib2.0-dev
       - libjpeg-dev
-      - pango
+      - libpango1.0-dev
       - python-gi-cairo
       - python-gobject
       - python3-dev
