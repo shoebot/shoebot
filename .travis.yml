@@ -13,6 +13,7 @@ addons:
   apt:
     packages:
       - build-essential
+      - gir1.2-gtk-3.0
       - gir1.2-rsvg-2.0
       - gobject-introspection
       - libpango-1.0-0
