@@ -1022,7 +1022,7 @@ class ShoebotIDE(object):
     @classmethod
     def get_next_untitled_filename(cls):
         cls.untitled_file_counter += 1
-        if cls.untitled_file_counter is 1:
+        if cls.untitled_file_counter == 1:
             return _('Untitled')
         else:
             return _('Untitled #%d') % cls.untitled_file_counter

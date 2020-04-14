@@ -75,7 +75,7 @@ class Grammar(object):
 
     def _should_run(self, iteration, max_iterations):
         """ Return False if bot should quit """
-        if iteration is 0:
+        if iteration == 0:
             # First frame always runs.
             return True
         if max_iterations:

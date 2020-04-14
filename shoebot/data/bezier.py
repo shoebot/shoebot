@@ -98,7 +98,7 @@ class BezierPath(Grob, ColorMixin):
         self._elements.append(pe)
 
     def append(self, *args):
-        if len(args) is 2:
+        if len(args) == 2:
             # TODO, check this against nodebox
             self.moveto(*args)
         elif isinstance(args[0], PathElement):

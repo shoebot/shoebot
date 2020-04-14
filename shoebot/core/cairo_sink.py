@@ -48,7 +48,7 @@ class CairoImageSink(DrawQueueSink):
         """
         DrawQueueSink.__init__(self)
         if format is None:
-            if target is not None and format is not 'surface':
+            if target is not None and format != 'surface':
                 format = os.path.splitext(target)[1][1:].lower()
                 self.filename = target
             elif buff is not None:
