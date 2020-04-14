@@ -48,7 +48,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install --no-install-recommends -y python3-pip ${CI_PACKAGES} ${PACKAGES}; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ${PYTHON} -m ensurepip; fi
   - $PYTHON -mpip freeze
-  - $PYTHON -mpip install --no-deps .
+  - $PYTHON -mpip install .
   - $PYTHON -mpip freeze
 
 script:
