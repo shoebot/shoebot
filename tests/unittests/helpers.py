@@ -9,10 +9,9 @@ from unittest import TestCase
 from shoebot import create_bot
 
 
-def shoebot_named_testclass(base, idx, attrs):
-    attr_values = attrs[idx]
-    suffix = "Windowed" if attr_values["windowed"] else "Headless"
-    return f"{base.__name__}{suffix}"
+def shoebot_named_testclass(cls, num, params_dict):
+    suffix = "Windowed" if params_dict["windowed"] else "Headless"
+    return f"{cls.__name__}{suffix}"
 
 
 class ShoebotTestCase(TestCase):

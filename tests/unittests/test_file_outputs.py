@@ -15,7 +15,7 @@ from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
         {"windowed": False},
         {"windowed": True},
     ],
-    classname_func=shoebot_named_testclass,
+    class_name_func=shoebot_named_testclass,
 )
 class TestOutputFormats(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI

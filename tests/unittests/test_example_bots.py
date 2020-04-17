@@ -8,7 +8,7 @@ from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
 
 
 @parameterized_class(
-    [{"windowed": False}, {"windowed": True}], classname_func=shoebot_named_testclass
+    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
 )
 class TestExampleOutput(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
