@@ -178,7 +178,7 @@ setup(
         debug="install" in sys.argv,
         with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
-    tests_require=["parameterized"],
+    tests_require=["parameterized", "pyyaml"],
     entry_points={
         "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.ide.ide:main"],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",
