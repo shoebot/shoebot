@@ -4,8 +4,12 @@ Check that lists of packages in the install script and travis match.
 import re
 import yaml
 
+from pathlib import Path
 from subprocess import run
 from unittest import TestCase
+
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_DIR = SCRIPT_DIR.parent.parent
 
 
 class TestTravisConfiguration(TestCase):
@@ -17,7 +21,7 @@ class TestTravisConfiguration(TestCase):
     @classmethod
     def setUpClass(cls):
         # TODO load travis YAML
-        with open("../../.travis.yml") as f:
+        with open(PROJECT_DIR / ".travis.yml") as f:
             cls.travis_conf = yaml.safe_load(f)
 
         cls.install_script_data = cls.read_install_script()
@@ -26,7 +30,7 @@ class TestTravisConfiguration(TestCase):
     def read_install_script(cls):
         package_name_re = r'([A-Z]*_PACKAGES)="(.*)"'
         script_data = {}
-        with open("../../install/install_dependencies.sh") as f:
+        with open(PROJECT_DIR / "install/install_dependencies.sh") as f:
             for line in f.readlines():
                 matches = re.match(package_name_re, line)
                 if matches and matches.groups():
