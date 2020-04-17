@@ -11,7 +11,7 @@ from shoebot import create_bot
 
 def shoebot_named_testclass(cls, num, params_dict):
     suffix = "Windowed" if params_dict["windowed"] else "Headless"
-    return f"{base.__name__}{suffix}"
+    return f"{cls.__name__}{suffix}"
 
 
 class ShoebotTestCase(TestCase):
