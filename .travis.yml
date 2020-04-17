@@ -1,6 +1,7 @@
 language: python
 addons:
   apt:
+    # These package lists must match those in install/install_dependencies.sh for CI to pass.
     packages:
       - build-essential
       - gir1.2-gtk-3.0
