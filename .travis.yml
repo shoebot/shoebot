@@ -8,6 +8,7 @@ addons:
       - gobject-introspection
       - libgirepository1.0-dev
       - libglib2.0-dev
+      - libgtksourceview-3.0-dev
       - libjpeg-dev
       - libpango1.0-dev
       - python-gi-cairo
@@ -16,12 +17,13 @@ addons:
   homebrew:
     packages:
       - cairo
-      - gtk+3
       - gobject-introspection
+      - gtk+3
       - gtksourceview3
       - jpeg
       - libffi
       - librsvg
+      - py3cairo
       - pygobject3
 services:
   - xvfb
