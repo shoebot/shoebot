@@ -7,13 +7,13 @@ Run
 From this directory:
 
 ```sh
-$ python run_all.py
+$ python3 run_all.py
 ```
 
 Or from setup.py in the root directory of Shoebot:
 
 ```sh
-$ python setup.py test
+$ python3 setup.py test
 ```
 
 

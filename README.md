@@ -26,8 +26,8 @@ The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more
 Installation can sometimes be tricky, to help us work out whats up paste the output
 of the following commands into an issue on github
 
-    python setup.py diagnose
-    python setup.py test
+    python3 setup.py diagnose
+    python3 setup.py test
 
 This will help us diagnose common issues more quickly.
 

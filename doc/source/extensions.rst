@@ -12,7 +12,7 @@ This Gedit plugin adds a menu to allow for running Shoebot scripts. It will open
 Run the following commands to add the plugin to Gedit::
 
     cd shoebot/extensions/gedit
-    python install.py
+    python3 install.py
 
 Now restart Gedit. Navigate to ``Edit > Preferences > Plugins`` and activate the Shoebotit plugin.
 

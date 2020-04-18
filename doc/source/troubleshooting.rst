@@ -39,4 +39,4 @@ If you see this error, it means you're missing the Python GObject interface for 
 
 .. code-block:: bash
 
-    sudo apt-get install python-gi-cairo
+    sudo apt-get install python3-gi-cairo

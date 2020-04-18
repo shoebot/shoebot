@@ -5,28 +5,27 @@ Installation
 GNU/Linux
 ---------
 
-Shoebot runs on Python 2.7.
+Shoebot runs on Python 3.7 and above.
 
 You need a few software packages on your system before installing Shoebot. There is a small handy script that will take care of this for you:
 
 .. code:: bash
 
-    cd install
-    ./install_dependencies.sh
+    ./install/install_dependencies.sh
 
-Now, the simplest way to install Shoebot is system-wide, but you can also install it locally with a few extra steps. This has the advantage of keeping your base system intact.
+It is recommended to install Shoebot locally, although it can be also be installed system-wide.
 
 
 If the script does not support your operating system, skip to `Add support for another operating system`.
 
-System-wide install
-^^^^^^^^^^^^^^^^^^^
+Local install
+^^^^^^^^^^^^^
 
-Only one command necessary:
+Installing shoebot for the current user.
 
 .. code:: bash
 
-    sudo python setup.py install
+    python3 setup.py install
 
 
 .. _virtualenvwrapper-install:
@@ -38,8 +37,8 @@ If you're using the handy `virtualenvwrapper <https://virtualenvwrapper.readthed
 
 .. code:: bash
 
-    mkvirtualenv shoebot
-    python setup.py install
+    mkvirtualenv shoebot -p $(which python3)
+    python3 setup.py install
 
 To use Shoebot in the future, you will need to activate the environment first:
 
@@ -56,13 +55,20 @@ If you don't use virtualenvwrapper, run these commands after installing the depe
 
     virtualenv .env
     source .env/bin/activate
-    python setup.py install
+    python3 setup.py install
 
 To use shoebot in the future, remember to activate the environment first.
 
 .. code:: bash
 
     source .env/bin/activate
+
+System wide install
+-------------------
+
+.. code:: bash
+
+    sudo python3 setup.py install
 
 
 Mac OS X
@@ -71,7 +77,10 @@ Mac OS X
 Installation on Mac OS X is identical to GNU/Linux based distributions. 
 
 Dependencies are installed via `Homebrew <https://brew.sh/>_` through the
-``install_dependencies.sh`` script.
+``install/install_dependencies.sh`` script.
+
+Python 3.8 is supported on Homebrew, since that is what is currently
+supported by pygobject3 there.
 
 
 Windows
@@ -95,15 +104,17 @@ Core:
 
 .. code::
 
-    Python2 Pycairo Pygobject Pango
+    Python3 Pycairo Pygobject3 Pango
 
 GUI:
 
 .. code::
 
-    Gtk3
+    Gtk3 Gtksourceview
 
 The community for your operating system may be able to offer help here.
+Looking at how the `install_dependencies.sh` script works for may help.
+
 
 Check progress with diagnose
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -113,16 +124,17 @@ Shoebot provides a `diagnose` command as part of setup to check if things are wo
 
 .. code:: bash
 
-    python setup.py diagnose
+    python3 setup.py diagnose
 
 
-It's usually easiest to start with Python and Pycairo, then move on to Pango and Gtk3.
+It's usually easiest to start with Python3 and Pycairo, then move on to PyGobject, Pango and Gtk3.
 
 
 PGI with CairoCFFI and Gtk3
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Shoebot can run under PGI and CairoCFFI, which may be easier to install than the recommened setup with pygobject and cairo.
+Shoebot can run under PGI and CairoCFFI, which may be easier to install
+than the recommened setup with pygobject and cairo.
 
 In this setup Shoebot can work with the GUI, but text output is not available.
 

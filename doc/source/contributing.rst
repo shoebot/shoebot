@@ -39,7 +39,7 @@ The `issues tagged 'Help Out' <https://github.com/shoebot/shoebot/issues?q=is%3A
 Make text editor plugins
 ------------------------
 
-While our simple editor is around, power-users will be using their favourite text editor to hack on Shoebot scripts. Having plugins for any popular text editor would be a fantastic addition.
+While our simple editor is around, power-users will be using their favourite text editor to hack on Shoebot scripts.  Having plugins for any popular text editor would be a fantastic addition.
 
 
 Integrate Shoebot with other software
@@ -61,13 +61,6 @@ Find bugs in our documentation and fix them
 -------------------------------------------
 
 We're missing many details and we'd definitely welcome some help here. While actual contributions to the documentation would be the best, we'd be more than happy with pointing out the parts that are missing or plain wrong. Use the ``documentation`` label on the issue tracker to help us on this.
-
-
-Try installing on Windows or Mac OS X
--------------------------------------
-
-Just knowing what happens on these platforms would be really useful for us so we can provide support for them. Try it out and post an issue for any problem that you find.
-
 
 
 Tips for Developers

@@ -55,7 +55,7 @@ of Shoebot. Using ``virtualenvwrapper`` for this is heavily recommended.
     # clone the Shoebot repository, enter it and install
     git clone https://github.com/shoebot/shoebot
     cd shoebot
-    python setup.py install
+    python3 setup.py install
 
 After ensuring both packages are available, install the extension after cloning
 the `jupyter-shoebot <https://github.com/shoebot/jupyter-shoebot/>`_ repository:
@@ -67,7 +67,7 @@ the `jupyter-shoebot <https://github.com/shoebot/jupyter-shoebot/>`_ repository:
     # clone the jupyter-shoebot repository, enter it and install
     git clone https://github.com/shoebot/jupyter-shoebot
     cd jupyter-shoebot
-    python setup.py install
+    python3 setup.py install
 
 And finally, while still on the ``jupyter-shoebot/`` directory, run
 
