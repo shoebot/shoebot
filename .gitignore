@@ -3,6 +3,9 @@ MANIFEST
 # ignore apps for now
 apps/*
 
+# Ignore generated message files
+po/*.mo
+
 # gedit plugin schemas (for layout in plugin)
 extensions/gedit3-plugin/gschemas.compiled
 
