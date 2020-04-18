@@ -1,0 +1,79 @@
+"""
+Dendrite example from Nodebox https://www.nodebox.net/code/index.php/Dendrite
+
+Frederik wrote this inspiring interactive script that draws living lines.
+You can press the mouse and draw lines,
+and then they come alive like organic, pulsating dendrites.
+
+You can learn an interesting trick or two about interaction,
+sine waves and Bezier paths by looking at the source code.
+"""
+
+size(400, 400)
+speed(100)
+from random import seed
+from math import sin
+
+lines = []
+down = False
+
+
+def append_line():
+    global down
+    if mousedown:
+        if len(lines) > 0 and lines[-1] == (MOUSEX, MOUSEY):
+            return
+        if down:
+            lines.append((LINETO, MOUSEX, MOUSEY, FRAME))
+        else:
+            down = True
+            lines.append((MOVETO, MOUSEX, MOUSEY, FRAME))
+    else:
+        down = False
+
+
+def draw_line():
+    if len(lines) == 0:
+        return
+    nofill()
+    stroke(1, 1, 1, 0.5)
+    strokewidth(0.25)
+    p = BezierPath()
+    for cmd, x, y, t in lines:
+        if cmd == MOVETO:
+            p.moveto(x, y)
+        else:
+            p.lineto(x, y)
+    p.inheritFromContext()
+    p.draw()
+
+
+def draw_ch_line():
+    for i in range(5):
+        seed(i)
+        if len(lines) == 0:
+            return
+        nofill()
+        stroke(1, 1, 1, 1)
+        strokewidth(0.1)
+        p = BezierPath()
+        for cmd, x, y, t in lines:
+            d = sin((FRAME - t) / 10.0) * 15.0
+            x += random(-d, d)
+            y += random(-d, d)
+            if cmd == MOVETO:
+                p.moveto(x, y)
+            else:
+                p.lineto(x, y)
+        p.inheritFromContext()
+        p.draw()
+
+
+def setup():
+    pass
+
+
+def draw():
+    background(0.18, 0.0, 0.15)
+    append_line()
+    draw_ch_line()
