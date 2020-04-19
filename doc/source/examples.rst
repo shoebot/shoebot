@@ -9,6 +9,7 @@ How curves work
 
 .. shoebot::
     :size: 250,250
+    :filename: how_curves_work.png
 
     """
     Simple path curve example

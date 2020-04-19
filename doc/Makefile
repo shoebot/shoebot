@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 # Note, we use the current python so this can work in virtualenv:
-SPHINXBUILD = $(shell which python) $(shell which sphinx-build)
+SPHINXBUILD = $(shell which python3) $(shell which sphinx-build)
 PAPER         =
 
 # Internal variables.
@@ -25,7 +25,7 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 
 clean:
-	-rm -rf build/*
+	-rm -rf build/* build-images/*
 
 html:
 	mkdir -p build/html build/doctrees
