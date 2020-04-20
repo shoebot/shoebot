@@ -9,6 +9,8 @@ from unittest import TestCase
 
 from shoebot import create_bot
 
+TEST_DIR = Path(__file__).parent.absolute()
+
 
 def shoebot_named_testfunction(func, num, param):
     return f"{func.__name__}_{'_'.join(param[0])}"
@@ -20,9 +22,8 @@ def shoebot_named_testclass(cls, num, params_dict):
 
 
 class ShoebotTestCase(TestCase):
-    test_dir = Path(__file__).parent.absolute()
-    test_output_dir = test_dir / "output/tests"
-    example_output_dir = test_dir / "output/examples"
+    test_output_dir = TEST_DIR / "output/tests"
+    example_output_dir = TEST_DIR / "output/examples"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
 
