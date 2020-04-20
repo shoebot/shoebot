@@ -23,7 +23,6 @@ class TestImage(ShoebotTestCase):
         image('{test_dir}/input-image-svg.svg', 0, 0)
         """)
 
-        print(code)
         self.run_code(code, outputfile=actual_output)
 
         self.assertOutputFile(actual_output)
