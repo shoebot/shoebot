@@ -20,8 +20,9 @@ def shoebot_named_testclass(cls, num, params_dict):
 
 
 class ShoebotTestCase(TestCase):
-    test_output_dir = Path(__file__).parent.absolute() / "output/tests"
-    example_output_dir = Path(__file__).parent.absolute() / "output/examples"
+    test_dir = Path(__file__).parent.absolute()
+    test_output_dir = test_dir / "output/tests"
+    example_output_dir = test_dir / "output/examples"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
 

@@ -13,11 +13,13 @@ class TestImage(ShoebotTestCase):
         """
         Test that loading an svg image doesn't raise an exception (this was a bug).
         """
+        test_dir = Path(__file__).parent.absolute()
+
         actual_output = self.test_output_dir / "image-svg-actual.png"
         expected_output = self.test_output_dir / "image-svg-expected.png"
         code = dedent(f"""
         size(100, 100)
-        image('input-image-svg.svg', 0, 0)
+        image('{test_dir}/input-image-svg.svg', 0, 0)
         """)
 
         self.run_code(code, outputfile=actual_output)
