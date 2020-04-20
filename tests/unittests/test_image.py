@@ -1,6 +1,7 @@
 import unittest
 import sys
 
+from pathlib import Path
 from tests.unittests.helpers import ShoebotTestCase
 from textwrap import dedent
 
