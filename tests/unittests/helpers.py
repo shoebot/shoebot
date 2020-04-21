@@ -1,5 +1,6 @@
 import filecmp
 import math
+import sys
 
 from pathlib import Path
 from PIL import Image, ImageChops
@@ -7,6 +8,10 @@ from random import seed
 from unittest import TestCase
 
 from shoebot import create_bot
+
+
+def shoebot_named_testfunction(func, num, param):
+    return f"{func.__name__}_{'_'.join(param[0])}"
 
 
 def shoebot_named_testclass(cls, num, params_dict):
@@ -19,12 +24,28 @@ class ShoebotTestCase(TestCase):
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
 
-    def assertOutputImagesAlmostEqual(self, file1, file2, error=0.14):
+    def assertReferenceImage(self, file1, file2):
+        """
+        Under Linux check the file contents match exactly,
+        with assertFilesEqual.
+
+        Under OSX use assertImagesAlmostEqual.
+        """
+        if sys.platform == "darwin":
+            # Rendering on OSX is slightly different to the original Linux renders.
+            self.assertImagesAlmostEqual(file1, file2)
+        else:
+            # So far Linux output has been identical - this will probably need to
+            # change to use image comparison.
+            self.assertFilesEqual(file1, file2)
+
+    def assertImagesAlmostEqual(self, file1, file2, error=0.14):
         """
         Assert that the two images have a high level of similarity.
 
-        Linux and OSX have minor differences so this is used when
-        running under OSX to check example image output.
+        Linux and OSX have render slightly fonts and lines slightly
+        differently, so this can be used under OSX to check against
+        reference images originally rendered in Linux.
         """
         with Image.open(file1) as img1, Image.open(file2) as img2:
             diff = ImageChops.difference(img1, img2).histogram()
@@ -36,20 +57,20 @@ class ShoebotTestCase(TestCase):
             # comparing 2 rotated images & 2 different images.
             self.assertLess(rms, error)
 
-    def assertOutputFilesEqual(self, file1, file2):
+    def assertFilesEqual(self, file1, file2):
         """
         Assert that the two passed in filenames are identical.
         """
         # TODO it would be fairly straightforward to check the contents of images if this is needed.
         self.assertTrue(filecmp.cmp(file1, file2), f"Files differ: {file1} {file2}")
 
-    def assertOutputFile(self, filename):
+    def assertFileSize(self, filename, size=0):
         """
-        Verify file exists and is more than 0 bytes.
+        Assert file exists and is larger than 0 bytes.
         """
         self.assertTrue(Path(filename).is_file(), f"{filename} does not exist.")
         self.assertNotEqual(
-            0, Path(filename).stat().st_size, f"{filename} is zero bytes."
+            size, Path(filename).stat().st_size, f"{filename} is zero bytes."
         )
 
     def run_code(self, code, outputfile, windowed=False):

@@ -1,9 +1,9 @@
 import math
 import unittest
 
-from shoebot.data.basecolor import Color
-
 from parameterized import parameterized, parameterized_class
+
+from shoebot.data.basecolor import Color
 
 
 class BaseColorTest(unittest.TestCase):

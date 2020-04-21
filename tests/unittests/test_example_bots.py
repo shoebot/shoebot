@@ -28,14 +28,8 @@ class TestExampleOutput(ShoebotTestCase):
 
         self.run_filename(filename, outputfile=actual_output, windowed=self.windowed)
 
-        self.assertOutputFile(actual_output)
-        if sys.platform == "darwin":
-            # Rendering on OSX is slightly different to the original Linux renders.
-            self.assertOutputImagesAlmostEqual(actual_output, expected_output)
-        else:
-            # So far Linux output has been identical - this will probably need to
-            # change to use image comparison.
-            self.assertOutputFilesEqual(actual_output, expected_output)
+        self.assertFileSize(actual_output)
+        self.assertReferenceImage(actual_output, expected_output)
 
 
 if __name__ == "__main__":
