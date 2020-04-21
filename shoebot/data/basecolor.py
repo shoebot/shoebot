@@ -221,7 +221,6 @@ class Color(object):
         h, s or hue, saturation, brightness
 
         """
-
         if a in self.__dict__:
             return a
         elif a == "black":
@@ -230,13 +229,13 @@ class Color(object):
             return self.__dict__["__brightness"]
         # CMYK
         elif a in ["a", "alpha",
-                   "r", "g", "b", "red", "green", "blue",
-                   "h", "s", "hue", "saturation",
-                   "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+                "r", "g", "b", "red", "green", "blue",
+                "h", "s", "hue", "saturation",
+                "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
             return self.__dict__["__" + a[0]]
         elif a in ["a", "alpha",
-                   "r", "g", "b", "red", "green", "blue",
-                   "h", "s", "hue", "saturation"]:
+                "r", "g", "b", "red", "green", "blue",
+                "h", "s", "hue", "saturation"]:
             return self.__dict__["__" + a[0]]
 
         raise AttributeError("'" + str(self.__class__) + "' object has no attribute '" + a + "'")

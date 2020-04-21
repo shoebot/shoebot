@@ -540,13 +540,13 @@ class Color(BaseColor):
             _ctx.colormode(RGB, 1.0)
             BaseColor.__init__(self, r, g, b, 1, mode='rgb', color_range=1.0)
 
-
         # RGB, HSB or CMYK color values.
         elif ("mode" in kwargs \
               and kwargs["mode"].lower() in modes) \
                 or mode in modes:
             m, ra = mode, range
-            if "mode" in kwargs: m = kwargs["mode"]
+            if "mode" in kwargs:
+                m = kwargs["mode"]
             if "color_range" in kwargs:
                 ra = kwargs["color_range"]
             else:
@@ -572,8 +572,8 @@ class Color(BaseColor):
                     else:
                         r, g, b, a = (args)
 
-                _ctx.colormode(RGB, ra)
-                BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=ra)
+            _ctx.colormode(RGB, ra)
+            BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=ra)
 
         if "name" in kwargs and kwargs["name"] != "":
             self.name = kwargs["name"]
@@ -583,11 +583,11 @@ class Color(BaseColor):
         # Reset the state.
         _ctx.colormode(mode, range)
 
-    def str_to_rgb(self, str):
+    def str_to_rgb(self, s):
 
         """ Returns RGB values based on a descriptive string.
 
-        If the given str is a named color, return its RGB values.
+        If the given s is a named color, return its RGB values.
         Otherwise, return a random named color that has str
         in its name, or a random named color which name appears in str.
 
@@ -597,24 +597,24 @@ class Color(BaseColor):
 
         """
 
-        str = str.lower()
+        s = s.lower()
         for ch in "_- ":
-            str = str.replace(ch, "")
+            s = s.replace(ch, "")
 
-        # if named_hues.has_key(str):
-        #    clr = color(named_hues[str], 1, 1, mode="hsb")
-        #    return clr.r, clr.g, clr.b
+        if s in named_hues:
+           clr = color(named_hues[s], 1, 1, mode="hsb")
+           return clr.r, clr.g, clr.b
 
-        if str in named_colors:
-            return named_colors[str]
+        if s in named_colors:
+            return named_colors[s]
 
         for suffix in ["ish", "ed", "y", "like"]:
-            str = re.sub("(.*?)" + suffix + "$", "\\1", str)
-        str = re.sub("(.*?)dd$", "\\1d", str)
+            s = re.sub("(.*?)" + suffix + "$", "\\1", str)
+        s = re.sub("(.*?)dd$", "\\1d", str)
 
         matches = []
         for name in named_colors:
-            if name in str or str in name:
+            if name in s or s in name:
                 matches.append(named_colors[name])
         if len(matches) > 0:
             return choice(matches)
@@ -624,34 +624,23 @@ class Color(BaseColor):
     def copy(self):
         return Color(self.r, self.g, self.b, self.a, mode="rgb", name=self.name)
 
-    def _is_black(self):
-        if self.r == self.g == self.b < 0.08:
-            return True
-        return False
+    @property
+    def is_black(self):
+        return self.r == self.g == self.b < 0.08
 
-    is_black = property(_is_black)
+    @property
+    def is_white(self):
+        return self.r == self.g == self.b == 1
 
-    def _is_white(self):
-        if self.r == self.g == self.b == 1:
-            return True
-        return False
-
-    is_white = property(_is_white)
-
-    def _is_grey(self):
-        if self.r == self.g == self.b:
-            return True
-        return False
-
-    is_grey = property(_is_grey)
+    @property
+    def is_grey(self):
+        return self.r == self.g == self.b
+    
     is_gray = is_grey
 
+    @property
     def _is_transparent(self):
-        if self.a == 0:
-            return True
-        return False
-
-    is_transparent = property(_is_transparent)
+        return self.a == 0
 
     def __eq__(self, clr):
         if not isinstance(clr, BaseColor):
@@ -970,9 +959,9 @@ class ColorList(_list):
                         self.extend(self.context_to_rgb(arg))
                         self.tags = arg
 
-        if "name" in list(kwargs.keys()):
+        if "name" in kwargs:
             self.name = kwargs["name"]
-        if "tags" in list(kwargs.keys()):
+        if "tags" in kwargs:
             self.tags = kwargs["tags"]
 
     def image_to_rgb(self, path, n=10):
@@ -2058,10 +2047,13 @@ class ColorRange(ColorList):
         if clr != None and not isinstance(clr, Color):
             clr = color(clr)
         if clr != None and not self.grayscale:
-            if clr.is_black: return self.black.color(clr, d)
-            if clr.is_white: return self.white.color(clr, d)
-            if clr.is_grey: return choice(
-                (self.black.color(clr, d), self.white.color(clr, d))
+            if clr.is_black:
+                return self.black.color(clr, d)
+            if clr.is_white:
+                return self.white.color(clr, d)
+            if clr.is_grey:
+                return choice(
+                    (self.black.color(clr, d), self.white.color(clr, d))
             )
 
         h, s, b, a = self.h, self.s, self.b, self.a
@@ -3287,6 +3279,9 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
             _ctx.pop()
 
     _ctx.reset()
+
+# 1.9.4.7-sb 2020-21-1
+# Fix HSB colors.
 
 # 1.9.4.7-sb.4
 # Mostly formatting fixes.
