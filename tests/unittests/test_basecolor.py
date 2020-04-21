@@ -73,9 +73,9 @@ class BaseColorTest(unittest.TestCase):
             ),
         ]
     )
-    def test_color_formats(self, input_color, expected_rgba):
+    def test_rgb_color_formats(self, input_color, expected_rgba):
         """
-        Verify output RGBA against the supported input formats of Color.
+        Test input colors in the RGB(A) colour space.
         """
         # This test was ported from nodebox 1, and could probably
         # be split into seperate tests.
