@@ -7,20 +7,22 @@ import unittest
 
 from parameterized import parameterized, parameterized_class
 
-from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
+from tests.unittests.helpers import (
+    ShoebotTestCase,
+    shoebot_named_testclass,
+    shoebot_named_testfunction,
+)
 
 
 @parameterized_class(
-    [
-        {"windowed": False},
-        {"windowed": True},
-    ],
-    class_name_func=shoebot_named_testclass,
+    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
 )
 class TestOutputFormats(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
 
-    @parameterized.expand(["png", "ps", "pdf", "svg"])
+    @parameterized.expand(
+        ["png", "ps", "pdf", "svg"], name_func=shoebot_named_testfunction
+    )
     def test_output_formats(self, file_format):
         """
         Run a simple bot for each supported output format and verify the output.
@@ -28,7 +30,7 @@ class TestOutputFormats(ShoebotTestCase):
         with tempfile.NamedTemporaryFile(suffix=f".{file_format}") as f:
             self.run_code("background(0)", outputfile=f.name, windowed=self.windowed)
 
-            self.assertOutputFile(f.name)
+            self.assertFileSize(f.name)
 
 
 if __name__ == "__main__":

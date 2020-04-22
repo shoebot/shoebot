@@ -1,13 +1,13 @@
 import math
 import unittest
 
-from shoebot.data.basecolor import Color
-
 from parameterized import parameterized, parameterized_class
+
+from shoebot.data.basecolor import Color
 
 
 class BaseColorTest(unittest.TestCase):
-    def assertRGBAAlmostEqual(self, actual, expected, message=None):
+    def assertColorAlmostEqualsRGBA(self, actual_color, expected_rgba, message=None):
         """
         This is ported from Nodebox 1 colors lib and improved.
 
@@ -15,13 +15,14 @@ class BaseColorTest(unittest.TestCase):
         are tricky things and behave a bit weird when comparing directly
         """
         almost_equal = True
-        for actual_channel, expected_channel in zip(actual, expected):
+        for actual_channel, expected_channel in zip(actual_color, expected_rgba):
             if not math.isclose(actual_channel, expected_channel, rel_tol=0.0001):
                 almost_equal = False
 
         if not almost_equal:
             self.fail(
-                message or f"RBGA values do not match: {actual} Expected {expected}"
+                message
+                or f"RBGA values do not match: {actual_color} Expected {expected_rgba}"
             )
 
     @parameterized.expand(
@@ -73,15 +74,24 @@ class BaseColorTest(unittest.TestCase):
             ),
         ]
     )
-    def test_color_formats(self, input_color, expected_rgba):
+    def test_rgb_color_formats(self, input_color, expected_rgba):
         """
-        Verify output RGBA against the supported input formats of Color.
+        Test input colors in the RGB(A) colour space.
         """
         # This test was ported from nodebox 1, and could probably
         # be split into seperate tests.
-        actual_rgba = Color(input_color, color_range=255)
+        actual_color = Color(input_color, color_range=255)
 
-        self.assertRGBAAlmostEqual(actual_rgba, expected_rgba)
+        self.assertColorAlmostEqualsRGBA(actual_color, expected_rgba)
+
+    def test_hsb_color_mode(self):
+        """
+        Test HSB colour mode results in expected RGBA colour.
+        """
+        expected_rgba = 0.050, 0.100, 0.100, 1.000
+        actual_rgba = Color(0.5, 0.5, 0.1, mode="hsb")
+
+        self.assertColorAlmostEqualsRGBA(actual_rgba, expected_rgba)
 
 
 if __name__ == "__main__":

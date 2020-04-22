@@ -221,7 +221,6 @@ class Color(object):
         h, s or hue, saturation, brightness
 
         """
-
         if a in self.__dict__:
             return a
         elif a == "black":
@@ -230,13 +229,13 @@ class Color(object):
             return self.__dict__["__brightness"]
         # CMYK
         elif a in ["a", "alpha",
-                   "r", "g", "b", "red", "green", "blue",
-                   "h", "s", "hue", "saturation",
-                   "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+                "r", "g", "b", "red", "green", "blue",
+                "h", "s", "hue", "saturation",
+                "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
             return self.__dict__["__" + a[0]]
         elif a in ["a", "alpha",
-                   "r", "g", "b", "red", "green", "blue",
-                   "h", "s", "hue", "saturation"]:
+                "r", "g", "b", "red", "green", "blue",
+                "h", "s", "hue", "saturation"]:
             return self.__dict__["__" + a[0]]
 
         raise AttributeError("'" + str(self.__class__) + "' object has no attribute '" + a + "'")
@@ -332,7 +331,7 @@ def parse_color(v, color_range=1):
         red = green = blue = v / color_range
         alpha = 1.
 
-    elif isinstance(v, data.Color):
+    elif isinstance(v, Color):
         red, green, blue, alpha = v
 
     elif isinstance(v, (tuple, list)):
@@ -361,7 +360,7 @@ def parse_color(v, color_range=1):
     elif isinstance(v, str):
         # got a hexstring: first remove hash character, if any
         v = v.strip('#')
-        if len(data) == 6:
+        if len(v) == 6:
             # RRGGBB
             red = hex2dec(v[0:2]) / 255.
             green = hex2dec(v[2:4]) / 255.
