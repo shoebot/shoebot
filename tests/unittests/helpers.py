@@ -57,7 +57,7 @@ class ShoebotTestCase(TestCase):
 
             if RUNNING_IN_CI:
                 for input_file in input_path.glob("*"):
-                    if input_file in cls._copied_files:
+                    if input_file in ShoebotTestCase._copied_files:
                         continue
 
                     ShoebotTestCase._copied_files.add(input_file)
