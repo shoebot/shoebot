@@ -27,31 +27,33 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import sys
+from operator import attrgetter
 
 from shoebot import ShoebotInstallError
 from shoebot.core.backend import cairo, gi, driver
 
-
 try:
-    gi.require_version('Pango', '1.0')
-    gi.require_version('PangoCairo', '1.0')
+    gi.require_version("Pango", "1.0")
+    gi.require_version("PangoCairo", "1.0")
     from gi.repository import Pango, PangoCairo
 except ValueError as e:
     global Pango, PangoCairo
 
-    # workaround for readthedocs where Pango is not installed
-    print("Pango not found - typography will not be available.")
+    # workaround for readthedocs where Pango is not installed,
+    print("Pango not found - typography will not be available.", file=sys.stderr)
 
     class FakePango(object):
         def __getattr__(self, item):
             raise NotImplementedError("FakePango does not implement %s" % item)
+
     Pango = FakePango()
     PangoCairo = FakePango()
 
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
-
+# Pango Utility functions
 def pangocairo_create_context(cr):
     """
     If python-gi-cairo is not installed, using PangoCairo.create_context
@@ -62,62 +64,130 @@ def pangocairo_create_context(cr):
     try:
         return PangoCairo.create_context(cr)
     except KeyError as e:
-        if e.args == ('could not find foreign type Context',):
-            raise ShoebotInstallError("Error creating PangoCairo missing dependency: python-gi-cairo")
+        if e.args == ("could not find foreign type Context",):
+            raise ShoebotInstallError(
+                "Error creating PangoCairo missing dependency: python-gi-cairo"
+            )
         else:
             raise
 
 
+# Map Nodebox / Shoebot names to Pango:
+def _style_name_to_pango(style="normal"):
+    """
+    Given a Shoebot/Nodebox style name return the a Pango constant.
+    """
+    if style == "normal":
+        return Pango.Style.NORMAL
+    elif style == "italic":
+        return Pango.Style.ITALIC
+    elif style == "oblique":
+        return Pango.Style.OBLIQUE
+    raise AttributeError(
+        "Invalid font style, valid styles are: normal, italic and oblique."
+    )
+
+
+def _alignment_name_to_pango(alignment):
+    if alignment == "right":
+        return Pango.Alignment.RIGHT
+    elif alignment == "center":
+        return Pango.Alignment.CENTER
+    elif alignment == "justify":
+        return Pango.Alignment.LEFT
+
+    return Pango.Alignment.LEFT
+
+
+PANGO_WEIGHTS = {
+    "ultralight": Pango.Weight.ULTRALIGHT,
+    "light": Pango.Weight.LIGHT,
+    "normal": Pango.Weight.NORMAL,
+    "bold": Pango.Weight.BOLD,
+    "ultrabold": Pango.Weight.ULTRABOLD,
+    "heavy": Pango.Weight.HEAVY,
+    None: Pango.Weight.NORMAL,  # default
+}
+
+
+def _weight_name_to_pango(weight="normal"):
+    """
+    :param weight:  "normal", or "bold"
+    :return:  Corresponding pango font weight from Pango.Weight
+    """
+    if weight not in PANGO_WEIGHTS:
+        raise AttributeError("Invalid font weight.")
+
+    return PANGO_WEIGHTS.get(weight)
+
+
 class Text(Grob, ColorMixin):
+
+    """
+    Changes from Nodebox 1:
+        font in Nodebox is a native Cocoa font, here it is the font name.
+        _fontsize, _fontsize, _lineheight, _align in Nodebox are public fields.
+
+        Implementation of fonts uses Pango instead of Cocoa.
+    """
 
     # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
 
-    def __init__(self, bot, text, x=0, y=0, width=None, height=None, outline=False, ctx=None, enableRendering=True, **kwargs):
+    def __init__(
+        self,
+        bot,
+        text,
+        x=0,
+        y=0,
+        width=None,
+        height=None,
+        outline=False,
+        ctx=None,
+        enableRendering=True,
+        **kwargs
+    ):
         self._canvas = canvas = bot._canvas
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
-
-        # self._transform = canvas.transform # TODO remove - this is in grob
-
-        self._ctx = ctx
-        self._pang_ctx = None
-
-        self._doRender = enableRendering
 
         self.text = str(text)
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self._outline = outline
+        self.outline = outline
 
-        self._fontfile = kwargs.get('font', canvas.fontfile)
-        self._fontsize = kwargs.get('fontsize', canvas.fontsize)
-        self._lineheight = kwargs.get('lineheight', canvas.lineheight)
-        self._align = kwargs.get('align', canvas.align)
-        self._indent = kwargs.get("indent")
+        self.font = kwargs.get("font", canvas.fontfile)
+        self.fontsize = kwargs.get("fontsize", canvas.fontsize)
+        self.style = kwargs.get("style", "normal")
+        self.weight = kwargs.get("weight", "normal")
 
-        # we use the pango parser instead of trying this by hand
-        self._fontface = Pango.FontDescription.from_string(self._fontfile)
+        self.align = kwargs.get("align", canvas.align)
+        self.indent = kwargs.get("indent")
+        self.lineheight = kwargs.get("lineheight", canvas.lineheight)
+
+        # Setup hidden vars for Cairo / Pango specific bits:
+        self._ctx = ctx
+        self._pangocairo_ctx = None
+        self._pango_fontface = Pango.FontDescription.from_string(self.font)
 
         # then we set fontsize (multiplied by Pango.SCALE)
-        self._fontface.set_absolute_size(self._fontsize * Pango.SCALE)
+        self._pango_fontface.set_absolute_size(self.fontsize * Pango.SCALE)
+        self._pango_fontface.set_style(_style_name_to_pango(self.style))
+        self._pango_fontface.set_weight(_weight_name_to_pango(self.weight))
 
-        # the style
-        self._style = Pango.Style.NORMAL
-        if kwargs.get("style") in ["italic", "oblique"]:
-            self._style = Pango.Style.ITALIC
-        self._fontface.set_style(self._style)
-
-        # we need to pre-render some stuff to enable metrics sizing
+        # Pre-render some stuff to enable metrics sizing
         self._pre_render()
 
-        if self._doRender:  # this way we do not render if we only need to create metrics
+        if (
+            enableRendering
+        ):  # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
                 # Normal rendering, can be deferred
                 self._deferred_render()
+        self._prerendered = enableRendering
 
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
@@ -125,84 +195,82 @@ class Text(Grob, ColorMixin):
         rs = cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         cr = cairo.Context(rs)
         cr = driver.ensure_pycairo_context(cr)
-        self._pang_ctx = pangocairo_create_context(cr)
-        self.layout = PangoCairo.create_layout(cr)
+        self._pangocairo_ctx = pangocairo_create_context(cr)
+        self._pango_layout = PangoCairo.create_layout(cr)
         # layout line spacing
         # TODO: the behaviour is not the same as nodebox yet
-        # self.layout.set_spacing(int(((self._lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
+        # self.layout.set_spacing(int(((self.lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
-        self.layout.set_font_description(self._fontface)
-        self.layout.set_text(self.text, -1)
+        self._pango_layout.set_font_description(self._pango_fontface)
+        self._pango_layout.set_text(self.text, -1)
+
         # check if max text width is set and pass it to pango layout
         # text will wrap, meanwhile it checks if and indent has to be applied
         # indent is subordinated to width because it makes no sense on a single-line text block
         if self.width:
-            self.layout.set_width(int(self.width) * Pango.SCALE)
-            if self._indent:
-                self.layout.set_indent(self._indent * Pango.SCALE)
+            self._pango_layout.set_width(int(self.width) * Pango.SCALE)
+            if self.indent:
+                self._pango_layout.set_indent(self.indent * Pango.SCALE)
         # set text alignment
-        if self._align == "right":
-            self.layout.set_alignment(Pango.Alignment.RIGHT)
-        elif self._align == "center":
-            self.layout.set_alignment(Pango.Alignment.CENTER)
-        elif self._align == "justify":
-            self.layout.set_alignment(Pango.Alignment.LEFT)
-            self.layout.set_justify(True)
-        else:
-            self.layout.set_alignment(Pango.Alignment.LEFT)
+        self._pango_layout.set_alignment(_alignment_name_to_pango(self.align))
+        if self.align == "justify":
+            self._pango_layout.set_justify(True)
 
     def _get_context(self):
-        self._ctx = self._ctx or cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
+        self._ctx = self._ctx or cairo.Context(
+            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
+        )
         return self._ctx
 
     def _render(self, ctx=None):
-        if not self._doRender:
+        if not self._prerendered:
             return
         ctx = ctx or self._get_context()
         pycairo_ctx = driver.ensure_pycairo_context(ctx)
         # we build a PangoCairo context linked to cairo context
-        # then we create a pango layout
-
-        # we update the context as we already used a null one on the pre-rendering
+        # then we create a pango layout.
+        # Update the context as we already used a null one on the pre-rendering
         # supposedly there should not be a big performance penalty
-        self._pang_ctx = pangocairo_create_context(pycairo_ctx)
+        self._pangocairo_ctx = pangocairo_create_context(pycairo_ctx)
 
-        if self._fillcolor is not None:
-            # Go to initial point (CORNER or CENTER):
-            transform = self._call_transform_mode(self._transform)
-            ctx.set_matrix(transform)
+        if self._fillcolor is None:
+            return
 
-            ctx.translate(self.x, self.y - self.baseline)
+        # Go to initial point (CORNER or CENTER):
+        transform = self._call_transform_mode(self._transform)
+        ctx.set_matrix(transform)
+        ctx.translate(self.x, self.y - self.baseline)
 
-            if self._outline is False:
-                ctx.set_source_rgba(*self._fillcolor)
-            PangoCairo.show_layout(pycairo_ctx, self.layout)
-            PangoCairo.update_layout(pycairo_ctx, self.layout)
+        if not self.outline:
+            # In outline, the caller will stroke the generated path
+            ctx.set_source_rgba(*self._fillcolor)
+        PangoCairo.show_layout(pycairo_ctx, self._pango_layout)
+        PangoCairo.update_layout(pycairo_ctx, self._pango_layout)
 
     # This version is probably more pangoesque, but the layout iterator
     # caused segfaults on some system
     @property
     def baseline(self):
-        self.iter = self.layout.get_iter()
+        self.iter = self._pango_layout.get_iter()
         baseline_y = self.iter.get_baseline()
         baseline_delta = baseline_y / Pango.SCALE
-        return (baseline_delta)
+        return baseline_delta
 
-#    @property
-#    def baseline(self):
-#        # retrieves first line of text block
-#        first_line = self.layout.get_line(0)
-#        # get the logical extents rectangle of first line
-#        first_line_extent = first_line.get_extents()[1]
-#        # get the descent value, in order to calculate baseline position
-#        first_line_descent = Pango.DESCENT(first_line.get_extents()[1])
-#        # gets the baseline offset from the top of thext block
-#        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
-#        return (baseline_delta)
+    #    @property
+    #    def baseline(self):
+    #        # retrieves first line of text block
+    #        first_line = self.layout.get_line(0)
+    #        # get the logical extents rectangle of first line
+    #        first_line_extent = first_line.get_extents()[1]
+    #        # get the descent value, in order to calculate baseline position
+    #        first_line_descent = Pango.DESCENT(first_line.get_extents()[1])
+    #        # gets the baseline offset from the top of thext block
+    #        baseline_delta = (first_line_extent[3]-first_line_descent)/Pango.SCALE
+    #        return (baseline_delta)
 
     @property
     def metrics(self):
-        w, h = self.layout.get_pixel_size()
+        w, h = self._pango_layout.get_pixel_size()
         return w, h
 
     # this function is quite computational expensive
@@ -210,11 +278,13 @@ class Text(Grob, ColorMixin):
 
     @property
     def path(self):
-        if not self._pang_ctx:
+        if not self._pangocairo_ctx:
             self._pre_render()
 
         # here we create a new cairo.Context in order to hold the pathdata
-        tempCairoContext = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
+        tempCairoContext = cairo.Context(
+            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
+        )
         tempCairoContext = driver.ensure_pycairo_context(tempCairoContext)
         tempCairoContext.move_to(self.x, self.y - self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
@@ -222,7 +292,7 @@ class Text(Grob, ColorMixin):
         # supposedly showlayout should work, but it fills the path instead,
         # therefore we use layout_path instead to render the layout to pangoCairoContext
         # tempCairoContext.show_layout(self.layout)
-        PangoCairo.layout_path(tempCairoContext, self.layout)
+        PangoCairo.layout_path(tempCairoContext, self._pango_layout)
         # here we extract the path from the temporal cairo.Context we used to draw on the previous step
         pathdata = tempCairoContext.copy_path()
 
@@ -241,22 +311,37 @@ class Text(Grob, ColorMixin):
                 p.curveto(*args)
             elif cmd == PATH_CLOSE_PATH:
                 p.closepath()
-        # cairo function for freeing path memory
         return p
 
     def _get_center(self):
-        '''Returns the center point of the path, disregarding transforms.
-        '''
-        w, h = self.layout.get_pixel_size()
-        x = (self.x + w / 2)
-        y = (self.y + h / 2)
+        """Returns the center point of the path, disregarding transforms.
+        """
+        w, h = self._pango_layout.get_pixel_size()
+        x = self.x + w / 2
+        y = self.y + h / 2
         return x, y
 
     center = property(_get_center)
 
     def copy(self):
-        new = self.__class__(self._bot, self.text)
-        _copy_attrs(self, new,
-                    ('x', 'y', 'width', 'height', '_transform', '_transformmode',
-                     '_fillcolor', '_fontfile', '_fontsize', '_align', '_lineheight'))
-        return new
+        copied_instance = self.__class__(self._bot, self.text)
+        _copy_attrs(
+            self,
+            copied_instance,
+            (
+                "x",
+                "y",
+                "width",
+                "height",
+                "style",
+                "weight",
+                "_fillcolor",
+                "fontfile",
+                "fontsize",
+                "align",
+                "lineheight",
+                "_transform",
+                "_transformmode",
+            ),
+        )
+        return copied_instance
