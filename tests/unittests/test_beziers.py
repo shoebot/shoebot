@@ -8,7 +8,7 @@ from shoebot.grammar import NodeBot
 class BezierTest(unittest.TestCase):
     # Test the bot API directly.
     def setUp(self):
-        sink = CairoImageSink("output.png")
+        sink = CairoImageSink("output-bezier.png")
         canvas = CairoCanvas(sink)
         self.bot = NodeBot(canvas=canvas)
 
