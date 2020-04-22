@@ -53,7 +53,7 @@ except ValueError as e:
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
-
+# Pango Utility functions
 def pangocairo_create_context(cr):
     """
     If python-gi-cairo is not installed, using PangoCairo.create_context
@@ -72,6 +72,7 @@ def pangocairo_create_context(cr):
             raise
 
 
+# Map Nodebox / Shoebot names to Pango:
 def _style_name_to_pango(style="normal"):
     """
     Given a Shoebot/Nodebox style name return the a Pango constant.
@@ -122,6 +123,14 @@ def _weight_name_to_pango(weight="normal"):
 
 class Text(Grob, ColorMixin):
 
+    """
+    Changes from Nodebox 1:
+        font in Nodebox is a native Cocoa font, here it is the font name.
+        _fontsize, _fontsize, _lineheight, _align in Nodebox are public fields.
+
+        Implementation of fonts uses Pango instead of Cocoa.
+    """
+
     # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
 
     def __init__(
@@ -148,7 +157,7 @@ class Text(Grob, ColorMixin):
         self.height = height
         self.outline = outline
 
-        self.fontfile = kwargs.get("font", canvas.fontfile)
+        self.font = kwargs.get("font", canvas.fontfile)
         self.fontsize = kwargs.get("fontsize", canvas.fontsize)
         self.style = kwargs.get("style", "normal")
         self.weight = kwargs.get("weight", "normal")
@@ -160,7 +169,7 @@ class Text(Grob, ColorMixin):
         # Setup hidden vars for Cairo / Pango specific bits:
         self._ctx = ctx
         self._pangocairo_ctx = None
-        self._pango_fontface = Pango.FontDescription.from_string(self.fontfile)
+        self._pango_fontface = Pango.FontDescription.from_string(self.font)
 
         # then we set fontsize (multiplied by Pango.SCALE)
         self._pango_fontface.set_absolute_size(self.fontsize * Pango.SCALE)
