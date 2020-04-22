@@ -1,5 +1,6 @@
 import filecmp
 import math
+import shutil
 import sys
 from os import makedirs
 
@@ -30,18 +31,36 @@ class ShoebotTestCase(TestCase):
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
 
-    _created_directories = []
+    _created_directories = set()
+    _copied_files = set()
 
     @classmethod
     def setUpClass(cls):
-        for path in (cls.test_output_dir, cls.example_output_dir):
-            if path in ShoebotTestCase._created_directories:
+        """
+        Create output directories and copy input images to them so that
+        users can view input and output images in using a file manager.
+        """
+        for input_path, output_path in [
+            (cls.test_input_dir, cls.test_output_dir),
+            (cls.example_input_dir, cls.example_output_dir),
+        ]:
+            if output_path in ShoebotTestCase._created_directories:
                 continue
             try:
-                path.mkdir()
-                ShoebotTestCase._created_directories.append(path)
+                output_path.mkdir()
             except FileExistsError:
+                # Directory already existing is expected.
                 pass
+            else:
+                ShoebotTestCase._created_directories.add(output_path)
+
+            for input_file in input_path.glob('*'):
+                if input_file in cls._copied_files:
+                    continue
+
+                ShoebotTestCase._copied_files.add(input_file)
+                output_file = output_path / input_file.name
+                shutil.copy(input_file, output_file)
 
     def assertReferenceImage(self, file1, file2):
         """
