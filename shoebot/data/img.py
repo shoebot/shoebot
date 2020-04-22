@@ -46,7 +46,7 @@ class Image(Grob, ColorMixin):
         if isinstance(self.data, cairo.ImageSurface):
             sw = self.data.get_width()
             sh = self.data.get_height()
-            self._imagesurface = self.data
+            self._surface = self.data
         else:
             # checks if image data is passed in command call, in this case it wraps
             # the data in a StringIO oject in order to use it as a file
@@ -57,23 +57,29 @@ class Image(Grob, ColorMixin):
             if self.data is None:
                 surfaceref = self._surface_cache.get(path)
                 if surfaceref:
-                    imagesurface = surfaceref.surface
-                    sw = imagesurface.get_width()
-                    sh = imagesurface.get_height()
+                    surface = surfaceref.surface
+                    if isinstance(surface, cairo.RecordingSurface):
+                        extents = surface.get_extents()
+                        # extents has x, y which we dont use right now
+                        sw = extents.width
+                        sh = extents.height
+                    else:
+                        sw = surface.get_width()
+                        sh = surface.get_height()
                 elif os.path.splitext(path)[1].lower() == '.svg' and Rsvg is not None:
                     handle = Rsvg.Handle()
                     svg = handle.new_from_file(path)
                     dimensions = svg.get_dimensions()
                     sw = dimensions.width
                     sh = dimensions.height
-                    imagesurface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
-                    ctx = cairo.Context(imagesurface)
+                    surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
+                    ctx = cairo.Context(surface)
                     pycairo_ctx = driver.ensure_pycairo_context(ctx)
                     svg.render_cairo(pycairo_ctx)
                 elif os.path.splitext(path)[1].lower() == '.png':
-                    imagesurface = cairo.ImageSurface.create_from_png(path)
-                    sw = imagesurface.get_width()
-                    sh = imagesurface.get_height()
+                    surface = cairo.ImageSurface.create_from_png(path)
+                    sw = surface.get_width()
+                    sh = surface.get_height()
                 else:
                     img = PILImage.open(path)
 
@@ -84,9 +90,9 @@ class Image(Grob, ColorMixin):
                     # Would be nice to not have to do some of these conversions :-\
                     bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
                     bgra_array = array.array('B', bgra_data)
-                    imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
+                    surface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
 
-                self._surface_cache[path] = SurfaceRef(imagesurface)
+                self._surface_cache[path] = SurfaceRef(surface)
             else:
                 img = PILImage.open(StringIO(self.data))
 
@@ -97,7 +103,7 @@ class Image(Grob, ColorMixin):
                 # Would be nice to not have to do some of these conversions :-\
                 bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
                 bgra_array = array.array('B', bgra_data)
-                imagesurface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
+                surface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
 
             if width is not None or height is not None:
                 if width:
@@ -115,7 +121,7 @@ class Image(Grob, ColorMixin):
 
             self.width = width or sw
             self.height = height or sh
-            self._imagesurface = imagesurface
+            self._surface = surface
 
         self._deferred_render()
 
@@ -126,7 +132,7 @@ class Image(Grob, ColorMixin):
 
             ctx.set_matrix(transform)
             ctx.translate(self.x, self.y)
-            ctx.set_source_surface(self._imagesurface)
+            ctx.set_source_surface(self._surface)
             ctx.paint()
 
     def draw(self):

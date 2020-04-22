@@ -1,13 +1,18 @@
 import filecmp
 import math
+import shutil
 import sys
 
+from os import environ, makedirs
 from pathlib import Path
 from PIL import Image, ImageChops
 from random import seed
 from unittest import TestCase
 
 from shoebot import create_bot
+
+TEST_DIR = Path(__file__).parent.absolute()
+RUNNING_IN_CI = "CI" in environ
 
 
 def shoebot_named_testfunction(func, num, param):
@@ -20,9 +25,44 @@ def shoebot_named_testclass(cls, num, params_dict):
 
 
 class ShoebotTestCase(TestCase):
-    output_dir = Path(__file__).parent.absolute() / "output"
+    test_input_dir = TEST_DIR / "input/tests"
+    test_output_dir = TEST_DIR / "output/tests"
+    example_input_dir = TEST_DIR / "input/examples"
+    example_output_dir = TEST_DIR / "output/examples"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
+
+    _created_directories = set()
+    _copied_files = set()
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Create output directories and copy input images to them so that
+        users can view input and output images in using a file manager.
+        """
+        for input_path, output_path in [
+            (cls.test_input_dir, cls.test_output_dir),
+            (cls.example_input_dir, cls.example_output_dir),
+        ]:
+            if output_path in ShoebotTestCase._created_directories:
+                continue
+            try:
+                output_path.mkdir(parents=True)
+            except FileExistsError:
+                # Directory already existing is expected.
+                pass
+            else:
+                ShoebotTestCase._created_directories.add(output_path)
+
+            if not RUNNING_IN_CI:
+                for input_file in input_path.glob("*"):
+                    if input_file in ShoebotTestCase._copied_files:
+                        continue
+
+                    ShoebotTestCase._copied_files.add(input_file)
+                    output_file = output_path / input_file.name
+                    shutil.copy(input_file, output_file)
 
     def assertReferenceImage(self, file1, file2):
         """

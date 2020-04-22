@@ -23,8 +23,8 @@ class TestExampleOutput(ShoebotTestCase):
         """
         Check non animated example bots render matches the reference images.
         """
-        actual_output = self.output_dir / f"{output_prefix}-actual.png"
-        expected_output = self.output_dir / f"{output_prefix}-expected.png"
+        actual_output = self.example_output_dir / f"{output_prefix}-actual.png"
+        expected_output = self.example_input_dir / f"{output_prefix}-expected.png"
 
         self.run_filename(filename, outputfile=actual_output, windowed=self.windowed)
 
