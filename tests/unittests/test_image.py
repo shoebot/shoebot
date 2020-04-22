@@ -18,21 +18,16 @@ class TestImage(ShoebotTestCase):
 
         actual_output = self.test_output_dir / "image-svg-actual.png"
         expected_output = self.test_output_dir / "image-svg-expected.png"
-        code = dedent(f"""
+        code = dedent(
+            f"""
         size(100, 100)
         image('{test_dir}/input-image-svg.svg', 0, 0)
-        """)
+        """
+        )
 
         self.run_code(code, outputfile=actual_output)
 
-        self.assertOutputFile(actual_output)
-        if sys.platform == "darwin":
-            # Rendering on OSX is slightly different to the original Linux renders.
-            self.assertOutputImagesAlmostEqual(actual_output, expected_output)
-        else:
-            # So far Linux output has been identical - this will probably need to
-            # change to use image comparison.
-            self.assertOutputFilesEqual(actual_output, expected_output)
+        self.assertReferenceImage(actual_output, expected_output)
 
 
 if __name__ == "__main__":
