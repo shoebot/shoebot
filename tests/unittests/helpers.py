@@ -48,7 +48,7 @@ class ShoebotTestCase(TestCase):
             if output_path in ShoebotTestCase._created_directories:
                 continue
             try:
-                output_path.mkdir()
+                output_path.mkdir(parents=True)
             except FileExistsError:
                 # Directory already existing is expected.
                 pass
