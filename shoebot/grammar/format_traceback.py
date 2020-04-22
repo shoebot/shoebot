@@ -14,23 +14,24 @@ def simple_traceback(ex, source):
 
     # Defaults...
     exc_location = exc[-2]
+    exc_first_line = 5
     for i, err in enumerate(exc):
         if 'exec(source, ns)' in err:
-            exc_location = exc[i + 1]
+            exc_first_line = i + 1
+            exc_location = exc[exc_first_line]
             break
+
 
     # extract line number from traceback
     fn = exc_location.split(',')[0][8:-1]
     line_number = int(exc_location.split(',')[1].replace('line', '').strip())
 
-    # Build error messages
-
     err_msgs = []
 
     # code around the error
-    err_where = ' '.join(exc[i - 1].split(',')[1:]).strip()  # 'line 37 in blah"
+    err_where = exc[i + 1].split(',')[1].strip()  # 'line 37 in blah"
     err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-    for i in range(max(0, line_number - 5), line_number):
+    for i in range(max(0, line_number - exc_first_line), line_number):
         if fn == "<string>":
             line = source_arr[i]
         else:
@@ -39,9 +40,10 @@ def simple_traceback(ex, source):
     err_msgs.append('  %s^ %s' % (len(str(i)) * ' ', exc[-1].rstrip()))
 
     err_msgs.append('')
+
     # traceback
     err_msgs.append(exc[0].rstrip())
-    for err in exc[3:]:
+    for err in exc[exc_first_line:]:
         err_msgs.append(err.rstrip())
 
     return '\n'.join(err_msgs)
