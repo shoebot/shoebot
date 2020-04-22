@@ -2,8 +2,8 @@ import filecmp
 import math
 import shutil
 import sys
-from os import makedirs
 
+from os import environ, makedirs
 from pathlib import Path
 from PIL import Image, ImageChops
 from random import seed
@@ -12,7 +12,7 @@ from unittest import TestCase
 from shoebot import create_bot
 
 TEST_DIR = Path(__file__).parent.absolute()
-RUNNING_IN_CI = "CI" not in os.environ
+RUNNING_IN_CI = "CI" not in environ
 
 
 def shoebot_named_testfunction(func, num, param):
