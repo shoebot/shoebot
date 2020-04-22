@@ -3,7 +3,7 @@ import math
 import shutil
 import sys
 
-from os import environ, makedirs
+from os import environ
 from pathlib import Path
 from PIL import Image, ImageChops
 from random import seed
