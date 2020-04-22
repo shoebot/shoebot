@@ -331,7 +331,7 @@ def parse_color(v, color_range=1):
         red = green = blue = v / color_range
         alpha = 1.
 
-    elif isinstance(v, data.Color):
+    elif isinstance(v, Color):
         red, green, blue, alpha = v
 
     elif isinstance(v, (tuple, list)):
@@ -360,7 +360,7 @@ def parse_color(v, color_range=1):
     elif isinstance(v, str):
         # got a hexstring: first remove hash character, if any
         v = v.strip('#')
-        if len(data) == 6:
+        if len(v) == 6:
             # RRGGBB
             red = hex2dec(v[0:2]) / 255.
             green = hex2dec(v[2:4]) / 255.
