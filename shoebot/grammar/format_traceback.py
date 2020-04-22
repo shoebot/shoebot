@@ -15,7 +15,7 @@ def simple_traceback(ex, source):
     # Defaults...
     exc_location = exc[-2]
     for i, err in enumerate(exc):
-        if 'exec source in ns' in err:
+        if 'exec(source, ns)' in err:
             exc_location = exc[i + 1]
             break
 
