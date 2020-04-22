@@ -15,12 +15,12 @@ PROJECT_DIR = SCRIPT_DIR.parent.parent
 class TestTravisConfiguration(TestCase):
     """
     Check that the packages in install_dependencies.sh match the ones
-    in .travis
+    in .travis.yml
     """
 
     @classmethod
     def setUpClass(cls):
-        # TODO load travis YAML
+        # load travis YAML
         with open(PROJECT_DIR / ".travis.yml") as f:
             cls.travis_conf = yaml.safe_load(f)
 
@@ -28,6 +28,12 @@ class TestTravisConfiguration(TestCase):
 
     @classmethod
     def read_install_script(cls):
+        """
+        Seach install_depdencies.sh for lines starting with
+        {PLATFORM}_PACKAGES, e.g. DEB_PACKAGES, HOMEBREW_PACKAGES
+
+        :return: a dict where the key is DEB_PACKAGES and the value is the list of packages.
+        """
         package_name_re = r'([A-Z]*_PACKAGES)="(.*)"'
         script_data = {}
         with open(PROJECT_DIR / "install/install_dependencies.sh") as f:
@@ -40,23 +46,29 @@ class TestTravisConfiguration(TestCase):
         return script_data
 
     def test_apt_package_list(self):
+        """
+        Verify APT_PACKAGES in the install script matches the apt list in travis.
+        """
         travis_packages = self.travis_conf["addons"]["apt"]["packages"]
         script_packages = self.install_script_data["DEB_PACKAGES"]
 
         self.assertListEqual(
             travis_packages,
             script_packages,
-            "deb packages in .travis should match DEV_PACKAGES in install script.",
+            "deb packages in .travis.yml should match DEV_PACKAGES in install script.",
         )
 
     def test_homebrew_package_list(self):
+        """
+        Verify HOMEBREW_PACKAGES in the install script matches the homebrew list in travis.
+        """
         travis_packages = self.travis_conf["addons"]["homebrew"]["packages"]
         script_packages = self.install_script_data["HOMEBREW_PACKAGES"]
 
         self.assertListEqual(
             travis_packages,
             script_packages,
-            "List of homebrew packages in .travis should match HOMEBREW_PACKAGES in the install script.",
+            "homebrew packages in .travis.yml should match HOMEBREW_PACKAGES in install script.",
         )
 
 
