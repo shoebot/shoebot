@@ -12,7 +12,7 @@ from unittest import TestCase
 from shoebot import create_bot
 
 TEST_DIR = Path(__file__).parent.absolute()
-RUNNING_IN_CI = "CI" not in environ
+RUNNING_IN_CI = "CI" in environ
 
 
 def shoebot_named_testfunction(func, num, param):
@@ -55,7 +55,7 @@ class ShoebotTestCase(TestCase):
             else:
                 ShoebotTestCase._created_directories.add(output_path)
 
-            if RUNNING_IN_CI:
+            if not RUNNING_IN_CI:
                 for input_file in input_path.glob("*"):
                     if input_file in ShoebotTestCase._copied_files:
                         continue
