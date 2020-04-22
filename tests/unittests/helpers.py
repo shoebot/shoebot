@@ -12,6 +12,7 @@ from unittest import TestCase
 from shoebot import create_bot
 
 TEST_DIR = Path(__file__).parent.absolute()
+RUNNING_IN_CI = "CI" not in os.environ
 
 
 def shoebot_named_testfunction(func, num, param):
@@ -54,13 +55,14 @@ class ShoebotTestCase(TestCase):
             else:
                 ShoebotTestCase._created_directories.add(output_path)
 
-            for input_file in input_path.glob('*'):
-                if input_file in cls._copied_files:
-                    continue
+            if RUNNING_IN_CI:
+                for input_file in input_path.glob("*"):
+                    if input_file in cls._copied_files:
+                        continue
 
-                ShoebotTestCase._copied_files.add(input_file)
-                output_file = output_path / input_file.name
-                shutil.copy(input_file, output_file)
+                    ShoebotTestCase._copied_files.add(input_file)
+                    output_file = output_path / input_file.name
+                    shutil.copy(input_file, output_file)
 
     def assertReferenceImage(self, file1, file2):
         """
