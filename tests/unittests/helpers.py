@@ -1,6 +1,7 @@
 import filecmp
 import math
 import sys
+from os import makedirs
 
 from pathlib import Path
 from PIL import Image, ImageChops
@@ -22,10 +23,25 @@ def shoebot_named_testclass(cls, num, params_dict):
 
 
 class ShoebotTestCase(TestCase):
+    test_input_dir = TEST_DIR / "input/tests"
     test_output_dir = TEST_DIR / "output/tests"
+    example_input_dir = TEST_DIR / "input/examples"
     example_output_dir = TEST_DIR / "output/examples"
     paths = [".", "../.."]  # When specifying a filename these paths will be searched.
     hide_gui = True
+
+    _created_directories = []
+
+    @classmethod
+    def setUpClass(cls):
+        for path in (cls.test_output_dir, cls.example_output_dir):
+            if path in ShoebotTestCase._created_directories:
+                continue
+            try:
+                path.mkdir()
+                ShoebotTestCase._created_directories.append(path)
+            except FileExistsError:
+                pass
 
     def assertReferenceImage(self, file1, file2):
         """
