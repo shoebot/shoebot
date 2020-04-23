@@ -57,9 +57,10 @@ from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 # Pango Utility functions
 def pangocairo_create_context(cr):
     """
-    If python-gi-cairo is not installed, using PangoCairo.create_context
-    dies with an unhelpful KeyError, check for that and output somethig
-    useful.
+    Create a PangoCairo context from a given pycairo context.
+
+    If python-gi-cairo is not installed PangoCairo.create_context dies
+    with an unhelpful KeyError, output a better error if that happens.
     """
     # TODO move this to core.backend
     try:
@@ -69,8 +70,7 @@ def pangocairo_create_context(cr):
             raise ShoebotInstallError(
                 "Error creating PangoCairo missing dependency: python-gi-cairo"
             )
-        else:
-            raise
+    raise
 
 
 # Map Nodebox / Shoebot names to Pango:
