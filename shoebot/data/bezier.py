@@ -657,25 +657,22 @@ class PathElement(object):
 
     def __init__(self, cmd=None, *args):
         self.cmd = cmd
-        if len(args) == 1:
-            while len(args) == 1:
-                args = args[0]
+        while len(args) == 1:
+            args = args[0]
         self.values = list(chain(args))  # flatten args, so that tuples of (x,y), (x2, y2) are supported
         self._ctrl1 = self._ctrl2 = None
 
-        if cmd == MOVETO or cmd == RMOVETO:
+        if cmd in (CLOSE, MOVETO, RMOVETO):
             self.x, self.y = self.values
             self.c1x = self.c1y = self.c2x = self.c2y = None
-        elif cmd == LINETO or cmd == RLINETO:
+        elif cmd in (LINETO, RLINETO):
             self.x, self.y = self.values
             self.c1x, self.c1y = self.values  # Possibly should be 0
             self.c2x, self.c2y = self.values  # Possibly should be 0
-        elif cmd == CURVETO or cmd == RCURVETO:
+        elif cmd in (CURVETO, RCURVETO):
             if len(self.values) == 3:
                 self.values = list(chain.from_iterable(self.values))
             self.c1x, self.c1y, self.c2x, self.c2y, self.x, self.y = self.values
-        elif cmd == CLOSE:
-            self.c1x = self.c1y = self.c2x = self.c2y = self.x = self.y = None
         elif cmd == ARC:
             self.x, self.y, self.radius, self.angle1, self.angle2 = self.values
         elif cmd == ELLIPSE:
@@ -685,7 +682,7 @@ class PathElement(object):
         elif cmd is None:
             self.x = self.y = self.c1x = self.c1y = self.c1x = self.c1y = 0
         else:
-            raise ValueError(_('Wrong initialiser for PathElement (got "%s")') % (cmd))
+            raise ValueError(_(f'Wrong initialiser for PathElement (got {cmd})'))
 
     def set_ctrl1(self, ctrl1):
         self._ctrl1 = ctrl1
