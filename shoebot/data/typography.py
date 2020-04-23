@@ -53,6 +53,7 @@ except ValueError as e:
 from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
+
 # Pango Utility functions
 def pangocairo_create_context(cr):
     """
@@ -122,7 +123,6 @@ def _weight_name_to_pango(weight="normal"):
 
 
 class Text(Grob, ColorMixin):
-
     """
     Changes from Nodebox 1:
         font in Nodebox is a native Cocoa font, here it is the font name.
