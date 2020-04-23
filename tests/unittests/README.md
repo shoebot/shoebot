@@ -7,7 +7,7 @@ Run
 From this directory:
 
 ```sh
-$ python3 run_all.py
+$ python3 -munittest
 ```
 
 Or from setup.py in the root directory of Shoebot:
