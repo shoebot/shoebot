@@ -12,13 +12,12 @@ def simple_traceback(ex, source):
 
     source_arr = source.splitlines()
 
-    # Defaults...
     exc_location = exc[-2]
-    exc_first_line = 5
+    exc_script_index = 0
     for i, err in enumerate(exc):
-        if 'exec(source, ns)' in err:
-            exc_first_line = i + 1
-            exc_location = exc[exc_first_line]
+        if 'File "<string>",' in err:
+            exc_script_index = i
+            exc_location = exc[exc_script_index]
             break
 
 
@@ -28,10 +27,10 @@ def simple_traceback(ex, source):
 
     err_msgs = []
 
-    # code around the error
-    err_where = exc[i + 1].split(',')[1].strip()  # 'line 37 in blah"
+    # Output code around the error
+    err_where = exc[i].split(',')[1].strip()  # 'line 37 in blah"
     err_msgs.append('Error in the Shoebot script at %s:' % err_where)
-    for i in range(max(0, line_number - exc_first_line), line_number):
+    for i in range(max(0, line_number - exc_script_index), line_number):
         if fn == "<string>":
             line = source_arr[i]
         else:
@@ -43,7 +42,7 @@ def simple_traceback(ex, source):
 
     # traceback
     err_msgs.append(exc[0].rstrip())
-    for err in exc[exc_first_line:]:
+    for err in exc[exc_script_index:]:
         err_msgs.append(err.rstrip())
 
     return '\n'.join(err_msgs)

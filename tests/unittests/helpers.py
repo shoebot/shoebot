@@ -29,8 +29,8 @@ class ShoebotTestCase(TestCase):
     test_output_dir = TEST_DIR / "output/tests"
     example_input_dir = TEST_DIR / "input/examples"
     example_output_dir = TEST_DIR / "output/examples"
-    paths = [".", "../.."]  # When specifying a filename these paths will be searched.
-    hide_gui = True
+    paths = [test_input_dir, ".", "../.."]  # When specifying a filename these paths will be searched.
+    windowed = False  # default is headless.
 
     _created_directories = set()
     _copied_files = set()
@@ -127,7 +127,7 @@ class ShoebotTestCase(TestCase):
         """
         Run shoebot from filename.
 
-        Paths in ShoebotTestCase.paths will be seatched for the file.
+        Paths in ShoebotTestCase.paths will be searched for the file.
 
         random.seed is set, to stabilize output.
 
@@ -139,7 +139,7 @@ class ShoebotTestCase(TestCase):
             full_path = Path(path) / filename
             if full_path.is_file():
                 with open(full_path) as f:
-                    self.run_code(f.read(), outputfile)
+                    self.run_code(f.read(), outputfile, windowed=windowed)
                     return
         else:
             raise ValueError(f"Could not find bot {filename} in paths {self.paths}")
