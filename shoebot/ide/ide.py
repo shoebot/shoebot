@@ -1,41 +1,36 @@
 #!/usr/bin/env python3
+import argparse
 import errno
 import gettext
-import errno
 import locale
 import os
 import sys
 
 import shoebot
+
 from shoebot.data import ShoebotError
 from shoebot.core.backend import gi
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('GtkSource', '3.0')
+gi.require_version("Gdk", "3.0")
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 
-from gi.repository import (
-    GObject,
-    Gdk,
-    Gtk,
-    GtkSource,
-    Pango
-)
+from gi.repository import Gdk, GObject, Gtk, GtkSource, Pango
 
-APP = 'shoebot'
-LOCALE_DIR = sys.prefix + '/share/shoebot/locale'
+APP = "shoebot"
+LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
 SEARCH_FORWARD = 0
 SEARCH_BACKWARD = 1
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, LOCALE_DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-if sys.platform != 'win32':
-    ICON_FILE = '/usr/share/shoebot/icon.png'
+if sys.platform != "win32":
+    ICON_FILE = "/usr/share/shoebot/icon.png"
 else:
-    ICON_FILE = os.path.join(sys.prefix, r'share\shoebot\icon.png')
+    ICON_FILE = os.path.join(sys.prefix, r"share\shoebot\icon.png")
 
 
 def hsv_to_rgb(h, s, v):
@@ -98,8 +93,7 @@ class SourceBuffer(GtkSource.Buffer):
             self.color_tags.append(tag)
 
         # self.invisible_tag = self.create_tag(None, invisible=True)
-        self.not_editable_tag = self.create_tag(editable=False,
-                                                foreground="purple")
+        self.not_editable_tag = self.create_tag(editable=False, foreground="purple")
         self.found_text_tag = self.create_tag(foreground="red")
 
         tabs = Pango.TabArray.new(4, True)
@@ -135,11 +129,13 @@ class SourceBuffer(GtkSource.Buffer):
             self.apply_tag(self.found_text_tag, match_start, match_end)
             it = match_end
 
-        dialog = Gtk.MessageDialog(view,
-                                   Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                   Gtk.MessageType.INFO,
-                                   Gtk.ButtonsType.OK,
-                                   _('%d strings found and marked in red') % total_matches)
+        dialog = Gtk.MessageDialog(
+            view,
+            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.INFO,
+            Gtk.ButtonsType.OK,
+            _("%d strings found and marked in red") % total_matches,
+        )
         dialog.connect("response", lambda x, y: dialog.destroy())
         dialog.show()
 
@@ -161,8 +157,7 @@ class SourceBuffer(GtkSource.Buffer):
         hue = 0.0
 
         if enabled and self.color_cycle_timeout_id == 0:
-            self.color_cycle_timeout_id = Gtk.timeout_add(
-                200, self.color_cycle_timeout)
+            self.color_cycle_timeout_id = Gtk.timeout_add(200, self.color_cycle_timeout)
         elif not enabled and self.color_cycle_timeout_id != 0:
             Gtk.timeout_remove(self.color_cycle_timeout_id)
             self.color_cycle_timeout_id = 0
@@ -203,8 +198,7 @@ class SourceBuffer(GtkSource.Buffer):
             print("Triple click at char %d tag `%s'\n" % (char_index, tag_name))
         elif event.type == Gdk.BUTTON_RELEASE:
             print("Button release at char %d tag `%s'\n" % (char_index, tag_name))
-        elif (event.type == Gdk.KEY_PRESS or
-              event.type == Gdk.KEY_RELEASE):
+        elif event.type == Gdk.KEY_PRESS or event.type == Gdk.KEY_RELEASE:
             print("Key event at char %d tag `%s'\n" % (char_index, tag_name))
         return False
 
@@ -224,7 +218,7 @@ class ShoebotFileChooserDialog(Gtk.FileChooserDialog):
 
         # set some defaults
         self.set_default_response(Gtk.ResponseType.OK)
-        self.set_property('do-overwrite-confirmation', True)
+        self.set_property("do-overwrite-confirmation", True)
 
         # set the working directory if available
         if ShoebotFileChooserDialog.CWD is not None:
@@ -248,7 +242,7 @@ class ConsoleWindow:
         self.text_area = Gtk.TextView()
         self.text_area.set_editable(False)
         self.text_area.set_wrap_mode(Gtk.WrapMode.WORD)
-        self.text_area.connect('size-allocate', self.on_contents_changed)
+        self.text_area.connect("size-allocate", self.on_contents_changed)
         self.text_window.add(self.text_area)
         # here we set default values for background and text of console window
         self.text_area.modify_base(Gtk.StateType.NORMAL, Gdk.color_parse("dark grey"))
@@ -256,8 +250,12 @@ class ConsoleWindow:
         # then we define some text tag for defining colors for system messages and stdout
         self.tag_table = self.text_buffer.get_tag_table()
 
-        self.stdout_tag = self.text_buffer.create_tag("stdout", foreground="black", weight=600, size_points=9)
-        self.system_message_tag = self.text_buffer.create_tag("system", foreground="darkgrey")
+        self.stdout_tag = self.text_buffer.create_tag(
+            "stdout", foreground="black", weight=600, size_points=9
+        )
+        self.system_message_tag = self.text_buffer.create_tag(
+            "system", foreground="darkgrey"
+        )
         self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
     def write(self, data, output=None, system=None):
@@ -282,7 +280,7 @@ class ConsoleWindow:
             Gtk.main_iteration()
 
     def clear(self):
-        self.text_buffer.set_text('')
+        self.text_buffer.set_text("")
 
     def on_contents_changed(self, widget, event):
         # scroll to bottom when there's new text
@@ -369,39 +367,116 @@ class ShoebotEditorWindow(Gtk.Window):
 
         action_group = Gtk.ActionGroup("my_actions")
 
-        action_group.add_actions([
-            ("FileMenu", None, "_File"),
-            ("FileNew", Gtk.STOCK_NEW, "_New", "<control>N", None, self.on_new_file),
-            ("FileOpen", Gtk.STOCK_OPEN, "_Open", "<control>O", None, self.on_open_file),
-            ("FileSave", Gtk.STOCK_SAVE, "_Save", "<control>S", None, self.on_save_file),
-            ("FileSaveAs", Gtk.STOCK_SAVE_AS, "Save _As", "<control><alt>S", None, self.on_save_file_as),
-            ("FileClose", Gtk.STOCK_CLOSE, "_Close", "<control>W", None, self.on_close_file),
-            ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.on_quit),
-        ])
+        action_group.add_actions(
+            [
+                ("FileMenu", None, "_File"),
+                (
+                    "FileNew",
+                    Gtk.STOCK_NEW,
+                    "_New",
+                    "<control>N",
+                    None,
+                    self.on_new_file,
+                ),
+                (
+                    "FileOpen",
+                    Gtk.STOCK_OPEN,
+                    "_Open",
+                    "<control>O",
+                    None,
+                    self.on_open_file,
+                ),
+                (
+                    "FileSave",
+                    Gtk.STOCK_SAVE,
+                    "_Save",
+                    "<control>S",
+                    None,
+                    self.on_save_file,
+                ),
+                (
+                    "FileSaveAs",
+                    Gtk.STOCK_SAVE_AS,
+                    "Save _As",
+                    "<control><alt>S",
+                    None,
+                    self.on_save_file_as,
+                ),
+                (
+                    "FileClose",
+                    Gtk.STOCK_CLOSE,
+                    "_Close",
+                    "<control>W",
+                    None,
+                    self.on_close_file,
+                ),
+                ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.on_quit),
+            ]
+        )
 
-        action_group.add_actions([
-            ("EditMenu", None, "_Edit"),
-            ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.on_undo),
-            ("EditRedo", Gtk.STOCK_REDO, "_Redo", "<control><shift>Z", None, self.on_redo),
-            ("EditFind", Gtk.STOCK_FIND, "_Find...", "<control>F", None, self.on_find),
-            ("ClearConsole", Gtk.STOCK_CLEAR, "_Clear console", "<control><shift>C", None, self.on_clear_console),
-        ])
+        action_group.add_actions(
+            [
+                ("EditMenu", None, "_Edit"),
+                ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.on_undo),
+                (
+                    "EditRedo",
+                    Gtk.STOCK_REDO,
+                    "_Redo",
+                    "<control><shift>Z",
+                    None,
+                    self.on_redo,
+                ),
+                (
+                    "EditFind",
+                    Gtk.STOCK_FIND,
+                    "_Find...",
+                    "<control>F",
+                    None,
+                    self.on_find,
+                ),
+                (
+                    "ClearConsole",
+                    Gtk.STOCK_CLEAR,
+                    "_Clear console",
+                    "<control><shift>C",
+                    None,
+                    self.on_clear_console,
+                ),
+            ]
+        )
 
         action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
-        action_group.add_radio_actions([
-            ("WrapNone", None, "Wrap None", None, None, Gtk.WrapMode.NONE),
-            ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
-            ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR)
-        ], 1, self.on_wrap_changed)
-        action_group.add_radio_actions([
-            ("ThemeLight", None, "Light Theme", None, None, True),
-            ("ThemeDark", None, "Dark Theme", None, None, False),
-        ], 1, self.on_theme_changed)
+        action_group.add_radio_actions(
+            [
+                ("WrapNone", None, "Wrap None", None, None, Gtk.WrapMode.NONE),
+                ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
+                ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR),
+            ],
+            1,
+            self.on_wrap_changed,
+        )
+        action_group.add_radio_actions(
+            [
+                ("ThemeLight", None, "Light Theme", None, None, True),
+                ("ThemeDark", None, "Dark Theme", None, None, False),
+            ],
+            1,
+            self.on_theme_changed,
+        )
 
-        action_group.add_actions([
-            ("RunMenu", None, "_Run"),
-            ("Run", Gtk.STOCK_MEDIA_PLAY, "_Run Script", "<control>R", None, self.on_run_script),
-        ])
+        action_group.add_actions(
+            [
+                ("RunMenu", None, "_Run"),
+                (
+                    "Run",
+                    Gtk.STOCK_MEDIA_PLAY,
+                    "_Run Script",
+                    "<control>R",
+                    None,
+                    self.on_run_script,
+                ),
+            ]
+        )
         varwindow = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
         varwindow.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(varwindow)
@@ -412,10 +487,12 @@ class ShoebotEditorWindow(Gtk.Window):
         socketserver.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socketserver)
 
-        action_group.add_actions([
-            ("HelpMenu", None, "_Help"),
-            ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.on_about),
-        ])
+        action_group.add_actions(
+            [
+                ("HelpMenu", None, "_Help"),
+                ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.on_about),
+            ]
+        )
 
         uimanager = Gtk.UIManager()
         # Throws exception if something went wrong
@@ -456,14 +533,14 @@ class ShoebotEditorWindow(Gtk.Window):
             context = self.text_view.get_pango_context()
             fonts = context.list_families()
             for font in fonts:
-                if font.get_name() == 'Bitstream Vera Sans Mono':
-                    ShoebotEditorWindow.FONT = 'Bitstream Vera Sans Mono 8'
+                if font.get_name() == "Bitstream Vera Sans Mono":
+                    ShoebotEditorWindow.FONT = "Bitstream Vera Sans Mono 8"
                     break
             else:
-                print('Bitstream Vera Font not found.')
-                print('Download and install it from here')
-                print('http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/')
-                ShoebotEditorWindow.FONT = 'Mono 8'
+                print("Bitstream Vera Font not found.")
+                print("Download and install it from here")
+                print("http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/")
+                ShoebotEditorWindow.FONT = "Mono 8"
 
         # self.text_view.modify_font(Pango.FontDescription(View.FONT))
 
@@ -482,9 +559,13 @@ class ShoebotEditorWindow(Gtk.Window):
         hpaned.add2(self.console_error.text_window)
         hpaned.set_position(450)
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
-        self.console_error.write(_(
-            "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"),
-            True, True)
+        self.console_error.write(
+            _(
+                "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"
+            ),
+            True,
+            True,
+        )
 
         self.set_default_size(800, 500)
         self.text_view.grab_focus()
@@ -521,11 +602,13 @@ class ShoebotEditorWindow(Gtk.Window):
             return True
         except IOError as xxx_todo_changeme1:
             (errnum, errmsg) = xxx_todo_changeme1.args
-            dialog = Gtk.MessageDialog(None,
-                                       Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK,
-                                       "Cannot open file '%s': %s" % (filename, errmsg))
+            dialog = Gtk.MessageDialog(
+                None,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK,
+                "Cannot open file '%s': %s" % (filename, errmsg),
+            )
             dialog.run()
             dialog.destroy()
             return False
@@ -537,18 +620,26 @@ class ShoebotEditorWindow(Gtk.Window):
         return True
 
     def on_close_window(self, window, event, data=None):
-            if self.confirm_quit_or_save():
-                self.close_view()
-                return False
-            return True
+        if self.confirm_quit_or_save():
+            self.close_view()
+            return False
+        return True
 
     def on_new_file(self, widget):
         ShoebotEditorWindow()
 
     def on_open_file(self, widget):
-        chooser = ShoebotFileChooserDialog('Open File', None, Gtk.FileChooserAction.OPEN,
-                                           (Gtk.STOCK_OPEN, Gtk.ResponseType.ACCEPT,
-                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        chooser = ShoebotFileChooserDialog(
+            "Open File",
+            None,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.ACCEPT,
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+            ),
+        )
 
         if chooser.run() == Gtk.ResponseType.ACCEPT:
             self.open_file(chooser.get_filename())
@@ -580,11 +671,15 @@ class ShoebotEditorWindow(Gtk.Window):
         start, end = buffer.get_bounds()
         mark = buffer.create_mark(None, end, False)
 
-        buffer.insert(end,
-                      "Hello this is multiple lines of text\n"
-                      "Line 1\n"  "Line 2\n"
-                      "Line 3\n"  "Line 4\n"
-                      "Line 5\n")
+        buffer.insert(
+            end,
+            "Hello this is multiple lines of text\n"
+            "Line 1\n"
+            "Line 2\n"
+            "Line 3\n"
+            "Line 4\n"
+            "Line 5\n",
+        )
 
         self.text_view.scroll_to_mark(mark, 0, True, 0.0, 1.0)
         buffer.delete_mark(mark)
@@ -592,9 +687,13 @@ class ShoebotEditorWindow(Gtk.Window):
     def on_theme_changed(self, widget, current):
         Gtk.Settings.get_default().set_property("gtk-theme-name", "Adwaita")
         if current.get_name() == "ThemeLight":
-            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", False)
+            Gtk.Settings.get_default().set_property(
+                "gtk-application-prefer-dark-theme", False
+            )
         elif current.get_name() == "ThemeDark":
-            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+            Gtk.Settings.get_default().set_property(
+                "gtk-application-prefer-dark-theme", True
+            )
 
     def on_wrap_changed(self, callback_action, widget):
         self.text_view.set_wrap_mode(callback_action)
@@ -670,11 +769,19 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def on_find(self, widget):
         search_text = Gtk.TextView()
-        dialog = Gtk.Dialog(_("Search"), self,
-                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                            (_("Forward"), SEARCH_FORWARD,
-                             _("Backward"), SEARCH_BACKWARD,
-                             Gtk.STOCK_CANCEL, Gtk.ResponseType.NONE))
+        dialog = Gtk.Dialog(
+            _("Search"),
+            self,
+            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            (
+                _("Forward"),
+                SEARCH_FORWARD,
+                _("Backward"),
+                SEARCH_BACKWARD,
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.NONE,
+            ),
+        )
         dialog.vbox.pack_end(search_text, True, True, 0)
         dialog.source_buffer = search_text.get_buffer()
         dialog.connect("response", self.search_dialog_handler)
@@ -696,10 +803,16 @@ class ShoebotEditorWindow(Gtk.Window):
     def on_about(self, widget):
         dlg = Gtk.AboutDialog()
         self.website = "http://shoebot.net/"
-        self.authors = ["Dave Crossland <dave AT lab6.com>", "est <electronixtar AT gmail.com>",
-                        "Francesco Fantoni <francesco AT hv-a.com>", "Paulo Silva <nitrofurano AT gmail.com>",
-                        "Pedro Angelo <pangelo AT virii-labs.org>", "Ricardo Lafuente <ricardo AT sollec.org>",
-                        "Stuart Axon <stuaxo2 AT yahoo.com>", "Tetsuya Saito <t2psyto AT gmail.com>"]
+        self.authors = [
+            "Dave Crossland <dave AT lab6.com>",
+            "est <electronixtar AT gmail.com>",
+            "Francesco Fantoni <francesco AT hv-a.com>",
+            "Paulo Silva <nitrofurano AT gmail.com>",
+            "Pedro Angelo <pangelo AT virii-labs.org>",
+            "Ricardo Lafuente <ricardo AT sollec.org>",
+            "Stuart Axon <stuaxo2 AT yahoo.com>",
+            "Tetsuya Saito <t2psyto AT gmail.com>",
+        ]
         dlg.set_version("1.3.1")
         dlg.set_name("shoebot")
         dlg.set_license("GPLv3")
@@ -752,11 +865,13 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def confirm_quit_or_save(self):
         if self.source_buffer.get_modified():
-            dialog = Gtk.MessageDialog(self,
-                                       Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.QUESTION,
-                                       Gtk.ButtonsType.YES_NO,
-                                       _("Save changes to '%s'?") % self.source_buffer.pretty_name())
+            dialog = Gtk.MessageDialog(
+                self,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.QUESTION,
+                Gtk.ButtonsType.YES_NO,
+                _("Save changes to '%s'?") % self.source_buffer.pretty_name(),
+            )
             dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
             result = dialog.run()
             dialog.destroy()
@@ -786,13 +901,18 @@ class ShoebotEditorWindow(Gtk.Window):
         except (OSError, IOError) as xxx_todo_changeme2:
             (errnum, errmsg) = xxx_todo_changeme2.args
             if errnum != errno.ENOENT:
-                err = "Cannot back up '%s' to '%s': %s" % (self.filename,
-                                                           bak_filename,
-                                                           errmsg)
-                dialog = Gtk.MessageDialog(self,
-                                           Gtk.DialogFlags.MODAL,
-                                           Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK, err)
+                err = "Cannot back up '%s' to '%s': %s" % (
+                    self.filename,
+                    bak_filename,
+                    errmsg,
+                )
+                dialog = Gtk.MessageDialog(
+                    self,
+                    Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK,
+                    err,
+                )
                 dialog.run()
                 dialog.destroy()
                 return False
@@ -809,10 +929,13 @@ class ShoebotEditorWindow(Gtk.Window):
         except IOError as xxx_todo_changeme3:
             (errnum, errmsg) = xxx_todo_changeme3.args
             err = "Error writing to '%s': %s" % (self.filename, errmsg)
-            dialog = Gtk.MessageDialog(self,
-                                       Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err)
+            dialog = Gtk.MessageDialog(
+                self,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK,
+                err,
+            )
             dialog.run()
             dialog.destroy()
 
@@ -821,13 +944,17 @@ class ShoebotEditorWindow(Gtk.Window):
                 os.rename(bak_filename, self.filename)
             except OSError as xxx_todo_changeme:
                 (errnum, errmsg) = xxx_todo_changeme.args
-                err = "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'" % (
-                    self.filename, bak_filename, errmsg, bak_filename)
-                dialog = Gtk.MessageDialog(self,
-                                           Gtk.DialogFlags.MODAL,
-                                           Gtk.MessageType.INFO,
-                                           Gtk.ButtonsType.OK,
-                                           err)
+                err = (
+                    "Can't restore backup file '%s' to '%s': %s\nBackup left as '%s'"
+                    % (self.filename, bak_filename, errmsg, bak_filename)
+                )
+                dialog = Gtk.MessageDialog(
+                    self,
+                    Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK,
+                    err,
+                )
                 dialog.run()
                 dialog.destroy()
 
@@ -837,9 +964,17 @@ class ShoebotEditorWindow(Gtk.Window):
         """
         Return True if the buffer was saved
         """
-        chooser = ShoebotFileChooserDialog(_('Save File'), None, Gtk.FileChooserAction.SAVE,
-                                           (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
-                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        chooser = ShoebotFileChooserDialog(
+            _("Save File"),
+            None,
+            Gtk.FileChooserAction.SAVE,
+            (
+                Gtk.STOCK_SAVE,
+                Gtk.ResponseType.ACCEPT,
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+            ),
+        )
         chooser.set_do_overwrite_confirmation(True)
         chooser.set_transient_for(self)
         saved = chooser.run() == Gtk.ResponseType.ACCEPT
@@ -908,8 +1043,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 position = Pango.PIXELS(position)
 
             pos, y = text_view.buffer_to_window_coords(type, position, 0)
-            target.draw_line(text_view.style.fg_gc[text_view.state],
-                             pos, 0, pos, 15)
+            target.draw_line(text_view.style.fg_gc[text_view.state], pos, 0, pos, 15)
 
         return True
 
@@ -940,16 +1074,18 @@ class ShoebotEditorWindow(Gtk.Window):
         start, end = buffer.get_bounds()
         codestring = buffer.get_text(start, end, include_hidden_chars=False)
         try:
-            buffer_dir = os.path.dirname(buffer.filename or '')
+            buffer_dir = os.path.dirname(buffer.filename or "")
             if buffer_dir:
                 os.chdir(buffer_dir)
 
-            bot = shoebot.create_bot(codestring,
-                                     shoebot.NODEBOX,
-                                     server=self.use_socketserver,
-                                     show_vars=self.use_varwindow,
-                                     title=self.window_title,
-                                     window=True)
+            bot = shoebot.create_bot(
+                codestring,
+                shoebot.NODEBOX,
+                server=self.use_socketserver,
+                show_vars=self.use_varwindow,
+                title=self.window_title,
+                window=True,
+            )
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
         except ShoebotError as NameError:
@@ -958,9 +1094,13 @@ class ShoebotEditorWindow(Gtk.Window):
 
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
-            dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err)
+            dialog = Gtk.MessageDialog(
+                self,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK,
+                err,
+            )
             dialog.run()
             dialog.destroy()
             self.sbot_window = None
@@ -1023,13 +1163,20 @@ class ShoebotIDE(object):
     def get_next_untitled_filename(cls):
         cls.untitled_file_counter += 1
         if cls.untitled_file_counter == 1:
-            return _('Untitled')
+            return _("Untitled")
         else:
-            return _('Untitled #%d') % cls.untitled_file_counter
+            return _("Untitled #%d") % cls.untitled_file_counter
 
 
 def main():
-    app = ShoebotIDE(sys.argv[1:])
+    parser = argparse.ArgumentParser(_("usage: shoebot [file...[file]]"))
+    parser.add_argument("filenames", nargs="+")
+
+    args = parser.parse_args()
+
+    files = vars(args)["filenames"]
+
+    app = ShoebotIDE(files)
     app.main()
 
 
