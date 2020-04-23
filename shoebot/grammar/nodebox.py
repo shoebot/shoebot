@@ -506,14 +506,14 @@ class NodeBot(Bot):
         '''
         raise NotImplementedError(_("outputmode() isn't implemented yet"))
 
-    def colormode(self, mode=None, crange=None):
+    def colormode(self, mode=None, range=None):
         '''Set the current colormode (can be RGB or HSB) and eventually
         the color range.
 
         If called without arguments, it returns the current colormode.
 
         :param mode: Color mode, either "rgb", or "hsb"
-        :param crange: Maximum scale value for color, e.g. 1.0 or 255
+        :param range: Maximum scale value for color, e.g. 1.0 or 255
 
         :return: Returns the current color mode.
         '''
@@ -524,8 +524,8 @@ class NodeBot(Bot):
                 self.color_mode = HSB
             else:
                 raise NameError(_("Only RGB and HSB colormodes are supported."))
-        if crange is not None:
-            self.color_range = crange
+        if range is not None:
+            self.color_range = range
         return self.color_mode
 
     def colorrange(self, crange):
