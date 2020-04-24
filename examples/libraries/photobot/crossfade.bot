@@ -2,7 +2,6 @@ pb = ximport("photobot")
 
 size(750,250)
 c = pb.canvas(750, 250)
-reload(pb)
  
 tiles = ["images/mount1.jpg", "images/mount2.jpg", "images/mount3.jpg", "images/mount4.jpg", "images/castle.jpg"]
  
