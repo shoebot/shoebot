@@ -13,13 +13,9 @@ from math import pi as _pi, sqrt
 
 from shoebot.core.backend import cairo
 
-from .grob import Grob
+from .grob import Grob, CENTER, CORNER, CORNERS
 from .basecolor import ColorMixin
 from . import geometry
-
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"

@@ -30,9 +30,9 @@
 """Assorted utility functions, mainly for color and font handling"""
 
 
-class flushfile:
+class UnbufferedFile:
     """
-    Wrapper for file that flushes - used to flush stdout
+    File wrapper, that flushes on writes.
 
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
     """
@@ -41,17 +41,17 @@ class flushfile:
         self.fd = fd
 
     def write(self, x):
-        ret = self.fd.write(x)
+        result = self.fd.write(x)
         self.fd.flush()
-        return ret
+        return result
 
     def writelines(self, lines):
-        ret = self.writelines(line)
+        result = self.writelines(line)
         self.fd.flush()
-        return ret
+        return result
 
     def flush(self):
-        return self.fd.flush
+        return self.fd.flush()
 
     def close(self):
         return self.fd.close()
@@ -76,6 +76,14 @@ def _copy_attr(v):
 
 
 def _copy_attrs(source, target, attrs):
+    """
+    Copy attributes from source to target.
+
+    :param source: source object
+    :param target: destination object
+    :param attrs: sequence of attributes to copy.
+    :return:
+    """
     for attr in attrs:
         setattr(target, attr, _copy_attr(getattr(source, attr)))
 
