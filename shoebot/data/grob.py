@@ -3,8 +3,10 @@
 
 from shoebot.core.backend import cairo
 
+# Alignments
 CENTER = "center"
 CORNER = "corner"
+CORNERS = "corners"
 
 STATES = {
     "strokewidth": "_strokewidth",
@@ -43,8 +45,7 @@ class Grob(object):
         """Return pathmode or get it from self._canvas"""
         if self._pathmode is not None:
             return self._pathmode
-        else:
-            return self._canvas.pathmode
+        return self._canvas.pathmode
 
     def _get_center(self):
         """Implementations must return the x, y of their center"""

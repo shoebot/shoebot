@@ -60,3 +60,31 @@ class UnbufferedFile:
 
     def fileno(self):
         return self.fd.fileno()
+
+
+def _copy_attr(v):
+    if v is None:
+        return None
+    elif hasattr(v, "copy"):
+        return v.copy()
+    elif isinstance(v, list):
+        return list(v)
+    elif isinstance(v, tuple):
+        return tuple(v)
+    elif isinstance(v, (int, str, float, bool)):
+        return v
+    else:
+        raise ValueError(_("Don't know how to copy '%s'.") % v)
+
+
+def _copy_attrs(source, target, attrs):
+    """
+    Copy attributes from source to target.
+
+    :param source: source object
+    :param target: destination object
+    :param attrs: sequence of attributes to copy.
+    :return:
+    """
+    for attr in attrs:
+        setattr(target, attr, _copy_attr(getattr(source, attr)))
