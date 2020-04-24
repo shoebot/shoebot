@@ -80,7 +80,7 @@ elif en.is_verb(q):
 elif en.is_adjective(q): 
     l = "adj."+en.adjective.lexname(q)
     
-print q, "is-a", l
+print(q, "is-a", l)
 
 clrs = colors.list()
 for clr, weight in lexname_scores[l]:

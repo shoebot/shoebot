@@ -4,11 +4,11 @@ try:
     web = ximport("web")
 except:
     web = ximport("__init__")
-    reload(web)
+    #reload(web)
 
 # Get a list of links for a search query.
 links = web.yahoo.search_images("food")
-print links
+print(links)
 
 # Retrieve a random image.
 img = web.url.retrieve(choice(links))
@@ -21,7 +21,7 @@ img = web.url.retrieve(choice(links))
 try:
     image(None, 0, 0, data=img.data)
 except:
-    print str(img.error)
+    print(str(img.error))
     
 # An easier command is web.download():
 img = web.download(choice(links))
