@@ -131,7 +131,13 @@ class Bot(Grammar):
                 setattr(self, key_name, value)
 
         self._canvas.size = None
-        self._frame = 1
+        if isinstance(namespace, dict) and "FRAME" in namespace:
+            try:
+                self._frame = int(namespace["FRAME"])
+            except ValueError:
+                raise ValueError("Frame must be an integer.")
+        else:
+            self._frame = 1
         self._set_initial_defaults() ### TODO Look at these
 
     def _set_initial_defaults(self):

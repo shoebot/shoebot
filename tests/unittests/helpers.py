@@ -62,7 +62,10 @@ class ShoebotTestCase(TestCase):
 
                     ShoebotTestCase._copied_files.add(input_file)
                     output_file = output_path / input_file.name
-                    shutil.copy(input_file, output_file)
+                    try:
+                        shutil.copy(input_file, output_file)
+                    except FileNotFoundError:
+                        pass
 
     def assertReferenceImage(self, file1, file2):
         """
@@ -104,26 +107,31 @@ class ShoebotTestCase(TestCase):
         # TODO it would be fairly straightforward to check the contents of images if this is needed.
         self.assertTrue(filecmp.cmp(file1, file2), f"Files differ: {file1} {file2}")
 
+    def assertFileExists(self, filename, msg=None):
+        if not Path(filename).is_file():
+            self.fail(msg or f"{filename} does not exist.")
+
     def assertFileSize(self, filename, size=0):
         """
         Assert file exists and is larger than 0 bytes.
         """
-        self.assertTrue(Path(filename).is_file(), f"{filename} does not exist.")
+        self.assertFileExists(filename)
         self.assertNotEqual(
             size, Path(filename).stat().st_size, f"{filename} is zero bytes."
         )
 
-    def run_code(self, code, outputfile, windowed=False):
+    def run_code(self, code, outputfile, windowed=False, namespace=None):
         """
         Run shoebot code, sets random.seed to stabilize output.
         """
-        bot = create_bot(window=windowed, outputfile=outputfile)
+        bot = create_bot(window=windowed,
+                         outputfile=outputfile, namespace=namespace)
 
         seed(0)
 
         bot.run(code)
 
-    def run_filename(self, filename, outputfile, windowed=False):
+    def run_filename(self, filename, outputfile, windowed=False, namespace=None):
         """
         Run shoebot from filename.
 
@@ -139,7 +147,8 @@ class ShoebotTestCase(TestCase):
             full_path = Path(path) / filename
             if full_path.is_file():
                 with open(full_path) as f:
-                    self.run_code(f.read(), outputfile, windowed=windowed)
+                    self.run_code(f.read(), outputfile,
+                                  windowed=windowed, namespace=namespace)
                     return
         else:
             raise ValueError(f"Could not find bot {filename} in paths {self.paths}")
