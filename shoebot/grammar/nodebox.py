@@ -1,22 +1,29 @@
+import locale
+import gettext
 import os.path
 import sys
-
-from shoebot.core.backend import cairo
-from shoebot.kgp import KantGenerator
-from shoebot.data import ShoebotError
-from .bot import Bot
-from shoebot.data import geometry, Point, BezierPath, Image, RGB, HSB, \
-    CORNER, CENTER, \
-    MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, \
-    CLOSE, \
-    LEFT, RIGHT
 
 from math import sin, cos, pi
 from math import radians as deg2rad
 from PIL import Image as PILImage
 
-import locale
-import gettext
+from shoebot.core.backend import cairo
+from shoebot.data import geometry, \
+    Point, BezierPath, Image, \
+    RGB, HSB, \
+    CORNER, CENTER, \
+    MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, \
+    CLOSE, \
+    LEFT, RIGHT
+from shoebot.kgp import KantGenerator
+
+from .bot import Bot
+
+
+class ShoebotError(Exception):
+    pass
+
+
 APP = 'shoebot'
 DIR = sys.prefix + '/share/shoebot/locale'
 locale.setlocale(locale.LC_ALL, '')
@@ -32,9 +39,8 @@ sys.path.append('.')  # ximport can work from current dir
 
 
 class NodeBot(Bot):
-
-    NORMAL = "1"
-    FORTYFIVE = "2"
+    NORMAL = 0
+    FORTYFIVE = 45
 
     CORNER = CORNER
     CENTER = CENTER
@@ -120,7 +126,7 @@ class NodeBot(Bot):
         elif mode is None:
             return self.rectmode
         else:
-            raise ShoebotError(_("rectmode: invalid input"))
+            raise ValueError(_("rectmode: invalid input"))
 
     def ellipsemode(self, mode=None):
         '''
@@ -135,7 +141,7 @@ class NodeBot(Bot):
         elif mode is None:
             return self.ellipsemode
         else:
-            raise ShoebotError(_("ellipsemode: invalid input"))
+            raise ValueError(_("ellipsemode: invalid input"))
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
         '''Draw an ellipse starting from (x,y) -  ovals and ellipses are not the same'''

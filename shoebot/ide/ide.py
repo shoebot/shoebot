@@ -5,6 +5,7 @@ import errno
 import gettext
 import locale
 import os
+import traceback
 import sys
 
 import shoebot

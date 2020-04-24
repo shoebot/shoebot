@@ -1,20 +1,22 @@
-
-
-import string
 from math import floor
 
-import sys, locale, gettext
+import gettext
+import locale
+import string
+import sys
 
-APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
-locale.setlocale(locale.LC_ALL, '')
+
+APP = "shoebot"
+DIR = sys.prefix + "/share/shoebot/locale"
+
+locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
 
 class Color(object):
-    '''
+    """
     Taken from Nodebox colors library and modified.
     Since we have no Cocoa, we have no way to use colour management for the moment.
     So we took another approach.
@@ -38,7 +40,7 @@ class Color(object):
 
     The CMYK parts have been commented out, as it may slow down code execution
     and at this point is quite useless, left it in place for a possible future implementation
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         if isinstance(args, Color):
@@ -67,7 +69,12 @@ class Color(object):
         # One value, grayscale.
         elif len(args) == 1:
             gs = args[0]
-            self.r, self.g, self.b, self.a = gs / color_range, gs / color_range, gs / color_range, 1
+            self.r, self.g, self.b, self.a = (
+                gs / color_range,
+                gs / color_range,
+                gs / color_range,
+                1,
+            )
 
         # Two values, grayscale and alpha OR hex and alpha.
         elif len(args) == 2:
@@ -77,7 +84,12 @@ class Color(object):
                 self.r, self.g, self.b, self.a = r, g, b, alpha
             else:
                 gs, a = args[0], args[1]
-                self.r, self.g, self.b, self.a = gs / color_range, gs / color_range, gs / color_range, a / color_range
+                self.r, self.g, self.b, self.a = (
+                    gs / color_range,
+                    gs / color_range,
+                    gs / color_range,
+                    a / color_range,
+                )
 
         # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
         # depending on the mode parameter.
@@ -87,18 +99,33 @@ class Color(object):
                 alpha = args[-1] / color_range
 
             if mode == "rgb":
-                self.r, self.g, self.b, self.a = args[0] / color_range, args[1] / color_range, args[
-                    2] / color_range, alpha
+                self.r, self.g, self.b, self.a = (
+                    args[0] / color_range,
+                    args[1] / color_range,
+                    args[2] / color_range,
+                    alpha,
+                )
             elif mode == "hsb":
-                self.h, self.s, self.brightness, self.a = args[0] / color_range, args[1] / color_range, args[
-                    2] / color_range, alpha
+                self.h, self.s, self.brightness, self.a = (
+                    args[0] / color_range,
+                    args[1] / color_range,
+                    args[2] / color_range,
+                    alpha,
+                )
             elif mode == "cmyk":
-                if len(args) == 4: alpha = 1
+                if len(args) == 4:
+                    alpha = 1
                 self.a = alpha
                 self.c, self.m, self.y, self.k = args[0], args[1], args[2], args[3]
 
     def __repr__(self):
-        return "%s(%.3f, %.3f, %.3f, %.3f)" % (self.__class__.__name__, self.r, self.g, self.b, self.a)
+        return "%s(%.3f, %.3f, %.3f, %.3f)" % (
+            self.__class__.__name__,
+            self.r,
+            self.g,
+            self.b,
+            self.a,
+        )
 
     @property
     def red(self):
@@ -160,7 +187,12 @@ class Color(object):
 
     def __div__(self, other):
         value = float(other)
-        return self.red / value, self.green / value, self.blue / value, self.alpha / value
+        return (
+            self.red / value,
+            self.green / value,
+            self.blue / value,
+            self.alpha / value,
+        )
 
     # end added
 
@@ -175,7 +207,7 @@ class Color(object):
                 r, g, b = (
                     self.__dict__["__r"],
                     self.__dict__["__g"],
-                    self.__dict__["__b"]
+                    self.__dict__["__b"],
                 )
                 self._update_cmyk(*rgb2cmyk(r, g, b))
                 self._update_hsb(*rgb2hsb(r, g, b))
@@ -191,21 +223,22 @@ class Color(object):
                 r, g, b = hsb2rgb(
                     self.__dict__["__h"],
                     self.__dict__["__s"],
-                    self.__dict__["__brightness"]
+                    self.__dict__["__brightness"],
                 )
                 self._update_rgb(r, g, b)
                 self._update_cmyk(*rgb2cmyk(r, g, b))
 
         # CMYK changes, update RGB and HSB accordingly.
         elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
-            if a != "black": a = a[0]
+            if a != "black":
+                a = a[0]
             self.__dict__["__" + a] = max(0, min(v, 1))
             if self._hasattrs(("__c", "__m", "__y", "__k")):
                 r, g, b = cmyk2rgb(
                     self.__dict__["__c"],
                     self.__dict__["__m"],
                     self.__dict__["__y"],
-                    self.__dict__["__k"]
+                    self.__dict__["__k"],
                 )
                 self._update_rgb(r, g, b)
                 self._update_hsb(*rgb2hsb(r, g, b))
@@ -228,17 +261,47 @@ class Color(object):
         elif a == "brightness":
             return self.__dict__["__brightness"]
         # CMYK
-        elif a in ["a", "alpha",
-                "r", "g", "b", "red", "green", "blue",
-                "h", "s", "hue", "saturation",
-                "c", "m", "y", "k", "cyan", "magenta", "yellow"]:
+        elif a in [
+            "a",
+            "alpha",
+            "r",
+            "g",
+            "b",
+            "red",
+            "green",
+            "blue",
+            "h",
+            "s",
+            "hue",
+            "saturation",
+            "c",
+            "m",
+            "y",
+            "k",
+            "cyan",
+            "magenta",
+            "yellow",
+        ]:
             return self.__dict__["__" + a[0]]
-        elif a in ["a", "alpha",
-                "r", "g", "b", "red", "green", "blue",
-                "h", "s", "hue", "saturation"]:
+        elif a in [
+            "a",
+            "alpha",
+            "r",
+            "g",
+            "b",
+            "red",
+            "green",
+            "blue",
+            "h",
+            "s",
+            "hue",
+            "saturation",
+        ]:
             return self.__dict__["__" + a[0]]
 
-        raise AttributeError("'" + str(self.__class__) + "' object has no attribute '" + a + "'")
+        raise AttributeError(
+            "'" + str(self.__class__) + "' object has no attribute '" + a + "'"
+        )
 
 
 class ColorMixin(object):
@@ -266,7 +329,7 @@ class ColorMixin(object):
             elif isinstance(args[0], Color):
                 self._fillcolor = Color(args[0])
                 return
-        self._fillcolor = Color(mode='rgb', color_range=1, *args)
+        self._fillcolor = Color(mode="rgb", color_range=1, *args)
 
     fill = property(_get_fill, _set_fill)
 
@@ -281,7 +344,7 @@ class ColorMixin(object):
             elif isinstance(args[0], Color):
                 self._strokecolor = Color(args[0])
                 return
-        self._strokecolor = Color(mode='rgb', color_range=1, *args)
+        self._strokecolor = Color(mode="rgb", color_range=1, *args)
 
     stroke = property(_get_stroke, _set_stroke)
 
@@ -299,11 +362,11 @@ def hex2dec(hexdata):
 
 
 def dec2hex(d):
-    return hex(d).split('x')[-1]
+    return hex(d).split("x")[-1]
 
 
 def parse_color(v, color_range=1):
-    '''Receives a colour definition and returns a (r,g,b,a) tuple.
+    """Receives a colour definition and returns a (r,g,b,a) tuple.
 
     Accepts:
     - v
@@ -321,7 +384,7 @@ def parse_color(v, color_range=1):
 
     The 'color_range' parameter sets the colour range in which the
     colour data values are specified (except in hexstrings).
-    '''
+    """
 
     # unpack one-element tuples, they show up sometimes
     while isinstance(v, (tuple, list)) and len(v) == 1:
@@ -329,7 +392,7 @@ def parse_color(v, color_range=1):
 
     if isinstance(v, (int, float)):
         red = green = blue = v / color_range
-        alpha = 1.
+        alpha = 1.0
 
     elif isinstance(v, Color):
         red, green, blue, alpha = v
@@ -350,7 +413,7 @@ def parse_color(v, color_range=1):
             red = color[0]
             green = color[1]
             blue = color[2]
-            alpha = 1.
+            alpha = 1.0
         elif len(color) == 4:
             red = color[0]
             green = color[1]
@@ -359,23 +422,24 @@ def parse_color(v, color_range=1):
 
     elif isinstance(v, str):
         # got a hexstring: first remove hash character, if any
-        v = v.strip('#')
+        v = v.strip("#")
         if len(v) == 6:
             # RRGGBB
-            red = hex2dec(v[0:2]) / 255.
-            green = hex2dec(v[2:4]) / 255.
-            blue = hex2dec(v[4:6]) / 255.
-            alpha = 1.
+            red = hex2dec(v[0:2]) / 255.0
+            green = hex2dec(v[2:4]) / 255.0
+            blue = hex2dec(v[4:6]) / 255.0
+            alpha = 1.0
         elif len(v) == 8:
-            red = hex2dec(v[0:2]) / 255.
-            green = hex2dec(v[2:4]) / 255.
-            blue = hex2dec(v[4:6]) / 255.
-            alpha = hex2dec(v[6:8]) / 255.
+            red = hex2dec(v[0:2]) / 255.0
+            green = hex2dec(v[2:4]) / 255.0
+            blue = hex2dec(v[4:6]) / 255.0
+            alpha = hex2dec(v[6:8]) / 255.0
 
     return red, green, blue, alpha
 
 
 # Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
+
 
 def hex_to_rgb(hex):
     """ Returns RGB values for a hex color string.
@@ -478,7 +542,8 @@ def hsv_to_rgb(h, s, v):
     Results will differ from the way NSColor converts color spaces.
     """
 
-    if s == 0: return v, v, v
+    if s == 0:
+        return v, v, v
 
     h = h / (60.0 / 360)
     i = floor(h)
@@ -533,12 +598,14 @@ rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
 
 
 def rgba_to_argb(stringImage):
-    tempBuffer = [None] * len(stringImage)  # Create an empty array of the same size as stringImage
+    tempBuffer = [None] * len(
+        stringImage
+    )  # Create an empty array of the same size as stringImage
     tempBuffer[0::4] = stringImage[2::4]
     tempBuffer[1::4] = stringImage[1::4]
     tempBuffer[2::4] = stringImage[0::4]
     tempBuffer[3::4] = stringImage[3::4]
-    stringImage = ''.join(tempBuffer)
+    stringImage = "".join(tempBuffer)
     return stringImage
 
 

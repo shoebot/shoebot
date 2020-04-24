@@ -33,18 +33,13 @@ import signal
 import sys
 import threading
 
-from shoebot.core.backend import cairo
-
-
-class ShoebotInstallError(Exception):
-    pass
-
-
-# TODO - Check if this needs importing here:
-# from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
 
+from shoebot.core.backend import cairo
 from shoebot.core.events import publish_event, QUIT_EVENT
+
+
+
 
 RGB = "rgb"
 HSB = "hsb"
@@ -141,7 +136,7 @@ def create_bot(src=None, grammar=NODEBOX, format=None, outputfile=None, iteratio
     See create_canvas for details on those parameters.
 
     """
-    multifile = True if iterations and iterations > 1 else False
+    multifile = iterations and iterations > 1
     canvas = create_canvas(src=src,
                            format=format,
                            outputfile=outputfile,

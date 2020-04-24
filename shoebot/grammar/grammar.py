@@ -300,9 +300,6 @@ class Grammar(object):
             # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-
-            import sys
-
             if verbose:
                 errmsg = traceback.format_exc()
             else:

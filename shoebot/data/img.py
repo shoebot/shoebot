@@ -1,5 +1,5 @@
 from shoebot.core.backend import cairo, gi, driver
-from shoebot.data import _copy_attrs
+from shoebot.util import _copy_attrs
 
 import array
 from io import StringIO
