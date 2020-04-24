@@ -2,8 +2,6 @@
 
 # TODO - Test on gedit-3 for windows
 
-from __future__ import print_function
-
 from os.path import abspath, dirname, exists, expanduser, expandvars, isdir, islink, lexists, join, normpath
 from glob import glob
 
@@ -78,7 +76,7 @@ def get_dirs_nt(is_admin):
         dirs = dict(
             dest_dir=dest_dir,
             language_dir=expandvars("%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs"),
-            plugin_dir=expandvars("%ProgramFiles%\\gedit\\lib\\gedit-3\\plugins"),                
+            plugin_dir=expandvars("%ProgramFiles%\\gedit\\lib\\gedit-3\\plugins"),
         )
     else:
         dest_dir = expandvars("%UserProfile%//AppData//Roaming"),
@@ -103,7 +101,7 @@ def get_dirs_unix(is_admin):
         language_dir=join(dest_dir, "gtksourceview-3.0/language-specs"),
         plugin_dir=join(dest_dir, "gedit/plugins"),
     )
-    
+
     return dirs
 
 if os.name == 'nt':
@@ -147,7 +145,7 @@ def install_plugin(name=None, dest_dir=None, plugin_dir=None, language_dir=None,
 
 def main():
     username, is_admin = has_admin()
-    
+
     dirs = get_dirs(is_admin)
     kwargs = dict(
         name = "gedit-3.12",

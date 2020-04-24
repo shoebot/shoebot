@@ -6,8 +6,6 @@
 #    python setup.py --help' for more options
 #
 
-from __future__ import print_function
-
 import glob
 import itertools
 import os

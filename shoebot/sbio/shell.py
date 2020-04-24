@@ -30,7 +30,6 @@ Other commands are available to control playback, try 'help' to
 list them.
 """
 
-from __future__ import print_function
 import base64
 import cmd
 import shlex
