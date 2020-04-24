@@ -11,6 +11,15 @@ from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
 class TestExampleOutput(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
 
+    """
+    Tests thst run examples.
+
+    Where we are lacking bots to test features, running an existing example
+    can work to excersize an API.
+
+    Be mindful this can be expensive (in CPU, Memory and time), before adding
+    examples.
+    """
     @parameterized.expand(
         [
             ("examples/basic/primitives.bot", "basic--primitives"),
