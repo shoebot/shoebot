@@ -1,7 +1,5 @@
-import sys
 import unittest
 
-from pathlib import Path
 from parameterized import parameterized, parameterized_class
 
 from tests.unittests.helpers import ShoebotTestCase, shoebot_named_testclass
