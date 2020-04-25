@@ -19,8 +19,9 @@ from gi.repository import Gdk, GObject, Gtk, GtkSource, Pango
 
 APP = "shoebot"
 LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
-SEARCH_FORWARD = 0
-SEARCH_BACKWARD = 1
+
+SEARCH_BACKWARD = -1
+SEARCH_FORWARD = 1
 
 locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, LOCALE_DIR)
@@ -35,7 +36,7 @@ else:
 
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
-        return (v, v, v)
+        return v, v, v
     else:
         hue = h * 6.0
         saturation = s
@@ -44,29 +45,29 @@ def hsv_to_rgb(h, s, v):
         if hue >= 6.0:
             hue = 0.0
 
-        f = hue - int(hue)
+        ihue = int(hue)
+        f = hue - ihue
         p = value * (1.0 - saturation)
         q = value * (1.0 - saturation * f)
         t = value * (1.0 - saturation * (1.0 - f))
 
-        ihue = int(hue)
         if ihue == 0:
-            return (value, t, p)
+            return value, t, p
         elif ihue == 1:
-            return (q, value, p)
+            return q, value, p
         elif ihue == 2:
-            return (p, value, t)
+            return p, value, t
         elif ihue == 3:
-            return (p, q, value)
+            return p, q, value
         elif ihue == 4:
-            return (t, p, value)
+            return t, p, value
         elif ihue == 5:
-            return (value, p, q)
+            return value, p, q
 
 
 def hue_to_color(hue):
     if hue > 1.0:
-        raise ValueError
+        raise ValueError("Hue must be < 1.0")
 
     h, s, v = hsv_to_rgb(hue, 1.0, 1.0)
     return h * 65535, s * 65535, v * 65535
@@ -258,25 +259,22 @@ class ConsoleWindow:
         )
         self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
-    def write(self, data, output=None, system=None):
-        self.message = data
+    def write(self, message, output=None, system=None):
         if not output:
             # no tags set for stderr messages, color will be the one set for TextView
-            self.text_buffer.insert_at_cursor(self.message)
-            self.message = ""
+            self.text_buffer.insert_at_cursor(message)
         elif system:
             # if output and system values are set, text is treated as a system message
             # and system tag is used
-            self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
-            self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "system")
-            self.message = ""
+            it = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
+            self.text_buffer.insert_with_tags(it, message, self.system_message_tag)
         else:
             # if only output value is set, tag used will be stdout
-            self.iter = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
-            self.text_buffer.insert_with_tags_by_name(self.iter, self.message, "stdout")
-            self.message = ""
-        # this is the trick to make gtk refresh the window
+            it = self.text_buffer.get_iter_at_mark(self.text_buffer.get_insert())
+            self.text_buffer.insert_with_tags(it, message, self.stdout_tag)
+
         while Gtk.events_pending():
+            # Refresh the Window
             Gtk.main_iteration()
 
     def clear(self):
@@ -293,14 +291,13 @@ class ConsoleWindow:
         return self.text_area.get_buffer()
 
 
-class Stdout_Filter(object):
+class StdoutFilter(object):
     def __init__(self, parent):
         self.parent = parent
 
     def write(self, data):
-        self.message = data
-        self.parent.write(self.message, True)
-        self.message = None
+        message = data
+        self.parent.write(message, True)
 
     def flush(self):
         pass
@@ -477,15 +474,15 @@ class ShoebotEditorWindow(Gtk.Window):
                 ),
             ]
         )
-        varwindow = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
-        varwindow.connect("toggled", self.on_varwindow_changed)
-        action_group.add_action(varwindow)
-        fullscreen = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
-        fullscreen.connect("toggled", self.on_fullscreen_changed)
-        action_group.add_action(fullscreen)
-        socketserver = Gtk.ToggleAction("SocketServer", "Run socket server", None, None)
-        socketserver.connect("toggled", self.on_socketserver_changed)
-        action_group.add_action(socketserver)
+        variable_window_action = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
+        variable_window_action.connect("toggled", self.on_varwindow_changed)
+        action_group.add_action(variable_window_action)
+        full_screen_action = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
+        full_screen_action.connect("toggled", self.on_fullscreen_changed)
+        action_group.add_action(full_screen_action)
+        socket_server_action = Gtk.ToggleAction("SocketServer", "Run socket server", None, None)
+        socket_server_action.connect("toggled", self.on_socketserver_changed)
+        action_group.add_action(socket_server_action)
 
         action_group.add_actions(
             [
@@ -494,18 +491,18 @@ class ShoebotEditorWindow(Gtk.Window):
             ]
         )
 
-        uimanager = Gtk.UIManager()
+        ui_manager = Gtk.UIManager()
         # Throws exception if something went wrong
-        uimanager.add_ui_from_string(UI_INFO)
+        ui_manager.add_ui_from_string(UI_INFO)
         # Add the accelerator group to the toplevel window
-        accelgroup = uimanager.get_accel_group()
-        self.add_accel_group(accelgroup)
+        accel_group = ui_manager.get_accel_group()
+        self.add_accel_group(accel_group)
         # Add menu actions
-        uimanager.insert_action_group(action_group)
+        ui_manager.insert_action_group(action_group)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        menubar = uimanager.get_widget("/MenuBar")
-        box.pack_start(menubar, False, False, 0)
+        menu_bar = ui_manager.get_widget("/MenuBar")
+        box.pack_start(menu_bar, False, False, 0)
 
         hpaned = Gtk.HPaned()
         vbox = Gtk.VBox(False, 0)
@@ -550,7 +547,7 @@ class ShoebotEditorWindow(Gtk.Window):
         # this creates a console error and output window besides script window
         self.console_error = ConsoleWindow()
         # we create an instance for stdout filter
-        self.stdout_filter = Stdout_Filter(self.console_error)
+        self.stdout_filter = StdoutFilter(self.console_error)
         # we redirect stderr
         sys.stderr = self.console_error
         # stdout is redirected too, but through the filter in order to get different color for text
@@ -600,8 +597,8 @@ class ShoebotEditorWindow(Gtk.Window):
         try:
             ShoebotEditorWindow(filename)
             return True
-        except IOError as xxx_todo_changeme1:
-            (errnum, errmsg) = xxx_todo_changeme1.args
+        except IOError as e:
+            errmsg = e.args[1]
             dialog = Gtk.MessageDialog(
                 None,
                 Gtk.DialogFlags.MODAL,
@@ -761,7 +758,7 @@ class ShoebotEditorWindow(Gtk.Window):
         start, end = dialog.source_buffer.get_bounds()
         search_string = start.get_text(end)
 
-        print(_("Searching for `%s'\n") % search_string)
+        print(_(f"Searching for `{search_string}'\n"))
 
         buffer = self.source_buffer
         buffer.search(search_string, self, search_direction)
@@ -1088,20 +1085,16 @@ class ShoebotEditorWindow(Gtk.Window):
             )
             self.sbot_window = bot._canvas.sink
             bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
-        except ShoebotError as NameError:
+        except (ShoebotError, NameError):
             import traceback
             import sys
 
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
-            dialog = Gtk.MessageDialog(
-                self,
-                Gtk.DialogFlags.MODAL,
-                Gtk.MessageType.INFO,
-                Gtk.ButtonsType.OK,
-                err,
-            )
-            dialog.run()
+            dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, err)
+            result = dialog.run()
             dialog.destroy()
             self.sbot_window = None
             return False
@@ -1118,7 +1111,7 @@ class ShoebotEditorWindow(Gtk.Window):
         return self.source_buffer.filename
 
 
-class ShoebotIDE(object):
+class ShoebotIDE:
     untitled_file_counter = 0
     colormap = None
     buffers = list()
