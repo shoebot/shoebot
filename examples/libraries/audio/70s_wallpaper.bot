@@ -25,7 +25,12 @@ def draw_pyramid(r, box_size):
         c = sin(20 / float(a + 1))
         fill(c, c, 0.2 + (c / 2))
         stroke(r - a)
-        rect(-half_box + a + (sin(r / 100) * 4.0), -half_box + a, box_size - a * 2, box_size - a * 2)
+        rect(
+            -half_box + a + (sin(r / 100) * 4.0),
+            -half_box + a,
+            box_size - a * 2,
+            box_size - a * 2,
+        )
     pop()
 
 
@@ -45,9 +50,9 @@ def draw():
     r += float(sum(bass) / len(bass) * 10.0)
 
     if r > 1:
-        r -= (r / 2.0)
+        r -= r / 2.0
     elif r < 1:
-        r -= (r / 2.0)
+        r -= r / 2.0
 
     # draw grid of boxes
     box_size = int(200 + (sin(float(FRAME) / 30.0) * 20))

@@ -46,14 +46,16 @@ def points(n, vx, vy, h=(0.0, 1.0), v=(0.0, 1.0)):
     return points
 
 
-def nebula(clr,
-           bg=True,
-           n=100,
-           d=300,
-           angle=0.5,
-           iterations=100,
-           tonality=0.1,
-           growth=[1.01, 1.01, 0.98]):
+def nebula(
+    clr,
+    bg=True,
+    n=100,
+    d=300,
+    angle=0.5,
+    iterations=100,
+    tonality=0.1,
+    growth=[1.01, 1.01, 0.98],
+):
 
     """ Draws a set of elegant curves in subtle shades of the given color.
 
@@ -89,11 +91,7 @@ def nebula(clr,
 
     colormode(HSB)
     if bg:
-        background(
-            clr.hue,
-            clr.saturation,
-            max(0.15, clr.brightness * 0.15)
-        )
+        background(clr.hue, clr.saturation, max(0.15, clr.brightness * 0.15))
     else:
         background(None)
 
@@ -117,9 +115,12 @@ def nebula(clr,
     # transform(CORNER)
     direction = choice((-1, 1))
     for i in range(iterations // 2):
-        stroke(_wrap_around((clr.hue + random(tonality) * direction)),
-               clr.saturation,
-               clr.brightness * (0.4 + random(0.6)), random(0.25))
+        stroke(
+            _wrap_around((clr.hue + random(tonality) * direction)),
+            clr.saturation,
+            clr.brightness * (0.4 + random(0.6)),
+            random(0.25),
+        )
         _draw_transformed(path, 1.5, 0, angle, growth[0])
 
     for i in range(choice((2, 3))):
@@ -136,20 +137,21 @@ def nebula(clr,
         # Incremental variations of the path.
         # Colors are light and desaturated.
         for i in range(iterations // 2):
-            stroke(clr.hue,
-                   clr.saturation + random(-0.6),
-                   random(0.2) + 0.8,
-                   random(0.25))
+            stroke(
+                clr.hue, clr.saturation + random(-0.6), random(0.2) + 0.8, random(0.25)
+            )
             _draw_transformed(path, random(), random(), angle, growth[1])
 
     # Variations that decrement in size.
     # Colors are light with variations in hue.
     direction = choice((-1, 1))
     for i in range(iterations):
-        stroke(_wrap_around((clr.hue + random(tonality) * direction)),
-               clr.saturation + random(-0.2),
-               random(0.2) + 0.8,
-               random(0.25))
+        stroke(
+            _wrap_around((clr.hue + random(tonality) * direction)),
+            clr.saturation + random(-0.2),
+            random(0.2) + 0.8,
+            random(0.25),
+        )
         _draw_transformed(path, 1.5, 0, angle, growth[2])
 
     reset()

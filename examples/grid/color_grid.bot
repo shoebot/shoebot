@@ -16,7 +16,7 @@ colormode(HSB)
 h = 0
 s = 0.5
 b = 0.9
-a = .5
+a = 0.5
 
 # Size is the size of one grid square.
 square_size = 50
@@ -30,7 +30,7 @@ for x, y in grid(10, 10, square_size, square_size):
     # Increase the hue while choosing a random saturation.
     # Try experimenting here, like decreasing the brightness while
     # changing the alpha value etc.
-    h += .01
+    h += 0.01
     s = random()
 
     # Set this to be the current fill color.
