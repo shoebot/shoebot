@@ -67,7 +67,7 @@ def hsv_to_rgb(h, s, v):
 
 def hue_to_color(hue):
     if hue > 1.0:
-        raise ValueError("Hue must be < 1.0")
+        raise ValueError("Hue cannot be > 1.0")
 
     h, s, v = hsv_to_rgb(hue, 1.0, 1.0)
     return h * 65535, s * 65535, v * 65535
