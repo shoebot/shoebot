@@ -15,7 +15,7 @@ gi.require_version("Gdk", "3.0")
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 
-from gi.repository import Gdk, GObject, Gtk, GtkSource, Pango
+from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Pango
 
 APP = "shoebot"
 LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
@@ -79,6 +79,7 @@ class SourceBuffer(GtkSource.Buffer):
 
     def __init__(self, filename=None):
         GObject.GObject.__init__(self)
+
         self.refcount = 0
         if filename is None:
             self.filename = ShoebotIDE.get_next_untitled_filename()
@@ -158,9 +159,9 @@ class SourceBuffer(GtkSource.Buffer):
         hue = 0.0
 
         if enabled and self.color_cycle_timeout_id == 0:
-            self.color_cycle_timeout_id = Gtk.timeout_add(200, self.color_cycle_timeout)
+            self.color_cycle_timeout_id = GLib.timeout_add(200, self.color_cycle_timeout)
         elif not enabled and self.color_cycle_timeout_id != 0:
-            Gtk.timeout_remove(self.color_cycle_timeout_id)
+            GLib.timeout_remove(self.color_cycle_timeout_id)
             self.color_cycle_timeout_id = 0
 
         for tag in self.color_tags:
@@ -357,8 +358,8 @@ class ShoebotEditorWindow(Gtk.Window):
         ShoebotIDE.add_view(self)
 
         #  Gtk3.TODO
-        # if not TestText.colormap:
-        #     TestText.colormap = self.get_colormap()
+        # if not ShoebotIDE.colormap:
+        #     ShoebotIDE.colormap = self.get_colormap()
 
         self.connect("delete_event", self.on_close_window)
 
@@ -711,7 +712,7 @@ class ShoebotEditorWindow(Gtk.Window):
     def on_color_cycle_changed(self, callback_action, widget):
         self.source_view.get_buffer().set_colors(callback_action)
 
-    def on_apply_tabs(self, widget):
+    def on_apply_tabs(self, callback_action, widget):
         buffer = self.source_buffer
         bounds = buffer.get_selection_bounds()
         if bounds:
