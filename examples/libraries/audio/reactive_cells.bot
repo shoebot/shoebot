@@ -4,14 +4,17 @@ from the microphone.
 by Stuart Axon
 """
 
-from random import random
 import sys
+
+from random import random
 from sbaudio import audio, scaled_fft
+
 try:
     from planar.py import Vec2
-except ImportError:
-    print("You need to install the planar module (pip install planar).")
-    raise
+except ImportError as e:
+    raise ImportError(
+        f'"{e.msg}\n\nInstall planar by running "$ pip install planar" to run this example.'
+    )
 
 
 class Moveable(object):
@@ -20,7 +23,17 @@ class Moveable(object):
 
     Controller functions manage the movement and are called on 'update'
     """
-    def __init__(self, pos=None, velocity=None, angle=None, controller=None, controllers=None, draw_func=None, **kw):
+
+    def __init__(
+        self,
+        pos=None,
+        velocity=None,
+        angle=None,
+        controller=None,
+        controllers=None,
+        draw_func=None,
+        **kw,
+    ):
         self.pos = pos or Vec2(WIDTH / 2, HEIGHT / 2)
         self.velocity = velocity or 0.0
         self.angle = angle or 0
@@ -101,7 +114,7 @@ def bounds_controller(pos, angle, velocity):
     if pos.x < 10 or pos.x > WIDTH:
         angle = 180 - angle
     if pos.y < 10 or pos.y > HEIGHT - 10:
-        angle = - angle
+        angle = -angle
     return pos, angle, velocity
 
 
@@ -111,16 +124,17 @@ def random_emitter(particles, **kw):
             velocity=random() * 2.0,
             angle=random() * 360,
             controller=inertia_controller,
-            **kw)
+            **kw,
+        )
         particles.append(p)
 
 
 def update_particles(particles):
-    '''
+    """
     Update particles
 
     return: list of particles to update
-    '''
+    """
     part = []
     for p in particles:
         if p.update():
@@ -130,17 +144,18 @@ def update_particles(particles):
 
 def loudness_emitter(particles, **kw):
     # pos = kw.get('pos', Vec2(0, 0))
-    trigger_energy = kw.get('trigger_energy', .15)
+    trigger_energy = kw.get("trigger_energy", 0.15)
 
     energy = max(scaled_fft(audio.spectrogram))
     if energy > trigger_energy:
-        for angle in xrange(0, 360, 30):
+        for angle in range(0, 360, 30):
             p = Particle(
                 velocity=2.0,
                 angle=angle,
                 controller=inertia_controller,
-                hp=energy * 5.,
-                **kw)
+                hp=energy * 5.0,
+                **kw,
+            )
             particles.append(p)
         return True
     else:
@@ -168,19 +183,21 @@ class CircleDoobry(object):
         elif self.pos.y < -self.size:
             self.pos = Vec2(self.pos.x, HEIGHT + self.size)
 
-        self.emitting = loudness_emitter(self.particles, pos=self.pos, size=4.0, trigger_energy=self.trigger_energy)
+        self.emitting = loudness_emitter(
+            self.particles, pos=self.pos, size=4.0, trigger_energy=self.trigger_energy
+        )
         self.particles = update_particles(self.particles)
 
     def draw(self):
-        stroke(.5, .1, .1)
+        stroke(0.5, 0.1, 0.1)
         strokewidth(2)
 
-        fill(.5, .1, .1)
+        fill(0.5, 0.1, 0.1)
         nostroke()
         for p in self.particles:
             p.draw()
 
-        for i, sz in enumerate(xrange(10, 40, 10)):
+        for i, sz in enumerate(range(10, 40, 10)):
             s = stroke()
             sz *= self.size
             s.a = sz * 0.4
@@ -202,13 +219,13 @@ def setup():
 
     # particles = []
     doobries = []
-    for i in xrange(0, 10):
+    for i in range(0, 10):
         doobries.append(
             CircleDoobry(
                 size=1.0 + random() * 0.3,
                 pos=(random() * WIDTH, random() * HEIGHT),
                 velocity=(random() * 5.0 - 2.5, random() * 3.0 - 2.5),
-                trigger_energy=random() * 4.
+                trigger_energy=random() * 4.0,
             )
         )
 
