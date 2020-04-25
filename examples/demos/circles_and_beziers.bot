@@ -7,7 +7,8 @@ colorrange(255)
 colormode(HSB)
 background(0, 0, 192)
 
-for i in range(0, WIDTH / 4, 1):
+for i in range(0, WIDTH // 4, 1):
+    # ^ range requires a float, so use integer division '//'
     sz = random(WIDTH / 40, WIDTH / 5)
     xpos = random(-WIDTH / 5, WIDTH)
     ypos = random(-WIDTH / 5, HEIGHT)
@@ -20,7 +21,8 @@ for i in range(0, WIDTH / 4, 1):
     strokewidth(.1)
     ellipse(xpos, ypos, sz, sz)
 
-    for j in range(0, WIDTH / 80, 1):
+    for j in range(0, WIDTH // 80, 1):
+        # ^ range requires a float, so use integer division '//'
         stroke(0, 0, 0, 255)
         strokewidth(.1)
         beginpath(random(-WIDTH / 2, WIDTH * 1.5), random(-HEIGHT / 2, HEIGHT * 1.5))
