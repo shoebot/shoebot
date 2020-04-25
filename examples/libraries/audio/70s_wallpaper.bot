@@ -11,13 +11,16 @@ from sbaudio import audio, scaled_fft, triple
 from math import sin
 
 
-def draw_pyra(r, box_size):
+def draw_pyramid(r, box_size):
+    """
+    Draw something that vaguely looks like a pyramid from the top.
+    """
     stroke(0)
     strokewidth(5)
     nostroke()
     push()
-    half_box = box_size / 2
-    for a in range(0, half_box, half_box / 10):
+    half_box = box_size // 2
+    for a in range(0, half_box, half_box // 10):
         rotate(r / 10)
         c = sin(20 / float(a + 1))
         fill(c, c, 0.2 + (c / 2))
@@ -49,10 +52,10 @@ def draw():
     # draw grid of boxes
     box_size = int(200 + (sin(float(FRAME) / 30.0) * 20))
     # translate(-box_size / 2, -box_size / 2)
-    for y in range(0, (HEIGHT / box_size) + 2):
+    for y in range(0, (HEIGHT // box_size) + 2):
         push()
-        for x in range(0, (WIDTH / box_size) + 2):
-            draw_pyra(r, box_size)
+        for x in range(0, (WIDTH // box_size) + 2):
+            draw_pyramid(r, box_size)
             translate(box_size, 0)
         pop()
         translate(0, box_size)

@@ -39,7 +39,7 @@ def drawdaisy(x, y, color='#fefefe'):
     # draw petals
     _ctx.fill(color)
     _ctx.nostroke()
-    for angle in xrange(0, 360, 45):
+    for angle in range(0, 360, 45):
         _ctx.rotate(degrees=45)
         _ctx.rect(x, y, 40, 8, 1)
 

@@ -12,8 +12,9 @@ colormode(RGB)
 var('noise', NUMBER, 0., 0., 16.)
 
 background(128, 128, 128)
-for y in range(0, HEIGHT / (step * 2), 1):
-    for x in range(0, WIDTH / (step * 2), 1):
+for y in range(0, HEIGHT // step * 2, 1):
+    for x in range(0, WIDTH / step * 2, 1):
+        # ^ range requires an integer, so use '//'
         fill(255, 255, 255)
         ellipse(x * step * 2 +random(0, noise),
                 y * step * 2 +random(0, noise),

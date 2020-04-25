@@ -116,7 +116,7 @@ def nebula(clr,
     # Colors are dark with variations in hue.
     # transform(CORNER)
     direction = choice((-1, 1))
-    for i in range(iterations / 2):
+    for i in range(iterations // 2):
         stroke(_wrap_around((clr.hue + random(tonality) * direction)),
                clr.saturation,
                clr.brightness * (0.4 + random(0.6)), random(0.25))
@@ -135,7 +135,7 @@ def nebula(clr,
 
         # Incremental variations of the path.
         # Colors are light and desaturated.
-        for i in range(iterations / 2):
+        for i in range(iterations // 2):
             stroke(clr.hue,
                    clr.saturation + random(-0.6),
                    random(0.2) + 0.8,
