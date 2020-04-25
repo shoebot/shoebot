@@ -474,13 +474,17 @@ class ShoebotEditorWindow(Gtk.Window):
                 ),
             ]
         )
-        variable_window_action = Gtk.ToggleAction("VarWindow", "Show variables window", None, None)
+        variable_window_action = Gtk.ToggleAction(
+            "VarWindow", "Show variables window", None, None
+        )
         variable_window_action.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(variable_window_action)
         full_screen_action = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
         full_screen_action.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(full_screen_action)
-        socket_server_action = Gtk.ToggleAction("SocketServer", "Run socket server", None, None)
+        socket_server_action = Gtk.ToggleAction(
+            "SocketServer", "Run socket server", None, None
+        )
         socket_server_action.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socket_server_action)
 
@@ -1091,9 +1095,13 @@ class ShoebotEditorWindow(Gtk.Window):
 
             errmsg = traceback.format_exc(limit=1)
             err = "Error in Shoebot script:\n %s" % (errmsg)
-            dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
-                                       Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, err)
+            dialog = Gtk.MessageDialog(
+                self,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK,
+                err,
+            )
             result = dialog.run()
             dialog.destroy()
             self.sbot_window = None
