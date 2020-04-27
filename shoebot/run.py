@@ -35,6 +35,8 @@ import locale
 import shlex
 import sys
 
+from shoebot.diagnose import diagnose
+
 DEFAULT_SERVERPORT = 7777
 
 OUTPUT_EXTENSIONS = ('.png', '.svg', '.ps', '.pdf')
@@ -210,7 +212,6 @@ def main():
     args, extra = parser.parse_known_args()
 
     if args.diagnose:
-        from .diagnose import diagnose
         diagnose()
         sys.exit()
 

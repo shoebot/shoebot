@@ -36,6 +36,7 @@ import threading
 from time import sleep
 
 from shoebot.core.backend import cairo
+from shoebot.core import CairoCanvas, CairoImageSink
 from shoebot.core.events import publish_event, QUIT_EVENT
 
 
@@ -95,8 +96,6 @@ def create_canvas(src, format=None, outputfile=None, multifile=False, buff=None,
 
     Output to a filename (or files if multifile is set), or a buffer object.
     """
-    from shoebot.core import CairoCanvas, CairoImageSink  # https://github.com/shoebot/shoebot/issues/206
-
     if window or show_vars:
         from shoebot.gui import ShoebotWindow
         if not title:
