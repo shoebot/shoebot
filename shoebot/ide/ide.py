@@ -328,6 +328,7 @@ class ShoebotEditorWindow(Gtk.Window):
 
         source_buffer = SourceBuffer(filename)
         source_buffer.ref()
+
         ShoebotIDE.add_view(self)
 
         self.connect("delete_event", self.on_close_window)
@@ -497,6 +498,11 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view.set_tab_width(4)
         self.source_view.set_indent_width(4)
         # self.source_view.connect("expose_event", self.tab_stops_expose)
+
+        self.style_scheme_manager = GtkSource.StyleSchemeManager.new()
+        self.toggle_dark_theme(dark=Gtk.Settings.get_default().get_property(
+            "gtk-application-prefer-dark-theme"
+        ))
 
         self.bhid = source_buffer.connect("mark_set", self.cursor_set_callback)
 
@@ -671,16 +677,21 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view.scroll_to_mark(mark, 0, True, 0.0, 1.0)
         buffer.delete_mark(mark)
 
+    def toggle_dark_theme(self, dark=False):
+        Gtk.Settings.get_default().set_property(
+            "gtk-application-prefer-dark-theme", dark
+        )
+        if dark:
+            scheme_name = 'cobalt'
+        else:
+            scheme_name = 'classic'
+
+        scheme = self.style_scheme_manager.get_scheme(scheme_name)
+        self.get_source_buffer().set_style_scheme(scheme)
+
     def on_theme_changed(self, widget, current):
-        Gtk.Settings.get_default().set_property("gtk-theme-name", "Adwaita")
-        if current.get_name() == "ThemeLight":
-            Gtk.Settings.get_default().set_property(
-                "gtk-application-prefer-dark-theme", False
-            )
-        elif current.get_name() == "ThemeDark":
-            Gtk.Settings.get_default().set_property(
-                "gtk-application-prefer-dark-theme", True
-            )
+        # Theme is either ThemeLight or ThemeDark
+        self.toggle_dark_theme(dark=current.get_name() == "ThemeDark")
 
     def on_wrap_changed(self, widget, current):
         self.source_view.set_wrap_mode(GTK_WRAP_MODES[current.get_name()])
