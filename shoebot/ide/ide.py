@@ -637,7 +637,29 @@ class ShoebotEditorWindow(Gtk.Window):
         )
 
         if chooser.run() == Gtk.ResponseType.ACCEPT:
-            self.open_file(chooser.get_filename())
+            try:
+                source_buffer = self.get_source_buffer()
+                if (
+                    source_buffer.can_undo() is False
+                    and source_buffer.can_redo() is False
+                ):
+                    # Opening in an unmodified buffer, so a new window is not needed
+                    source_buffer.open_file(chooser.get_filename())
+                else:
+                    # Default, open a new window
+                    ShoebotEditorWindow(chooser.get_filename())
+            except IOError as e:
+                errmsg = e.args[1]
+                error_dialog = Gtk.MessageDialog(
+                    None,
+                    Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK,
+                    f"Cannot open file '{chooser.get_filename()}': {errmsg}",
+                )
+                error_dialog.run()
+                error_dialog.destroy()
+
         chooser.destroy()
 
     def save_or_save_as(self):
@@ -1109,11 +1131,6 @@ class ShoebotEditorWindow(Gtk.Window):
     def get_source_buffer(self):
         return self.source_view.get_buffer()
 
-    @property
-    def filename(self):
-        raise Exception("Oh")
-        return self.get_source_buffer().filename
-
 
 class ShoebotIDE:
     colormap = None
@@ -1136,8 +1153,22 @@ class ShoebotIDE:
         files_were_opened = False
         for filename in filelist:
             filename = os.path.abspath(filename)
-            files_were_opened |= ShoebotEditorWindow.open_file(filename)
-        if not files_were_opened:
+            try:
+                ShoebotEditorWindow(filename)
+            except IOError as e:
+                files_not_opened.append(filename)
+                errmsg = e.args[1]
+
+        if files_not_opened:
+            dialog = Gtk.MessageDialog(
+                None,
+                Gtk.DialogFlags.MODAL,
+                Gtk.MessageType.INFO,
+                Gtk.ButtonsType.OK,
+                f"Cannot open files '%s'" % ", ".join(files_not_opened),
+            )
+            dialog.run()
+            dialog.destroy()
             sys.exit(1)
 
     @classmethod
