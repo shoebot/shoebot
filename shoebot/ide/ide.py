@@ -679,9 +679,9 @@ class ShoebotEditorWindow(Gtk.Window):
             "gtk-application-prefer-dark-theme", dark
         )
         if dark:
-            scheme_name = 'cobalt'
+            scheme_name = "cobalt"
         else:
-            scheme_name = 'classic'
+            scheme_name = "classic"
 
         ShoebotIDE.set_source_buffers_style_scheme(scheme_name)
         ShoebotIDE.dark_theme = dark
@@ -1112,9 +1112,9 @@ class ShoebotIDE:
 
     style_scheme_manager = GtkSource.StyleSchemeManager.new()
 
-    dark_theme = Gtk.Settings.get_default().get_property(
-        "gtk-theme-name"
-    ).endswith("-dark")  # TODO - Is there a proper way of doing this?
+    dark_theme = (
+        Gtk.Settings.get_default().get_property("gtk-theme-name").endswith("-dark")
+    )  # TODO - Is there a proper way of doing this?
 
     def __init__(self, filelist):
         if not filelist:
