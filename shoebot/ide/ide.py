@@ -75,7 +75,6 @@ class SourceBuffer(GtkSource.Buffer):
         tabs.set_tab(2, Pango.TabAlign.LEFT, 60)
         tabs.set_tab(3, Pango.TabAlign.LEFT, 120)
         self.custom_tabs_tag = self.create_tag(tabs=tabs, foreground="green")
-        ShoebotIDE.add_buffer(self)
 
     def pretty_name(self):
         return os.path.basename(self.filename)
@@ -92,12 +91,12 @@ class SourceBuffer(GtkSource.Buffer):
         total_matches = 0
         while True:
             if direction == SEARCH_FORWARD:
-                res = it.forward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
+                match = it.forward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
             else:
-                res = it.backward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
-            if not res:
+                match = it.backward_search(text, Gtk.TextSearchFlags.TEXT_ONLY)
+            if not match:
                 break
-            match_start, match_end = res
+            match_start, match_end = match
             total_matches += 1
             self.apply_tag(self.found_text_tag, match_start, match_end)
             it = match_end
@@ -119,7 +118,6 @@ class SourceBuffer(GtkSource.Buffer):
         self.refcount -= 1
         if self.refcount == 0:
             self.set_colors(False)
-            ShoebotIDE.remove_buffer(self)
             del self
 
     def color_cycle_timeout(self):
@@ -325,22 +323,21 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def __init__(self, filename=None):
         GObject.GObject.__init__(self)
+        ShoebotIDE.add_editor_window(self)
 
         source_buffer = SourceBuffer(filename)
         source_buffer.ref()
 
-        ShoebotIDE.add_view(self)
-
         self.connect("delete_event", self.on_close_window)
 
-        action_group = Gtk.ActionGroup("my_actions")
+        action_group = Gtk.ActionGroup("menubar_actions")
         action_group.add_actions(
             [
-                ("FileMenu", None, "_File"),
+                ("FileMenu", None, _("_File")),
                 (
                     "FileNew",
                     Gtk.STOCK_NEW,
-                    "_New",
+                    _("_New"),
                     "<control>N",
                     None,
                     self.on_new_file,
@@ -348,7 +345,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "FileOpen",
                     Gtk.STOCK_OPEN,
-                    "_Open",
+                    _("_Open"),
                     "<control>O",
                     None,
                     self.on_open_file,
@@ -356,7 +353,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "FileSave",
                     Gtk.STOCK_SAVE,
-                    "_Save",
+                    _("_Save"),
                     "<control>S",
                     None,
                     self.on_save_file,
@@ -364,7 +361,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "FileSaveAs",
                     Gtk.STOCK_SAVE_AS,
-                    "Save _As",
+                    _("Save _As"),
                     "<control><alt>S",
                     None,
                     self.on_save_file_as,
@@ -372,23 +369,37 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "FileClose",
                     Gtk.STOCK_CLOSE,
-                    "_Close",
+                    _("_Close"),
                     "<control>W",
                     None,
                     self.on_close_file,
                 ),
-                ("FileQuit", Gtk.STOCK_QUIT, "_Quit", "<control>Q", None, self.on_quit),
+                (
+                    "FileQuit",
+                    Gtk.STOCK_QUIT,
+                    _("_Quit"),
+                    "<control>Q",
+                    None,
+                    self.on_quit,
+                ),
             ]
         )
 
         action_group.add_actions(
             [
-                ("EditMenu", None, "_Edit"),
-                ("EditUndo", Gtk.STOCK_UNDO, "_Undo", "<control>Z", None, self.on_undo),
+                ("EditMenu", None, _("_Edit")),
+                (
+                    "EditUndo",
+                    Gtk.STOCK_UNDO,
+                    _("_Undo"),
+                    "<control>Z",
+                    None,
+                    self.on_undo,
+                ),
                 (
                     "EditRedo",
                     Gtk.STOCK_REDO,
-                    "_Redo",
+                    _("_Redo"),
                     "<control><shift>Z",
                     None,
                     self.on_redo,
@@ -396,7 +407,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "EditFind",
                     Gtk.STOCK_FIND,
-                    "_Find...",
+                    _("_Find"),
                     "<control>F",
                     None,
                     self.on_find,
@@ -404,7 +415,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 (
                     "ClearConsole",
                     Gtk.STOCK_CLEAR,
-                    "_Clear console",
+                    _("_Clear console"),
                     "<control><shift>C",
                     None,
                     self.on_clear_console,
@@ -412,20 +423,20 @@ class ShoebotEditorWindow(Gtk.Window):
             ]
         )
 
-        action_group.add_action(Gtk.Action("SettingsMenu", "Settings", None, None))
+        action_group.add_action(Gtk.Action("SettingsMenu", _("_Settings"), None, None))
         action_group.add_radio_actions(
             [
-                ("WrapNone", None, "Wrap None", None, None, Gtk.WrapMode.NONE),
-                ("WrapWords", None, "Wrap Words", None, None, Gtk.WrapMode.WORD),
-                ("WrapChars", None, "Wrap Chars", None, None, Gtk.WrapMode.CHAR),
+                ("WrapNone", None, _("Wrap None"), None, None, Gtk.WrapMode.NONE),
+                ("WrapWords", None, _("Wrap Words"), None, None, Gtk.WrapMode.WORD),
+                ("WrapChars", None, _("Wrap Chars"), None, None, Gtk.WrapMode.CHAR),
             ],
             1,
             self.on_wrap_changed,
         )
         action_group.add_radio_actions(
             [
-                ("ThemeLight", None, "Light Theme", None, None, True),
-                ("ThemeDark", None, "Dark Theme", None, None, False),
+                ("ThemeLight", None, _("Light Theme"), None, None, True),
+                ("ThemeDark", None, _("Dark Theme"), None, None, False),
             ],
             0 if ShoebotIDE.dark_theme else 1,
             self.on_theme_changed,
@@ -433,9 +444,9 @@ class ShoebotEditorWindow(Gtk.Window):
 
         action_group.add_actions(
             [
-                ("RunMenu", None, "_Run"),
+                ("RunMenu", None, _("_Run")),
                 (
-                    "Run",
+                    _("Run"),
                     Gtk.STOCK_MEDIA_PLAY,
                     "_Run Script",
                     "<control>R",
@@ -445,23 +456,25 @@ class ShoebotEditorWindow(Gtk.Window):
             ]
         )
         variable_window_action = Gtk.ToggleAction(
-            "VarWindow", "Show variables window", None, None
+            "VarWindow", _("Show variables window"), None, None
         )
         variable_window_action.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(variable_window_action)
-        full_screen_action = Gtk.ToggleAction("FullScreen", "Full screen", None, None)
+        full_screen_action = Gtk.ToggleAction(
+            "FullScreen", _("Full screen"), None, None
+        )
         full_screen_action.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(full_screen_action)
         socket_server_action = Gtk.ToggleAction(
-            "SocketServer", "Run socket server", None, None
+            "SocketServer", _("Run socket server"), None, None
         )
         socket_server_action.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socket_server_action)
 
         action_group.add_actions(
             [
-                ("HelpMenu", None, "_Help"),
-                ("HelpAbout", Gtk.STOCK_INFO, "_About", None, None, self.on_about),
+                ("HelpMenu", None, _("_Help")),
+                ("HelpAbout", Gtk.STOCK_INFO, _("_About"), None, None, self.on_about),
             ]
         )
 
@@ -559,11 +572,9 @@ class ShoebotEditorWindow(Gtk.Window):
         self.go_fullscreen = False
 
         # setup syntax highlighting
-        manager = GtkSource.LanguageManager()
-        language = manager.guess_language(None, "text/x-python")
+        language_manager = GtkSource.LanguageManager()
+        language = language_manager.guess_language(None, "text/x-python")
         source_buffer.set_language(language)
-
-        self.shoebot_window = None
 
         try:
             self.set_icon_from_file(ICON_FILE)
@@ -591,7 +602,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 Gtk.DialogFlags.MODAL,
                 Gtk.MessageType.INFO,
                 Gtk.ButtonsType.OK,
-                f"Cannot open file '{filename}': {errmsg}",
+                _("Cannot open file '%s': %s") % (filename, errmsg),
             )
         dialog.run()
         dialog.destroy()
@@ -614,7 +625,7 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def on_open_file(self, widget):
         chooser = ShoebotFileChooserDialog(
-            "Open File",
+            _("Open File"),
             None,
             Gtk.FileChooserAction.OPEN,
             (
@@ -646,7 +657,7 @@ class ShoebotEditorWindow(Gtk.Window):
         self.save_or_save_as()
 
     def on_quit(self, widget):
-        for view in ShoebotIDE.views:
+        for view in ShoebotIDE.editor_windows:
             if not view.confirm_quit_or_save():
                 return
         if self.shoebot_window is not None:
@@ -846,7 +857,7 @@ class ShoebotEditorWindow(Gtk.Window):
         #     menu_item.activate()
 
     def close_view(self):
-        ShoebotIDE.remove_view(self)
+        ShoebotIDE.remove_editor_window(self)
         source_buffer = self.get_source_buffer()
         # source_buffer.unref()
         source_buffer.disconnect(self.bhid)
@@ -855,7 +866,7 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view = None
         self.destroy()
         del self
-        if not ShoebotIDE.views:
+        if not ShoebotIDE.editor_windows:
             Gtk.main_quit()
 
     def confirm_quit_or_save(self):
@@ -865,7 +876,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 Gtk.DialogFlags.MODAL,
                 Gtk.MessageType.QUESTION,
                 Gtk.ButtonsType.YES_NO,
-                f"Save changes to '{self.get_source_buffer().pretty_name()}'?",
+                _("Save changes to '%s'?") % self.get_source_buffer().pretty_name(),
             )
             dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
             result = dialog.run()
@@ -1105,25 +1116,23 @@ class ShoebotEditorWindow(Gtk.Window):
 
 
 class ShoebotIDE:
-    untitled_file_counter = 0
     colormap = None
-    source_buffers = list()
-    views = list()
+    untitled_file_counter = 0
+    editor_windows = list()
 
     style_scheme_manager = GtkSource.StyleSchemeManager.new()
-
     dark_theme = (
         Gtk.Settings.get_default().get_property("gtk-theme-name").endswith("-dark")
     )  # TODO - Is there a proper way of doing this?
 
-    def __init__(self, filelist):
-        if not filelist:
+    def __init__(self, filenames):
+        if not filenames:
             ShoebotEditorWindow()
         else:
-            self.open_filelist(filelist)
+            self.open_files(filenames)
 
     @classmethod
-    def open_filelist(cls, filelist):
+    def open_files(cls, filelist):
         files_were_opened = False
         for filename in filelist:
             filename = os.path.abspath(filename)
@@ -1134,27 +1143,17 @@ class ShoebotIDE:
     @classmethod
     def set_source_buffers_style_scheme(cls, scheme_name):
         scheme = cls.style_scheme_manager.get_scheme(scheme_name)
-        for source_buffer in cls.source_buffers:
+        for view in cls.editor_windows:
+            source_buffer = view.get_source_buffer()
             source_buffer.set_style_scheme(scheme)
 
     @classmethod
-    def add_buffer(cls, buffer):
-        cls.source_buffers.append(buffer)
+    def add_editor_window(cls, view):
+        cls.editor_windows.append(view)
 
     @classmethod
-    def add_view(cls, view):
-        cls.views.append(view)
-
-    @classmethod
-    def remove_buffer(cls, buffer):
-        cls.source_buffers.remove(buffer)
-
-    @classmethod
-    def remove_view(cls, view):
-        cls.views.remove(view)
-
-    def main(self):
-        Gtk.main()
+    def remove_editor_window(cls, view):
+        cls.editor_windows.remove(view)
 
     @classmethod
     def get_next_untitled_filename(cls):
@@ -1175,10 +1174,10 @@ def main():
 
     args = parser.parse_args()
 
-    files = vars(args)["filenames"]
+    filenames = vars(args)["filenames"]
 
-    app = ShoebotIDE(files)
-    app.main()
+    app = ShoebotIDE(filenames)
+    Gtk.main()
 
 
 if __name__ == "__main__":
