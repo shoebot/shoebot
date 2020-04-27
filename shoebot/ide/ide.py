@@ -328,6 +328,7 @@ class ShoebotEditorWindow(Gtk.Window):
 
         source_buffer = SourceBuffer(filename)
         source_buffer.ref()
+
         ShoebotIDE.add_view(self)
 
         self.connect("delete_event", self.on_close_window)
@@ -426,7 +427,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 ("ThemeLight", None, "Light Theme", None, None, True),
                 ("ThemeDark", None, "Dark Theme", None, None, False),
             ],
-            1,
+            0 if ShoebotIDE.dark_theme else 1,
             self.on_theme_changed,
         )
 
@@ -497,6 +498,8 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view.set_tab_width(4)
         self.source_view.set_indent_width(4)
         # self.source_view.connect("expose_event", self.tab_stops_expose)
+
+        self.toggle_dark_theme(dark=ShoebotIDE.dark_theme)
 
         self.bhid = source_buffer.connect("mark_set", self.cursor_set_callback)
 
@@ -671,16 +674,21 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view.scroll_to_mark(mark, 0, True, 0.0, 1.0)
         buffer.delete_mark(mark)
 
+    def toggle_dark_theme(self, dark=False):
+        Gtk.Settings.get_default().set_property(
+            "gtk-application-prefer-dark-theme", dark
+        )
+        if dark:
+            scheme_name = "cobalt"
+        else:
+            scheme_name = "classic"
+
+        ShoebotIDE.set_source_buffers_style_scheme(scheme_name)
+        ShoebotIDE.dark_theme = dark
+
     def on_theme_changed(self, widget, current):
-        Gtk.Settings.get_default().set_property("gtk-theme-name", "Adwaita")
-        if current.get_name() == "ThemeLight":
-            Gtk.Settings.get_default().set_property(
-                "gtk-application-prefer-dark-theme", False
-            )
-        elif current.get_name() == "ThemeDark":
-            Gtk.Settings.get_default().set_property(
-                "gtk-application-prefer-dark-theme", True
-            )
+        # Theme is either ThemeLight or ThemeDark
+        self.toggle_dark_theme(dark=current.get_name() == "ThemeDark")
 
     def on_wrap_changed(self, widget, current):
         self.source_view.set_wrap_mode(GTK_WRAP_MODES[current.get_name()])
@@ -1099,8 +1107,14 @@ class ShoebotEditorWindow(Gtk.Window):
 class ShoebotIDE:
     untitled_file_counter = 0
     colormap = None
-    buffers = list()
+    source_buffers = list()
     views = list()
+
+    style_scheme_manager = GtkSource.StyleSchemeManager.new()
+
+    dark_theme = (
+        Gtk.Settings.get_default().get_property("gtk-theme-name").endswith("-dark")
+    )  # TODO - Is there a proper way of doing this?
 
     def __init__(self, filelist):
         if not filelist:
@@ -1118,8 +1132,14 @@ class ShoebotIDE:
             sys.exit(1)
 
     @classmethod
+    def set_source_buffers_style_scheme(cls, scheme_name):
+        scheme = cls.style_scheme_manager.get_scheme(scheme_name)
+        for source_buffer in cls.source_buffers:
+            source_buffer.set_style_scheme(scheme)
+
+    @classmethod
     def add_buffer(cls, buffer):
-        cls.buffers.append(buffer)
+        cls.source_buffers.append(buffer)
 
     @classmethod
     def add_view(cls, view):
@@ -1127,7 +1147,7 @@ class ShoebotIDE:
 
     @classmethod
     def remove_buffer(cls, buffer):
-        cls.buffers.remove(buffer)
+        cls.source_buffers.remove(buffer)
 
     @classmethod
     def remove_view(cls, view):
