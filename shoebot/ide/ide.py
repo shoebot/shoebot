@@ -427,7 +427,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 ("ThemeLight", None, "Light Theme", None, None, True),
                 ("ThemeDark", None, "Dark Theme", None, None, False),
             ],
-            1,
+            0 if ShoebotIDE.dark_theme else 1,
             self.on_theme_changed,
         )
 
@@ -500,9 +500,7 @@ class ShoebotEditorWindow(Gtk.Window):
         # self.source_view.connect("expose_event", self.tab_stops_expose)
 
         self.style_scheme_manager = GtkSource.StyleSchemeManager.new()
-        self.toggle_dark_theme(dark=Gtk.Settings.get_default().get_property(
-            "gtk-application-prefer-dark-theme"
-        ))
+        self.toggle_dark_theme(dark=ShoebotIDE.dark_theme)
 
         self.bhid = source_buffer.connect("mark_set", self.cursor_set_callback)
 
@@ -1112,6 +1110,9 @@ class ShoebotIDE:
     colormap = None
     buffers = list()
     views = list()
+    dark_theme = Gtk.Settings.get_default().get_property(
+        "gtk-theme-name"
+    ).endswith("-dark")  # TODO - Is there a proper way of doing this?
 
     def __init__(self, filelist):
         if not filelist:
