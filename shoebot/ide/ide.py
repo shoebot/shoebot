@@ -499,7 +499,6 @@ class ShoebotEditorWindow(Gtk.Window):
         self.source_view.set_indent_width(4)
         # self.source_view.connect("expose_event", self.tab_stops_expose)
 
-        self.style_scheme_manager = GtkSource.StyleSchemeManager.new()
         self.toggle_dark_theme(dark=ShoebotIDE.dark_theme)
 
         self.bhid = source_buffer.connect("mark_set", self.cursor_set_callback)
@@ -684,8 +683,8 @@ class ShoebotEditorWindow(Gtk.Window):
         else:
             scheme_name = 'classic'
 
-        scheme = self.style_scheme_manager.get_scheme(scheme_name)
-        self.get_source_buffer().set_style_scheme(scheme)
+        ShoebotIDE.set_source_buffers_style_scheme(scheme_name)
+        ShoebotIDE.dark_theme = dark
 
     def on_theme_changed(self, widget, current):
         # Theme is either ThemeLight or ThemeDark
@@ -1108,8 +1107,11 @@ class ShoebotEditorWindow(Gtk.Window):
 class ShoebotIDE:
     untitled_file_counter = 0
     colormap = None
-    buffers = list()
+    source_buffers = list()
     views = list()
+
+    style_scheme_manager = GtkSource.StyleSchemeManager.new()
+
     dark_theme = Gtk.Settings.get_default().get_property(
         "gtk-theme-name"
     ).endswith("-dark")  # TODO - Is there a proper way of doing this?
@@ -1130,8 +1132,14 @@ class ShoebotIDE:
             sys.exit(1)
 
     @classmethod
+    def set_source_buffers_style_scheme(cls, scheme_name):
+        scheme = cls.style_scheme_manager.get_scheme(scheme_name)
+        for source_buffer in cls.source_buffers:
+            source_buffer.set_style_scheme(scheme)
+
+    @classmethod
     def add_buffer(cls, buffer):
-        cls.buffers.append(buffer)
+        cls.source_buffers.append(buffer)
 
     @classmethod
     def add_view(cls, view):
@@ -1139,7 +1147,7 @@ class ShoebotIDE:
 
     @classmethod
     def remove_buffer(cls, buffer):
-        cls.buffers.remove(buffer)
+        cls.source_buffers.remove(buffer)
 
     @classmethod
     def remove_view(cls, view):
