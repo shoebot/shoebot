@@ -623,7 +623,7 @@ class ShoebotEditorWindow(Gtk.Window):
         )
 
         if chooser.run() == Gtk.ResponseType.ACCEPT:
-            self.open_file(chooser.filename)
+            self.open_file(chooser.get_filename())
         chooser.destroy()
 
     def save_or_save_as(self):
