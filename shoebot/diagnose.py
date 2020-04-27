@@ -17,6 +17,8 @@ import traceback
 
 from collections import namedtuple
 
+from shoebot.util import ShoebotInstallError
+
 COL_WIDTH = 10
 
 AvailableModules = namedtuple('AvailableModules', 'gi pgi meta pubsub rsvg vext')
@@ -133,7 +135,6 @@ def shoebot_example(**shoebot_kwargs):
 
     def decorator(f):
         def run():
-            from shoebot.util import ShoebotInstallError  # https://github.com/shoebot/shoebot/issues/206
             print("    Shoebot - %s:" % f.__name__.replace("_", " "))
             try:
                 import shoebot
