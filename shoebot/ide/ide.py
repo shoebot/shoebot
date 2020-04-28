@@ -1113,7 +1113,7 @@ class ShoebotEditorWindow(Gtk.Window):
             import sys
 
             errmsg = traceback.format_exc(limit=1)
-            err = f"Error in Shoebot script:\n {errmsg}"
+            err = _("Error in Shoebot script:") + "\n {errmsg}"
             dialog = Gtk.MessageDialog(
                 self,
                 Gtk.DialogFlags.MODAL,
@@ -1149,15 +1149,17 @@ class ShoebotIDE:
             self.open_files(filenames)
 
     @classmethod
-    def open_files(cls, filelist):
+    def open_files(cls, filenames):
+        files_not_opened = []
         files_were_opened = False
-        for filename in filelist:
+        for filename in filenames:
             filename = os.path.abspath(filename)
             try:
                 ShoebotEditorWindow(filename)
             except IOError as e:
                 files_not_opened.append(filename)
-                errmsg = e.args[1]
+            else:
+                files_were_opened = True
 
         if files_not_opened:
             dialog = Gtk.MessageDialog(
@@ -1165,10 +1167,12 @@ class ShoebotIDE:
                 Gtk.DialogFlags.MODAL,
                 Gtk.MessageType.INFO,
                 Gtk.ButtonsType.OK,
-                f"Cannot open files '%s'" % ", ".join(files_not_opened),
+                _("Cannot open files:") + "\n%s" % "\n".join(files_not_opened),
             )
             dialog.run()
             dialog.destroy()
+
+        if not files_were_opened:
             sys.exit(1)
 
     @classmethod
