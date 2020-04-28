@@ -1137,7 +1137,6 @@ class ShoebotIDE:
     untitled_file_counter = 0
     editor_windows = list()
 
-    style_scheme_manager = GtkSource.StyleSchemeManager.new()
     dark_theme = (
         Gtk.Settings.get_default().get_property("gtk-theme-name").endswith("-dark")
     )  # TODO - Is there a proper way of doing this?
@@ -1177,7 +1176,9 @@ class ShoebotIDE:
 
     @classmethod
     def set_source_buffers_style_scheme(cls, scheme_name):
-        scheme = cls.style_scheme_manager.get_scheme(scheme_name)
+        style_manager = GtkSource.StyleSchemeManager.get_default()
+        scheme = style_manager.get_scheme(scheme_name)
+
         for view in cls.editor_windows:
             source_buffer = view.get_source_buffer()
             source_buffer.set_style_scheme(scheme)
