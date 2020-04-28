@@ -7,7 +7,7 @@ Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home)
 [![Build Status](https://travis-ci.org/shoebot/shoebot.svg?branch=master)](https://travis-ci.org/shoebot/shoebot)
 
 * [How to install](http://shoebot.readthedocs.io/en/latest/install.html)
-* [Getting started](http://shoebot.readthedocs.io/en/latest/commands.html) 
+* [Getting started](https://shoebot.readthedocs.io/en/latest/getstarted.html) 
 
 ## Documentation
 
