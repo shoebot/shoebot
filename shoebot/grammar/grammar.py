@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import copy
 import os
 import sys
@@ -17,10 +15,10 @@ from shoebot.core.events import (
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
 from shoebot.grammar.format_traceback import simple_traceback
-from shoebot.util import flushfile
+from shoebot.util import UnbufferedFile
 
-sys.stdout = flushfile(sys.stdout)
-sys.stderr = flushfile(sys.stderr)
+sys.stdout = UnbufferedFile(sys.stdout)
+sys.stderr = UnbufferedFile(sys.stderr)
 
 
 class Grammar(object):
@@ -300,9 +298,6 @@ class Grammar(object):
             # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
             # maybe this is too verbose, but okay for now
-
-            import sys
-
             if verbose:
                 errmsg = traceback.format_exc()
             else:

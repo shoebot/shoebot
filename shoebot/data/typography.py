@@ -28,9 +28,8 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
-from operator import attrgetter
 
-from shoebot import ShoebotInstallError
+from shoebot.util import ShoebotInstallError, _copy_attrs
 from shoebot.core.backend import cairo, gi, driver
 
 try:
@@ -50,7 +49,7 @@ except ValueError as e:
     Pango = FakePango()
     PangoCairo = FakePango()
 
-from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
+from shoebot.data import Grob, BezierPath, ColorMixin
 from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
 
 
@@ -74,7 +73,7 @@ def pangocairo_create_context(cr):
 
 
 # Map Nodebox / Shoebot names to Pango:
-def _style_name_to_pango(style="normal"):
+def _style_name_to_pango_style(style="normal"):
     """
     Given a Shoebot/Nodebox style name return the a Pango constant.
     """
@@ -84,20 +83,22 @@ def _style_name_to_pango(style="normal"):
         return Pango.Style.ITALIC
     elif style == "oblique":
         return Pango.Style.OBLIQUE
-    raise AttributeError(
+    raise ValueError(
         "Invalid font style, valid styles are: normal, italic and oblique."
     )
 
 
-def _alignment_name_to_pango(alignment):
+def _alignment_name_to_pango_alignment(alignment):
     if alignment == "right":
         return Pango.Alignment.RIGHT
     elif alignment == "center":
         return Pango.Alignment.CENTER
-    elif alignment == "justify":
+    elif alignment in ("left", "justify"):
         return Pango.Alignment.LEFT
 
-    return Pango.Alignment.LEFT
+    raise ValueError(
+        "Invalid font style, valid styles are: left, center, right and justify."
+    )
 
 
 PANGO_WEIGHTS = {
@@ -111,7 +112,7 @@ PANGO_WEIGHTS = {
 }
 
 
-def _weight_name_to_pango(weight="normal"):
+def _weight_name_to_pango_weight(weight="normal"):
     """
     :param weight:  "normal", or "bold"
     :return:  Corresponding pango font weight from Pango.Weight
@@ -173,8 +174,8 @@ class Text(Grob, ColorMixin):
 
         # then we set fontsize (multiplied by Pango.SCALE)
         self._pango_fontface.set_absolute_size(self.fontsize * Pango.SCALE)
-        self._pango_fontface.set_style(_style_name_to_pango(self.style))
-        self._pango_fontface.set_weight(_weight_name_to_pango(self.weight))
+        self._pango_fontface.set_style(_style_name_to_pango_style(self.style))
+        self._pango_fontface.set_weight(_weight_name_to_pango_weight(self.weight))
 
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
@@ -212,7 +213,7 @@ class Text(Grob, ColorMixin):
             if self.indent:
                 self._pango_layout.set_indent(self.indent * Pango.SCALE)
         # set text alignment
-        self._pango_layout.set_alignment(_alignment_name_to_pango(self.align))
+        self._pango_layout.set_alignment(_alignment_name_to_pango_alignment(self.align))
         if self.align == "justify":
             self._pango_layout.set_justify(True)
 

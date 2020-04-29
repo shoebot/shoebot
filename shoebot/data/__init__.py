@@ -39,69 +39,35 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
 """
 
-
-class ShoebotError(Exception):
-    pass
-
-
-class ShoebotScriptError(Exception):
-    pass
-
-
-class NodeBoxError(ShoebotError):
-    pass
-
-
-def _copy_attr(v):
-    if v is None:
-        return None
-    elif hasattr(v, "copy"):
-        return v.copy()
-    elif isinstance(v, list):
-        return list(v)
-    elif isinstance(v, tuple):
-        return tuple(v)
-    elif isinstance(v, (int, str, float, bool)):
-        return v
-    else:
-        raise NodeBoxError(_("Don't know how to copy '%s'.") % v)
-
-
-def _copy_attrs(source, target, attrs):
-    for attr in attrs:
-        setattr(target, attr, _copy_attr(getattr(source, attr)))
-
-
 from . import geometry as geo
 from .point import Point
 from .basecolor import Color, ColorMixin
+from .bezier import (
+    BezierPath,
+    ClippingPath,
+    EndClip,
+    PathElement,
+    MOVETO,
+    RMOVETO,
+    LINETO,
+    RLINETO,
+    CURVETO,
+    RCURVETO,
+    ARC,
+    ELLIPSE,
+    CLOSE,
+    CENTER,
+    CORNER,
+    CORNERS,
+)
 from .grob import Grob
-from .bezier import BezierPath, PathElement, ClippingPath, EndClip
-try:
-    from .typography import Text
-except ImportError as e:
-    Text = None
-    print(('Typography not available ', e))
 from .img import Image
-from .variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
 from .transforms import Transform
+from .typography import Text
+from .variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
 
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
-CLOSE = "close"
-
-CENTER = 'center'
-CORNER = 'corner'
-CORNERS = "corners"
-
-LEFT = 'left'
-RIGHT = 'right'
+LEFT = "left"
+RIGHT = "right"
 
 RGB = "rgb"
 HSB = "hsb"

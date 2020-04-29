@@ -30,12 +30,16 @@ Other commands are available to control playback, try 'help' to
 list them.
 """
 
-from __future__ import print_function
 import base64
 import cmd
 import shlex
 
-from shoebot.core.events import QUIT_EVENT, SOURCE_CHANGED_EVENT, publish_event, SET_WINDOW_TITLE
+from shoebot.core.events import (
+    QUIT_EVENT,
+    SOURCE_CHANGED_EVENT,
+    publish_event,
+    SET_WINDOW_TITLE,
+)
 
 PROMPT = ""
 RESPONSE_PROMPT = ""
@@ -71,14 +75,14 @@ class ShoebotCmd(cmd.Cmd):
     """Simple command processor example."""
 
     shortcuts = {
-        'rw': 'rewind',
-        '?': 'help',
-        'h': 'help',
-        's': 'speed',
-        'g': 'goto',
-        'p': 'pause',
-        'q': 'quit',
-        'r': 'restart'
+        "rw": "rewind",
+        "?": "help",
+        "h": "help",
+        "s": "speed",
+        "g": "goto",
+        "p": "pause",
+        "q": "quit",
+        "r": "restart",
     }
 
     trusted_cmds = set()
@@ -98,14 +102,14 @@ class ShoebotCmd(cmd.Cmd):
         self.pause_speed = None
         self.intro = intro or INTRO
         self.prompt = PROMPT
-        self.response_prompt = ''
+        self.response_prompt = ""
         self.use_rawinput = False
         self.cookie = None
         self.escape_nl = False
-        self.live_prefix = ''
+        self.live_prefix = ""
         self.trusted = trusted
 
-    def print_response(self, input='', keep=False, *args, **kwargs):
+    def print_response(self, input="", keep=False, *args, **kwargs):
         """
         print response, if cookie is set then print that each line
         :param args:
@@ -115,31 +119,35 @@ class ShoebotCmd(cmd.Cmd):
                        if set to 'False' disables cookie output entirely
         :return:
         """
-        cookie = kwargs.get('cookie')
+        cookie = kwargs.get("cookie")
         if cookie is None:
-            cookie = self.cookie or ''
-        status = kwargs.get('status')
+            cookie = self.cookie or ""
+        status = kwargs.get("status")
         lines = input.splitlines()
         if status and not lines:
-            lines = ['']
+            lines = [""]
 
         if cookie:
-            output_template = '{cookie} {status}{cookie_char}{line}'
+            output_template = "{cookie} {status}{cookie_char}{line}"
         else:
-            output_template = '{line}'
+            output_template = "{line}"
 
         for i, line in enumerate(lines):
             if i != len(lines) - 1 or keep is True:
-                cookie_char = '>'
+                cookie_char = ">"
             else:
                 # last line
-                cookie_char = ':'
+                cookie_char = ":"
 
-            print(output_template.format(
-                cookie_char=cookie_char,
-                cookie=cookie,
-                status=status or '',
-                line=line.strip()), file=self.stdout)
+            print(
+                output_template.format(
+                    cookie_char=cookie_char,
+                    cookie=cookie,
+                    status=status or "",
+                    line=line.strip(),
+                ),
+                file=self.stdout,
+            )
 
     def emptyline(self):
         """
@@ -153,7 +161,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         Escape newlines in any responses
         """
-        if arg.lower() == 'off':
+        if arg.lower() == "off":
             self.escape_nl = False
         else:
             self.escape_nl = True
@@ -164,14 +172,16 @@ class ShoebotCmd(cmd.Cmd):
         :param arg: on|off
         :return:
         """
-        if arg.lower() == 'off':
-            self.response_prompt = ''
-            self.prompt = ''
+        if arg.lower() == "off":
+            self.response_prompt = ""
+            self.prompt = ""
             return
-        elif arg.lower() == 'on':
+        elif arg.lower() == "on":
             self.prompt = PROMPT
             self.response_prompt = RESPONSE_PROMPT
-        self.print_response('prompt: %s' % self.prompt, '\n', 'response: %s' % self.response_prompt)
+        self.print_response(
+            "prompt: %s" % self.prompt, "\n", "response: %s" % self.response_prompt
+        )
 
     def do_title(self, title):
         """
@@ -187,9 +197,9 @@ class ShoebotCmd(cmd.Cmd):
             try:
                 self.bot._speed = float(speed)
             except Exception as e:
-                self.print_response('%s is not a valid framerate' % speed)
+                self.print_response("%s is not a valid framerate" % speed)
                 return
-        self.print_response('Speed: %s FPS' % self.bot._speed)
+        self.print_response("Speed: %s FPS" % self.bot._speed)
 
     def do_restart(self, line):
         """
@@ -207,11 +217,11 @@ class ShoebotCmd(cmd.Cmd):
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
-            self.print_response('Paused')
+            self.print_response("Paused")
         else:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
-            self.print_response('Playing')
+            self.print_response("Playing")
 
     def do_play(self, line):
         """
@@ -246,7 +256,9 @@ class ShoebotCmd(cmd.Cmd):
             max_name_len = max([len(name) for name in self.bot._vars])
             for i, (name, v) in enumerate(self.bot._vars.items()):
                 keep = i < len(self.bot._vars) - 1
-                self.print_response("%s = %s" % (name.ljust(max_name_len), v.value), keep=keep)
+                self.print_response(
+                    "%s = %s" % (name.ljust(max_name_len), v.value), keep=keep
+                )
         else:
             self.print_response("No vars")
 
@@ -272,16 +284,20 @@ class ShoebotCmd(cmd.Cmd):
         def source_bad(tb):
             if called_good:
                 # good and bad callbacks shouldn't both be called
-                raise ValueError('Good AND Bad callbacks called !')
+                raise ValueError("Good AND Bad callbacks called !")
             self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
-            self.print_response(tb.replace('\n', '\\n'), cookie=cookie)
+            self.print_response(tb.replace("\n", "\\n"), cookie=cookie)
             executor.clear_callbacks()
 
         called_good = False
         source = str(base64.b64decode(line))
         # Test compile
-        publish_event(SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source")
-        self.bot._executor.load_edited_source(source, good_cb=source_good, bad_cb=source_bad)
+        publish_event(
+            SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source"
+        )
+        self.bot._executor.load_edited_source(
+            source, good_cb=source_good, bad_cb=source_bad
+        )
 
     def do_bye(self, line):
         """
@@ -297,7 +313,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         if self.trusted:
             publish_event(QUIT_EVENT)
-        self.print_response('Bye.\n')
+        self.print_response("Bye.\n")
         return True
 
     def do_quit(self, line):
@@ -343,20 +359,22 @@ class ShoebotCmd(cmd.Cmd):
         Set a variable.
         """
         try:
-            name, value = [part.strip() for part in line.split('=')]
+            name, value = [part.strip() for part in line.split("=")]
             if name not in self.bot._vars:
-                self.print_response('No such variable %s enter vars to see available vars' % name)
+                self.print_response(
+                    "No such variable %s enter vars to see available vars" % name
+                )
                 return
             variable = self.bot._vars[name]
-            variable.value = variable.sanitize(value.strip(';'))
+            variable.value = variable.sanitize(value.strip(";"))
 
             success, msg = self.bot.canvas.sink.var_changed(name, variable.value)
             if success:
-                print('{}={}'.format(name, variable.value), file=self.stdout)
+                print("{}={}".format(name, variable.value), file=self.stdout)
             else:
-                print('{}\n'.format(msg), file=self.stdout)
+                print("{}\n".format(msg), file=self.stdout)
         except Exception as e:
-            print('Invalid Syntax.', e)
+            print("Invalid Syntax.", e)
             return
 
     def precmd(self, line):
@@ -371,14 +389,14 @@ class ShoebotCmd(cmd.Cmd):
         :return:
         """
         args = shlex.split(line or "")
-        if args and 'cookie=' in args[-1]:
-            cookie_index = line.index('cookie=')
-            cookie = line[cookie_index + 7:]
+        if args and "cookie=" in args[-1]:
+            cookie_index = line.index("cookie=")
+            cookie = line[cookie_index + 7 :]
             line = line[:cookie_index].strip()
             self.cookie = cookie
-        if line.startswith('#'):
-            return ''
-        elif '=' in line:
+        if line.startswith("#"):
+            return ""
+        elif "=" in line:
             # allow  somevar=somevalue
 
             # first check if we really mean a command
@@ -401,4 +419,4 @@ class ShoebotCmd(cmd.Cmd):
         return stop
 
     def postloop(self):
-        print('', file=self.stdout)
+        print("", file=self.stdout)

@@ -23,11 +23,11 @@ from shoebot.core.backend import gi
 from gi.repository import GObject
 from .shell import ShoebotCmd
 
-APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
-locale.setlocale(locale.LC_ALL, '')
+APP = "shoebot"
+DIR = sys.prefix + "/share/shoebot/locale"
+locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
+# gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
@@ -53,6 +53,7 @@ Enter bye or press CTRL-D to quit.
 
 INTRO = "[o_o] " + '"Shoebot Telnet Shell, enter "help" for help."'
 
+
 def create_listening_socket(host, port, handler):
     """
     Create socket and set listening options
@@ -70,15 +71,16 @@ def create_listening_socket(host, port, handler):
     GObject.io_add_watch(sock, GObject.IO_IN, handler)
     return sock
 
+
 class SocketServer(object):
     def __init__(self, bot, host, port):
-        '''Initialize server and start listening.'''
+        """Initialize server and start listening."""
         create_listening_socket(host, port, self.listener)
         self.shell = None
         self.bot = bot
 
     def listener(self, sock, *args):
-        '''Asynchronous connection listener. Starts a handler for each connection.'''
+        """Asynchronous connection listener. Starts a handler for each connection."""
         conn, addr = sock.accept()
         f = conn.makefile(conn)
         self.shell = ShoebotCmd(self.bot, stdin=f, stdout=f, intro=INTRO)
@@ -86,22 +88,22 @@ class SocketServer(object):
         print((_("Connected")))
         GObject.io_add_watch(conn, GObject.IO_IN, self.handler)
         if self.shell.intro:
-            self.shell.stdout.write(str(self.shell.intro)+"\n")
+            self.shell.stdout.write(str(self.shell.intro) + "\n")
             self.shell.stdout.flush()
         return True
 
     def handler(self, conn, *args):
-        '''
+        """
         Asynchronous connection handler. Processes each line from the socket.
-        '''
+        """
         # lines from cmd.Cmd
         self.shell.stdout.write(self.shell.prompt)
         line = self.shell.stdin.readline()
         if not len(line):
-            line = 'EOF'
+            line = "EOF"
             return False
         else:
-            line = line.rstrip('\r\n')
+            line = line.rstrip("\r\n")
             line = self.shell.precmd(line)
             stop = self.shell.onecmd(line)
             stop = self.shell.postcmd(stop, line)

@@ -1,31 +1,40 @@
+import gettext
+import locale
 import sys
-from .bot import Bot
-from shoebot.data import BezierPath, Image, ShoebotError
+
 from math import radians as deg2rad
 
-import locale, gettext
-APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
-locale.setlocale(locale.LC_ALL, '')
+from .bot import Bot
+from shoebot.data import BezierPath, Image
+
+APP = "shoebot"
+DIR = sys.prefix + "/share/shoebot/locale"
+
+locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
-#gettext.bindtextdomain(APP)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-'''
+"""
     - text() should be flipped in CENTER mode, maybe include it in the text class?
-'''
+"""
 
-TOP_LEFT = 1
-BOTTOM_LEFT = 2
+TOP_LEFT = "top-left"
+BOTTOM_LEFT = "bottom-right"
+CORNER = "corner"
 
-CORNER = 'corner'
+
+class DrawBotError(Exception):
+    pass
+
 
 class DrawBot(Bot):
+    """
+    An implementation of a pretty old version of the drawbot grammar.
+    """
 
-    def __init__(self, canvas, namespace = None, vars = None):
-        ### TODO - Need to do whole drawbot class
-        Bot.__init__(self, canvas, namespace = namespace, vars = None)
+    def __init__(self, canvas, namespace=None, vars=None):
+        Bot.__init__(self, canvas, namespace=namespace, vars=None)
         self._transformmode = CORNER
         self._canvas.origin = BOTTOM_LEFT
 
@@ -34,10 +43,10 @@ class DrawBot(Bot):
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        '''Draws a rectangle with top left corner at (x,y)
+        """Draws a rectangle with top left corner at (x,y)
 
         The roundness variable sets rounded corners.
-        '''
+        """
         path = self.BezierPath(**kwargs)
         path.rect(x, y, width, height, roundness, self.rectmode)
         if draw:
@@ -51,10 +60,10 @@ class DrawBot(Bot):
         elif mode is None:
             return self.rectmode
         else:
-            raise ShoebotError(_("rectmode: invalid input"))
+            raise ValueError(_("rectmode: invalid input"))
 
     def oval(self, x, y, width, height, draw=True, **kwargs):
-        '''Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same'''
+        """Draws an ellipse starting from (x,y) -  ovals and ellipses are not the same"""
         path = self.BezierPath(**kwargs)
         path.ellipse(x, y, width, height)
         if draw:
@@ -62,9 +71,9 @@ class DrawBot(Bot):
         return path
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
-        '''Draws an ellipse starting from (x,y)'''
+        """Draws an ellipse starting from (x,y)"""
         path = self.BezierPath(**kwargs)
-        path.ellipse(x,y,width,height)
+        path.ellipse(x, y, width, height)
         if draw:
             path.draw()
         return path
@@ -73,11 +82,11 @@ class DrawBot(Bot):
         self.ellipse(x, y, diameter, diameter)
 
     def line(self, x1, y1, x2, y2, draw=True):
-        '''Draws a line from (x1,y1) to (x2,y2)'''
+        """Draws a line from (x1,y1) to (x2,y2)"""
         p = self._path
         self.newpath()
-        self.moveto(x1,y1)
-        self.lineto(x2,y2)
+        self.moveto(x1, y1)
+        self.lineto(x2, y2)
         self.endpath(draw=draw)
         self._path = p
         return p
@@ -88,44 +97,44 @@ class DrawBot(Bot):
     def newpath(self, x=None, y=None):
         self._path = self.BezierPath()
         if x and y:
-            self._path.moveto(x,y)
+            self._path.moveto(x, y)
         self._path.closed = False
 
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
-            self._path.moveto(x,y)
+            self._path.moveto(x, y)
 
     def moveto(self, x, y):
         if self._path is None:
             ## self.newpath()
-            raise ShoebotError(_("No current path. Use newpath() first."))
-        self._path.moveto(x,y)
+            raise DrawbotError(_("No current path. Use newpath() first."))
+        self._path.moveto(x, y)
 
     def lineto(self, x, y):
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
+            raise DrawbotError(_("No current path. Use newpath() first."))
         self._path.lineto(x, y)
 
     def curveto(self, x1, y1, x2, y2, x3, y3):
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
+            raise DrawbotError(_("No current path. Use newpath() first."))
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
     def arcto(self, x, y, radius, angle1, angle2):
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
+            raise DrawbotError(_("No current path. Use newpath() first."))
         self._path.arc(x, y, radius, angle1, angle2)
 
     def closepath(self):
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
+            raise DrawbotError(_("No current path. Use newpath() first."))
         if not self._path.closed:
             self._path.closepath()
             self._path.closed = True
 
     def endpath(self, draw=True):
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
+            raise DrawbotError(_("No current path. Use newpath() first."))
         if self._autoclosepath:
             self._path.closepath()
         p = self._path
@@ -135,46 +144,56 @@ class DrawBot(Bot):
             self._path = None
         return p
 
-    def drawpath(self,path):
+    def drawpath(self, path):
         if isinstance(path, BezierPath):
             p = self.BezierPath(path=path)
             p.draw()
         elif isinstance(path, Image):
-            path.draw() # Is this right ? - added to make test_clip_4.bot work
-        elif hasattr(path, '__iter__'):
+            path.draw()  # Is this right ? - added to make test_clip_4.bot work
+        elif hasattr(path, "__iter__"):
             p = self.BezierPath()
             for point in path:
                 p.addpoint(point)
             p.draw()
-        
 
     def relmoveto(self, x, y):
-        '''Move relatively to the last point.'''
+        """Move relatively to the last point."""
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
-        self._path.relmoveto(x,y)
+            raise DrawbotError(_("No current path. Use newpath() first."))
+        self._path.relmoveto(x, y)
 
     def rellineto(self, x, y):
-        '''Draw a line using relative coordinates.'''
+        """Draw a line using relative coordinates."""
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
-        self._path.rellineto(x,y)
+            raise DrawbotError(_("No current path. Use newpath() first."))
+        self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        '''Draws a curve relatively to the last point.
-        '''
+        """Draws a curve relatively to the last point.
+        """
         if self._path is None:
-            raise ShoebotError(_("No current path. Use newpath() first."))
-        self._path.relcurveto(x,y)
+            raise DrawbotError(_("No current path. Use newpath() first."))
+        self._path.relcurveto(x, y)
 
-    def autoclosepath(self, close=True): 
+    def autoclosepath(self, close=True):
         self._autoclosepath = close
 
     # Image
 
-    def image(self, path, x, y, width=None, height=None, alpha=1.0, data=None, draw=True, **kwargs):
-        '''Draws a image form path, in x,y and resize it to width, height dimensions.
-        '''
+    def image(
+        self,
+        path,
+        x,
+        y,
+        width=None,
+        height=None,
+        alpha=1.0,
+        data=None,
+        draw=True,
+        **kwargs
+    ):
+        """Draws a image form path, in x,y and resize it to width, height dimensions.
+        """
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -182,11 +201,11 @@ class DrawBot(Bot):
         return img.size
 
     def drawimage(self, image):
-        self.image(image.path, image.x, image.y, data = image.data)
+        self.image(image.path, image.x, image.y, data=image.data)
 
     #### Transform and utility
 
-    def translate(self, xt, yt, mode = None):
+    def translate(self, xt, yt, mode=None):
         self._canvas.translate(xt, yt)
         if mode:
             self._canvas.mode = mode
@@ -212,8 +231,8 @@ class DrawBot(Bot):
     def skew(self, x=1, y=0):
         ### TODO bring back transform mixin
         t = self._canvas.transform
-        t *= cairo.Matrix(1,0,x,1,0,0)
-        t *= cairo.Matrix(1,y,0,1,0,0)
+        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
+        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
         self._canvas.transform = t
 
     def push(self):
@@ -228,11 +247,11 @@ class DrawBot(Bot):
     #### Color
 
     def colormode(self, mode=None, crange=None):
-        '''Sets the current colormode (can be RGB or HSB) and eventually
+        """Sets the current colormode (can be RGB or HSB) and eventually
         the color range.
 
         If called without arguments, it returns the current colormode.
-        '''
+        """
         if mode is not None:
             if mode == "rgb":
                 self.color_mode = Bot.RGB
@@ -247,41 +266,41 @@ class DrawBot(Bot):
     def colorrange(self, crange):
         self.color_range = float(crange)
 
-    def fill(self,*args):
-        '''Sets a fill color, applying it to new paths.'''
+    def fill(self, *args):
+        """Sets a fill color, applying it to new paths."""
         self._fillcolor = self.color(*args)
         return self._fillcolor
 
     def nofill(self):
-        ''' Stop applying fills to new paths.'''
+        """ Stop applying fills to new paths."""
         self._fillcolor = None
 
-    def stroke(self,*args):
-        '''Set a stroke color, applying it to new paths.'''
+    def stroke(self, *args):
+        """Set a stroke color, applying it to new paths."""
         self._strokecolor = self.color(*args)
         return self._strokecolor
 
     def nostroke(self):
-        ''' Stop applying strokes to new paths.'''
+        """ Stop applying strokes to new paths."""
         self._strokecolor = None
 
     def strokewidth(self, w=None):
-        '''Set the stroke width.'''
+        """Set the stroke width."""
         if w is not None:
             self._strokewidth = w
         else:
             return self._strokewidth
 
-    def background(self,*args):
-        '''Set the background colour.'''
+    def background(self, *args):
+        """Set the background colour."""
         self._canvas.background = self.color(*args)
 
     #### Text
 
     def font(self, fontpath=None, fontsize=None):
-        '''Set the font to be used with new text instances.
+        """Set the font to be used with new text instances.
 
-        Accepts any font Pango can recognize'''
+        Accepts any font Pango can recognize"""
         if fontpath is not None:
             self._canvas.fontfile = fontpath
         else:
@@ -295,23 +314,27 @@ class DrawBot(Bot):
         else:
             return self._canvas.font_size
 
-    def text(self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs):
-        '''
+    def text(
+        self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs
+    ):
+        """
         Draws a string of text according to current font settings.
-        '''
+        """
         txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
-          path = txt.path
-          if draw:
-              path.draw()
-          return path
+            path = txt.path
+            if draw:
+                path.draw()
+            return path
         else:
-          return txt
+            return txt
 
-    def textpath(self, txt, x, y, width=None, height=1000000, enableRendering=False, **kwargs):
-        '''
+    def textpath(
+        self, txt, x, y, width=None, height=1000000, enableRendering=False, **kwargs
+    ):
+        """
         Draws an outlined path of the input text
-        '''
+        """
         txt = self.Text(txt, x, y, width, height, **kwargs)
         path = txt.path
         if draw:
@@ -319,28 +342,28 @@ class DrawBot(Bot):
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):
-        '''Returns the width and height of a string of text as a tuple
+        """Returns the width and height of a string of text as a tuple
         (according to current font settings).
-        '''
+        """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        
+
         # we send doRender=False to prevent the actual rendering process, only the path generation is enabled
         # not the most efficient way, but it generates accurate results
         txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):
-        '''Returns the width of a string of text according to the current
+        """Returns the width of a string of text according to the current
         font settings.
-        '''
+        """
         w = width
         return self.textmetrics(txt, width=w)[0]
 
     def textheight(self, txt, width=None):
-        '''Returns the height of a string of text according to the current
+        """Returns the height of a string of text according to the current
         font settings.
-        '''
+        """
         w = width
         return self.textmetrics(txt, width=w)[1]
 
@@ -349,8 +372,6 @@ class DrawBot(Bot):
             self._canvas.lineheight = height
 
     def align(self, align="LEFT"):
-        self._canvas.align=align
+        self._canvas.align = align
 
     # TODO: Set the framework to setup font options
-
-

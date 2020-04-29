@@ -5,11 +5,11 @@ import errno
 import gettext
 import locale
 import os
+import traceback
 import sys
 
 import shoebot
 
-from shoebot.data import ShoebotError
 from shoebot.core.backend import gi
 
 gi.require_version("Gdk", "3.0")
@@ -1088,6 +1088,8 @@ class ShoebotEditorWindow(Gtk.Window):
         return count
 
     def on_run_script(self, widget):
+        self.console_error.clear()
+
         # get the buffer contents
         source_buffer = self.source_view.get_buffer()
         start, end = source_buffer.get_bounds()
@@ -1108,7 +1110,7 @@ class ShoebotEditorWindow(Gtk.Window):
             )
             self.shoebot_window = bot._canvas.sink
             bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
-        except (ShoebotError, NameError):
+        except (Exception, NameError):
             import traceback
             import sys
 

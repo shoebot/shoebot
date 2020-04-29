@@ -7,12 +7,14 @@ from shoebot.core.backend import cairo, gi, driver
 from shoebot.core.events import REDRAW, publish_event
 from shoebot.sbio.socket_server import SocketServer
 
-gi.require_version('Gtk', '3.0')
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 pycairo = driver.cairo
 
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+ICON_FILE = resource_filename(
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+)
 
 
 class BackingStore:
@@ -35,9 +37,9 @@ class BackingStore:
 
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):
-    '''
+    """
     Create a double buffered GTK+ widget on which we will draw using Cairo
-    '''
+    """
 
     # Draw in response to an expose-event
     def __init__(self, scale_fit=True, input_device=None):
@@ -106,9 +108,9 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             self.input_device.scale_y = scale_y
 
     def draw(self, widget, cr):
-        '''
+        """
         Draw just the exposed part of the backing store, scaled to fit
-        '''
+        """
         if self.bot_size is None:
             # No bot to draw yet.
             self.draw_default_image(cr)
@@ -121,27 +123,29 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         cr.paint()
 
     def create_rcontext(self, size, frame):
-        '''
+        """
         Creates a recording surface for the bot to draw on
 
         :param size: The width and height of bot
-        '''
+        """
         self.frame = frame
         width, height = size
-        meta_surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
+        meta_surface = cairo.RecordingSurface(
+            cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height)
+        )
 
         ctx = cairo.Context(meta_surface)
         return ctx
 
     def do_drawing(self, size, frame, cairo_ctx):
-        '''
+        """
         Update the backing store from a cairo context and
         schedule a redraw (expose event)
 
         :param size: width, height in pixels of bot
         :param frame: frame # thar was drawn
         :param cairo_ctx: cairo context the bot was drawn on
-        '''
+        """
         if self.get_window() and not self.bot_size:
             # Get initial size for window
             self.set_size_request(*size)

@@ -16,10 +16,12 @@ from .gtk_input_device import GtkInputDeviceMixin
 import locale
 import gettext
 
-APP = 'shoebot'
-DIR = sys.prefix + '/share/shoebot/locale'
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
-locale.setlocale(locale.LC_ALL, '')
+APP = "shoebot"
+DIR = sys.prefix + "/share/shoebot/locale"
+ICON_FILE = resource_filename(
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+)
+locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
@@ -29,8 +31,18 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
     """
     Create a GTK+ window that contains a ShoebotWidget
     """
+
     # Draw in response to an expose-event
-    def __init__(self, title=None, show_vars=False, menu_enabled=True, server=False, port=7777, fullscreen=False, outputfile=None):
+    def __init__(
+        self,
+        title=None,
+        show_vars=False,
+        menu_enabled=True,
+        server=False,
+        port=7777,
+        fullscreen=False,
+        outputfile=None,
+    ):
         Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
         GtkInputDeviceMixin.__init__(self)
@@ -62,25 +74,79 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
 
-        self.action_group = Gtk.ActionGroup(name='Canvas')
+        self.action_group = Gtk.ActionGroup(name="Canvas")
 
-        self.action_group.add_actions([('Save as', None, _('_Save as')),
-                                       ('svg', 'Save as SVG', _('Save as _SVG'), "<Control>1", None, self.snapshot_svg),
-                                       ('pdf', 'Save as PDF', _('Save as _PDF'), "<Control>2", None, self.snapshot_pdf),
-                                       ('ps', 'Save as PS', _('Save as P_S'), "<Control>3", None, self.snapshot_ps),
-                                       ('png', 'Save as PNG', _('Save as P_NG'), "<Control>4", None, self.snapshot_png),
-                                       ('close', 'Close window', _('_Close Window'), "<Control>w", None,
-                                        self.do_window_close)
-                                       ])
+        self.action_group.add_actions(
+            [
+                ("Save as", None, _("_Save as")),
+                (
+                    "svg",
+                    "Save as SVG",
+                    _("Save as _SVG"),
+                    "<Control>1",
+                    None,
+                    self.snapshot_svg,
+                ),
+                (
+                    "pdf",
+                    "Save as PDF",
+                    _("Save as _PDF"),
+                    "<Control>2",
+                    None,
+                    self.snapshot_pdf,
+                ),
+                (
+                    "ps",
+                    "Save as PS",
+                    _("Save as P_S"),
+                    "<Control>3",
+                    None,
+                    self.snapshot_ps,
+                ),
+                (
+                    "png",
+                    "Save as PNG",
+                    _("Save as P_NG"),
+                    "<Control>4",
+                    None,
+                    self.snapshot_png,
+                ),
+                (
+                    "close",
+                    "Close window",
+                    _("_Close Window"),
+                    "<Control>w",
+                    None,
+                    self.do_window_close,
+                ),
+            ]
+        )
 
-        self.action_group.add_toggle_actions([
-            ('vars', 'Variables Window', _('Va_riables Window'), "<Control>r", None, self.do_toggle_variables,
-             self.show_vars),
-            ('fullscreen', 'Fullscreen', _('_Fullscreen'), "<Control>f", None, self.do_toggle_fullscreen, False),
-            ('play', 'Play', _('_Play'), "<Alt>p", None, self.do_toggle_play, True),
-        ])
+        self.action_group.add_toggle_actions(
+            [
+                (
+                    "vars",
+                    "Variables Window",
+                    _("Va_riables Window"),
+                    "<Control>r",
+                    None,
+                    self.do_toggle_variables,
+                    self.show_vars,
+                ),
+                (
+                    "fullscreen",
+                    "Fullscreen",
+                    _("_Fullscreen"),
+                    "<Control>f",
+                    None,
+                    self.do_toggle_fullscreen,
+                    False,
+                ),
+                ("play", "Play", _("_Play"), "<Alt>p", None, self.do_toggle_play, True),
+            ]
+        )
 
-        menuxml = '''
+        menuxml = """
         <popup action="Save as">
             <menuitem action="play"/>
             <menuitem action="vars"/>
@@ -94,7 +160,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             <separator/>
             <menuitem action="close"/>
         </popup>
-        '''
+        """
 
         self.uimanager.insert_action_group(self.action_group, 0)
         self.uimanager.add_ui_from_string(menuxml)
@@ -117,9 +183,9 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.pause_speed = None  # TODO - factor out bot controller stuff
 
     def gtk_mouse_button_down(self, widget, event):
-        ''' Handle right mouse button clicks '''
+        """ Handle right mouse button clicks """
         if self.menu_enabled and event.button == 3:
-            menu = self.uimanager.get_widget('/Save as')
+            menu = self.uimanager.get_widget("/Save as")
             menu.popup(None, None, None, None, event.button, event.time)
         else:
             super(ShoebotWindow, self).gtk_mouse_button_down(widget, event)
@@ -159,7 +225,9 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         Show the variables window.
         """
         if self.var_window is None and self.bot._vars:
-            self.var_window = VarWindow(self, self.bot, '%s variables' % (self.title or 'Shoebot'))
+            self.var_window = VarWindow(
+                self, self.bot, "%s variables" % (self.title or "Shoebot")
+            )
             self.var_window.window.connect("destroy", self.var_window_closed)
 
     def hide_variables_window(self):
@@ -177,7 +245,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         :return:
         """
         # TODO - Clean up the menu handling stuff its a bit spagetti right now
-        self.action_group.get_action('vars').set_active(False)
+        self.action_group.get_action("vars").set_active(False)
         self.show_vars = False
         self.var_window = None
 
@@ -195,42 +263,42 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         :param format:  Format, e.g. svg, pdf, png
         :return:  Full image filename, based on bot name
         """
-        script = self.bot._namespace['__file__']
+        script = self.bot._namespace["__file__"]
         if script:
-            return f'{Path(script).stem}.{format}'
+            return f"{Path(script).stem}.{format}"
 
-        return f'output.{format}'
+        return f"output.{format}"
 
     def snapshot_svg(self, widget):
         """
         Request to save an SVG file after drawing is complete.
         """
-        self.pending_snapshots.append(self.output_image_filename('svg'))
+        self.pending_snapshots.append(self.output_image_filename("svg"))
 
     def snapshot_ps(self, widget):
         """
         Request to save a Postscript file after drawing is complete.
         """
-        self.pending_snapshots.append(self.output_image_filename('ps'))
+        self.pending_snapshots.append(self.output_image_filename("ps"))
 
     def snapshot_pdf(self, widget):
         """
         Request to save a PDF file after drawing is complete.
         """
-        self.pending_snapshots.append(self.output_image_filename('pdf'))
+        self.pending_snapshots.append(self.output_image_filename("pdf"))
 
     def snapshot_png(self, widget):
         """
         Request to save a PNG file after drawing is complete.
         """
-        self.pending_snapshots.append(self.output_image_filename('png'))
+        self.pending_snapshots.append(self.output_image_filename("png"))
 
     def trigger_fullscreen_action(self, fullscreen):
         """
         Toggle fullscreen from outside the GUI,
         causes the GUI to updated and run all its actions.
         """
-        action = self.action_group.get_action('fullscreen')
+        action = self.action_group.get_action("fullscreen")
         action.set_active(fullscreen)
 
     def do_fullscreen(self, widget):
