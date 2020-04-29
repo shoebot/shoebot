@@ -20,20 +20,19 @@ INFINITE = 1e20  # float("inf") doesn't work on windows.
 def angle(x0, y0, x1, y1):
     """ Returns the angle between two points.
     """
-    return degrees(atan2(y1-y0, x1-x0))
+    return degrees(atan2(y1 - y0, x1 - x0))
 
 
 def distance(x0, y0, x1, y1):
     """ Returns the distance between two points.
     """
-    return sqrt(pow(x1-x0, 2) + pow(y1-y0, 2))
+    return sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2))
 
 
 def coordinates(x0, y0, distance, angle):
     """ Returns the location of a point by rotating around origin (x0,y0).
     """
-    return (x0 + cos(radians(angle)) * distance,
-            y0 + sin(radians(angle)) * distance)
+    return (x0 + cos(radians(angle)) * distance, y0 + sin(radians(angle)) * distance)
 
 
 def rotate(x, y, x0, y0, angle):
@@ -41,15 +40,13 @@ def rotate(x, y, x0, y0, angle):
     """
     x, y = x - x0, y - y0
     a, b = cos(radians(angle)), sin(radians(angle))
-    return (x * a - y * b + x0,
-            y * a + x * b + y0)
+    return (x * a - y * b + x0, y * a + x * b + y0)
 
 
 def reflect(x, y, x0, y0, d=1.0, a=180):
     """ Returns the reflection of a point through origin (x0,y0).
     """
-    return coordinates(x0, y0, d * distance(x0, y0, x, y),
-                       a + angle(x0, y0, x, y))
+    return coordinates(x0, y0, d * distance(x0, y0, x, y), a + angle(x0, y0, x, y))
 
 
 # Fast C implementations:
@@ -60,6 +57,7 @@ except:
 
 
 # --- INTERPOLATION -----------------------------------------------------------------------------------
+
 
 def lerp(a, b, t):
     """ Returns the linear interpolation between a and b for time t between 0.0-1.0.
@@ -91,6 +89,7 @@ def clamp(v, a, b):
 
 # --- INTERSECTION ------------------------------------------------------------------------------------
 
+
 def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
     """ Determines the intersection point of two lines, or two finite line segments if infinite=False.
         When the lines do not intersect, returns an empty list.
@@ -111,8 +110,7 @@ def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
     if not infinite and not (0 <= ua <= 1 and 0 <= ub <= 1):
         # Intersection point is not within both line segments.
         return None, None
-    return [(x1 + ua * (x2 - x1),
-             y1 + ua * (y2 - y1))]
+    return [(x1 + ua * (x2 - x1), y1 + ua * (y2 - y1))]
 
 
 def circle_line_intersection(cx, cy, radius, x1, y1, x2, y2, infinite=False):
@@ -179,8 +177,8 @@ def point_in_polygon(points, x, y):
 # --- AFFINE TRANSFORM --------------------------------------------------------------------------------
 # Based on http://www.senocular.com/flash/tutorials/transformmatrix/
 
-class AffineTransform:
 
+class AffineTransform:
     def __init__(self, transform=None):
         """ A geometric transformation in Euclidean space (i.e. 2D)
             that preserves collinearity and ratio of distance between points.
@@ -217,7 +215,7 @@ class AffineTransform:
             0,
             a[6] * b[0] + a[7] * b[3] + b[6],
             a[6] * b[1] + a[7] * b[4] + b[7],
-            1
+            1,
         ]
 
     def invert(self):
@@ -226,46 +224,53 @@ class AffineTransform:
         m = self.matrix
         d = m[0] * m[4] - m[1] * m[3]
         self.matrix = [
-             m[4] / d, -m[1] / d, 0,
-             -m[3] / d,  m[0] / d, 0,
-             (m[3] * m[7] - m[4] * m[6]) / d,
-             -(m[0] * m[7] - m[1] * m[6]) / d,
-             1
+            m[4] / d,
+            -m[1] / d,
+            0,
+            -m[3] / d,
+            m[0] / d,
+            0,
+            (m[3] * m[7] - m[4] * m[6]) / d,
+            -(m[0] * m[7] - m[1] * m[6]) / d,
+            1,
         ]
 
     @property
     def inverse(self):
-        m = self.copy(); m.invert(); return m;
+        m = self.copy()
+        m.invert()
+        return m
 
     @property
     def identity(self):
-        return [1,0,0, 0,1,0, 0,0,1]
+        return [1, 0, 0, 0, 1, 0, 0, 0, 1]
 
     def scale(self, x, y=None):
-        if y==None: y = x
-        self.matrix = self._mmult([x,0,0, 0,y,0, 0,0,1], self.matrix)
+        if y == None:
+            y = x
+        self.matrix = self._mmult([x, 0, 0, 0, y, 0, 0, 0, 1], self.matrix)
 
     def translate(self, x, y):
-        self.matrix = self._mmult([1,0,0, 0,1,0, x,y,1], self.matrix)
+        self.matrix = self._mmult([1, 0, 0, 0, 1, 0, x, y, 1], self.matrix)
 
     def rotate(self, degrees=0, radians=0):
-        radians = degrees and degrees*pi/180 or radians
+        radians = degrees and degrees * pi / 180 or radians
         c = cos(radians)
         s = sin(radians)
-        self.matrix = self._mmult([c,s,0, -s,c,0, 0,0,1], self.matrix)
+        self.matrix = self._mmult([c, s, 0, -s, c, 0, 0, 0, 1], self.matrix)
 
     def transform_point(self, x, y):
         """ Returns the new coordinates of (x,y) after transformation.
         """
         m = self.matrix
-        return (x*m[0]+y*m[3]+m[6], x*m[1]+y*m[4]+m[7])
+        return (x * m[0] + y * m[3] + m[6], x * m[1] + y * m[4] + m[7])
 
     apply = transform_point
 
     def transform_path(self, path):
         """ Returns a BezierPath object with the transformation applied.
         """
-        p = path.__class__() # Create a new BezierPath.
+        p = path.__class__()  # Create a new BezierPath.
         for pt in path:
             if pt.cmd == "close":
                 p.closepath()
@@ -287,20 +292,22 @@ class AffineTransform:
     def map(self, points):
         return [self.apply(*pt) for pt in points]
 
-#=====================================================================================================
 
-#--- POINT -------------------------------------------------------------------------------------------
+# =====================================================================================================
+
+# --- POINT -------------------------------------------------------------------------------------------
+
 
 class Point(object):
-
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
 
     def _get_xy(self):
         return (self.x, self.y)
+
     def _set_xy(self, xxx_todo_changeme):
-        (x,y) = xxx_todo_changeme
+        (x, y) = xxx_todo_changeme
         self.x = x
         self.y = y
 
@@ -313,27 +320,32 @@ class Point(object):
         return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
 
     def __eq__(self, pt):
-        if not isinstance(pt, Point): return False
-        return self.x == pt.x \
-           and self.y == pt.y
+        if not isinstance(pt, Point):
+            return False
+        return self.x == pt.x and self.y == pt.y
 
     def __ne__(self, pt):
         return not self.__eq__(pt)
 
-#--- BOUNDS ------------------------------------------------------------------------------------------
+
+# --- BOUNDS ------------------------------------------------------------------------------------------
+
 
 class Bounds:
-
     def __init__(self, x, y, width, height):
         """ Creates a bounding box.
             The bounding box is an untransformed rectangle that encompasses a shape or group of shapes.
         """
         # context.Layer does not always have a width or height defined (i.e. infinite layer):
-        if width == None: width = INFINITE
-        if height == None: height = INFINITE
+        if width == None:
+            width = INFINITE
+        if height == None:
+            height = INFINITE
         # Normalize if width or height is negative:
-        if width < 0: x, width = x+width,  -width
-        if height < 0: y, height = y+height, -height
+        if width < 0:
+            x, width = x + width, -width
+        if height < 0:
+            y, height = y + height, -height
         self.x = x
         self.y = y
         self.width = width
@@ -350,8 +362,9 @@ class Bounds:
     def intersects(self, b):
         """ Return True if a part of the two bounds overlaps.
         """
-        return max(self.x, b.x) < min(self.x+self.width, b.x+b.width) \
-           and max(self.y, b.y) < min(self.y+self.height, b.y+b.height)
+        return max(self.x, b.x) < min(self.x + self.width, b.x + b.width) and max(
+            self.y, b.y
+        ) < min(self.y + self.height, b.y + b.height)
 
     def intersection(self, b):
         """ Returns bounds that encompass the intersection of the two.
@@ -360,43 +373,63 @@ class Bounds:
         if not self.intersects(b):
             return None
         mx, my = max(self.x, b.x), max(self.y, b.y)
-        return Bounds(mx, my,
-            min(self.x+self.width, b.x+b.width) - mx,
-            min(self.y+self.height, b.y+b.height) - my)
+        return Bounds(
+            mx,
+            my,
+            min(self.x + self.width, b.x + b.width) - mx,
+            min(self.y + self.height, b.y + b.height) - my,
+        )
 
     def union(self, b):
         """ Returns bounds that encompass the union of the two.
         """
         mx, my = min(self.x, b.x), min(self.y, b.y)
-        return Bounds(mx, my,
-            max(self.x+self.width, b.x+b.width) - mx,
-            max(self.y+self.height, b.y+b.height) - my)
+        return Bounds(
+            mx,
+            my,
+            max(self.x + self.width, b.x + b.width) - mx,
+            max(self.y + self.height, b.y + b.height) - my,
+        )
 
     def contains(self, *a):
         """ Returns True if the given point or rectangle falls within the bounds.
         """
-        if len(a) == 2: a = [Point(a[0], a[1])]
+        if len(a) == 2:
+            a = [Point(a[0], a[1])]
         if len(a) == 1:
             a = a[0]
             if isinstance(a, Point):
-                return a.x >= self.x and a.x <= self.x+self.width \
-                   and a.y >= self.y and a.y <= self.y+self.height
+                return (
+                    a.x >= self.x
+                    and a.x <= self.x + self.width
+                    and a.y >= self.y
+                    and a.y <= self.y + self.height
+                )
             if isinstance(a, Bounds):
-                return a.x >= self.x and a.x+a.width <= self.x+self.width \
-                   and a.y >= self.y and a.y+a.height <= self.y+self.height
+                return (
+                    a.x >= self.x
+                    and a.x + a.width <= self.x + self.width
+                    and a.y >= self.y
+                    and a.y + a.height <= self.y + self.height
+                )
 
     def __eq__(self, b):
         if not isinstance(b, Bounds):
             return False
-        return self.x == b.x \
-           and self.y == b.y \
-           and self.width == b.width \
-           and self.height == b.height
+        return (
+            self.x == b.x
+            and self.y == b.y
+            and self.width == b.width
+            and self.height == b.height
+        )
 
     def __ne__(self, b):
         return not self.__eq__(b)
 
     def __repr__(self):
-        return "Bounds(%.1f, %.1f, %.1f, %.1f)" % (self.x, self.y, self.width, self.height)
-
-
+        return "Bounds(%.1f, %.1f, %.1f, %.1f)" % (
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+        )

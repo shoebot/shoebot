@@ -13,19 +13,25 @@
 
 from shoebot.data import CENTER, LEFT, RIGHT
 
-__all__ = ['files', 'random']
+__all__ = ["files", "random"]
 
 import warnings
-warnings.warn('DrawingPrimitives is deprecated. Please use "from nodebox import graphics"', DeprecationWarning, stacklevel=2)
+
+warnings.warn(
+    'DrawingPrimitives is deprecated. Please use "from nodebox import graphics"',
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 from glob import glob
 import random as _random
 
-def files(pattern = '*'):
+
+def files(pattern="*"):
     return glob(pattern)
 
 
-def random(v1 = None, v2 = None):
+def random(v1=None, v2=None):
     if isinstance(v1, int):
         if v2 is None:
             v2 = v1 + 1

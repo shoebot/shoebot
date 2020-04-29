@@ -92,9 +92,5 @@ class ShoebotInstallError(Exception):
     pass
 
 
-
-
 class ShoebotScriptError(Exception):
     pass
-
-

@@ -11,7 +11,7 @@ def clamp(minvalue, value, maxvalue):
 
 
 class Variable(object):
-    '''Taken from Nodebox'''
+    """Taken from Nodebox"""
 
     def __init__(self, name, type, **kwargs):
         """
@@ -29,7 +29,9 @@ class Variable(object):
         if not isinstance(name, str):
             raise AttributeError("Variable name must be a string")
         if kwargs.get("step") and kwargs.get("steps"):
-            raise AttributeError("Can only set step or steps")  # TODO - is this too strict
+            raise AttributeError(
+                "Can only set step or steps"
+            )  # TODO - is this too strict
         self.type = type or NUMBER
         self.min = None
         self.max = None
@@ -40,7 +42,7 @@ class Variable(object):
             self.max = kwargs.get("max", 100.0)
             if self.step is None:
                 diff = max(self.min, self.max) - min(self.min, self.max)
-                self.step = (diff / float(self.steps))
+                self.step = diff / float(self.steps)
             self.default = kwargs.get("default")
             if self.default is None:
                 self.default = self.min
@@ -51,7 +53,9 @@ class Variable(object):
         elif self.type == BUTTON:
             self.default = kwargs.get("default", self.name)
         else:
-            raise AttributeError("Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON")
+            raise AttributeError(
+                "Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON"
+            )
         self.value = kwargs.get("value", self.default)
         if self.value is None and self.default is not None:
             self.value = self.default
@@ -87,5 +91,11 @@ class Variable(object):
         return False
 
     def __repr__(self):
-        return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % \
-               (self.name, self.type, self.default, self.min, self.max, self.value)
+        return "Variable(name=%s, type=%s, default=%s, min=%s, max=%s, value=%s)" % (
+            self.name,
+            self.type,
+            self.default,
+            self.min,
+            self.max,
+            self.value,
+        )
