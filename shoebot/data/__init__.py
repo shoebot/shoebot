@@ -77,11 +77,12 @@ from .point import Point
 from .basecolor import Color, ColorMixin
 from .grob import Grob
 from .bezier import BezierPath, PathElement, ClippingPath, EndClip
+
 try:
     from .typography import Text
 except ImportError as e:
     Text = None
-    print(('Typography not available ', e))
+    print(("Typography not available ", e))
 from .img import Image
 from .variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
 from .transforms import Transform
@@ -92,16 +93,16 @@ LINETO = "lineto"
 RLINETO = "rlineto"
 CURVETO = "curveto"
 RCURVETO = "rcurveto"
-ARC = 'arc'
-ELLIPSE = 'ellipse'
+ARC = "arc"
+ELLIPSE = "ellipse"
 CLOSE = "close"
 
-CENTER = 'center'
-CORNER = 'corner'
+CENTER = "center"
+CORNER = "corner"
 CORNERS = "corners"
 
-LEFT = 'left'
-RIGHT = 'right'
+LEFT = "left"
+RIGHT = "right"
 
 RGB = "rgb"
 HSB = "hsb"

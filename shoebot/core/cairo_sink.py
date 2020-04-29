@@ -34,9 +34,10 @@ from .drawqueue_sink import DrawQueueSink
 
 
 class CairoImageSink(DrawQueueSink):
-    '''
+    """
     DrawQueueSink that uses cairo contexts as the render context.
-    '''
+    """
+
     def __init__(self, target=None, format=None, multifile=False, buff=None):
         """
         :param target:  output filename (or cairo surface if format is 'surface')
@@ -48,7 +49,7 @@ class CairoImageSink(DrawQueueSink):
         """
         DrawQueueSink.__init__(self)
         if format is None:
-            if target is not None and format != 'surface':
+            if target is not None and format != "surface":
                 format = os.path.splitext(target)[1][1:].lower()
                 self.filename = target
             elif buff is not None:
@@ -82,13 +83,13 @@ class CairoImageSink(DrawQueueSink):
         """
         Called when CairoCanvas needs a cairo context to draw on
         """
-        if self.format == 'pdf':
+        if self.format == "pdf":
             surface = cairo.PDFSurface(self._output_file(frame), *size)
-        elif self.format in ('ps', 'eps'):
+        elif self.format in ("ps", "eps"):
             surface = cairo.PSSurface(self._output_file(frame), *size)
-        elif self.format == 'svg':
+        elif self.format == "svg":
             surface = cairo.SVGSurface(self._output_file(frame), *size)
-        elif self.format == 'surface':
+        elif self.format == "surface":
             surface = self.target
         else:
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
@@ -99,7 +100,7 @@ class CairoImageSink(DrawQueueSink):
         Called when CairoCanvas has rendered a bot
         """
         surface = cairo_ctx.get_target()
-        if self.format == 'png':
+        if self.format == "png":
             surface.write_to_png(self._output_file(frame))
         surface.finish()
         surface.flush()

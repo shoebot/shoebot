@@ -7,7 +7,7 @@ class VarListener(object):
     the gui or socketserver when variables change
     """
 
-    active = True # set to False to temporarily disable
+    active = True  # set to False to temporarily disable
 
     listeners = []
 
@@ -78,7 +78,11 @@ class VarListener(object):
         for name in existing_vars:
             old_var = snapshot_vars[name]
             new_var = vars[name]
-            if old_var.type != new_var.type or old_var.min != new_var.min or old_var.max != new_var.max:
+            if (
+                old_var.type != new_var.type
+                or old_var.min != new_var.min
+                or old_var.max != new_var.max
+            ):
                 deleted_vars.add(name)
                 added_vars.add(name)
                 if old_var.type == new_var.type:

@@ -53,14 +53,17 @@ class BackendMixin(object):
                 module = None
                 has_module = False
             setattr(self, name, module)
-            setattr(self, 'has_%s' % name, has_module)
+            setattr(self, "has_%s" % name, has_module)
 
         for name in module_names:
             try:
                 return name, __import__(name)
             except ImportError:
                 pass
-        raise ImportError('No %s Implementation found, tried: %s' % (impl_name, ' '.join(module_names)))
+        raise ImportError(
+            "No %s Implementation found, tried: %s"
+            % (impl_name, " ".join(module_names))
+        )
 
     def get_libs(self):
         return {}
@@ -87,22 +90,21 @@ class CairoGIBackend(BackendMixin):
     Graphics backend using gi.repository or pgi
     PyCairo / CairoCFFI (+PyCairo needed if using Gtk Too)
     """
+
     def __init__(self, options):
-        cairo_pref = sort_by_preference(["cairo", "cairocffi"], options.get("cairo", "").split(','))
-        gi_pref = sort_by_preference(["gi", "pgi"], options.get("gi", "").split(','))
-        self.cairo_lib, self.cairo_module = self.import_libs(cairo_pref,
-                                                             'Cairo')
+        cairo_pref = sort_by_preference(
+            ["cairo", "cairocffi"], options.get("cairo", "").split(",")
+        )
+        gi_pref = sort_by_preference(["gi", "pgi"], options.get("gi", "").split(","))
+        self.cairo_lib, self.cairo_module = self.import_libs(cairo_pref, "Cairo")
         self.gi_lib, self.gi_module = self.setup_gi(gi_pref)
 
     def get_libs(self):
-        return {
-            "gi": self.gi_lib,
-            "cairo": self.cairo_lib,
-        }
+        return {"gi": self.gi_lib, "cairo": self.cairo_lib}
 
     def setup_gi(self, gi_pref):
-        name, gi_module = self.import_libs(['gi', 'pgi'], 'gi')
-        if name == 'pgi':
+        name, gi_module = self.import_libs(["gi", "pgi"], "gi")
+        if name == "pgi":
             gi_module.install_as_gi()
         return name, gi_module
 
@@ -115,7 +117,10 @@ class CairoGIBackend(BackendMixin):
         :return:
         """
         if self.cairocffi and isinstance(ctx, self.cairocffi.Context):
-            from shoebot.util.cairocffi.cairocffi_to_pycairo import _UNSAFE_cairocffi_context_to_pycairo
+            from shoebot.util.cairocffi.cairocffi_to_pycairo import (
+                _UNSAFE_cairocffi_context_to_pycairo,
+            )
+
             return _UNSAFE_cairocffi_context_to_pycairo(ctx)
         else:
             return ctx
@@ -131,10 +136,12 @@ def get_driver_options():
         return {}
 
     try:
-        return dict([kv.split('=') for kv in options.split()])
+        return dict([kv.split("=") for kv in options.split()])
     except ValueError:
         sys.stderr.write("Bad option format.\n")
-        sys.stderr.write("Environment variable should be in the format key=value separated by spaces.\n\n")
+        sys.stderr.write(
+            "Environment variable should be in the format key=value separated by spaces.\n\n"
+        )
         sys.stderr.write("SHOEBOT_GRAPHICS='cairo=cairocffi,cairo gi=pgi'\n")
         sys.exit(1)
 
