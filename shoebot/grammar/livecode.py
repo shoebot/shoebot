@@ -18,6 +18,7 @@ class LiveExecution(object):
     Initially code is known-good, new code sent to the executor is tenuous, until
     it has been executed at least once.
     """
+
     ns = {}
     lock = threading.RLock()
 
@@ -52,7 +53,7 @@ class LiveExecution(object):
             self.bad_cb = bad_cb
             try:
                 # text compile
-                compile(source + '\n\n', filename or self.filename, "exec")
+                compile(source + "\n\n", filename or self.filename, "exec")
                 self.edited_source = source
             except Exception as e:
                 if bad_cb:
@@ -71,7 +72,9 @@ class LiveExecution(object):
             if self.edited_source:
                 tree = ast.parse(self.edited_source)
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                    self.ns[f.name].__code__ = meta.decompiler.compile_func(f, self.filename, self.ns).__code__
+                    self.ns[f.name].__code__ = meta.decompiler.compile_func(
+                        f, self.filename, self.ns
+                    ).__code__
 
     def do_exec(self, source, ns):
         """
@@ -172,4 +175,3 @@ class LiveExecution(object):
                 self.edited_source = None
                 self.ns.clear()
                 self.ns.update(ns_snapshot)
-

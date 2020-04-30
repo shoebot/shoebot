@@ -8,28 +8,46 @@ import os.path
 from PIL import Image as PILImage
 
 try:
-    gi.require_version('Rsvg', '2.0')
+    gi.require_version("Rsvg", "2.0")
     from gi.repository import Rsvg
 except ValueError:
     Rsvg = None
 
 from shoebot.data import Grob, ColorMixin
 
-CENTER = 'center'
-CORNER = 'corner'
+CENTER = "center"
+CORNER = "corner"
 
 
 class SurfaceRef(object):
-    ''' Cannot have a weakref to a cairo surface, so wrapper is used '''
+    """ Cannot have a weakref to a cairo surface, so wrapper is used """
+
     def __init__(self, surface):
         self.surface = surface
 
 
 class Image(Grob, ColorMixin):
-    _surface_cache = {}   # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
-    _state_attributes = {'transform', 'pathmode'}  # NBX uses transform and transformmode here
+    _surface_cache = (
+        {}
+    )  # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
+    _state_attributes = {
+        "transform",
+        "pathmode",
+    }  # NBX uses transform and transformmode here
 
-    def __init__(self, bot, path=None, x=0, y=0, width=None, height=None, alpha=1.0, data=None, pathmode=CORNER, **kwargs):
+    def __init__(
+        self,
+        bot,
+        path=None,
+        x=0,
+        y=0,
+        width=None,
+        height=None,
+        alpha=1.0,
+        data=None,
+        pathmode=CORNER,
+        **kwargs
+    ):
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, **kwargs)
 
@@ -66,44 +84,50 @@ class Image(Grob, ColorMixin):
                     else:
                         sw = surface.get_width()
                         sh = surface.get_height()
-                elif os.path.splitext(path)[1].lower() == '.svg' and Rsvg is not None:
+                elif os.path.splitext(path)[1].lower() == ".svg" and Rsvg is not None:
                     handle = Rsvg.Handle()
                     svg = handle.new_from_file(path)
                     dimensions = svg.get_dimensions()
                     sw = dimensions.width
                     sh = dimensions.height
-                    surface = cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh))
+                    surface = cairo.RecordingSurface(
+                        cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh)
+                    )
                     ctx = cairo.Context(surface)
                     pycairo_ctx = driver.ensure_pycairo_context(ctx)
                     svg.render_cairo(pycairo_ctx)
-                elif os.path.splitext(path)[1].lower() == '.png':
+                elif os.path.splitext(path)[1].lower() == ".png":
                     surface = cairo.ImageSurface.create_from_png(path)
                     sw = surface.get_width()
                     sh = surface.get_height()
                 else:
                     img = PILImage.open(path)
 
-                    if img.mode != 'RGBA':
+                    if img.mode != "RGBA":
                         img = img.convert("RGBA")
 
                     sw, sh = img.size
                     # Would be nice to not have to do some of these conversions :-\
-                    bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
-                    bgra_array = array.array('B', bgra_data)
-                    surface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
+                    bgra_data = img.tobytes("raw", "BGRA", 0, 1)
+                    bgra_array = array.array("B", bgra_data)
+                    surface = cairo.ImageSurface.create_for_data(
+                        bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
+                    )
 
                 self._surface_cache[path] = SurfaceRef(surface)
             else:
                 img = PILImage.open(StringIO(self.data))
 
-                if img.mode != 'RGBA':
+                if img.mode != "RGBA":
                     img = img.convert("RGBA")
 
                 sw, sh = img.size
                 # Would be nice to not have to do some of these conversions :-\
-                bgra_data = img.tobytes('raw', 'BGRA', 0, 1)
-                bgra_array = array.array('B', bgra_data)
-                surface = cairo.ImageSurface.create_for_data(bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4)
+                bgra_data = img.tobytes("raw", "BGRA", 0, 1)
+                bgra_array = array.array("B", bgra_data)
+                surface = cairo.ImageSurface.create_for_data(
+                    bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
+                )
 
             if width is not None or height is not None:
                 if width:
@@ -139,14 +163,17 @@ class Image(Grob, ColorMixin):
         self._deferred_render()
 
     def _get_center(self):
-        '''Returns the center point of the path, disregarding transforms.
-        '''
-        x = (self.x + self.width / 2)
-        y = (self.y + self.height / 2)
+        """Returns the center point of the path, disregarding transforms.
+        """
+        x = self.x + self.width / 2
+        y = self.y + self.height / 2
         return (x, y)
+
     center = property(_get_center)
 
     def copy(self):
-        p = self.__class__(self._bot, self.path, self.x, self.y, self.width, self.height)
+        p = self.__class__(
+            self._bot, self.path, self.x, self.y, self.width, self.height
+        )
         _copy_attrs(self._bot, p, self.state_attributes)
         return p

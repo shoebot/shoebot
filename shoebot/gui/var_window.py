@@ -7,7 +7,9 @@ from shoebot.core.events import VARIABLE_UPDATED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
 
-ICON_FILE = resource_filename(Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png")
+ICON_FILE = resource_filename(
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+)
 
 NUMBER = 1
 TEXT = 2
@@ -16,7 +18,7 @@ BUTTON = 4
 
 
 def pretty_name(name):
-    return (name or '').replace('_', ' ').capitalize()
+    return (name or "").replace("_", " ").capitalize()
 
 
 class VarWindow(object):
@@ -54,9 +56,11 @@ class VarWindow(object):
         :return:
         """
         for k, v in list(self.bot._vars.items()):
-            if not hasattr(v, 'type'):
+            if not hasattr(v, "type"):
                 raise AttributeError(
-                    '%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables' % k)
+                    "%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables"
+                    % k
+                )
             self.add_variable(v)
 
     def add_variable(self, v):
@@ -69,7 +73,7 @@ class VarWindow(object):
         elif v.type is BUTTON:
             self.widgets[v.name] = self.add_button(v)
         else:
-            raise ValueError('Unknown variable type.')
+            raise ValueError("Unknown variable type.")
         self.vars[v.name] = v
 
     def add_number(self, v):
@@ -150,7 +154,7 @@ class VarWindow(object):
         """
         widget = self.widgets.get(name)
         if widget is None:
-            return False, 'No widget found matching, {}'.format(name)
+            return False, "No widget found matching, {}".format(name)
 
         try:
             if isinstance(widget, Gtk.CheckButton):
@@ -166,19 +170,25 @@ class VarWindow(object):
             return False, str(e)
 
     def widget_changed(self, widget, v):
-        ''' Called when a slider is adjusted. '''
+        """ Called when a slider is adjusted. """
         # set the appropriate bot var
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
-            self.bot._vars[v.name].value = widget.get_value()  ## Not sure if this is how to do this - stu
+            self.bot._vars[
+                v.name
+            ].value = widget.get_value()  ## Not sure if this is how to do this - stu
             publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
-            self.bot._vars[v.name].value = widget.get_active()  ## Not sure if this is how to do this - stu
+            self.bot._vars[
+                v.name
+            ].value = widget.get_active()  ## Not sure if this is how to do this - stu
             publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
-            self.bot._vars[v.name].value = widget.get_text()  ## Not sure if this is how to do this - stu
+            self.bot._vars[
+                v.name
+            ].value = widget.get_text()  ## Not sure if this is how to do this - stu
             publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
 
     def var_added(self, v):

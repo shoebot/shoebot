@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''Cairo implementation of the canvas'''
+"""Cairo implementation of the canvas"""
 import os.path
 
 from math import pi as _pi
@@ -39,7 +39,8 @@ from .drawqueue import DrawQueue
 
 
 class CairoCanvas(Canvas):
-    ''' Cairo implementation of Canvas '''
+    """ Cairo implementation of Canvas """
+
     def __init__(self, sink):
         Canvas.__init__(self, sink)
         self.size = None
@@ -48,9 +49,9 @@ class CairoCanvas(Canvas):
         return DrawQueue()
 
     def initial_transform(self):
-        '''
+        """
         Return an identity matrix
-        '''
+        """
         return cairo.Matrix()
 
     def get_input_device(self):
@@ -88,45 +89,52 @@ class CairoCanvas(Canvas):
     def moveto_closure(self, x, y):
         def moveto(ctx):
             ctx.move_to(x, y)
+
         return moveto
 
     def lineto_closure(self, x, y):
         def lineto(ctx):
             ctx.line_to(x, y)
+
         return lineto
 
     def curveto_closure(self, x1, y1, x2, y2, x3, y3):
         def curveto(ctx):
             ctx.curve_to(x1, y1, x2, y2, x3, y3)
+
         return curveto
 
     def closepath_closure(self):
         def closepath(ctx):
             ctx.close_path()
+
         return closepath
 
     def ellipse_closure(self, x, y, w, h):
         def ellipse(ctx):
             if w != 0.0 and h != 0.0:
                 ctx.save()
-                ctx.translate(x + w / 2., y + h / 2.)
+                ctx.translate(x + w / 2.0, y + h / 2.0)
                 ctx.scale(w * 0.5, h * 0.5)
-                ctx.arc(0., 0., 1., 0., 2 * _pi)
+                ctx.arc(0.0, 0.0, 1.0, 0.0, 2 * _pi)
                 ctx.close_path()
                 ctx.restore()
+
         return ellipse
 
     def rellineto_closure(self, x, y):
         def rellineto(ctx):
             ctx.rel_line_to(x, y)
+
         return rellineto
 
     def output_closure(self, target):
-        '''
+        """
         Function to output to a cairo surface
 
         target is a cairo Context or filename
-        '''
+        """
+
         def output_context(ctx):
             target_ctx = target
             target_ctx.set_source_surface(ctx.get_target())
@@ -144,21 +152,27 @@ class CairoCanvas(Canvas):
             filename = target
 
             extension = extension.lower()
-            if extension == '.png':
+            if extension == ".png":
                 surface = ctx.get_target()
                 surface.write_to_png(target)
-            elif extension == '.pdf':
-                target_ctx = cairo.Context(cairo.PDFSurface(filename, *self.size_or_default()))
+            elif extension == ".pdf":
+                target_ctx = cairo.Context(
+                    cairo.PDFSurface(filename, *self.size_or_default())
+                )
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
-            elif extension in ('.ps', '.eps'):
-                target_ctx = cairo.Context(cairo.PSSurface(filename, *self.size_or_default()))
-                if extension == '.eps':
-                    target_ctx.set_eps(extension='.eps')
+            elif extension in (".ps", ".eps"):
+                target_ctx = cairo.Context(
+                    cairo.PSSurface(filename, *self.size_or_default())
+                )
+                if extension == ".eps":
+                    target_ctx.set_eps(extension=".eps")
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
-            elif extension == '.svg':
-                target_ctx = cairo.Context(cairo.SVGSurface(filename, *self.size_or_default()))
+            elif extension == ".svg":
+                target_ctx = cairo.Context(
+                    cairo.SVGSurface(filename, *self.size_or_default())
+                )
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             return filename
@@ -171,9 +185,9 @@ class CairoCanvas(Canvas):
             return output_file
 
     def ctx_render_background(self, cairo_ctx):
-        '''
+        """
         Draws the background colour of the bot
-        '''
+        """
         # TODO - rename this
         cairo_ctx.set_source_rgba(*self.background)
         cairo_ctx.paint()

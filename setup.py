@@ -6,12 +6,11 @@
 #    python setup.py --help' for more options
 #
 
-from __future__ import print_function
-
 import glob
 import itertools
 import os
 import platform
+import re
 import shutil
 import sys
 import textwrap
@@ -132,6 +131,14 @@ BASE_REQUIREMENTS = [
 ]
 
 
+def read_version():
+    global here
+    with open(f"{here}/VERSION", mode="r") as f:
+        content = f.read()
+        version_info = dict(re.findall(r"(^[a-z]+)\s+(.+)$", content, re.MULTILINE))
+    return version_info["version"]
+
+
 def requirements(debug=True, with_pgi=None):
     """
     Build requirements based on flags
@@ -163,7 +170,7 @@ def requirements(debug=True, with_pgi=None):
 
 setup(
     name="shoebot",
-    version="1.3.1",
+    version=read_version(),
     description="Vector graphics scripting application",
     long_description=info,
     author="Ricardo Lafuente",

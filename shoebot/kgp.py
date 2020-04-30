@@ -35,6 +35,7 @@ import getopt
 
 _debug = 0
 
+
 def openAnything(source, searchpaths=None):
     """URI, filename, or string --> stream
 
@@ -62,35 +63,42 @@ def openAnything(source, searchpaths=None):
 
     if source == "-":
         import sys
+
         return sys.stdin
 
     # try to open with urllib (if source is http, ftp, or file URL)
     import urllib.request, urllib.parse, urllib.error
+
     try:
         return urllib.request.urlopen(source)
     except (IOError, OSError):
         pass
 
     # try to open with native open function (if source is pathname)
-    for path in searchpaths or ['.']:
+    for path in searchpaths or ["."]:
         try:
             return open(os.path.join(path, source))
         except (IOError, OSError):
             pass
 
-
     # treat source as string
     import io
+
     return io.StringIO(str(source))
 
-class NoSourceError(Exception): pass
+
+class NoSourceError(Exception):
+    pass
+
 
 class KantGenerator(object):
     """generates mock philosophy based on a context-free grammar"""
 
     def __init__(self, grammar, source=None, searchpaths=None):
         self.loadGrammar(grammar, searchpaths=searchpaths)
-        self.loadSource(source and source or self.getDefaultSource(), searchpaths=searchpaths)
+        self.loadSource(
+            source and source or self.getDefaultSource(), searchpaths=searchpaths
+        )
         self.refresh()
 
     def _load(self, source, searchpaths=None):
@@ -164,13 +172,14 @@ class KantGenerator(object):
 
         This is a utility method used by do_xref and do_choice.
         """
-        choices = [e for e in node.childNodes
-                   if e.nodeType == e.ELEMENT_NODE]
+        choices = [e for e in node.childNodes if e.nodeType == e.ELEMENT_NODE]
         chosen = random.choice(choices)
         if _debug:
-            sys.stderr.write('%s available choices: %s\n' % \
-                (len(choices), [e.toxml() for e in choices]))
-            sys.stderr.write('Chosen: %s\n' % chosen.toxml())
+            sys.stderr.write(
+                "%s available choices: %s\n"
+                % (len(choices), [e.toxml() for e in choices])
+            )
+            sys.stderr.write("Chosen: %s\n" % chosen.toxml())
         return chosen
 
     def parse(self, node):
@@ -259,11 +268,12 @@ class KantGenerator(object):
                 self.capitalizeNextWord = 1
         if "chance" in keys:
             chance = int(node.attributes["chance"].value)
-            doit = (chance > random.randrange(100))
+            doit = chance > random.randrange(100)
         else:
             doit = 1
         if doit:
-            for child in node.childNodes: self.parse(child)
+            for child in node.childNodes:
+                self.parse(child)
 
     def do_choice(self, node):
         """handle <choice> tag
@@ -273,8 +283,10 @@ class KantGenerator(object):
         """
         self.parse(self.randomChildElement(node))
 
+
 def usage():
     print(__doc__)
+
 
 def main(argv):
     grammar = "kant.xml"
@@ -287,7 +299,7 @@ def main(argv):
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
-        elif opt == '-d':
+        elif opt == "-d":
             global _debug
             _debug = 1
         elif opt in ("-g", "--grammar"):
@@ -296,6 +308,7 @@ def main(argv):
     source = "".join(args)
     k = KantGenerator(grammar, source)
     print(k.output())
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
