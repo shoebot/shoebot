@@ -4,7 +4,7 @@ from tests.unittests.helpers import ShoebotTestCase
 from textwrap import dedent
 
 class TestLifecycle(ShoebotTestCase):
-    def test_lifecycle(self):
+    def test_lifecycle_non_dynamic_bot(self):
         """
         Test that loading an svg image doesn't raise an exception (this was a bug).
         """

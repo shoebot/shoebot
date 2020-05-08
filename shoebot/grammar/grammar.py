@@ -245,25 +245,26 @@ class Grammar(object):
 
             event = None
 
-            while self._should_run(iteration, iterations) and not event_is(event, QUIT_EVENT):
+            while iteration != iterations and not event_is(event, QUIT_EVENT):
                 # do the magic
 
-                # First iteration
-                self._run_frame(executor, limit=frame_limiter, iteration=iteration)
-                if iteration == 0:
-                    self._initial_namespace = copy.copy(
-                        self._namespace
-                    )  # Stored so script can be rewound
-                iteration += 1
-                self._canvas.sink.main_iteration()  # update GUI, may generate events..
-
-                # Subsequent iterations
-                while self._should_run(iteration, iterations) and event is None:
-                    iteration += 1
+                if self._dynamic:
+                    # First iteration
                     self._run_frame(executor, limit=frame_limiter, iteration=iteration)
-                    event = next_event()
-                    if not event:
-                        self._canvas.sink.main_iteration()  # update GUI, may generate events..
+                    if iteration == 0:
+                        self._initial_namespace = copy.copy(
+                            self._namespace
+                        )  # Stored so script can be rewound
+                    iteration += 1
+                    self._canvas.sink.main_iteration()  # update GUI, may generate events..
+
+                    # Subsequent iterations
+                    while self._should_run(iteration, iterations) and event is None:
+                        iteration += 1
+                        self._run_frame(executor, limit=frame_limiter, iteration=iteration)
+                        event = next_event()
+                        if not event:
+                            self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
                 while run_forever:
                     #
