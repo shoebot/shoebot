@@ -312,7 +312,7 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
         base, menu = mk_menu(_("Shoebot"))
 
         for name, accel in WINDOW_ACCELS:
-            self.app.add_accelerator(accel, "win.on_%s" % name, None)
+            self.app.set_accels_for_action("win.on_%s" % name, (accel,))
         
         self.shoebot_menu = base
         self.tools_menu_ext = self.extend_menu("tools-section")
