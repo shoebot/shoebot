@@ -847,12 +847,8 @@ class ShoebotEditorWindow(Gtk.Window):
         about_dialog.set_authors(authors)
         about_dialog.set_website(website)
 
-        def close(w, res):
-            if res == Gtk.ResponseType.CANCEL:
-                w.hide()
-
-        about_dialog.connect("response", close)
-        about_dialog.run()
+        about_dialog.connect("response", lambda dialog, data: dialog.destroy())
+        about_dialog.show_all()
 
     def init_menus(self):
         text_view = self.source_view
