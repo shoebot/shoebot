@@ -180,6 +180,7 @@ class Bot(Grammar):
 
     def _set_dynamic_vars(self):
         self._namespace["FRAME"] = self._frame
+        self._namespace["PAGENUM"] = self._frame
 
     # Input GUI callbacks
 
