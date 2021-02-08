@@ -118,7 +118,7 @@ class ShoebotProcess(object):
         else:
             print('no sbot!')
 
-        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, close_fds=os.name != 'nt', shell=False, cwd=cwd)
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=os.name != 'nt', shell=False, cwd=cwd)
 
         self.running = True
 
@@ -128,7 +128,7 @@ class ShoebotProcess(object):
             line = line.decode('utf-8').rstrip()
             for cookie, response in list(self.responses.items()):
                 if line.startswith(cookie):
-                    pattern = r"^"+cookie+"\s?(?P<status>(.*?))[\:>](?P<info>.*)"
+                    pattern = r"^" + cookie + "\s?(?P<status>(.*?))[\:>](?P<info>.*)"
 
                     match = re.match(pattern, line)
                     d = match.groupdict()
@@ -166,7 +166,7 @@ class ShoebotProcess(object):
 
         self.source = source.rstrip('\n')
 
-        #self.setup_io()
+        self.setup_io()
 
     def setup_io(self):
         # Turn off user prompts
@@ -189,11 +189,11 @@ class ShoebotProcess(object):
         source = source.rstrip('\n')
         if source != self.source:
             self.source = source
-            b64_source = base64.b64encode(bytes(bytearray(source, "ascii")))
+            b64_source = base64.b64encode(source.encode('utf-8')).decode('utf-8')
             self.send_command(CMD_LOAD_BASE64, b64_source)
 
-    def pause(self, callback=None):
-        self.send_command('pause', callback=callback)
+    def pause(self):
+        self.send_command('pause')
 
     def send_command(self, cmd, *args):
         """
@@ -201,25 +201,12 @@ class ShoebotProcess(object):
         :param args:
         :return:
         """
-        # Test in python 2 and 3 before modifying (gedit2 + 3)
-        if True:
-            # Create a CommandResponse using a cookie as a unique id
-            cookie = str(uuid.uuid4())
-            response = CommandResponse(cmd, cookie, None, info=[])
-            self.responses[cookie] = response
-            args = list(args) + [b'cookie=' + bytes(cookie, "ascii")]
-        if args:
-            bytes_args = []
-            for arg in args:
-                if isinstance(arg, bytes):
-                    bytes_args.append(arg)
-                else:
-                    bytes_args.append(bytearray(arg, "ascii"))
-            data = bytearray(cmd, "ascii") + b' ' + b' '.join(bytes_args) + b'\n'
-        else:
-            data = bytearray(cmd, "ascii") + b'\n'
+        cookie = f"{uuid.uuid4()}"
+        response = CommandResponse(cmd, cookie, None, info=[])
+        self.responses[cookie] = response
+        data = ' '.join([cmd, *args, f'cookie={cookie}\n'])
 
-        self.process.stdin.write(data)
+        self.process.stdin.write(data.encode('ascii'))
         self.process.stdin.flush()
 
     def close(self):
@@ -282,7 +269,6 @@ def find_example_dir():
 
     """)
 
-
     # Needs to run in same python env as shoebot (may be different to gedits)
     code = code_stub % 'share/shoebot/examples'
     cmd = ["python", "-c", code]
@@ -298,7 +284,7 @@ def find_example_dir():
             return examples_dir
 
         # If user is running 'setup.py develop' then examples could be right here
-        #code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'examples/')"
+        # code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'examples/')"
         code = code_stub % 'examples/'
         cmd = ["python", "-c", code]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)

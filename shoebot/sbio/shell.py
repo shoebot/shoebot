@@ -291,7 +291,7 @@ class ShoebotCmd(cmd.Cmd):
             executor.clear_callbacks()
 
         called_good = False
-        source = str(base64.b64decode(line))
+        source = base64.b64decode(line).decode('ascii')
         # Test compile
         publish_event(
             SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source"
