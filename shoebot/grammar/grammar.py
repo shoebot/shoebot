@@ -159,21 +159,18 @@ class Grammar(object):
         else:
             # Subsequent frames
             if self._dynamic:
-                if self._speed != 0:  # speed 0 is paused, so do nothing
+                if self._speed != 0:
                     with executor.run_context() as (known_good, source, ns):
                         # Code in main block may redefine 'draw'
                         if not known_good:
                             executor.reload_functions()
                             with VarListener.batch(self._vars, self._oldvars, ns):
                                 self._oldvars.clear()
-
-                                # Re-run the function body - ideally this would only
-                                # happen if the body had actually changed
-                                # - Or perhaps if the line included a variable declaration
-                                print("exec here")
+                                # Run the body of the edited program in case any
+                                # globals were edited.
+                                # Ideally this would only happen if a change was in the body.
                                 exec(source, ns)
-
-                        ns["draw"]()
+                        executor.ns["draw"]()
                         self._canvas.flush(self._frame)
             else:
                 # Non "dynamic" bots
@@ -231,7 +228,7 @@ class Grammar(object):
             source = open(inputcode).read()
             filename = inputcode
         elif isinstance(inputcode, str):
-            filename = "shoebot_code"
+            filename = "<string>"
             source = inputcode
 
         self._load_namespace(self._namespace, filename)

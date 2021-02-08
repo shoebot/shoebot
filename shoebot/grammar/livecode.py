@@ -52,10 +52,11 @@ class LiveExecution(object):
             self.good_cb = good_cb
             self.bad_cb = bad_cb
             try:
-                # text compile
-                compile(source + "\n\n", filename or self.filename, "exec")
+                # Test compile (TODO - keep the binary object + use that)
+                source = f"{source}\n\n"
+                compile(source, filename or self.filename, "exec")
                 self.edited_source = source
-            except Exception as e:
+            except Exception:  # noqa
                 if bad_cb:
                     self.edited_source = None
                     tb = traceback.format_exc()
@@ -64,13 +65,20 @@ class LiveExecution(object):
             if filename is not None:
                 self.filename = filename
 
-    def reload_functions(self):
+    def reload_functions(self, edited=True):
         """
-        Replace functions in namespace with functions from edited_source.
+        Reload functions, from edited_source or known_good
+
+        :param edited: if True then functions are reloaded from edited_source, otherwise known_good is used.
         """
+        if edited:
+            source = self.edited_source
+        else:
+            source = self.known_good
+
         with LiveExecution.lock:
-            if self.edited_source:
-                tree = ast.parse(self.edited_source)
+            if source is not None:
+                tree = ast.parse(source)
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
                     self.ns[f.name].__code__ = meta.decompiler.compile_func(
                         f, self.filename, self.ns
@@ -157,21 +165,31 @@ class LiveExecution(object):
         >>> ...  ns['draw']()
 
         """
+        import sys; print("livecode run_context", file=sys.stderr)
         with LiveExecution.lock:
+            print("livecode run_context enter lock", file=sys.stderr)
             if self.edited_source is None:
                 yield True, self.known_good, self.ns
+                import sys; print("S", file=sys.stderr, end=''); sys.stderr.flush()
                 return
 
             ns_snapshot = copy.copy(self.ns)
             try:
                 yield False, self.edited_source, self.ns
+                import sys; print("livecode SOURCE RAN OK", file=sys.stderr); sys.stderr.flush()
                 self.known_good = self.edited_source
                 self.edited_source = None
                 self.call_good_cb()
                 return
             except Exception as ex:
                 tb = traceback.format_exc()
+                import sys; print(f"livecode SOURCE EXCEPTION {ex} {tb}", file=sys.stderr); sys.stderr.flush()
                 self.call_bad_cb(tb)
                 self.edited_source = None
                 self.ns.clear()
                 self.ns.update(ns_snapshot)
+                try:
+                    self.reload_functions(edited=False)
+                except:
+                    print("livecode EXCEPTION LOADING FUNCTIONS")
+                import sys; print(f"livecode revert to \n{self.known_good}\n--livecode", file=sys.stderr); sys.stderr.flush()
