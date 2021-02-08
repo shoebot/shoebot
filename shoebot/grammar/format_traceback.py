@@ -20,9 +20,9 @@ def simple_traceback(ex, source):
             exc_location = exc[exc_script_index]
             break
 
-    # extract line number from traceback
+    # Extract line number from traceback
     fn = exc_location.split(",")[0][8:-1]
-    line_number = int(exc_location.split(",")[1].replace("line", "").strip())
+    line_number = int(exc_location.split(", ")[1].lstrip("line "))
 
     err_msgs = []
 
