@@ -52,8 +52,10 @@ class VarListener(object):
         ...     pass
         """
         VarListener.active = False
-        yield
-        VarListener.active = True
+        try:
+            yield
+        finally:
+            VarListener.active = True
 
     @staticmethod
     @contextmanager

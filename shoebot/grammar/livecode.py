@@ -165,31 +165,22 @@ class LiveExecution(object):
         >>> ...  ns['draw']()
 
         """
-        import sys; print("livecode run_context", file=sys.stderr)
         with LiveExecution.lock:
-            print("livecode run_context enter lock", file=sys.stderr)
             if self.edited_source is None:
                 yield True, self.known_good, self.ns
-                import sys; print("S", file=sys.stderr, end=''); sys.stderr.flush()
                 return
 
             ns_snapshot = copy.copy(self.ns)
             try:
                 yield False, self.edited_source, self.ns
-                import sys; print("livecode SOURCE RAN OK", file=sys.stderr); sys.stderr.flush()
                 self.known_good = self.edited_source
                 self.edited_source = None
                 self.call_good_cb()
                 return
             except Exception as ex:
                 tb = traceback.format_exc()
-                import sys; print(f"livecode SOURCE EXCEPTION {ex} {tb}", file=sys.stderr); sys.stderr.flush()
                 self.call_bad_cb(tb)
                 self.edited_source = None
                 self.ns.clear()
                 self.ns.update(ns_snapshot)
-                try:
-                    self.reload_functions(edited=False)
-                except:
-                    print("livecode EXCEPTION LOADING FUNCTIONS")
-                import sys; print(f"livecode revert to \n{self.known_good}\n--livecode", file=sys.stderr); sys.stderr.flush()
+                self.reload_functions(edited=False)
