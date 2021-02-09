@@ -120,7 +120,7 @@ class ShoebotTestCase(TestCase):
             size, Path(filename).stat().st_size, f"{filename} is zero bytes."
         )
 
-    def run_code(self, code, outputfile, windowed=False, namespace=None):
+    def run_code(self, code, outputfile, windowed=False, namespace=None, verbose=True):
         """
         Run shoebot code, sets random.seed to stabilize output.
         """
@@ -129,9 +129,9 @@ class ShoebotTestCase(TestCase):
 
         seed(0)
 
-        bot.run(code)
+        bot.run(code, verbose=True)
 
-    def run_filename(self, filename, outputfile, windowed=False, namespace=None):
+    def run_filename(self, filename, outputfile, windowed=False, namespace=None, verbose=True):
         """
         Run shoebot from filename.
 
@@ -148,7 +148,7 @@ class ShoebotTestCase(TestCase):
             if full_path.is_file():
                 with open(full_path) as f:
                     self.run_code(f.read(), outputfile,
-                                  windowed=windowed, namespace=namespace)
+                                  windowed=windowed, namespace=namespace, verbose=verbose)
                     return
         else:
             raise ValueError(f"Could not find bot {filename} in paths {self.paths}")

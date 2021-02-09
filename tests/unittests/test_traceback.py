@@ -43,7 +43,7 @@ class TestSimpleTraceback(ShoebotTestCase):
         with tempfile.NamedTemporaryFile(suffix=f".png") as f:
             output_buffer = io.StringIO()
             with contextlib.redirect_stderr(output_buffer):
-                self.run_code(code, outputfile=f.name, windowed=False)
+                self.run_code(code, outputfile=f.name, windowed=False, verbose=False)
                 actual_output = output = output_buffer.getvalue()
 
         self.assertEqual(actual_output, expected_output)
@@ -72,7 +72,7 @@ class TestSimpleTraceback(ShoebotTestCase):
         with tempfile.NamedTemporaryFile(suffix=f".png") as f:
             output_buffer = io.StringIO()
             with contextlib.redirect_stderr(output_buffer):
-                self.run_filename("test_traceback_from_file.bot", outputfile=f.name)
+                self.run_filename("test_traceback_from_file.bot", outputfile=f.name, verbose=False)
                 actual_output = output = output_buffer.getvalue()
 
         self.assertEqual(actual_output, expected_output)
