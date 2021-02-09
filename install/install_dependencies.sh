@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -x
+# Uncomment next line to view execution.
+# set -x
 
 # Fedora, Redhat, (Centos?)
 FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
