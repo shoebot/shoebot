@@ -39,7 +39,7 @@ def draw():
     nofill()
     strokewidth(2)
     beginpath(WIDTH / 2 + r1 * singr(0), HEIGHT / 2 + r1 * cosgr(0))
-    for i in range(360 // step, 360, 360 // step):
+    for i in range(360 // int(step), 360, 360 // int(step)):
         # ^ range requires an integeer, so use integer division
         curveto(
             WIDTH / 2 + r1 * singr(i + 360 / sts),

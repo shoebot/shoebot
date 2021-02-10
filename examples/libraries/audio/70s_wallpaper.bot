@@ -3,8 +3,8 @@ A audio reactive bot that looks somewhat like an animated version of
 wallpaper from the 1970s
 by Stuart Axon
 
-Requires the pysoundcard Python module:
-    $ pip install pysoundcard
+Requires the fuzzywuzzy, pysoundcard and numpy Python modules:
+    $ pip install fuzzywuzzy numpy pysoundcard
 """
 
 from sbaudio import audio, scaled_fft, triple
