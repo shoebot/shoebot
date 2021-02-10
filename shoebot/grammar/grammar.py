@@ -170,7 +170,7 @@ class Grammar(object):
                                 # globals were edited.
                                 # Ideally this would only happen if a change was in the body.
                                 exec(source, ns)
-                        executor.ns["draw"]()
+                        ns["draw"]()
                         self._canvas.flush(self._frame)
             else:
                 # Non "dynamic" bots

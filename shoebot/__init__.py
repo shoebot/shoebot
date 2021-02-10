@@ -222,7 +222,7 @@ class ShoebotThread(threading.Thread):
         :param send_sigint: if True then SIGINT will be sent on bot completion
                             so the main thread can terminate
         """
-        super(ShoebotThread, self).__init__()
+        super(ShoebotThread, self).__init__(daemon=True)
         # isSet() will return True once the bot has been created
         self.bot_ready = threading.Event()
 
@@ -244,9 +244,9 @@ class ShoebotThread(threading.Thread):
             sbot.run(*self.run_args, **self.run_kwargs)
         except Exception:
             print("Exception in shoebot code")
-            self.bot_ready.set()  # need to stop waiting
             raise
         finally:
+            self.bot_ready.set()  # Stop waiting
             if self.send_sigint:
                 os.kill(os.getpid(), signal.SIGINT)
 
@@ -380,9 +380,8 @@ def run(
             while sbot_thread.is_alive():
                 sleep(1)
         except KeyboardInterrupt:
+            sbot_thread.send_sigint = False
             publish_event(QUIT_EVENT)
-
-    if all((background_thread, sbot_thread)):
-        sbot_thread.join()
+            raise
 
     return sbot
