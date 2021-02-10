@@ -149,6 +149,7 @@ class Grammar(object):
             self._canvas.reset_canvas()
         self._set_dynamic_vars()
         if iteration == 0:
+            self._canvas.has_painted_initial_background = False
             # First frame
             executor.run()
             # run setup and draw

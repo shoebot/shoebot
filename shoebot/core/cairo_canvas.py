@@ -43,7 +43,6 @@ class CairoCanvas(Canvas):
 
     def __init__(self, sink):
         Canvas.__init__(self, sink)
-        self.size = None
 
     def initial_drawqueue(self):
         return DrawQueue()
@@ -189,5 +188,14 @@ class CairoCanvas(Canvas):
         Draws the background colour of the bot
         """
         # TODO - rename this
-        cairo_ctx.set_source_rgba(*self.background)
-        cairo_ctx.paint()
+        background = self.background
+
+        if self.has_painted_initial_background is False:
+            self.has_painted_initial_background = True
+            if background is None:
+                if self.screen_border is not None:
+                    background = self.screen_border
+
+        if background is not None:
+            cairo_ctx.set_source_rgba(*background)
+            cairo_ctx.paint()
