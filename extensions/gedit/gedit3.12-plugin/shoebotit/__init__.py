@@ -1,10 +1,10 @@
-from distutils.spawn import find_executable as which
+import errno
+import base64
+import os
+
 from gi.repository import Gtk, GLib, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
-
-import base64
-import os
 
 WINDOW_ACTIONS = [
     (_("Run in Shoebot"), "run")
@@ -31,7 +31,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
 
         self.changed_handler_id = None
         self.idle_handler_id = None
-        
+
         self.text = None
         self.live_text = None
 
@@ -39,7 +39,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
 
         for _, name, default in WINDOW_TOGGLES:
             setattr(self, "%s_enabled" % name, default)
-        
+
         self.bot = None
 
     def do_activate(self):
@@ -79,7 +79,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             action = Gio.SimpleAction.new(
                 "open_example__%s" % gtk3_utils.encode_relpath(rel_path),
                 None)
-        
+
             action.connect("activate", self.on_open_example)
             self.window.add_action(action)
 
@@ -92,8 +92,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         for _, name, default in WINDOW_TOGGLES:
             action_name = "toggle_%s" % name
             action = Gio.SimpleAction.new_stateful(
-                action_name, 
-                None, 
+                action_name,
+                None,
                 GLib.Variant.new_boolean(default))
             action.connect("activate", getattr(self, action_name))
             self.window.add_action(action)
@@ -127,10 +127,11 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             while Gtk.events_pending():
                Gtk.main_iteration()
             return False
-            
+
         if self.bot and self.bot.process.poll() == None:
             print('Sending quit.')
             self.bot.send_command("quit")
+            # TODO - wait for response.
 
         # get the text buffer
         doc = self.window.get_active_document()
@@ -239,7 +240,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             return self.bot.running
         else:
             return False
-    
+
     def toggle_socket_server(self, action, user_data):
         action.set_state(GLib.Variant.new_boolean(not action.get_state()))
         self.socket_server_enabled = action.get_state().get_boolean()
@@ -275,7 +276,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.panel.remove(self.output_container)
 
     def do_create_configure_widget(self):
-        widget = gtk3_utils.ShoebotPreferences()    
+        widget = gtk3_utils.ShoebotPreferences()
         return widget
 
 
@@ -294,7 +295,7 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
             item = Gio.MenuItem.new_submenu(text, menu)
 
             examples_item, examples = gtk3_utils.mk_examples_menu(_("E_xamples"))
-            
+
             if examples and not EXAMPLES:
                 # if examples is None, examples were not found.
                 EXAMPLES.extend(examples)
@@ -302,18 +303,18 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
 
             for text, name in WINDOW_ACTIONS:
                 menu.append(text, "win.on_%s" % name)
-                
+
             for text, name, toggled in WINDOW_TOGGLES:
                 action_name = "win.toggle_%s" % name
                 menu.append(text, action_name)
 
             return item, menu
-        
+
         base, menu = mk_menu(_("Shoebot"))
 
         for name, accel in WINDOW_ACCELS:
             self.app.set_accels_for_action("win.on_%s" % name, (accel,))
-        
+
         self.shoebot_menu = base
         self.tools_menu_ext = self.extend_menu("tools-section")
         self.tools_menu_ext.append_menu_item(base)

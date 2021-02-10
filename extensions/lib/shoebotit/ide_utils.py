@@ -206,7 +206,7 @@ class ShoebotProcess(object):
         self.responses[cookie] = response
         data = ' '.join([cmd, *args, f'cookie={cookie}\n'])
 
-        self.process.stdin.write(data.encode('ascii'))
+        self.process.stdin.write(data.encode('utf-8'))
         self.process.stdin.flush()
 
     def close(self):

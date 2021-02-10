@@ -3,19 +3,23 @@ Simple command shell
 
 Launch shoebot with -l to activate it.
 
-IDEs can launch shoebot with -wl and communicate via this shell
-You can also try it as a user
+IDEs can launch shoebot with -l and communicate via this shell
+You can also try it as a user:
 
-sbot -wl ~/examples/animation/hypnoval.bot
+$ sbot -l ~/examples/animation/hypnoval.bot
 
 
-For Livecoding IDEs can use the load_base64 command, simply pass
-the updated python code as the first parameter.
+For live coding, IDEs can use the load_base64 command to load new
+source:  The first parameter is the base64 encoded source code.
+
+Cookie parameter:
 
 If an editor wants to know the status of specific commands, set
 cookie=unique_value as the last parameter of any command.
 
-output will come back like this
+The cookie will be the first text on the line, followed by > or :
+
+Examples:
 
 %cookie> this is an intermediate line
 %cookie>
@@ -26,8 +30,12 @@ output will come back like this
 
 %cookie status:
 
-Other commands are available to control playback, try 'help' to
-list them.
+This makes it possible to filter responses from other info on stdout.
+
+
+List available commands:
+
+Type 'help' to list all the available commands.
 """
 
 from __future__ import print_function
