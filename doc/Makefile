@@ -3,8 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-# Note, we use the current python so this can work in virtualenv:
-SPHINXBUILD = $(shell which python3) $(shell which sphinx-build)
+SPHINXBUILD = $(shell which sphinx-build)
 PAPER         =
 
 # Internal variables.
