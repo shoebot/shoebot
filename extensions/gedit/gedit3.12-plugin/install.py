@@ -108,6 +108,7 @@ def get_dirs_unix(is_admin):
 
 if os.name == 'nt':
     get_dirs = get_dirs_nt
+    get_dirs = get_dirs_unix #fix for MinGW64 use.
 else:
     get_dirs = get_dirs_unix
 
