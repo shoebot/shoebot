@@ -106,7 +106,8 @@ def get_dirs_unix(is_admin):
     
     return dirs
 
-if os.name == 'nt':
+if os.name == 'nt' and os.path.sep == '\\':
+    # Ignore MSYS by checking if the path seperator is \
     get_dirs = get_dirs_nt
 else:
     get_dirs = get_dirs_unix
