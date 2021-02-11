@@ -76,7 +76,7 @@ Mac OS X
 
 Installation on Mac OS X is identical to GNU/Linux based distributions. 
 
-Dependencies are installed via `Homebrew <https://brew.sh/>_` through the
+Dependencies are installed via `Homebrew <https://brew.sh/>`_ through the
 ``install/install_dependencies.sh`` script.
 
 Python 3.8 is supported on Homebrew, since that is what is currently
@@ -86,13 +86,33 @@ supported by pygobject3 there.
 Windows
 -------
 
-Windows is currently untested. There used to be a purpose-built Windows version
-of Shoebot (Spryte) but it has been unmaintained for a long while.
+Shoebot will install and run on Windows 64 bit (7 and above) using `msys2 <https://www.msys2.org/>`_. 
 
-If you try your hand at running Shoebot on Windows and can get *anything*
-running, let us know in our `issue tracker
-<https://github.com/shoebot/shoebot/issues>`_ so we can improve this
-documentation.
+The easiest way to install Shoebot on Windows after installing Msys2 is to download and use the `install_dependencies.sh <https://raw.githubusercontent.com/shoebot/shoebot/master/install/install_dependencies.sh>`_ file.
+
+Save this file to your ``Msys2 home\user`` directory (default ``C:\msys64\home\%YourUserName%\``).
+
+Run ``Msys2 Sys`` from the Start Menu and enter:
+
+.. code:: 
+
+    ./install_dependencies.sh
+	
+When that is complete enter:
+
+.. code::
+
+    git clone https://github.com/shoebot/shoebot
+	
+When that is complete run ``MinGW 64-bit`` from the Start Menu and enter: 
+
+.. code::
+
+   	cd shoebot
+	
+	python setup.py install
+
+After installing, the compiled executables can be used without running the Msys2 shell.
 
 
 Add support for another operating system
@@ -104,13 +124,13 @@ Core:
 
 .. code::
 
-    Python3 Pycairo Pygobject3 Pango
+    Python3 Pycairo PyGObject3 Pango Pillow
 
 GUI:
 
 .. code::
 
-    Gtk3 Gtksourceview
+    GTK3 GTKsourceview3
 
 The community for your operating system may be able to offer help here.
 Looking at how the `install_dependencies.sh` script works for may help.
@@ -130,7 +150,7 @@ Shoebot provides a `diagnose` command as part of setup to check if things are wo
 It's usually easiest to start with Python3 and Pycairo, then move on to PyGobject, Pango and Gtk3.
 
 
-PGI with CairoCFFI and Gtk3
+PGI with CairoCFFI and GTK3
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Shoebot can run under PGI and CairoCFFI, which may be easier to install
@@ -145,3 +165,4 @@ Open a bug on the Shoebot issue tracker
 Open a bug on the issue tracker to track progress on adding your OS.
 
 https://github.com/shoebot/shoebot/issues
+
