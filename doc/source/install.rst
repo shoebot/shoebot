@@ -130,7 +130,13 @@ GUI:
 
 .. code::
 
-    GTK3 GTKsourceview3
+    GTK3
+
+IDE:
+
+.. code::
+
+    GTKSourceView3
 
 The community for your operating system may be able to offer help here.
 Looking at how the `install_dependencies.sh` script works for may help.
