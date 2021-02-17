@@ -137,7 +137,7 @@ elif [ "SuSE" = "$OS" ]; then
     PACKAGE_MANAGER="zypper"
     PACKAGES=$SUSE_PACKAGES
     INSTALL=install_zypper
-if [ "Arch" = "$OS" ] || \
+elif [ "Arch" = "$OS" ] || \
    [ "Manjaro" = "$OS" ]; then
     PACKAGE_MANAGER="pacman"
     PACKAGES=$ARCH_PACKAGES
@@ -204,3 +204,4 @@ fi
 # Default action, install packages:
 $INSTALL
 hash -r
+
