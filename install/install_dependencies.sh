@@ -3,14 +3,20 @@
 # Uncomment next line to view execution.
 # set -x
 
+# Linux Distros:
+
+# Arch, Manjaro [NEEDS FURTHER TESTING]
+ARCH_PACKAGES="cairo gobject-introspection gobject-introspection-runtime gtk3 gtksourceview3 libjpeg-turbo librsvg pango python python-cairo python-gobject"
+
+# Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
+DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python-gi-cairo python-gobject python3-dev"
+
 # Fedora, Redhat, (Centos?)
 FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
 
 # SuSE:
 SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
 
-# Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
-DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python-gi-cairo python-gobject python3-dev"
 
 # Mac OSX (keep in alphabetical order: tested to match those in .travis)
 HOMEBREW_PACKAGES="cairo gobject-introspection gtk+3 gtksourceview3 jpeg libffi librsvg py3cairo pygobject3"
@@ -86,8 +92,13 @@ get_osx_packages_and_installer() {
 
 # get operating system and version
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
-if [ -f /etc/lsb-release ]; then
-    . /etc/lsb-release
+if [ -f /etc/arch-release ]; then
+    # arch-release is present, but empty so needs to be checked before
+    # lsb_release which will be present if the user installed lsb_release.
+    OS=Arch
+    VER=''
+elif [ -f /etc/lsb-release ]; then
+    source /etc/lsb-release
     OS=$DISTRIB_ID
     VER=$DISTRIB_RELEASE
 elif [ -f /etc/debian_version ]; then
@@ -126,6 +137,12 @@ elif [ "SuSE" = "$OS" ]; then
     PACKAGE_MANAGER="zypper"
     PACKAGES=$SUSE_PACKAGES
     INSTALL=install_zypper
+if [ "Arch" = "$OS" ] || \
+   [ "Manjaro" = "$OS" ]; then
+    PACKAGE_MANAGER="pacman"
+    PACKAGES=$ARCH_PACKAGES
+    INSTALL=install_pacman
+    echo "$OS is in testing, please report any problems to https://github.com/shoebot/shoebot"
 elif [ "Darwin" = "$OS" ]; then
     get_osx_packages_and_installer
 elif [ "MinGW64" = "$OS" ]; then
