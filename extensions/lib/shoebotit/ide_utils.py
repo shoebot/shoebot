@@ -118,7 +118,10 @@ class ShoebotProcess(object):
         else:
             print('no sbot!')
 
-        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=os.name != 'nt', shell=False, cwd=cwd)
+        startupinfo = subprocess.STARTUPINFO()
+        if os.name == 'nt':
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=os.name != 'nt', shell=False, cwd=cwd, startupinfo=startupinfo)
 
         self.running = True
 
@@ -272,7 +275,10 @@ def find_example_dir():
     # Needs to run in same python env as shoebot (may be different to gedits)
     code = code_stub % 'share/shoebot/examples'
     cmd = ["python", "-c", code]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    startupinfo = subprocess.STARTUPINFO()
+    if os.name == 'nt':
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo)
     output, errors = p.communicate()
     if errors:
         print('Shoebot experienced errors searching for install and examples.')
@@ -287,7 +293,7 @@ def find_example_dir():
         # code = "from pkg_resources import resource_filename, Requirement; print resource_filename(Requirement.parse('shoebot'), 'examples/')"
         code = code_stub % 'examples/'
         cmd = ["python", "-c", code]
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, startupinfo=startupinfo)
         output, errors = p.communicate()
         examples_dir = output.decode('utf-8').strip()
         if os.path.isdir(examples_dir):

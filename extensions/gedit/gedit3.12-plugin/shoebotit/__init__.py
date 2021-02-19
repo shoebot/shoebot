@@ -109,8 +109,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         path = os.path.join(example_dir, rel_path)
 
         drive, directory = os.path.splitdrive(os.path.abspath(os.path.normpath(path)))
-        uri = "file://%s%s" % (drive, directory)
-        gio_file = Gio.file_new_for_uri(uri)
+        path = "%s%s" % (drive, directory)
+        gio_file = Gio.file_new_for_path(path)
         self.window.create_tab_from_location(
             gio_file,
             None,  # encoding
