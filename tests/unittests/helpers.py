@@ -74,7 +74,7 @@ class ShoebotTestCase(TestCase):
 
         Under OSX use assertImagesAlmostEqual.
         """
-        if sys.platform == "darwin":
+        if sys.platform in ("darwin", "nt"):
             # Rendering on OSX is slightly different to the original Linux renders.
             self.assertImagesAlmostEqual(file1, file2)
         else:
