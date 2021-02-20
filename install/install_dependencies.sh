@@ -170,12 +170,17 @@ key="$1"
 case $key in
     -h|--help)
        echo "-h|--help             This message."
+       echo "-o|--osinfo           Show operating system that was detected."
        echo "-p|--packagemanager   Show package manager that will be used for install.."
        echo "-l|--list             Show packages that will be installed."
        exit
     ;;
     -l|--list)
     LIST_PACKAGES=1
+    shift
+    ;;
+    -o|--osinfo)
+    SHOW_OS_INFO=1
     shift
     ;;
     -p|--packagemanager)
@@ -193,10 +198,13 @@ done
 if [[ "${SHOW_PACKAGE_MANAGER}" = 1 ]]; then
     echo $PACKAGE_MANAGER
 fi
+if [[ "${SHOW_OS_INFO}" = 1 ]]; then
+    echo $OS, $VER
+fi
 if [[ "${LIST_PACKAGES}" = 1 ]]; then
     echo $PACKAGES
 fi
-if [[ "${LIST_PACKAGES}${SHOW_PACKAGE_MANAGER}" ]]; then
+if [[ "${LIST_PACKAGES}${SHOW_PACKAGE_MANAGER}${SHOW_OS_INFO}" ]]; then
     exit
 fi
 
