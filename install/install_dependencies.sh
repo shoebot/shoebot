@@ -92,15 +92,14 @@ get_osx_packages_and_installer() {
 
 # get operating system and version
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
-if [ -f /etc/arch-release ]; then
-    # arch-release is present, but empty so needs to be checked before
-    # lsb_release which will be present if the user installed lsb_release.
-    OS=Arch
-    VER=''
-elif [ -f /etc/lsb-release ]; then
+if [ -f /etc/lsb-release ]; then
     source /etc/lsb-release
     OS=$DISTRIB_ID
     VER=$DISTRIB_RELEASE
+elif [ -f /etc/arch-release ]; then
+    # Arch keeps this file empty
+    OS=Arch
+    VER=''
 elif [ -f /etc/debian_version ]; then
     OS=Debian  # XXX or Ubuntu??
     VER=$(cat /etc/debian_version)
