@@ -212,3 +212,4 @@ fi
 $INSTALL
 hash -r
 
+echo "Done with dependencies, you can now install Shoebot."

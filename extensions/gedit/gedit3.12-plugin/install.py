@@ -12,6 +12,7 @@ import os
 import shutil
 import stat
 import sys
+import sysconfig
 
 here = dirname(abspath(__file__))
 source_dirs = [here, normpath(join(here, '../../lib'))]
@@ -89,6 +90,20 @@ def get_dirs_nt(is_admin):
         )
     return dirs
 
+def get_dirs_mingw(is_admin):
+    dirs = {}
+
+    if is_admin:
+        dest_dir = expandvars(f"{sys.prefix}\\lib")
+    else:
+        dest_dir = expandvars("%LOCALAPPDATA%")
+    dirs = dict(
+        dest_dir=dest_dir,
+        language_dir=expandvars(f"{dest_dir}\\gtksourceview-3.0\\language-specs"),
+        plugin_dir=expandvars(f"{dest_dir}\\gedit\\plugins"),                
+    )
+    return dirs
+
 def get_dirs_unix(is_admin):
     if is_admin:
         if isdir('/usr/lib64'):
@@ -106,9 +121,11 @@ def get_dirs_unix(is_admin):
     
     return dirs
 
-if os.name == 'nt' and os.path.sep == '\\':
-    # Ignore MSYS by checking if the path seperator is \
-    get_dirs = get_dirs_nt
+if os.name == 'nt':
+    if sysconfig.get_platform() == 'mingw':
+        get_dirs = get_dirs_mingw
+    else:
+        get_dirs = get_dirs_nt
 else:
     get_dirs = get_dirs_unix
 
@@ -138,9 +155,15 @@ def install_plugin(name=None, dest_dir=None, plugin_dir=None, language_dir=None,
         sys.exit(1)
 
     if language_dir:
-        mkdir_p(language_dir)
+        mkdir_p("%s/mime/packages" % language_dir)
         shutil.copyfile(join(here, "shoebot.lang"), join(language_dir, "shoebot.lang"))
-        os.system("update-mime-database %s/mime" % dest_dir)
+        if os.name == 'nt':
+            # Even under mingw we need the \ - maybe this should really use subprocess.run            
+            print("update-mime-database %s\\mime" % language_dir)
+            os.system("update-mime-database %s\\mime" % language_dir)
+        else:
+            print("update-mime-database %s/mime" % language_dir)
+            os.system("update-mime-database %s/mime" % language_dir)
 
     os.system("glib-compile-schemas %s/gedit/plugins/shoebotit" % dest_dir) ## FIXME, kind of specific to gedit...
     print('success')
