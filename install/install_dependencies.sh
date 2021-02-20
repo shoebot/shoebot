@@ -195,11 +195,11 @@ esac
 done
 
 
-if [[ "${SHOW_PACKAGE_MANAGER}" = 1 ]]; then
-    echo $PACKAGE_MANAGER
-fi
 if [[ "${SHOW_OS_INFO}" = 1 ]]; then
     echo $OS, $VER
+fi
+if [[ "${SHOW_PACKAGE_MANAGER}" = 1 ]]; then
+    echo $PACKAGE_MANAGER
 fi
 if [[ "${LIST_PACKAGES}" = 1 ]]; then
     echo $PACKAGES
