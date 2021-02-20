@@ -28,6 +28,7 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
+from enum import Enum
 from operator import attrgetter
 
 from shoebot import ShoebotInstallError
@@ -44,7 +45,25 @@ except ValueError as e:
     print("Pango not found - typography will not be available.", file=sys.stderr)
 
     class FakePango(object):
+        class Weight(Enum):
+            # Weights copied from PangoWeight
+            THIN = 100
+            ULTRALIGHT = 200
+            LIGHT = 300
+            SEMILIGHT = 350
+            BOOK = 380
+            NORMAL = 400
+            MEDIUM = 500
+            SEMIBOLD = 600
+            BOLD = 700
+            ULTRABOLD = 800
+            HEAVY = 900
+            ULTRAHEAVY = 1000
+
         def __getattr__(self, item):
+            if item == 'Weight':
+                return Weight
+
             raise NotImplementedError("FakePango does not implement %s" % item)
 
     Pango = FakePango()
