@@ -66,3 +66,6 @@ class DrawQueue(object):
             render_func(r_context)
 
         return r_context
+
+    def __str__(self):
+        return f'<DrawQueue render_funcs={self.render_funcs}>'
