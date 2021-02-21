@@ -137,29 +137,16 @@ elif [ "SuSE" = "$OS" ]; then
     PACKAGES=$SUSE_PACKAGES
     INSTALL=install_zypper
 elif [ "Arch" = "$OS" ] || \
-   [ "Manjaro" = "$OS" ]; then
+   [ "ManjaroLinux" = "$OS" ]; then
     PACKAGE_MANAGER="pacman"
     PACKAGES=$ARCH_PACKAGES
     INSTALL=install_pacman
-    echo "$OS is in testing, please report any problems to https://github.com/shoebot/shoebot"
 elif [ "Darwin" = "$OS" ]; then
     get_osx_packages_and_installer
 elif [ "MinGW64" = "$OS" ]; then
     PACKAGE_MANAGER=pacman
     PACKAGES=$MINGW64_PACKAGES
     INSTALL=install_pacman
-fi
-
-if [[ -z ${INSTALL} ]]; then
-    if [ -z "$OS" ]; then
-        echo $OS
-    fi
-    echo "Shoebot does not directly support $OS $VER at the moment."
-    echo ''
-    echo 'Get started by looking at "Add support for another operating system".'
-    echo 'in the installation documentation.'
-    echo ''
-    exit
 fi
 
 
@@ -208,7 +195,21 @@ if [[ "${LIST_PACKAGES}${SHOW_PACKAGE_MANAGER}${SHOW_OS_INFO}" ]]; then
     exit
 fi
 
+
+
 # Default action, install packages:
+if [[ -z ${INSTALL} ]]; then
+    if [ -z "$OS" ]; then
+        echo $OS
+    fi
+    echo "Shoebot does not directly support $OS $VER at the moment."
+    echo ''
+    echo 'Get started by looking at "Add support for another operating system".'
+    echo 'in the installation documentation.'
+    echo ''
+    exit
+fi
+
 $INSTALL
 hash -r
 
