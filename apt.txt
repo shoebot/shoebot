@@ -1,0 +1,12 @@
+build-essential
+gir1.2-gtk-3.0
+gir1.2-rsvg-2.0
+gobject-introspection
+libgirepository1.0-dev
+libglib2.0-dev
+libgtksourceview-3.0-dev
+libjpeg-dev
+libpango1.0-dev
+python-gi-cairo
+python-gobject
+python3-dev
