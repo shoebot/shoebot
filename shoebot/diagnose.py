@@ -19,7 +19,7 @@ from collections import namedtuple
 
 COL_WIDTH = 10
 
-AvailableModules = namedtuple("AvailableModules", "gi pgi meta pubsub rsvg vext")
+AvailableModules = namedtuple("AvailableModules", "gi pgi meta pango pubsub rsvg vext")
 
 
 def display_platform():
@@ -114,17 +114,16 @@ def test_imports():
     pgi = test_import("pgi")
     _gi = gi or pgi
     if gi:
-        test_import("gi.repository.Pango", gi_require=("Pango", "1.0"), gi=_gi)
+        pango = test_import("gi.repository.Pango", gi_require=("Pango", "1.0"), gi=_gi)
     else:
-        print("    No gi implementation, text will not be available")
+        print("    No gi.repository.Pango implementation, text will not be available")
+        pango = None
     # virtualenv help
     vext = test_import("vext")
 
     # internal dependencies
     pubsub = test_import("pubsub")
     meta = test_import("meta")
-    if _gi:
-        _gi.require_version("Rsvg", "2.0")
     rsvg = test_import(
         "gi.repository.Rsvg", "SVG Support unavailable", gi_require=("Rsvg", "2.0")
     )
@@ -132,7 +131,7 @@ def test_imports():
     return (
         test_import("shoebot"),
         AvailableModules(
-            gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext
+            gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext, pango=pango
         ),
     )
 
@@ -218,7 +217,8 @@ def diagnose():
     standard_module_example()
 
     # shoebot with text (will fail under pypy or pgi)
-    module_using_text()
+    if available_modules.pango:
+        module_using_text()
 
 
 if __name__ == "__main__":
