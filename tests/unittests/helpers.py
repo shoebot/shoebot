@@ -131,7 +131,7 @@ class ShoebotTestCase(TestCase):
 
         seed(0)
 
-        bot.run(code, verbose=True)
+        bot.run(code, verbose=verbose)
 
     def run_filename(self, filename, outputfile, windowed=False, namespace=None, verbose=True):
         """
