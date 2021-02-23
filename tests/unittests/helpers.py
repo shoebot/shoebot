@@ -35,6 +35,8 @@ class ShoebotTestCase(TestCase):
     _created_directories = set()
     _copied_files = set()
 
+    maxDiff = None
+
     @classmethod
     def setUpClass(cls):
         """
@@ -74,8 +76,8 @@ class ShoebotTestCase(TestCase):
 
         Under OSX use assertImagesAlmostEqual.
         """
-        if sys.platform == "darwin":
-            # Rendering on OSX is slightly different to the original Linux renders.
+        if sys.platform in ("darwin", "win32"):
+            # Rendering on OSX and Windows is slightly different to the original Linux renders.
             self.assertImagesAlmostEqual(file1, file2)
         else:
             # So far Linux output has been identical - this will probably need to
