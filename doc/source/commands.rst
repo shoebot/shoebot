@@ -26,6 +26,9 @@ Drawing shapes
         :alt: four rectangles.  The last three have increasingly round corners.
         :filename: drawing_shapes__rect.png
 
+        size(200,200)
+        background(1)
+        fill(0.95, 0.75, 0)
         rect(10, 10, 35, 35)
         # see how roundness affects the shape
         rect(55, 10, 35, 35, 0.3)
