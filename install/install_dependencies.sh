@@ -3,14 +3,20 @@
 # Uncomment next line to view execution.
 # set -x
 
+# Linux Distros:
+
+# Arch, Manjaro [NEEDS FURTHER TESTING]
+ARCH_PACKAGES="cairo gobject-introspection gobject-introspection-runtime gtk3 gtksourceview3 libjpeg-turbo librsvg pango python python-cairo python-gobject"
+
+# Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
+DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python-gi-cairo python-gobject python3-dev"
+
 # Fedora, Redhat, (Centos?)
 FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
 
 # SuSE:
 SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
 
-# Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
-DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python-gi-cairo python-gobject python3-dev"
 
 # Mac OSX (keep in alphabetical order: tested to match those in .travis)
 HOMEBREW_PACKAGES="cairo gobject-introspection gtk+3 gtksourceview3 jpeg libffi librsvg py3cairo pygobject3"
@@ -87,9 +93,13 @@ get_osx_packages_and_installer() {
 # get operating system and version
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 if [ -f /etc/lsb-release ]; then
-    . /etc/lsb-release
+    source /etc/lsb-release
     OS=$DISTRIB_ID
     VER=$DISTRIB_RELEASE
+elif [ -f /etc/arch-release ]; then
+    # Arch keeps this file empty
+    OS=Arch
+    VER=''
 elif [ -f /etc/debian_version ]; then
     OS=Debian  # XXX or Ubuntu??
     VER=$(cat /etc/debian_version)
@@ -126,24 +136,17 @@ elif [ "SuSE" = "$OS" ]; then
     PACKAGE_MANAGER="zypper"
     PACKAGES=$SUSE_PACKAGES
     INSTALL=install_zypper
+elif [ "Arch" = "$OS" ] || \
+   [ "ManjaroLinux" = "$OS" ]; then
+    PACKAGE_MANAGER="pacman"
+    PACKAGES=$ARCH_PACKAGES
+    INSTALL=install_pacman
 elif [ "Darwin" = "$OS" ]; then
     get_osx_packages_and_installer
 elif [ "MinGW64" = "$OS" ]; then
     PACKAGE_MANAGER=pacman
     PACKAGES=$MINGW64_PACKAGES
     INSTALL=install_pacman
-fi
-
-if [[ -z ${INSTALL} ]]; then
-    if [ -z "$OS" ]; then
-        echo $OS
-    fi
-    echo "Shoebot does not directly support $OS $VER at the moment."
-    echo ''
-    echo 'Get started by looking at "Add support for another operating system".'
-    echo 'in the installation documentation.'
-    echo ''
-    exit
 fi
 
 
@@ -154,12 +157,17 @@ key="$1"
 case $key in
     -h|--help)
        echo "-h|--help             This message."
+       echo "-o|--osinfo           Show operating system that was detected."
        echo "-p|--packagemanager   Show package manager that will be used for install.."
        echo "-l|--list             Show packages that will be installed."
        exit
     ;;
     -l|--list)
     LIST_PACKAGES=1
+    shift
+    ;;
+    -o|--osinfo)
+    SHOW_OS_INFO=1
     shift
     ;;
     -p|--packagemanager)
@@ -174,17 +182,34 @@ esac
 done
 
 
+if [[ "${SHOW_OS_INFO}" = 1 ]]; then
+    echo $OS, $VER
+fi
 if [[ "${SHOW_PACKAGE_MANAGER}" = 1 ]]; then
     echo $PACKAGE_MANAGER
 fi
 if [[ "${LIST_PACKAGES}" = 1 ]]; then
     echo $PACKAGES
 fi
-if [[ "${LIST_PACKAGES}${SHOW_PACKAGE_MANAGER}" ]]; then
+if [[ "${LIST_PACKAGES}${SHOW_PACKAGE_MANAGER}${SHOW_OS_INFO}" ]]; then
     exit
 fi
 
+
+
 # Default action, install packages:
+if [[ -z ${INSTALL} ]]; then
+    if [ -z "$OS" ]; then
+        echo $OS
+    fi
+    echo "Shoebot does not directly support $OS $VER at the moment."
+    echo ''
+    echo 'Get started by looking at "Add support for another operating system".'
+    echo 'in the installation documentation.'
+    echo ''
+    exit
+fi
+
 $INSTALL
 hash -r
 

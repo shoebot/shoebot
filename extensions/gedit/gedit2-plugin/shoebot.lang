@@ -333,7 +333,7 @@
           <keyword>RuntimeWarning</keyword>
           <keyword>FutureWarning</keyword>
 
-          
+
         </context>
 
         <context id="builtin-function" style-ref="builtin-function">
@@ -409,7 +409,6 @@
           <keyword>unichr</keyword>
           <keyword>unicode</keyword>
           <keyword>vars</keyword>
-          <keyword>xrange</keyword>
           <keyword>zip</keyword>
 
           <keyword>rect</keyword>

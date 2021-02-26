@@ -351,7 +351,7 @@ class Bot(Grammar):
         """Save the contents of current surface into a file or cairo surface/context
 
         :param filename: Can be a filename or a Cairo surface.
-        :param defer: If true, buffering/threading may be employed however output will not be immediate.
+        :param defer: When to snapshot, if set to True waits until the frame has finished rendering.
         :param autonumber: If true then a number will be appended to the filename.
         """
         if autonumber:
