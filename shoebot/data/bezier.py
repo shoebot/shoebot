@@ -122,6 +122,11 @@ class BezierPath(Grob, ColorMixin):
                     self._canvas.curveto_closure(p.x, p.y, p.c1x, p.c1y, p.c2x, p.c2y),
                     p,
                 )
+            elif p.cmd == ARC:
+                self._append_element(
+                    self._canvas.arc_closure(p.x, p.y, p.radius, p.angle1, p.angle2),
+                    p,
+                )
 
     def addpoint(self, *args):
         self.append(*args)

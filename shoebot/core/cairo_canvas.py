@@ -104,6 +104,12 @@ class CairoCanvas(Canvas):
 
         return curveto
 
+    def arc_closure(self, x, y, radius, angle1, angle2):
+        def arc(ctx):
+            ctx.arc(x, y, radius, angle1, angle2)
+
+        return arc
+
     def closepath_closure(self):
         def closepath(ctx):
             ctx.close_path()
