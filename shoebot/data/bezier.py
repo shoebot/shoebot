@@ -161,6 +161,12 @@ class BezierPath(Grob, ColorMixin):
             (CURVETO, x1, y1, x2, y2, x3, y3),
         )
 
+    def arc(self, x, y, radius, angle1, angle2):
+        self._append_element(
+            self._canvas.arc_closure(x, y, radius, angle1, angle2),
+            (ARC, x, y, radius, angle1, angle2),
+        )
+
     def closepath(self):
         if self._elements:
             start_el = self[0]
