@@ -403,10 +403,9 @@ Text
 
   Set the font to be used with new text instances.
 
-  Accepts TrueType and OpenType files. Depends on FreeType being
-  installed.
+  Accepts a system font name, e.g. "Inconsolata".
 
-  :param fontpath: path to TrueType or OpenType font
+  :param fontpath: font name
   :param fontsize: font size in points
   :rtype: current font path (if ``fontpath`` was not set)
 
