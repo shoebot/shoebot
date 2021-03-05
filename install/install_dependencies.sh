@@ -9,7 +9,7 @@
 ARCH_PACKAGES="cairo gobject-introspection gobject-introspection-runtime gtk3 gtksourceview3 libjpeg-turbo librsvg pango python python-cairo python-gobject"
 
 # Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
-DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python-gi-cairo python-gobject python3-dev"
+DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python3-gi-cairo python3-gi python3-dev"
 
 # Fedora, Redhat, (Centos?)
 FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
