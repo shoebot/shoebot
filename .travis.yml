@@ -32,7 +32,7 @@ matrix:
   include:
     - os: linux
       sudo: required
-      dist: xenial
+      dist: bionic
       python: 3.7
       env:
         - PYTHON="python3"
