@@ -302,6 +302,10 @@ class NodeBot(Bot):
     def arc(self, x, y, radius, angle1, angle2):
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
+        # use degrees by default
+        import math
+        angle1 = math.radians(angle1)
+        angle2 = math.radians(angle2)
         self._path.arc(x, y, radius, angle1, angle2)
 
     def closepath(self):
