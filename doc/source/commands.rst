@@ -411,12 +411,11 @@ Text
         font("Liberation Mono")
         fontsize(16)
 
-        text("Bot", 15, 40)
-        text("Bot", 15, 65, weight='bold')
-
-        text("Bot", 55, 40, style='italic')
-        text("Bot", 55, 65, style='italic', weight=700)
-
+        text("Bot", 35, 25)
+        text("Bot", 35, 45, weight='bold')
+        text("Bot", 35, 65, style='italic')
+        text("Bot", 35, 85, style='italic', weight=700)
+        
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
