@@ -392,20 +392,39 @@ Text
   :param y: y-coordinate of the top left corner
   :param width: text box width. When set, text will wrap to the next line if it would exceed this width. If unset, there will be no line breaks.
   :param height: text box height
+  :param weight: font weight. It can be a numeric value (100 to 900), but you can also use
+    a set of predefined names: ``ultralight`` (200), ``light`` (300), ``normal`` (400),
+    ``bold`` (700), ``ultrabold`` (800) and ``heavy`` (900).
+  :param style: font style. Can be ``normal`` (default), ``oblique`` or ``italic``.
   :param outline: whether to draw as an outline.
   :param draw: if False, the object won't be immediately drawn to canvas.
   :type outline: bool
   :type draw: bool
   :rtype: BezierPath object representing the text
 
+    .. shoebot::
+        :alt: The word 'bot' in bold and italic styles
+        :filename: text__text.png
+
+        fill(0.3)
+
+        font("Liberation Mono")
+        fontsize(16)
+
+        text("Bot", 15, 40)
+        text("Bot", 15, 65, weight='bold')
+
+        text("Bot", 55, 40, style='italic')
+        text("Bot", 55, 65, style='italic', weight=700)
+
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
-  Set the font to be used with new text instances.
+  Set the font family to be used in new text instances.
 
-  Accepts a system font name, e.g. "Inconsolata".
+  Accepts a system font family name, e.g. "Inconsolata". To use a specific weight or style (e.g. bold, italic) use the ``weight`` and ``style`` arguments when calling ``text()``.
 
-  :param fontpath: font name
+  :param fontpath: font family name
   :param fontsize: font size in points
   :rtype: current font path (if ``fontpath`` was not set)
 
