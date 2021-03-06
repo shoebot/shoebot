@@ -192,8 +192,6 @@ class Text(Grob, ColorMixin):
 
         # then we set fontsize (multiplied by Pango.SCALE)
         self._pango_fontface.set_absolute_size(self.fontsize * Pango.SCALE)
-        self._pango_fontface.set_style(_style_name_to_pango(self.style))
-        self._pango_fontface.set_weight(_weight_name_to_pango(self.weight))
 
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
