@@ -13,7 +13,7 @@ Drawing shapes
 .. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
 
     Draw a rectangle.
- 
+
     :param x: top left x-coordinate
     :param y: top left y-coordinate
     :param width: rectangle width
@@ -38,7 +38,7 @@ Drawing shapes
 .. py:function:: ellipse(x, y, width, height, draw=True)
 
     Draw an ellipse. Same as ``oval()``.
- 
+
     :param x: top left x-coordinate
     :param y: top left y-coordinate
     :param width: ellipse width
@@ -55,7 +55,7 @@ Drawing shapes
 .. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
 
     Draw an arrow.
- 
+
     :param x: arrow tip x-coordinate
     :param y: arrow tip y-coordinate
     :param width: arrow width (also sets height)
@@ -73,7 +73,7 @@ Drawing shapes
 .. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
 
     Draw a star-like polygon.
- 
+
     :param startx: center x-coordinate
     :param starty: center y-coordinate
     :param points: amount of points
@@ -93,13 +93,13 @@ Drawing shapes
 .. py:function:: line(x1, y1, x2, y2, draw=True)
 
     Draw a line from (x1,y1) to (x2,y2).
-    
+
     :param x1: x-coordinate of the first point
     :param y1: y-coordinate of the first point
     :param x2: x-coordinate of the second point
     :param y2: y-coordinate of the second point
     :param boolean draw: whether to draw the shape on the canvas or not
-    
+
     .. shoebot::
         :alt: 3 crossing lines.
         :filename: drawing_shapes__line.png
@@ -113,7 +113,7 @@ Drawing shapes
 .. py:function:: rectmode(mode=None)
 
     Change the way rectangles are specified. Each mode alters the parameters
-    necessary to draw a rectangle using the :py:func:`rect` function. 
+    necessary to draw a rectangle using the :py:func:`rect` function.
 
     :param mode: the mode to draw new rectangles in
     :type mode: CORNER, CENTER or CORNERS
@@ -162,7 +162,7 @@ Drawing shapes
 .. py:function:: ellipsemode(mode=None)
 
     Change the way ellipses are specified. Each mode alters the parameters
-    necessary to draw an ellipse using the :py:func:`ellipse` function. 
+    necessary to draw an ellipse using the :py:func:`ellipse` function.
 
     It works exactly the same as the :py:func:`rectmode` command.
 
