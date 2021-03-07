@@ -100,8 +100,7 @@ class NodeBot(Bot):
         draw=True,
         **kwargs
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions.
-        """
+        """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -254,8 +253,7 @@ class NodeBot(Bot):
         return path
 
     def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
-        """Draws a star.
-        """
+        """Draws a star."""
         # Taken from Nodebox.
         self.beginpath(**kwargs)
         self.moveto(startx, starty + outer)
@@ -304,6 +302,7 @@ class NodeBot(Bot):
             raise ShoebotError(_("No current path. Use beginpath() first."))
         # use degrees by default
         import math
+
         angle1 = math.radians(angle1)
         angle2 = math.radians(angle2)
         self._path.arc(x, y, radius, angle1, angle2)
@@ -370,8 +369,7 @@ class NodeBot(Bot):
         self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        """Draws a curve relatively to the last point.
-        """
+        """Draws a curve relatively to the last point."""
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.relcurveto(h1x, h1y, h2x, h2y, x, y)
@@ -596,7 +594,7 @@ class NodeBot(Bot):
         return self._canvas.strokecolor
 
     def nostroke(self):
-        """ Stop applying strokes to new paths.
+        """Stop applying strokes to new paths.
 
         :return: stroke color before nostroke was called.
         """
@@ -652,7 +650,7 @@ class NodeBot(Bot):
                 for axis, value in variants.items():
                     varstring += axis + "=" + str(value) + ","
                 # remove trailing comma -- lazy but simple
-                varstring = varstring.rstrip(',')
+                varstring = varstring.rstrip(",")
                 fontpath += varstring
             self._canvas.fontfile = fontpath
         else:
