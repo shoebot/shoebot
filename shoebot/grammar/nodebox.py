@@ -624,11 +624,12 @@ class NodeBot(Bot):
 
     # Text
 
-    def font(self, fontpath=None, fontsize=None, *args, **kwargs):
+    def font(self, fontpath=None, fontsize=None, vars=None, *args, **kwargs):
         """Set the font to be used with new text instances.
 
         :param fontpath: font name (can include styles like "Bold")
         :param fontsize: font size
+        :param vars: font variant values, as a dict of axis/value pairs (variable fonts only)
         :param var_XXXX: set variant value (variable fonts only)
 
         :return: current current fontpath (if fontpath param not set)
@@ -636,11 +637,14 @@ class NodeBot(Bot):
         installed."""
         if fontpath is not None:
             # do we have variants set?
-            variants = {}
-            for arg, value in kwargs.items():
-                if arg.startswith("var_"):
-                    axis = arg.replace("var_", "")
-                    variants[axis] = value
+            if not vars:
+                variants = {}
+                for arg, value in kwargs.items():
+                    if arg.startswith("var_"):
+                        axis = arg.replace("var_", "")
+                        variants[axis] = value
+            else:
+                variants = vars
             if variants:
                 # append to the font string
                 # syntax: "Inconsolata @wdth=50,wght=600"
