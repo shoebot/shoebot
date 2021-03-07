@@ -624,16 +624,32 @@ class NodeBot(Bot):
 
     # Text
 
-    def font(self, fontpath=None, fontsize=None):
+    def font(self, fontpath=None, fontsize=None, *args, **kwargs):
         """Set the font to be used with new text instances.
 
-        :param fontpath: path to truetype or opentype font.
-        :param fontsize: size of font
+        :param fontpath: font name (can include styles like "Bold")
+        :param fontsize: font size
+        :param var_XXXX: set variant value (variable fonts only)
 
         :return: current current fontpath (if fontpath param not set)
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed."""
         if fontpath is not None:
+            # do we have variants set?
+            variants = {}
+            for arg, value in kwargs.items():
+                if arg.startswith("var_"):
+                    axis = arg.replace("var_", "")
+                    variants[axis] = value
+            if variants:
+                # append to the font string
+                # syntax: "Inconsolata @wdth=50,wght=600"
+                varstring = " @"
+                for axis, value in variants.items():
+                    varstring += axis + "=" + str(value) + ","
+                # remove trailing comma -- lazy but simple
+                varstring = varstring.rstrip(',')
+                fontpath += varstring
             self._canvas.fontfile = fontpath
         else:
             return self._canvas.fontfile
