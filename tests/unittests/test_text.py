@@ -27,8 +27,6 @@ class TestText(unittest.TestCase):
             250,
             font="Bitstream Vera",
             fontsize=64,
-            weight="bold",
-            style="italic",
         )
 
         self.assertEqual(text.text, "Hello vector graphics")
@@ -36,8 +34,6 @@ class TestText(unittest.TestCase):
         self.assertEqual(text.y, 250)
         self.assertEqual(text.font, "Bitstream Vera")
         self.assertEqual(text.fontsize, 64)
-        self.assertEqual(text.weight, "bold")
-        self.assertEqual(text.style, "italic")
 
 
 if __name__ == "__main__":
