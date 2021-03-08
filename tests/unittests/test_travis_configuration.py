@@ -2,11 +2,11 @@
 Check that lists of packages in the install script and travis match.
 """
 import re
-import yaml
-
 from pathlib import Path
 from subprocess import run
 from unittest import TestCase
+
+import yaml
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent.parent

@@ -6,25 +6,26 @@
 # Linux Distros:
 
 # Arch, Manjaro [NEEDS FURTHER TESTING]
-ARCH_PACKAGES="cairo gobject-introspection gobject-introspection-runtime gtk3 gtksourceview3 libjpeg-turbo librsvg pango python python-cairo python-gobject"
+ARCH_PACKAGES="cairo gobject-introspection gobject-introspection-runtime gtk3 gtksourceview3 libjpeg-turbo librsvg pango python python-cairo python-gobject python3-wrapt"
 
 # Debian, Ubuntu, Mint (keep in alphabetical order: tested to match those in .travis)
-DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python3-dev python3-gi python3-gi-cairo"
+DEB_PACKAGES="build-essential gir1.2-gtk-3.0 gir1.2-rsvg-2.0 gobject-introspection libgirepository1.0-dev libglib2.0-dev libgtksourceview-3.0-dev libjpeg-dev libpango1.0-dev python3-dev python3-gi python3-gi-cairo python3-wrapt"
 
 # Fedora, Redhat, (Centos?)
-FEDORA_PACKAGES="redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject cairo-gobject"
+FEDORA_PACKAGES="cairo-gobject redhat-rpm-config gcc cairo-devel libjpeg-devel python3-devel python3-gobject python3-wrapt"
 
 # SuSE:
-SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo"
+SUSE_PACKAGES="gcc libjpeg62-devel python-gobject python-gobject-cairo python3-wrapt"
 
 
 # Mac OSX (keep in alphabetical order: tested to match those in .travis)
+# Homebrew doesn't package wrapt, which is needed to run tests.
 HOMEBREW_PACKAGES="cairo gobject-introspection gtk+3 gtksourceview3 jpeg libffi librsvg py3cairo pygobject3"
-MACPORTS_PACKAGES="gtk3 py37-gobject gobject-introspection jpeg librsvg cairo cairo-devel py37-cairo gtksourceview3"
+MACPORTS_PACKAGES="gtk3 py37-gobject gobject-introspection jpeg librsvg cairo cairo-devel py37-cairo gtksourceview3 python3-wrapt"
 
 # MinGW64 (Windows x86_64) (install in this order)
-MINGW64_PACKAGES="mingw-w64-x86_64-python mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3-gobject mingw-w64-x86_64-gtksourceview3 mingw-w64-x86_64-python-pillow mingw-w64-x86_64-python-pip git" 
-# mingw-w64-x86_64-python-pip and git are not dependencies but are required for git clone https://github.com/shoebot/shoebot and python setup.py install 
+MINGW64_PACKAGES="mingw-w64-x86_64-python mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3-gobject mingw-w64-x86_64-gtksourceview3 mingw-w64-x86_64-python-pillow mingw-w64-x86_64-python-pip mingw-w64-python-wrapt git"
+# mingw-w64-x86_64-python-pip and git are not dependencies but are required for git clone https://github.com/shoebot/shoebot and python setup.py install
 
 install_apt() {
     sudo apt-get install -y $PACKAGES
@@ -39,6 +40,7 @@ install_zypper() {
 }
 
 install_homebrew() {
+    pip3 install wrapy --user
     brew install $PACKAGES
 }
 

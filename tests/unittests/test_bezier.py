@@ -3,16 +3,15 @@ import unittest
 
 from parameterized import parameterized
 
-from shoebot.core import CairoCanvas, CairoImageSink
-from shoebot.data import (
-    BezierPath,
-    PathElement,
-    CLOSE,
-    MOVETO,
-    RMOVETO,
-    LINETO,
-    RLINETO,
-)
+from shoebot.core import CairoCanvas
+from shoebot.core import CairoImageSink
+from shoebot.data import BezierPath
+from shoebot.data import CLOSE
+from shoebot.data import LINETO
+from shoebot.data import MOVETO
+from shoebot.data import PathElement
+from shoebot.data import RLINETO
+from shoebot.data import RMOVETO
 from shoebot.grammar import NodeBot
 
 

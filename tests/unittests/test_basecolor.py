@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from parameterized import parameterized, parameterized_class
+from parameterized import parameterized
 
 from shoebot.data.basecolor import Color
 

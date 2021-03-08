@@ -128,6 +128,7 @@ BASE_REQUIREMENTS = [
     "meta==1.0.2",
     "Pillow>=6.0.0",
     "pubsub==0.1.2",
+    "wrapt>=1.12.1",
 ]
 
 
@@ -185,7 +186,7 @@ setup(
         debug="install" in sys.argv,
         with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
-    tests_require=["parameterized", "pyyaml"],
+    tests_require=["parameterized", "pyyaml", "wrapt"],
     entry_points={
         "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.ide.ide:main"],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",

@@ -1,13 +1,12 @@
 import re
 import sys
 import unittest
-
 from importlib import reload
 from pathlib import Path
 from textwrap import dedent
-from unittest.mock import patch, mock_open, Mock
-
-from tests.unittests.helpers import ShoebotTestCase
+from unittest.mock import Mock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -40,7 +39,7 @@ class TestSetup(unittest.TestCase):
     def test_setup_parses_version_from_version_file(self):
         """
         Test that setup loads and parses the version from the
-        file VERSION.
+        file VERSION, deliberately uses a version that is not the real version.
 
         Mocks open, to do an end to end test using mock data.
         """

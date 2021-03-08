@@ -5,13 +5,11 @@ and that none are zero bytes long.
 import tempfile
 import unittest
 
-from parameterized import parameterized, parameterized_class
-
-from tests.unittests.helpers import (
-    ShoebotTestCase,
-    shoebot_named_testclass,
-    shoebot_named_testfunction,
-)
+from parameterized import parameterized
+from parameterized import parameterized_class
+from tests.unittests.helpers import shoebot_named_testclass
+from tests.unittests.helpers import shoebot_named_testfunction
+from tests.unittests.helpers import ShoebotTestCase
 
 
 @parameterized_class(
