@@ -190,20 +190,20 @@ class NodeBot(Bot):
         """
         return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
 
-    def line(self, x1, y1, x2, y2, draw=True):
+    def line(self, x1, y1, x2, y2, draw=True, **kwargs):
         """Draw a line from (x1,y1) to (x2,y2)
         :param x1: start x-coordinate
         :param y1: start y-coordinate
         :param x2: end x-coordinate
         :param y2: end y-coordinate
         """
-        p = self._path
-        self.beginpath()
-        self.moveto(x1, y1)
-        self.lineto(x2, y2)
-        self.endpath(draw=draw)
-        self._path = p
-        return p
+        path = self.BezierPath(**kwargs)
+        path.moveto(x1, y1)
+        path.lineto(x2, y2)
+        if draw:
+            path.draw()
+        # self._path = path
+        return path
 
     def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
         """Draw an arrow.
