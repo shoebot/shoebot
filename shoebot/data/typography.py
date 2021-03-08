@@ -135,9 +135,8 @@ def _weight_name_to_pango(weight="normal"):
     :param weight:  "normal", or "bold"
     :return:  Corresponding pango font weight from Pango.Weight
     """
-    if weight not in PANGO_WEIGHTS:
-        raise AttributeError("Invalid font weight.")
-
+    if type(weight) == int:
+        return weight
     return PANGO_WEIGHTS.get(weight)
 
 

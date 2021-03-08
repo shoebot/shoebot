@@ -41,7 +41,7 @@ pickle:
 web: pickle
 
 serve:
-	cd build/html; python -m SimpleHTTPServer
+	cd build/html; python -m http.server
 
 json:
 	mkdir -p build/json build/doctrees

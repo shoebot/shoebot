@@ -36,3 +36,8 @@ clean:
 	fakeroot $(MAKE) -f $(CURDIR)/debian/rules clean
 	rm -rf build/ dist/ MANIFEST
 	find . -name '*.pyc' -delete
+
+deploy: clean html
+	rsync --compress --checksum --progress --recursive --update build/html/ manufactura:~/apps/shoebot-docs/ --exclude="__pycache__" --exclude=".*"
+dry-deploy: clean html
+	rsync --compress --checksum --progress --recursive --update build/html/ manufactura:~/apps/shoebot-docs/ --exclude="__pycache__" --exclude=".*" --dry-run
