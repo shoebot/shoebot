@@ -644,8 +644,7 @@ class NodeBot(Bot):
             if variants:
                 # append to the font string
                 # syntax: "Inconsolata @wdth=50,wght=600"
-                fontpath += " @" + variants.join(",")
-                fontpath += varstring
+                fontpath += " @" + ",".join(variants)
             self._canvas.fontfile = fontpath
         else:
             return self._canvas.fontfile
