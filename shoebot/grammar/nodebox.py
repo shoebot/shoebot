@@ -636,21 +636,15 @@ class NodeBot(Bot):
         if fontpath is not None:
             # do we have variants set?
             if not vars:
-                variants = {}
-                for arg, value in kwargs.items():
-                    if arg.startswith("var_"):
-                        axis = arg.replace("var_", "")
-                        variants[axis] = value
+                # make a list of "arg=value" strings to append to the font name below
+                variants = [f"{arg.replace('var_', '')}={value}" for arg, value in kwargs.items() if arg.startswith("var_")]
             else:
-                variants = vars
+                # make a list of "arg=value" strings from the provided dict
+                variants = [f"{arg}={value}" for arg, value in vars.items()]
             if variants:
                 # append to the font string
                 # syntax: "Inconsolata @wdth=50,wght=600"
-                varstring = " @"
-                for axis, value in variants.items():
-                    varstring += axis + "=" + str(value) + ","
-                # remove trailing comma -- lazy but simple
-                varstring = varstring.rstrip(",")
+                fontpath += " @" + variants.join(",")
                 fontpath += varstring
             self._canvas.fontfile = fontpath
         else:
