@@ -1,17 +1,79 @@
 /** overrides for rtd style */
 
-.function dd img {
-    float: left !important;
-}
-
 .rst-content table.field-list .field-name {
-    padding-left: 0 !important;
+  padding-left: 0 !important;
 }
 
 .rst-content dl dd {
-    margin-left: 0 !important;
+  margin-left: 0 !important;
 }
 
-.rst-content dl dt {
-    width: 100%;
+.rst-content dl:not(.docutils) dt {
+  border-top: none !important;
+  background: none !important;
+  font-size: 22px !important;
+}
+.rst-content dl:not(.docutils) code.descname {
+  font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
+  font-weight: 900;
+  margin-right: 4px;
+}
+.rst-content dl.field-list dt {
+  font-size: 16px !important;
+}
+.rst-content dl.function dt {
+  color: #d65d0e !important;
+  font-weight: normal;
+}
+.rst-content .section ul strong {
+  color: #d79921;
+}
+
+
+.rst-content .section ul li {
+  list-style: none;
+}
+.rst-content dl li p {
+  margin-bottom: 0 !important;
+}
+
+.rst-content p {
+  padding-left: 6px;
+}
+
+.rst-content .function {
+  border-top: solid 1px #d79921;
+  margin-bottom: 70px !important;
+}
+.rst-content dl:not(.docutils) dl dt {
+  background: none;
+  border-left: none;
+  color: #2980B9;
+}
+
+
+.rst-content code {
+  padding: 2px 4px;
+  color: #222 !important;
+  background: #eee;
+  border: none !important;
+  border-radius: 3px;
+}
+
+.highlight {
+  display: inline-block;
+  margin: 0 0 0 16px !important;
+  background: #FDF5D8;
+  border: none !important;
+  border-radius: 10px;
+}
+
+.highlight pre {
+  font-size: 14px !important;
+  font-family: Inconsolata,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace
+}
+
+.function img {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  vertical-align: top;
 }
