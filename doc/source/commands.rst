@@ -418,15 +418,47 @@ Text
         text("Bot", 35, 85, style='italic', weight=700)
 
 
+
 .. py:function:: font(fontpath=None, fontsize=None)
 
-  Set the font family to be used in new text instances.
+  Set the font to be used in new text instances.
 
-  Accepts a system font family name, e.g. "Inconsolata". To use a specific weight or style (e.g. bold, italic) use the ``weight`` and ``style`` arguments when calling ``text()``.
+  Accepts a system font name, e.g. "Inconsolata Bold".
+  A full list of your system's font names can be viewed with the `pango-list` command in a terminal.
 
-  :param fontpath: font family name
+  :param fontpath: font name
   :param fontsize: font size in points
-  :rtype: current font path (if ``fontpath`` was not set)
+  :rtype: current font name (if ``fontpath`` was not set)
+
+    .. shoebot::
+        :alt: The word 'bot' in bold and italic styles
+        :filename: text__text.png
+
+        fill(0.3)
+        fontsize(16)
+
+        font("Liberation Mono")
+        text("Bot", 35, 25)
+        font("Liberation Mono Italic")
+        text("Bot", 35, 45)
+        font("Liberation Mono Bold")
+        text("Bot", 35, 65)
+        font("Liberation Mono Bold Italic")
+        text("Bot", 35, 85)
+
+  Variable fonts are supported. You can specify the value for an axis using keyword arguments
+  with the ``var_`` prefix: to set the ``wdth`` axis to ``100``, use ``var_wdth=100``.
+
+    .. shoebot::
+        :alt: The word 'bot' in bold and italic styles
+        :filename: text__text2.png
+
+        fill(0.3)
+        fontsize(30)
+
+        for x, y in grid(5, 4, 20, 22):
+            font("Inconsolata", var_wdth=y+50, var_wght=x*12)
+            text("R", 3+x, 25+y)
 
 .. py:function:: fontsize(fontsize=None)
 

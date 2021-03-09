@@ -100,8 +100,7 @@ class NodeBot(Bot):
         draw=True,
         **kwargs
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions.
-        """
+        """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -254,8 +253,7 @@ class NodeBot(Bot):
         return path
 
     def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
-        """Draws a star.
-        """
+        """Draws a star."""
         # Taken from Nodebox.
         self.beginpath(**kwargs)
         self.moveto(startx, starty + outer)
@@ -369,8 +367,7 @@ class NodeBot(Bot):
         self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        """Draws a curve relatively to the last point.
-        """
+        """Draws a curve relatively to the last point."""
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.relcurveto(h1x, h1y, h2x, h2y, x, y)
@@ -595,7 +592,7 @@ class NodeBot(Bot):
         return self._canvas.strokecolor
 
     def nostroke(self):
-        """ Stop applying strokes to new paths.
+        """Stop applying strokes to new paths.
 
         :return: stroke color before nostroke was called.
         """
@@ -623,16 +620,29 @@ class NodeBot(Bot):
 
     # Text
 
-    def font(self, fontpath=None, fontsize=None):
+    def font(self, fontpath=None, fontsize=None, vars=None, *args, **kwargs):
         """Set the font to be used with new text instances.
 
-        :param fontpath: path to truetype or opentype font.
-        :param fontsize: size of font
+        :param fontpath: font name (can include styles like "Bold")
+        :param fontsize: font size
+        :param vars: font variant values, as a dict of axis/value pairs (variable fonts only)
+        :param var_XXXX: set variant value (variable fonts only)
 
         :return: current current fontpath (if fontpath param not set)
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed."""
         if fontpath is not None:
+            # do we have variants set?
+            if not vars:
+                # make a list of "arg=value" strings to append to the font name below
+                variants = [f"{arg.replace('var_', '')}={value}" for arg, value in kwargs.items() if arg.startswith("var_")]
+            else:
+                # make a list of "arg=value" strings from the provided dict
+                variants = [f"{arg}={value}" for arg, value in vars.items()]
+            if variants:
+                # append to the font string
+                # syntax: "Inconsolata @wdth=50,wght=600"
+                fontpath += " @" + ",".join(variants)
             self._canvas.fontfile = fontpath
         else:
             return self._canvas.fontfile
