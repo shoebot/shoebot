@@ -393,30 +393,11 @@ Text
   :param y: y-coordinate of the top left corner
   :param width: text box width. When set, text will wrap to the next line if it would exceed this width. If unset, there will be no line breaks.
   :param height: text box height
-  :param weight: font weight. It can be a numeric value (100 to 900), but you can also use
-    a set of predefined names: ``ultralight`` (200), ``light`` (300), ``normal`` (400),
-    ``bold`` (700), ``ultrabold`` (800) and ``heavy`` (900).
-  :param style: font style. Can be ``normal`` (default), ``oblique`` or ``italic``.
   :param outline: whether to draw as an outline.
   :param draw: if False, the object won't be immediately drawn to canvas.
   :type outline: bool
   :type draw: bool
   :rtype: BezierPath object representing the text
-
-    .. shoebot::
-        :alt: The word 'bot' in bold and italic styles
-        :filename: text__text.png
-
-        fill(0.3)
-
-        font("Liberation Mono")
-        fontsize(16)
-
-        text("Bot", 35, 25)
-        text("Bot", 35, 45, weight='bold')
-        text("Bot", 35, 65, style='italic')
-        text("Bot", 35, 85, style='italic', weight=700)
-
 
 
 .. py:function:: font(fontpath=None, fontsize=None)
@@ -451,7 +432,7 @@ Text
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
-        :filename: text__text2.png
+        :filename: text__variablefonts.png
 
         fill(0.3)
         fontsize(30)
