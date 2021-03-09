@@ -77,21 +77,21 @@ Documentation Index
 
 .. toctree::
    :maxdepth: 2
-   
+
    install
    getstarted
    tutorial
+   commands
+   examples
+   compatibility
+   cli_flags
    live
    libraries
-   examples
    advanced
    extensions
    troubleshooting
-   commands
-   cli_flags
-   compatibility
    contributing
-   
+
 
 .. We won't be needing these for now
     Indices and tables

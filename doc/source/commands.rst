@@ -1,9 +1,10 @@
-Command reference
-=================
+Complete reference
+==================
 
-This documentation is still missing some parts. Refer to the `Nodebox
-documentation <https://www.nodebox.net/code/index.php/Reference>`_ for the best
-reference in the meantime.
+This is the full list of commands available in Shoebot. This documentation is
+still missing some parts. Refer to the `Nodebox documentation
+<https://www.nodebox.net/code/index.php/Reference>`_ for the best reference in
+the meantime.
 
 .. contents:: :local:
 
@@ -415,7 +416,7 @@ Text
         text("Bot", 35, 45, weight='bold')
         text("Bot", 35, 65, style='italic')
         text("Bot", 35, 85, style='italic', weight=700)
-        
+
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
