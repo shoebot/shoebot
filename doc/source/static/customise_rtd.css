@@ -67,6 +67,9 @@
   border: none !important;
   border-radius: 10px;
 }
+.highlight-bash, .highlight-python {
+  border: none !important;
+}
 
 .highlight pre {
   font-size: 14px !important;
@@ -76,4 +79,34 @@
 .function img {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
   vertical-align: top;
+}
+
+
+
+/* sidebar */
+.wy-nav-side, .wy-side-nav-search {
+  background: none !important;
+}
+.wy-menu-vertical li.current, li.toctree-l3 > a, li.toctree-l2.current > a {
+  background: none !important;
+}
+.wy-menu-vertical li.current a {
+  border: none !important;
+}
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-bottom: none !important;
+  border-top: none !important;
+}
+.toctree-l1 a, a.icon-home {
+  color: #fe8019 !important;
+}
+.toctree-l2 a, .version {
+  color: #d65d0e !important;
+}
+.wy-side-nav-search input[type="text"] {
+  border: none !important;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 6px;
+}
+.wy-menu-vertical li.current a:hover, .wy-menu-vertical a:hover {
+  background: #FDF5D8 !important;
 }
