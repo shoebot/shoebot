@@ -338,7 +338,7 @@ Set background to any valid color
   :param mode: Color mode to use
   :type mode: RGB or HSB
   :param crange: Maximum value for the new color range to use. See `colorrange`_.
-  :rtype: Current color mode (if called without arguments)
+  :return: Current color mode (if called without arguments)
 
 
 .. py:function:: colorrange(crange=1.0)
@@ -372,12 +372,12 @@ Set background to any valid color
 .. py:function:: strokewidth(w=None)
 
   :param w: Stroke width
-  :rtype: Current width (if no width was specified)
+  :return: Current width (if no width was specified)
 
 .. py:function:: color(*args)
 
   :param args: color in a supported format
-  :rtype: Color object
+  :return: Color object
 
 
 Text
@@ -400,7 +400,7 @@ Text
   :param draw: if False, the object won't be immediately drawn to canvas.
   :type outline: bool
   :type draw: bool
-  :rtype: BezierPath object representing the text
+  :return: BezierPath object representing the text
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
@@ -415,7 +415,7 @@ Text
         text("Bot", 35, 45, weight='bold')
         text("Bot", 35, 65, style='italic')
         text("Bot", 35, 85, style='italic', weight=700)
-        
+
 
 
 .. py:function:: font(fontpath=None, fontsize=None)
@@ -427,7 +427,7 @@ Text
 
   :param fontpath: font name
   :param fontsize: font size in points
-  :rtype: current font name (if ``fontpath`` was not set)
+  :return: current font name (if ``fontpath`` was not set)
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
@@ -464,7 +464,7 @@ Text
   Set or return size of current font.
 
   :param fontsize: Font size in points (pt)
-  :rtype: Font size in points (if ``fontsize`` was not specified)
+  :return: Font size in points (if ``fontsize`` was not specified)
 
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
@@ -476,21 +476,21 @@ Text
   :param width: text width
   :param height: text height
   :param draw: Set to False to inhibit immediate drawing (defaults to False)
-  :rtype: Path object representing the text.
+  :return: Path object representing the text.
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
-  :rtype: the width and height of a string of text as a tuple (according to current font settings).
+  :return: the width and height of a string of text as a tuple (according to current font settings).
 
 .. py:function:: textwidth(txt, width=None)
 
   :param text: the text to test for its dimensions
-  :rtype: the width of a string of text according to the current font settings
+  :return: the width of a string of text according to the current font settings
 
 .. py:function:: textheight(txt, width=None)
 
   :param text: the text to test for its dimensions
-  :rtype: the height of a string of text according to the current font settings
+  :return: the height of a string of text according to the current font settings
 
 .. py:function:: lineheight(height=None)
 
@@ -544,7 +544,7 @@ Utility functions
    Generates mock philosophy based on a context-free grammar.
 
    :param sourcefile: file path to use as source
-   :rtype: the generated text
+   :return: the generated text
 
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
 
@@ -578,7 +578,7 @@ Core
   Set the framerate on windowed mode.
 
   :param framerate: Frames per second
-  :rtype: Current framerate
+  :return: Current framerate
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
