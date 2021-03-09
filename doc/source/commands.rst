@@ -441,6 +441,9 @@ Text
             font("Inconsolata", var_wdth=y+50, var_wght=x*12)
             text("R", 3+x, 25+y)
 
+  Note that for the above example to work, you need to install the variable
+  version of `Inconsolata <https://fonts.google.com/specimen/Inconsolata>`_.
+
 .. py:function:: fontsize(fontsize=None)
 
   Set or return size of current font.
