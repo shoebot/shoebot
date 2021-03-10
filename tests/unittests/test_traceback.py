@@ -8,8 +8,6 @@ import tempfile
 import textwrap
 import unittest
 
-from parameterized import parameterized, parameterized_class
-
 from tests.unittests.helpers import ShoebotTestCase
 
 
@@ -44,7 +42,7 @@ class TestSimpleTraceback(ShoebotTestCase):
             output_buffer = io.StringIO()
             with contextlib.redirect_stderr(output_buffer):
                 self.run_code(code, outputfile=f.name, windowed=False, verbose=False)
-                actual_output = output = output_buffer.getvalue()
+                actual_output = output_buffer.getvalue()
 
         self.assertEqual(actual_output, expected_output)
 
@@ -72,11 +70,12 @@ class TestSimpleTraceback(ShoebotTestCase):
         with tempfile.NamedTemporaryFile(suffix=f".png") as f:
             output_buffer = io.StringIO()
             with contextlib.redirect_stderr(output_buffer):
-                self.run_filename("test_traceback_from_file.bot", outputfile=f.name, verbose=False)
+                self.run_filename(
+                    "test_traceback_from_file.bot", outputfile=f.name, verbose=False
+                )
                 actual_output = output = output_buffer.getvalue()
 
         self.assertEqual(actual_output, expected_output)
-
 
 
 if __name__ == "__main__":

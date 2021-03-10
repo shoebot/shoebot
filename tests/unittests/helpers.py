@@ -2,34 +2,115 @@ import filecmp
 import math
 import shutil
 import sys
-
 from os import environ
 from pathlib import Path
-from PIL import Image, ImageChops
 from random import seed
 from unittest import TestCase
+from unittest.mock import Mock
+
+from PIL import Image
+from PIL import ImageChops
+from wrapt import decorator
 
 from shoebot import create_bot
 
 TEST_DIR = Path(__file__).parent.absolute()
+TEST_INPUT_DIR = TEST_DIR / "input/tests"
+TEST_OUTPUT_DIR = TEST_DIR / "output/tests"
+EXAMPLE_INPUT_DIR = TEST_DIR / "input/examples"
+EXAMPLE_OUTPUT_DIR = TEST_DIR / "output/examples"
+
 RUNNING_IN_CI = "CI" in environ
 
 
+def stub_sideeffect():
+    # Stubs are here to give IDEs something to import without complaining.
+    NotImplementedError("This dummy stub should not be used directly.")
+
+
+command_stubs = Mock(side_effect=stub_sideeffect)
+
+
 def shoebot_named_testfunction(func, num, param):
+    """
+    The following code:
+
+    @parameterized.expand(
+        ["png", "ps", "pdf", "svg"], name_func=shoebot_named_testfunction
+    )
+    def test_output_formats(self, file_format):
+    ....
+
+    Will name tests based on the first parameter:
+     test_output_formats_png
+     test_output_formats_ps
+     test_output_formats_pdf
+     test_output_formats_svg
+    """
     return f"{func.__name__}_{'_'.join(param[0])}"
 
 
 def shoebot_named_testclass(cls, num, params_dict):
+    """
+    parameterized helper to name class based whether 'windowed' is set to True or not.
+
+    The following code:
+
+    @parameterized_class(
+        [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
+    )
+    class TestOutputFormats(ShoebotTestCase):
+    ...
+
+    Will name the expanded test classes:
+     TestOutputFormatsHeadless
+     TestOutputFormatsWindowed
+    """
     suffix = "Windowed" if params_dict["windowed"] else "Headless"
     return f"{cls.__name__}{suffix}"
 
 
+def test_as_bot(outputfile=None, windowed=None, verbose=True):
+    @decorator
+    def wrapper(wrapped, instance, args, kwargs):
+        """
+        Decorator that runs code in a method as a shoebot bot.
+
+        This is adapted from ShoebotTestCase.run_code with extra code to
+        inject the bot namespace.
+        """
+        # TODO, need to get window from the test class again!!!
+        bot = create_bot(window=windowed, outputfile=outputfile)
+
+        # Inject the test into the namespace.
+        test_name = wrapped.__name__
+        bot._namespace[test_name] = wrapped
+        bot._namespace["args"] = args
+        bot._namespace["kwargs"] = kwargs
+        # Inject the bot globals into the test method namespace
+        bot._load_namespace(wrapped.__globals__)
+        # Inject outputfile as it may be need for image assertions.
+        wrapped.__globals__["outputfile"] = outputfile
+        # Hack!  Create a function to allow flushing the output file.
+        wrapped.__globals__["flush_outputfile"] = lambda: bot._canvas.flush(bot._frame)
+
+        seed(0)
+        # should be equivalent to bot.run:  bot.run(f"{test_name}(*args, **kwargs)", verbose=verbose)
+        # TODO - This isn't quite the same as bot.run :-\
+        result = wrapped(*args, **kwargs)
+        # cleanup.
+        # del wrapped.__globals__["outputfile"]
+        return result
+
+    return wrapper
+
+
 class ShoebotTestCase(TestCase):
-    test_input_dir = TEST_DIR / "input/tests"
-    test_output_dir = TEST_DIR / "output/tests"
-    example_input_dir = TEST_DIR / "input/examples"
-    example_output_dir = TEST_DIR / "output/examples"
-    paths = [test_input_dir, ".", "../.."]  # When specifying a filename these paths will be searched.
+    paths = [
+        TEST_INPUT_DIR,
+        ".",
+        "../..",
+    ]  # When specifying a filename these paths will be searched.
     windowed = False  # default is headless.
 
     _created_directories = set()
@@ -44,8 +125,8 @@ class ShoebotTestCase(TestCase):
         users can view input and output images in using a file manager.
         """
         for input_path, output_path in [
-            (cls.test_input_dir, cls.test_output_dir),
-            (cls.example_input_dir, cls.example_output_dir),
+            (TEST_INPUT_DIR, TEST_OUTPUT_DIR),
+            (EXAMPLE_INPUT_DIR, EXAMPLE_OUTPUT_DIR),
         ]:
             if output_path in ShoebotTestCase._created_directories:
                 continue
@@ -122,18 +203,19 @@ class ShoebotTestCase(TestCase):
             size, Path(filename).stat().st_size, f"{filename} is zero bytes."
         )
 
-    def run_code(self, code, outputfile, windowed=False, namespace=None, verbose=True):
+    @staticmethod
+    def run_code(code, outputfile, windowed=False, namespace=None, verbose=True):
         """
         Run shoebot code, sets random.seed to stabilize output.
         """
-        bot = create_bot(window=windowed,
-                         outputfile=outputfile, namespace=namespace)
+        bot = create_bot(window=windowed, outputfile=outputfile, namespace=namespace)
 
         seed(0)
-
         bot.run(code, verbose=verbose)
 
-    def run_filename(self, filename, outputfile, windowed=False, namespace=None, verbose=True):
+    def run_filename(
+        self, filename, outputfile, windowed=False, namespace=None, verbose=True
+    ):
         """
         Run shoebot from filename.
 
@@ -149,8 +231,13 @@ class ShoebotTestCase(TestCase):
             full_path = Path(path) / filename
             if full_path.is_file():
                 with open(full_path) as f:
-                    self.run_code(f.read(), outputfile,
-                                  windowed=windowed, namespace=namespace, verbose=verbose)
+                    self.run_code(
+                        f.read(),
+                        outputfile,
+                        windowed=windowed,
+                        namespace=namespace,
+                        verbose=verbose,
+                    )
                     return
         else:
             raise ValueError(f"Could not find bot {filename} in paths {self.paths}")
