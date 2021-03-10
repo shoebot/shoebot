@@ -2,7 +2,7 @@ import subprocess
 import unittest
 
 
-class TestCommands(unittest.TestCase):
+class TestCommandLine(unittest.TestCase):
     """
     See if the commands can start successfully, by starting
     them with an option that does nothing: --version

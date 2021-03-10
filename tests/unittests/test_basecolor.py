@@ -6,7 +6,7 @@ from parameterized import parameterized
 from shoebot.data.basecolor import Color
 
 
-class BaseColorTest(unittest.TestCase):
+class TestBaseColor(unittest.TestCase):
     def assertColorAlmostEqualsRGBA(self, actual_color, expected_rgba, message=None):
         """
         This is ported from Nodebox 1 colors lib and improved.

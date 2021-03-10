@@ -79,12 +79,11 @@ def test_as_bot(outputfile=None, windowed=None, verbose=True):
         This is adapted from ShoebotTestCase.run_code with extra code to
         inject the bot namespace.
         """
-        bot = create_bot(
-            window=any([instance.windowed, windowed]), outputfile=outputfile
-        )
+        # TODO, need to get window from the test class again!!!
+        bot = create_bot(window=windowed, outputfile=outputfile)
 
         # Inject the test into the namespace.
-        test_name = f"{wrapped.__func__.__name__}"
+        test_name = wrapped.__name__
         bot._namespace[test_name] = wrapped
         bot._namespace["args"] = args
         bot._namespace["kwargs"] = kwargs
@@ -96,10 +95,12 @@ def test_as_bot(outputfile=None, windowed=None, verbose=True):
         wrapped.__globals__["flush_outputfile"] = lambda: bot._canvas.flush(bot._frame)
 
         seed(0)
-        bot.run(f"{test_name}(*args, **kwargs)", verbose=verbose)
-
+        # should be equivalent to bot.run:  bot.run(f"{test_name}(*args, **kwargs)", verbose=verbose)
+        # TODO - This isn't quite the same as bot.run :-\
+        result = wrapped(*args, **kwargs)
         # cleanup.
-        del wrapped.__globals__["outputfile"]
+        # del wrapped.__globals__["outputfile"]
+        return result
 
     return wrapper
 
