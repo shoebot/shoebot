@@ -2,9 +2,12 @@ import unittest
 
 from parameterized import parameterized
 
+# Add stubs for all shoebot APIs called:
 from tests.unittests.stubs.extras import flush_outputfile
 from tests.unittests.stubs.extras import outputfile
-from tests.unittests.stubs.nodebox import moveto, beginpath, endpath  # noqa
+from tests.unittests.stubs.nodebox import moveto  # noqa
+from tests.unittests.stubs.nodebox import beginpath  # noqa
+from tests.unittests.stubs.nodebox import endpath  # noqa
 from tests.unittests.stubs.nodebox import image  # noqa
 from tests.unittests.stubs.nodebox import size  # noqa
 from tests.unittests.stubs.nodebox import text  # noqa
@@ -34,6 +37,10 @@ class TestPath(ShoebotTestCase):
                 [PathElement(MOVETO, 40, 40), PathElement(CLOSE, 40, 40)],
             ),
             (
+                "relmoveto(40, 40)",
+                [PathElement(RMOVETO, 40, 40), PathElement(CLOSE, 40, 40)],
+            ),
+            (
                 "lineto(40, 40)",
                 [PathElement(LINETO, 40, 40), PathElement(CLOSE, 40, 40)],
             ),
@@ -48,13 +55,19 @@ class TestPath(ShoebotTestCase):
                     PathElement(CLOSE, 80, 80),
                 ],
             ),
+            (
+                "arc(40, 40, 23, 90, 180)",
+                [PathElement(ARC, 40, 40, 23, 90, 180), PathElement(CLOSE, 40, 40)],
+            ),
         ]
     )
     @test_as_bot()
     def test_path_commands(self, cmd, expected_elements):
         """
-        Run a command that should create path, first check if it requires beginpath
-        Then run with begin + endpath, and verify the path contains the expected elements.
+        Run a command that should create a one element path.
+
+        - Verify it requires beginpath.
+        - Run with begin + endpath, and verify the path contains the expected elements.
         """
         with self.assertRaises(ShoebotError):
             # ShoebotError should be raised if you haven't called beginpath
