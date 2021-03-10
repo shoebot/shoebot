@@ -296,11 +296,73 @@ Transforms
 
 .. py:function:: translate(xt, yt, mode=None)
 
+
 .. py:function:: rotate(degrees=0, radians=0)
+
+    .. shoebot::
+        :alt: Rotated squares
+        :filename: transforms__rotate_corner.png
+
+        fill('#4a69bd', 0.2)
+        translate(25, 25)
+        for i in range(7):
+            rotate(15)
+            rect(0, 0, 50, 50)
+
+    .. shoebot::
+        :alt: Rotated squares
+        :filename: transforms__rotate_center.png
+
+        fill('#e55039', 0.2)
+        transform(CENTER)
+        for i in range(5):
+            rotate(15)
+            rect(25, 25, 50, 50)
+
 
 .. py:function:: scale(x=1, y=None)
 
+    .. shoebot::
+        :alt: Scaled squares
+        :filename: transforms__scale_corner.png
+
+        fill('#78e08f', 0.2)
+        translate(25,25)
+        for i in range(7):
+            rect(0, 0, 50, 50)
+            scale(.8)
+
+    .. shoebot::
+        :alt: Scaled squares
+        :filename: transforms__scale_center.png
+
+        fill('#60a3bc', 0.2)
+        transform(CENTER)
+        for i in range(7):
+            rect(25, 25, 50, 50)
+            scale(.8)
+
 .. py:function:: skew(x=1, y=0)
+
+    .. shoebot::
+        :alt: Skewed squares
+        :filename: transforms__skew_corner.png
+
+        fill('#82ccdd', 0.2)
+        translate(5, 25)
+        for i in range(7):
+            rect(0, 0, 50, 50)
+            skew(.2, 0)
+
+    .. shoebot::
+        :alt: Skewed squares
+        :filename: transforms__skew_center.png
+
+        fill('#e58e26', 0.2)
+        transform(CENTER)
+        for i in range(7):
+            rect(25, 25, 50, 50)
+            skew(.2, 0)
 
 .. py:function:: push()
 
@@ -568,3 +630,11 @@ Core
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
     Executes the contents of a Nodebox or Shoebot script in the current surface's context.
+
+
+Classes
+-------
+
+.. py:class:: BezierPath
+
+.. py:class:: Text
