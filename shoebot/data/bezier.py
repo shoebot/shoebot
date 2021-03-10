@@ -374,6 +374,9 @@ class BezierPath(Grob, ColorMixin):
             elif el.cmd == CURVETO:
                 empty = False
                 current_contour.curveto(el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
+            elif el.cmd == ARC:
+                empty = False
+                current_contour.curveto(el.x, el.y, el.radius, el.angle1, el.angle2)
             elif el.cmd == CLOSE:
                 current_contour.closepath()
         if not empty:
