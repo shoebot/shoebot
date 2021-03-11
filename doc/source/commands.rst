@@ -1,5 +1,5 @@
-Complete reference
-==================
+Reference and examples
+======================
 
 This is the full list of commands available in Shoebot. This documentation is
 still missing some parts. Refer to the `Nodebox documentation
