@@ -4,7 +4,10 @@ Reference and examples
 This is the full list of commands available in Shoebot. This documentation is
 still missing some parts. Refer to the `Nodebox documentation
 <https://www.nodebox.net/code/index.php/Reference>`_ for the best reference in
-the meantime.
+the meantime (and where many parts of this documentation are derived from.)
+
+Note that all examples here are drawn on a 100x100 size for simplicity; the
+Shoebot default is 300x300px.
 
 .. contents:: :local:
 
@@ -116,6 +119,10 @@ Drawing shapes
     Change the way rectangles are specified. Each mode alters the parameters
     necessary to draw a rectangle using the :py:func:`rect` function.
 
+    * use the CORNER mode (default) when you want to specify an origin point and dimensions (width and height)
+    * use the CENTER mode when you want to draw a shape centered on a point
+    * use the CORNERS mode when you want to specify an origin point and a destination point
+
     :param mode: the mode to draw new rectangles in
     :type mode: CORNER, CENTER or CORNERS
 
@@ -137,9 +144,9 @@ Drawing shapes
         * x-coordinate of the bottom right corner
         * y-coordinate of the bottom right corner
 
-    So while you always specify 4 parameters to the :py:func:`rect` function, you can use
-    :py:func:`rectmode` to change the function's behaviour according to what might suit your
-    script's needs.
+    So while you always specify 4 parameters to the :py:func:`rect` function,
+    you can use :py:func:`rectmode` to change the function's behaviour according
+    to what might suit your script's needs.
 
     .. shoebot::
         :alt: green rectangle top left, blue centered and red at the bottom right.
@@ -374,16 +381,14 @@ Transforms
 Colors
 ------
 
-Colors can be specified in a few ways:
-  * grayscale: ``(value)``
-  * grayscale with alpha: ``(value, alpha)``
-  * RGB: ``(red, green, blue)``
-  * RGBA: ``(red, green, blue, alpha)``
-  * hex: ``('#FFFFFF')``
-  * hex with alpha: ``('#FFFFFFFF')``
+  Colors can be specified in a few ways:
 
-You can use any of these formats to specify a colour; for example, `fill(1,0,0)`
-and `fill('#FF0000')` yield the same result.
+    * grayscale: ``(value)``
+    * grayscale with alpha: ``(value, alpha)``
+    * RGB: ``(red, green, blue)``
+    * RGBA: ``(red, green, blue, alpha)``
+    * hex: ``('#FFFFFF')``
+    * hex with alpha: ``('#FFFFFFFF')``
 
 .. py:function:: background(*args)
 
