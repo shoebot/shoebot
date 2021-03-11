@@ -610,9 +610,6 @@ Colors
   1.0, and this command can set this to a different range. For example,
   a scale of 0 to 255 can be set with ``colorrange(255)``.
 
-  :param crange: Maximum value for the new color range to use
-  :type crange: float
-
     .. shoebot::
         :alt: Color range example
         :filename: colors__colorrange.png
