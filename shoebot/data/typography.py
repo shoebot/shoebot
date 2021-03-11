@@ -92,22 +92,6 @@ def pangocairo_create_context(cr):
     raise
 
 
-# Map Nodebox / Shoebot names to Pango:
-def _style_name_to_pango(style="normal"):
-    """
-    Given a Shoebot/Nodebox style name return the a Pango constant.
-    """
-    if style == "normal":
-        return Pango.Style.NORMAL
-    elif style == "italic":
-        return Pango.Style.ITALIC
-    elif style == "oblique":
-        return Pango.Style.OBLIQUE
-    raise AttributeError(
-        "Invalid font style, valid styles are: normal, italic and oblique."
-    )
-
-
 def _alignment_name_to_pango(alignment):
     if alignment == "right":
         return Pango.Alignment.RIGHT
@@ -117,27 +101,6 @@ def _alignment_name_to_pango(alignment):
         return Pango.Alignment.LEFT
 
     return Pango.Alignment.LEFT
-
-
-PANGO_WEIGHTS = {
-    "ultralight": Pango.Weight.ULTRALIGHT,
-    "light": Pango.Weight.LIGHT,
-    "normal": Pango.Weight.NORMAL,
-    "bold": Pango.Weight.BOLD,
-    "ultrabold": Pango.Weight.ULTRABOLD,
-    "heavy": Pango.Weight.HEAVY,
-    None: Pango.Weight.NORMAL,  # default
-}
-
-
-def _weight_name_to_pango(weight="normal"):
-    """
-    :param weight:  "normal", or "bold"
-    :return:  Corresponding pango font weight from Pango.Weight
-    """
-    if type(weight) == int:
-        return weight
-    return PANGO_WEIGHTS.get(weight)
 
 
 class Text(Grob, ColorMixin):
@@ -177,9 +140,6 @@ class Text(Grob, ColorMixin):
 
         self.font = kwargs.get("font", canvas.fontfile)
         self.fontsize = kwargs.get("fontsize", canvas.fontsize)
-        self.style = kwargs.get("style", "normal")
-        self.weight = kwargs.get("weight", "normal")
-
         self.align = kwargs.get("align", canvas.align)
         self.indent = kwargs.get("indent")
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
@@ -349,8 +309,6 @@ class Text(Grob, ColorMixin):
                 "y",
                 "width",
                 "height",
-                "style",
-                "weight",
                 "_fillcolor",
                 "fontfile",
                 "fontsize",

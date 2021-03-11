@@ -12,7 +12,7 @@ Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home)
 
 ## Documentation
 
-You can find the current docs at [ReadTheDocs](http://shoebot.readthedocs.org/).
+You can find the current docs at [docs.shoebot.net](https://docs.shoebot.net/).
 
 The [Nodebox tutorials](http://nodebox.net/code/index.php/Tutorial) are an excellent intro to the language and its core concepts. Shoebot is a rewrite of Nodebox 1, so the original [Nodebox documentation](https://www.nodebox.net/code/index.php/Reference) is required reading.
 

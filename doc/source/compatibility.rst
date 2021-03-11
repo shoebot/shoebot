@@ -1,9 +1,9 @@
-Compatibility with Nodebox
-==========================
+Nodebox compatibility
+=====================
 
 Shoebot was originally developed as a rewrite of Nodebox, attempting to follow its behaviour as close as possible. However, the developers eventually wanted some functionality that was not in Nodebox, and there are many aspects of Nodebox that, for one reason or other, were not ported over.
 
-Now that the original Nodebox isn't being developed further, we have decided to go on and keep implementing original features whenever appropriate. 
+Now that the original Nodebox isn't being developed further, we have decided to go on and keep implementing original features whenever appropriate.
 
 In this page, you'll find the features and behavior that differs between Nodebox and Shoebot.
 
@@ -44,33 +44,33 @@ While animations work well in a window, Shoebot does not support exporting them 
 Unported libraries
 ^^^^^^^^^^^^^^^^^^
 
-- Knowledge: 
+- Knowledge:
   `WordNet <https://www.nodebox.net/code/index.php/WordNet>`_,
-  `Keywords <https://www.nodebox.net/code/index.php/Keywords>`_, 
+  `Keywords <https://www.nodebox.net/code/index.php/Keywords>`_,
   `Linguistics <https://www.nodebox.net/code/index.php/Linguistics>`_
 
-- Bitmap:  
-  `Core Image <https://www.nodebox.net/code/index.php/Core_Image>`_, 
-  `iSight <https://www.nodebox.net/code/index.php/iSight>`_, 
+- Bitmap:
+  `Core Image <https://www.nodebox.net/code/index.php/Core_Image>`_,
+  `iSight <https://www.nodebox.net/code/index.php/iSight>`_,
   `Quicktime <https://www.nodebox.net/code/index.php/Quicktime>`_
 
-- Systems: 
-  `Ants <https://www.nodebox.net/code/index.php/Ants>`_, 
+- Systems:
+  `Ants <https://www.nodebox.net/code/index.php/Ants>`_,
   `Noise <https://www.nodebox.net/code/index.php/Noise>`_
 
 - Design:
   `Grid <https://www.nodebox.net/code/index.php/Grid>`_
 
 - Typography:
-  `Pixie <https://www.nodebox.net/code/index.php/Pixie>`_, 
+  `Pixie <https://www.nodebox.net/code/index.php/Pixie>`_,
   `Fatpath <https://www.nodebox.net/code/index.php/Fatpath>`_
 
-- Tangible: 
-  `WiiNode <https://www.nodebox.net/code/index.php/WiiNode>`_, 
+- Tangible:
+  `WiiNode <https://www.nodebox.net/code/index.php/WiiNode>`_,
   `OSC <https://www.nodebox.net/code/index.php/OSC>`_
 
 - Other:
-  `Flowerewolf <https://github.com/karstenw/Library/tree/master/flowerewolf>`_, 
+  `Flowerewolf <https://github.com/karstenw/Library/tree/master/flowerewolf>`_,
   `twyg <https://github.com/karstenw/Library/tree/master/twyg>`_
 
 
@@ -98,29 +98,29 @@ Bundled libraries
 
 Nodebox provides a set of external libraries that can be downloaded and added to a project. Shoebot comes with ported versions of those libraries already included and available.
 
-- Knowledge: 
+- Knowledge:
   `Database <https://www.nodebox.net/code/index.php/Database>`_,
-  `Graph <https://www.nodebox.net/code/index.php/Graph>`_, 
+  `Graph <https://www.nodebox.net/code/index.php/Graph>`_,
   `Web <https://www.nodebox.net/code/index.php/Web>`_
 
-- Bitmap:  
+- Bitmap:
   `Photobot <https://www.nodebox.net/code/index.php/Photobot>`_
 
-- Paths: 
+- Paths:
   `Bezier <https://www.nodebox.net/code/index.php/Bezier>`_,
-  `Cornu <https://www.nodebox.net/code/index.php/Cornu>`_, 
+  `Cornu <https://www.nodebox.net/code/index.php/Cornu>`_,
   `SVG <https://www.nodebox.net/code/index.php/SVG>`_
-  `Supershape <https://www.nodebox.net/code/index.php/Supershape>`_, 
+  `Supershape <https://www.nodebox.net/code/index.php/Supershape>`_,
   `Bezier Editor <https://www.nodebox.net/code/index.php/Bezier_Editor>`_
 
-- Systems: 
-  `Boids <https://www.nodebox.net/code/index.php/Boids>`_, 
+- Systems:
+  `Boids <https://www.nodebox.net/code/index.php/Boids>`_,
   `L-system <https://www.nodebox.net/code/index.php/L-system>`_
 
 - Design:
   `Colors <https://www.nodebox.net/code/index.php/Colors>`_
 
-- Tangible: 
+- Tangible:
   `TUIO <https://www.nodebox.net/code/index.php/TUIO>`_
 
 
