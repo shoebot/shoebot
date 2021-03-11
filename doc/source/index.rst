@@ -83,13 +83,13 @@ Documentation Index
    tutorial
    commands
    examples
-   compatibility
    cli_flags
    live
-   libraries
    advanced
+   libraries
    extensions
    troubleshooting
+   compatibility
    contributing
 
 
