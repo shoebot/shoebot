@@ -198,8 +198,15 @@ Bézier paths
 
 .. py:function:: beginpath(x=None, y=None)
 
-    Begin drawing a Bézier path. If x and y are not specified, this command
+    Begin drawing a Bézier path.
+
+
+    If x and y are not specified, this command
     should be followed by a :py:func:`moveto` call.
+
+    After calling beginpath(), a series of other path commands usually follows,
+    for example moveto(), lineto(), or curveto(). Finally, the endpath()
+    command draws the path on the screen.
 
     :param x: x-coordinate of the starting point
     :param y: y-coordinate of the starting point
@@ -217,7 +224,8 @@ Bézier paths
 
 .. py:function:: relmoveto(x, y)
 
-    Move the Bézier "pen" to the specified point without drawing; coordinates are relative to the pen's current location.
+    Move the Bézier "pen" to the specified point without drawing; coordinates
+    are relative to the pen's current location.
 
     :param x: x-coordinate of the point to move to, relative to the pen's current point
     :param y: y-coordinate of the point to move to, relative to the pen's current point
@@ -228,14 +236,15 @@ Bézier paths
 
     Draw a line from the pen's current point; coordinates are absolute.
 
-    :param x: x-coordinate of the point to draw to, relative to the pen's current point
-    :param y: y-coordinate of the point to draw to, relative to the pen's current point
+    :param x: x-coordinate of the point to draw to
+    :param y: y-coordinate of the point to draw to
     :type x: float
     :type y: float
 
 .. py:function:: rellineto(x, y)
 
-    Draw a line from the pen's current point; coordinates are relative to the pen's current location.
+    Draw a line from the pen's current point; coordinates are relative to the
+    pen's current location.
 
     :param x: x-coordinate of the point to draw to, relative to the pen's current point
     :param y: y-coordinate of the point to draw to, relative to the pen's current point
@@ -244,19 +253,111 @@ Bézier paths
 
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
+    The curveto() command must be called between beginpath() and endpath().
+    Draws a curve between the current point in the path and a new destination
+    point.
+
+    The last two parameters are the coordinates of the destination point. The
+    first 4 parameters are the coordinates of the two control points, which
+    define the edge and slant of the curve.
+
+    .. shoebot::
+        :alt: Curve example
+        :filename: path__curveto.png
+
+        x, y = 10, 62     # Start curve point
+        x1, y1 = 50, 115  # Left control point
+        x2, y2 = 75, 10   # Right control point
+        x3, y3 = 115, 62  # End curve point
+
+        # Only strokes
+        autoclosepath(False)
+        nofill()
+
+        # Draw the curve
+        strokewidth(12)
+        stroke(0.1)
+        beginpath()
+        moveto(x, y)
+        curveto(x1, y1, x2, y2, x3, y3)
+        endpath()
+
+        # To show where the control points are,
+        # we draw helper lines
+        strokewidth(6)
+        stroke(1, 0.2, 0.2, 0.6)
+        # The first control point starts at the
+        # x, y position
+        line(x, y, x1, y1)
+        # And the second control point is the
+        # end curve point
+        line(x2, y2, x3, y3)
+
 .. py:function:: arc(x, y, radius, angle1, angle2)
 
 .. py:function:: closepath()
 
-   Close the path; in case the current point is not the path's starting point, a line will be drawn between them.
+ Close the path; in case the current point is not the path's starting point, a
+ line will be drawn between them.
 
 .. py:function:: endpath(draw=True)
 
+	The endpath() command is the companion command to beginpath(). When endpath()
+	is called, the path defined between beginpath() and endpath() is drawn.
+	Optionally, when endpath(draw=False) is called, the path is not drawn but can
+	be assigned to a variable and drawn to the screen at a later time with the
+	drawpath() command.
+
 .. py:function:: drawpath(path)
+
+  Draws a path on the screen. A path is a series of lines and curves defined
+  between beginpath() and endpath(). Normally, endpath() draws the path to the
+  screen, unless when calling endpath(draw=False). The path can then be assigned
+  to a variable, and this variable used as a parameter for drawpath().
+
+  Note: if you have one path that you want to draw multiple times with
+  drawpath(), for example each with its own rotation and position, you need to
+  supply a copy: drawpath(path.copy())
+
+    .. shoebot::
+        :alt: Drawpath example
+        :filename: path__drawpath.png
+
+        stroke(0.2)
+        beginpath(10, 10)
+        lineto(40, 10)
+        p = endpath(draw=False)
+        drawpath(p)
 
 .. py:function:: autoclosepath(close=True)
 
+  Defines whether paths are automatically closed by connecting the last and
+  first points with a line. It takes a single parameter of True or False. All
+  shapes created with beginpath() following this command will adhere to the
+  setting.
+
 .. py:function:: findpath(points, curvature=1.0)
+
+  Constructs a fluid path from a list of coordinates. Each element in the list
+  is a 2-tuple defining the x-coordinate and the y-coordinate. If the curve has
+  more than three points, the curvature parameter offers some control on how
+  separate segments are stitched together: from straight lines (0.0) to smooth
+  curves (1.0).
+
+    .. shoebot::
+        :alt: Findpath example
+        :filename: path__findpath.png
+
+        points = [(10, 10), (90, 90), (350, 200)]
+        ellipsemode(CENTER)
+        for x, y in points:
+            ellipse(x, y, 6, 6)
+
+        nofill()
+        stroke(0.2)
+        autoclosepath(False)
+        path = findpath(points)
+        drawpath(path)
 
 
 Images
@@ -274,7 +375,7 @@ Images
     :param alpha: opacity
     :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
     :param draw: whether to place the image immediately on the canvas or not
-    :type path: str
+    :type path: filename
     :type x: float
     :type y: float
     :type width: float or None
@@ -290,21 +391,78 @@ Clipping paths
 
 .. py:function:: beginclip(path)
 
+    The beginclip() and endclip() commands define a clipping mask. The supplied
+    parameter defines the path to be used as a clipping mask.
+
+    All basic shapes and path commands return paths that can be used with
+    beginclip() - setting the ``draw`` parameter of a shape command will simply
+    return the path without actually drawing the shape. Any shapes, paths, texts
+    and images between beginclip() and endclip() are `clipped`: any part that
+    falls outside the clipping mask path is not drawn.
+
+    .. shoebot::
+        :alt: Clipped lines
+        :filename: clip__beginclip.png
+
+        p = ellipse(20, 20, 60, 60, draw=False)
+        beginclip(p)
+        stroke(0.5)
+        strokewidth(3)
+        line(20, 20, 80, 80)
+        line(20, 80, 80, 20)
+        line(50, 20, 50, 80)
+        endclip()
+
 .. py:function:: endclip()
 
+    Used along with ``beginclip()``.
 
 Transforms
 ----------
 
 .. py:function:: transform(mode=None)
 
+    The mode parameter sets the registration point – the offset for rotate(),
+    scale() and skew() commands. By default, primitives, text, and images rotate
+    around their own centerpoints. But if you call transform() with CORNER as
+    its mode parameter, transformations will be applied relative to the canvas
+    ‘origin point’ rather than being relative to the objects’ centerpoint
+    origins.
+
+    Each command example below shows how the transform mode affects the result.
+
     :param mode: the mode to base new transformations on
     :type mode: CORNER or CENTER
 
-.. py:function:: translate(xt, yt, mode=None)
+.. py:function:: translate(xt, yt)
 
+	Specifies the amount to move a subsequent shape, path, text, image on the
+	screen. Once called, all commands following translate() are repositioned,
+	which makes translate() useful for positioning whole compositions of multiple
+	elements.
+
+    :param xt: horizontal offset
+    :param yt: vertical offset
+
+    .. shoebot::
+        :alt: Two circles
+        :filename: transforms__translate.png
+
+        fill(0.2)
+        oval(-10, -10, 40, 40)
+        translate(50, 50)
+        oval(-10, -10, 40, 40)
 
 .. py:function:: rotate(degrees=0, radians=0)
+
+  Rotates all subsequent drawing commands. The default unit is degrees; radians
+  can be used with ``rotate(radians=PI)``.
+  Like other transform operations, the rotate() command works incrementally: if
+  you call rotate(30), and later on call rotate(60), all commands following that
+  second rotate() will be rotated 90° (30+60).
+
+    :param degrees: angle in degrees
+    :param radians: angle in radians
 
     .. shoebot::
         :alt: Rotated squares
@@ -329,6 +487,16 @@ Transforms
 
 .. py:function:: scale(x=1, y=None)
 
+  Increases, decreases, or streches the size of all subsequent drawing commands.
+  The first parameter sets the horizontal scale and the optional second
+  parameter the vertical scale. You can also call scale() with a single
+  parameter that sets both the horizontal and vertical scale. Scale values are
+  specified as floating-point (decimal) numbers with 1.0 corresponding to 100%.
+
+  The scale() command works incrementally: if you call scale(0.5), and later on
+  call scale(0.2), all subsequent drawing commands will be sized to 10% (0.2 of
+  0.5).
+
     .. shoebot::
         :alt: Scaled squares
         :filename: transforms__scale_corner.png
@@ -350,6 +518,13 @@ Transforms
             scale(.8)
 
 .. py:function:: skew(x=1, y=0)
+
+  Slants the direction of all subsequent drawing commands. The first parameter
+  sets the horizontal skew. The second parameter is optional and sets the
+  vertical skew.
+
+  The skew() command works incrementally: if you call skew(10), and later on
+  call skew(20), all subsequent drawing commands will be skewed by 30° (10+20).
 
     .. shoebot::
         :alt: Skewed squares
@@ -373,10 +548,46 @@ Transforms
 
 .. py:function:: push()
 
+  The push() function, along with its companion pop(), allows for "saving" a
+  transform state. All transformations, such as rotate() and skew(), defined
+  between a push() and pop() call last only until pop() is called.
+
+    .. shoebot::
+        :alt: Text with push and pop
+        :filename: transforms__push_pop.png
+
+        fill(0.2)
+        fontsize(14)
+        rotate(90)
+        text("one", 40, 80)
+
+        push()
+        rotate(-90)
+        text("two", 40, 40)
+        pop()
+
+        text("three", 50, 80)
+
+
 .. py:function:: pop()
+
+  The pop() function is meant to be used after push(). It "loads" the transform
+  state that was set before the call to push().
 
 .. py:function:: reset()
 
+  Resets the transform state to its default values.
+
+    .. shoebot::
+        :alt: Text with transform reset
+        :filename: transforms__reset.png
+
+        rotate(90)
+        text("one", 30, 80)
+        text("two", 45, 80)
+
+        reset()
+        text("three", 70, 80)
 
 Colors
 ------
@@ -392,11 +603,15 @@ Colors
 
 .. py:function:: background(*args)
 
-Set background to any valid color
+  Set the background color.
 
-.. py:function:: outputmode()
+    .. shoebot::
+        :alt: Background example
+        :filename: colors__background.png
 
-    Not implemented yet (Nodebox API)
+        background(0.8)
+        fill(0.2)
+        circle(40, 40, 20)
 
 .. py:function:: colormode(mode=None, crange=None)
 
