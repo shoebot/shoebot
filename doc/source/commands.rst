@@ -222,16 +222,6 @@ Bézier paths
     :type x: float
     :type y: float
 
-.. py:function:: relmoveto(x, y)
-
-    Move the Bézier "pen" to the specified point without drawing; coordinates
-    are relative to the pen's current location.
-
-    :param x: x-coordinate of the point to move to, relative to the pen's current point
-    :param y: y-coordinate of the point to move to, relative to the pen's current point
-    :type x: float
-    :type y: float
-
 .. py:function:: lineto(x, y)
 
     Draw a line from the pen's current point. Can only be called between
@@ -896,7 +886,7 @@ Core
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
-    Executes the contents of a Shoebot script in the current surface's context. 
+    Executes the contents of a Shoebot script in the current surface's context.
 
 
 Classes
