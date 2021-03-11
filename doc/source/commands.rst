@@ -200,13 +200,12 @@ Bézier paths
 
     Begin drawing a Bézier path.
 
-
-    If x and y are not specified, this command
-    should be followed by a :py:func:`moveto` call.
-
     After calling beginpath(), a series of other path commands usually follows,
-    for example moveto(), lineto(), or curveto(). Finally, the endpath()
-    command draws the path on the screen.
+    such as moveto(), lineto(), or curveto(). Finally, the endpath() command
+    draws the path on the screen.
+
+    If x and y are not specified, this command should be followed by a
+    :py:func:`moveto` call.
 
     :param x: x-coordinate of the starting point
     :param y: y-coordinate of the starting point
@@ -215,7 +214,8 @@ Bézier paths
 
 .. py:function:: moveto(x, y)
 
-    Move the Bézier "pen" to the specified point without drawing; coordinates are absolute.
+    Move the Bézier "pen" to the specified point without drawing. Can only be
+    called between beginpath() and endpath().
 
     :param x: x-coordinate of the point to move to
     :param y: y-coordinate of the point to move to
@@ -234,28 +234,18 @@ Bézier paths
 
 .. py:function:: lineto(x, y)
 
-    Draw a line from the pen's current point; coordinates are absolute.
+    Draw a line from the pen's current point. Can only be called between
+    beginpath() and endpath().
 
     :param x: x-coordinate of the point to draw to
     :param y: y-coordinate of the point to draw to
     :type x: float
     :type y: float
 
-.. py:function:: rellineto(x, y)
-
-    Draw a line from the pen's current point; coordinates are relative to the
-    pen's current location.
-
-    :param x: x-coordinate of the point to draw to, relative to the pen's current point
-    :param y: y-coordinate of the point to draw to, relative to the pen's current point
-    :type x: float
-    :type y: float
-
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
-    The curveto() command must be called between beginpath() and endpath().
     Draws a curve between the current point in the path and a new destination
-    point.
+    point. Can only be called between beginpath() and endpath().
 
     The last two parameters are the coordinates of the destination point. The
     first 4 parameters are the coordinates of the two control points, which
@@ -609,13 +599,13 @@ Colors
         :alt: Background example
         :filename: colors__background.png
 
-        background(0.8)
-        fill(0.2)
+        background(0.9)
+        fill(1)
         circle(40, 40, 20)
 
 .. py:function:: colormode(mode=None, crange=None)
 
-  Set the current colormode (can be RGB or HSB) and eventually
+  Set the current color mode (can be RGB or HSB) and eventually
   the color range.
 
   :param mode: Color mode to use
@@ -626,23 +616,33 @@ Colors
 
 .. py:function:: colorrange(crange=1.0)
 
-  Set the numeric range for color values. By default colors range from 0.0 - 1.0; use this to set a different range, e.g. with ``colorrange(255)`` values will range between 0 and 255.
+  Set the numeric range for color values. By default colors range from 0.0 -
+  1.0, and this command can set this to a different range. For example,
+  a scale of 0 to 255 can be set with ``colorrange(255)``
 
   :param crange: Maximum value for the new color range to use
   :type crange: float
 
+    .. shoebot::
+        :alt: Color range example
+        :filename: colors__colorrange.png
 
-.. py:function:: fill(*args)
+        colorrange(255)
+        background(127)
+        fill(255)
+        circle(40, 40, 20)
+
+.. py:function:: fill(color)
 
   Sets a fill color, applying it to new paths.
 
-  :param args: color in supported format
+  :param color: color in supported format (see above)
 
-.. py:function:: stroke(*args)
+.. py:function:: stroke(color)
 
   Set a stroke color, applying it to new paths.
 
-  :param args: color in supported format
+  :param color: color in supported format (see above)
 
 .. py:function:: nofill()
 
@@ -798,11 +798,57 @@ Utility functions
 
 .. py:function:: random(v1=None, v2=None)
 
+  Returns a random number that can be assigned to a variable or a parameter.
+  When no parameters are supplied, returns a floating-point (decimal) number
+  between 0.0 and 1.0 (including 0.0 and 1.0). When one parameter is supplied,
+  returns a number between 0 and this parameter. When two parameters are
+  supplied, returns a number between the first and the second parameter.
+
+    .. shoebot::
+        :alt: Random example
+        :filename: util__random.png
+
+        r = random() # returns a float between 0 and 1
+        r = random(2.5) # returns a float between 0 and 2.5
+        r = random(-1.0, 1.0) # returns a float between -1.0 and 1.0
+        r = random(5) # returns an int between 0 and 5
+        r = random(1, 10) # returns an int between 1 and 10
+
+        # sets the fill to anything from
+        # black (0.0,0,0) to red (1.0,0,0)
+        fill(random(), 0, 0)
+        circle(40, 40, 20)
+
+        # Note: new random values are returned each time the script runs.
+        # The variation can be locked by supplying a custom random seed:
+
+        from random import seed
+        seed(0)
+
 .. py:function:: grid(cols, rows, colSize=1, rowSize=1, shuffled=False)
+
+  The grid() command returns an iteratable object, something that can be
+  traversed in a for-loop (like the range() command for example).
+
+  The grid() is a complex but powerful command. The first two parameters define
+  the number of columns and rows in the grid. The next two parameters are
+  optional, and set the width and height of one cell in the grid. In each iteration
+  of a for-loop, the offset for the current column and row is returned.
+
+    .. shoebot::
+        :alt: Grid example
+        :filename: util__grid.png
+
+        fill(0.2)
+        for x, y in grid(7, 5, 12, 12):
+            rect(10+x, 10+y, 10, 10)
+
 
 .. py:function:: files(path="*")
 
-    You can use wildcards to specify which files to pick, e.g. ``f = files('*.gif')``
+    Retrieves all files from a given path and returns their names as a list.
+    Wildcards can be used to specify which files to pick, e.g. ``f =
+    files('*.gif')``
 
     :param path: wildcard to use in file list
 
@@ -838,7 +884,8 @@ Core
 
 .. py:function:: size(w=None, h=None)
 
-    Sets the size of the canvas, and creates a Cairo surface and context. Only the first call will actually be effective.
+    Sets the size of the canvas, and creates a Cairo surface and context. Only
+    the first call will have any effect.
 
 .. py:function:: speed(framerate)
 
@@ -849,7 +896,7 @@ Core
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
-    Executes the contents of a Nodebox or Shoebot script in the current surface's context.
+    Executes the contents of a Shoebot script in the current surface's context. 
 
 
 Classes
