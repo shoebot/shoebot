@@ -608,7 +608,7 @@ Colors
 
   Set the numeric range for color values. By default colors range from 0.0 -
   1.0, and this command can set this to a different range. For example,
-  a scale of 0 to 255 can be set with ``colorrange(255)``
+  a scale of 0 to 255 can be set with ``colorrange(255)``.
 
   :param crange: Maximum value for the new color range to use
   :type crange: float
@@ -865,10 +865,10 @@ Core
 
 .. py:function:: ximport(libName)
 
-    Import nodebox libraries.
+    Import Nodebox libraries.
 
-    The libraries get _ctx, which provides
-    them with the nodebox API.
+    The libraries get access to the _ctx context object, which provides them
+    with the Shoebot API.
 
     :param libName: Library name to import
 
@@ -879,7 +879,7 @@ Core
 
 .. py:function:: speed(framerate)
 
-  Set the framerate on windowed mode.
+  Set the framerate for animations.
 
   :param framerate: Frames per second
   :rtype: Current framerate
