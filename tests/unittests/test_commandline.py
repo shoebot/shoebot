@@ -1,12 +1,8 @@
 import subprocess
 import unittest
 
-from shoebot.core import CairoCanvas, CairoImageSink
-from shoebot.data import BezierPath
-from shoebot.grammar import NodeBot
 
-
-class TestCommands(unittest.TestCase):
+class TestCommandLine(unittest.TestCase):
     """
     See if the commands can start successfully, by starting
     them with an option that does nothing: --version
@@ -27,7 +23,9 @@ class TestCommands(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True)
 
         self.assertEqual(
-            result.returncode, 0, f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}"
+            result.returncode,
+            0,
+            f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
         )
 
     def test_shoebot_starts(self):
@@ -42,7 +40,9 @@ class TestCommands(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True)
 
         self.assertEqual(
-            result.returncode, 0, f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}"
+            result.returncode,
+            0,
+            f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
         )
 
 
