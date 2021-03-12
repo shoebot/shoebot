@@ -11,7 +11,7 @@ def fontnames():
     families = PangoCairo.font_map_get_default().list_families()
     for family in families:
         # FIXME: Ensure this is the correct way to make a font name
-        facenames = ['{} {}'.format(family.get_name(), face.get_face_name()) for face in family.list_faces()]
+        facenames = [f'{family.get_name()} {face.get_face_name()}' for face in family.list_faces()]
         names.extend(facenames)
         # description = face.describe()
     return names
