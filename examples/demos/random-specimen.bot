@@ -1,0 +1,13 @@
+for x,y in grid(1, 6, 10, 60):
+  randomfont = choice(fontnames())
+
+  # font title
+  fill(0.5)
+  font("Liberation Sans", 14)
+  text(randomfont, 15, y+30)
+
+  # specimen line
+  fill(0.2)
+  font(randomfont, 36)
+  text("Handgloves", 25, y+65)
+
