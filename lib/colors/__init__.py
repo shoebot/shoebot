@@ -559,8 +559,15 @@ class Color(BaseColor):
                         "v" in kwargs:
                     r, g, b = hsv_to_rgb(kwargs["h"], kwargs["s"], kwargs["v"])
                 else:
-                    h, s, l, a = (args)
-                    r, g, b = hsv_to_rgb(h, s, l)
+                    if len(args) == 4:
+                        h, s, l, a = args
+                        r, g, b = hsv_to_rgb(h, s, l)
+                    elif len(args) == 3:
+                        h, s, l = args
+                        a = 1.0
+                        r, g, b = hsv_to_rgb(h, s, l)
+                    else:
+                        raise ValueError("hsb mode color requires 3 or 4 arguments.")
             elif m == "rgb":
                 if "r" in kwargs and \
                         "g" in kwargs and \
