@@ -470,6 +470,8 @@ def _load_color_context():
             tags.sort()
             context[name] = tags
     return context
+
+
 context = _load_color_context()
 
 from shoebot.data import Color as BaseColor
@@ -610,15 +612,15 @@ class Color(BaseColor):
             s = s.replace(ch, "")
 
         if s in named_hues:
-           clr = color(named_hues[s], 1, 1, mode="hsb")
-           return clr.r, clr.g, clr.b
+            clr = color(named_hues[s], 1, 1, mode="hsb")
+            return clr.r, clr.g, clr.b
 
         if s in named_colors:
             return named_colors[s]
 
         for suffix in ["ish", "ed", "y", "like"]:
-            s = re.sub("(.*?)" + suffix + "$", "\\1", str)
-        s = re.sub("(.*?)dd$", "\\1d", str)
+            s = re.sub(rf"(.*?){{suffix}}$", "\\1", s)
+        s = re.sub(r"(.*?)dd$", "\\1d", s)
 
         matches = []
         for name in named_colors:
@@ -647,7 +649,7 @@ class Color(BaseColor):
     is_gray = is_grey
 
     @property
-    def _is_transparent(self):
+    def is_transparent(self):
         return self.a == 0
 
     def __eq__(self, clr):
@@ -848,22 +850,24 @@ class Color(BaseColor):
 # color(c, m, y, k, mode="cmyk", range=1.0)
 # color(h, s, b, a, mode="hsb", range=1.0)
 # color(l, a, b, mode="lab")
-def color(*args, **kwargs):
-    return Color(*args, **kwargs)
+color = Color
 
 
 def rgb(r, g, b, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(r, g, b, a, mode="rgb", name=name, range=range)
 
 
 def hsb(h, s, b, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(h, s, b, a, mode="hsb", name=name, range=range)
 
 
 def cmyk(c, m, y, k, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(c, m, y, k, mode="cmyk", name=name, range=range)
 
 
@@ -875,27 +879,22 @@ def hex(str, name=""):
     return color("#" + str.lstrip("#"), name=name)
 
 
-def named_color(str):
-    return color(str)
+named_color = color
 
 
 ### NAMED COLOR OBJECTS ##############################################################################
+def _build_named_colors():
+    code = ""
 
-code = ""
-for clr in named_colors:
-    try:
-        r, g, b = named_colors[clr]
-        a = 1.0
-    except:
-        r, g, b, a = named_colors[clr]
-    r, g, b, a = [str(v) for v in [r, g, b, a]]
-    code += clr + " = lambda: Color(" + r + ", " + g + ", " + b + ", " + a + ", mode=\"rgb\", name=\"" + clr + "\")\n"
+    for name, value in named_colors.items():
+        code += f"{name} = lambda: Color(*{value}, mode='rgb', name='{name}')\n"
 
-# for clr in named_hues:
-#    h = named_hues[clr]
-#    code += clr+" = lambda: Color("+str(h)+", 1, 1, 1, mode=\"hsb\", name=\""+clr+"\")\n"
+    for name, h in named_hues.items():
+        code += f"{name} = lambda: Color({h}, 1, 1, 1, mode='hsb', name='{name}')\n"
 
-eval(compile(code, "<string>", "exec"))
+    return code
+
+eval(compile(_build_named_colors(), "<string>", "exec"))
 
 
 # background(green().darken())
@@ -1235,7 +1234,7 @@ class ColorList(_list):
                 i = j
         clusters.extend(sorted_colors[i:].sort(cmp2))
         if reversed:
-            #_list.reverse(clusters)
+            # _list.reverse(clusters)
             clusters.reverse()
         return clusters
 
@@ -1319,8 +1318,8 @@ class ColorList(_list):
         """
         Rectangle swatches for all the colors in the list.
         """
-        for clr in self:
-            clr.swatch(x, y, w, h, roundness)
+        for _color in self:
+            _color.swatch(x, y, w, h, roundness)
             y += h + padding
 
     draw = swatch
@@ -1556,6 +1555,7 @@ def monochrome(clr):
     """
     Returns colors in the same hue with varying brightness/saturation.
     """
+
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
             return x + plus
@@ -1634,6 +1634,7 @@ def compound(clr, flip=False):
     """
     Roughly the complement and some far analogs.
     """
+
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
             return x + plus
@@ -1864,6 +1865,7 @@ def outline(path, colors, precision=0.4, continuous=True):
     Because each line segment is drawn separately,
     works only with corner-mode transforms.
     """
+
     # The count of points in a given path/contour.
     def _point_count(path, precision):
         return max(int(path.length * precision * 0.5), 10)
@@ -2064,7 +2066,7 @@ class ColorRange(ColorList):
             if clr.is_grey:
                 return choice(
                     (self.black.color(clr, d), self.white.color(clr, d))
-            )
+                )
 
         h, s, b, a = self.h, self.s, self.b, self.a
         if clr != None:

@@ -53,7 +53,9 @@ def shoebot_named_testfunction(func, num, param):
 
 def shoebot_example_render_testfunction(func, num, param):
     """Test function that accepts a tuple containing a posixpath to an example."""
-    return f"{func.__name__}_{'_'.join(param[0][0].suffix)}"
+    if not isinstance(param[0][0], Path):
+        raise ValueError()
+    return f"{func.__name__}__{param[0][0].stem}"
 
 
 def shoebot_named_testclass(cls, num, params_dict):
