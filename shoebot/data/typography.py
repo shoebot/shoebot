@@ -141,8 +141,23 @@ class Text(Grob, ColorMixin):
         self.font = kwargs.get("font", canvas.fontfile)
         self.fontsize = kwargs.get("fontsize", canvas.fontsize)
         self.align = kwargs.get("align", canvas.align)
-        self.indent = kwargs.get("indent")
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
+        self.indent = kwargs.get("indent")
+
+        # these are the settings that we have to define with the
+        # Pango.Markup hack (see below in _pre_render), so it's neater to
+        # have them in a dict
+        self.markup_vars = {}
+        for arg in ("letterspacing", "underline", "underlinecolor", "overline",
+                    "overlinecolor"):
+            if kwargs.get(arg):
+                if arg == "letterspacing":
+                    # slightly different name in Pango
+                    # and also the value of letterspacing is in 1/1024ths of
+                    # a pt, so we multiply that. AND it needs ints
+                    self.markup_vars['letter_spacing'] = int(1024 * kwargs.get(arg))
+                else:
+                    self.markup_vars[arg] = kwargs.get(arg)
 
         # Setup hidden vars for Cairo / Pango specific bits:
         self._ctx = ctx
@@ -178,7 +193,22 @@ class Text(Grob, ColorMixin):
         # self.layout.set_spacing(int(((self.lineheight-1)*self._fontsize)*Pango.SCALE)) #pango requires an int casting
         # we pass pango font description and the text to the pango layout
         self._pango_layout.set_font_description(self._pango_fontface)
-        self._pango_layout.set_text(self.text, -1)
+
+        if not self.markup_vars:
+            self._pango_layout.set_text(self.text, -1)
+        else:
+            # some of the specified settings require a Pango.Markup hack
+            # see https://stackoverflow.com/questions/55533312/how-to-create-a-letter-spacing-attribute-with-pycairo
+            # and https://developer.gnome.org/pango/1.46/pango-Markup.html
+
+            # we want to output something like
+            # <span letter_spacing="2048">Hello World</span>
+            markup = '<span'
+            for setting, value in self.markup_vars.items():
+                markup += f' {setting}="{self.markup_vars[setting]}"'
+            markup += f">{self.text}</span>"
+            self._pango_layout.set_markup(markup)
+
 
         # check if max text width is set and pass it to pango layout
         # text will wrap, meanwhile it checks if and indent has to be applied
