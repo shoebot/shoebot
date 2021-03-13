@@ -668,6 +668,18 @@ Text
   :type draw: bool
   :return: BezierPath object representing the text
 
+    .. shoebot::
+        :alt: The word 'bot' in bold and italic styles
+        :filename: text__text.png
+
+        # when using text(), the origin point
+        # is on the text baseline
+        ellipsemode(CENTER)
+        circle(12, 65, 10, fill='#ff0033')
+        # place the text box
+        font("Inconsolata", 50)
+        text("Bot", 12, 65)
+
 .. py:function:: font(fontpath=None, fontsize=None)
 
   Set the font to be used in new text instances.
@@ -681,7 +693,7 @@ Text
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
-        :filename: text__text.png
+        :filename: text__font.png
 
         fill(0.3)
         fontsize(16)
