@@ -157,7 +157,7 @@ class Bot(Grammar):
 
     def _set_initial_defaults(self):
         """Set the default values. Called at __init__ and at the end of run(),
-        do that new draw loop iterations don't take up values left over by the
+        so that new draw loop iterations don't take up values left over by the
         previous one."""
         DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
