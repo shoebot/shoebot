@@ -112,7 +112,8 @@ class Text(Grob, ColorMixin):
         Implementation of fonts uses Pango instead of Cocoa.
     """
 
-    # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
+    # several reference docs can be found at
+    # https://developer.gnome.org/pygtk/stable/class-pangofontdescription.html
 
     def __init__(
         self,
