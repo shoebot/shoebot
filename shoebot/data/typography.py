@@ -205,6 +205,7 @@ class Text(Grob, ColorMixin):
             # we want to output something like
             # <span letter_spacing="2048">Hello World</span>
             markup = '<span'
+            # markup_vars was set in __init__()
             for setting, value in self.markup_vars.items():
                 markup += f' {setting}="{self.markup_vars[setting]}"'
             markup += f">{self.text}</span>"
