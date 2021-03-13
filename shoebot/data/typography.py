@@ -149,12 +149,12 @@ class Text(Grob, ColorMixin):
         # Pango.Markup hack (see below in _pre_render), so it's neater to
         # have them in a dict
         self.markup_vars = {}
-        for arg in ("letterspacing", "underline", "underlinecolor", "overline",
+        for arg in ("tracking", "underline", "underlinecolor", "overline",
                     "overlinecolor"):
             if kwargs.get(arg):
-                if arg == "letterspacing":
-                    # slightly different name in Pango
-                    # and also the value of letterspacing is in 1/1024ths of
+                if arg == "tracking":
+                    # different name in Pango
+                    # and also the value of letter_spacing is in 1/1024ths of
                     # a pt, so we multiply that. AND it needs ints
                     self.markup_vars['letter_spacing'] = int(1024 * kwargs.get(arg))
                 else:
