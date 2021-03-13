@@ -168,14 +168,19 @@ class Bot(Grammar):
         self._transformmode = Bot.CENTER
 
         self._canvas.settings(
-            fontfile="assets/notcouriersans.ttf",
-            fontsize=16,
-            align=Bot.LEFT,
-            lineheight=1,
             fillcolor=self.color(0.2),
             strokecolor=None,
             strokewidth=1.0,
             background=self.color(1, 1, 1),
+            fontfile="Sans",
+            fontsize=16,
+            align=Bot.LEFT,
+            lineheight=1,
+            tracking=0,
+            underline=None,
+            overline=None,
+            underlinecolor=None,
+            overlinecolor=None,
         )
 
     def _set_dynamic_vars(self):
