@@ -246,7 +246,13 @@ class Text(Grob, ColorMixin):
 
     @property
     def metrics(self):
-        w, h = self._pango_layout.get_pixel_size()
+        # see https://developer.gnome.org/pygtk/stable/class-pangolayout.html#method-pangolayout--get-extents
+        boundsrect, totalrect = self._pango_layout.get_pixel_extents()
+        # x = boundsrect.x
+        # y = boundsrect.y
+        w = totalrect.width
+        h = totalrect.height
+        # w, h = self._pango_layout.get_pixel_size()
         return w, h
 
     # this function is quite computational expensive
