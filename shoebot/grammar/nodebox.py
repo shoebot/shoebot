@@ -4,7 +4,7 @@ import sys
 from shoebot.core.backend import cairo
 from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
-from shoebot.util.fontnames import fontnames
+from shoebot.util.fonts import list_pango_fonts
 from .bot import Bot
 from shoebot.data import (
     geometry,
@@ -757,8 +757,7 @@ class NodeBot(Bot):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
 
     def fontnames(self):
-        # from shoebot.util
-        return fontnames()
+        return list_pango_fonts()
 
     def autotext(self, sourceFile):
         k = KantGenerator(sourceFile, searchpaths=[".", ASSETS_DIR])
