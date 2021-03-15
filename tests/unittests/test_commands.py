@@ -105,5 +105,20 @@ class TestText(ShoebotTestCase):
         self.assertEqual(output_text.fontsize, 64)
 
 
+class TestFontUtils(ShoebotTestCase):
+    @test_as_bot()
+    def test_fontnames_gives_output(self):
+        """
+        Verify that fontnames() gives a list as output.
+        """
+        output = fontnames()
+        # it's a list
+        self.assertTrue(isinstance(output, list))
+        # it's not empty
+        self.assertTrue(bool(output))
+        # contains a string
+        self.assertTrue(isinstance(output[0], str))
+
+
 if __name__ == "__main__":
     unittest.main()
