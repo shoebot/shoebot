@@ -61,7 +61,7 @@ except ValueError as e:
             ULTRAHEAVY = 1000
 
         def __getattr__(self, item):
-            if item == 'Weight':
+            if item == "Weight":
                 return Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
@@ -246,14 +246,13 @@ class Text(Grob, ColorMixin):
 
     @property
     def metrics(self):
-        # see https://developer.gnome.org/pygtk/stable/class-pangolayout.html#method-pangolayout--get-extents
-        boundsrect, totalrect = self._pango_layout.get_pixel_extents()
-        # x = boundsrect.x
-        # y = boundsrect.y
-        w = totalrect.width
-        h = totalrect.height
-        # w, h = self._pango_layout.get_pixel_size()
+        w, h = self._pango_layout.get_pixel_size()
         return w, h
+
+    @property
+    def bounds(self):
+        boundsrect, totalrect = self._pango_layout.get_pixel_extents()
+        return (boundsrect.x, boundsrect.y, boundsrect.width, boundsrect.height)
 
     # this function is quite computational expensive
     # there should be a way to make it faster, by not creating a new context each time it's called
@@ -296,8 +295,7 @@ class Text(Grob, ColorMixin):
         return p
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         w, h = self._pango_layout.get_pixel_size()
         x = self.x + w / 2
         y = self.y + h / 2
