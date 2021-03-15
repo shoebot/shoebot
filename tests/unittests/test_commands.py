@@ -112,12 +112,10 @@ class TestFontUtils(ShoebotTestCase):
         Verify that fontnames() gives a list as output.
         """
         output = fontnames()
-        # it's a list
-        self.assertTrue(isinstance(output, list))
-        # it's not empty
-        self.assertTrue(bool(output))
+        self.assertIsInstance(output, list)
+        self.assertTrue(output)
         # contains a string
-        self.assertTrue(isinstance(output[0], str))
+        self.assertIsInstance(output[0], str)
 
 
 if __name__ == "__main__":
