@@ -87,7 +87,7 @@ class TestText(ShoebotTestCase):
     @test_as_bot()
     def test_text_saves_params(self):
         """
-        Verify parameters are saved and returned by the expected properties.
+        Verify text parameters are saved and returned by the expected properties.
         """
         # There was a bug where using fontsize, weight or style was causing a crash.
         output_text = text(
@@ -103,6 +103,17 @@ class TestText(ShoebotTestCase):
         self.assertEqual(output_text.y, 250)
         self.assertEqual(output_text.font, "Bitstream Vera Bold Italic")
         self.assertEqual(output_text.fontsize, 64)
+
+        # parameters set by font()
+        font("Bitstream Vera Italic", 32)
+        output_text = text("Mademoiselle", 40, 80)
+        self.assertEqual(output_text.text, "Mademoiselle")
+        self.assertEqual(output_text.x, 40)
+        self.assertEqual(output_text.y, 80)
+        self.assertEqual(output_text.font, "Bitstream Vera Italic")
+        self.assertEqual(output_text.fontsize, 32)
+        # check other parameters to see if defaults are being followed
+        self.assertEqual(output_text.align, LEFT)
 
 
 class TestFontUtils(ShoebotTestCase):
