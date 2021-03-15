@@ -17,6 +17,8 @@ def list_pango_fonts():
             for face in family.list_faces()
         ]
         names.extend(facenames)
+        # this is how to access a font's FontDescription, which will help if
+        # or when we want to get more info from font files
         # description = face.describe()
     return names
 
