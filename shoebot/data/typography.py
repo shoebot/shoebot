@@ -61,7 +61,7 @@ except ValueError as e:
             ULTRAHEAVY = 1000
 
         def __getattr__(self, item):
-            if item == 'Weight':
+            if item == "Weight":
                 return Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
@@ -126,7 +126,7 @@ class Text(Grob, ColorMixin):
         outline=False,
         ctx=None,
         enableRendering=True,
-        **kwargs
+        **kwargs,
     ):
         self._canvas = canvas = bot._canvas
         Grob.__init__(self, bot)
@@ -148,17 +148,22 @@ class Text(Grob, ColorMixin):
         # these are the settings that we have to define with the
         # Pango.Markup hack (see below in _pre_render), so it's neater to
         # have them in a dict
-        self.markup_vars = {}
-        for arg in ("tracking", "underline", "underlinecolor", "overline",
-                    "overlinecolor"):
-            if kwargs.get(arg):
-                if arg == "tracking":
-                    # different name in Pango
-                    # and also the value of letter_spacing is in 1/1024ths of
-                    # a pt, so we multiply that. AND it needs ints
-                    self.markup_vars['letter_spacing'] = int(1024 * kwargs.get(arg))
-                else:
-                    self.markup_vars[arg] = kwargs.get(arg)
+        self.markup_vars = {
+            arg: kwargs[arg]
+            for arg in (
+                "tracking",
+                "underline",
+                "underlinecolor",
+                "overline",
+                "overlinecolor",
+            )
+            if arg in kwargs
+        }
+        if "tracking" in kwargs:
+            # different name in Pango
+            # and also the value of letter_spacing is in 1/1024ths of
+            # a pt, so we multiply that. AND it needs ints
+            self.markup_vars["letter_spacing"] = int(1024 * kwargs["tracking"])
 
         # Setup hidden vars for Cairo / Pango specific bits:
         self._ctx = ctx
@@ -171,9 +176,8 @@ class Text(Grob, ColorMixin):
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
 
-        if (
-            enableRendering
-        ):  # this way we do not render if we only need to create metrics
+        if enableRendering:
+            # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
@@ -197,20 +201,17 @@ class Text(Grob, ColorMixin):
 
         if not self.markup_vars:
             self._pango_layout.set_text(self.text, -1)
-        else:
-            # some of the specified settings require a Pango.Markup hack
-            # see https://stackoverflow.com/questions/55533312/how-to-create-a-letter-spacing-attribute-with-pycairo
-            # and https://developer.gnome.org/pango/1.46/pango-Markup.html
+            return
+        # some of the specified settings require a Pango.Markup hack
+        # see https://stackoverflow.com/questions/55533312/how-to-create-a-letter-spacing-attribute-with-pycairo
+        # and https://developer.gnome.org/pango/1.46/pango-Markup.html
 
-            # we want to output something like
-            # <span letter_spacing="2048">Hello World</span>
-            markup = '<span'
-            # markup_vars was set in __init__()
-            for setting, value in self.markup_vars.items():
-                markup += f' {setting}="{self.markup_vars[setting]}"'
-            markup += f">{self.text}</span>"
-            self._pango_layout.set_markup(markup)
-
+        # we want to output something like
+        # <span letter_spacing="2048">Hello World</span>
+        markup_styles = " ".join(
+            [f'{setting}="{value}"' for setting, value in self.markup_vars.items()]
+        )
+        self._pango_layout.set_markup(f"<span {markup_styles}>{self.text}</span>")
 
         # check if max text width is set and pass it to pango layout
         # text will wrap, meanwhile it checks if and indent has to be applied
@@ -322,8 +323,7 @@ class Text(Grob, ColorMixin):
         return p
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         w, h = self._pango_layout.get_pixel_size()
         x = self.x + w / 2
         y = self.y + h / 2
