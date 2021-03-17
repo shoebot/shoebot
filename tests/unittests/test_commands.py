@@ -113,9 +113,7 @@ class TestFontUtils(ShoebotTestCase):
         """
         output = fontnames()
         self.assertIsInstance(output, list)
-        self.assertTrue(output)
-        # contains a string
-        self.assertIsInstance(output[0], str)
+        self.assertRegexpMatches(output[0], r"(.*)\s(.*)")
 
 
 if __name__ == "__main__":
