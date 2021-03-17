@@ -6,7 +6,7 @@ still missing some parts. Refer to the `Nodebox documentation
 <https://www.nodebox.net/code/index.php/Reference>`_ for the best reference in
 the meantime (and where many parts of this documentation are derived from.)
 
-Note that all examples here are drawn on a 100x100 size for simplicity; the
+Note that most examples here are drawn on a 100x100 size for simplicity; the
 Shoebot default is 300x300px.
 
 .. contents:: :local:
@@ -30,8 +30,6 @@ Drawing shapes
         :alt: four rectangles.  The last three have increasingly round corners.
         :filename: drawing_shapes__rect.png
 
-        size(200,200)
-        background(1)
         fill(0.95, 0.75, 0)
         rect(10, 10, 35, 35)
         # see how roundness affects the shape
@@ -841,6 +839,10 @@ Utility functions
         for x, y in grid(7, 5, 12, 12):
             rect(10+x, 10+y, 10, 10)
 
+.. py:function:: fontnames()
+
+    Returns a list of system font faces, in the same format that ``font()``
+    expects.
 
 .. py:function:: files(path="*")
 
