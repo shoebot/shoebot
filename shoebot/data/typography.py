@@ -254,7 +254,7 @@ class Text(Grob, ColorMixin):
         boundsrect, totalrect = self._pango_layout.get_pixel_extents()
         return (
             boundsrect.x + self.x,
-            boundsrect.y + self.y,
+            boundsrect.y + self.y - self.baseline,
             boundsrect.width,
             boundsrect.height,
         )
