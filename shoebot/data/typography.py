@@ -141,8 +141,9 @@ class Text(Grob, ColorMixin):
         self.font = kwargs.get("font", canvas.fontfile)
         self.fontsize = kwargs.get("fontsize", canvas.fontsize)
         self.align = kwargs.get("align", canvas.align)
-        self.indent = kwargs.get("indent")
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
+        self.indent = kwargs.get("indent")
+        self.textmode = kwargs.get("textmode")
 
         # Setup hidden vars for Cairo / Pango specific bits:
         self._ctx = ctx
@@ -215,7 +216,13 @@ class Text(Grob, ColorMixin):
         # Go to initial point (CORNER or CENTER):
         transform = self._call_transform_mode(self._transform)
         ctx.set_matrix(transform)
-        ctx.translate(self.x, self.y - self.baseline)
+        # FIXME: hardcoded corner constant
+        if self.textmode == "CORNER":
+            # corner was specified, so draw from the top left corner
+            ctx.translate(self.x, self.y)
+        else:
+            # draw from the baseline
+            ctx.translate(self.x, self.y - self.baseline)
 
         if not self.outline:
             # In outline, the caller will stroke the generated path
@@ -252,9 +259,14 @@ class Text(Grob, ColorMixin):
     @property
     def bounds(self):
         boundsrect, totalrect = self._pango_layout.get_pixel_extents()
+        # FIXME: hardcoded corner constant
+        if self.textmode == "CORNER":
+            y = boundsrect.y + self.y
+        else:
+            y = boundsrect.y + self.y - self.baseline
         return (
             boundsrect.x + self.x,
-            boundsrect.y + self.y - self.baseline,
+            y,
             boundsrect.width,
             boundsrect.height,
         )
@@ -272,7 +284,13 @@ class Text(Grob, ColorMixin):
             cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         )
         tempCairoContext = driver.ensure_pycairo_context(tempCairoContext)
-        tempCairoContext.move_to(self.x, self.y - self.baseline)
+        # FIXME: hardcoded corner constant
+        if self.textmode == "CORNER":
+            # corner was specified, so draw from the top left corner
+            tempCairoContext.move_to(self.x, self.y)
+        else:
+            # draw from the baseline
+            tempCairoContext.move_to(self.x, self.y - self.baseline)
         # in here we create a pangoCairoContext in order to display layout on it
 
         # supposedly showlayout should work, but it fills the path instead,
