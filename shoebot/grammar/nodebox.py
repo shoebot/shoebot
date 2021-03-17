@@ -98,7 +98,7 @@ class NodeBot(Bot):
         alpha=1.0,
         data=None,
         draw=True,
-        **kwargs
+        **kwargs,
     ):
         """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
@@ -635,7 +635,11 @@ class NodeBot(Bot):
             # do we have variants set?
             if not vars:
                 # make a list of "arg=value" strings to append to the font name below
-                variants = [f"{arg.replace('var_', '')}={value}" for arg, value in kwargs.items() if arg.startswith("var_")]
+                variants = [
+                    f"{arg.replace('var_', '')}={value}"
+                    for arg, value in kwargs.items()
+                    if arg.startswith("var_")
+                ]
             else:
                 # make a list of "arg=value" strings from the provided dict
                 variants = [f"{arg}={value}" for arg, value in vars.items()]
