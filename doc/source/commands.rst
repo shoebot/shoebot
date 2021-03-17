@@ -839,6 +839,10 @@ Utility functions
         for x, y in grid(7, 5, 12, 12):
             rect(10+x, 10+y, 10, 10)
 
+.. py:function:: fontnames()
+
+    Returns a list of system font faces, in the same format that ``font()``
+    expects.
 
 .. py:function:: files(path="*")
 
