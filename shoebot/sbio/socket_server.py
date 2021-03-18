@@ -36,7 +36,7 @@ _ = gettext.gettext
 
 
 BANNER = """
-############`             [Welcome to Shoebot Telnet Console.]`
+############`             [Welcome to the Shoebot Telnet Console.]`
 ##```####```              `````````````````````````````````````
 ############`
 ############`
@@ -88,29 +88,32 @@ class SocketServer(object):
         print((_("Connected")))
         GObject.io_add_watch(conn, GObject.IO_IN, self.handler)
         if self.shell.intro:
-            self.shell.stdout.write(str(self.shell.intro) + "\n")
+            self.shell.stdout.write(f"{self.shell.intro}\n")
             self.shell.stdout.flush()
         return True
 
     def handler(self, conn, *args):
         """
-        Asynchronous connection handler. Processes each line from the socket.
+        Asynchronous connection handler.
+
+        Processes each lines from the socket, sending it
+        to be processed by the commandline shell handler.
         """
         # lines from cmd.Cmd
         self.shell.stdout.write(self.shell.prompt)
         line = self.shell.stdin.readline()
         if not len(line):
-            line = "EOF"
             return False
-        else:
-            line = line.rstrip("\r\n")
-            line = self.shell.precmd(line)
-            stop = self.shell.onecmd(line)
-            stop = self.shell.postcmd(stop, line)
-            self.shell.stdout.flush()
-            self.shell.postloop()
-            # end lines from cmd.Cmd
-            if stop:
-                self.shell = None
-                conn.close()
-            return not stop
+
+        line = line.rstrip("\r\n")
+        line = self.shell.precmd(line)
+        stop = self.shell.onecmd(line)
+        stop = self.shell.postcmd(stop, line)
+        self.shell.stdout.flush()
+        self.shell.postloop()
+
+        if stop:
+            self.shell = None
+            conn.close()
+        
+        return not stop
