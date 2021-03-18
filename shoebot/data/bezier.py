@@ -322,10 +322,17 @@ class BezierPath(Grob, ColorMixin):
             # Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
-            if fillcolor is not None and strokecolor is not None:
+            if (
+                fillcolor is not None
+                and fillcolor[3] != 0
+                and strokecolor is not None
+                and strokecolor[3] != 0
+            ):
                 if strokecolor[3] < 1:
                     # Draw onto intermediate surface so that stroke
                     # does not overlay fill
+                    # FIXME: This outputs a bitmap
+
                     cairo_ctx.push_group()
 
                     cairo_ctx.set_source_rgba(*fillcolor)
@@ -347,10 +354,10 @@ class BezierPath(Grob, ColorMixin):
                     cairo_ctx.set_source_rgba(*strokecolor)
                     cairo_ctx.set_line_width(strokewidth)
                     cairo_ctx.stroke()
-            elif fillcolor is not None:
+            elif fillcolor is not None and fillcolor[3] != 0:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
-            elif strokecolor is not None:
+            elif strokecolor is not None and strokecolor[3] != 0:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
