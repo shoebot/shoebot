@@ -115,5 +115,5 @@ class SocketServer(object):
         if stop:
             self.shell = None
             conn.close()
-        
+
         return not stop
