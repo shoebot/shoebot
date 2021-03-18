@@ -148,8 +148,14 @@ class BezierPath(Grob, ColorMixin):
     def moveto(self, x, y):
         self._append_element(self._canvas.moveto_closure(x, y), (MOVETO, x, y))
 
+    def relmoveto(self, x, y):
+        self._append_element(self._canvas.relmoveto_closure(x, y), (RMOVETO, x, y))
+
     def lineto(self, x, y):
         self._append_element(self._canvas.lineto_closure(x, y), (LINETO, x, y))
+
+    def rellineto(self, x, y):
+        self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
     def line(self, x1, y1, x2, y2):
         self.moveto(x1, y1)
@@ -159,6 +165,12 @@ class BezierPath(Grob, ColorMixin):
         self._append_element(
             self._canvas.curveto_closure(x1, y1, x2, y2, x3, y3),
             (CURVETO, x1, y1, x2, y2, x3, y3),
+        )
+
+    def relcurveto(self, x1, y1, x2, y2, x3, y3):
+        self._append_element(
+            self._canvas.relcurveto_closure(x1, y1, x2, y2, x3, y3),
+            (RCURVETO, x1, y1, x2, y2, x3, y3),
         )
 
     def arc(self, x, y, radius, angle1, angle2):
@@ -187,9 +199,6 @@ class BezierPath(Grob, ColorMixin):
             self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h)
         )
         self.closed = True
-
-    def rellineto(self, x, y):
-        self._append_element(self._canvas.rellineto_closure(x, y), (RLINETO, x, y))
 
     def rect(self, x, y, w, h, roundness=0.0, rectmode=CORNER):
         # convert values if rectmode is not CORNER

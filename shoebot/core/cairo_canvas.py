@@ -92,6 +92,12 @@ class CairoCanvas(Canvas):
 
         return moveto
 
+    def relmoveto_closure(self, x, y):
+        def relmoveto(ctx):
+            ctx.rel_move_to(x, y)
+
+        return relmoveto
+
     def lineto_closure(self, x, y):
         def lineto(ctx):
             ctx.line_to(x, y)
@@ -127,6 +133,12 @@ class CairoCanvas(Canvas):
                 ctx.restore()
 
         return ellipse
+
+    def relcurveto_closure(self, x1, y1, x2, y2, x3, y3):
+        def relcurveto(ctx):
+            ctx.rel_curve_to(x1, y1, x2, y2, x3, y3)
+
+        return relcurveto
 
     def rellineto_closure(self, x, y):
         def rellineto(ctx):
