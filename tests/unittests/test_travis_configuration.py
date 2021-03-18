@@ -49,7 +49,7 @@ class TestTravisConfiguration(TestCase):
         """
         Verify APT_PACKAGES in the install script matches the apt list in travis.
         """
-        travis_packages = self.travis_conf["addons"]["apt"]["packages"]
+        travis_packages = list(*self.travis_conf["addons"]["apt"]["packages"])
         script_packages = self.install_script_data["DEB_PACKAGES"]
 
         self.assertListEqual(
@@ -63,6 +63,7 @@ class TestTravisConfiguration(TestCase):
         Verify HOMEBREW_PACKAGES in the install script matches the homebrew list in travis.
         """
         travis_packages = self.travis_conf["addons"]["homebrew"]["packages"]
+        travis_packages.remove("black")
         script_packages = self.install_script_data["HOMEBREW_PACKAGES"]
 
         self.assertListEqual(
