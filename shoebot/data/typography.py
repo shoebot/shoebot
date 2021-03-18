@@ -151,7 +151,6 @@ class Text(Grob, ColorMixin):
         self.markup_vars = {
             arg: kwargs[arg]
             for arg in (
-                "tracking",
                 "underline",
                 "underlinecolor",
                 "overline",
