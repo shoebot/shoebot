@@ -322,21 +322,16 @@ class BezierPath(Grob, ColorMixin):
             # Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
-            if (
-                fillcolor != None
-                and fillcolor[3] != 0
-                and strokecolor != None
-                and strokecolor[3] != 0
-            ):
+            if fillcolor and strokecolor:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill_preserve()
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
-            elif fillcolor is not None and fillcolor[3] != 0:
+            elif fillcolor:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
-            elif strokecolor is not None and strokecolor[3] != 0:
+            elif strokecolor:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
