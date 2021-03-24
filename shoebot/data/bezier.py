@@ -323,37 +323,16 @@ class BezierPath(Grob, ColorMixin):
             cairo_ctx.set_matrix(cairo.Matrix())
 
             if (
-                fillcolor is not None
+                fillcolor != None
                 and fillcolor[3] != 0
-                and strokecolor is not None
+                and strokecolor != None
                 and strokecolor[3] != 0
             ):
-                if strokecolor[3] < 1:
-                    # Draw onto intermediate surface so that stroke
-                    # does not overlay fill
-                    # FIXME: This outputs a bitmap
-
-                    cairo_ctx.push_group()
-
-                    cairo_ctx.set_source_rgba(*fillcolor)
-                    cairo_ctx.fill_preserve()
-
-                    e = cairo_ctx.stroke_extents()
-                    cairo_ctx.set_source_rgba(*strokecolor)
-                    cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
-                    cairo_ctx.set_line_width(strokewidth)
-                    cairo_ctx.stroke()
-
-                    cairo_ctx.pop_group_to_source()
-                    cairo_ctx.paint()
-                else:
-                    # Fast path if no alpha in stroke
-                    cairo_ctx.set_source_rgba(*fillcolor)
-                    cairo_ctx.fill_preserve()
-
-                    cairo_ctx.set_source_rgba(*strokecolor)
-                    cairo_ctx.set_line_width(strokewidth)
-                    cairo_ctx.stroke()
+                cairo_ctx.set_source_rgba(*fillcolor)
+                cairo_ctx.fill_preserve()
+                cairo_ctx.set_source_rgba(*strokecolor)
+                cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.stroke()
             elif fillcolor is not None and fillcolor[3] != 0:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
