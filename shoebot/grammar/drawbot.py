@@ -161,8 +161,7 @@ class DrawBot(Bot):
         self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        """Draws a curve relatively to the last point.
-        """
+        """Draws a curve relatively to the last point."""
         if self._path is None:
             raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.relcurveto(x, y)
@@ -184,8 +183,7 @@ class DrawBot(Bot):
         draw=True,
         **kwargs
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions.
-        """
+        """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):

@@ -61,7 +61,7 @@ except ValueError as e:
             ULTRAHEAVY = 1000
 
         def __getattr__(self, item):
-            if item == 'Weight':
+            if item == "Weight":
                 return Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
@@ -287,8 +287,7 @@ class Text(Grob, ColorMixin):
         return p
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         w, h = self._pango_layout.get_pixel_size()
         x = self.x + w / 2
         y = self.y + h / 2
