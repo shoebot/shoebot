@@ -321,9 +321,7 @@ class DrawBot(Bot):
         else:
             return txt
 
-    def textpath(
-        self, txt, x, y, width=None, height=1000000, enableRendering=False, **kwargs
-    ):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         """
         Draws an outlined path of the input text
         """
@@ -342,7 +340,7 @@ class DrawBot(Bot):
 
         # we send doRender=False to prevent the actual rendering process, only the path generation is enabled
         # not the most efficient way, but it generates accurate results
-        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):
