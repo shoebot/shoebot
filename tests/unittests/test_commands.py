@@ -154,6 +154,7 @@ class TestText(ShoebotTestCase):
                 continue
             font(fontname)
             t = text("Hello world", 0, 100, draw=False)
+            assert t.bounds == test_fonts[fontname]
 
 
 class TestFontUtils(ShoebotTestCase):
