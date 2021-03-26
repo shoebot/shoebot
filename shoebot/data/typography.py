@@ -112,9 +112,6 @@ class Text(Grob, ColorMixin):
         Implementation of fonts uses Pango instead of Cocoa.
     """
 
-    # several reference docs can be found at
-    # https://developer.gnome.org/pygtk/stable/class-pangofontdescription.html
-
     def __init__(
         self,
         bot,
@@ -125,7 +122,7 @@ class Text(Grob, ColorMixin):
         height=None,
         outline=False,
         ctx=None,
-        enableRendering=True,
+        draw=True,
         **kwargs,
     ):
         self._canvas = canvas = bot._canvas
@@ -175,14 +172,14 @@ class Text(Grob, ColorMixin):
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
 
-        if enableRendering:
+        if draw:
             # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
                 # Normal rendering, can be deferred
                 self._deferred_render()
-        self._prerendered = enableRendering
+        self._prerendered = draw
 
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):

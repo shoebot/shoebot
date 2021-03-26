@@ -1,4 +1,4 @@
-for x,y in grid(1, 6, 10, 60):
+for x, y in grid(1, 6, 10, 60):
     randomfont = choice(fontnames())
 
     # font title
