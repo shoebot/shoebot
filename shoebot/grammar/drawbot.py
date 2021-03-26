@@ -161,8 +161,7 @@ class DrawBot(Bot):
         self._path.rellineto(x, y)
 
     def relcurveto(self, h1x, h1y, h2x, h2y, x, y):
-        """Draws a curve relatively to the last point.
-        """
+        """Draws a curve relatively to the last point."""
         if self._path is None:
             raise ShoebotError(_("No current path. Use newpath() first."))
         self._path.relcurveto(x, y)
@@ -184,8 +183,7 @@ class DrawBot(Bot):
         draw=True,
         **kwargs
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions.
-        """
+        """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -321,9 +319,7 @@ class DrawBot(Bot):
         else:
             return txt
 
-    def textpath(
-        self, txt, x, y, width=None, height=1000000, enableRendering=False, **kwargs
-    ):
+    def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         """
         Draws an outlined path of the input text
         """
@@ -342,7 +338,7 @@ class DrawBot(Bot):
 
         # we send doRender=False to prevent the actual rendering process, only the path generation is enabled
         # not the most efficient way, but it generates accurate results
-        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):

@@ -702,7 +702,7 @@ class NodeBot(Bot):
         :param draw: Set to False to inhibit immediate drawing (defaults to False)
         :return: Path object representing the text.
         """
-        txt = self.Text(txt, x, y, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, x, y, width, height, draw=False, **kwargs)
         path = txt.path
         if draw:
             path.draw()
@@ -716,7 +716,7 @@ class NodeBot(Bot):
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.metrics
 
     def textbounds(self, txt, width=None, height=None, **kwargs):
