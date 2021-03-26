@@ -134,27 +134,42 @@ class TestText(ShoebotTestCase):
         self.assertEqual(output_text.font, "Bitstream Vera Bold Italic")
         self.assertEqual(output_text.fontsize, 64)
 
+    @parameterized.expand(
+        [
+            (
+                "DejaVu Sans Book",
+                (1, 87.0, 87, 14),
+            ),
+            (
+                "Liberation Sans Regular",
+                (1, 88.0, 79, 13),
+            ),
+            (
+                "Bitstream Vera Sans Roman",
+                (1, 87.0, 87, 14),
+            ),
+        ]
+    )
     @test_as_bot()
-    def test_text_bounds_property(self):
+    def test_text_bounds_property(self, fontname, expected_bounds):
         """
         Check text.bounds() against expected values
         """
-        test_fonts = {
-            "DejaVu Sans Book": (1, 87.0, 87, 14),
-            "Liberation Sans Regular": (1, 88.0, 79, 13),
-            "Bitstream Vera Sans Roman": (1, 87.0, 87, 14),
-        }
+        test_fonts = [
+            "DejaVu Sans Book",
+            "Liberation Sans Regular",
+            "Bitstream Vera Sans Roman",
+        ]
 
-        available_fonts = [f for f in fontnames() if f in test_fonts.keys()]
+        available_fonts = [f for f in fontnames() if f in test_fonts]
         if not available_fonts:
-            raise SystemError("None of the test fonts is available in this system")
+            self.skip("None of the test fonts is available in this system")
 
-        for fontname, value in test_fonts.items():
-            if not fontname in fontnames():
-                continue
-            font(fontname)
-            t = text("Hello world", 0, 100, draw=False)
-            assert t.bounds == test_fonts[fontname]
+        if not fontname in fontnames():
+            return
+        font(fontname)
+        t = text("Hello world", 0, 100, draw=False)
+        assert t.bounds == expected_bounds
 
 
 class TestFontUtils(ShoebotTestCase):
