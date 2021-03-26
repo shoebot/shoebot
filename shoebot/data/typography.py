@@ -61,7 +61,7 @@ except ValueError as e:
             ULTRAHEAVY = 1000
 
         def __getattr__(self, item):
-            if item == 'Weight':
+            if item == "Weight":
                 return Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
@@ -122,7 +122,7 @@ class Text(Grob, ColorMixin):
         height=None,
         outline=False,
         ctx=None,
-        enableRendering=True,
+        draw=True,
         **kwargs
     ):
         self._canvas = canvas = bot._canvas
@@ -153,15 +153,14 @@ class Text(Grob, ColorMixin):
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
 
-        if (
-            enableRendering
-        ):  # this way we do not render if we only need to create metrics
+        if draw:
+            # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
                 # Normal rendering, can be deferred
                 self._deferred_render()
-        self._prerendered = enableRendering
+        self._prerendered = draw
 
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
@@ -288,8 +287,7 @@ class Text(Grob, ColorMixin):
         return p
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         w, h = self._pango_layout.get_pixel_size()
         x = self.x + w / 2
         y = self.y + h / 2
