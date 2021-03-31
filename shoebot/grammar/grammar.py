@@ -15,7 +15,7 @@ from shoebot.core.events import (
     SOURCE_CHANGED_EVENT,
 )
 from shoebot.core.var_listener import VarListener
-from shoebot.data import Variable
+from shoebot.data import Variable, ShoebotError, ShoebotScriptError
 from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import UnbufferedFile
 
@@ -305,6 +305,7 @@ class Grammar(object):
             else:
                 errmsg = simple_traceback(e, executor.known_good or "")
             print(errmsg, file=sys.stderr)
+            raise ShoebotScriptError()
             if break_on_error:
                 raise
 

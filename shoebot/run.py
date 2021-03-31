@@ -289,6 +289,7 @@ def main():
         args=shlex.split(args.script_args or ""),
         verbose=args.verbose,
         background_thread=not args.disable_background_thread,
+        quit_on_error=True,
     )
 
 

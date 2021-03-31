@@ -35,6 +35,13 @@ import threading
 
 from shoebot.core.backend import cairo
 
+
+class ShoebotInstallError(Exception):
+    pass
+
+
+from shoebot.data import ShoebotScriptError
+
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
@@ -206,7 +213,13 @@ class ShoebotThread(threading.Thread):
     """
 
     def __init__(
-        self, create_args, create_kwargs, run_args, run_kwargs, send_sigint=False
+        self,
+        create_args,
+        create_kwargs,
+        run_args,
+        run_kwargs,
+        send_sigint=False,
+        quit_on_error=False,
     ):
         """
         :param create_args: passed to create_bot
@@ -227,6 +240,7 @@ class ShoebotThread(threading.Thread):
         self.run_kwargs = run_kwargs
 
         self.send_sigint = send_sigint
+        self.quit_on_error = quit_on_error
         self._sbot = None
 
     def run(self):
@@ -236,6 +250,9 @@ class ShoebotThread(threading.Thread):
             self._sbot = sbot
             self.bot_ready.set()
             sbot.run(*self.run_args, **self.run_kwargs)
+        except (ShoebotError, ShoebotScriptError):
+            if self.quit_on_error:
+                os._exit(1)
         except Exception:
             print("Exception in shoebot code")
             raise
@@ -372,7 +389,7 @@ def run(
     elif background_thread:
         try:
             while sbot_thread.is_alive():
-                sleep(0.001)
+                sleep(0.005)
         except KeyboardInterrupt:
             sbot_thread.send_sigint = False
             publish_event(QUIT_EVENT)
