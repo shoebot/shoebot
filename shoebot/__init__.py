@@ -40,7 +40,7 @@ class ShoebotInstallError(Exception):
     pass
 
 
-from shoebot.data import ShoebotScriptError
+from shoebot.data import ShoebotError, ShoebotScriptError
 
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
