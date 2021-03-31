@@ -105,7 +105,7 @@ class Grammar(object):
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
     def _run_frame(self, executor, limit=False, iteration=0):
-        """ Run single frame of the bot
+        """Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
@@ -316,7 +316,7 @@ class Grammar(object):
 
     #### Variables
     def _addvar(self, v):
-        """ Sets a new accessible variable.
+        """Sets a new accessible variable.
 
         :param v: Variable.
         """

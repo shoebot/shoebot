@@ -299,7 +299,7 @@ def run(
     See shoebot.io for implementation of the shell, and the gedit
     plugin for an example of using livecoding.
     """
-    # Munge shoebogt sys.argv
+    # Munge shoebot sys.argv
     sys.argv = [
         sys.argv[0]
     ] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
