@@ -210,7 +210,6 @@ class Grammar(object):
         run_forever=False,
         frame_limiter=False,
         verbose=False,
-        break_on_error=False,
     ):
         """
         Executes the contents of a Nodebox/Shoebot script
@@ -306,8 +305,6 @@ class Grammar(object):
                 errmsg = simple_traceback(e, executor.known_good or "")
             print(errmsg, file=sys.stderr)
             raise ShoebotScriptError()
-            if break_on_error:
-                raise
 
     def finish(self):
         ## For use when using shoebot as a module
