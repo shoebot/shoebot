@@ -82,7 +82,7 @@ class SocketServer(object):
     def listener(self, sock, *args):
         """Asynchronous connection listener. Starts a handler for each connection."""
         conn, addr = sock.accept()
-        f = conn.makefile(conn)
+        f = conn.makefile("rw")
         self.shell = ShoebotCmd(self.bot, stdin=f, stdout=f, intro=INTRO)
 
         print((_("Connected")))
