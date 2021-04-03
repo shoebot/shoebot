@@ -322,35 +322,16 @@ class BezierPath(Grob, ColorMixin):
             # Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
-            if fillcolor is not None and strokecolor is not None:
-                if strokecolor[3] < 1:
-                    # Draw onto intermediate surface so that stroke
-                    # does not overlay fill
-                    cairo_ctx.push_group()
-
-                    cairo_ctx.set_source_rgba(*fillcolor)
-                    cairo_ctx.fill_preserve()
-
-                    e = cairo_ctx.stroke_extents()
-                    cairo_ctx.set_source_rgba(*strokecolor)
-                    cairo_ctx.set_operator(cairo.OPERATOR_SOURCE)
-                    cairo_ctx.set_line_width(strokewidth)
-                    cairo_ctx.stroke()
-
-                    cairo_ctx.pop_group_to_source()
-                    cairo_ctx.paint()
-                else:
-                    # Fast path if no alpha in stroke
-                    cairo_ctx.set_source_rgba(*fillcolor)
-                    cairo_ctx.fill_preserve()
-
-                    cairo_ctx.set_source_rgba(*strokecolor)
-                    cairo_ctx.set_line_width(strokewidth)
-                    cairo_ctx.stroke()
-            elif fillcolor is not None:
+            if fillcolor and strokecolor:
+                cairo_ctx.set_source_rgba(*fillcolor)
+                cairo_ctx.fill_preserve()
+                cairo_ctx.set_source_rgba(*strokecolor)
+                cairo_ctx.set_line_width(strokewidth)
+                cairo_ctx.stroke()
+            elif fillcolor:
                 cairo_ctx.set_source_rgba(*fillcolor)
                 cairo_ctx.fill()
-            elif strokecolor is not None:
+            elif strokecolor:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
                 cairo_ctx.stroke()
@@ -390,16 +371,16 @@ class BezierPath(Grob, ColorMixin):
         return contours
 
     def _locate(self, t, segments=None):
-        """ Locates t on a specific segment in the path.
-            Returns (index, t, PathElement)
-            A path is a combination of lines and curves (segments).
-            The returned index indicates the start of the segment that contains point t.
-            The returned t is the absolute time on that segment,
-            in contrast to the relative t on the whole of the path.
-            The returned point is the last MOVETO, any subsequent CLOSETO after i closes to that point.
-            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
-            point() works about thirty times faster in a for-loop since it doesn't need to recalculate
-            the length during each iteration.
+        """Locates t on a specific segment in the path.
+        Returns (index, t, PathElement)
+        A path is a combination of lines and curves (segments).
+        The returned index indicates the start of the segment that contains point t.
+        The returned t is the absolute time on that segment,
+        in contrast to the relative t on the whole of the path.
+        The returned point is the last MOVETO, any subsequent CLOSETO after i closes to that point.
+        When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
+        point() works about thirty times faster in a for-loop since it doesn't need to recalculate
+        the length during each iteration.
         """
         # Originally from nodebox-gl
         if segments is None:
@@ -423,14 +404,14 @@ class BezierPath(Grob, ColorMixin):
 
     def point(self, t, segments=None):
         """
-            Returns the PathElement at time t (0.0-1.0) on the path.
+        Returns the PathElement at time t (0.0-1.0) on the path.
 
-            Returns coordinates for point at t on the path.
-            Gets the length of the path, based on the length of each curve and line in the path.
-            Determines in what segment t falls. Gets the point on that segment.
-            When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
-            point() works about thirty times faster in a for-loop since it doesn't need to recalculate
-            the length during each iteration.
+        Returns coordinates for point at t on the path.
+        Gets the length of the path, based on the length of each curve and line in the path.
+        Determines in what segment t falls. Gets the point on that segment.
+        When you supply the list of segment lengths yourself, as returned from length(path, segmented=True),
+        point() works about thirty times faster in a for-loop since it doesn't need to recalculate
+        the length during each iteration.
         """
         # Originally from nodebox-gl
         if len(self._elements) == 0:
@@ -469,8 +450,8 @@ class BezierPath(Grob, ColorMixin):
             raise PathError("Unknown cmd '%s' for p1 %s" % (p1.cmd, p1))
 
     def points(self, amount=100, start=0.0, end=1.0, segments=None):
-        """ Returns an iterator with a list of calculated points for the path.
-            To omit the last point on closed paths: end=1-1.0/amount
+        """Returns an iterator with a list of calculated points for the path.
+        To omit the last point on closed paths: end=1-1.0/amount
         """
         # Originally from nodebox-gl
         if len(self._elements) == 0:
@@ -487,11 +468,11 @@ class BezierPath(Grob, ColorMixin):
             yield self.point(start + d * i, segments)
 
     def _linepoint(self, t, x0, y0, x1, y1):
-        """ Returns coordinates for point at t on the line.
-            Calculates the coordinates of x and y for a point at t on a straight line.
-            The t parameter is a number between 0.0 and 1.0,
-            x0 and y0 define the starting point of the line,
-            x1 and y1 the ending point of the line.
+        """Returns coordinates for point at t on the line.
+        Calculates the coordinates of x and y for a point at t on a straight line.
+        The t parameter is a number between 0.0 and 1.0,
+        x0 and y0 define the starting point of the line,
+        x1 and y1 the ending point of the line.
         """
         # Originally from nodebox-gl
         out_x = x0 + t * (x1 - x0)
@@ -499,24 +480,23 @@ class BezierPath(Grob, ColorMixin):
         return (out_x, out_y)
 
     def _linelength(self, x0, y0, x1, y1):
-        """ Returns the length of the line.
-        """
+        """Returns the length of the line."""
         # Originally from nodebox-gl
         a = pow(abs(x0 - x1), 2)
         b = pow(abs(y0 - y1), 2)
         return sqrt(a + b)
 
     def _curvepoint(self, t, x0, y0, x1, y1, x2, y2, x3, y3, handles=False):
-        """ Returns coordinates for point at t on the spline.
-            Calculates the coordinates of x and y for a point at t on the cubic bezier spline,
-            and its control points, based on the de Casteljau interpolation algorithm.
-            The t parameter is a number between 0.0 and 1.0,
-            x0 and y0 define the starting point of the spline,
-            x1 and y1 its control point,
-            x3 and y3 the ending point of the spline,
-            x2 and y2 its control point.
-            If the handles parameter is set, returns not only the point at t,
-            but the modified control points of p0 and p3 should this point split the path as well.
+        """Returns coordinates for point at t on the spline.
+        Calculates the coordinates of x and y for a point at t on the cubic bezier spline,
+        and its control points, based on the de Casteljau interpolation algorithm.
+        The t parameter is a number between 0.0 and 1.0,
+        x0 and y0 define the starting point of the spline,
+        x1 and y1 its control point,
+        x3 and y3 the ending point of the spline,
+        x2 and y2 its control point.
+        If the handles parameter is set, returns not only the point at t,
+        but the modified control points of p0 and p3 should this point split the path as well.
         """
         # Originally from nodebox-gl
         mint = 1 - t
@@ -549,12 +529,12 @@ class BezierPath(Grob, ColorMixin):
             )
 
     def _curvelength(self, x0, y0, x1, y1, x2, y2, x3, y3, n=20):
-        """ Returns the length of the spline.
-            Integrates the estimated length of the cubic bezier spline defined by x0, y0, ... x3, y3,
-            by adding the lengths of lineair lines between points at t.
-            The number of points is defined by n
-            (n=10 would add the lengths of lines between 0.0 and 0.1, between 0.1 and 0.2, and so on).
-            The default n=20 is fine for most cases, usually resulting in a deviation of less than 0.01.
+        """Returns the length of the spline.
+        Integrates the estimated length of the cubic bezier spline defined by x0, y0, ... x3, y3,
+        by adding the lengths of lineair lines between points at t.
+        The number of points is defined by n
+        (n=10 would add the lengths of lines between 0.0 and 0.1, between 0.1 and 0.2, and so on).
+        The default n=20 is fine for most cases, usually resulting in a deviation of less than 0.01.
         """
         # Originally from nodebox-gl
         length = 0
@@ -572,8 +552,7 @@ class BezierPath(Grob, ColorMixin):
         return length
 
     def _segment_lengths(self, relative=False, n=20):
-        """ Returns a list with the lengths of each segment in the path.
-        """
+        """Returns a list with the lengths of each segment in the path."""
         # From nodebox_gl
         lengths = []
         first = True
@@ -607,11 +586,11 @@ class BezierPath(Grob, ColorMixin):
             return lengths
 
     def _get_length(self, segmented=False, precision=10):
-        """ Returns the length of the path.
-            Calculates the length of each spline in the path, using n as a number of points to measure.
-            When segmented is True, returns a list containing the individual length of each spline
-            as values between 0.0 and 1.0, defining the relative length of each spline
-            in relation to the total path length.
+        """Returns the length of the path.
+        Calculates the length of each spline in the path, using n as a number of points to measure.
+        When segmented is True, returns a list containing the individual length of each spline
+        as values between 0.0 and 1.0, defining the relative length of each spline
+        in relation to the total path length.
         """
         # Originally from nodebox-gl
         if not segmented:

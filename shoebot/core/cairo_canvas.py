@@ -188,9 +188,9 @@ class CairoCanvas(Canvas):
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             elif extension == ".svg":
-                target_ctx = cairo.Context(
-                    cairo.SVGSurface(filename, *self.size_or_default())
-                )
+                surface = cairo.SVGSurface(filename, *self.size_or_default())
+                surface.restrict_to_version(cairo.SVGVersion.VERSION_1_2)
+                target_ctx = cairo.Context(surface)
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             return filename

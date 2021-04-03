@@ -89,6 +89,7 @@ class CairoImageSink(DrawQueueSink):
             surface = cairo.PSSurface(self._output_file(frame), *size)
         elif self.format == "svg":
             surface = cairo.SVGSurface(self._output_file(frame), *size)
+            surface.restrict_to_version(cairo.SVGVersion.VERSION_1_2)
         elif self.format == "surface":
             surface = self.target
         else:
