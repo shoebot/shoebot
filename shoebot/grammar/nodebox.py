@@ -725,7 +725,7 @@ class NodeBot(Bot):
         :return: the width and height of a string of text as a tuple
         according to current font settings (inked part)
         """
-        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.bounds
 
     def textwidth(self, txt, width=None):
