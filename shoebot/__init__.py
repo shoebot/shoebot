@@ -370,8 +370,12 @@ def run(
             )
 
         sbot_thread = None
-        sbot = create_bot(*create_args, **create_kwargs)
-        sbot.run(*run_args, **run_kwargs)
+        try:
+            sbot = create_bot(*create_args, **create_kwargs)
+            sbot.run(*run_args, **run_kwargs)
+        except (ShoebotError, ShoebotScriptError):
+            if quit_on_error:
+                sys.exit(1)
 
     if run_shell:
         import shoebot.sbio.shell
