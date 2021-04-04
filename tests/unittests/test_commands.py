@@ -176,6 +176,19 @@ class TestText(ShoebotTestCase):
         pango_cairo.show_layout.assert_called()
         pango_cairo.reset_mock()
 
+    @test_as_bot()
+    def test_fontname_with_variants(self):
+        """
+        Verify that font() reads variable font values correctly
+        """
+        font("Inconsolata", var_wdth=100, var_wght=200)
+        fontstr = font()
+        self.assertEquals(fontstr, "Inconsolata @wdth=100,wght=200")
+
+        font("Inconsolata", vars={"wdth": 50, "wght": 400})
+        fontstr = font()
+        self.assertEquals(fontstr, "Inconsolata @wdth=50,wght=400")
+
 
 class TestFontUtils(ShoebotTestCase):
     @test_as_bot()
