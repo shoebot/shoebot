@@ -226,7 +226,7 @@ class Bot(Grammar):
 
     def _makeInstance(self, clazz, args, kwargs):
         """Creates an instance of a class defined in this document.
-           This method sets the context of the object to the current context."""
+        This method sets the context of the object to the current context."""
         inst = clazz(self, *args, **kwargs)
         return inst
 
@@ -414,6 +414,7 @@ class Bot(Grammar):
             from IPython.display import SVG
 
             surface = cairo.SVGSurface(b, self.WIDTH, self.HEIGHT)
+            surface.restrict_to_version(cairo.SVGVersion.VERSION_1_2)
             surface.finish()
             b.seek(0)
             data = b.read()
