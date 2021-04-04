@@ -206,6 +206,21 @@ class NodeBot(Bot):
         self._path = p
         return p
 
+    def arc(self, x, y, radius, angle1, angle2, draw=True):
+        """Draw a arc with center (x,y) between two angles in degrees.
+        :param x1: start x-coordinate
+        :param y1: start y-coordinate
+        :param radius: arc radius
+        :param angle1: start angle
+        :param angle2: end angle
+        """
+        p = self._path
+        self.beginpath()
+        self.arcto(x, y, radius, angle1, angle2)
+        self.endpath(draw=draw)
+        self._path = p
+        return p
+
     def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
         """Draw an arrow.
 
@@ -298,7 +313,7 @@ class NodeBot(Bot):
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.curveto(x1, y1, x2, y2, x3, y3)
 
-    def arc(self, x, y, radius, angle1, angle2):
+    def arcto(self, x, y, radius, angle1, angle2):
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         # use degrees by default
