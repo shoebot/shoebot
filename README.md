@@ -1,17 +1,18 @@
 # Shoebot
 
-Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line. 
+Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line.
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
 
 [![Build Status](https://travis-ci.org/shoebot/shoebot.svg?branch=master)](https://travis-ci.org/shoebot/shoebot)
+[![Matrix channel](https://img.shields.io/matrix/shoebot:matrix.org)](https://matrix.to/#/#shoebot:matrix.org)
 
 * [How to install](http://shoebot.readthedocs.io/en/latest/install.html)
-* [Getting started](https://shoebot.readthedocs.io/en/latest/getstarted.html) 
+* [Getting started](https://shoebot.readthedocs.io/en/latest/getstarted.html)
 
 ## Documentation
 
-You can find the current docs at [ReadTheDocs](http://shoebot.readthedocs.org/).
+You can find the current docs at [docs.shoebot.net](https://docs.shoebot.net/).
 
 The [Nodebox tutorials](http://nodebox.net/code/index.php/Tutorial) are an excellent intro to the language and its core concepts. Shoebot is a rewrite of Nodebox 1, so the original [Nodebox documentation](https://www.nodebox.net/code/index.php/Reference) is required reading.
 
@@ -60,5 +61,3 @@ Originally developed by Ricardo Lafuente with the support of the Piet Zwart Inst
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-

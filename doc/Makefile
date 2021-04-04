@@ -41,7 +41,7 @@ pickle:
 web: pickle
 
 serve:
-	cd build/html; python -m http.server
+	cd build/html; python3 -m http.server
 
 json:
 	mkdir -p build/json build/doctrees
@@ -76,3 +76,9 @@ linkcheck:
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in build/linkcheck/output.txt."
+
+deploy: clean html
+	rsync -e "ssh" -P -rvzc build/html/ manufactura:~/apps/shoebot-docs/ --cvs-exclude
+
+dry-deploy: clean html
+	rsync -n -e "ssh" -P -rvzc build/html/ manufactura:~/apps/shoebot-docs/ --cvs-exclude

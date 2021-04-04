@@ -61,7 +61,7 @@ except ValueError as e:
             ULTRAHEAVY = 1000
 
         def __getattr__(self, item):
-            if item == 'Weight':
+            if item == "Weight":
                 return Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
@@ -92,22 +92,6 @@ def pangocairo_create_context(cr):
     raise
 
 
-# Map Nodebox / Shoebot names to Pango:
-def _style_name_to_pango(style="normal"):
-    """
-    Given a Shoebot/Nodebox style name return the a Pango constant.
-    """
-    if style == "normal":
-        return Pango.Style.NORMAL
-    elif style == "italic":
-        return Pango.Style.ITALIC
-    elif style == "oblique":
-        return Pango.Style.OBLIQUE
-    raise AttributeError(
-        "Invalid font style, valid styles are: normal, italic and oblique."
-    )
-
-
 def _alignment_name_to_pango(alignment):
     if alignment == "right":
         return Pango.Alignment.RIGHT
@@ -119,27 +103,6 @@ def _alignment_name_to_pango(alignment):
     return Pango.Alignment.LEFT
 
 
-PANGO_WEIGHTS = {
-    "ultralight": Pango.Weight.ULTRALIGHT,
-    "light": Pango.Weight.LIGHT,
-    "normal": Pango.Weight.NORMAL,
-    "bold": Pango.Weight.BOLD,
-    "ultrabold": Pango.Weight.ULTRABOLD,
-    "heavy": Pango.Weight.HEAVY,
-    None: Pango.Weight.NORMAL,  # default
-}
-
-
-def _weight_name_to_pango(weight="normal"):
-    """
-    :param weight:  "normal", or "bold"
-    :return:  Corresponding pango font weight from Pango.Weight
-    """
-    if type(weight) == int:
-        return weight
-    return PANGO_WEIGHTS.get(weight)
-
-
 class Text(Grob, ColorMixin):
     """
     Changes from Nodebox 1:
@@ -148,8 +111,6 @@ class Text(Grob, ColorMixin):
 
         Implementation of fonts uses Pango instead of Cocoa.
     """
-
-    # several reference docs can be found at http://www.pyGtk.org/docs/pygtk/class-pangofontdescription.html
 
     def __init__(
         self,
@@ -161,7 +122,7 @@ class Text(Grob, ColorMixin):
         height=None,
         outline=False,
         ctx=None,
-        enableRendering=True,
+        draw=True,
         **kwargs
     ):
         self._canvas = canvas = bot._canvas
@@ -177,9 +138,6 @@ class Text(Grob, ColorMixin):
 
         self.font = kwargs.get("font", canvas.fontfile)
         self.fontsize = kwargs.get("fontsize", canvas.fontsize)
-        self.style = kwargs.get("style", "normal")
-        self.weight = kwargs.get("weight", "normal")
-
         self.align = kwargs.get("align", canvas.align)
         self.indent = kwargs.get("indent")
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
@@ -195,15 +153,14 @@ class Text(Grob, ColorMixin):
         # Pre-render some stuff to enable metrics sizing
         self._pre_render()
 
-        if (
-            enableRendering
-        ):  # this way we do not render if we only need to create metrics
+        if draw:
+            # this way we do not render if we only need to create metrics
             if bool(ctx):
                 self._render(self._ctx)
             else:
                 # Normal rendering, can be deferred
                 self._deferred_render()
-        self._prerendered = enableRendering
+        self._prerendered = draw
 
     # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
     def _pre_render(self):
@@ -330,8 +287,7 @@ class Text(Grob, ColorMixin):
         return p
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         w, h = self._pango_layout.get_pixel_size()
         x = self.x + w / 2
         y = self.y + h / 2
@@ -349,8 +305,6 @@ class Text(Grob, ColorMixin):
                 "y",
                 "width",
                 "height",
-                "style",
-                "weight",
                 "_fillcolor",
                 "fontfile",
                 "fontsize",

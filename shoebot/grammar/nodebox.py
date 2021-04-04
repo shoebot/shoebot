@@ -4,6 +4,7 @@ import sys
 from shoebot.core.backend import cairo
 from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
+from shoebot.util.fonts import list_pango_fonts
 from .bot import Bot
 from shoebot.data import (
     geometry,
@@ -98,7 +99,7 @@ class NodeBot(Bot):
         alpha=1.0,
         data=None,
         draw=True,
-        **kwargs
+        **kwargs,
     ):
         """Draws a image form path, in x,y and resize it to width, height dimensions."""
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
@@ -635,7 +636,11 @@ class NodeBot(Bot):
             # do we have variants set?
             if not vars:
                 # make a list of "arg=value" strings to append to the font name below
-                variants = [f"{arg.replace('var_', '')}={value}" for arg, value in kwargs.items() if arg.startswith("var_")]
+                variants = [
+                    f"{arg.replace('var_', '')}={value}"
+                    for arg, value in kwargs.items()
+                    if arg.startswith("var_")
+                ]
             else:
                 # make a list of "arg=value" strings from the provided dict
                 variants = [f"{arg}={value}" for arg, value in vars.items()]
@@ -697,7 +702,7 @@ class NodeBot(Bot):
         :param draw: Set to False to inhibit immediate drawing (defaults to False)
         :return: Path object representing the text.
         """
-        txt = self.Text(txt, x, y, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, x, y, width, height, draw=False, **kwargs)
         path = txt.path
         if draw:
             path.draw()
@@ -711,7 +716,7 @@ class NodeBot(Bot):
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, enableRendering=False, **kwargs)
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.metrics
 
     def textwidth(self, txt, width=None):
@@ -750,11 +755,13 @@ class NodeBot(Bot):
         self._canvas.align = align
 
     # TODO: Set the framework to setup font options
-
     def fontoptions(
         self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
     ):
         raise NotImplementedError(_("fontoptions() isn't implemented yet"))
+
+    def fontnames(self):
+        return list_pango_fonts()
 
     def autotext(self, sourceFile):
         k = KantGenerator(sourceFile, searchpaths=[".", ASSETS_DIR])

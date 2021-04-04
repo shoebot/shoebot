@@ -62,10 +62,11 @@ trusted_cmds = set()
 
 def trusted_cmd(f):
     """
-    Trusted commands cannot be run remotely
+    Decorator for methods that are trusted commands.
 
-    :param f:
-    :return:
+    If self.trusted is not set, then the command prints an error.
+
+    :param f: do_XXX function to decorate.
     """
 
     def run_cmd(self, line):
@@ -94,13 +95,15 @@ class ShoebotCmd(cmd.Cmd):
         "r": "restart",
     }
 
+    # Trusted commands can only be run if trusted is set, e.g. when running from the commandline
+    # not a socket.
     trusted_cmds = set()
 
     def __init__(self, bot, intro=None, trusted=False, **kwargs):
         """
 
-        :param bot:
-        :param intro:
+        :param bot: bot instance
+        :param intro: intro banner to display.
         :param trusted: Only running from the commandline is trusted, not from sockets
                         untrusted can only change variables
         :param kwargs:
@@ -122,25 +125,33 @@ class ShoebotCmd(cmd.Cmd):
         """
         print response, if cookie is set then print that each line
         :param args:
-        :param keep: if True more output is to come
+        :param keep: if True more output is to follow.
         :param cookie: set a custom cookie,
                        if set to 'None' then self.cookie will be used.
                        if set to 'False' disables cookie output entirely
         :return:
         """
+        status = kwargs.get("status")
+        lines = input.splitlines()
+
+        # Get cookie - unique string that can be provided by the sender to
+        # filter replies to its requests that can arrive later.
         cookie = kwargs.get("cookie")
         if cookie is None:
             cookie = self.cookie or ""
-        status = kwargs.get("status")
-        lines = input.splitlines()
+
         if status and not lines:
-            lines = [""]
+            # Nothing to output, just send a newline.
+            print("", file=self.stdout)
+            return
 
-        if cookie:
-            output_template = "{cookie} {status}{cookie_char}{line}"
-        else:
-            output_template = "{line}"
+        if not cookie:
+            # Standard output, lines arrive as they are.
+            for line in lines:
+                print(line, file=self.stdout)
+            return
 
+        # Prefix lines with unique str "cookie" and : or > on the last line.
         for i, line in enumerate(lines):
             if i != len(lines) - 1 or keep is True:
                 cookie_char = ">"
@@ -149,18 +160,13 @@ class ShoebotCmd(cmd.Cmd):
                 cookie_char = ":"
 
             print(
-                output_template.format(
-                    cookie_char=cookie_char,
-                    cookie=cookie,
-                    status=status or "",
-                    line=line.strip(),
-                ),
+                f"{cookie} {status or ''}{cookie_char}{line.strip()}",
                 file=self.stdout,
             )
 
     def emptyline(self):
         """
-        Kill the default behaviour of repeating the last line.
+        Override the default behaviour of repeating the last line.
 
         :return:
         """
@@ -168,7 +174,7 @@ class ShoebotCmd(cmd.Cmd):
 
     def do_escape_nl(self, arg):
         """
-        Escape newlines in any responses
+        Toggle escaping newlines.
         """
         if arg.lower() == "off":
             self.escape_nl = False
@@ -189,7 +195,7 @@ class ShoebotCmd(cmd.Cmd):
             self.prompt = PROMPT
             self.response_prompt = RESPONSE_PROMPT
         self.print_response(
-            "prompt: %s" % self.prompt, "\n", "response: %s" % self.response_prompt
+            f"prompt: {self.prompt}\n" + f"response: {self.response_prompt}"
         )
 
     def do_title(self, title):
@@ -204,33 +210,37 @@ class ShoebotCmd(cmd.Cmd):
         """
         if speed:
             try:
-                self.bot._speed = float(speed)
-            except Exception as e:
-                self.print_response("%s is not a valid framerate" % speed)
+                new_speed = float(speed)
+            except ValueError as e:
+                self.print_response(f"{speed} is not a valid framerate")
                 return
-        self.print_response("Speed: %s FPS" % self.bot._speed)
+
+            self.bot._speed = new_speed
+            self.print_response(f"Speed: {self.bot._speed} FPS")
 
     def do_restart(self, line):
         """
-        Attempt to restart the bot.
+        Attempt to restart bot by clearing its namespace and resetting FRAME to 0.
         """
         self.bot._frame = 0
-        self.bot._namespace.clear()
-        self.bot._namespace.update(self.bot._initial_namespace)
+        self.bot._namespace.clear()  # noqa
+        self.bot._namespace.update(self.bot._initial_namespace)  # noqa
 
     def do_pause(self, line):
         """
-        Toggle pause
+        Toggle paused state.
+
+        Stores the bots speed in pause_speed and temporarily sets the bot speed to 0.
         """
-        # along with stuff in socketserver and shell
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
             self.print_response("Paused")
-        else:
-            self.bot._speed = self.pause_speed
-            self.pause_speed = None
-            self.print_response("Playing")
+            return
+
+        self.bot._speed = self.pause_speed
+        self.pause_speed = None
+        self.print_response("Playing")
 
     def do_play(self, line):
         """
@@ -244,29 +254,33 @@ class ShoebotCmd(cmd.Cmd):
     def do_goto(self, line):
         """
         Go to specific frame
-        :param line:
-        :return:
         """
-        self.print_response("Go to frame %s" % line)
-        self.bot._frame = int(line)
+        try:
+            new_frame = int(line)
+        except ValueError:
+            self.print_response(f"{line} is not a valid framerate")
+            return
+
+        self.print_response(f"Go to frame {new_frame}")
+        self.bot._frame = new_frame
 
     def do_rewind(self, line):
         """
         rewind
         """
-        self.print_response("Rewinding from frame %s to 0" % self.bot._frame)
+        self.print_response(f"Rewinding from frame {self.bot._frame} to 0")
         self.bot._frame = 0
 
     def do_vars(self, line):
         """
         List bot variables and values
         """
-        if self.bot._vars:
-            max_name_len = max([len(name) for name in self.bot._vars])
-            for i, (name, v) in enumerate(self.bot._vars.items()):
-                keep = i < len(self.bot._vars) - 1
+        if self.bot._vars:  # noqa
+            max_name_len = max([len(name) for name in self.bot._vars])  # noqa
+            for i, (name, v) in enumerate(self.bot._vars.items()):  # noqa
+                keep = i < len(self.bot._vars) - 1  # noqa
                 self.print_response(
-                    "%s = %s" % (name.ljust(max_name_len), v.value), keep=keep
+                    f"{name.ljust(max_name_len)} = {v.value}", keep=keep
                 )
         else:
             self.print_response("No vars")
@@ -281,10 +295,10 @@ class ShoebotCmd(cmd.Cmd):
 
         If it does not run successfully shoebot will attempt to role back.
 
-        Editors can enable livecoding by sending new code as it is edited.
+        Editors can enable live-coding by sending new code as it is edited.
         """
         cookie = self.cookie
-        executor = self.bot._executor
+        executor = self.bot._executor  # noqa
 
         def source_good():
             self.print_response(status=RESPONSE_CODE_OK, cookie=cookie)
@@ -293,18 +307,21 @@ class ShoebotCmd(cmd.Cmd):
         def source_bad(tb):
             if called_good:
                 # good and bad callbacks shouldn't both be called
-                raise ValueError("Good AND Bad callbacks called !")
+                raise ValueError(
+                    "Unexpected condition, Good and bad callbacks were called !"
+                )
+
             self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
             self.print_response(tb.replace("\n", "\\n"), cookie=cookie)
             executor.clear_callbacks()
 
         called_good = False
-        source = base64.b64decode(line).decode('ascii')
+        source = base64.b64decode(line).decode("ascii")
         # Test compile
         publish_event(
             SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source"
         )
-        self.bot._executor.load_edited_source(
+        self.bot._executor.load_edited_source(  # noqa
             source, good_cb=source_good, bad_cb=source_bad
         )
 
@@ -369,7 +386,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         try:
             name, value = [part.strip() for part in line.split("=")]
-            if name not in self.bot._vars:
+            if name not in self.bot._vars:  # noqa
                 self.print_response(
                     "No such variable %s enter vars to see available vars" % name
                 )
@@ -379,48 +396,64 @@ class ShoebotCmd(cmd.Cmd):
 
             success, msg = self.bot.canvas.sink.var_changed(name, variable.value)
             if success:
-                print("{}={}".format(name, variable.value), file=self.stdout)
+                print(f"{name}={variable.value}", file=self.stdout)
             else:
-                print("{}\n".format(msg), file=self.stdout)
+                print(f"{msg}\n", file=self.stdout)
         except Exception as e:
             print("Invalid Syntax.", e)
             return
 
     def precmd(self, line):
         """
-        Allow commands to have a last parameter of 'cookie=somevalue'
+        Preprocess the commandline.
 
-        TODO somevalue will be prepended onto any output lines so
-        that editors can distinguish output from certain kinds
-        of events they have sent.
+        Cookies:
+            Allow commands to have a last parameter of 'cookie=arbitrary_string'
 
-        :param line:
-        :return:
+            Editors can send a "cookie" value - an arbitrary string, usually
+            a uuid, for commands that have responses, this will be prepended
+            to the response, along with : if there is more data to follow
+            or > on the last line.
+
+        :param line:  input command line.
+        :return:  processed command line.
         """
         args = shlex.split(line or "")
         if args and "cookie=" in args[-1]:
+            # Get the cookie value.
+            # TODO - this could probably be cleaner with a regex.
             cookie_index = line.index("cookie=")
             cookie = line[cookie_index + 7 :]
             line = line[:cookie_index].strip()
             self.cookie = cookie
-        if line.startswith("#"):
+            args = shlex.split(line or "")
+
+        if len(args) and args[0].startswith("#"):
+            # Ignore comments.
             return ""
-        elif "=" in line:
-            # allow  somevar=somevalue
 
-            # first check if we really mean a command
-            cmdname = line.partition(" ")[0]
-            if hasattr(self, "do_%s" % cmdname):
+        if len(args) > 1 and "=" in line:
+            # Assignment
+            #
+            # If it looks like the user is trying to pass var=value then prefix it with
+            # set, so the do_set can be looked up later.
+            #
+            # Ignore commands:
+            if hasattr(self, f"do_{args[0]}"):
                 return line
 
-            if not line.startswith("set "):
-                return "set " + line
-            else:
-                return line
-        if len(args) and args[0] in self.shortcuts:
-            return "%s %s" % (self.shortcuts[args[0]], " ".join(args[1:]))
-        else:
+            if not args[0] == "set":
+                return f"set {line}"
             return line
+
+        # Shortcuts
+        #
+        # If the first item on the commandline is a shortcut, the substitute it for
+        # the full command.
+        if len(args) and args[0] in self.shortcuts:
+            return self.shortcuts[args[0]] + " ".join(args[1:])
+
+        return line
 
     def postcmd(self, stop, line):
         """Hook method executed just after a command dispatch is finished."""
