@@ -64,7 +64,6 @@ class BezierPath(Grob, ColorMixin):
         fill=None,
         stroke=None,
         strokewidth=0,
-        pathmode=CORNER,
         packed_elements=None,
     ):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
@@ -82,7 +81,6 @@ class BezierPath(Grob, ColorMixin):
             self._elements = []
             self._render_funcs = []
 
-        self._pathmode = pathmode
         self.closed = False
 
         self._drawn = False
@@ -138,7 +136,6 @@ class BezierPath(Grob, ColorMixin):
             self._fillcolor,
             self._strokecolor,
             self._strokewidth,
-            self._pathmode,
             packed_elements=(self._elements[:], self._render_funcs[:]),
         )
         path.closed = self.closed
