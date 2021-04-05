@@ -54,6 +54,9 @@ class NodeBot(Bot):
     NORMAL = "1"
     FORTYFIVE = "2"
 
+    PIE = "pie"
+    CHORD = "chord"
+
     CORNER = CORNER
     CENTER = CENTER
     MOVETO = MOVETO
@@ -206,7 +209,7 @@ class NodeBot(Bot):
         self._path = p
         return p
 
-    def arc(self, x, y, radius, angle1, angle2, draw=True):
+    def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True):
         """Draw a arc with center (x,y) between two angles in degrees.
         :param x1: start x-coordinate
         :param y1: start y-coordinate
@@ -216,6 +219,15 @@ class NodeBot(Bot):
         """
         p = self._path
         self.beginpath()
+        if type == self.PIE:
+            # find the coordinates of the start and end points
+            x1 = x + radius * cos(deg2rad(angle1))
+            y1 = y + radius * sin(deg2rad(angle1))
+            x2 = x + radius * cos(deg2rad(angle2))
+            y2 = y + radius * sin(deg2rad(angle2))
+            self.moveto(x2, y2)
+            self.lineto(x, y)
+            self.lineto(x1, y1)
         self.arcto(x, y, radius, angle1, angle2)
         self.endpath(draw=draw)
         self._path = p
