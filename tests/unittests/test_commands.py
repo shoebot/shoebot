@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, Mock, call
 
 from math import radians
 from parameterized import parameterized
@@ -133,6 +134,60 @@ class TestText(ShoebotTestCase):
         self.assertEqual(output_text.y, 250)
         self.assertEqual(output_text.font, "Bitstream Vera Bold Italic")
         self.assertEqual(output_text.fontsize, 64)
+
+    @parameterized.expand(
+        [
+            (
+                ("Letter spaced", 4, 5),
+                {"tracking": 7},
+                '<span letter_spacing="7168">Letter spaced</span>',
+            ),
+            (
+                ("Underlined", 23, 25),
+                {"underline": 3},
+                '<span underline="3">Underlined</span>',
+            ),
+        ]
+    )
+    @patch("shoebot.data.typography.PangoCairo")
+    @test_as_bot()
+    def test_text_outputs_pango_text_spans(
+        self, text_args, text_kwargs, expected_pango_text_span, pango_cairo
+    ):
+        """
+        For text calls that can only be
+        For calls that should result in a call to set_markup in a Pango layout
+        verify they arrive as expected.
+        """
+        # This test is a little implementation / specific, but gets close to verifying
+        # the layout is used, and the markup is rendered.
+        text(*text_args, **text_kwargs)
+
+        # A layout should have been created.
+        pango_cairo.create_layout.assert_called()
+        layout = pango_cairo.create_layout.return_value
+
+        layout.set_markup.assert_called_with(expected_pango_text_span)
+
+        # Lastly, verify that flushing output causes show layout to be called.
+        pango_cairo.show_layout.assert_not_called()
+
+        flush_outputfile()
+        pango_cairo.show_layout.assert_called()
+        pango_cairo.reset_mock()
+
+    @test_as_bot()
+    def test_fontname_with_variants(self):
+        """
+        Verify that font() reads variable font values correctly
+        """
+        font("Inconsolata", var_wdth=100, var_wght=200)
+        fontstr = font()
+        self.assertEquals(fontstr, "Inconsolata @wdth=100,wght=200")
+
+        font("Inconsolata", vars={"wdth": 50, "wght": 400})
+        fontstr = font()
+        self.assertEquals(fontstr, "Inconsolata @wdth=50,wght=400")
 
 
 class TestFontUtils(ShoebotTestCase):
