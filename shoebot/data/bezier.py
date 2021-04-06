@@ -560,14 +560,13 @@ class BezierPath(Grob, ColorMixin):
         The t parameter is a number between 0.0 and 1.0,
         """
         t_angle = abs(angle2 - angle1)
-        out_x = x + radius * cos(deg2rad(t_angle))
-        out_y = y + radius * sin(deg2rad(t_angle))
+        out_x = x + radius * cos(t_angle)
+        out_y = y + radius * sin(t_angle)
         return (out_x, out_y)
 
     def _arclength(self, t, x, y, radius, angle1, angle2):
         """Returns the length of the arc."""
-        t_angle = abs(angle2 - angle1)
-        return 2 * math.pi * radius * (t_angle / 360)
+        return radius * abs(angle2 - angle1)
 
     def _segment_lengths(self, relative=False, n=20):
         """Returns a list with the lengths of each segment in the path."""
