@@ -378,7 +378,7 @@ def run(
     elif background_thread:
         try:
             while sbot_thread.is_alive():
-                sleep(0.05)
+                sleep(0.001)
         except KeyboardInterrupt:
             sbot_thread.send_sigint = False
             publish_event(QUIT_EVENT)
