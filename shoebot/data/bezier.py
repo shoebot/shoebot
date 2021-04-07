@@ -15,6 +15,7 @@ from .grob import Grob
 from itertools import chain
 from .basecolor import ColorMixin
 from math import pi as _pi, sqrt
+from math import sin, cos
 
 from . import geometry
 
@@ -564,7 +565,7 @@ class BezierPath(Grob, ColorMixin):
         out_y = y + radius * sin(t_angle)
         return (out_x, out_y)
 
-    def _arclength(self, t, x, y, radius, angle1, angle2):
+    def _arclength(self, x, y, radius, angle1, angle2):
         """Returns the length of the arc."""
         return radius * abs(angle2 - angle1)
 
