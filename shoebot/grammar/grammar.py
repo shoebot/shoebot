@@ -105,7 +105,7 @@ class Grammar(object):
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
     def _run_frame(self, executor, limit=False, iteration=0):
-        """ Run single frame of the bot
+        """Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
@@ -210,7 +210,6 @@ class Grammar(object):
         run_forever=False,
         frame_limiter=False,
         verbose=False,
-        break_on_error=False,
     ):
         """
         Executes the contents of a Nodebox/Shoebot script
@@ -280,6 +279,7 @@ class Grammar(object):
                             self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
                     if event.type == QUIT_EVENT:
+                        run_forever = False
                         break
                     elif event.type == SOURCE_CHANGED_EVENT:
                         # Debounce SOURCE_CHANGED events -
@@ -292,7 +292,7 @@ class Grammar(object):
 
                     event = None  # this loop is a bit weird...
                     break
-
+                return True
         except Exception as e:
             # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
@@ -305,8 +305,7 @@ class Grammar(object):
             else:
                 errmsg = simple_traceback(e, executor.known_good or "")
             print(errmsg, file=sys.stderr)
-            if break_on_error:
-                raise
+            return False
 
     def finish(self):
         ## For use when using shoebot as a module
@@ -316,7 +315,7 @@ class Grammar(object):
 
     #### Variables
     def _addvar(self, v):
-        """ Sets a new accessible variable.
+        """Sets a new accessible variable.
 
         :param v: Variable.
         """
