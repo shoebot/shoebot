@@ -32,7 +32,6 @@ class Image(Grob, ColorMixin):
     )  # Did have a WeakValueDictionary here but this caused a memory leak of images every frame
     _state_attributes = {
         "transform",
-        "pathmode",
     }  # NBX uses transform and transformmode here
 
     def __init__(
@@ -45,7 +44,6 @@ class Image(Grob, ColorMixin):
         height=None,
         alpha=1.0,
         data=None,
-        pathmode=CORNER,
         **kwargs
     ):
         Grob.__init__(self, bot)
@@ -58,7 +56,6 @@ class Image(Grob, ColorMixin):
         self.alpha = alpha
         self.path = path
         self.data = data
-        self._pathmode = pathmode
         sh = sw = None  # Surface Height and Width
 
         if isinstance(self.data, cairo.ImageSurface):
@@ -163,8 +160,7 @@ class Image(Grob, ColorMixin):
         self._deferred_render()
 
     def _get_center(self):
-        """Returns the center point of the path, disregarding transforms.
-        """
+        """Returns the center point of the path, disregarding transforms."""
         x = self.x + self.width / 2
         y = self.y + self.height / 2
         return (x, y)

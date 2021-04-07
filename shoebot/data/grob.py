@@ -39,13 +39,6 @@ class Grob(object):
         else:
             raise ValueError("mode must be CENTER or CORNER")
 
-    def _get_pathmode(self):
-        """Return pathmode or get it from self._canvas"""
-        if self._pathmode is not None:
-            return self._pathmode
-        else:
-            return self._canvas.pathmode
-
     def _get_center(self):
         """Implementations must return the x, y of their center"""
         raise NotImplementedError()

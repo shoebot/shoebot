@@ -71,7 +71,7 @@ class TestPath(ShoebotTestCase):
                 ],
             ),
             (
-                "arc(40, 40, 23, 90, 180)",
+                "arcto(40, 40, 23, 90, 180)",
                 [
                     PathElement(ARC, 40, 40, 23, radians(90), radians(180)),
                     PathElement(CLOSE, 40, 40),
