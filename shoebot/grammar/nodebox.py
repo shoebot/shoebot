@@ -194,22 +194,19 @@ class NodeBot(Bot):
         """
         return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
 
-    def line(self, x1, y1, x2, y2, draw=True):
+    def line(self, x1, y1, x2, y2, draw=True, **kwargs):
         """Draw a line from (x1,y1) to (x2,y2)
         :param x1: start x-coordinate
         :param y1: start y-coordinate
         :param x2: end x-coordinate
         :param y2: end y-coordinate
         """
-        p = self._path
-        self.beginpath()
+        self.beginpath(**kwargs)
         self.moveto(x1, y1)
         self.lineto(x2, y2)
-        self.endpath(draw=draw)
-        self._path = p
-        return p
+        return self.endpath(draw=draw)
 
-    def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True):
+    def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
         """Draw a arc with center (x,y) between two angles in degrees.
         :param x1: start x-coordinate
         :param y1: start y-coordinate
@@ -217,8 +214,7 @@ class NodeBot(Bot):
         :param angle1: start angle
         :param angle2: end angle
         """
-        p = self._path
-        self.beginpath()
+        self.beginpath(**kwargs)
         if type == self.PIE:
             # find the coordinates of the start and end points
             x1 = x + radius * cos(deg2rad(angle1))
@@ -229,9 +225,7 @@ class NodeBot(Bot):
             self.lineto(x, y)
             self.lineto(x1, y1)
         self.arcto(x, y, radius, angle1, angle2)
-        self.endpath(draw=draw)
-        self._path = p
-        return p
+        return self.endpath(draw=draw)
 
     def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
         """Draw an arrow.
@@ -247,38 +241,36 @@ class NodeBot(Bot):
         :return: Path object representing the arrow.
         """
         # Taken from Nodebox
-        path = self.BezierPath(**kwargs)
+        self.beginpath(**kwargs)
         if type == self.NORMAL:
             head = width * 0.4
             tail = width * 0.2
-            path.moveto(x, y)
-            path.lineto(x - head, y + head)
-            path.lineto(x - head, y + tail)
-            path.lineto(x - width, y + tail)
-            path.lineto(x - width, y - tail)
-            path.lineto(x - head, y - tail)
-            path.lineto(x - head, y - head)
-            path.lineto(x, y)
+            self.moveto(x, y)
+            self.lineto(x - head, y + head)
+            self.lineto(x - head, y + tail)
+            self.lineto(x - width, y + tail)
+            self.lineto(x - width, y - tail)
+            self.lineto(x - head, y - tail)
+            self.lineto(x - head, y - head)
+            self.lineto(x, y)
         elif type == self.FORTYFIVE:
             head = 0.3
             tail = 1 + head
-            path.moveto(x, y)
-            path.lineto(x, y + width * (1 - head))
-            path.lineto(x - width * head, y + width)
-            path.lineto(x - width * head, y + width * tail * 0.4)
-            path.lineto(x - width * tail * 0.6, y + width)
-            path.lineto(x - width, y + width * tail * 0.6)
-            path.lineto(x - width * tail * 0.4, y + width * head)
-            path.lineto(x - width, y + width * head)
-            path.lineto(x - width * (1 - head), y)
-            path.lineto(x, y)
+            self.moveto(x, y)
+            self.lineto(x, y + width * (1 - head))
+            self.lineto(x - width * head, y + width)
+            self.lineto(x - width * head, y + width * tail * 0.4)
+            self.lineto(x - width * tail * 0.6, y + width)
+            self.lineto(x - width, y + width * tail * 0.6)
+            self.lineto(x - width * tail * 0.4, y + width * head)
+            self.lineto(x - width, y + width * head)
+            self.lineto(x - width * (1 - head), y)
+            self.lineto(x, y)
         else:
             raise NameError(
                 _("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
             )
-        if draw:
-            path.draw()
-        return path
+        return self.endpath(draw=draw)
 
     def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
         """Draws a star."""
