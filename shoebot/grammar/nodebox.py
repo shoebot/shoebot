@@ -215,6 +215,8 @@ class NodeBot(Bot):
         :param angle2: end angle
         """
         self.beginpath(**kwargs)
+        # FIXME: hack to ensure the path is not empty
+        self.moveto(0, 0)
         if type == self.PIE:
             # find the coordinates of the start and end points
             x1 = x + radius * cos(deg2rad(angle1))
