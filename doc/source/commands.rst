@@ -363,6 +363,16 @@ Images
     :type data: binary data
     :type draw: bool
 
+    .. shoebot::
+        :alt: Image example
+        :filename: image__image.png
+
+        image("source/images/sign.jpg", 0, 0, 100, 100)
+
+.. py:function:: imagesize(path)
+
+    Get the dimensions of an image file as a (width, height) tuple.
+
 
 Clipping paths
 --------------
