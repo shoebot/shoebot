@@ -107,7 +107,7 @@ Drawing shapes
         :filename: drawing_shapes__line.png
 
         stroke(0.5)
-        strokewidth(3)
+        strokewidth(15)
         line(20, 20, 80, 80)
         line(20, 80, 80, 20)
         line(50, 20, 50, 80)
@@ -242,6 +242,7 @@ Bézier paths
     .. shoebot::
         :alt: Curve example
         :filename: path__curveto.png
+        :size: 150, 150
 
         x, y = 10, 62     # Start curve point
         x1, y1 = 50, 115  # Left control point
@@ -262,7 +263,7 @@ Bézier paths
 
         # To show where the control points are,
         # we draw helper lines
-        strokewidth(6)
+        strokewidth(2)
         stroke(1, 0.2, 0.2, 0.6)
         # The first control point starts at the
         # x, y position
@@ -385,7 +386,7 @@ Clipping paths
         p = ellipse(20, 20, 60, 60, draw=False)
         beginclip(p)
         stroke(0.5)
-        strokewidth(3)
+        strokewidth(15)
         line(20, 20, 80, 80)
         line(20, 80, 80, 20)
         line(50, 20, 50, 80)
@@ -533,18 +534,20 @@ Transforms
     .. shoebot::
         :alt: Text with push and pop
         :filename: transforms__push_pop.png
+        :size: 200, 200
 
         fill(0.2)
         fontsize(14)
-        rotate(90)
-        text("one", 40, 80)
+        transform(CENTER)
+        rotate(45)
+        text("one", 40, 40)
 
         push()
-        rotate(-90)
-        text("two", 40, 40)
+        rotate(-45)
+        text("two", 40, 80)
         pop()
 
-        text("three", 50, 80)
+        text("three", 40, 120)
 
 
 .. py:function:: pop()
@@ -835,9 +838,9 @@ Utility functions
         :alt: Grid example
         :filename: util__grid.png
 
-        fill(0.2)
+        translate(10, 10)
         for x, y in grid(7, 5, 12, 12):
-            rect(10+x, 10+y, 10, 10)
+            rect(x, y, 10, 10)
 
 .. py:function:: fontnames()
 
