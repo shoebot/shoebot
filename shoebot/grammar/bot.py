@@ -157,7 +157,7 @@ class Bot(Grammar):
 
     def _set_initial_defaults(self):
         """Set the default values. Called at __init__ and at the end of run(),
-        do that new draw loop iterations don't take up values left over by the
+        so that new draw loop iterations don't take up values left over by the
         previous one."""
         DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
@@ -168,14 +168,19 @@ class Bot(Grammar):
         self._transformmode = Bot.CENTER
 
         self._canvas.settings(
-            fontfile="assets/notcouriersans.ttf",
-            fontsize=16,
-            align=Bot.LEFT,
-            lineheight=1,
             fillcolor=self.color(0.2),
             strokecolor=None,
             strokewidth=1.0,
             background=self.color(1, 1, 1),
+            fontfile="Sans",
+            fontsize=16,
+            align=Bot.LEFT,
+            lineheight=1,
+            tracking=0,
+            underline=None,
+            overline=None,
+            underlinecolor=None,
+            overlinecolor=None,
         )
 
     def _set_dynamic_vars(self):
