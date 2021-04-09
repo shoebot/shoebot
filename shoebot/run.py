@@ -169,7 +169,7 @@ def main():
         "--grammar",
         dest="grammar",
         default=NODEBOX,
-        help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
+        help=_("Select the bot grammar (only 'nodebox' is supported for now)"),
     )
 
     group = parser.add_argument_group("Window Management")

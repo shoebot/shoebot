@@ -181,9 +181,8 @@ def create_bot(
     )
 
     if grammar == DRAWBOT:
-        from shoebot.grammar import DrawBot
-
-        bot = DrawBot(canvas, namespace=namespace, vars=vars)
+        error("Drawbot not supported yet")
+        return None
     else:
         from shoebot.grammar import NodeBot
 
@@ -289,7 +288,7 @@ def run(
 
     See create_bot for details on create_args
 
-    run_args are passed to bot.run - see Nodebot.run or Drawbot.run
+    run_args are passed to bot.run - see Nodebot.run
 
 
 
