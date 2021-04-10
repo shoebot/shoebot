@@ -677,6 +677,15 @@ class NodeBot(Bot):
         """
         self._canvas.background = self.color(*args)
 
+    def blendmode(self, mode=None):
+        """
+        Set the current blend mode.
+
+        :param mode: mode name (e.g. "multiply")"""
+        if mode:
+            self._canvas.blendmode = mode
+        return self._canvas.blendmode
+
     # Text
 
     def font(self, fontpath=None, fontsize=None, vars=None, *args, **kwargs):

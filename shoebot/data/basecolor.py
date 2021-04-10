@@ -317,6 +317,7 @@ class ColorMixin(object):
         strokewidth=None,
         strokecap=None,
         strokejoin=None,
+        blendmode=None,
         **kwargs
     ):
         self._set_fill(fill)
@@ -325,6 +326,7 @@ class ColorMixin(object):
         self.fillrule = fillrule
         self.strokecap = strokecap
         self.strokejoin = strokejoin
+        self.blendmode = blendmode
 
     def _get_fill(self):
         return self._fillcolor

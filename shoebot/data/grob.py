@@ -14,6 +14,7 @@ STATES = {
     "strokewidth": "_strokewidth",
     "strokecap": "_strokecap",
     "strokejoin": "_strokejoin",
+    "blendmode": "_blendmode",
     "align": "_align",
     "fontsize": "_fontsize",
     "lineheight": "_lineheight",
