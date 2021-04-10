@@ -244,7 +244,7 @@ class Color(object):
 
     def __getattr__(self, a):
 
-        """ Available properties:
+        """Available properties:
         r, g, b, a or red, green, blue, alpha
         c, m, y, k or cyan, magenta, yellow, black,
         h, s or hue, saturation, brightness
@@ -450,8 +450,7 @@ def parse_color(v, color_range=1):
 
 
 def hex_to_rgb(hex):
-    """ Returns RGB values for a hex color string.
-    """
+    """Returns RGB values for a hex color string."""
     hex = hex.lstrip("#")
     if len(hex) < 6:
         hex += hex[-1] * (6 - len(hex))
@@ -469,7 +468,7 @@ hex2rgb = hex_to_rgb
 
 
 def lab_to_rgb(l, a, b):
-    """ Converts CIE Lab to RGB components.
+    """Converts CIE Lab to RGB components.
 
     First we have to convert to XYZ color space.
     Conversion involves using a white point,
@@ -513,7 +512,7 @@ lab2rgb = lab_to_rgb
 
 
 def cmyk_to_rgb(c, m, y, k):
-    """ Cyan, magenta, yellow, black to red, green, blue.
+    """Cyan, magenta, yellow, black to red, green, blue.
     ReportLab, http://www.koders.com/python/fid5C006F554616848C01AC7CB96C21426B69D2E5A9.aspx
     Results will differ from the way NSColor converts color spaces.
     """
@@ -545,7 +544,7 @@ rgb2cmyk = rgb_to_cmyk
 
 
 def hsv_to_rgb(h, s, v):
-    """ Hue, saturation, brightness to red, green, blue.
+    """Hue, saturation, brightness to red, green, blue.
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """
