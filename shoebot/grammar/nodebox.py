@@ -91,7 +91,6 @@ class NodeBot(Bot):
         """
         Bot.__init__(self, canvas, namespace=namespace, vars=vars)
         canvas.mode = CORNER
-        self._ns = self._namespace
 
     # Drawing
 
