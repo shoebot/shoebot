@@ -46,6 +46,8 @@ ROUND = "round"
 SQUARE = "square"
 BEVEL = "bevel"
 MITER = "miter"
+WINDING = "winding"
+EVENODD = "evenodd"
 
 OVER = "over"
 MULTIPLY = "multiply"
