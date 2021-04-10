@@ -171,6 +171,8 @@ class Bot(Grammar):
             fillcolor=self.color(0.2),
             strokecolor=None,
             strokewidth=1.0,
+            strokecap=None,
+            strokejoin=None,
             background=self.color(1, 1, 1),
             fontfile="Sans",
             fontsize=16,
@@ -253,6 +255,8 @@ class Bot(Grammar):
         kwargs["stroke"] = stroke
 
         kwargs["strokewidth"] = kwargs.get("strokewidth", self._canvas.strokewidth)
+        kwargs["strokecap"] = kwargs.get("strokecap", self._canvas.strokecap)
+        kwargs["strokejoin"] = kwargs.get("strokejoin", self._canvas.strokejoin)
         inst = clazz(self, *args, **kwargs)
         return inst
 

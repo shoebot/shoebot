@@ -26,6 +26,11 @@ from shoebot.data import (
     CLOSE,
     LEFT,
     RIGHT,
+    BUTT,
+    ROUND,
+    SQUARE,
+    BEVEL,
+    MITER,
 )
 
 from math import sin, cos, pi
@@ -632,6 +637,28 @@ class NodeBot(Bot):
             self._canvas.strokewidth = w
         else:
             return self._canvas.strokewidth
+
+    def strokecap(self, c=None):
+        """Set the stroke cap.
+
+        :param w: Stroke cap.
+        :return: If no cap was specified then current cap is returned.
+        """
+        if c is not None:
+            self._canvas.strokecap = c
+        else:
+            return self._canvas.strokecap
+
+    def strokejoin(self, j=None):
+        """Set the stroke join.
+
+        :param w: Stroke join.
+        :return: If no join was specified then current join is returned.
+        """
+        if j is not None:
+            self._canvas.strokejoin = j
+        else:
+            return self._canvas.strokejoin
 
     def background(self, *args):
         """Set the background color.

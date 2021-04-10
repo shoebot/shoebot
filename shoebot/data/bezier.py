@@ -42,6 +42,23 @@ ARC = "arc"
 ELLIPSE = "ellipse"
 CLOSE = "close"
 
+BUTT = "butt"
+ROUND = "round"
+SQUARE = "square"
+BEVEL = "bevel"
+MITER = "miter"
+
+STROKE_CAPS = {
+    BUTT: cairo.LINE_CAP_BUTT,
+    ROUND: cairo.LINE_CAP_ROUND,
+    SQUARE: cairo.LINE_CAP_SQUARE,
+}
+STROKE_JOINS = {
+    BEVEL: cairo.LINE_JOIN_BEVEL,
+    ROUND: cairo.LINE_JOIN_ROUND,
+    MITER: cairo.LINE_JOIN_MITER,
+}
+
 
 class BezierPath(Grob, ColorMixin):
     """
@@ -57,6 +74,14 @@ class BezierPath(Grob, ColorMixin):
     """
 
     _state_attributes = {"fillcolor", "strokecolor", "strokewidth", "transform"}
+    _state_attributes = {
+        "fillcolor",
+        "strokecolor",
+        "strokewidth",
+        "strokecap",
+        "strokejoin",
+        "transform",
+    }
 
     def __init__(
         self,
@@ -65,6 +90,8 @@ class BezierPath(Grob, ColorMixin):
         fill=None,
         stroke=None,
         strokewidth=0,
+        strokecap=None,
+        strokejoin=None,
         packed_elements=None,
     ):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
@@ -75,6 +102,14 @@ class BezierPath(Grob, ColorMixin):
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
         ColorMixin.__init__(self, fill=fill, stroke=stroke, strokewidth=strokewidth)
+        ColorMixin.__init__(
+            self,
+            fill=fill,
+            stroke=stroke,
+            strokewidth=strokewidth,
+            strokecap=strokecap,
+            strokejoin=strokejoin,
+        )
 
         if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
@@ -132,11 +167,13 @@ class BezierPath(Grob, ColorMixin):
 
     def copy(self):
         path = BezierPath(
-            self._bot,
-            None,
-            self._fillcolor,
-            self._strokecolor,
-            self._strokewidth,
+            bot=self._bot,
+            path=None,
+            fill=self._fillcolor,
+            stroke=self._strokecolor,
+            strokewidth=self._strokewidth,
+            strokecap=self._strokecap,
+            strokejoin=self._strokejoin,
             packed_elements=(self._elements[:], self._render_funcs[:]),
         )
         path.closed = self.closed
@@ -299,6 +336,8 @@ class BezierPath(Grob, ColorMixin):
         fillcolor = self.fill
         strokecolor = self.stroke
         strokewidth = self.strokewidth
+        strokecap = self.strokecap
+        strokejoin = self.strokejoin
 
         def _render(cairo_ctx):
             """
@@ -329,6 +368,12 @@ class BezierPath(Grob, ColorMixin):
             if strokecolor:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
+                if strokecap:
+                    # this is needed because strokecap and strokejoin have a ROUND
+                    # option which is a different value for each
+                    cairo_ctx.set_line_cap(STROKE_CAPS[strokecap])
+                if strokejoin:
+                    cairo_ctx.set_line_join(STROKE_JOINS[strokejoin])
                 cairo_ctx.stroke()
 
         return _render
@@ -661,7 +706,13 @@ class BezierPath(Grob, ColorMixin):
 
 class ClippingPath(BezierPath):
 
-    _state_attributes = {"fillcolor", "strokecolor", "strokewidth"}
+    _state_attributes = {
+        "fillcolor",
+        "strokecolor",
+        "strokewidth",
+        "strokecap",
+        "strokejoin",
+    }
 
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, **kwargs)

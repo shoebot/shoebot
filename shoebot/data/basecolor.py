@@ -310,9 +310,19 @@ class ColorMixin(object):
     """
 
     def __init__(self, fill=None, stroke=None, strokewidth=None, **kwargs):
+    def __init__(
+        fill=None,
+        stroke=None,
+        strokewidth=None,
+        strokecap=None,
+        strokejoin=None,
+        **kwargs
+    ):
         self._set_fill(fill)
         self._set_stroke(stroke)
         self._set_strokewidth(strokewidth)
+        self.strokecap = strokecap
+        self.strokejoin = strokejoin
 
     def _get_fill(self):
         return self._fillcolor

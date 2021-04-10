@@ -7,13 +7,15 @@ CENTER = "center"
 CORNER = "corner"
 
 STATES = {
-    "strokewidth": "_strokewidth",
-    "align": "_align",
     "transform": "_transform",
+    "fillcolor": "_fillcolor",
     "strokecolor": "_strokecolor",
+    "strokewidth": "_strokewidth",
+    "strokecap": "_strokecap",
+    "strokejoin": "_strokejoin",
+    "align": "_align",
     "fontsize": "_fontsize",
     "lineheight": "_lineheight",
-    "fillcolor": "_fillcolor",
 }
 
 

@@ -73,6 +73,7 @@ def _copy_attrs(source, target, attrs):
 
 
 from . import geometry as geo
+from shoebot.core.backend import cairo
 from .point import Point
 from .basecolor import Color, ColorMixin
 from .grob import Grob
@@ -107,3 +108,9 @@ RIGHT = "right"
 RGB = "rgb"
 HSB = "hsb"
 CMYK = "cmyk"
+
+BUTT = "butt"
+ROUND = "round"
+SQUARE = "square"
+BEVEL = "bevel"
+MITER = "miter"
