@@ -209,7 +209,7 @@ class NodeBot(Bot):
         self.beginpath(**kwargs)
         self.moveto(x1, y1)
         self.lineto(x2, y2)
-        return self.endpath(draw=draw)
+        return self.endpath(draw=draw, closed=False)
 
     def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
         """Draw a arc with center (x,y) between two angles in degrees.
@@ -339,11 +339,11 @@ class NodeBot(Bot):
             self._path.closepath()
             self._path.closed = True
 
-    def endpath(self, draw=True):
+    def endpath(self, draw=True, closed=None):
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         p = self._path
-        if self._autoclosepath is True:
+        if self._autoclosepath is True and closed is not False:
             self._path.closepath()
         if draw:
             p.draw()
