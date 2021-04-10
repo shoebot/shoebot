@@ -309,9 +309,10 @@ class ColorMixin(object):
     them to be specfied in other ways, such as   fill="#123456"
     """
 
-    def __init__(self, fill=None, stroke=None, strokewidth=None, **kwargs):
     def __init__(
+        self,
         fill=None,
+        fillrule=None,
         stroke=None,
         strokewidth=None,
         strokecap=None,
@@ -321,6 +322,7 @@ class ColorMixin(object):
         self._set_fill(fill)
         self._set_stroke(stroke)
         self._set_strokewidth(strokewidth)
+        self.fillrule = fillrule
         self.strokecap = strokecap
         self.strokejoin = strokejoin
 

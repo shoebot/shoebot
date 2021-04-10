@@ -9,6 +9,7 @@ CORNER = "corner"
 STATES = {
     "transform": "_transform",
     "fillcolor": "_fillcolor",
+    "fillrule": "_fillrule",
     "strokecolor": "_strokecolor",
     "strokewidth": "_strokewidth",
     "strokecap": "_strokecap",

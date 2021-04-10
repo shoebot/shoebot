@@ -169,6 +169,7 @@ class Bot(Grammar):
 
         self._canvas.settings(
             fillcolor=self.color(0.2),
+            fillrule=None,
             strokecolor=None,
             strokewidth=1.0,
             strokecap=None,
@@ -254,6 +255,7 @@ class Bot(Grammar):
             stroke = Color(stroke, mode="rgb", color_range=1)
         kwargs["stroke"] = stroke
 
+        kwargs["fillrule"] = kwargs.get("fillrule", self._canvas.fillrule)
         kwargs["strokewidth"] = kwargs.get("strokewidth", self._canvas.strokewidth)
         kwargs["strokecap"] = kwargs.get("strokecap", self._canvas.strokecap)
         kwargs["strokejoin"] = kwargs.get("strokejoin", self._canvas.strokejoin)

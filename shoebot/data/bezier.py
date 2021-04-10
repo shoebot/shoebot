@@ -31,7 +31,6 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
 LINETO = "lineto"
@@ -73,9 +72,9 @@ class BezierPath(Grob, ColorMixin):
     for getting path dimensions)
     """
 
-    _state_attributes = {"fillcolor", "strokecolor", "strokewidth", "transform"}
     _state_attributes = {
         "fillcolor",
+        "fillrule",
         "strokecolor",
         "strokewidth",
         "strokecap",
@@ -88,6 +87,7 @@ class BezierPath(Grob, ColorMixin):
         bot,
         path=None,
         fill=None,
+        fillrule=None,
         stroke=None,
         strokewidth=0,
         strokecap=None,
@@ -101,10 +101,10 @@ class BezierPath(Grob, ColorMixin):
         #
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
-        ColorMixin.__init__(self, fill=fill, stroke=stroke, strokewidth=strokewidth)
         ColorMixin.__init__(
             self,
             fill=fill,
+            fillrule=fillrule,
             stroke=stroke,
             strokewidth=strokewidth,
             strokecap=strokecap,
@@ -170,6 +170,7 @@ class BezierPath(Grob, ColorMixin):
             bot=self._bot,
             path=None,
             fill=self._fillcolor,
+            fillrule=self._fillrule,
             stroke=self._strokecolor,
             strokewidth=self._strokewidth,
             strokecap=self._strokecap,
@@ -334,6 +335,7 @@ class BezierPath(Grob, ColorMixin):
     def _render_closure(self):
         """Use a closure so that draw attributes can be saved"""
         fillcolor = self.fill
+        fillrule = self.fillrule
         strokecolor = self.stroke
         strokewidth = self.strokewidth
         strokecap = self.strokecap
@@ -361,6 +363,8 @@ class BezierPath(Grob, ColorMixin):
 
             if fillcolor:
                 cairo_ctx.set_source_rgba(*fillcolor)
+                if fillrule:
+                    cairo_ctx.set_fill_rule(fillrule)
                 if not strokecolor:
                     cairo_ctx.fill()
                 else:
@@ -708,6 +712,7 @@ class ClippingPath(BezierPath):
 
     _state_attributes = {
         "fillcolor",
+        "fillrule",
         "strokecolor",
         "strokewidth",
         "strokecap",

@@ -609,6 +609,17 @@ class NodeBot(Bot):
         """ Stop applying fills to new paths."""
         self._canvas.fillcolor = None
 
+    def fillrule(self, c=None):
+        """Set the fill rule to use in new paths.
+
+        :param w: Fill rule
+        :return: If no fillrule was specified then current fillrule is returned.
+        """
+        if w is not None:
+            self._canvas.fillrule = w
+        else:
+            return self._canvas.fillrule
+
     def stroke(self, *args):
         """Set a stroke color, applying it to new paths.
 
