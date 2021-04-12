@@ -733,12 +733,21 @@ class NodeBot(Bot):
         """
 
         :return: the width and height of a string of text as a tuple
-        according to current font settings.
+        according to current font settings (text box size)
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
         txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.metrics
+
+    def textbounds(self, txt, width=None, height=None, **kwargs):
+        """
+
+        :return: the width and height of a string of text as a tuple
+        according to current font settings (inked part)
+        """
+        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
+        return txt.bounds
 
     def textwidth(self, txt, width=None):
         """
