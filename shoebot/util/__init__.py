@@ -30,9 +30,9 @@
 """Assorted utility functions, mainly for color and font handling"""
 
 
-class flushfile(object):
+class UnbufferedFile:
     """
-    Wrapper for file that flushes - used to flush stdout
+    File wrapper, that flushes on writes.
 
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
     """
@@ -41,17 +41,15 @@ class flushfile(object):
         self.fd = fd
 
     def write(self, x):
-        ret = self.fd.write(x)
+        self.fd.write(x)
         self.fd.flush()
-        return ret
 
     def writelines(self, lines):
-        ret = self.writelines(line)
+        self.fd.writelines(lines)
         self.fd.flush()
-        return ret
 
     def flush(self):
-        return self.fd.flush
+        return self.fd.flush()
 
     def close(self):
         return self.fd.close()
