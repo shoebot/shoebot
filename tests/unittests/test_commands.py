@@ -113,6 +113,23 @@ class TestImage(ShoebotTestCase):
         flush_outputfile()
         self.assertReferenceImage(outputfile, expected_output)
 
+    @parameterized.expand([(200, 10, None, 50, 200, 50), (200, 10, 30, None, 30, 10)])
+    @test_as_bot()
+    def test_default_coordinates(
+        self, image_x, image_y, draw_x, draw_y, expected_x, expected_y
+    ):
+        """
+        Verify that when None is passed as x or y to drawimage, the images x or y coordinates are used as
+        defaults.
+        """
+        im = image(
+            f"{TEST_INPUT_DIR}/shoebot-logo.png", image_x, image_y
+        )
+
+        actual_image = drawimage(im, draw_x, draw_y)
+
+        self.assertEqual((actual_image.x, actual_image.y), (expected_x, expected_y))
+
 
 class TestText(ShoebotTestCase):
     @test_as_bot()
