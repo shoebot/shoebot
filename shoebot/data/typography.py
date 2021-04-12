@@ -31,7 +31,7 @@ import sys
 from enum import Enum
 from operator import attrgetter
 
-from shoebot import ShoebotInstallError
+from shoebot.util import ShoebotInstallError
 from shoebot.core.backend import cairo, gi, driver
 
 try:

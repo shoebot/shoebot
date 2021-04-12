@@ -30,6 +30,10 @@
 """Assorted utility functions, mainly for color and font handling"""
 
 
+class ShoebotInstallError(Exception):
+    pass
+
+
 class UnbufferedFile:
     """
     File wrapper, that flushes on writes.
