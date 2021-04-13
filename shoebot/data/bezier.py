@@ -10,6 +10,7 @@ import gettext
 
 from itertools import chain
 from math import pi as _pi, sqrt
+from math import sin, cos
 
 from shoebot.core.backend import cairo
 
@@ -57,7 +58,6 @@ class BezierPath(Grob, ColorMixin):
         fill=None,
         stroke=None,
         strokewidth=0,
-        pathmode=CORNER,
         packed_elements=None,
     ):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
@@ -75,7 +75,6 @@ class BezierPath(Grob, ColorMixin):
             self._elements = []
             self._render_funcs = []
 
-        self._pathmode = pathmode
         self.closed = False
 
         self._drawn = False
@@ -131,7 +130,6 @@ class BezierPath(Grob, ColorMixin):
             self._fillcolor,
             self._strokecolor,
             self._strokewidth,
-            self._pathmode,
             packed_elements=(self._elements[:], self._render_funcs[:]),
         )
         path.closed = self.closed
@@ -357,6 +355,9 @@ class BezierPath(Grob, ColorMixin):
             elif el.cmd == CURVETO:
                 empty = False
                 current_contour.curveto(el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
+            elif el.cmd == ARC:
+                empty = False
+                current_contour.arc(el.x, el.y, el.radius, el.angle1, el.angle2)
             elif el.cmd == CLOSE:
                 current_contour.closepath()
         if not empty:
@@ -423,6 +424,9 @@ class BezierPath(Grob, ColorMixin):
             x1, y1 = p1.x, p1.y
             x, y = self._linepoint(t, x0, y0, x1, y1)
             return PathElement(LINETO, x, y)
+        elif p1.cmd == ARC:
+            x, y = self._arcpoint(t, p1.x, p1.y, p1.radius, p1.angle1, p1.angle2)
+            return PathElement(ARC, p1.x, p1.y, p1.radius, p1.angle1, p1.angle2)
         elif p1.cmd == CURVETO:
             # Note: the handles need to be interpreted differenty than in a BezierPath.
             # In a BezierPath, ctrl1 is how the curve started, and ctrl2 how it arrives in this point.
@@ -544,6 +548,20 @@ class BezierPath(Grob, ColorMixin):
             yi = pt_y
         return length
 
+    def _arcpoint(self, t, x, y, radius, angle1, angle2):
+        """Returns coordinates for point at t on the arc.
+        Calculates the coordinates of x and y for a point at t on an arc.
+        The t parameter is a number between 0.0 and 1.0,
+        """
+        t_angle = abs(angle2 - angle1)
+        out_x = x + radius * cos(t_angle)
+        out_y = y + radius * sin(t_angle)
+        return (out_x, out_y)
+
+    def _arclength(self, x, y, radius, angle1, angle2):
+        """Returns the length of the arc."""
+        return radius * abs(angle2 - angle1)
+
     def _segment_lengths(self, relative=False, n=20):
         """Returns a list with the lengths of each segment in the path."""
         # From nodebox_gl
@@ -560,6 +578,10 @@ class BezierPath(Grob, ColorMixin):
                 lengths.append(self._linelength(x0, y0, close_x, close_y))
             elif el.cmd == LINETO:
                 lengths.append(self._linelength(x0, y0, el.x, el.y))
+            elif el.cmd == ARC:
+                lengths.append(
+                    self._arclength(el.x, el.y, el.radius, el.angle1, el.angle2)
+                )
             elif el.cmd == CURVETO:
                 x3, y3, x1, y1, x2, y2 = el.x, el.y, el.c1x, el.c1y, el.c2x, el.c2y
                 # (el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
