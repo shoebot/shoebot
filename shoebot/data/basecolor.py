@@ -1,7 +1,12 @@
+import gettext
+import locale
 import string
+import sys
 from math import floor
 
-import sys, locale, gettext
+RGB = "rgb"
+HSB = "hsb"
+CMYK = "cmyk"
 
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
