@@ -34,6 +34,7 @@ import sys
 import threading
 
 from shoebot.core.backend import cairo
+from shoebot.grammar import NodeBot
 
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
@@ -49,7 +50,6 @@ CORNER = "corner"
 CORNERS = "corners"
 
 NODEBOX = "nodebox"
-DRAWBOT = "drawbot"
 
 
 def _save():
@@ -180,13 +180,7 @@ def create_bot(
         show_vars=show_vars,
     )
 
-    if grammar == DRAWBOT:
-        error("Drawbot not supported yet")
-        return None
-    else:
-        from shoebot.grammar import NodeBot
-
-        bot = NodeBot(canvas, namespace=namespace, vars=vars)
+    bot = NodeBot(canvas, namespace=namespace, vars=vars)
 
     if server:
         from shoebot.sbio import SocketServer
