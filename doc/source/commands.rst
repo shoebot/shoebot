@@ -611,7 +611,7 @@ Colors
 
   :param mode: Color mode to use
   :type mode: RGB or HSB
-  :param crange: Maximum value for the new color range to use. See `colorrange`_.
+  :param crange: Maximum value for the new color range to use
   :return: Current color mode (if called without arguments)
 
 
