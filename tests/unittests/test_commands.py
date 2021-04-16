@@ -138,6 +138,43 @@ class TestText(ShoebotTestCase):
     @parameterized.expand(
         [
             (
+                "DejaVu Sans Book",
+                (1, 87.0, 87, 14),
+            ),
+            (
+                "Liberation Sans Regular",
+                (1, 88.0, 79, 13),
+            ),
+            (
+                "Bitstream Vera Sans Roman",
+                (1, 87.0, 87, 14),
+            ),
+        ]
+    )
+    @test_as_bot()
+    def test_text_bounds_property(self, fontname, expected_bounds):
+        """
+        Check text.bounds() against expected values
+        """
+        test_fonts = [
+            "DejaVu Sans Book",
+            "Liberation Sans Regular",
+            "Bitstream Vera Sans Roman",
+        ]
+
+        available_fonts = [f for f in fontnames() if f in test_fonts]
+        if not available_fonts:
+            self.skip("None of the test fonts is available in this system")
+
+        if not fontname in fontnames():
+            return
+        font(fontname)
+        t = text("Hello world", 0, 100, draw=False)
+        assert t.bounds == expected_bounds
+
+    @parameterized.expand(
+        [
+            (
                 ("Letter spaced", 4, 5),
                 {"tracking": 7},
                 '<span letter_spacing="7168">Letter spaced</span>',

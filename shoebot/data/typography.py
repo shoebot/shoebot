@@ -278,6 +278,16 @@ class Text(Grob, ColorMixin):
         w, h = self._pango_layout.get_pixel_size()
         return w, h
 
+    @property
+    def bounds(self):
+        boundsrect, totalrect = self._pango_layout.get_pixel_extents()
+        return (
+            boundsrect.x + self.x,
+            boundsrect.y + self.y - self.baseline,
+            boundsrect.width,
+            boundsrect.height,
+        )
+
     # this function is quite computational expensive
     # there should be a way to make it faster, by not creating a new context each time it's called
 
