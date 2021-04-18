@@ -89,6 +89,7 @@ Documentation Index
    libraries
    extensions
    troubleshooting
+   apidoc
    compatibility
    contributing
 
