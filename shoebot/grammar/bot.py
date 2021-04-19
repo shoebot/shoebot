@@ -350,12 +350,13 @@ class Bot(Grammar):
 
     def files(self, path="*"):
         """Returns a list of files.
-        You can use wildcards to specify which files to pick, e.g.
-            f = files('*.gif')
 
-        :param path: wildcard to use in file list.
+        Use wildcards to specify which files to pick, e.g. ``f =
+        files('*.gif')``.
+
+        :param path: wildcard to use in file list
+        :return: list of file names
         """
-        # Taken ipsis verbis from Nodebox
         return glob(path)
 
     def snapshot(self, target=None, defer=None, autonumber=False):
