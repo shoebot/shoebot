@@ -14,17 +14,9 @@ Shoebot default is 300x300px.
 Drawing shapes
 --------------
 
-.. py:function:: rect(x, y, width, height, roundness=0, draw=True, fill=None)
+.. py:function:: rect(x, y, width, height, roundness=0, draw=True)
 
     Draw a rectangle.
-
-    :param x: top left x-coordinate
-    :param y: top left y-coordinate
-    :param width: rectangle width
-    :param height: rectangle height
-    :param roundness: rounded corner radius
-    :param boolean draw: whether to draw the shape on the canvas or not
-    :param fill: fill color
 
     .. shoebot::
         :alt: four rectangles.  The last three have increasingly round corners.
@@ -37,110 +29,34 @@ Drawing shapes
         rect(10, 55, 35, 35, 0.7)
         rect(55, 55, 35, 35, 1)
 
-.. py:function:: ellipse(x, y, width, height, draw=True)
-
-    Draw an ellipse. Same as ``oval()``.
-
-    :param x: top left x-coordinate
-    :param y: top left y-coordinate
-    :param width: ellipse width
-    :param height: ellipse height
-    :param boolean draw: whether to draw the shape on the canvas or not
-
-    .. shoebot::
-        :alt: Two ellipses.
-        :filename: drawing_shapes__ellipse.png
-
-        ellipse(10, 20, 30, 60)
-        ellipse(50, 30, 40, 40) # circle
-
-.. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
-
-    Draw an arrow.
-
-    :param x: arrow tip x-coordinate
-    :param y: arrow tip y-coordinate
-    :param width: arrow width (also sets height)
-    :param type: arrow type
-    :type type: NORMAL or FORTYFIVE
-    :param boolean draw: whether to draw the shape on the canvas or not
-
-    .. shoebot::
-        :alt: An arrow pointing right, and another pointing to the bottom right.
-        :filename: drawing_shapes__arrows.png
-
-        arrow(50, 40, 40) # NORMAL is the default arrow type
-        arrow(90, 40, 40, FORTYFIVE)
-
-.. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
-
-    Draw a star-like polygon.
-
-    :param startx: center x-coordinate
-    :param starty: center y-coordinate
-    :param points: amount of points
-    :param outer: outer radius
-    :param inner: inner radius
-    :param boolean draw: whether to draw the shape on the canvas or not
-
-    .. shoebot::
-        :alt: 4 stars.
-        :filename: drawing_shapes__stars.png
-
-        star(25, 25, 5, 20, 10)  # top left
-        star(75, 25, 10, 20, 3)  # top right
-        star(25, 75, 20, 20, 17) # bottom left
-        star(75, 75, 40, 20, 19) # bottom right
-
-.. py:function:: line(x1, y1, x2, y2, draw=True)
-
-    Draw a line from (x1,y1) to (x2,y2).
-
-    :param x1: x-coordinate of the first point
-    :param y1: y-coordinate of the first point
-    :param x2: x-coordinate of the second point
-    :param y2: y-coordinate of the second point
-    :param boolean draw: whether to draw the shape on the canvas or not
-
-    .. shoebot::
-        :alt: 3 crossing lines.
-        :filename: drawing_shapes__line.png
-
-        stroke(0.5)
-        strokewidth(15)
-        line(20, 20, 80, 80)
-        line(20, 80, 80, 20)
-        line(50, 20, 50, 80)
 
 .. py:function:: rectmode(mode=None)
 
     Change the way rectangles are specified. Each mode alters the parameters
     necessary to draw a rectangle using the :py:func:`rect` function.
 
-    * use the CORNER mode (default) when you want to specify an origin point and dimensions (width and height)
-    * use the CENTER mode when you want to draw a shape centered on a point
-    * use the CORNERS mode when you want to specify an origin point and a destination point
+    There are 3 different modes available, each expecting different parameters:
 
-    :param mode: the mode to draw new rectangles in
-    :type mode: CORNER, CENTER or CORNERS
+    * CORNER mode (default) -- origin point and dimensions (width and height)
 
-    There are 3 different modes available:
+      * x-value of the top left corner
+      * y-value of the top left corner
+      * width
+      * height
 
-    * CORNER mode (default)
-        * x-value of the top left corner
-        * y-value of the top left corner
-        * width
-        * height
-    * CENTER mode
-        * x-coordinate of the rectangle's center point
-        * y-coordinate of the rectangle's center point
-        * width
-        * height
-    * CORNERS mode
-        * x-coordinate of the top left corner
-        * y-coordinate of the top left corner
-        * x-coordinate of the bottom right corner
-        * y-coordinate of the bottom right corner
+    * CENTER mode -- draw a shape centered on a point
+
+      * x-coordinate of the rectangle's center point
+      * y-coordinate of the rectangle's center point
+      * width
+      * height
+
+    * CORNERS mode -- origin point and destination point
+
+      * x-coordinate of the top left corner
+      * y-coordinate of the top left corner
+      * x-coordinate of the bottom right corner
+      * y-coordinate of the bottom right corner
 
     So while you always specify 4 parameters to the :py:func:`rect` function,
     you can use :py:func:`rectmode` to change the function's behaviour according
@@ -164,6 +80,19 @@ Drawing shapes
         rectmode(CORNERS)  # blue
         stroke(0.1, 0.1, 0.8)
         rect(25, 25, 40, 40)
+
+.. py:function:: ellipse(x, y, width, height, draw=True)
+
+    Draw an ellipse by specifying the coordinates of its top left origin point,
+    along with its width and height dimensions. See :py:func:`ellipsemode` for
+    other ways of drawing ellipses.
+
+    .. shoebot::
+        :alt: Two ellipses.
+        :filename: drawing_shapes__ellipse.png
+
+        ellipse(10, 20, 30, 60)
+        ellipse(50, 30, 40, 40) # circle
 
 .. py:function:: ellipsemode(mode=None)
 
@@ -191,53 +120,101 @@ Drawing shapes
         stroke(0.1, 0.1, 0.8)
         ellipse(25, 25, 40, 40)
 
+
+.. py:function:: line(x1, y1, x2, y2, draw=True)
+
+    Draw a line from (x1,y1) to (x2,y2).
+
+    .. shoebot::
+        :alt: 3 crossing lines.
+        :filename: drawing_shapes__line.png
+
+        stroke(0.5)
+        strokewidth(5)
+        line(20, 20, 80, 80)
+        line(20, 80, 80, 20)
+        line(50, 20, 50, 80)
+
+
+.. py:function:: arc(x, y, radius, angle1, angle2, draw=True)
+
+    Draws a circular arc with center at (x,y) between two angles.
+
+    .. shoebot::
+        :alt: 3 arcs
+        :filename: drawing_shapes__arc.png
+
+        nofill()
+        stroke(.2)
+        autoclosepath(False)
+        arc(50, 50, 40, 0, 180)
+        arc(50, 50, 30, -90, 0)
+        stroke('#ff6633')
+        arc(50, 50, 20, 0, 270, type=PIE)
+
+
+.. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
+
+    Draw an arrow with its tip at (x,y) and the specified width. Its type can be
+    NORMAL (default) or FORTYFIVE.
+
+    .. shoebot::
+        :alt: An arrow pointing right, and another pointing to the bottom right.
+        :filename: drawing_shapes__arrows.png
+
+        arrow(50, 40, 40)
+        arrow(90, 40, 40, FORTYFIVE)
+
+.. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
+
+    Draw a star-like polygon.
+
+    .. shoebot::
+        :alt: 4 stars.
+        :filename: drawing_shapes__stars.png
+
+        star(25, 25, 5, 20, 10)  # top left
+        star(75, 25, 10, 20, 3)  # top right
+        star(25, 75, 20, 20, 17) # bottom left
+        star(75, 75, 40, 20, 19) # bottom right
+
+
+
 Bézier paths
 ------------
 
 .. py:function:: beginpath(x=None, y=None)
 
-    Begin drawing a Bézier path.
-
-    After calling beginpath(), a series of other path commands usually follows,
-    such as moveto(), lineto(), or curveto(). Finally, the endpath() command
-    draws the path on the screen.
+    Start a new Bézier path. This command is needed before any other path
+    drawing commands such as :py:func:`moveto()`, :py:func:`lineto()`, or
+    :py:func:`curveto()`. Finally, the :py:func:`endpath()` command draws the
+    path on the screen.
 
     If x and y are not specified, this command should be followed by a
     :py:func:`moveto` call.
 
-    :param x: x-coordinate of the starting point
-    :param y: y-coordinate of the starting point
-    :type x: float or None
-    :type y: float or None
-
 .. py:function:: moveto(x, y)
 
-    Move the Bézier "pen" to the specified point without drawing. Can only be
-    called between beginpath() and endpath().
+    Move the Bézier "pen" to the specified point without drawing.
 
-    :param x: x-coordinate of the point to move to
-    :param y: y-coordinate of the point to move to
-    :type x: float
-    :type y: float
+    Can only be called between :py:func:`beginpath()` and :py:func:`endpath()`.
 
 .. py:function:: lineto(x, y)
 
-    Draw a line from the pen's current point. Can only be called between
-    beginpath() and endpath().
+    Draw a line from the pen's current point to the specified (x,y) coordinates.
 
-    :param x: x-coordinate of the point to draw to
-    :param y: y-coordinate of the point to draw to
-    :type x: float
-    :type y: float
+    Can only be called between :py:func:`beginpath()` and :py:func:`endpath()`.
 
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
     Draws a curve between the current point in the path and a new destination
-    point. Can only be called between beginpath() and endpath().
+    point.
 
     The last two parameters are the coordinates of the destination point. The
     first 4 parameters are the coordinates of the two control points, which
     define the edge and slant of the curve.
+
+    Can only be called between :py:func:`beginpath()` and :py:func:`endpath()`.
 
     .. shoebot::
         :alt: Curve example
@@ -252,10 +229,10 @@ Bézier paths
         # Only strokes
         autoclosepath(False)
         nofill()
-
-        # Draw the curve
         strokewidth(12)
         stroke(0.1)
+
+        # Draw the curve
         beginpath()
         moveto(x, y)
         curveto(x1, y1, x2, y2, x3, y3)
@@ -272,20 +249,23 @@ Bézier paths
         # end curve point
         line(x2, y2, x3, y3)
 
-.. py:function:: arc(x, y, radius, angle1, angle2)
+.. py:function:: arcto(x, y, radius, angle1, angle2)
+
+    Continues the path with a circular arc in a way identical to :py:func:`arc`.
+    A line will be drawn between the current point and the arc's starting point.
 
 .. py:function:: closepath()
 
- Close the path; in case the current point is not the path's starting point, a
- line will be drawn between them.
+   Close the path; in case the current point is not the path's starting point, a
+   line will be drawn between them.
 
 .. py:function:: endpath(draw=True)
 
-	The endpath() command is the companion command to beginpath(). When endpath()
-	is called, the path defined between beginpath() and endpath() is drawn.
-	Optionally, when endpath(draw=False) is called, the path is not drawn but can
-	be assigned to a variable and drawn to the screen at a later time with the
-	drawpath() command.
+	 The endpath() command is the companion command to beginpath(). When endpath()
+	 is called, the path defined between beginpath() and endpath() is drawn.
+	 Optionally, when endpath(draw=False) is called, the path is not drawn but can
+	 be assigned to a variable and drawn to the screen at a later time with the
+	 drawpath() command.
 
 .. py:function:: drawpath(path)
 
