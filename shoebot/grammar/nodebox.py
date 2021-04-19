@@ -623,6 +623,7 @@ class NodeBot(Bot):
         :return: current range value
         """
         self.color_range = float(crange)
+        return self.color_range
 
     def fill(self, *args):
         """Sets a fill color, applying it to new paths.
@@ -807,6 +808,7 @@ class NodeBot(Bot):
         """
         if height is not None:
             self._canvas.lineheight = height
+        return self._canvas.lineheight
 
     def align(self, align=LEFT):
         """
@@ -815,6 +817,7 @@ class NodeBot(Bot):
         :param align: Text alignment (LEFT, CENTER, RIGHT)
         """
         self._canvas.align = align
+        return self._canvas.align
 
     # TODO: Set the framework to setup font options
     def fontoptions(
