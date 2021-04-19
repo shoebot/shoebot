@@ -693,14 +693,13 @@ Text
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
-  Set the font to be used in new text instances.
+  Sets the font to be used in new text instances. Accepts a system font name,
+  e.g. "Inconsolata Bold", and an optional font size value.
 
-  Accepts a system font name, e.g. "Inconsolata Bold".
-  A full list of your system's font names can be viewed with the `pango-list` command in a terminal.
+  A full list of your system's font names can be viewed with the ``pango-list``
+  command in a terminal.
 
-  :param fontpath: font name
-  :param fontsize: font size in points
-  :return: current font name (if ``fontpath`` was not set)
+  If called with no arguments, it returns the current font name.
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
@@ -718,8 +717,12 @@ Text
         font("Liberation Mono Bold Italic")
         text("Bot", 35, 85)
 
-  Variable fonts are supported. You can specify the value for an axis using keyword arguments
-  with the ``var_`` prefix: to set the ``wdth`` axis to ``100``, use ``var_wdth=100``.
+  Variable fonts are supported. You can specify the value for an axis using
+  keyword arguments with the ``var_`` prefix: to set the ``wdth`` axis to
+  ``100``, use ``var_wdth=100``.
+
+  Alternatively, you can provide a ``vars`` dictionary with each axis's values,
+  e.g. ``font("Inconsolata", vars={"wdth": 100, "wght": 600})``
 
     .. shoebot::
         :alt: The word 'bot' in bold and italic styles
@@ -737,10 +740,8 @@ Text
 
 .. py:function:: fontsize(fontsize=None)
 
-  Set or return size of current font.
-
-  :param fontsize: Font size in points (pt)
-  :return: Font size in points (if ``fontsize`` was not specified)
+  Sets the size of the current font to use. If called with no parameters,
+  returns the current size.
 
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
@@ -756,34 +757,28 @@ Text
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
-  :return: the width and height of a string of text as a tuple (according to current font settings).
+  Returns the width and height of a string of text as a tuple, according to the
+  current font settings.
 
 .. py:function:: textwidth(txt, width=None)
 
-  :param text: the text to test for its dimensions
-  :return: the width of a string of text according to the current font settings
+  Accepts a string and returns its width, according to the current font settings.
 
 .. py:function:: textheight(txt, width=None)
 
-  :param text: the text to test for its dimensions
-  :return: the height of a string of text according to the current font settings
+  Accepts a string and returns its height, according to the current font settings.
 
 .. py:function:: lineheight(height=None)
 
   Set the space between lines of text.
 
-  :param height: line height
-
 .. py:function:: align(align=LEFT)
 
-  Set the way lines of text align with each other.
-
-  :param align: Text alignment rule
-  :type align: LEFT, CENTER or RIGHT
+  Set the way lines of text align with each other. Values can be LEFT, CENTER or RIGHT.
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
-    Not implemented.
+  Not implemented.
 
 Dynamic variables
 -----------------
@@ -836,13 +831,14 @@ Utility functions
 
 .. py:function:: grid(cols, rows, colSize=1, rowSize=1, shuffled=False)
 
-  The grid() command returns an iteratable object, something that can be
-  traversed in a for-loop (like the range() command for example).
+  This command returns an iterable object which can be traversed in a for-loop.
 
-  The grid() is a complex but powerful command. The first two parameters define
-  the number of columns and rows in the grid. The next two parameters are
-  optional, and set the width and height of one cell in the grid. In each iteration
-  of a for-loop, the offset for the current column and row is returned.
+  The first two parameters define the number of columns and rows in the grid.
+  The next two parameters are optional, and set the width and height of one cell
+  in the grid. In each loop iteration, the offset for the current column and row
+  is returned.
+
+  If ``shuffled`` is True, the cells will be returned in a random order.
 
     .. shoebot::
         :alt: Grid example
@@ -863,14 +859,10 @@ Utility functions
     Wildcards can be used to specify which files to pick, e.g. ``f =
     files('*.gif')``
 
-    :param path: wildcard to use in file list
-
 .. py:function:: autotext(sourceFile)
 
-   Generates mock philosophy based on a context-free grammar.
-
-   :param sourcefile: file path to use as source
-   :return: the generated text
+   Accepts a source file name, and generates mock philosophy based on a
+   context-free grammar.
 
 .. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
 
