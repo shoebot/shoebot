@@ -218,8 +218,6 @@ class NodeBot(Bot):
         :param angle2: end angle
         """
         self.beginpath(**kwargs)
-        # FIXME: hack to ensure the path is not empty
-        self.moveto(0, 0)
         if type == self.PIE:
             # find the coordinates of the start and end points
             x1 = x + radius * cos(deg2rad(angle1))
@@ -229,6 +227,7 @@ class NodeBot(Bot):
             self.moveto(x2, y2)
             self.lineto(x, y)
             self.lineto(x1, y1)
+        # self.moveto(x, y)  # uncomment to fix the "empty path" issue
         self.arcto(x, y, radius, angle1, angle2)
         return self.endpath(draw=draw)
 
