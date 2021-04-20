@@ -360,7 +360,7 @@ class Bot(Grammar):
         return glob(path)
 
     def snapshot(self, target=None, defer=None, autonumber=False):
-        """Save the contents of current surface into a file or cairo surface/context
+        """Save the contents of current surface into a file or cairo surface/context.
 
         :param filename: Can be a filename or a Cairo surface.
         :param defer: When to snapshot, if set to True waits until the frame has finished rendering.

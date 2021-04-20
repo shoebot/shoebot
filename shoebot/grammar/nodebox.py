@@ -719,7 +719,7 @@ class NodeBot(Bot):
         :param fontsize: font size
         :param vars: font variant values, as a dict of axis/value pairs (variable fonts only)
         :param var_XXXX: set variant value (variable fonts only)
-        :return: current current fontpath (if fontpath param not set)
+        :return: current fontpath (if fontpath param not set)
 
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed."""
@@ -746,11 +746,10 @@ class NodeBot(Bot):
             self._canvas.fontsize = fontsize
 
     def fontsize(self, fontsize=None):
-        """
-        Set or return size of current font.
+        """Sets and/or returns the current font size.
 
-        :param fontsize: Size of font.
-        :return: Size of font (if fontsize was not specified)
+        :param fontsize: Font size in pt
+        :return: the current font size value
         """
         if fontsize is not None:
             self._canvas.fontsize = fontsize
@@ -760,15 +759,14 @@ class NodeBot(Bot):
     def text(
         self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs
     ):
-        """
-        Draws a string of text according to current font settings.
+        """Draws a string of text according to the current font settings.
 
         :param txt: Text to output
         :param x: x-coordinate of the top left corner
         :param y: y-coordinate of the top left corner
         :param width: text width
         :param height: text height
-        :param outline: If True draws outline text (defaults to False)
+        :param outline: If True, draws a path instead of a text object (defaults to False)
         :param draw: Set to False to inhibit immediate drawing (defaults to True)
         :return: Path object representing the text.
         """

@@ -634,17 +634,13 @@ Colors
 
   Sets a fill color, applying it to new paths.
 
-  :param color: color in supported format (see above)
+.. py:function:: nofill()
+
+  Stop applying fills to new paths.
 
 .. py:function:: stroke(color)
 
   Set a stroke color, applying it to new paths.
-
-  :param color: color in supported format (see above)
-
-.. py:function:: nofill()
-
-  Stop applying fills to new paths.
 
 .. py:function:: nostroke()
 
@@ -652,65 +648,63 @@ Colors
 
 .. py:function:: strokewidth(w=None)
 
-  :param w: Stroke width
-  :return: Current width (if no width was specified)
+  Set the width of the stroke in new paths.
+
+  Returns the current stroke width.
 
 
 Text
 ----
 
-.. py:function:: text(txt, x, y, width=None, height=1000000, outline=False, draw=True)
+.. py:function:: text(txt, x, y, width=None, height=None, outline=False, draw=True)
 
-  Draws a string of text according to current font settings.
+  Draws a string of text according to the current font settings.
 
-  :param txt: Text to output
-  :param x: x-coordinate of the top left corner
-  :param y: y-coordinate of the top left corner
-  :param width: text box width. When set, text will wrap to the next line if it would exceed this width. If unset, there will be no line breaks.
-  :param height: text box height
-  :param outline: whether to draw as an outline.
-  :param draw: if False, the object won't be immediately drawn to canvas.
-  :type outline: bool
-  :type draw: bool
-  :return: BezierPath object representing the text
+  This command takes 3 mandatory arguments: the string of text to write and the
+  (x, y) coordinates of the baseline origin.
 
-    .. shoebot::
-        :alt: The word 'bot' in bold and italic styles
-        :filename: text__text.png
+  If ``width`` is set, the text will wrap (move to the next line) when it exceeds
+  the specified value. Setting ``height`` will limit the vertical size of the
+  text box, after which no text will be drawn.
 
-        # when using text(), the origin point
-        # is on the text baseline
-        ellipsemode(CENTER)
-        circle(12, 65, 10, fill='#ff0033')
-        # place the text box
-        font("Inconsolata", 50)
-        text("Bot", 12, 65)
+  If the ``outline`` option is true, the resulting object will be a BezierPath
+  instead of a Text object. It's an alternative to using :py:func:`textpath`.
+
+  .. shoebot::
+      :alt: The word 'bot' in bold and italic styles
+      :filename: text__text.png
+
+      # when using text(), the origin point
+      # is on the text baseline
+      arrow(12, 65, 10, type=FORTYFIVE, fill='#ff9966')
+      # place the text box
+      font("Inconsolata", 50)
+      text("Bot", 12, 65)
 
 .. py:function:: font(fontpath=None, fontsize=None)
 
   Sets the font to be used in new text instances. Accepts a system font name,
-  e.g. "Inconsolata Bold", and an optional font size value.
+  e.g. "Inconsolata Bold", and an optional font size value. Returns the
+  current font name.
 
   A full list of your system's font names can be viewed with the ``pango-list``
   command in a terminal.
 
-  If called with no arguments, it returns the current font name.
+  .. shoebot::
+      :alt: The word 'bot' in bold and italic styles
+      :filename: text__font.png
 
-    .. shoebot::
-        :alt: The word 'bot' in bold and italic styles
-        :filename: text__font.png
+      fill(0.3)
+      fontsize(16)
 
-        fill(0.3)
-        fontsize(16)
-
-        font("Liberation Mono")
-        text("Bot", 35, 25)
-        font("Liberation Mono Italic")
-        text("Bot", 35, 45)
-        font("Liberation Mono Bold")
-        text("Bot", 35, 65)
-        font("Liberation Mono Bold Italic")
-        text("Bot", 35, 85)
+      font("Liberation Mono")
+      text("Bot", 35, 25)
+      font("Liberation Mono Italic")
+      text("Bot", 35, 45)
+      font("Liberation Mono Bold")
+      text("Bot", 35, 65)
+      font("Liberation Mono Bold Italic")
+      text("Bot", 35, 85)
 
   Variable fonts are supported. You can specify the value for an axis using
   keyword arguments with the ``var_`` prefix: to set the ``wdth`` axis to
@@ -740,15 +734,11 @@ Text
 
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
-  Generates an outlined path of the input text.
+  Returns an outlined path of the input text.
 
-  :param txt: Text to output
-  :param x: x-coordinate of the top left corner
-  :param y: y-coordinate of the top left corner
-  :param width: text width
-  :param height: text height
-  :param draw: Set to False to inhibit immediate drawing (defaults to False)
-  :return: Path object representing the text.
+  For an explanation of the parameters, see :py:func:`text`. Note that, unline
+  text(), the ``draw`` option is False by default, as this command is meant
+  for doing further manipulation on the text path before rendering it.
 
 .. py:function:: textmetrics(txt, width=None, height=None)
 
@@ -757,11 +747,13 @@ Text
 
 .. py:function:: textwidth(txt, width=None)
 
-  Accepts a string and returns its width, according to the current font settings.
+  Accepts a string and returns its width, according to the current font
+  settings.
 
 .. py:function:: textheight(txt, width=None)
 
-  Accepts a string and returns its height, according to the current font settings.
+  Accepts a string and returns its height, according to the current font
+  settings.
 
 .. py:function:: lineheight(height=None)
 
@@ -780,17 +772,19 @@ Dynamic variables
 
 .. py:function:: var(name, type, default=None, min=0, max=255, value=None, step=None, steps=256.0)
 
-  Create a :doc:`live variable <live>`.
+  Creates a :doc:`live variable <live>`, which can be manipulated using the
+  variables UI, socket server or live coding shell.
 
-  :param name: Variable name
-  :param type: Variable type
-  :type type: NUMBER, TEXT, BOOLEAN or BUTTON
-  :param default: Default value
-  :param min: Minimum value (NUMBER only)
-  :param max: Maximum value (NUMBER only)
-  :param value: Initial value (if not defined, use ``default``)
-  :param step: Step length for the variables GUI (use this or ``steps``, not both)
-  :param steps: Number of steps in the variables GUI (use this or ``step``, not both)
+  The first two arguments are the variable name and type (NUMBER, TEXT, BOOLEAN
+  or BUTTON).
+
+  An optional third argument is the default (initial) value. For NUMBER
+  variables, the minimum and maximum values for the variable can be indicated.
+
+  Finally, there are two options for setting the step length on the variables
+  interface. This is the "jump" between values if you don't want to use a
+  continuous scale. You can either set a fixed number of steps using the
+  ``steps`` option, or set a step length with the ``step`` option.
 
 Utility functions
 -----------------
@@ -803,30 +797,30 @@ Utility functions
   returns a number between 0 and this parameter. When two parameters are
   supplied, returns a number between the first and the second parameter.
 
-    .. shoebot::
-        :alt: Random example
-        :filename: util__random.png
+  .. shoebot::
+      :alt: Random example
+      :filename: util__random.png
 
-        r = random() # returns a float between 0 and 1
-        r = random(2.5) # returns a float between 0 and 2.5
-        r = random(-1.0, 1.0) # returns a float between -1.0 and 1.0
-        r = random(5) # returns an int between 0 and 5
-        r = random(1, 10) # returns an int between 1 and 10
+      r = random() # returns a float between 0 and 1
+      r = random(2.5) # returns a float between 0 and 2.5
+      r = random(-1.0, 1.0) # returns a float between -1.0 and 1.0
+      r = random(5) # returns an int between 0 and 5
+      r = random(1, 10) # returns an int between 1 and 10
 
-        # sets the fill to anything from
-        # black (0.0,0,0) to red (1.0,0,0)
-        fill(random(), 0, 0)
-        circle(40, 40, 20)
+      # sets the fill to anything from
+      # black (0.0,0,0) to red (1.0,0,0)
+      fill(random(), 0, 0)
+      circle(40, 40, 20)
 
-        # Note: new random values are returned each time the script runs.
-        # The variation can be locked by supplying a custom random seed:
+      # Note: new random values are returned each time the script runs.
+      # The variation can be locked by supplying a custom random seed:
 
-        from random import seed
-        seed(0)
+      from random import seed
+      seed(0)
 
 .. py:function:: grid(cols, rows, colSize=1, rowSize=1, shuffled=False)
 
-  This command returns an iterable object which can be traversed in a for-loop.
+  This command returns an iterable object which can be traversed in a loop.
 
   The first two parameters define the number of columns and rows in the grid.
   The next two parameters are optional, and set the width and height of one cell
@@ -835,39 +829,29 @@ Utility functions
 
   If ``shuffled`` is True, the cells will be returned in a random order.
 
-    .. shoebot::
-        :alt: Grid example
-        :filename: util__grid.png
+  .. shoebot::
+      :alt: Grid example
+      :filename: util__grid.png
 
-        translate(10, 10)
-        for x, y in grid(7, 5, 12, 12):
-            rect(x, y, 10, 10)
+      translate(10, 10)
+      for x, y in grid(7, 5, 12, 12):
+          rect(x, y, 10, 10)
 
 .. py:function:: fontnames()
 
-    Returns a list of system font faces, in the same format that ``font()``
-    expects.
+  Returns a list of system font faces, in the same format that :py:func:`font()`
+  expects.
 
 .. py:function:: files(path="*")
 
-    Retrieves all files from a given path and returns their names as a list.
-    Wildcards can be used to specify which files to pick, e.g. ``f =
-    files('*.gif')``
+  Retrieves all files from a given path and returns their names as a list.
+  Wildcards can be used to specify which files to pick, e.g. ``f =
+  files('*.gif')``
 
 .. py:function:: autotext(sourceFile)
 
-   Accepts a source file name, and generates mock philosophy based on a
-   context-free grammar.
-
-.. py:function:: snapshot(filename=None, surface=None, defer=None, autonumber=False)
-
-    Save the contents of current surface into a file or cairo surface/context.
-
-    :param filename: File name to output to. The file type will be deduced from the extension.
-    :param surface:  If specified will output snapshot to the supplied cairo surface.
-    :param boolean defer: Decides whether the action needs to happen now or can happen later. When set to False, it ensures that a file is written before returning, but can hamper performance. Usually you won't want to do this.  For files defer defaults to True, and for Surfaces to False, this means writing files won't stop execution, while the surface will be ready when snapshot returns. The drawqueue will have to stop and render everything up until this point.
-    :param boolean autonumber: If true then a number will be appended to the filename.
-
+  Accepts a source file name, and generates mock philosophy based on a
+  context-free grammar.
 
 
 Core
@@ -875,33 +859,20 @@ Core
 
 .. py:function:: ximport(libName)
 
-    Import Nodebox libraries.
+    Import a Nodebox library.
 
-    The libraries get access to the _ctx context object, which provides them
-    with the Shoebot API.
+    See the :doc:`libraries` page for a full list.
 
-    :param libName: Library name to import
+.. py:function:: size(w, h)
 
-.. py:function:: size(w=None, h=None)
-
-    Sets the size of the canvas, and creates a Cairo surface and context. Only
+    Sets the size of the canvas. Only
     the first call will have any effect.
 
 .. py:function:: speed(framerate)
 
-  Set the framerate for animations.
-
-  :param framerate: Frames per second
-  :return: Current framerate
+  Set the frame rate for animations (frames per second), and returns the current
+  frame rate.
 
 .. py:function:: run(inputcode, iterations=None, run_forever=False, frame_limiter=False)
 
-    Executes the contents of a Shoebot script in the current surface's context.
-
-
-Classes
--------
-
-.. py:class:: BezierPath
-
-.. py:class:: Text
+  Executes the contents of a Shoebot script in the current surface's context.
