@@ -106,4 +106,3 @@ RIGHT = "right"
 
 RGB = "rgb"
 HSB = "hsb"
-CMYK = "cmyk"

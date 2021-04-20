@@ -48,7 +48,6 @@ from shoebot.core.events import publish_event, QUIT_EVENT
 
 RGB = "rgb"
 HSB = "hsb"
-CMYK = "cmyk"
 
 CENTER = "center"
 CORNER = "corner"
