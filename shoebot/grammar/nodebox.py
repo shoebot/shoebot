@@ -753,8 +753,7 @@ class NodeBot(Bot):
         """
         if fontsize is not None:
             self._canvas.fontsize = fontsize
-        else:
-            return self._canvas.fontsize
+        return self._canvas.fontsize
 
     def text(
         self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs
@@ -776,8 +775,7 @@ class NodeBot(Bot):
             if draw:
                 path.draw()
             return path
-        else:
-            return txt
+        return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         """Generates an outlined path of the input text.
