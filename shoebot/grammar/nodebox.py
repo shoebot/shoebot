@@ -523,18 +523,14 @@ class NodeBot(Bot):
             self._canvas.mode = mode
         return self._canvas.mode
 
-    def translate(self, xt, yt, mode=None):
+    def translate(self, xt, yt):
         """
-        Translate the current position by (xt, yt) and
-        optionally set the transform mode.
+        Translate the canvas origin point by (xt, yt).
 
         :param xt: Amount to move horizontally
         :param yt: Amount to move vertically
-        :mode: Set the transform mode to CENTER or CORNER
         """
         self._canvas.translate(xt, yt)
-        if mode:
-            self._canvas.mode = mode
 
     def rotate(self, degrees=0, radians=0):
         """
