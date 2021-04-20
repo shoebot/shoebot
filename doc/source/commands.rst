@@ -565,36 +565,54 @@ Transforms
 Colors
 ------
 
-  Colors can be specified in a few ways:
+  Shapes can be filled, stroked, or both. The :py:func:`fill` and
+  :py:func:`stroke` commands are used to set the colors for those operations
+  globally. In addition, most drawing commands have ``fill`` and ``stroke``
+  parameters to allow setting colors for single objects.
 
-    * grayscale: ``(value)``
-    * grayscale with alpha: ``(value, alpha)``
-    * RGB: ``(red, green, blue)``
-    * RGBA: ``(red, green, blue, alpha)``
-    * hex: ``('#FFFFFF')``
-    * hex with alpha: ``('#FFFFFFFF')``
+  Fill and stroke colors can be specified in a few ways:
+
+  * grayscale: ``(value)`` and ``(value, alpha)``
+  * RGB: ``(red, green, blue)`` and ``(red, green, blue, alpha)``
+  * hex colors: ``('#FFFFFF')`` and ``('#FFFFFFFF')``
+  * Color objects as created by :py:func:`color`
+
+  The grayscale and RGB options take values between 0 and 1; this behavior can
+  be changed with :py:func:`colorrange`.
+
+
+.. py:function:: color(*args)
+
+  Returns a Color object that can be stored in a variable and reused.
+
+  .. shoebot::
+      :alt: Color reuse
+      :filename: color__color.png
+
+      teal = color("#008080")
+
+      rect(20, 20, 60, 15, fill=teal)
+      rect(20, 40, 60, 15, fill=teal)
+      rect(20, 60, 60, 15)
+
 
 .. py:function:: background(*args)
 
   Set the background color.
 
-    .. shoebot::
-        :alt: Background example
-        :filename: colors__background.png
+  .. shoebot::
+      :alt: Background example
+      :filename: colors__background.png
 
-        background(0.9)
-        fill(1)
-        circle(40, 40, 20)
+      background(0.9)
+      fill(1)
+      circle(40, 40, 20)
+
 
 .. py:function:: colormode(mode=None, crange=None)
 
-  Set the current color mode (can be RGB or HSB) and eventually
+  Set the current color mode, which can be RGB or HSB, and optionally
   the color range.
-
-  :param mode: Color mode to use
-  :type mode: RGB or HSB
-  :param crange: Maximum value for the new color range to use
-  :return: Current color mode (if called without arguments)
 
 
 .. py:function:: colorrange(crange=1.0)
@@ -636,11 +654,6 @@ Colors
 
   :param w: Stroke width
   :return: Current width (if no width was specified)
-
-.. py:function:: color(*args)
-
-  :param args: color in a supported format
-  :return: Color object
 
 
 Text

@@ -630,12 +630,19 @@ class NodeBot(Bot):
         :param mode: Color mode, either "rgb", or "hsb"
         :param range: Maximum scale value for color, e.g. 1.0 or 255
 
+        :param mode: Color mode to use
+        :type mode: RGB or HSB
+        :param crange: Maximum value for the new color range to use
+        :type crange: float
+        :return: Current color mode
+
+
         :return: Returns the current color mode.
         """
         if mode is not None:
-            if mode == "rgb":
+            if mode == RGB:
                 self.color_mode = RGB
-            elif mode == "hsb":
+            elif mode == HSB:
                 self.color_mode = HSB
             else:
                 raise NameError(_("Only RGB and HSB colormodes are supported."))
