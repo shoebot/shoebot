@@ -18,6 +18,9 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # https://docs.readthedocs.io/en/stable/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
 autodoc_mock_imports = ["gobject", "pygobject"]
 
+# order autodoc entries as per the source
+autodoc_member_order = "bysource"
+
 
 # General configuration
 # ---------------------
