@@ -136,9 +136,13 @@ Drawing shapes
         line(50, 20, 50, 80)
 
 
-.. py:function:: arc(x, y, radius, angle1, angle2, draw=True)
+.. py:function:: arc(x, y, radius, angle1, angle2, type=CHORD, draw=True)
 
     Draws a circular arc with center at (x,y) between two angles.
+
+    The default arc type (CHORD) only draws the contour of the circle arc
+    section. The PIE arc type will close the path connecting the arc points to
+    its center, as a pie-chart-like shape.
 
     .. shoebot::
         :alt: 3 arcs
@@ -324,24 +328,15 @@ Images
 
 .. py:function:: image(path, x=0, y=0, width=None, height=None, alpha=1.0, data=None, draw=True)
 
-    Place a bitmap image on the canvas.
+    Place an image on the canvas with (x,y) as its top left corner. Both bitmap
+    and SVG images can be used; in the case of SVG images, the result is
+    rendered as paths (not bitmaps).
 
-    :param path: location of the image on disk
-    :param x: x-coordinate of the top left corner
-    :param y: y-coordinate of the top left corner
-    :param width: image width (leave blank to use its original width)
-    :param height: image height (leave blank to use its original height)
-    :param alpha: opacity
-    :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
-    :param draw: whether to place the image immediately on the canvas or not
-    :type path: filename
-    :type x: float
-    :type y: float
-    :type width: float or None
-    :type height: float or None
-    :type alpha: float
-    :type data: binary data
-    :type draw: bool
+    If ``width`` and ``height`` are specified, the image is resized to fit.
+    The ``alpha`` parameter (0-1) controls the image opacity.
+
+    A filename is expected, but you can use the ``data`` argument instead to
+    pass image data as a string or file-like object.
 
     .. shoebot::
         :alt: Image example
@@ -359,6 +354,8 @@ Clipping paths
 
 
 .. py:function:: beginclip(path)
+
+.. py:function:: endclip()
 
     The beginclip() and endclip() commands define a clipping mask. The supplied
     parameter defines the path to be used as a clipping mask.
@@ -382,183 +379,188 @@ Clipping paths
         line(50, 20, 50, 80)
         endclip()
 
-.. py:function:: endclip()
 
-    Used along with ``beginclip()``.
 
 Transforms
 ----------
 
 .. py:function:: transform(mode=None)
 
-    The mode parameter sets the registration point – the offset for rotate(),
-    scale() and skew() commands. By default, primitives, text, and images rotate
-    around their own centerpoints. But if you call transform() with CORNER as
-    its mode parameter, transformations will be applied relative to the canvas
-    ‘origin point’ rather than being relative to the objects’ centerpoint
-    origins.
+  Sets whether shapes are transformed along their centerpoint or (0,0).
 
-    Each command example below shows how the transform mode affects the result.
+  The mode parameter can be CORNER (default) or CENTER.
 
-    :param mode: the mode to base new transformations on
-    :type mode: CORNER or CENTER
+  It sets the registration point – the offset for :py:func:`rotate()`,
+  :py:func:`scale()` and :py:func:`skew()` commands. By default, primitives,
+  text, and images rotate around their own centerpoints. But if you call
+  transform() with CORNER as
+  its mode parameter, transformations will be applied relative to the canvas
+  top left corner (its "origin point") instead.
+
+  See the examples in :py:func:`translate`, :py:func:`rotate`,
+  :py:func:`scale` and :py:func:`skew` to see how the transform mode affects
+  the result.
+
 
 .. py:function:: translate(xt, yt)
 
-	Specifies the amount to move a subsequent shape, path, text, image on the
-	screen. Once called, all commands following translate() are repositioned,
-	which makes translate() useful for positioning whole compositions of multiple
-	elements.
+	Specifies the amount to move the canvas origin point.
 
-    :param xt: horizontal offset
-    :param yt: vertical offset
+  Once called, all commands following translate() are repositioned, which makes
+  translate() useful for positioning whole compositions of multiple elements.
 
-    .. shoebot::
-        :alt: Two circles
-        :filename: transforms__translate.png
+  .. shoebot::
+      :alt: Two circles
+      :filename: transforms__translate.png
 
-        fill(0.2)
-        oval(-10, -10, 40, 40)
-        translate(50, 50)
-        oval(-10, -10, 40, 40)
+      fill(0.2)
+      oval(10, 10, 40, 40)
+      translate(45, 45)
+      oval(10, 10, 40, 40)
+
 
 .. py:function:: rotate(degrees=0, radians=0)
 
-  Rotates all subsequent drawing commands. The default unit is degrees; radians
-  can be used with ``rotate(radians=PI)``.
-  Like other transform operations, the rotate() command works incrementally: if
-  you call rotate(30), and later on call rotate(60), all commands following that
-  second rotate() will be rotated 90° (30+60).
+  Rotates all subsequent drawing commands.
 
-    :param degrees: angle in degrees
-    :param radians: angle in radians
+  The default unit is degrees; radians can be used with ``rotate(radians=PI)``.
 
-    .. shoebot::
-        :alt: Rotated squares
-        :filename: transforms__rotate_corner.png
+  This command works incrementally: if you call ``rotate(30)``, and later on
+  call ``rotate(60)``, all commands following that second rotate() will be
+  rotated 90° (30+60).
 
-        fill('#4a69bd', 0.2)
-        translate(25, 25)
-        for i in range(7):
-            rotate(15)
-            rect(0, 0, 50, 50)
+  .. shoebot::
+      :alt: Rotated squares
+      :filename: transforms__rotate_corner.png
 
-    .. shoebot::
-        :alt: Rotated squares
-        :filename: transforms__rotate_center.png
+      fill('#4a69bd', 0.2)
+      translate(25, 25)
+      for i in range(7):
+          rotate(15)
+          rect(0, 0, 50, 50)
 
-        fill('#e55039', 0.2)
-        transform(CENTER)
-        for i in range(5):
-            rotate(15)
-            rect(25, 25, 50, 50)
+  .. shoebot::
+      :alt: Rotated squares
+      :filename: transforms__rotate_center.png
+
+      fill('#e55039', 0.2)
+      transform(CENTER)
+      for i in range(5):
+          rotate(15)
+          rect(25, 25, 50, 50)
 
 
 .. py:function:: scale(x=1, y=None)
 
   Increases, decreases, or streches the size of all subsequent drawing commands.
+
   The first parameter sets the horizontal scale and the optional second
   parameter the vertical scale. You can also call scale() with a single
   parameter that sets both the horizontal and vertical scale. Scale values are
   specified as floating-point (decimal) numbers with 1.0 corresponding to 100%.
 
-  The scale() command works incrementally: if you call scale(0.5), and later on
-  call scale(0.2), all subsequent drawing commands will be sized to 10% (0.2 of
-  0.5).
+  This command works incrementally: if you call ``scale(0.5)``, and later on
+  call ``scale(0.2)``, all subsequent drawing commands will be sized to 10% (0.2
+  of 0.5).
 
-    .. shoebot::
-        :alt: Scaled squares
-        :filename: transforms__scale_corner.png
+  .. shoebot::
+      :alt: Scaled squares
+      :filename: transforms__scale_corner.png
 
-        fill('#78e08f', 0.2)
-        translate(25,25)
-        for i in range(7):
-            rect(0, 0, 50, 50)
-            scale(.8)
+      fill('#78e08f', 0.2)
+      translate(25,25)
+      for i in range(7):
+          rect(0, 0, 50, 50)
+          scale(.8)
 
-    .. shoebot::
-        :alt: Scaled squares
-        :filename: transforms__scale_center.png
+  .. shoebot::
+      :alt: Scaled squares
+      :filename: transforms__scale_center.png
 
-        fill('#60a3bc', 0.2)
-        transform(CENTER)
-        for i in range(7):
-            rect(25, 25, 50, 50)
-            scale(.8)
+      fill('#60a3bc', 0.2)
+      transform(CENTER)
+      for i in range(7):
+          rect(25, 25, 50, 50)
+          scale(.8)
 
 .. py:function:: skew(x=1, y=0)
 
-  Slants the direction of all subsequent drawing commands. The first parameter
-  sets the horizontal skew. The second parameter is optional and sets the
-  vertical skew.
+  Slants the direction of all subsequent drawing commands.
 
-  The skew() command works incrementally: if you call skew(10), and later on
-  call skew(20), all subsequent drawing commands will be skewed by 30° (10+20).
+  The first parameter sets the horizontal skew. The second parameter is optional
+  and sets the vertical skew.
 
-    .. shoebot::
-        :alt: Skewed squares
-        :filename: transforms__skew_corner.png
+  This command works incrementally: if you call ``skew(10)``, and later on call
+  ``skew(20)``, all subsequent drawing commands will be skewed by 30° (10+20).
 
-        fill('#82ccdd', 0.2)
-        translate(5, 25)
-        for i in range(7):
-            rect(0, 0, 50, 50)
-            skew(.2, 0)
+  .. shoebot::
+      :alt: Skewed squares
+      :filename: transforms__skew_corner.png
 
-    .. shoebot::
-        :alt: Skewed squares
-        :filename: transforms__skew_center.png
+      fill('#82ccdd', 0.2)
+      translate(5, 25)
+      for i in range(7):
+          rect(0, 0, 50, 50)
+          skew(.2, 0)
 
-        fill('#e58e26', 0.2)
-        transform(CENTER)
-        for i in range(7):
-            rect(25, 25, 50, 50)
-            skew(.2, 0)
+  .. shoebot::
+      :alt: Skewed squares
+      :filename: transforms__skew_center.png
+
+      fill('#e58e26', 0.2)
+      transform(CENTER)
+      for i in range(7):
+          rect(25, 25, 50, 50)
+          skew(.2, 0)
 
 .. py:function:: push()
 
+  Saves the current transform state.
+
   The push() function, along with its companion pop(), allows for "saving" a
   transform state. All transformations, such as rotate() and skew(), defined
-  between a push() and pop() call last only until pop() is called.
+  between push() and pop() will stop being applied after pop() is called.
 
-    .. shoebot::
-        :alt: Text with push and pop
-        :filename: transforms__push_pop.png
-        :size: 200, 200
+  .. shoebot::
+      :alt: Text with push and pop
+      :filename: transforms__push_pop.png
+      :size: 200, 200
 
-        fill(0.2)
-        fontsize(14)
-        transform(CENTER)
-        rotate(45)
-        text("one", 40, 40)
+      fill(0.2)
+      fontsize(14)
+      transform(CENTER)
+      rotate(45)
+      text("one", 40, 40)
 
-        push()
-        rotate(-45)
-        text("two", 40, 80)
-        pop()
+      push()
+      rotate(-45)
+      text("two", 40, 80)
+      pop()
 
-        text("three", 40, 120)
+      text("three", 40, 120)
 
 
 .. py:function:: pop()
 
-  The pop() function is meant to be used after push(). It "loads" the transform
-  state that was set before the call to push().
+  Restores the saved transform state.
+
+  This command is meant to be used after push(). It "loads" the transform state
+  that was set before the call to push().
 
 .. py:function:: reset()
 
   Resets the transform state to its default values.
 
-    .. shoebot::
-        :alt: Text with transform reset
-        :filename: transforms__reset.png
+  .. shoebot::
+      :alt: Text with transform reset
+      :filename: transforms__reset.png
 
-        rotate(90)
-        text("one", 30, 80)
-        text("two", 45, 80)
-
-        reset()
-        text("three", 70, 80)
+      transform(CENTER)
+      rotate(30)
+      text("one", 10, 20)
+      text("two", 10, 50)
+      reset()
+      text("three", 10, 80)
 
 Colors
 ------

@@ -104,7 +104,30 @@ class NodeBot(Bot):
         draw=True,
         **kwargs,
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions."""
+        """Draws a image with (x,y) as the top left corner.
+
+        If width and height are specified, resize the image to fit.
+
+        form path, in x,y and resize it to width, height dimensions.
+
+        :param path: location of the image on disk
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param width: image width (leave blank to use its original width)
+        :param height: image height (leave blank to use its original height)
+        :param alpha: opacity
+        :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
+        :param draw: whether to place the image immediately on the canvas or not
+        :type path: filename
+        :type x: float
+        :type y: float
+        :type width: float or None
+        :type height: float or None
+        :type alpha: float
+        :type data: binary data
+        :type draw: bool
+        """
+
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -210,7 +233,8 @@ class NodeBot(Bot):
         return self.endpath(draw=draw)
 
     def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
-        """Draw a arc with center (x,y) between two angles in degrees.
+        """Draw an arc with center (x,y) between two angles in degrees.
+
         :param x1: start x-coordinate
         :param y1: start y-coordinate
         :param radius: arc radius
@@ -505,20 +529,29 @@ class NodeBot(Bot):
     # Transform and utility
 
     def beginclip(self, path):
-        # FIXME: this save should go into Canvas
+        """Use a path as a clipping mask.
+
+        All drawing commands between beginclip() and endclip() will be drawn
+        inside the clipping mask set by beginclip().
+
+        :param path: the path to be used as a clipping mask
+        :type path: BezierPath
+        """
         p = self.ClippingPath(path)
         p.draw()
         return p
 
     def endclip(self):
+        """Finish a clipping mask and render the result."""
         p = self.EndClip()
         p.draw()
 
     def transform(self, mode=None):
-        """
-        Set the current transform mode.
+        """Set the current transform mode.
 
-        :param mode: CENTER or CORNER"""
+        :param mode: the mode to base new transformations on
+        :type mode: CORNER or CENTER
+        """
         if mode:
             self._canvas.mode = mode
         return self._canvas.mode
@@ -550,7 +583,7 @@ class NodeBot(Bot):
         """
         Set a scale at which to draw objects.
 
-        1.0 draws objects at their natural size
+        1.0 draws objects at their natural size.
 
         :param x: Scale on the horizontal plane
         :param y: Scale on the vertical plane
