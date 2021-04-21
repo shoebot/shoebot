@@ -784,11 +784,13 @@ class NodeBot(Bot):
         """
         self._canvas.align = align
 
-    # TODO: Set the framework to setup font options
     def fontoptions(
         self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
     ):
-        raise NotImplementedError(_("fontoptions() isn't implemented yet"))
+        self._canvas.hintstyle = hintstyle
+        self._canvas.hintmetrics = hintmetrics
+        self._canvas.subpixelorder = subpixelorder
+        self._canvas.antialias = antialias
 
     def fontnames(self):
         return list_pango_fonts()

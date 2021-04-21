@@ -142,6 +142,10 @@ class Text(Grob, ColorMixin):
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
         self.indent = kwargs.get("indent")
 
+        self.hintstyle = kwargs.get("hintstyle")
+        self.hintmetrics = kwargs.get("hintmetrics")
+        self.antialias = kwargs.get("antialias")
+        self.subpixelorder = kwargs.get("subpixelorder")
         # these are the settings that we have to define with the
         # Pango.Markup hack (see below in _pre_render), so it's neater to
         # have them in a dict
@@ -181,12 +185,32 @@ class Text(Grob, ColorMixin):
                 self._deferred_render()
         self._prerendered = draw
 
-    # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
+    # pre rendering is needed to measure the metrics of the text, it's also
+    # useful to get the path, without the need to call _render()
     def _pre_render(self):
         # we use a new CairoContext to pre render the text
         rs = cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         cr = cairo.Context(rs)
         cr = driver.ensure_pycairo_context(cr)
+
+        # apply font options if set
+        if self.hintstyle or self.hintmetrics or self.subpixelorder or self.antialias:
+            opts = cairo.FontOptions()
+            # map values to Cairo constants
+            if self.antialias:
+                opts.set_antialias(getattr(cairo.Antialias, self.antialias.upper()))
+            if self.hintstyle:
+                opts.set_hint_style(getattr(cairo.HintStyle, self.hintstyle.upper()))
+            if self.hintmetrics:
+                opts.set_hint_metrics(
+                    getattr(cairo.HintMetrics, self.hintmetrics.upper())
+                )
+            if self.subpixelorder:
+                opts.set_subpixel_order(
+                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper())
+                )
+            cr.set_font_options(opts)
+
         self._pangocairo_ctx = pangocairo_create_context(cr)
         self._pango_layout = PangoCairo.create_layout(cr)
         # layout line spacing
