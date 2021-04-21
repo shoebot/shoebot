@@ -388,7 +388,7 @@ class Bot(Grammar):
                 defer = True
             self._canvas.snapshot(target, defer=defer, file_number=file_number)
         else:
-            raise ShoebotError("No image saved")
+            raise ShoebotError("Image not saved: no target, filename or default to save to.")
 
     def show(self, format="png", as_data=False):
         """Returns an Image object of the current surface. Used for displaying

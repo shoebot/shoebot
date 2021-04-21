@@ -29,10 +29,15 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
 from enum import Enum
-from operator import attrgetter
 
-from shoebot import ShoebotInstallError
-from shoebot.core.backend import cairo, gi, driver
+from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
+
+from shoebot.core.backend import cairo, driver, gi
+from shoebot.util import ShoebotInstallError, _copy_attrs
+
+from .basecolor import ColorMixin
+from .bezier import BezierPath
+from .grob import Grob
 
 try:
     gi.require_version("Pango", "1.0")
@@ -42,7 +47,7 @@ except ValueError as e:
     global Pango, PangoCairo
 
     # workaround for readthedocs where Pango is not installed,
-    print("Pango not found - typography will not be available.", file=sys.stderr)
+    print(_("Pango not found - typography will not be available."), file=sys.stderr)
 
     class FakePango(object):
         class Weight(Enum):
@@ -68,10 +73,6 @@ except ValueError as e:
 
     Pango = FakePango()
     PangoCairo = FakePango()
-
-from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
-from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
-
 
 # Pango Utility functions
 def pangocairo_create_context(cr):
