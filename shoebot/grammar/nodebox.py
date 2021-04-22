@@ -670,10 +670,11 @@ class NodeBot(Bot):
                 # syntax: "Inconsolata @wdth=50,wght=600"
                 fontpath += " @" + ",".join(variants)
             self._canvas.fontfile = fontpath
-        else:
-            return self._canvas.fontfile
+
         if fontsize is not None:
             self._canvas.fontsize = fontsize
+
+        return self._canvas.fontfile
 
     def fontsize(self, fontsize=None):
         """
