@@ -142,10 +142,10 @@ class Text(Grob, ColorMixin):
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
         self.indent = kwargs.get("indent")
 
-        self.hintstyle = kwargs.get("hintstyle")
-        self.hintmetrics = kwargs.get("hintmetrics")
-        self.antialias = kwargs.get("antialias")
-        self.subpixelorder = kwargs.get("subpixelorder")
+        self.hintstyle = kwargs.get("hintstyle", canvas.hintstyle)
+        self.hintmetrics = kwargs.get("hintmetrics", canvas.hintmetrics)
+        self.antialias = kwargs.get("antialias", canvas.antialias)
+        self.subpixelorder = kwargs.get("subpixelorder", canvas.subpixelorder)
         # these are the settings that we have to define with the
         # Pango.Markup hack (see below in _pre_render), so it's neater to
         # have them in a dict
