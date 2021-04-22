@@ -174,6 +174,8 @@ class Bot(Grammar):
             strokewidth=1.0,
             strokecap=None,
             strokejoin=None,
+            strokedash=None,
+            dashoffset=None,
             blendmode=None,
             background=self.color(1, 1, 1),
             fontfile="Sans",

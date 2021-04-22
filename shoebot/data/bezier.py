@@ -128,7 +128,6 @@ class BezierPath(Grob, ColorMixin):
         "strokewidth",
         "strokecap",
         "strokejoin",
-        "blendmode",
         "transform",
     }
 
@@ -142,6 +141,8 @@ class BezierPath(Grob, ColorMixin):
         strokewidth=0,
         strokecap=None,
         strokejoin=None,
+        strokedash=None,
+        dashoffset=None,
         blendmode=None,
         packed_elements=None,
     ):
@@ -160,6 +161,8 @@ class BezierPath(Grob, ColorMixin):
             strokewidth=strokewidth,
             strokecap=strokecap,
             strokejoin=strokejoin,
+            strokedash=strokedash,
+            dashoffset=dashoffset,
             blendmode=blendmode,
         )
 

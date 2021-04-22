@@ -638,15 +638,34 @@ class NodeBot(Bot):
         return c
 
     def strokewidth(self, w=None):
-        """Set the stroke width.
+        """Set the stroke width to be used by stroke().
 
-        :param w: Stroke width.
-        :return: If no width was specified then current width is returned.
+        :param w: the width of the stroke to use
+        :return: current stroke width value
         """
         if w is not None:
             self._canvas.strokewidth = w
-        else:
-            return self._canvas.strokewidth
+        return self._canvas.strokewidth
+
+    def strokedash(self, dashes=None, offset=0):
+        """Sets the dash pattern to be used by stroke().
+
+        A dash pattern is specified by dashes - a sequence of positive values.
+        Each value provides the length of alternate “on” and “off” portions of
+        the stroke.
+
+        The offset specifies an offset into the pattern at which the stroke
+        begins.
+
+        :param dashes: a sequence specifying alternate lengths of on and off stroke portions
+        :param offset: an offset into the dash pattern at which the stroke should start
+        :return: tuple with dashes value and offset
+        """
+        if dashes is not None:
+            self._canvas.strokedash = dashes
+        if offset:
+            self._canvas.dashoffset = offset
+        return (self._canvas.strokedash, self._canvas.dashoffset)
 
     def strokecap(self, c=None):
         """Set the stroke cap.
