@@ -128,6 +128,9 @@ class BezierPath(Grob, ColorMixin):
         "strokewidth",
         "strokecap",
         "strokejoin",
+        "strokedash",
+        "dashoffset",
+        "blendmode",
         "transform",
     }
 
@@ -230,6 +233,8 @@ class BezierPath(Grob, ColorMixin):
             strokewidth=self._strokewidth,
             strokecap=self._strokecap,
             strokejoin=self._strokejoin,
+            strokedash=self._strokedash,
+            dashoffset=self._dashoffset,
             blendmode=self._blendmode,
             packed_elements=(self._elements[:], self._render_funcs[:]),
         )
@@ -396,6 +401,8 @@ class BezierPath(Grob, ColorMixin):
         strokewidth = self.strokewidth
         strokecap = self.strokecap
         strokejoin = self.strokejoin
+        strokedash = self.strokedash
+        dashoffset = self.dashoffset
         blendmode = self.blendmode
 
         def _render(cairo_ctx):
@@ -432,6 +439,8 @@ class BezierPath(Grob, ColorMixin):
             if strokecolor:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
+                if strokedash:
+                    cairo_ctx.set_dash(strokedash, dashoffset)
                 if strokecap:
                     # this is needed because strokecap and strokejoin have a ROUND
                     # option which is a different value for each
