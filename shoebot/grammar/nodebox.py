@@ -777,18 +777,26 @@ class NodeBot(Bot):
             self._canvas.lineheight = height
 
     def align(self, align=LEFT):
-        """
-        Set text alignment
+        """Set text alignment
 
         :param align: Text alignment (LEFT, CENTER, RIGHT)
         """
         self._canvas.align = align
 
-    # TODO: Set the framework to setup font options
     def fontoptions(
         self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
     ):
-        raise NotImplementedError(_("fontoptions() isn't implemented yet"))
+        """Set font rendering options.
+
+        :param hintstyle: Hinting style (NONE, SLIGHT, MEDIUM, FULL)
+        :param hintmetrics: Quantize font metrics (ON, OFF)
+        :param antialias: Antialiasing type (NONE, GRAY, SUBPIXEL, FAST, GOOD, BEST)
+        :param subpixelorder: Order of pixels when antialiasing in SUBPIXEL mode (RGB, BGR, VRGB, VBGR)
+        """
+        self._canvas.hintstyle = hintstyle
+        self._canvas.hintmetrics = hintmetrics
+        self._canvas.subpixelorder = subpixelorder
+        self._canvas.antialias = antialias
 
     def fontnames(self):
         return list_pango_fonts()

@@ -181,6 +181,10 @@ class Bot(Grammar):
             overline=None,
             underlinecolor=None,
             overlinecolor=None,
+            hintstyle=None,
+            hintmetrics=None,
+            antialias=None,
+            subpixelorder=None,
         )
 
     def _set_dynamic_vars(self):
