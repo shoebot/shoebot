@@ -38,7 +38,8 @@ class Grob(object):
             self._call_transform_mode = self._center_transform
         elif mode == CORNER:
             self._call_transform_mode = self._corner_transform
-        raise ValueError("mode must be CENTER or CORNER")
+        else:
+            raise ValueError("mode must be CENTER or CORNER")
 
     def _get_center(self):
         """Implementations must return the x, y of their center"""
