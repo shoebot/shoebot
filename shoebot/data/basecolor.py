@@ -84,7 +84,7 @@ class Color(object):
                     a / color_range,
                 )
 
-        # Three to five parameters, either RGB, RGBA, HSB, HSBA, CMYK, CMYKA
+        # Three to five parameters, either RGB, RGBA, HSB, HSBA,
         # depending on the mode parameter.
         elif len(args) >= 3:
             alpha = 1
@@ -105,11 +105,6 @@ class Color(object):
                     args[2] / color_range,
                     alpha,
                 )
-            elif mode == "cmyk":
-                if len(args) == 4:
-                    alpha = 1
-                self.a = alpha
-                self.c, self.m, self.y, self.k = args[0], args[1], args[2], args[3]
 
     def __repr__(self):
         return "%s(%.3f, %.3f, %.3f, %.3f)" % (
@@ -153,12 +148,6 @@ class Color(object):
         self.__dict__["__g"] = g
         self.__dict__["__b"] = b
 
-    def _update_cmyk(self, c, m, y, k):
-        self.__dict__["__c"] = c
-        self.__dict__["__m"] = m
-        self.__dict__["__y"] = y
-        self.__dict__["__k"] = k
-
     def _update_hsb(self, h, s, b):
         self.__dict__["__h"] = h
         self.__dict__["__s"] = s
@@ -193,7 +182,7 @@ class Color(object):
         if a in ["a", "alpha"]:
             self.__dict__["__" + a[0]] = max(0, min(v, 1))
 
-        # RGB changes, update CMYK and HSB accordingly.
+        # RGB changes, update HSB accordingly.
         elif a in ["r", "g", "b", "red", "green", "blue"]:
             self.__dict__["__" + a[0]] = max(0, min(v, 1))
             if self._hasattrs(("__r", "__g", "__b")):
@@ -202,10 +191,9 @@ class Color(object):
                     self.__dict__["__g"],
                     self.__dict__["__b"],
                 )
-                self._update_cmyk(*rgb2cmyk(r, g, b))
                 self._update_hsb(*rgb2hsb(r, g, b))
 
-        # HSB changes, update RGB and CMYK accordingly.
+        # HSB changes, update RGB accordingly.
         elif a in ["h", "s", "hue", "saturation", "brightness"]:
             if a != "brightness":
                 a = a[0]
@@ -219,22 +207,6 @@ class Color(object):
                     self.__dict__["__brightness"],
                 )
                 self._update_rgb(r, g, b)
-                self._update_cmyk(*rgb2cmyk(r, g, b))
-
-        # CMYK changes, update RGB and HSB accordingly.
-        elif a in ["c", "m", "y", "k", "cyan", "magenta", "yellow", "black"]:
-            if a != "black":
-                a = a[0]
-            self.__dict__["__" + a] = max(0, min(v, 1))
-            if self._hasattrs(("__c", "__m", "__y", "__k")):
-                r, g, b = cmyk2rgb(
-                    self.__dict__["__c"],
-                    self.__dict__["__m"],
-                    self.__dict__["__y"],
-                    self.__dict__["__k"],
-                )
-                self._update_rgb(r, g, b)
-                self._update_hsb(*rgb2hsb(r, g, b))
 
         else:
             self.__dict__[a] = v
@@ -243,17 +215,13 @@ class Color(object):
 
         """Available properties:
         r, g, b, a or red, green, blue, alpha
-        c, m, y, k or cyan, magenta, yellow, black,
         h, s or hue, saturation, brightness
 
         """
         if a in self.__dict__:
             return a
-        elif a == "black":
-            return self.__dict__["__k"]
         elif a == "brightness":
             return self.__dict__["__brightness"]
-        # CMYK
         elif a in [
             "a",
             "alpha",
@@ -267,13 +235,6 @@ class Color(object):
             "s",
             "hue",
             "saturation",
-            "c",
-            "m",
-            "y",
-            "k",
-            "cyan",
-            "magenta",
-            "yellow",
         ]:
             return self.__dict__["__" + a[0]]
         elif a in [
@@ -494,38 +455,6 @@ def lab_to_rgb(l, a, b):
 
 
 lab2rgb = lab_to_rgb
-
-
-def cmyk_to_rgb(c, m, y, k):
-    """Cyan, magenta, yellow, black to red, green, blue.
-    ReportLab, http://www.koders.com/python/fid5C006F554616848C01AC7CB96C21426B69D2E5A9.aspx
-    Results will differ from the way NSColor converts color spaces.
-    """
-
-    r = 1.0 - min(1.0, c + k)
-    g = 1.0 - min(1.0, m + k)
-    b = 1.0 - min(1.0, y + k)
-
-    return r, g, b
-
-
-cmyk2rgb = cmyk_to_rgb
-
-
-def rgb_to_cmyk(r, g, b):
-    c = 1 - r
-    m = 1 - g
-    y = 1 - b
-    k = min(c, m, y)
-    c = min(1, max(0, c - k))
-    m = min(1, max(0, m - k))
-    y = min(1, max(0, y - k))
-    k = min(1, max(0, k))
-
-    return c, m, y, k
-
-
-rgb2cmyk = rgb_to_cmyk
 
 
 def hsv_to_rgb(h, s, v):
