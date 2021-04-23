@@ -303,7 +303,7 @@ class Color(object):
 class ColorMixin(object):
     """
     Mixin class for color support.
-    Adds the _fillcolor, _strokecolor and _strokewidth attributes to the class.
+    Adds fill, stroke and blending mode attributes to the class.
 
     Setting color attributes, will convert them to Color instances, allowing
     them to be specfied in other ways, such as   fill="#123456"
@@ -317,6 +317,8 @@ class ColorMixin(object):
         strokewidth=None,
         strokecap=None,
         strokejoin=None,
+        strokedash=None,
+        dashoffset=0,
         blendmode=None,
         **kwargs
     ):
@@ -326,6 +328,8 @@ class ColorMixin(object):
         self.fillrule = fillrule
         self.strokecap = strokecap
         self.strokejoin = strokejoin
+        self.strokedash = strokedash
+        self.dashoffset = dashoffset
         self.blendmode = blendmode
 
     def _get_fill(self):

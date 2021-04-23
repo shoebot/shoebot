@@ -790,6 +790,8 @@ class ClippingPath(BezierPath):
         "strokewidth",
         "strokecap",
         "strokejoin",
+        "strokedash",
+        "dashoffset",
         "blendmode",
     }
 

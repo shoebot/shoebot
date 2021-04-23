@@ -262,6 +262,8 @@ class Bot(Grammar):
         kwargs["strokewidth"] = kwargs.get("strokewidth", self._canvas.strokewidth)
         kwargs["strokecap"] = kwargs.get("strokecap", self._canvas.strokecap)
         kwargs["strokejoin"] = kwargs.get("strokejoin", self._canvas.strokejoin)
+        kwargs["strokedash"] = kwargs.get("strokedash", self._canvas.strokedash)
+        kwargs["dashoffset"] = kwargs.get("dashoffset", self._canvas.dashoffset)
         kwargs["blendmode"] = kwargs.get("blendmode", self._canvas.blendmode)
         inst = clazz(self, *args, **kwargs)
         return inst
