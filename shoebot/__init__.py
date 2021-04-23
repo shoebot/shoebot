@@ -140,7 +140,6 @@ def create_canvas(
 
 def create_bot(
     src=None,
-    grammar=NODEBOX,
     format=None,
     outputfile=None,
     iterations=1,
@@ -158,7 +157,6 @@ def create_bot(
     Create a canvas and a bot with the same canvas attached to it
 
     bot parameters
-    :param grammar: DRAWBOT or NODEBOX - decides what kind of bot is created
     :param vars: preset dictionary of vars from the called
 
     canvas parameters:
@@ -248,7 +246,6 @@ class ShoebotThread(threading.Thread):
 
 def run(
     src,
-    grammar=NODEBOX,
     format=None,
     outputfile=None,
     iterations=1,
@@ -300,7 +297,6 @@ def run(
     # arguments for create_bot
     create_args = [
         src,
-        grammar,
         format,
         outputfile,
         iterations,
