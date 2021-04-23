@@ -7,29 +7,16 @@
 import sys
 import locale
 import gettext
-from shoebot.data import _copy_attrs
 
-# from shoebot.data import Grob, ColorMixin, TransformMixin
-from shoebot.core.backend import cairo
-from .grob import Grob
 from itertools import chain
-from .basecolor import ColorMixin
 from math import pi as _pi, sqrt
 from math import sin, cos
 
+from shoebot.core.backend import cairo
+
+from .basecolor import ColorMixin
+from .grob import Grob, CENTER, CORNER, CORNERS
 from . import geometry
-
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
-
-APP = "shoebot"
-DIR = sys.prefix + "/share/shoebot/locale"
-locale.setlocale(locale.LC_ALL, "")
-gettext.bindtextdomain(APP, DIR)
-# gettext.bindtextdomain(APP)
-gettext.textdomain(APP)
-_ = gettext.gettext
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -106,6 +93,13 @@ BLENDMODES = {
     ADD: cairo.OPERATOR_ADD,
     SATURATE: cairo.OPERATOR_SATURATE,
 }
+
+APP = "shoebot"
+DIR = sys.prefix + "/share/shoebot/locale"
+locale.setlocale(locale.LC_ALL, "")
+gettext.bindtextdomain(APP, DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
 
 
 class BezierPath(Grob, ColorMixin):

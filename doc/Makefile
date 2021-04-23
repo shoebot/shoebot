@@ -77,8 +77,8 @@ linkcheck:
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in build/linkcheck/output.txt."
 
-deploy: clean html
+deploy: html
 	rsync -e "ssh" -P -rvzc build/html/ manufactura:~/apps/shoebot-docs/ --cvs-exclude
 
-dry-deploy: clean html
+dry-deploy: html
 	rsync -n -e "ssh" -P -rvzc build/html/ manufactura:~/apps/shoebot-docs/ --cvs-exclude

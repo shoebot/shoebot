@@ -27,7 +27,6 @@ class TestExampleOutput(ShoebotTestCase):
     @parameterized.expand(
         [
             ("examples/basic/primitives.bot", "basic--primitives"),
-            ("examples/libraries/graph/shortest_path.bot", "graph--shortest_path"),
             (
                 "examples/libraries/lsystem/growing_plant.bot",
                 "lsystem--growing_plant",

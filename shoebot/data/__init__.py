@@ -38,79 +38,56 @@ The drawing objects could benefit from an actual, proper Python library to
 handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 
 """
+import sys
+
+from . import geometry as geo
+from shoebot.core.backend import cairo
+from .basecolor import (
+    CMYK,
+    HSB,
+    RGB,
+    BUTT,
+    ROUND,
+    SQUARE,
+    BEVEL,
+    MITER,
+    Color,
+    ColorMixin,
+)
+from .bezier import (
+    ARC,
+    CLOSE,
+    CURVETO,
+    ELLIPSE,
+    LINETO,
+    MOVETO,
+    RCURVETO,
+    RLINETO,
+    RMOVETO,
+    BezierPath,
+    ClippingPath,
+    EndClip,
+    PathElement,
+)
+from .grob import CENTER, CORNER, CORNERS
+from .img import Image
+from .point import Point
+from .transforms import Transform
+from .variable import BOOLEAN, BUTTON, NUMBER, TEXT, Variable
+
+try:
+    from .typography import Text
+except ImportError as e:
+    Text = None
+    print(_("Typography not available ", e), file=sys.stderr)
+
+LEFT = "left"
+RIGHT = "right"
 
 
 class ShoebotError(Exception):
     pass
 
 
-class ShoebotScriptError(Exception):
-    pass
-
-
 class NodeBoxError(ShoebotError):
     pass
-
-
-def _copy_attr(v):
-    if v is None:
-        return None
-    elif hasattr(v, "copy"):
-        return v.copy()
-    elif isinstance(v, list):
-        return list(v)
-    elif isinstance(v, tuple):
-        return tuple(v)
-    elif isinstance(v, (int, str, float, bool)):
-        return v
-    else:
-        raise NodeBoxError(_("Don't know how to copy '%s'.") % v)
-
-
-def _copy_attrs(source, target, attrs):
-    for attr in attrs:
-        setattr(target, attr, _copy_attr(getattr(source, attr)))
-
-
-from . import geometry as geo
-from shoebot.core.backend import cairo
-from .point import Point
-from .basecolor import Color, ColorMixin
-from .grob import Grob
-from .bezier import BezierPath, PathElement, ClippingPath, EndClip
-
-try:
-    from .typography import Text
-except ImportError as e:
-    Text = None
-    print(("Typography not available ", e))
-from .img import Image
-from .variable import Variable, NUMBER, TEXT, BOOLEAN, BUTTON
-from .transforms import Transform
-
-MOVETO = "moveto"
-RMOVETO = "rmoveto"
-LINETO = "lineto"
-RLINETO = "rlineto"
-CURVETO = "curveto"
-RCURVETO = "rcurveto"
-ARC = "arc"
-ELLIPSE = "ellipse"
-CLOSE = "close"
-
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
-
-LEFT = "left"
-RIGHT = "right"
-
-RGB = "rgb"
-HSB = "hsb"
-CMYK = "cmyk"
-
-BUTT = "butt"
-ROUND = "round"
-SQUARE = "square"
-BEVEL = "bevel"
-MITER = "miter"

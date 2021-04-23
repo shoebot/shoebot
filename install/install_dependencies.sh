@@ -24,7 +24,7 @@ HOMEBREW_PACKAGES="cairo gobject-introspection gtk+3 gtksourceview3 jpeg libffi 
 MACPORTS_PACKAGES="gtk3 py37-gobject gobject-introspection jpeg librsvg cairo cairo-devel py37-cairo gtksourceview3 python3-wrapt"
 
 # MinGW64 (Windows x86_64) (install in this order)
-MINGW64_PACKAGES="mingw-w64-x86_64-python mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3-gobject mingw-w64-x86_64-gtksourceview3 mingw-w64-x86_64-python-pillow mingw-w64-x86_64-python-pip mingw-w64-python-wrapt git"
+MINGW64_PACKAGES="mingw-w64-x86_64-python mingw-w64-x86_64-gtk3 mingw-w64-x86_64-python3-gobject mingw-w64-x86_64-gtksourceview3 mingw-w64-x86_64-python-pillow mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-wrapt git"
 # mingw-w64-x86_64-python-pip and git are not dependencies but are required for git clone https://github.com/shoebot/shoebot and python setup.py install
 
 install_apt() {
@@ -214,5 +214,3 @@ fi
 
 $INSTALL
 hash -r
-
-echo "Done with dependencies, you can now install Shoebot."

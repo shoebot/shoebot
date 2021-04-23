@@ -3,8 +3,10 @@
 
 from shoebot.core.backend import cairo
 
+# Alignments
 CENTER = "center"
 CORNER = "corner"
+CORNERS = "corners"
 
 STATES = {
     "transform": "_transform",
