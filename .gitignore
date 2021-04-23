@@ -21,6 +21,7 @@ debian/files
 
 # as well as sphinx output
 doc/build/*
+doc/build-images/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

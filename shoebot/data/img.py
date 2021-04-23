@@ -1,11 +1,14 @@
-from shoebot.core.backend import cairo, gi, driver
-from shoebot.data import _copy_attrs
-
 import array
-from io import StringIO
 import os.path
+from io import StringIO
 
 from PIL import Image as PILImage
+
+from shoebot.core.backend import cairo, driver, gi
+from shoebot.util import _copy_attrs
+
+from .basecolor import ColorMixin
+from .grob import Grob
 
 try:
     gi.require_version("Rsvg", "2.0")
@@ -13,7 +16,6 @@ try:
 except ValueError:
     Rsvg = None
 
-from shoebot.data import Grob, ColorMixin
 
 CENTER = "center"
 CORNER = "corner"

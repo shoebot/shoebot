@@ -14,16 +14,18 @@ class Variable(object):
     """Taken from Nodebox"""
 
     def __init__(self, name, type, **kwargs):
-        """
-        :param name:     Name of variable
-        :param type:     NUMBER | TEXT | BOOLEAN | BUTTON
-        :param default:  default value
-        :param min:      min value if number
-        :param max:      max value if number
-        :param value:    value
-        :param step:     step between values - cannot specify at same time as step
-        :param steps:    total steps
-        :return:
+        """Creates a live variable, which can be manipulated using the
+        variables UI, socket server or live coding shell.
+
+        :param name: variable name
+        :param type: variable type
+        :type type: NUMBER, TEXT, BOOLEAN or BUTTON
+        :param default: default value
+        :param min: minimum value (NUMBER only)
+        :param max: maximum value (NUMBER only)
+        :param value: initial value (if not defined, use ``default``)
+        :param step: step length for the variables GUI (use this or ``steps``, not both)
+        :param steps: number of steps in the variables GUI (use this or ``step``, not both)
         """
         self.name = name
         if not isinstance(name, str):
@@ -80,8 +82,8 @@ class Variable(object):
 
     def compliesTo(self, v):
         """Return whether I am compatible with the given var:
-             - Type should be the same
-             - My value should be inside the given vars' min/max range.
+        - Type should be the same
+        - My value should be inside the given vars' min/max range.
         """
         if self.type == v.type:
             if self.type == NUMBER:

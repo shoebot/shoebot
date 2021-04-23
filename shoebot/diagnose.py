@@ -143,9 +143,7 @@ def shoebot_example(**shoebot_kwargs):
 
     def decorator(f):
         def run():
-            from shoebot import (
-                ShoebotInstallError,
-            )  # https://github.com/shoebot/shoebot/issues/206
+            from shoebot.util import ShoebotInstallError
 
             print("    Shoebot - %s:" % f.__name__.replace("_", " "))
             try:

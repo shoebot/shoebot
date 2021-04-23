@@ -36,11 +36,6 @@ import threading
 from shoebot.core.backend import cairo
 from shoebot.grammar import NodeBot
 
-
-class ShoebotInstallError(Exception):
-    pass
-
-
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
@@ -49,7 +44,6 @@ from shoebot.core.events import publish_event, QUIT_EVENT
 
 RGB = "rgb"
 HSB = "hsb"
-CMYK = "cmyk"
 
 CENTER = "center"
 CORNER = "corner"
