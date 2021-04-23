@@ -608,16 +608,16 @@ class NodeBot(Bot):
         """ Stop applying fills to new paths."""
         self._canvas.fillcolor = None
 
-    def fillrule(self, c=None):
+    def fillrule(self, r=None):
         """Set the fill rule to use in new paths.
 
-        :param w: Fill rule
-        :return: If no fillrule was specified then current fillrule is returned.
+        :param r: fill rule to apply
+        :type r: WINDING or EVENODD
+        :return: current fill rule value
         """
-        if w is not None:
-            self._canvas.fillrule = w
-        else:
-            return self._canvas.fillrule
+        if r is not None:
+            self._canvas.fillrule = r
+        return self._canvas.fillrule
 
     def stroke(self, *args):
         """Set a stroke color, applying it to new paths.
@@ -675,8 +675,7 @@ class NodeBot(Bot):
         """
         if c is not None:
             self._canvas.strokecap = c
-        else:
-            return self._canvas.strokecap
+        return self._canvas.strokecap
 
     def strokejoin(self, j=None):
         """Set the stroke join.
@@ -686,8 +685,7 @@ class NodeBot(Bot):
         """
         if j is not None:
             self._canvas.strokejoin = j
-        else:
-            return self._canvas.strokejoin
+        return self._canvas.strokejoin
 
     def background(self, *args):
         """Set the background color.
@@ -695,6 +693,7 @@ class NodeBot(Bot):
         :param color: See color() function for supported color formats.
         """
         self._canvas.background = self.color(*args)
+        return self._canvas.background
 
     def blendmode(self, mode=None):
         """
