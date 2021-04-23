@@ -1,7 +1,12 @@
+import gettext
+import locale
 import string
+import sys
 from math import floor
 
-import sys, locale, gettext
+RGB = "rgb"
+HSB = "hsb"
+CMYK = "cmyk"
 
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
@@ -12,14 +17,9 @@ _ = gettext.gettext
 
 
 class Color(object):
-    """
-    Taken from Nodebox colors library and modified.
-    Since we have no Cocoa, we have no way to use colour management for the moment.
-    So we took another approach.
+    """Represents a single color.
 
-    Attributes:
-    r, g, b (0-1)
-    hue, saturation, lightness (0-1)
+    Attributes (RGB and HSL) are values between 0 and 1
 
     This stores color values as a list of 4 floats (RGBA) in a 0-1 range.
 

@@ -170,7 +170,7 @@ class TestText(ShoebotTestCase):
             return
         font(fontname)
         t = text("Hello world", 0, 100, draw=False)
-        assert t.bounds == expected_bounds
+        self.assertEqual(t.bounds, expected_bounds)
 
     @parameterized.expand(
         [

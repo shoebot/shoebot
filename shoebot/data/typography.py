@@ -29,10 +29,15 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
 from enum import Enum
-from operator import attrgetter
 
-from shoebot import ShoebotInstallError
-from shoebot.core.backend import cairo, gi, driver
+from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
+
+from shoebot.core.backend import cairo, driver, gi
+from shoebot.util import ShoebotInstallError, _copy_attrs
+
+from .basecolor import ColorMixin
+from .bezier import BezierPath
+from .grob import Grob
 
 try:
     gi.require_version("Pango", "1.0")
@@ -42,7 +47,7 @@ except ValueError as e:
     global Pango, PangoCairo
 
     # workaround for readthedocs where Pango is not installed,
-    print("Pango not found - typography will not be available.", file=sys.stderr)
+    print(_("Pango not found - typography will not be available."), file=sys.stderr)
 
     class FakePango(object):
         class Weight(Enum):
@@ -68,10 +73,6 @@ except ValueError as e:
 
     Pango = FakePango()
     PangoCairo = FakePango()
-
-from shoebot.data import Grob, BezierPath, ColorMixin, _copy_attrs
-from cairo import PATH_MOVE_TO, PATH_LINE_TO, PATH_CURVE_TO, PATH_CLOSE_PATH
-
 
 # Pango Utility functions
 def pangocairo_create_context(cr):
@@ -142,6 +143,10 @@ class Text(Grob, ColorMixin):
         self.lineheight = kwargs.get("lineheight", canvas.lineheight)
         self.indent = kwargs.get("indent")
 
+        self.hintstyle = kwargs.get("hintstyle", canvas.hintstyle)
+        self.hintmetrics = kwargs.get("hintmetrics", canvas.hintmetrics)
+        self.antialias = kwargs.get("antialias", canvas.antialias)
+        self.subpixelorder = kwargs.get("subpixelorder", canvas.subpixelorder)
         # these are the settings that we have to define with the
         # Pango.Markup hack (see below in _pre_render), so it's neater to
         # have them in a dict
@@ -181,12 +186,32 @@ class Text(Grob, ColorMixin):
                 self._deferred_render()
         self._prerendered = draw
 
-    # pre rendering is needed to measure the metrics of the text, it's also useful to get the path, without the need to call _render()
+    # pre rendering is needed to measure the metrics of the text, it's also
+    # useful to get the path, without the need to call _render()
     def _pre_render(self):
         # we use a new CairoContext to pre render the text
         rs = cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
         cr = cairo.Context(rs)
         cr = driver.ensure_pycairo_context(cr)
+
+        # apply font options if set
+        if self.hintstyle or self.hintmetrics or self.subpixelorder or self.antialias:
+            opts = cairo.FontOptions()
+            # map values to Cairo constants
+            if self.antialias:
+                opts.set_antialias(getattr(cairo.Antialias, self.antialias.upper()))
+            if self.hintstyle:
+                opts.set_hint_style(getattr(cairo.HintStyle, self.hintstyle.upper()))
+            if self.hintmetrics:
+                opts.set_hint_metrics(
+                    getattr(cairo.HintMetrics, self.hintmetrics.upper())
+                )
+            if self.subpixelorder:
+                opts.set_subpixel_order(
+                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper())
+                )
+            cr.set_font_options(opts)
+
         self._pangocairo_ctx = pangocairo_create_context(cr)
         self._pango_layout = PangoCairo.create_layout(cr)
         # layout line spacing
