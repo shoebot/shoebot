@@ -119,8 +119,11 @@ class Bot(Grammar):
 
     # Default mouse values
     MOUSEX = -1
+    """The x-value of the mouse cursor coordinates."""
     MOUSEY = -1
+    """The y-value of the mouse cursor coordinates."""
     mousedown = False
+    """Is True if the mouse button is pressed."""
 
     # Default key values
     key = "-"
@@ -329,12 +332,15 @@ class Bot(Grammar):
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled=False):
         """Returns an iterator that contains coordinate tuples.
-        The grid can be used to quickly create grid-like structures.
-        A common way to use them is:
+
+        This command can be used to quickly create grid-like structures.
+        A common usage pattern is:
+
+        .. code-block:: python
+
             for x, y in grid(10,10,12,12):
                 rect(x,y, 10,10)
         """
-        # Taken ipsis verbis from Nodebox
         from random import shuffle
 
         rowRange = list(range(int(rows)))
@@ -348,16 +354,17 @@ class Bot(Grammar):
 
     def files(self, path="*"):
         """Returns a list of files.
-        You can use wildcards to specify which files to pick, e.g.
-            f = files('*.gif')
 
-        :param path: wildcard to use in file list.
+        Use wildcards to specify which files to pick, e.g. ``f =
+        files('*.gif')``.
+
+        :param path: wildcard to use in file list
+        :return: list of file names
         """
-        # Taken ipsis verbis from Nodebox
         return glob(path)
 
     def snapshot(self, target=None, defer=None, autonumber=False):
-        """Save the contents of current surface into a file or cairo surface/context
+        """Save the contents of current surface into a file or cairo surface/context.
 
         :param filename: Can be a filename or a Cairo surface.
         :param defer: When to snapshot, if set to True waits until the frame has finished rendering.

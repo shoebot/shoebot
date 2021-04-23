@@ -104,7 +104,30 @@ class NodeBot(Bot):
         draw=True,
         **kwargs,
     ):
-        """Draws a image form path, in x,y and resize it to width, height dimensions."""
+        """Draws a image with (x,y) as the top left corner.
+
+        If width and height are specified, resize the image to fit.
+
+        form path, in x,y and resize it to width, height dimensions.
+
+        :param path: location of the image on disk
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param width: image width (leave blank to use its original width)
+        :param height: image height (leave blank to use its original height)
+        :param alpha: opacity
+        :param data: image data to load. Use this instead of ``path`` if you want to load an image from memory or have another source (e.g. using the `web` library)
+        :param draw: whether to place the image immediately on the canvas or not
+        :type path: filename
+        :type x: float
+        :type y: float
+        :type width: float or None
+        :type height: float or None
+        :type alpha: float
+        :type data: binary data
+        :type draw: bool
+        """
+
         return self.Image(path, x, y, width, height, alpha, data, **kwargs)
 
     def imagesize(self, path):
@@ -118,19 +141,16 @@ class NodeBot(Bot):
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        """
-        Draw a rectangle from x, y of width, height.
+        """Draw a rectangle.
 
-        :param startx: top left x-coordinate
-        :param starty: top left y-coordinate
-
-        :param width: height  Size of rectangle.
-        :roundness: Corner roundness defaults to 0.0 (a right-angle).
-        :draw: If True draws immediately.
-        :fill: Optionally pass a fill color.
-
-        :return: path representing the rectangle.
-
+        :param x: top left x-coordinate
+        :param y: top left y-coordinate
+        :param width: rectangle width
+        :param height: rectangle height
+        :param roundness: rounded corner radius
+        :param boolean draw: whether to draw the shape on the canvas or not
+        :param fill: fill color
+        :return: BezierPath representing the rectangle
         """
         path = self.BezierPath(**kwargs)
         path.rect(x, y, width, height, roundness, self.rectmode)
@@ -139,11 +159,11 @@ class NodeBot(Bot):
         return path
 
     def rectmode(self, mode=None):
-        """
-        Set the current rectmode.
+        """Get or set the current rectmode.
 
-        :param mode: CORNER, CENTER, CORNERS
-        :return: rectmode if mode is None or valid.
+        :param mode: the mode to draw new rectangles in
+        :type mode: CORNER, CENTER or CORNERS
+        :return: current rectmode value
         """
         if mode in (self.CORNER, self.CENTER, self.CORNERS):
             self.rectmode = mode
@@ -152,6 +172,35 @@ class NodeBot(Bot):
             return self.rectmode
         else:
             raise ShoebotError(_("rectmode: invalid input"))
+
+    def ellipse(self, x, y, width, height, draw=True, **kwargs):
+        """Draw an ellipse.
+
+        :param x: top left x-coordinate
+        :param y: top left y-coordinate
+        :param width: ellipse width
+        :param height: ellipse height
+        :param boolean draw: whether to draw the shape on the canvas or not
+        :return: BezierPath representing the ellipse
+        """
+
+        path = self.BezierPath(**kwargs)
+        path.ellipse(x, y, width, height, self.ellipsemode)
+        if draw:
+            path.draw()
+        return path
+
+    oval = ellipse
+
+    def circle(self, x, y, diameter, draw=True, **kwargs):
+        """Draw a circle
+        :param x: x-coordinate of the top left corner
+        :param y: y-coordinate of the top left corner
+        :param diameter: circle diameter
+        :param boolean draw: whether to draw the shape on the canvas or not
+        :return: BezierPath representing the circle
+        """
+        return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
 
     def ellipsemode(self, mode=None):
         """
@@ -168,38 +217,15 @@ class NodeBot(Bot):
         else:
             raise ShoebotError(_("ellipsemode: invalid input"))
 
-    def oval(self, x, y, width, height, draw=True, **kwargs):
-        """Draw an ellipse starting from (x,y) -  ovals and ellipses are not the same"""
-        path = self.BezierPath(**kwargs)
-        path.ellipse(x, y, width, height, self.ellipsemode)
-        if draw:
-            path.draw()
-        return path
-
-    def ellipse(self, x, y, width, height, draw=True, **kwargs):
-        """Draw an ellipse starting from (x,y)"""
-        path = self.BezierPath(**kwargs)
-        path.ellipse(x, y, width, height, self.ellipsemode)
-        if draw:
-            path.draw()
-        return path
-
-    def circle(self, x, y, diameter, draw=True, **kwargs):
-        """Draw a circle
-        :param x: x-coordinate of the top left corner
-        :param y: y-coordinate of the top left corner
-        :param diameter: Diameter of circle.
-        :param draw: Draw immediately (defaults to True, set to False to inhibit drawing)
-        :return: Path object representing circle
-        """
-        return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
-
     def line(self, x1, y1, x2, y2, draw=True, **kwargs):
-        """Draw a line from (x1,y1) to (x2,y2)
-        :param x1: start x-coordinate
-        :param y1: start y-coordinate
-        :param x2: end x-coordinate
-        :param y2: end y-coordinate
+        """Draw a line from (x1,y1) to (x2,y2).
+
+        :param x1: x-coordinate of the first point
+        :param y1: y-coordinate of the first point
+        :param x2: x-coordinate of the second point
+        :param y2: y-coordinate of the second point
+        :param boolean draw: whether to draw the shape on the canvas or not
+        :return: BezierPath representing the line
         """
         self.beginpath(**kwargs)
         self.moveto(x1, y1)
@@ -207,7 +233,8 @@ class NodeBot(Bot):
         return self.endpath(draw=draw)
 
     def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
-        """Draw a arc with center (x,y) between two angles in degrees.
+        """Draw an arc with center (x,y) between two angles in degrees.
+
         :param x1: start x-coordinate
         :param y1: start y-coordinate
         :param radius: arc radius
@@ -215,8 +242,6 @@ class NodeBot(Bot):
         :param angle2: end angle
         """
         self.beginpath(**kwargs)
-        # FIXME: hack to ensure the path is not empty
-        self.moveto(0, 0)
         if type == self.PIE:
             # find the coordinates of the start and end points
             x1 = x + radius * cos(deg2rad(angle1))
@@ -226,21 +251,20 @@ class NodeBot(Bot):
             self.moveto(x2, y2)
             self.lineto(x, y)
             self.lineto(x1, y1)
+        # self.moveto(x, y)  # uncomment to fix the "empty path" issue
         self.arcto(x, y, radius, angle1, angle2)
         return self.endpath(draw=draw)
 
     def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
         """Draw an arrow.
 
-        Arrows can be two types: NORMAL or FORTYFIVE.
-
-        :param x: top left x-coordinate
-        :param y: top left y-coordinate
-        :param width: width of arrow
-        :param type:  NORMAL or FORTYFIVE
-        :draw:  If True draws arrow immediately
-
-        :return: Path object representing the arrow.
+        :param x: arrow tip x-coordinate
+        :param y: arrow tip y-coordinate
+        :param width: arrow width (also sets height)
+        :param type: arrow type
+        :type type: NORMAL or FORTYFIVE
+        :param boolean draw: whether to draw the shape on the canvas or not
+        :return: BezierPath object representing the arrow
         """
         # Taken from Nodebox
         self.beginpath(**kwargs)
@@ -275,7 +299,16 @@ class NodeBot(Bot):
         return self.endpath(draw=draw)
 
     def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
-        """Draws a star."""
+        """Draws a star.
+
+        :param startx: center x-coordinate
+        :param starty: center y-coordinate
+        :param points: amount of points
+        :param outer: outer radius
+        :param inner: inner radius
+        :param boolean draw: whether to draw the shape on the canvas or not
+        """
+
         # Taken from Nodebox.
         self.beginpath(**kwargs)
         self.moveto(startx, starty + outer)
@@ -298,18 +331,41 @@ class NodeBot(Bot):
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None, **kwargs):
+        """Start a new Bézier path.
+
+        This command is needed before any other path drawing commands.
+
+        :param x: x-coordinate of the starting point
+        :param y: y-coordinate of the starting point
+        :type x: float or None
+        :type y: float or None
+        """
         self._path = self.BezierPath(**kwargs)
         # if we have arguments, do a moveto too
         if x is not None and y is not None:
             self._path.moveto(x, y)
 
     def moveto(self, x, y):
+        """Move the Bézier "pen" to the specified point without drawing.
+
+        :param x: x-coordinate of the point to move to
+        :param y: y-coordinate of the point to move to
+        :type x: float
+        :type y: float
+        """
         if self._path is None:
             # self.beginpath()
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.moveto(x, y)
 
     def lineto(self, x, y):
+        """Draw a line from the pen's current point.
+
+        :param x: x-coordinate of the point to draw to
+        :param y: y-coordinate of the point to draw to
+        :type x: float
+        :type y: float
+        """
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.lineto(x, y)
@@ -473,36 +529,41 @@ class NodeBot(Bot):
     # Transform and utility
 
     def beginclip(self, path):
-        # FIXME: this save should go into Canvas
+        """Use a path as a clipping mask.
+
+        All drawing commands between beginclip() and endclip() will be drawn
+        inside the clipping mask set by beginclip().
+
+        :param path: the path to be used as a clipping mask
+        :type path: BezierPath
+        """
         p = self.ClippingPath(path)
         p.draw()
         return p
 
     def endclip(self):
+        """Finish a clipping mask and render the result."""
         p = self.EndClip()
         p.draw()
 
     def transform(self, mode=None):
-        """
-        Set the current transform mode.
+        """Set the current transform mode.
 
-        :param mode: CENTER or CORNER"""
+        :param mode: the mode to base new transformations on
+        :type mode: CORNER or CENTER
+        """
         if mode:
             self._canvas.mode = mode
         return self._canvas.mode
 
-    def translate(self, xt, yt, mode=None):
+    def translate(self, xt, yt):
         """
-        Translate the current position by (xt, yt) and
-        optionally set the transform mode.
+        Translate the canvas origin point by (xt, yt).
 
         :param xt: Amount to move horizontally
         :param yt: Amount to move vertically
-        :mode: Set the transform mode to CENTER or CORNER
         """
         self._canvas.translate(xt, yt)
-        if mode:
-            self._canvas.mode = mode
 
     def rotate(self, degrees=0, radians=0):
         """
@@ -522,7 +583,7 @@ class NodeBot(Bot):
         """
         Set a scale at which to draw objects.
 
-        1.0 draws objects at their natural size
+        1.0 draws objects at their natural size.
 
         :param x: Scale on the horizontal plane
         :param y: Scale on the vertical plane
@@ -569,12 +630,19 @@ class NodeBot(Bot):
         :param mode: Color mode, either "rgb", or "hsb"
         :param range: Maximum scale value for color, e.g. 1.0 or 255
 
+        :param mode: Color mode to use
+        :type mode: RGB or HSB
+        :param crange: Maximum value for the new color range to use
+        :type crange: float
+        :return: Current color mode
+
+
         :return: Returns the current color mode.
         """
         if mode is not None:
-            if mode == "rgb":
+            if mode == RGB:
                 self.color_mode = RGB
-            elif mode == "hsb":
+            elif mode == HSB:
                 self.color_mode = HSB
             else:
                 raise NameError(_("Only RGB and HSB colormodes are supported."))
@@ -583,13 +651,15 @@ class NodeBot(Bot):
         return self.color_mode
 
     def colorrange(self, crange):
-        """By default colors range from 0.0 - 1.0 using colorrange
-        other defaults can be used, e.g. 0.0 - 255.0
+        """Sets the current color range.
 
-        :param crange: Color range of 0.0 - 255:
-        >>> colorrange(256)
+        The default is 0-1; for a range of 0-255, use ``colorrange(256)``.
+
+        :param crange: maximum value for new color range
+        :return: current range value
         """
         self.color_range = float(crange)
+        return self.color_range
 
     def fill(self, *args):
         """Sets a fill color, applying it to new paths.
@@ -649,8 +719,8 @@ class NodeBot(Bot):
         :param fontsize: font size
         :param vars: font variant values, as a dict of axis/value pairs (variable fonts only)
         :param var_XXXX: set variant value (variable fonts only)
+        :return: current fontpath (if fontpath param not set)
 
-        :return: current current fontpath (if fontpath param not set)
         Accepts TrueType and OpenType files. Depends on FreeType being
         installed."""
         if fontpath is not None:
@@ -676,29 +746,26 @@ class NodeBot(Bot):
             self._canvas.fontsize = fontsize
 
     def fontsize(self, fontsize=None):
-        """
-        Set or return size of current font.
+        """Sets and/or returns the current font size.
 
-        :param fontsize: Size of font.
-        :return: Size of font (if fontsize was not specified)
+        :param fontsize: Font size in pt
+        :return: the current font size value
         """
         if fontsize is not None:
             self._canvas.fontsize = fontsize
-        else:
-            return self._canvas.fontsize
+        return self._canvas.fontsize
 
     def text(
         self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs
     ):
-        """
-        Draws a string of text according to current font settings.
+        """Draws a string of text according to the current font settings.
 
         :param txt: Text to output
         :param x: x-coordinate of the top left corner
         :param y: y-coordinate of the top left corner
         :param width: text width
         :param height: text height
-        :param outline: If True draws outline text (defaults to False)
+        :param outline: If True, draws a path instead of a text object (defaults to False)
         :param draw: Set to False to inhibit immediate drawing (defaults to True)
         :return: Path object representing the text.
         """
@@ -708,12 +775,10 @@ class NodeBot(Bot):
             if draw:
                 path.draw()
             return path
-        else:
-            return txt
+        return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
-        """
-        Generates an outlined path of the input text.
+        """Generates an outlined path of the input text.
 
         :param txt: Text to output
         :param x: x-coordinate of the top left corner
@@ -721,7 +786,7 @@ class NodeBot(Bot):
         :param width: text width
         :param height: text height
         :param draw: Set to False to inhibit immediate drawing (defaults to False)
-        :return: Path object representing the text.
+        :return: BezierPath representing the text
         """
         txt = self.Text(txt, x, y, width, height, draw=False, **kwargs)
         path = txt.path
@@ -730,10 +795,10 @@ class NodeBot(Bot):
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):
-        """
+        """Returns the dimensions of the text box of a string of text, according
+        to the current font settings.
 
-        :return: the width and height of a string of text as a tuple
-        according to current font settings (text box size)
+        :return: (width, height) tuple
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
@@ -741,19 +806,19 @@ class NodeBot(Bot):
         return txt.metrics
 
     def textbounds(self, txt, width=None, height=None, **kwargs):
-        """
+        """Returns the dimensions of the actual shapes (inked part) of a string
+        of text, according to the current font settings.
 
-        :return: the width and height of a string of text as a tuple
-        according to current font settings (inked part)
+        :return: (width, height) tuple
         """
         txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.bounds
 
     def textwidth(self, txt, width=None):
-        """
-
-        :return: the width of a string of text according to the current
+        """Returns the width of a string of text according to the current
         font settings.
+
+        :return:
         """
         w = width
         return self.textmetrics(txt, width=w)[0]
@@ -775,6 +840,7 @@ class NodeBot(Bot):
         """
         if height is not None:
             self._canvas.lineheight = height
+        return self._canvas.lineheight
 
     def align(self, align=LEFT):
         """Set text alignment
@@ -782,6 +848,7 @@ class NodeBot(Bot):
         :param align: Text alignment (LEFT, CENTER, RIGHT)
         """
         self._canvas.align = align
+        return self._canvas.align
 
     def fontoptions(
         self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
