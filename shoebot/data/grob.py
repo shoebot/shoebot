@@ -16,6 +16,8 @@ STATES = {
     "strokewidth": "_strokewidth",
     "strokecap": "_strokecap",
     "strokejoin": "_strokejoin",
+    "strokedash": "_strokedash",
+    "dashoffset": "_dashoffset",
     "blendmode": "_blendmode",
     "align": "_align",
     "fontsize": "_fontsize",
