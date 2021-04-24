@@ -169,9 +169,12 @@ Drawing shapes
         arrow(50, 40, 40)
         arrow(90, 40, 40, FORTYFIVE)
 
-.. py:function:: star(startx, starty, points=20, outer=100, inner=50, draw=True)
+.. py:function:: star(x, y, points=20, outer=100, inner=50, draw=True)
 
-    Draw a star-like polygon.
+    Draw a star-like polygon with its center at (x,y).
+
+    Following the coordinates, this command expects the number of points, the
+    outer radius of the star shape, and finally the inner radius.
 
     .. shoebot::
         :alt: 4 stars.

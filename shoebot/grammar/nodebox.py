@@ -302,11 +302,11 @@ class NodeBot(Bot):
             )
         return self.endpath(draw=draw)
 
-    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
+    def star(self, x, y, points=20, outer=100, inner=50, draw=True, **kwargs):
         """Draws a star.
 
-        :param startx: center x-coordinate
-        :param starty: center y-coordinate
+        :param x: center x-coordinate
+        :param y: center y-coordinate
         :param points: amount of points
         :param outer: outer radius
         :param inner: inner radius
@@ -315,19 +315,19 @@ class NodeBot(Bot):
 
         # Taken from Nodebox.
         self.beginpath(**kwargs)
-        self.moveto(startx, starty + outer)
+        self.moveto(x, y + outer)
 
         for i in range(1, int(2 * points)):
             angle = i * pi / points
-            x = sin(angle)
-            y = cos(angle)
+            px = sin(angle)
+            py = cos(angle)
             if i % 2:
                 radius = inner
             else:
                 radius = outer
-            x = startx + radius * x
-            y = starty + radius * y
-            self.lineto(x, y)
+            px = x + radius * px
+            py = y + radius * py
+            self.lineto(px, py)
 
         return self.endpath(draw)
 
