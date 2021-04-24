@@ -864,7 +864,41 @@ Text
 
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
-  Not implemented.
+  Sets text rendering options.
+
+  The ``antialias`` option specifies the type of antialiasing to do:
+
+  - ``default`` -- Use the default antialiasing for the subsystem and target device
+  - ``none`` -- no antialiasing
+  - ``gray`` -- single-color antialiasing
+  - ``subpixel`` -- take advantage of the order of subpixel elements on
+    devices such as LCD panels
+  - ``fast`` -- prefer speed over quality
+  - ``good`` -- balance quality against performance
+  - ``best`` -- render at the highest quality, sacrificing speed if necessary
+
+  The ``subpixelorder`` sets the order to use with the antialias ``subpixel``
+  option:
+
+  - ``rgb`` -- arranged horizontally with red at the left
+  - ``bgr`` -- arranged horizontally with blue at the left
+  - ``vrgb`` -- arranged vertically with red at the top
+  - ``vbgr`` -- arranged vertically with blue at the top
+
+  The ``hintstyle`` option sets the amount of font hinting to apply:
+
+  - ``default`` - Use the default hint style for font backend and target device
+  - ``none`` - Do not hint outlines
+  - ``slight`` - Hint outlines slightly to improve contrast while retaining good
+    fidelity to the original shapes.
+  - ``medium`` - Hint outlines with medium strength giving a compromise between
+    fidelity to the original shapes and contrast
+  - ``full`` - Hint outlines to maximize contrast
+
+  The ``hintmetrics`` option (``on`` or ``off``) deals with hint metrics, which
+  means quantizing (or "rounding") glyph outlines so that they are integer
+  values. Doing this improves the consistency of letter and line spacing, but it
+  also means that text will be laid out differently at different zoom factors.
 
 Dynamic variables
 -----------------
