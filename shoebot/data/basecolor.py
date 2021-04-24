@@ -289,12 +289,13 @@ class ColorMixin(object):
         self._set_fill(fill)
         self._set_stroke(stroke)
         self._set_strokewidth(strokewidth)
-        self.fillrule = fillrule
-        self.strokecap = strokecap
-        self.strokejoin = strokejoin
-        self.strokedash = strokedash
-        self.dashoffset = dashoffset
-        self.blendmode = blendmode
+
+        self.fillrule = self._fillrule = fillrule
+        self.strokecap = self._strokecap = strokecap
+        self.strokejoin = self._strokejoin = strokejoin
+        self.strokedash = self._strokedash = strokedash
+        self.dashoffset = self._dashoffset = dashoffset
+        self.blendmode = self._blendmode = blendmode
 
     def _get_fill(self):
         return self._fillcolor
