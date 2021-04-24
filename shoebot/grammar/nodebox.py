@@ -623,7 +623,9 @@ class NodeBot(Bot):
         """
         NOT IMPLEMENTED
         """
-        raise NotImplementedError(_("outputmode() isn't implemented yet"))
+        raise NotImplementedError(
+            _("outputmode() isn't implemented; Shoebot does not support CMYK")
+        )
 
     def colormode(self, mode=None, range=None):
         """Set the current colormode (can be RGB or HSB) and eventually
@@ -631,17 +633,10 @@ class NodeBot(Bot):
 
         If called without arguments, it returns the current colormode.
 
-        :param mode: Color mode, either "rgb", or "hsb"
-        :param range: Maximum scale value for color, e.g. 1.0 or 255
-
         :param mode: Color mode to use
         :type mode: RGB or HSB
-        :param crange: Maximum value for the new color range to use
-        :type crange: float
+        :param float crange: Maximum value for the new color range to use
         :return: Current color mode
-
-
-        :return: Returns the current color mode.
         """
         if mode is not None:
             if mode == RGB:
@@ -654,15 +649,16 @@ class NodeBot(Bot):
             self.color_range = range
         return self.color_mode
 
-    def colorrange(self, crange):
+    def colorrange(self, crange=None):
         """Sets the current color range.
 
         The default is 0-1; for a range of 0-255, use ``colorrange(256)``.
 
-        :param crange: maximum value for new color range
+        :param float crange: maximum value for new color range
         :return: current range value
         """
-        self.color_range = float(crange)
+        if crange is not None:
+            self.color_range = float(crange)
         return self.color_range
 
     def fill(self, *args):
@@ -675,8 +671,13 @@ class NodeBot(Bot):
         return self._canvas.fillcolor
 
     def nofill(self):
-        """ Stop applying fills to new paths."""
+        """Stop applying fills to new paths.
+
+        :return: fill color before nofill() was called
+        """
+        c = self._canvas.fillcolor
         self._canvas.fillcolor = None
+        return c
 
     def fillrule(self, r=None):
         """Set the fill rule to use in new paths.
@@ -693,6 +694,7 @@ class NodeBot(Bot):
         """Set a stroke color, applying it to new paths.
 
         :param args: color in supported format
+        :return: new stroke color
         """
         if args is not None:
             self._canvas.strokecolor = self.color(*args)
@@ -701,7 +703,7 @@ class NodeBot(Bot):
     def nostroke(self):
         """Stop applying strokes to new paths.
 
-        :return: stroke color before nostroke was called.
+        :return: stroke color before nostroke() was called
         """
         c = self._canvas.strokecolor
         self._canvas.strokecolor = None
@@ -710,7 +712,7 @@ class NodeBot(Bot):
     def strokewidth(self, w=None):
         """Set the stroke width to be used by stroke().
 
-        :param w: the width of the stroke to use
+        :param w: width of the stroke to use
         :return: current stroke width value
         """
         if w is not None:
@@ -720,15 +722,8 @@ class NodeBot(Bot):
     def strokedash(self, dashes=None, offset=0):
         """Sets the dash pattern to be used by stroke().
 
-        A dash pattern is specified by dashes - a sequence of positive values.
-        Each value provides the length of alternate “on” and “off” portions of
-        the stroke.
-
-        The offset specifies an offset into the pattern at which the stroke
-        begins.
-
-        :param dashes: a sequence specifying alternate lengths of on and off stroke portions
-        :param offset: an offset into the dash pattern at which the stroke should start
+        :param list dashes: a sequence specifying alternate lengths of on and off stroke portions
+        :param float offset: an offset into the dash pattern at which the stroke should start
         :return: tuple with dashes value and offset
         """
         if dashes is not None:
@@ -737,39 +732,40 @@ class NodeBot(Bot):
             self._canvas.dashoffset = offset
         return (self._canvas.strokedash, self._canvas.dashoffset)
 
-    def strokecap(self, c=None):
+    def strokecap(self, cap=None):
         """Set the stroke cap.
 
-        :param w: Stroke cap.
-        :return: If no cap was specified then current cap is returned.
+        :param w: new stroke cap value
+        :return: current stroke cap value
         """
-        if c is not None:
-            self._canvas.strokecap = c
+        if cap is not None:
+            self._canvas.strokecap = cap
         return self._canvas.strokecap
 
-    def strokejoin(self, j=None):
+    def strokejoin(self, join=None):
         """Set the stroke join.
 
-        :param w: Stroke join.
-        :return: If no join was specified then current join is returned.
+        :param w: new stroke join value
+        :return: current line join value
         """
-        if j is not None:
-            self._canvas.strokejoin = j
+        if join is not None:
+            self._canvas.strokejoin = join
         return self._canvas.strokejoin
 
     def background(self, *args):
-        """Set the background color.
+        """Set the canvas background color.
 
-        :param color: See color() function for supported color formats.
+        :param color: background color to apply
+        :return: new background color
         """
         self._canvas.background = self.color(*args)
         return self._canvas.background
 
     def blendmode(self, mode=None):
-        """
-        Set the current blend mode.
+        """Set the current blending mode.
 
-        :param mode: mode name (e.g. "multiply")"""
+        :param mode: mode name (e.g. "multiply")
+        """
         if mode:
             self._canvas.blendmode = mode
         return self._canvas.blendmode
