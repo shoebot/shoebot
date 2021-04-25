@@ -627,6 +627,21 @@ Colors
 
   Returns the current stroke width.
 
+  .. shoebot::
+    :alt: Stroke widths
+    :filename: color__strokewidth.png
+
+    stroke(0.2)
+    strokewidth(1)
+    line(20, 20, 20, 110)
+    strokewidth(3)
+    line(40, 20, 40, 110)
+    strokewidth(10)
+    line(60, 20, 60, 110)
+    strokewidth(15)
+    line(80, 20, 80, 110)
+
+
 .. py:function:: strokedash(dashes, offset=0)
 
   Sets a dash pattern to be used in stroked shapes.
@@ -646,16 +661,51 @@ Colors
   If the number of dashes is 1, a symmetric pattern is assumed with alternating
   on and off portions of the size specified by the single value in dashes.
 
+  .. shoebot::
+    :alt: Stroke dashes
+    :filename: color__strokedash.png
+
+    nofill()
+    stroke(0.2)
+    strokewidth(3)
+
+    circle(5,5,40)
+
+    strokedash([3,2,1,2])
+    circle(55,5,40)
+
+    strokedash([10,15,5])
+    circle(5,55,40)
+
+    strokedash([10,15,5], 20)
+    strokecap(ROUND)
+    circle(55,55,40)
+
+
 .. py:function:: strokecap(cap)
 
   Sets the cap to be drawn at the ends of strokes.
 
   This command can be called with a new cap value:
-  - ``BUTT``: start/stop the line exactly at the start/end point
-  - ``ROUND``: use a round ending, the center of the circle is the end point
-  - ``SQUARE``: use a squared ending, the center of the square is the end point
+
+  - ``BUTT`` -- start/stop the line exactly at the start/end point
+  - ``ROUND`` -- use a round ending, the center of the circle is the end point
+  - ``SQUARE`` -- use a squared ending, the center of the square is the end point
 
   If called with no arguments, returns the current cap value.
+
+  .. shoebot::
+    :alt: Stroke caps
+    :filename: color__strokecap.png
+
+    stroke(0.2)
+    strokewidth(15)
+    line(25, 25, 25, 110)
+    strokecap(ROUND)
+    line(50, 25, 50, 110)
+    strokecap(SQUARE)
+    line(75, 25, 75, 110)
+
 
 .. py:function:: strokejoin(join)
 
@@ -663,12 +713,41 @@ Colors
 
   This command can be called with a new join value:
 
-  - ``MITER``: use a sharp angled corner (default)
-  - ``ROUND``: use a rounded join, the center of the circle is the joint point
-  - ``BEVEL``: use a cut-off join, the join is cut off at half the line width
+  - ``MITER`` -- use a sharp angled corner (default)
+  - ``ROUND`` -- use a rounded join, the center of the circle is the joint point
+  - ``BEVEL`` -- use a cut-off join, the join is cut off at half the line width
     from the joint point
 
   If called with no arguments, returns the current join value.
+
+  .. shoebot::
+    :alt: Stroke joins
+    :filename: color__strokejoin.png
+
+    autoclosepath(False)
+    nofill()
+    stroke(0.2)
+    strokewidth(15)
+
+    beginpath(10,25)
+    lineto(40,50)
+    lineto(10,75)
+    endpath()
+    translate(25,0)
+
+    strokejoin(ROUND)
+    beginpath(10,25)
+    lineto(40,50)
+    lineto(10,75)
+    endpath()
+    translate(25,0)
+
+    strokejoin(BEVEL)
+    beginpath(10,25)
+    lineto(40,50)
+    lineto(10,75)
+    endpath()
+
 
 .. py:function:: color(*args)
 
@@ -728,10 +807,11 @@ Colors
     otherwise keeps the source.
   - ``COLORDODGE`` -- brightens the destination color to reflect the source color
   - ``COLORBURN`` -- darkens the destination color to reflect the source color
-  - ``HARDLIGHT`` -- multiplies or screens, dependent on source color.
-  - ``SOFTLIGHT`` -- darkens or lightens, dependent on source color.
+  - ``HARDLIGHT`` -- multiplies or screens, dependent on source color
+  - ``SOFTLIGHT`` -- darkens or lightens, dependent on source color
   - ``DIFFERENCE`` -- takes the difference of the source and destination color
-  - ``EXCLUSION`` -- produces an effect similar to difference, but with lower contrast
+  - ``EXCLUSION`` -- produces an effect similar to difference, but with lower
+    contrast
   - ``HUE`` -- creates a color with the hue of the source and the saturation and
     luminosity of the target
   - ``SATURATION`` -- creates a color with the saturation of the source and the
