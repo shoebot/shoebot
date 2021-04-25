@@ -9,6 +9,75 @@ In this page, you'll find the features and behavior that differs between Nodebox
 
 If you find any difference that isn't documented here, please `file an issue <https://github.com/shoebot/shoebot/issues/new>`_.
 
+Additional Shoebot features
+---------------------------
+
+These are features that were created in Shoebot and are not available in
+Nodebox, or where Shoebot behavior is distinct.
+
+New functions
+^^^^^^^^^^^^^
+
+- Drawing
+
+  * :py:func:`rectmode()` and :py:func:`ellipsemode()` are inspired by
+    Processing and cater to the preferences of users who expect alternative ways
+    to draw primitives. These are also useful for specific situations where
+    coordinate calculation would be otherwise necessary.
+  * :py:func:`arc()` is provided by Cairo, so we support it as well.
+
+- Others
+
+  * :py:func:`snapshot()` is a simple way to output to an image in the middle of
+    the script execution.
+
+  * :py:func:`run()` can execute another script in the current context. This is
+    mostly useful when using Shoebot as a Python module inside another
+    application.
+
+Bundled libraries
+^^^^^^^^^^^^^^^^^
+
+Nodebox provides a set of external libraries that can be downloaded and added to
+a project. Shoebot comes with ported versions of those libraries already
+included and available.
+
+- Knowledge:
+  `Database <https://www.nodebox.net/code/index.php/Database>`_,
+  `Graph <https://www.nodebox.net/code/index.php/Graph>`_,
+  `Web <https://www.nodebox.net/code/index.php/Web>`_
+
+- Bitmap:
+  `Photobot <https://www.nodebox.net/code/index.php/Photobot>`_
+
+- Paths:
+  `Bezier <https://www.nodebox.net/code/index.php/Bezier>`_,
+  `Cornu <https://www.nodebox.net/code/index.php/Cornu>`_,
+  `SVG <https://www.nodebox.net/code/index.php/SVG>`_
+  `Supershape <https://www.nodebox.net/code/index.php/Supershape>`_,
+  `Bezier Editor <https://www.nodebox.net/code/index.php/Bezier_Editor>`_
+
+- Systems:
+  `Boids <https://www.nodebox.net/code/index.php/Boids>`_,
+  `L-system <https://www.nodebox.net/code/index.php/L-system>`_
+
+- Design:
+  `Colors <https://www.nodebox.net/code/index.php/Colors>`_
+
+- Tangible:
+  `TUIO <https://www.nodebox.net/code/index.php/TUIO>`_
+
+
+New libraries
+^^^^^^^^^^^^^
+
+Additional external libraries were developed for Shoebot:
+
+* :ref:`audio-lib`
+* :ref:`video-lib`
+* :ref:`opencv-lib`
+
+
 Unsupported Nodebox features
 ----------------------------
 
@@ -72,63 +141,3 @@ Unported libraries
 - Other:
   `Flowerewolf <https://github.com/karstenw/Library/tree/master/flowerewolf>`_,
   `twyg <https://github.com/karstenw/Library/tree/master/twyg>`_
-
-
-Additional Shoebot features
----------------------------
-
-These are features that were created in Shoebot and are not available in Nodebox, or where Shoebot behavior is distinct.
-
-New functions
-^^^^^^^^^^^^^
-
-- Drawing
-
-  * :py:func:`rectmode()` and :py:func:`ellipsemode()` are inspired by Processing and cater to the preferences of users who expect alternative ways to draw primitives. These are also useful for specific situations where coordinate calculation would be needed.
-  * Relative path commands are available: :py:func:`relmoveto()` and :py:func:`rellineto()`.
-  * :py:func:`arc()` is provided by Cairo, so we support it as well.
-
-- Others
-
-  * :py:func:`snapshot()` is a simple way to output to an image in the middle of the script execution.
-  * :py:func:`run()` can execute another script in the current context. This is mostly useful when using Shoebot as a Python module inside another application.
-
-Bundled libraries
-^^^^^^^^^^^^^^^^^
-
-Nodebox provides a set of external libraries that can be downloaded and added to a project. Shoebot comes with ported versions of those libraries already included and available.
-
-- Knowledge:
-  `Database <https://www.nodebox.net/code/index.php/Database>`_,
-  `Graph <https://www.nodebox.net/code/index.php/Graph>`_,
-  `Web <https://www.nodebox.net/code/index.php/Web>`_
-
-- Bitmap:
-  `Photobot <https://www.nodebox.net/code/index.php/Photobot>`_
-
-- Paths:
-  `Bezier <https://www.nodebox.net/code/index.php/Bezier>`_,
-  `Cornu <https://www.nodebox.net/code/index.php/Cornu>`_,
-  `SVG <https://www.nodebox.net/code/index.php/SVG>`_
-  `Supershape <https://www.nodebox.net/code/index.php/Supershape>`_,
-  `Bezier Editor <https://www.nodebox.net/code/index.php/Bezier_Editor>`_
-
-- Systems:
-  `Boids <https://www.nodebox.net/code/index.php/Boids>`_,
-  `L-system <https://www.nodebox.net/code/index.php/L-system>`_
-
-- Design:
-  `Colors <https://www.nodebox.net/code/index.php/Colors>`_
-
-- Tangible:
-  `TUIO <https://www.nodebox.net/code/index.php/TUIO>`_
-
-
-New libraries
-^^^^^^^^^^^^^
-
-Additional external libraries were developed for Shoebot:
-
-* :ref:`audio-lib`
-* :ref:`video-lib`
-* :ref:`opencv-lib`

@@ -709,41 +709,41 @@ Colors
 
   Sets the blending mode to apply to the colors of new elements.
 
-  - ``OVER``: draw source layer on top of destination layer
-  - ``MULTIPLY``: source and destination layers are multiplied. This causes the
+  - ``OVER`` -- draw source layer on top of destination layer
+  - ``MULTIPLY`` -- source and destination layers are multiplied. This causes the
     result to be at least as dark as the darker inputs.
-  - ``SCREEN``: source and destination are complemented and multiplied. This
+  - ``SCREEN`` -- source and destination are complemented and multiplied. This
     causes the result to be at least as light as the lighter inputs.
-  - ``OVERLAY``: multiplies or screens, depending on the lightness of the
+  - ``OVERLAY`` -- multiplies or screens, depending on the lightness of the
     destination color
-  - ``DARKEN``: replaces the destination with the source if it is darker,
+  - ``DARKEN`` -- replaces the destination with the source if it is darker,
     otherwise keeps the source
-  - ``LIGHTEN``: replaces the destination with the source if it is lighter,
+  - ``LIGHTEN`` -- replaces the destination with the source if it is lighter,
     otherwise keeps the source.
-  - ``COLORDODGE``: brightens the destination color to reflect the source color
-  - ``COLORBURN``: darkens the destination color to reflect the source color
-  - ``HARDLIGHT``: multiplies or screens, dependent on source color.
-  - ``SOFTLIGHT``: darkens or lightens, dependent on source color.
-  - ``DIFFERENCE``: takes the difference of the source and destination color
-  - ``EXCLUSION``: produces an effect similar to difference, but with lower contrast
-  - ``HUE``: creates a color with the hue of the source and the saturation and
+  - ``COLORDODGE`` -- brightens the destination color to reflect the source color
+  - ``COLORBURN`` -- darkens the destination color to reflect the source color
+  - ``HARDLIGHT`` -- multiplies or screens, dependent on source color.
+  - ``SOFTLIGHT`` -- darkens or lightens, dependent on source color.
+  - ``DIFFERENCE`` -- takes the difference of the source and destination color
+  - ``EXCLUSION`` -- produces an effect similar to difference, but with lower contrast
+  - ``HUE`` -- creates a color with the hue of the source and the saturation and
     luminosity of the target
-  - ``SATURATION``: creates a color with the saturation of the source and the
+  - ``SATURATION`` -- creates a color with the saturation of the source and the
     hue and luminosity of the target. Painting with this mode onto a gray area
     produces no change.
-  - ``COLOR``: creates a color with the hue and saturation of the source and the
+  - ``COLOR`` -- creates a color with the hue and saturation of the source and the
     luminosity of the target. This preserves the gray levels of the target and
     is useful for coloring monochrome images or tinting color images.
-  - ``LUMINOSITY``: creates a color with the luminosity of the source and the
+  - ``LUMINOSITY`` -- creates a color with the luminosity of the source and the
     hue and saturation of the target. This produces an inverse effect to
     COLOR.
-  - ``ATOP``: draw source on top of destination content and only there
-  - ``DEST``: ignore the source
-  - ``DEST_OVER``: draw destination on top of source
-  - ``DEST_ATOP``: leave destination on top of source content and only there
-  - ``XOR``: source and destination are shown where there is only one of them
-  - ``ADD``: source and destination layers are accumulated
-  - ``SATURATE``: like over, but assuming source and dest are disjoint geometries
+  - ``ATOP`` -- draw source on top of destination content and only there
+  - ``DEST`` -- ignore the source
+  - ``DEST_OVER`` -- draw destination on top of source
+  - ``DEST_ATOP`` -- leave destination on top of source content and only there
+  - ``XOR`` -- source and destination are shown where there is only one of them
+  - ``ADD`` -- source and destination layers are accumulated
+  - ``SATURATE`` -- like over, but assuming source and dest are disjoint geometries
 
 .. py:function:: fillrule(rule=WINDING)
 
@@ -868,7 +868,7 @@ Text
 
   The ``antialias`` option specifies the type of antialiasing to do:
 
-  - ``default`` -- Use the default antialiasing for the subsystem and target device
+  - ``default`` -- use the default antialiasing for the subsystem and target device
   - ``none`` -- no antialiasing
   - ``gray`` -- single-color antialiasing
   - ``subpixel`` -- take advantage of the order of subpixel elements on
@@ -887,13 +887,13 @@ Text
 
   The ``hintstyle`` option sets the amount of font hinting to apply:
 
-  - ``default`` - Use the default hint style for font backend and target device
-  - ``none`` - Do not hint outlines
-  - ``slight`` - Hint outlines slightly to improve contrast while retaining good
-    fidelity to the original shapes.
-  - ``medium`` - Hint outlines with medium strength giving a compromise between
-    fidelity to the original shapes and contrast
-  - ``full`` - Hint outlines to maximize contrast
+  - ``default`` -- use the default hint style for font backend and target device
+  - ``none`` -- do not hint outlines
+  - ``slight`` -- improve contrast while retaining good fidelity to the original
+    shapes
+  - ``medium`` -- compromise between fidelity to the original shapes and
+    contrast
+  - ``full`` -- maximize contrast
 
   The ``hintmetrics`` option (``on`` or ``off``) deals with hint metrics, which
   means quantizing (or "rounding") glyph outlines so that they are integer
