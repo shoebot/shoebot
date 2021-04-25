@@ -709,6 +709,12 @@ Colors
 
   Sets the blending mode to apply to the colors of new elements.
 
+  Blending modes, also known as Porter-Duff compositing operations, are ways to
+  combine two images. Usually, an image (destination) placed on top of another
+  (destination) completely covers it; this is the OVER blending mode, but there
+  are many others that give distinct results, and which you might know from
+  image editors.
+
   - ``OVER`` -- draw source layer on top of destination layer
   - ``MULTIPLY`` -- source and destination layers are multiplied. This causes the
     result to be at least as dark as the darker inputs.
@@ -744,6 +750,11 @@ Colors
   - ``XOR`` -- source and destination are shown where there is only one of them
   - ``ADD`` -- source and destination layers are accumulated
   - ``SATURATE`` -- like over, but assuming source and dest are disjoint geometries
+
+  The `Wikipedia page on blending modes
+  <https://en.wikipedia.org/wiki/Blend_modes>`_ is a deeper reference on how
+  these work, and the `Cairo operators page
+  <https://www.cairographics.org/operators/>`_ is also a good resource.
 
 .. py:function:: fillrule(rule=WINDING)
 
