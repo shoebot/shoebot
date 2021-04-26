@@ -28,9 +28,8 @@ jobs:
         ./install/install_dependencies.sh
         python -mpip freeze
         python -mpip install .
-
+        export DISPLAY=':99.0'
 
     - name: Run tests
-      run: |
-        python setup.py diagnose
-        python setup.py test
+      run: xvfb-run --auto-servernum python setup.py diagnose
+      run: xvfb-run --auto-servernum python setup.py test
