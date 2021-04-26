@@ -21,9 +21,6 @@ jobs:
 
     - name: Install dependencies
       run: |
-        if [[ "${{ matrix.python-version }}" == "pypy3" ]]; then
-          sudo add-apt-repository -y ppa:pypy/ppa; apt-get update -y;
-        fi
         sudo apt-get install --no-install-recommends -y python3-pip xvfb python3-setuptools python3-pep8
         ./install/install_dependencies.sh
         python -mpip freeze
