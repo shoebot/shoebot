@@ -26,6 +26,9 @@ jobs:
         fi
         sudo apt-get install --no-install-recommends -y python3-pip xvfb python3-setuptools python3-pep8
         ./install/install_dependencies.sh
+        python -mpip freeze
+        python -mpip install .
+
 
     - name: Run tests
       run: |
