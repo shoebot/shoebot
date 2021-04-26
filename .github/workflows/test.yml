@@ -25,9 +25,83 @@ jobs:
         ./install/install_dependencies.sh
         python -mpip freeze
         python -mpip install .
-        export DISPLAY=':99.0'
 
     - name: Run tests
       run: |
         xvfb-run --auto-servernum python setup.py diagnose
         xvfb-run --auto-servernum python setup.py test
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        #brew install pkg-config || true
+        #export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
+        #brew install cairo gobject-introspection gtk+3 gtksourceview3 jpeg libffi librsvg py3cairo pygobject3 || true
+        #brew install python@${{ matrix.python-version }} || true
+        ./install/install_dependencies.sh
+        python3 -m venv ../venv
+        source ../venv/bin/activate
+        pip install wheel
+        pip install --upgrade pip setuptools
+        python -mpip freeze
+        python -mpip install .
+
+    - name: Run tests
+      run: |
+        source ../venv/bin/activate
+        python setup.py diagnose
+        python setup.py test
+
+
+  msys2:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - msystem: MINGW64
+            arch: x86_64
+          - msystem: MINGW32
+            arch: i686
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: setup-msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: >-
+            mingw-w64-${{ matrix.arch }}-cairo
+            mingw-w64-${{ matrix.arch }}-python
+            mingw-w64-${{ matrix.arch }}-python-pip
+            mingw-w64-${{ matrix.arch }}-toolchain
+      - name: Install dependencies
+        shell: msys2 {0}
+        run: |
+          python -m pip install pytest coverage hypothesis mypy
+      - name: Run tests
+        shell: msys2 {0}
+        run: |
+          export CFLAGS="-std=c90 -Wall -Wno-long-long -Werror -coverage"
+          python -m coverage run --branch setup.py test
+          python -m coverage xml -i
+          python setup.py sdist
+          python setup.py install --root="$(pwd)"/_root_abs
+          python -m pip install dist/*
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
