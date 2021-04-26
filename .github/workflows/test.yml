@@ -31,5 +31,6 @@ jobs:
         export DISPLAY=':99.0'
 
     - name: Run tests
-      run: xvfb-run --auto-servernum python setup.py diagnose
-      run: xvfb-run --auto-servernum python setup.py test
+      run: |
+        xvfb-run --auto-servernum python setup.py diagnose
+        xvfb-run --auto-servernum python setup.py test
