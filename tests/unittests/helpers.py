@@ -13,6 +13,7 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot import create_bot
+from shoebot.data.typography import TextBounds
 
 TEST_DIR = Path(__file__).parent.absolute()
 TEST_INPUT_DIR = TEST_DIR / "input/tests"
@@ -149,6 +150,21 @@ class ShoebotTestCase(TestCase):
                         shutil.copy(input_file, output_file)
                     except FileNotFoundError:
                         pass
+
+    def assertBoundingBoxAlmostEqual(self, expected_bounds, actual_bounds, threshold=2.0):
+        """
+
+        """
+        if expected_bounds == actual_bounds:
+            return
+
+        within_bounds = True
+        for actual, expected in zip(expected_bounds, actual_bounds):
+            if math.fabs(expected) - math.fabs(actual) > threshold:
+                within_bounds = False
+
+        if not within_bounds:
+            self.fail(f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}")
 
     def assertReferenceImage(self, file1, file2):
         """

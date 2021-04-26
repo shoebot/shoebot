@@ -139,38 +139,36 @@ class TestText(ShoebotTestCase):
         [
             (
                 "DejaVu Sans Book",
-                (1, 87.0, 87, 14),
+                (1, 88.0, 87, 12),
             ),
             (
                 "Liberation Sans Regular",
-                (1, 88.0, 79, 13),
+                (1, 88.0, 79, 12),
             ),
             (
                 "Bitstream Vera Sans Roman",
-                (1, 87.0, 87, 14),
+                (1, 88.0, 87, 12),
             ),
         ]
     )
     @test_as_bot()
-    def test_text_bounds_property(self, fontname, expected_bounds):
+    def test_text_bounds(self, fontname, expected_bounds):
         """
-        Check text.bounds() against expected values
+        Check text.bounds() against expected values.
+
+        Actual bounding box values may vary depending on font hinting, and DPI,
+        so check within known values.
+
+        This still may not be enough leniency, so this test may need to be changed
+        just to verify the aspect ratio of the bounding box.
         """
-        test_fonts = [
-            "DejaVu Sans Book",
-            "Liberation Sans Regular",
-            "Bitstream Vera Sans Roman",
-        ]
+        self.assertEqual(
+            fontname, font(fontname), f"{fontname} is not available in the system"
+        )
 
-        available_fonts = [f for f in fontnames() if f in test_fonts]
-        if not available_fonts:
-            self.skip("None of the test fonts is available in this system")
-
-        if not fontname in fontnames():
-            return
-        font(fontname)
         t = text("Hello world", 0, 100, draw=False)
-        self.assertEqual(t.bounds, expected_bounds)
+
+        self.assertBoundingBoxAlmostEqual(expected_bounds, t.bounds)
 
     @parameterized.expand(
         [

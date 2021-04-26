@@ -28,6 +28,7 @@
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
+from collections import namedtuple
 from enum import Enum
 
 from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
@@ -43,7 +44,7 @@ try:
     gi.require_version("Pango", "1.0")
     gi.require_version("PangoCairo", "1.0")
     from gi.repository import Pango, PangoCairo
-except ValueError as e:
+except ValueError as no_pango:
     global Pango, PangoCairo
 
     # workaround for readthedocs where Pango is not installed,
@@ -67,12 +68,13 @@ except ValueError as e:
 
         def __getattr__(self, item):
             if item == "Weight":
-                return Weight
+                return FakePango.Weight
 
             raise NotImplementedError("FakePango does not implement %s" % item)
 
     Pango = FakePango()
     PangoCairo = FakePango()
+
 
 # Pango Utility functions
 def pangocairo_create_context(cr):
@@ -102,6 +104,16 @@ def _alignment_name_to_pango(alignment):
         return Pango.Alignment.LEFT
 
     return Pango.Alignment.LEFT
+
+
+TextBounds = namedtuple("TextBounds", "x y width height")
+TextBounds.__doc__ = """\
+Text Bounds in pixels.
+
+:param x: X position in pixels.
+:param y: Y position in pixels.
+:param width: Width in pixels.
+:param height: Height in pixels."""
 
 
 class Text(Grob, ColorMixin):
@@ -305,12 +317,15 @@ class Text(Grob, ColorMixin):
 
     @property
     def bounds(self):
-        boundsrect, totalrect = self._pango_layout.get_pixel_extents()
-        return (
-            boundsrect.x + self.x,
-            boundsrect.y + self.y - self.baseline,
-            boundsrect.width,
-            boundsrect.height,
+        """
+        :return: TextBounds namedtuple containing bounds as (x, y, width, height)
+        """
+        bounds_rect, _ = self._pango_layout.get_pixel_extents()
+        return TextBounds(
+            bounds_rect.x + self.x,
+            bounds_rect.y + self.y - self.baseline,
+            bounds_rect.width,
+            bounds_rect.height,
         )
 
     # this function is quite computational expensive
@@ -321,37 +336,31 @@ class Text(Grob, ColorMixin):
         if not self._pangocairo_ctx:
             self._pre_render()
 
-        # here we create a new cairo.Context in order to hold the pathdata
-        tempCairoContext = cairo.Context(
+        # Render path data to a temporary cairo Context
+        with cairo.Context(
             cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
-        )
-        tempCairoContext = driver.ensure_pycairo_context(tempCairoContext)
-        tempCairoContext.move_to(self.x, self.y - self.baseline)
-        # in here we create a pangoCairoContext in order to display layout on it
+        ) as cairo_ctx:
+            cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
+            cairo_ctx.move_to(self.x, self.y - self.baseline)
+            # show_layout should work here, but fills the path instead,
+            # instead, use layout_path to render the layout.
+            PangoCairo.layout_path(cairo_ctx, self._pango_layout)
 
-        # supposedly showlayout should work, but it fills the path instead,
-        # therefore we use layout_path instead to render the layout to pangoCairoContext
-        # tempCairoContext.show_layout(self.layout)
-        PangoCairo.layout_path(tempCairoContext, self._pango_layout)
-        # here we extract the path from the temporal cairo.Context we used to draw on the previous step
-        pathdata = tempCairoContext.copy_path()
-
-        # creates a BezierPath instance for storing new shoebot path
-        p = BezierPath(self._bot)
-
-        # parsing of cairo path to build a shoebot path
-        for item in pathdata:
-            cmd = item[0]
-            args = item[1]
-            if cmd == PATH_MOVE_TO:
-                p.moveto(*args)
-            elif cmd == PATH_LINE_TO:
-                p.lineto(*args)
-            elif cmd == PATH_CURVE_TO:
-                p.curveto(*args)
-            elif cmd == PATH_CLOSE_PATH:
-                p.closepath()
-        return p
+            # Parse cairo path into Shoebot BezierPath
+            cairo_text_path = cairo_ctx.copy_path()
+            p = BezierPath(self._bot)
+            for item in cairo_text_path:
+                cmd = item[0]
+                args = item[1]
+                if cmd == PATH_MOVE_TO:
+                    p.moveto(*args)
+                elif cmd == PATH_LINE_TO:
+                    p.lineto(*args)
+                elif cmd == PATH_CURVE_TO:
+                    p.curveto(*args)
+                elif cmd == PATH_CLOSE_PATH:
+                    p.closepath()
+            return p
 
     def _get_center(self):
         """Returns the center point of the path, disregarding transforms."""
