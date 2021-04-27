@@ -151,10 +151,10 @@ class ShoebotTestCase(TestCase):
                     except FileNotFoundError:
                         pass
 
-    def assertBoundingBoxAlmostEqual(self, expected_bounds, actual_bounds, threshold=2.0):
-        """
-
-        """
+    def assertBoundingBoxAlmostEqual(
+        self, expected_bounds, actual_bounds, threshold=2.0
+    ):
+        """"""
         if expected_bounds == actual_bounds:
             return
 
@@ -164,7 +164,9 @@ class ShoebotTestCase(TestCase):
                 within_bounds = False
 
         if not within_bounds:
-            self.fail(f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}")
+            self.fail(
+                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}"
+            )
 
     def assertReferenceImage(self, file1, file2):
         """
