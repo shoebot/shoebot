@@ -45,6 +45,23 @@ class TestCommandLine(unittest.TestCase):
             f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
         )
 
+    def test_sbot_errorcode_on_invalid_code(self):
+        """
+        Try and run sbot, call a function that doesn't exist and verify
+
+        The errorcode is set as expected.
+        """
+        # TODO, sbot --version would be better, but we don't have that yet.
+        cmd = ["sbot", "this_will_fail()"]
+
+        result = subprocess.run(cmd, capture_output=True)
+
+        self.assertEqual(
+            result.returncode,
+            1,
+            f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
