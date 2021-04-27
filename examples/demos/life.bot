@@ -23,7 +23,9 @@ class Life(object):
 
     def _neighbors(self, x, y):
         result = 0
-        for dx, dy in [d for d in itertools.product([-1, 0, 1], repeat=2) if d != (0, 0)]:
+        for dx, dy in [
+            d for d in itertools.product([-1, 0, 1], repeat=2) if d != (0, 0)
+        ]:
             result += self.world[(x + dx) % self.xsize][(y + dy) % self.ysize]
         return result
 
@@ -34,7 +36,7 @@ class Life(object):
                 neighbors = self._neighbors(x, y)
                 if neighbors == 3:
                     new_world[x][y] = 1
-                elif (neighbors < 2 or neighbors > 3):
+                elif neighbors < 2 or neighbors > 3:
                     new_world[x][y] = 0
         self.world = copy.deepcopy(new_world)
 

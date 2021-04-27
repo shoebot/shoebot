@@ -12,7 +12,7 @@ size(500, 500)
 
 class Tendril:
     def __init__(self, x, y, width=15):
-        """ A new sinewy tendril at location x and y.
+        """A new sinewy tendril at location x and y.
         Its segment width will gradually become smaller as it grows.
         """
         self.x = x
@@ -23,7 +23,7 @@ class Tendril:
         self.v = 0
 
     def grow(self, distance=3.0, curl=1.0, step=0.02):
-        """ Tendril segment growth using fluid, spiral sine functions,
+        """Tendril segment growth using fluid, spiral sine functions,
         taken from the ART+COM Tendrils class for Processing.
         """
         # Think of a tendril having a steering compass.
@@ -33,12 +33,10 @@ class Tendril:
         self.v += random(-step, step)
         self.v *= 0.9 + curl * 0.1
         self.angle += self.v
-        self.segments.append(
-            (self.x, self.y, self.angle)
-        )
+        self.segments.append((self.x, self.y, self.angle))
 
     def draw(self, path=None):
-        """ Draws all the segments in the tendril,
+        """Draws all the segments in the tendril,
         as separate ovals or as a single path if one is supplied.
         """
         n = len(self.segments)
@@ -52,31 +50,25 @@ class Tendril:
 
 class Plant:
     def __init__(self, x, y, tendrils=30, width=15):
-        """ A collection of tendrils.
-        """
+        """A collection of tendrils."""
         self.x = x
         self.y = y
         self.tendrils = []
         for i in range(tendrils):
-            self.tendrils.append(
-                Tendril(self.x, self.y, width)
-            )
+            self.tendrils.append(Tendril(self.x, self.y, width))
 
     def grow(self, distance=3.0, curl=1.0, step=0.02):
-        """ Grow a new segment on each of the plant's tendrils.
-        """
+        """Grow a new segment on each of the plant's tendrils."""
         for b in self.tendrils:
             b.grow(distance, curl, step)
 
     def draw(self):
-        """ Draw the plant.
-        """
+        """Draw the plant."""
         for tendril in self.tendrils:
             tendril.draw()
 
     def path(self):
-        """ Return the plant as a path consisting of ovals.
-        """
+        """Return the plant as a path consisting of ovals."""
         path = BezierPath()
         for tendril in self.tendrils:
             tendril.draw(path)

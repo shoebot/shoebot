@@ -9,6 +9,10 @@ and a color according to original path color (it should give slightly colored
 shadows for objects with a alpha value < 1.0 .
 """
 
+from pathlib import Path
+
+here = Path(__file__).parent
+
 svg = ximport("svg")
 
 size(600, 600)
@@ -17,24 +21,37 @@ dx = 8
 dy = 8
 s_alpha = 0.4
 
-# The parse() command will return a list of the shapes in the SVG file.
-paths = svg.parse(open("circles.svg").read())
+# The parse() command will return
+# a list of the shapes in the SVG file.
+with open(here / "circles.svg") as f:
+    paths = svg.parse(f.read())
+
 
 background(color(1, 1, 1))
 # nofill()
 
 for path in paths:
-        # Use copies of the paths that adhere to the transformations (translate, scale, rotate)
-        # that we defined, and draw them as shadows
-        push()
-        translate(dx, dy)
-        if path.fill:
-            fill(0.5 * path.fill.r, 0.5 * path.fill.g, 0.5 * path.fill.b, s_alpha * path.fill.alpha)
-        if path.stroke:
-            stroke(0.2 * path.stroke.r, 0.2 * path.stroke.g, 0.2 * path.stroke.b, s_alpha * path.stroke.alpha)
-            strokewidth(path.strokewidth)
-        drawpath(path.copy())
-        pop()
+    # Use copies of the paths that adhere to the transformations (translate, scale, rotate)
+    # that we defined, and draw them as shadows
+    push()
+    translate(dx, dy)
+    if path.fill:
+        fill(
+            0.5 * path.fill.r,
+            0.5 * path.fill.g,
+            0.5 * path.fill.b,
+            s_alpha * path.fill.alpha,
+        )
+    if path.stroke:
+        stroke(
+            0.2 * path.stroke.r,
+            0.2 * path.stroke.g,
+            0.2 * path.stroke.b,
+            s_alpha * path.stroke.alpha,
+        )
+        strokewidth(path.strokewidth)
+    drawpath(path.copy())
+    pop()
 
-        # then draw original path
-        drawpath(path)
+    # then draw original path
+    drawpath(path)

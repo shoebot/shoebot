@@ -28,16 +28,10 @@ for i in range(amount):
 
             if prev is not None:
                 line(
-                    pt.x,
-                    pt.y,
-                    prev.x + random(-amount, 0),
-                    prev.y + random(-amount, 0)
+                    pt.x, pt.y, prev.x + random(-amount, 0), prev.y + random(-amount, 0)
                 )
                 line(
-                    pt.x + random(-amount, 0),
-                    pt.y + random(-amount, 0),
-                    prev.x,
-                    prev.y
+                    pt.x + random(-amount, 0), pt.y + random(-amount, 0), prev.x, prev.y
                 )
 
             prev = pt
