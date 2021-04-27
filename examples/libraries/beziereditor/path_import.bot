@@ -1,8 +1,13 @@
+from pathlib import Path
+
+here = Path(__file__).parent
+
 svg = ximport("svg")
 
 size(400, 400)
 
-paths = svg.parse(open("path.svg").read())
+with open(here / "path.svg") as f:
+    paths = svg.parse(f.read())
 
 # Create a copy of the path we can manipulate with rotate() and scale() etc.
 points = []
