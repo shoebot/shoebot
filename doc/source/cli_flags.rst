@@ -50,13 +50,6 @@ This is a list of all the flags you can specify to the ``sbot`` command-line run
   Set number of iterations to run the script, producing multiple images.
 
 
-.. data:: --grammar <LANG>, -g <LANG>
-
-  Select the language to use: ``nodebox`` (default) or ``drawbot``.  
-
-  Note that Drawbot support is experimental.
-
-
 .. data:: --window, -w
 
   Run the script in a GTK window (default).

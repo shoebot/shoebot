@@ -46,9 +46,6 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-NODEBOX = "nodebox"
-DRAWBOT = "drawbot"
-
 
 def json_arg(s):
     try:
@@ -164,13 +161,6 @@ def main():
         default=False,
         help=_("set number of iteration, multiple images will be produced"),
     )
-    group.add_argument(
-        "-g",
-        "--grammar",
-        dest="grammar",
-        default=NODEBOX,
-        help=_("Select the bot grammar 'nodebox' (default) or 'drawbot' languages"),
-    )
 
     group = parser.add_argument_group("Window Management")
     group.add_argument(
@@ -273,7 +263,6 @@ def main():
 
     success = run(
         src=args.script,
-        grammar=args.grammar,
         outputfile=args.outputfile,
         iterations=args.repeat or None,
         window=window,

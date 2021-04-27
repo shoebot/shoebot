@@ -34,6 +34,7 @@ import sys
 import threading
 
 from shoebot.core.backend import cairo
+from shoebot.grammar import NodeBot
 
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
@@ -49,7 +50,6 @@ CORNER = "corner"
 CORNERS = "corners"
 
 NODEBOX = "nodebox"
-DRAWBOT = "drawbot"
 
 
 def _save():
@@ -140,7 +140,6 @@ def create_canvas(
 
 def create_bot(
     src=None,
-    grammar=NODEBOX,
     format=None,
     outputfile=None,
     iterations=1,
@@ -158,7 +157,6 @@ def create_bot(
     Create a canvas and a bot with the same canvas attached to it
 
     bot parameters
-    :param grammar: DRAWBOT or NODEBOX - decides what kind of bot is created
     :param vars: preset dictionary of vars from the called
 
     canvas parameters:
@@ -180,14 +178,7 @@ def create_bot(
         show_vars=show_vars,
     )
 
-    if grammar == DRAWBOT:
-        from shoebot.grammar import DrawBot
-
-        bot = DrawBot(canvas, namespace=namespace, vars=vars)
-    else:
-        from shoebot.grammar import NodeBot
-
-        bot = NodeBot(canvas, namespace=namespace, vars=vars)
+    bot = NodeBot(canvas, namespace=namespace, vars=vars)
 
     if server:
         from shoebot.sbio import SocketServer
@@ -259,7 +250,6 @@ class ShoebotThread(threading.Thread):
 
 def run(
     src,
-    grammar=NODEBOX,
     format=None,
     outputfile=None,
     iterations=1,
@@ -289,7 +279,7 @@ def run(
 
     See create_bot for details on create_args
 
-    run_args are passed to bot.run - see Nodebot.run or Drawbot.run
+    run_args are passed to bot.run - see Nodebot.run
 
 
 
@@ -311,7 +301,6 @@ def run(
     # arguments for create_bot
     create_args = [
         src,
-        grammar,
         format,
         outputfile,
         iterations,
