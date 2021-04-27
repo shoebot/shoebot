@@ -5,8 +5,8 @@ Random shapes and sliders
 size(180, 180)
 
 # underscores are displayed as spaces in the GUI
-var('oval_tendency', NUMBER, 0.5, 0., 2.)
-var('grid_size', NUMBER, 30, 20, 40)
+var("oval_tendency", NUMBER, 0.5, 0.0, 2.0)
+var("grid_size", NUMBER, 30, 20, 40)
 
 w, h = 180, 180
 

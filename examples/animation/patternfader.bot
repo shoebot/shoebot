@@ -40,15 +40,15 @@ def draw():
         xify = (float(x + counter) / 8) % 1
         xify = abs((2 * xify - 1) ** 2)
 
-        yify = (float(y + counter) / 8 * .866) % 1
+        yify = (float(y + counter) / 8 * 0.866) % 1
         yify = abs((2 * yify - 1) ** 2)
 
         r = abs(xify - yify)
 
-        r = 0.9 - r * .6
-        fill(0, 0, (1 - (sin(r * 2 * pi) + 1) / 2.0)**2)
+        r = 0.9 - r * 0.6
+        fill(0, 0, (1 - (sin(r * 2 * pi) + 1) / 2.0) ** 2)
 
-        circle(x + (y % 2) * .5 - r / 2, y * 0.866 - r / 2, r)
+        circle(x + (y % 2) * 0.5 - r / 2, y * 0.866 - r / 2, r)
         # Increase the counter so that every oval looks a bit different.
         s += 0.03
 

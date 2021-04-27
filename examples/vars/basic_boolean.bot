@@ -6,7 +6,7 @@ size(300, 300)
 colorrange(255)
 colormode(RGB)
 
-var('color_switch', BOOLEAN, 0)
+var("color_switch", BOOLEAN, 0)
 
 background(255, 0, 0)
 if color_switch:

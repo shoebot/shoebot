@@ -41,6 +41,7 @@ from copy import deepcopy
 from glob import glob
 from math import degrees, radians, sin, cos, atan2, sqrt
 from math import floor
+from operator import attrgetter
 from random import random, choice
 from xml.dom.minidom import parseString
 
@@ -50,7 +51,8 @@ try:
     from shoebot import _restore, _save
 except ImportError:
     class Grob:
-        pass
+        def __init__(self, _ctx):
+            pass
 
 try:
     from . import favorites as _favorites
@@ -469,6 +471,8 @@ def _load_color_context():
             tags.sort()
             context[name] = tags
     return context
+
+
 context = _load_color_context()
 
 from shoebot.data import Color as BaseColor
@@ -558,8 +562,15 @@ class Color(BaseColor):
                         "v" in kwargs:
                     r, g, b = hsv_to_rgb(kwargs["h"], kwargs["s"], kwargs["v"])
                 else:
-                    h, s, l, a = (args)
-                    r, g, b = hsv_to_rgb(h, s, l)
+                    if len(args) == 4:
+                        h, s, l, a = args
+                        r, g, b = hsv_to_rgb(h, s, l)
+                    elif len(args) == 3:
+                        h, s, l = args
+                        a = 1.0
+                        r, g, b = hsv_to_rgb(h, s, l)
+                    else:
+                        raise ValueError("hsb mode color requires 3 or 4 arguments.")
             elif m == "rgb":
                 if "r" in kwargs and \
                         "g" in kwargs and \
@@ -602,15 +613,15 @@ class Color(BaseColor):
             s = s.replace(ch, "")
 
         if s in named_hues:
-           clr = color(named_hues[s], 1, 1, mode="hsb")
-           return clr.r, clr.g, clr.b
+            clr = color(named_hues[s], 1, 1, mode="hsb")
+            return clr.r, clr.g, clr.b
 
         if s in named_colors:
             return named_colors[s]
 
         for suffix in ["ish", "ed", "y", "like"]:
-            s = re.sub("(.*?)" + suffix + "$", "\\1", str)
-        s = re.sub("(.*?)dd$", "\\1d", str)
+            s = re.sub(rf"(.*?){{suffix}}$", "\\1", s)
+        s = re.sub(r"(.*?)dd$", "\\1d", s)
 
         matches = []
         for name in named_colors:
@@ -635,11 +646,11 @@ class Color(BaseColor):
     @property
     def is_grey(self):
         return self.r == self.g == self.b
-    
+
     is_gray = is_grey
 
     @property
-    def _is_transparent(self):
+    def is_transparent(self):
         return self.a == 0
 
     def __eq__(self, clr):
@@ -840,22 +851,24 @@ class Color(BaseColor):
 # color(c, m, y, k, mode="cmyk", range=1.0)
 # color(h, s, b, a, mode="hsb", range=1.0)
 # color(l, a, b, mode="lab")
-def color(*args, **kwargs):
-    return Color(*args, **kwargs)
+color = Color
 
 
 def rgb(r, g, b, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(r, g, b, a, mode="rgb", name=name, range=range)
 
 
 def hsb(h, s, b, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(h, s, b, a, mode="hsb", name=name, range=range)
 
 
 def cmyk(c, m, y, k, a=None, range=1.0, name=""):
-    if a is None: a = range
+    if a is None:
+        a = range
     return color(c, m, y, k, mode="cmyk", name=name, range=range)
 
 
@@ -867,27 +880,22 @@ def hex(str, name=""):
     return color("#" + str.lstrip("#"), name=name)
 
 
-def named_color(str):
-    return color(str)
+named_color = color
 
 
 ### NAMED COLOR OBJECTS ##############################################################################
+def _build_named_colors():
+    code = ""
 
-code = ""
-for clr in named_colors:
-    try:
-        r, g, b = named_colors[clr]
-        a = 1.0
-    except:
-        r, g, b, a = named_colors[clr]
-    r, g, b, a = [str(v) for v in [r, g, b, a]]
-    code += clr + " = lambda: Color(" + r + ", " + g + ", " + b + ", " + a + ", mode=\"rgb\", name=\"" + clr + "\")\n"
+    for name, value in named_colors.items():
+        code += f"{name} = lambda: Color(*{value}, mode='rgb', name='{name}')\n"
 
-# for clr in named_hues:
-#    h = named_hues[clr]
-#    code += clr+" = lambda: Color("+str(h)+", 1, 1, 1, mode=\"hsb\", name=\""+clr+"\")\n"
+    for name, h in named_hues.items():
+        code += f"{name} = lambda: Color({h}, 1, 1, 1, mode='hsb', name='{name}')\n"
 
-eval(compile(code, "<string>", "exec"))
+    return code
+
+eval(compile(_build_named_colors(), "<string>", "exec"))
 
 
 # background(green().darken())
@@ -1122,78 +1130,77 @@ class ColorList(_list):
         Returns a list with the smallest distance between two neighboring colors.
         The algorithm has a factorial complexity so it may run slow.
         """
-        if len(self) == 0: return ColorList()
+        if not len(self):
+            return ColorList()
 
         # Find the darkest color in the list.
         root = self[0]
-        for clr in self[1:]:
-            if clr.brightness < root.brightness:
-                root = clr
+        for _color in self[1:]:
+            if _color.brightness < root.brightness:
+                root = _color
 
         # Remove the darkest color from the stack,
         # put it in the sorted list as starting element.
-        stack = [clr for clr in self]
+        stack = [*self]
         stack.remove(root)
-        sorted = [root]
+        sorted_colors = [root]
 
         # Now find the color in the stack closest to that color.
         # Take this color from the stack and add it to the sorted list.
         # Now find the color closest to that color, etc.
         while len(stack) > 1:
-            closest, distance = stack[0], stack[0].distance(sorted[-1])
-            for clr in stack[1:]:
-                d = clr.distance(sorted[-1])
+            closest, distance = stack[0], stack[0].distance(sorted_colors[-1])
+            for _color in stack[1:]:
+                d = _color.distance(sorted_colors[-1])
                 if d < distance:
-                    closest, distance = clr, d
+                    closest, distance = _color, d
             stack.remove(closest)
-            sorted.append(closest)
-        sorted.append(stack[0])
+            sorted_colors.append(closest)
+        sorted_colors.append(stack[0])
 
-        if reversed: _list.reverse(sorted)
-        return ColorList(sorted)
+        if reversed:
+            _list.reverse(sorted_colors)
+        return ColorList(sorted_colors)
 
     def _sorted_copy(self, comparison, reversed=False):
         """
         Returns a sorted copy with the colors arranged according to the given comparison.
         """
-        sorted = self.copy()
-        _list.sort(sorted, comparison)
-        if reversed:
-            _list.reverse(sorted)
-        return sorted
+        sorted_colors = ColorList(*sorted(self.copy(), key=comparison, reverse=reversed))
+        return sorted_colors
 
     def sort_by_hue(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.h < b.h) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("h"), reversed)
 
     def sort_by_saturation(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.s < b.s) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("s"), reversed)
 
     def sort_by_brightness(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.brightness < b.brightness) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("brightness"), reversed)
 
     def sort_by_red(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.r < b.r) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("r"), reversed)
 
     def sort_by_green(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.g < b.g) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("g"), reversed)
 
     def sort_by_blue(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.b < b.b) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("b"), reversed)
 
     def sort_by_alpha(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.a < b.a) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("a"), reversed)
 
     def sort_by_cyan(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.c < b.c) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("c"), reversed)
 
     def sort_by_magenta(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.m < b.m) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("m"), reversed)
 
     def sort_by_yellow(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.y < b.y) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("y"), reversed)
 
     def sort_by_black(self, reversed=False):
-        return self._sorted_copy(lambda a, b: int(a.k < b.k) * 2 - 1, reversed)
+        return self._sorted_copy(attrgetter("k"), reversed)
 
     def sort(self, comparison="hue", reversed=False):
 
@@ -1203,8 +1210,7 @@ class ColorList(_list):
         since colors need to be represented in 2 or 3 dimensions.
 
         """
-
-        return getattr(self, "sort_by_" + comparison)(reversed)
+        return getattr(self, f"sort_by_{comparison}")(reversed)
 
     def cluster_sort(self, cmp1="hue", cmp2="brightness", reversed=False, n=12):
         """
@@ -1215,18 +1221,22 @@ class ColorList(_list):
         n is used rather to slice up the cmp1 property of the colors,
         e.g. cmp1=brightness and n=3 will cluster colors by brightness >= 0.66, 0.33, 0.0
         """
-        sorted = self.sort(cmp1)
+        sorted_colors = self.sort(cmp1)
         clusters = ColorList()
 
         d = 1.0
         i = 0
-        for j in _range(len(sorted)):
-            if getattr(sorted[j], cmp1) < d:
-                clusters.extend(sorted[i:j].sort(cmp2))
+        for j in _range(len(sorted_colors)):
+            if getattr(sorted_colors[j], cmp1) < d:
+                if not sorted_colors[i: j]:
+                    continue
+                clusters.extend(sorted_colors[i:j].sort(cmp2))
                 d -= 1.0 / n
                 i = j
-        clusters.extend(sorted[i:].sort(cmp2))
-        if reversed: _list.reverse(clusters)
+        clusters.extend(sorted_colors[i:].sort(cmp2))
+        if reversed:
+            # _list.reverse(clusters)
+            clusters.reverse()
         return clusters
 
     cluster = clustersort = cluster_sort
@@ -1309,8 +1319,8 @@ class ColorList(_list):
         """
         Rectangle swatches for all the colors in the list.
         """
-        for clr in self:
-            clr.swatch(x, y, w, h, roundness)
+        for _color in self:
+            _color.swatch(x, y, w, h, roundness)
             y += h + padding
 
     draw = swatch
@@ -1351,10 +1361,10 @@ class ColorList(_list):
     # single Color objects can be added with +,
     # and * equals the repeat() method.
 
-    def __getslice__(self, i, j):
-        j = min(len(self), j)
-        n = min(len(self), j - i)
-        return colorlist([self[i + k] for k in _range(n)])
+    def __getitem__(self, *args):
+        if isinstance(args[0], slice):
+            return ColorList(super().__getitem__(*args))
+        return super().__getitem__(*args)
 
     def __add__(self, clr):
         if isinstance(clr, BaseColor):
@@ -1546,6 +1556,7 @@ def monochrome(clr):
     """
     Returns colors in the same hue with varying brightness/saturation.
     """
+
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
             return x + plus
@@ -1624,6 +1635,7 @@ def compound(clr, flip=False):
     """
     Roughly the complement and some far analogs.
     """
+
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
             return x + plus
@@ -1818,8 +1830,8 @@ class Gradient(ColorList):
 
         # Chop into left half and right half.
         # Make sure their ending and beginning match colors.
-        left = colors[:len(colors) / 2]
-        right = colors[len(colors) / 2:]
+        left = colors[:len(colors) // 2]
+        right = colors[len(colors) // 2:]
         left.append(right[0])
         right.insert(0, left[-1])
 
@@ -1854,6 +1866,7 @@ def outline(path, colors, precision=0.4, continuous=True):
     Because each line segment is drawn separately,
     works only with corner-mode transforms.
     """
+
     # The count of points in a given path/contour.
     def _point_count(path, precision):
         return max(int(path.length * precision * 0.5), 10)
@@ -2054,7 +2067,7 @@ class ColorRange(ColorList):
             if clr.is_grey:
                 return choice(
                     (self.black.color(clr, d), self.white.color(clr, d))
-            )
+                )
 
         h, s, b, a = self.h, self.s, self.b, self.a
         if clr != None:

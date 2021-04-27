@@ -30,7 +30,7 @@
 """Abstract canvas class"""
 
 from collections import deque
-import abc, six
+import abc
 import sys
 import locale
 import gettext
@@ -53,8 +53,7 @@ TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Canvas(object):
+class Canvas(metaclass=abc.ABCMeta):
     DEFAULT_SIZE = 400, 400
     DEFAULT_MODE = CENTER
 

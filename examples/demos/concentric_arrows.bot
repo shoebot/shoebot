@@ -3,7 +3,7 @@ Concentric arrows
 """
 
 size(200, 200)
-background(.8, .65, .1)
+background(0.8, 0.65, 0.1)
 fill(0, 0, 0)
 transform(CORNER)
 translate(100, 100)

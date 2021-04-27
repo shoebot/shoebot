@@ -13,8 +13,9 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot import create_bot
+from shoebot.data.typography import TextBounds
 
-TEST_DIR = Path(__file__).parent.absolute()
+TEST_DIR = Path(__file__).absolute().parent
 TEST_INPUT_DIR = TEST_DIR / "input/tests"
 TEST_OUTPUT_DIR = TEST_DIR / "output/tests"
 EXAMPLE_INPUT_DIR = TEST_DIR / "input/examples"
@@ -48,6 +49,13 @@ def shoebot_named_testfunction(func, num, param):
      test_output_formats_svg
     """
     return f"{func.__name__}_{'_'.join(param[0])}"
+
+
+def shoebot_example_render_testfunction(func, num, param):
+    """Test function that accepts a tuple containing a posixpath to an example."""
+    if not isinstance(param[0][0], Path):
+        raise ValueError()
+    return f"{func.__name__}__{param[0][0].stem}"
 
 
 def shoebot_named_testclass(cls, num, params_dict):
@@ -118,6 +126,11 @@ class ShoebotTestCase(TestCase):
 
     maxDiff = None
 
+    # Extending classes may set their own output directory by setting image_output_dir to a Path instance.
+    image_output_dir: Path = EXAMPLE_OUTPUT_DIR
+    # Extending classes can disable copying of expected output
+    copy_expected_output = True
+
     @classmethod
     def setUpClass(cls):
         """
@@ -126,7 +139,7 @@ class ShoebotTestCase(TestCase):
         """
         for input_path, output_path in [
             (TEST_INPUT_DIR, TEST_OUTPUT_DIR),
-            (EXAMPLE_INPUT_DIR, EXAMPLE_OUTPUT_DIR),
+            (EXAMPLE_INPUT_DIR, cls.image_output_dir),
         ]:
             if output_path in ShoebotTestCase._created_directories:
                 continue
@@ -140,15 +153,33 @@ class ShoebotTestCase(TestCase):
 
             if not RUNNING_IN_CI:
                 for input_file in input_path.glob("*"):
-                    if input_file in ShoebotTestCase._copied_files:
+                    output_file = output_path / input_file.name
+                    if (input_file, output_file) in ShoebotTestCase._copied_files:
                         continue
 
-                    ShoebotTestCase._copied_files.add(input_file)
-                    output_file = output_path / input_file.name
-                    try:
-                        shutil.copy(input_file, output_file)
-                    except FileNotFoundError:
-                        pass
+                    if cls.copy_expected_output:
+                        ShoebotTestCase._copied_files.add((input_file, output_file))
+                        try:
+                            shutil.copy(input_file, output_file)
+                        except FileNotFoundError:
+                            pass
+
+    def assertBoundingBoxAlmostEqual(
+        self, expected_bounds, actual_bounds, threshold=2.0
+    ):
+        """"""
+        if expected_bounds == actual_bounds:
+            return
+
+        within_bounds = True
+        for actual, expected in zip(expected_bounds, actual_bounds):
+            if math.fabs(expected) - math.fabs(actual) > threshold:
+                within_bounds = False
+
+        if not within_bounds:
+            self.fail(
+                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}"
+            )
 
     def assertReferenceImage(self, file1, file2):
         """

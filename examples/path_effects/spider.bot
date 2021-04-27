@@ -23,7 +23,7 @@ for contour in path.contours:
         d = float("inf")  # infinity
         while d > fontsize() / 5:
             pt2 = choice(points)
-            d = sqrt((pt2.x - pt1.x)**2 + (pt2.y - pt1.y)**2)
+            d = sqrt((pt2.x - pt1.x) ** 2 + (pt2.y - pt1.y) ** 2)
 
         nofill()
         stroke(1, 1, 1, 0.9)
@@ -32,5 +32,5 @@ for contour in path.contours:
             pt1.x + random(-amount, amount),
             pt1.y + random(-amount, amount),
             pt2.x + random(-amount, amount),
-            pt2.y + random(-amount, amount)
+            pt2.y + random(-amount, amount),
         )

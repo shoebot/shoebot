@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install --no-install-recommends -y python3-pip python3-pep8 python3-setuptools xvfb
+        ./install/install_dependencies.sh
+        python -mpip freeze
+        python -mpip install .
+
+    - name: Run tests
+      run: |
+        xvfb-run --auto-servernum python setup.py diagnose
+        xvfb-run --auto-servernum python setup.py test
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        ./install/install_dependencies.sh
+        python3 -m venv ../venv
+        source ../venv/bin/activate
+        pip install wheel
+        pip install --upgrade pip setuptools
+        python -mpip freeze
+        python -mpip install .
+
+    - name: Run tests
+      run: |
+        source ../venv/bin/activate
+        python setup.py diagnose
+        python setup.py test
