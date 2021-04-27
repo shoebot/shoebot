@@ -19,7 +19,7 @@ STATES = {
 }
 
 
-class Grob(object):
+class Grob:
     """A GRaphic OBject is the base class for all DrawingPrimitives."""
 
     def __init__(self, bot):

@@ -4,6 +4,4 @@ stroke(0.5)
 strokewidth(5)
 autoclosepath(False)
 
-beginpath()
 arc(150, 150, 135, 45, 270)
-endpath()

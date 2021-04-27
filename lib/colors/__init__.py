@@ -51,7 +51,8 @@ try:
     from shoebot import _restore, _save
 except ImportError:
     class Grob:
-        pass
+        def __init__(self, _ctx):
+            pass
 
 try:
     from . import favorites as _favorites
