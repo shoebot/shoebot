@@ -23,7 +23,7 @@ x2, y2 = 150, 20
 # End curve point
 x3, y3 = 230, 125
 
-# Note that 
+# Note that
 #     x, y = 25, 125
 # is equivalent to
 #     x = 25

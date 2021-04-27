@@ -35,14 +35,7 @@ for i in range(amount):
         r = boid.z / 5
         oval(boid.x - r / 2, boid.y - r / 2, r, r)
         beginpath(boid.x, boid.y)
-        curveto(
-            boid.y,
-            boid.x,
-            boid.y,
-            boid.y,
-            WIDTH / 2,
-            HEIGHT / 2
-        )
+        curveto(boid.y, boid.x, boid.y, boid.y, WIDTH / 2, HEIGHT / 2)
         endpath()
 
         push()

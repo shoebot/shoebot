@@ -1,4 +1,4 @@
-size(300,300)
+size(300, 300)
 nofill()
 stroke(0.5)
 strokewidth(5)

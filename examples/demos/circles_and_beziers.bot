@@ -18,15 +18,20 @@ for i in range(0, WIDTH // 4, 1):
 
     nofill()
     stroke(0, 0, 0, 255)
-    strokewidth(.1)
+    strokewidth(0.1)
     ellipse(xpos, ypos, sz, sz)
 
     for j in range(0, WIDTH // 80, 1):
         # ^ range requires a float, so use integer division '//'
         stroke(0, 0, 0, 255)
-        strokewidth(.1)
+        strokewidth(0.1)
         beginpath(random(-WIDTH / 2, WIDTH * 1.5), random(-HEIGHT / 2, HEIGHT * 1.5))
-        curveto(random(-WIDTH / 2, WIDTH * 1.5), random(-HEIGHT / 2, HEIGHT * 1.5),
-                random(-WIDTH / 2, WIDTH * 1.5), random(-HEIGHT / 2, HEIGHT * 1.5),
-                random(-WIDTH / 2, WIDTH * 1.5), random(-HEIGHT / 2, HEIGHT * 1.5))
+        curveto(
+            random(-WIDTH / 2, WIDTH * 1.5),
+            random(-HEIGHT / 2, HEIGHT * 1.5),
+            random(-WIDTH / 2, WIDTH * 1.5),
+            random(-HEIGHT / 2, HEIGHT * 1.5),
+            random(-WIDTH / 2, WIDTH * 1.5),
+            random(-HEIGHT / 2, HEIGHT * 1.5),
+        )
         endpath()
