@@ -65,5 +65,9 @@ class ShoebotError(Exception):
     pass
 
 
+class ShoebotScriptError(Exception):
+    pass
+
+
 class NodeBoxError(ShoebotError):
     pass
