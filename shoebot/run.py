@@ -271,7 +271,7 @@ def main():
 
     from shoebot.__init__ import run  # https://github.com/shoebot/shoebot/issues/206
 
-    run(
+    success = run(
         src=args.script,
         grammar=args.grammar,
         outputfile=args.outputfile,
@@ -291,6 +291,10 @@ def main():
         background_thread=not args.disable_background_thread,
     )
 
+    # Return errorcode
+    return 0 if success else 1
+
 
 if __name__ == "__main__":
-    main()
+    # Not to be confused with entrypoint from setup.
+    sys.exit(main())

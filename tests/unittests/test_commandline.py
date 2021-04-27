@@ -1,6 +1,8 @@
 import subprocess
 import unittest
 
+from parameterized import parameterized
+
 
 class TestCommandLine(unittest.TestCase):
     """
@@ -42,6 +44,21 @@ class TestCommandLine(unittest.TestCase):
         self.assertEqual(
             result.returncode,
             0,
+            f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
+        )
+
+    @parameterized.expand([("sbot", "this_will_fail()",), ("sbot", "-dt", "this_will_fail()")])
+    def test_sbot_errorcode_on_invalid_code(self, *cmd):
+        """
+        Try and run sbot, call a function that doesn't exist and verify
+
+        The errorcode is set as expected.
+        """
+        result = subprocess.run(cmd, capture_output=True)
+
+        self.assertEqual(
+            result.returncode,
+            1,
             f"Failed to start shoebot, output:\n{result.stderr.decode('utf-8')}",
         )
 
