@@ -164,6 +164,3 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         cr.paint()
 
         self.queue_draw()
-
-        while Gtk.events_pending():
-            Gtk.main_iteration_do(False)

@@ -252,7 +252,7 @@ def run(
     src,
     format=None,
     outputfile=None,
-    iterations=1,
+    max_iterations=1,
     buff=None,
     window=True,
     title=None,
@@ -303,7 +303,7 @@ def run(
         src,
         format,
         outputfile,
-        iterations,
+        max_iterations,
         buff,
         window,
         title,
@@ -315,7 +315,7 @@ def run(
     create_kwargs = dict(vars=vars, namespace=namespace)
     run_args = [src]
     run_kwargs = dict(
-        iterations=iterations,
+        max_iterations=max_iterations,
         frame_limiter=window,
         verbose=verbose,
         # run forever except 1. windowed mode is off 2. if --close-window was specified and
