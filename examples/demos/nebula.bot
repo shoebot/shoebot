@@ -19,8 +19,7 @@ except:
 
 
 def merge(points, x, y, vx, vy, reflected=False, d=0):
-    """ Smooth curves from all points in the list to x, y.
-    """
+    """Smooth curves from all points in the list to x, y."""
     beginpath(0, 0)
     for pt in points:
         if not reflected:
@@ -33,8 +32,7 @@ def merge(points, x, y, vx, vy, reflected=False, d=0):
 
 
 def points(n, vx, vy, h=(0.0, 1.0), v=(0.0, 1.0)):
-    """ Random points in a relative h, v box with vx, vy handles.
-    """
+    """Random points in a relative h, v box with vx, vy handles."""
     points = []
     for i in range(n):
         pt = PathElement()
@@ -57,7 +55,7 @@ def nebula(
     growth=[1.01, 1.01, 0.98],
 ):
 
-    """ Draws a set of elegant curves in subtle shades of the given color.
+    """Draws a set of elegant curves in subtle shades of the given color.
 
     If bg is True, fills the background with a dark variation of the color.
     Increasing n produces more curves.

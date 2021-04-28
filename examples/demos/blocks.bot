@@ -15,10 +15,10 @@ cols = 9
 
 
 def block(x, y, z):
-    '''
+    """
     draw an isometric square prism; x,y are the coordinates of
     the BOTTOM-CENTER corner, z is the height
-    '''
+    """
     # TODO: variables for width+depth instead of fixed value
 
     # no strokes in the inside

@@ -22,7 +22,7 @@ translate(0, 100)
 
 for i in range(6):
     push()
-    scale(i / 6.)
+    scale(i / 6.0)
     rect(0, 0, 80, 80)
     pop()
 
@@ -30,6 +30,6 @@ translate(0, 100)
 
 for i in range(6):
     push()
-    skew(i / 3.)
+    skew(i / 3.0)
     rect(0, 0, 80, 80)
     pop()

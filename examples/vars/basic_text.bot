@@ -8,7 +8,7 @@ size(400, 300)
 colorrange(255)
 
 var("txt", TEXT, "test")
-var("font_size", NUMBER, 100., 10., 200.)
+var("font_size", NUMBER, 100.0, 10.0, 200.0)
 
 background(80, 80, 80)
 fontsize(font_size)

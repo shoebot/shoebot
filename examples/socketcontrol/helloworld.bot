@@ -1,4 +1,4 @@
-'''
+"""
 Socket control
 by Ricardo Lafuente
 
@@ -19,30 +19,31 @@ the star will change color and the variable sliders will move.
 
 There is a companion puredata file 'helloworld.pd' that
 demonstrates controling this bot from puredata.
-'''
+"""
 
-size(200,200)
+size(200, 200)
 
 # create the variables we want to use in the script
 # and that should be accessible from outside;
 #
 # the values set here will be used if we use Shoebot
 # to create a still image instead of a GTK window.
-var('red', NUMBER, 186., 0., 255.)
-var('green', NUMBER, 186., 0., 255.)
-var('blue', NUMBER, 93., 0., 255.)
+var("red", NUMBER, 186.0, 0.0, 255.0)
+var("green", NUMBER, 186.0, 0.0, 255.0)
+var("blue", NUMBER, 93.0, 0.0, 255.0)
+
 
 def setup():
     # set the colour range to 255
     colorrange(255)
 
+
 def draw():
     # khaki background
-    background(76,102,51)
+    background(76, 102, 51)
 
     # use the outside variables to set the fill
     fill(red, green, blue)
 
     # draw the shape
     star(100, 100, 20, outer=25, inner=15)
-
