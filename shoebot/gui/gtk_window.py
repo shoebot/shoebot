@@ -4,9 +4,8 @@ import sys
 from pathlib import Path
 from shoebot.core.backend import gi
 from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
-from gi.repository import Gdk, Gtk, GObject
+from gi.repository import Gdk, Gtk
 
-from collections import deque
 from pkg_resources import resource_filename, Requirement
 
 from shoebot.gui import ShoebotWidget, VarWindow
@@ -34,14 +33,14 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
     # Draw in response to an expose-event
     def __init__(
-        self,
-        title=None,
-        show_vars=False,
-        menu_enabled=True,
-        server=False,
-        port=7777,
-        fullscreen=False,
-        outputfile=None,
+            self,
+            title=None,
+            show_vars=False,
+            menu_enabled=True,
+            server=False,
+            port=7777,
+            fullscreen=False,
+            outputfile=None,
     ):
         Gtk.Window.__init__(self)
         DrawQueueSink.__init__(self)
@@ -182,6 +181,10 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.window_open = True
         self.pause_speed = None  # TODO - factor out bot controller stuff
 
+    def set_bot(self, bot):
+        super().set_bot(bot)
+        self.sb_widget.bot = bot
+
     def gtk_mouse_button_down(self, widget, event):
         """ Handle right mouse button clicks """
         if self.menu_enabled and event.button == 3:
@@ -202,9 +205,8 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         :param frame:   frame  number
         :param r_context:  cairo context
         """
-
         bot = self.bot
-        canvas = self.bot.canvas
+        canvas = bot.canvas
 
         pending_snapshots = self.pending_snapshots
         for filename in pending_snapshots:

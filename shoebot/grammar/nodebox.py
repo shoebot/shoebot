@@ -706,9 +706,21 @@ class NodeBot(Bot):
     def background(self, *args):
         """Set the background color.
 
+        Pass None for no background.
+
         :param color: See color() function for supported color formats.
         """
-        self._canvas.background = self.color(*args)
+        if args == (None,):
+            if self._canvas.background is not None:
+                self._canvas.screen_border = self._canvas.background[:3]
+            self._canvas.background = None
+        else:
+            self._canvas.background = self.color(*args).data[:3]
+            self._canvas.screen_border = self._canvas.background
+
+    def nobackground(self):
+        """Don't redraw the background every frame."""
+        self.background(None)
 
     # Text
 
