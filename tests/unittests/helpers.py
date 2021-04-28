@@ -235,14 +235,14 @@ class ShoebotTestCase(TestCase):
         )
 
     @staticmethod
-    def run_code(code, outputfile, windowed=False, namespace=None, verbose=True):
+    def run_code(code, outputfile, windowed=False, namespace=None, verbose=True, run_forever=False):
         """
         Run shoebot code, sets random.seed to stabilize output.
         """
         bot = create_bot(window=windowed, outputfile=outputfile, namespace=namespace)
 
         seed(0)
-        bot.run(code, verbose=verbose)
+        bot.run(code, verbose=verbose, run_forever=run_forever)
 
     def run_filename(
         self, filename, outputfile, windowed=False, namespace=None, verbose=True
