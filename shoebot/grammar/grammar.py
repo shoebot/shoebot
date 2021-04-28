@@ -279,7 +279,6 @@ class Grammar(object):
                             self._canvas.sink.main_iteration()  # update GUI, may generate events..
 
                     if event.type == QUIT_EVENT:
-                        run_forever = False
                         break
                     elif event.type == SOURCE_CHANGED_EVENT:
                         # Debounce SOURCE_CHANGED events -
@@ -292,7 +291,7 @@ class Grammar(object):
 
                     event = None  # this loop is a bit weird...
                     break
-                return True
+            return True
         except Exception as e:
             # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
