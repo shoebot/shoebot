@@ -4,7 +4,7 @@ Shoebot is a Python graphics robot: It takes a Python script as input, which des
 
 Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
 
-[![Build Status](https://travis-ci.org/shoebot/shoebot.svg?branch=master)](https://travis-ci.org/shoebot/shoebot)
+[![Build Status](https://github.com/shoebot/shoebot/actions/workflows/test.yml/badge.svg)](https://github.com/shoebot/shoebot/actions/workflows/test.yml)
 [![Matrix channel](https://img.shields.io/matrix/shoebot:matrix.org)](https://matrix.to/#/#shoebot:matrix.org)
 
 * [How to install](http://shoebot.readthedocs.io/en/latest/install.html)
