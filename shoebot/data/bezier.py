@@ -28,6 +28,72 @@ ARC = "arc"
 ELLIPSE = "ellipse"
 CLOSE = "close"
 
+BUTT = "butt"
+ROUND = "round"
+SQUARE = "square"
+BEVEL = "bevel"
+MITER = "miter"
+WINDING = "winding"
+EVENODD = "evenodd"
+
+OVER = "over"
+MULTIPLY = "multiply"
+SCREEN = "screen"
+OVERLAY = "overlay"
+DARKEN = "darken"
+LIGHTEN = "lighten"
+COLORDODGE = "colordodge"
+COLORBURN = "colorburn"
+HARDLIGHT = "hardlight"
+SOFTLIGHT = "softlight"
+DIFFERENCE = "difference"
+EXCLUSION = "exclusion"
+HUE = "hue"
+SATURATION = "saturation"
+COLOR = "color"
+LUMINOSITY = "luminosity"
+IN = "in"
+OUT = "out"
+ATOP = "atop"
+XOR = "xor"
+ADD = "add"
+SATURATE = "saturate"
+
+STROKE_CAPS = {
+    BUTT: cairo.LINE_CAP_BUTT,
+    ROUND: cairo.LINE_CAP_ROUND,
+    SQUARE: cairo.LINE_CAP_SQUARE,
+}
+STROKE_JOINS = {
+    BEVEL: cairo.LINE_JOIN_BEVEL,
+    ROUND: cairo.LINE_JOIN_ROUND,
+    MITER: cairo.LINE_JOIN_MITER,
+}
+BLENDMODES = {
+    OVER: cairo.OPERATOR_OVER,
+    MULTIPLY: cairo.OPERATOR_MULTIPLY,
+    SCREEN: cairo.OPERATOR_SCREEN,
+    OVERLAY: cairo.OPERATOR_OVERLAY,
+    DARKEN: cairo.OPERATOR_DARKEN,
+    LIGHTEN: cairo.OPERATOR_LIGHTEN,
+    COLORDODGE: cairo.OPERATOR_COLOR_DODGE,
+    COLORBURN: cairo.OPERATOR_COLOR_BURN,
+    HARDLIGHT: cairo.OPERATOR_HARD_LIGHT,
+    SOFTLIGHT: cairo.OPERATOR_SOFT_LIGHT,
+    DIFFERENCE: cairo.OPERATOR_DIFFERENCE,
+    EXCLUSION: cairo.OPERATOR_EXCLUSION,
+    HUE: cairo.OPERATOR_HSL_HUE,
+    SATURATION: cairo.OPERATOR_HSL_SATURATION,
+    COLOR: cairo.OPERATOR_HSL_COLOR,
+    LUMINOSITY: cairo.OPERATOR_HSL_LUMINOSITY,
+    IN: cairo.OPERATOR_IN,
+    OUT: cairo.OPERATOR_OUT,
+    ATOP: cairo.OPERATOR_ATOP,
+    XOR: cairo.OPERATOR_XOR,
+    ADD: cairo.OPERATOR_ADD,
+    SATURATE: cairo.OPERATOR_SATURATE,
+}
+
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
 locale.setlocale(locale.LC_ALL, "")
@@ -49,15 +115,32 @@ class BezierPath(Grob, ColorMixin):
     for getting path dimensions)
     """
 
-    _state_attributes = {"fillcolor", "strokecolor", "strokewidth", "transform"}
+    _state_attributes = {
+        "fillcolor",
+        "fillrule",
+        "strokecolor",
+        "strokewidth",
+        "strokecap",
+        "strokejoin",
+        "strokedash",
+        "dashoffset",
+        "blendmode",
+        "transform",
+    }
 
     def __init__(
         self,
         bot,
         path=None,
         fill=None,
+        fillrule=None,
         stroke=None,
         strokewidth=0,
+        strokecap=None,
+        strokejoin=None,
+        strokedash=None,
+        dashoffset=None,
+        blendmode=None,
         packed_elements=None,
     ):
         # Stores two lists, _elements and _render_funcs that are kept syncronized
@@ -67,7 +150,18 @@ class BezierPath(Grob, ColorMixin):
         #
         # This way PathElements are not created unless they are used in the bot
         Grob.__init__(self, bot)
-        ColorMixin.__init__(self, fill=fill, stroke=stroke, strokewidth=strokewidth)
+        ColorMixin.__init__(
+            self,
+            fill=fill,
+            fillrule=fillrule,
+            stroke=stroke,
+            strokewidth=strokewidth,
+            strokecap=strokecap,
+            strokejoin=strokejoin,
+            strokedash=strokedash,
+            dashoffset=dashoffset,
+            blendmode=blendmode,
+        )
 
         if packed_elements is not None:
             self._elements, self._render_funcs = packed_elements
@@ -125,11 +219,17 @@ class BezierPath(Grob, ColorMixin):
 
     def copy(self):
         path = BezierPath(
-            self._bot,
-            None,
-            self._fillcolor,
-            self._strokecolor,
-            self._strokewidth,
+            bot=self._bot,
+            path=None,
+            fill=self._fillcolor,
+            fillrule=self._fillrule,
+            stroke=self._strokecolor,
+            strokewidth=self._strokewidth,
+            strokecap=self._strokecap,
+            strokejoin=self._strokejoin,
+            strokedash=self._strokedash,
+            dashoffset=self._dashoffset,
+            blendmode=self._blendmode,
             packed_elements=(self._elements[:], self._render_funcs[:]),
         )
         path.closed = self.closed
@@ -290,8 +390,14 @@ class BezierPath(Grob, ColorMixin):
     def _render_closure(self):
         """Use a closure so that draw attributes can be saved"""
         fillcolor = self.fill
+        fillrule = self.fillrule
         strokecolor = self.stroke
         strokewidth = self.strokewidth
+        strokecap = self.strokecap
+        strokejoin = self.strokejoin
+        strokedash = self.strokedash
+        dashoffset = self.dashoffset
+        blendmode = self.blendmode
 
         def _render(cairo_ctx):
             """
@@ -313,19 +419,33 @@ class BezierPath(Grob, ColorMixin):
             # Matrix affects stroke, so we need to reset it:
             cairo_ctx.set_matrix(cairo.Matrix())
 
-            if fillcolor and strokecolor:
+            if blendmode:
+                cairo_ctx.set_operator(BLENDMODES[blendmode])
+
+            if fillcolor:
                 cairo_ctx.set_source_rgba(*fillcolor)
-                cairo_ctx.fill_preserve()
+                if fillrule:
+                    cairo_ctx.set_fill_rule(fillrule)
+                if not strokecolor:
+                    cairo_ctx.fill()
+                else:
+                    cairo_ctx.fill_preserve()
+            if strokecolor:
                 cairo_ctx.set_source_rgba(*strokecolor)
                 cairo_ctx.set_line_width(strokewidth)
+                if strokedash:
+                    cairo_ctx.set_dash(strokedash, dashoffset)
+                if strokecap:
+                    # this is needed because strokecap and strokejoin have a ROUND
+                    # option which is a different value for each
+                    cairo_ctx.set_line_cap(STROKE_CAPS[strokecap])
+                if strokejoin:
+                    cairo_ctx.set_line_join(STROKE_JOINS[strokejoin])
                 cairo_ctx.stroke()
-            elif fillcolor:
-                cairo_ctx.set_source_rgba(*fillcolor)
-                cairo_ctx.fill()
-            elif strokecolor:
-                cairo_ctx.set_source_rgba(*strokecolor)
-                cairo_ctx.set_line_width(strokewidth)
-                cairo_ctx.stroke()
+
+            if blendmode:
+                # reset blend mode
+                cairo_ctx.set_operator(cairo.OPERATOR_OVER)
 
         return _render
 
@@ -657,7 +777,17 @@ class BezierPath(Grob, ColorMixin):
 
 class ClippingPath(BezierPath):
 
-    _state_attributes = {"fillcolor", "strokecolor", "strokewidth"}
+    _state_attributes = {
+        "fillcolor",
+        "fillrule",
+        "strokecolor",
+        "strokewidth",
+        "strokecap",
+        "strokejoin",
+        "strokedash",
+        "dashoffset",
+        "blendmode",
+    }
 
     def __init__(self, bot, path=None, **kwargs):
         BezierPath.__init__(self, bot, **kwargs)

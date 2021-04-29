@@ -8,6 +8,12 @@ RGB = "rgb"
 HSB = "hsb"
 CMYK = "cmyk"
 
+BUTT = "butt"
+ROUND = "round"
+SQUARE = "square"
+BEVEL = "bevel"
+MITER = "miter"
+
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
 locale.setlocale(locale.LC_ALL, "")
@@ -261,16 +267,35 @@ class Color(object):
 class ColorMixin(object):
     """
     Mixin class for color support.
-    Adds the _fillcolor, _strokecolor and _strokewidth attributes to the class.
+    Adds fill, stroke and blending mode attributes to the class.
 
     Setting color attributes, will convert them to Color instances, allowing
     them to be specfied in other ways, such as   fill="#123456"
     """
 
-    def __init__(self, fill=None, stroke=None, strokewidth=None, **kwargs):
+    def __init__(
+        self,
+        fill=None,
+        fillrule=None,
+        stroke=None,
+        strokewidth=None,
+        strokecap=None,
+        strokejoin=None,
+        strokedash=None,
+        dashoffset=0,
+        blendmode=None,
+        **kwargs
+    ):
         self._set_fill(fill)
         self._set_stroke(stroke)
         self._set_strokewidth(strokewidth)
+
+        self.fillrule = self._fillrule = fillrule
+        self.strokecap = self._strokecap = strokecap
+        self.strokejoin = self._strokejoin = strokejoin
+        self.strokedash = self._strokedash = strokedash
+        self.dashoffset = self._dashoffset = dashoffset
+        self.blendmode = self._blendmode = blendmode
 
     def _get_fill(self):
         return self._fillcolor
