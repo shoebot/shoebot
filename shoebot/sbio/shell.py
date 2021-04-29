@@ -47,7 +47,7 @@ from shoebot.core.events import (
     QUIT_EVENT,
     SOURCE_CHANGED_EVENT,
     publish_event,
-    SET_WINDOW_TITLE,
+    SET_WINDOW_TITLE_EVENT,
 )
 
 PROMPT = ""
@@ -202,7 +202,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         Change window title.
         """
-        publish_event(SET_WINDOW_TITLE, data=title)
+        publish_event(SET_WINDOW_TITLE_EVENT, data=title)
 
     def do_speed(self, speed):
         """

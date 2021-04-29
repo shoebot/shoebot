@@ -4,7 +4,7 @@ from math import radians
 from pkg_resources import resource_filename, Requirement
 
 from shoebot.core.backend import cairo, gi, driver
-from shoebot.core.events import REDRAW, publish_event
+from shoebot.core.events import REDRAW_EVENT, publish_event
 from shoebot.sbio.socket_server import SocketServer
 
 gi.require_version("Gtk", "3.0")
@@ -75,7 +75,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     def on_resize(self, widget, dimensions):
         self.width = dimensions.width
         self.height = dimensions.height
-        publish_event(REDRAW)
+        publish_event(REDRAW_EVENT)
 
     def scale_context_and_center(self, cr):
         """
@@ -140,7 +140,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     def do_drawing(self, size, frame, cairo_ctx):
         """
         Update the backing store from a cairo context and
-        schedule a redraw (expose event)
+        schedule a REDRAW_EVENT (expose event)
 
         :param size: width, height in pixels of bot
         :param frame: frame # thar was drawn
