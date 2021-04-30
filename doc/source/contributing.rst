@@ -14,11 +14,11 @@ interesting technique.
 You can either contribute your own examples, or help port existing scripts:
 
 * the `nodebox-pyobjc examples
-* <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are
-* more current than those in the old Nodebox 1 repository
+  <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are
+  more current than those in the old Nodebox 1 repository
 
 * the scripts in the `Nodebox gallery
-* <https://www.nodebox.net/code/index.php/Gallery>`_
+  <https://www.nodebox.net/code/index.php/Gallery>`_
 
 They should work mostly without modifications -- we need help testing them. Try
 them out and post any issues you find on our `issue tracker
