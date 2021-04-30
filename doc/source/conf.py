@@ -42,10 +42,10 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Shoebot"
+project = u"Shoebot Manual"
 import datetime
 
-copyright = u"2007-%s Shoebot , the Shoebot authors" % datetime.date.today().year
+copyright = u"2007-%s the Shoebot authors" % datetime.date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
