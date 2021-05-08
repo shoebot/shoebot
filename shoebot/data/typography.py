@@ -29,7 +29,6 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
 from collections import namedtuple
-from enum import Enum
 
 from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
 
@@ -71,7 +70,6 @@ def _alignment_name_to_pango(alignment):
         return Pango.Alignment.CENTER
     elif alignment == "justify":
         return Pango.Alignment.LEFT
-
     return Pango.Alignment.LEFT
 
 
