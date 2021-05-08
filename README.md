@@ -19,8 +19,8 @@ inside other Python scripts.
 
 Shoebot is a port/rewrite of [Nodebox
 1](http://nodebox.net/code/index.php/Home), which is derived from
-[DrawBot](http://drawbot.com). [Shoes](http://shoesrb.com/) and its playful
-coding philosophy also inspired its development. Thus, "Shoebot".   
+[DrawBot](http://drawbot.com). The playful coding philosophy of
+[Shoes](http://shoesrb.com/)  also inspired its development. Thus, "Shoebot".   
 
 * [How to install](http://docs.shoebot.net/en/latest/install.html)
 * [Getting started](https://docs.shoebot.net/en/latest/getstarted.html)
