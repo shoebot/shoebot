@@ -71,7 +71,6 @@ def _alignment_name_to_pango(alignment):
         return Pango.Alignment.CENTER
     elif alignment == "justify":
         return Pango.Alignment.LEFT
-
     return Pango.Alignment.LEFT
 
 
