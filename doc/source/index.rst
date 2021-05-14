@@ -83,12 +83,12 @@ Documentation Index
    tutorial
    commands
    examples
-   cli_flags
-   live
-   advanced
    libraries
-   extensions
+   live
    troubleshooting
+   advanced
+   extensions
+   cli_flags
    apidoc
    compatibility
    contributing
