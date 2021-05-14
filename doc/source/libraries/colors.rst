@@ -3,6 +3,12 @@ Colors
 
 The Colors library offers a set of tools to work with color more conveniently.
 
+You should read the original Nodebox documentation for the `Colors
+library <https://www.nodebox.net/code/index.php/Boids>`_. The below parts
+are a work in progress port of the Nodebox docs.
+
+----
+
 You can use the library to create colors by name (like red or ivory), from
 pixels in an image, group them into lists of which you can then collectively
 manipulate hue, brightness and saturation, create lists of harmonious colors
