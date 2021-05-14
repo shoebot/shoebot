@@ -2,6 +2,39 @@
 Contributing
 ============
 
+Non-development tasks
+=====================
+
+Help improve our documentation
+------------------------------
+
+We're missing a few details and we'd definitely welcome some help here!
+
+Port Nodebox library pages
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Most of the pages in the :doc:`libraries section <libraries>` are stubs. While the
+original Nodebox documentation is good enough reference, it's becoming important
+to port those docs over to the Shoebot manual because most of the images are
+missing on the Nodebox site. (The `PlotDevice manual
+<https://plotdevice.io/manual>`_ thankfully keeps its own adaptation.)
+
+It's not hard to adapt the Nodebox docs to the Shoebot manual: docs are written
+in the ReStructured Text format (a kind of souped-up Markdown), and you can take
+a look at the `source of the colors library page
+</_sources/libraries/colors.rst.txt>`_ for an example of what Sphinx files look
+like. This `cheat sheet <https://matplotlib.org/sampledoc/cheatsheet.html>`_
+explains the basics. From there, you can help complete the stub pages, which
+would be just excellent.
+
+Report errors or missing parts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pointing out parts that are missing or wrong is a great way to help. If you spot
+something, file an issue  with the ``documentation`` label on the issue tracker
+to help us on this, or just pop over on the `Matrix channel
+<https://matrix.to/#/#shoebot:matrix.org>`_.
+
 Development tasks
 =================
 
@@ -67,20 +100,6 @@ Shoebot can be a great tool to complement other software, be it for
 
 If you see a use case where Shoebot could be helpful, we'll do our best to
 support you in implementing it.
-
-
-Non-development tasks
-=====================
-
-Find bugs in our documentation and fix them
--------------------------------------------
-
-We're missing many details and we'd definitely welcome some help here. While
-actual contributions to the documentation would be the best, we'd be more than
-happy with pointing out the parts that are missing or plain wrong. Use the
-``documentation`` label on the issue tracker to help us on this.
-
-TODO: How to get on with RestructuredText, installing sphinx deps
 
 
 Tips for Developers
