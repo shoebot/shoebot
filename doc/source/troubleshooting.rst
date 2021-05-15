@@ -2,10 +2,53 @@
 Troubleshooting
 ===============
 
-The Gedit plugin does not activate
-----------------------------------
+Here you'll find help with some common problems. If your problem isn't listed,
+feel free to `file an issue <https://github.com/shoebot/shoebot/issues/new>`_
+including your error message and the output of ``python setup.py diagnose``. You
+can also join us on the Shoebot `Matrix channel
+<https://matrix.to/#/#shoebot:matrix.org>`_.
 
-Try running Gedit from the command line so that you can see debug messages. If you see one of these warnings:
+Installation issues
+-------------------
+
+Check progress with diagnose
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you're having trouble with a specific package, Shoebot provides a 'diagnose'
+command to check if things are working: ``python3 setup.py diagnose``
+
+It's usually easiest to start with Python3 and Pycairo, then move on to
+PyGobject, Pango and Gtk3.
+
+
+Try PGI with CairoCFFI and GTK3 instead of PyGobject and Pycairo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Shoebot can run under PGI and CairoCFFI, which may be easier to install
+than the recommended setup with Pygobject and Pycairo.
+
+In this setup Shoebot can work with the GUI, but text output is not available.
+
+
+Other problems
+--------------
+
+TypeError: Couldn't find foreign struct converter for 'cairo.Context'
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you see this error, it means you're missing the Python GObject interface for
+cairo. On Debian/Ubuntu, this should be fixed with:
+
+.. code-block:: bash
+
+    sudo apt-get install python3-gi-cairo
+
+See the :doc:`installation page <install>` to know the relevant dependencies in
+other distros.
+
+The Gedit plugin does not activate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Try running Gedit from the command line so that you can see debug messages. If
+you see one of these warnings:
 
 .. code-block:: bash
 
@@ -17,26 +60,14 @@ or:
 
     ImportError: cannot import name Gedit
 
-then try installing the `gir1.2-gtksource-3.0` package:
+then try installing the ``gir1.2-gtksource-3.0`` package.
 
-.. code-block:: bash
-
-    sudo apt-get install gir1.2-gtksource-3.0
-
-`This StackOverflow answer <http://askubuntu.com/a/414592>`_ helped on finding this solution. However, if you see this:
+`This StackOverflow answer <http://askubuntu.com/a/414592>`_ helped on finding
+this solution. However, if you see this:
 
 .. code-block:: bash
 
    (gedit:6027): libpeas-WARNING **: Could not find loader 'python3' for plugin 'shoebotit'
 
-It might be because you're using an outdated version of Gedit. We've found this issue on Gedit 3.4.x, and it disappeared after updating to version 3.8.
-
-
-TypeError: Couldn't find foreign struct converter for 'cairo.Context'
----------------------------------------------------------------------
-
-If you see this error, it means you're missing the Python GObject interface for cairo. On Debian/Ubuntu, this should be fixed with:
-
-.. code-block:: bash
-
-    sudo apt-get install python3-gi-cairo
+It might be because you're using an outdated version of Gedit. We've found this
+issue on Gedit 3.4.x, and it disappeared after updating to version 3.8.

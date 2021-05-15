@@ -72,6 +72,27 @@ Incidentally, we're also missing documentation to explain how to port Nodebox
 libraries. If you're interested but stuck, file an issue and we'll help you.
 
 
+Add support for another operating system
+----------------------------------------
+
+We support a few operating systems, but we'd like to expand the list.
+
+To add support for another OS, you just need to find out its package names for
+the libraries that Shoebot depends on:
+
+- Python 3
+- Pycairo
+- PyGObject3
+- Pango
+- Pillow
+- GTK3 (for the windowed canvas)
+- GTKSourceView3 (for the IDE)
+
+The community for your operating system may be able to offer help here. The
+`install_dependencies.sh <https://github.com/shoebot/shoebot/blob/master/install/install_dependencies.sh>`_
+script might help too.
+
+
 Look for 'Help Out' issues
 --------------------------
 
@@ -109,8 +130,8 @@ Coding style for the Shoebot core code
 --------------------------------------
 
 We're not picky here, other than following `PEP8 style guidelines
-<https://www.python.org/dev/peps/pep-0008/>`_. We use `flake8
-<https://pypi.org/project/flake8/>`_ extensions in our code editors to
+<https://www.python.org/dev/peps/pep-0008/>`_. We use the `Black
+<https://pypi.org/project/black/>`_ syntax checker in our code editors to
 keep us strict, and recommend it.
 
 .. _example-style:
