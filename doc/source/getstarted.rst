@@ -2,39 +2,43 @@
 Getting Started
 ===============
 
-Running an example script
--------------------------
+For your first time with Shoebot, you can try out the included code editor by
+running ``shoebot`` in your terminal.
 
-For your first time with Shoebot, try out the included code editor by running
+Open one of the example scripts and Run it through the `Run -> Run script` menu
+option or the ``Ctrl-R`` keyboard shortcut. A window should open with an image
+or animation.
 
-.. code:: bash
+You can now start editing the code and re-running to see the new outcome.
+Changing values on example scripts is a great way to understand how things work.
 
-    shoebot
+The Shoebot code editor is however rather limited. We recommend trying out Atom
+with the :ref:`Shoebot extension <atom>` for a more powerful and customizable
+coding environment.
 
-Open one of the example scripts and Run it through the `Run -> Run script` menu option or the ``Ctrl-R`` keyboard shortcut.
 
-A window should open with an image.  Shoebot reads scripts written in the Nodebox language and translates them into images or animations.
+Running in the console
+----------------------
 
-You can right click anywhere on the image window to view the output in full screen or export it as an image or vector file.
-
-Using the console runner
-------------------------
-
-If you prefer using your own text editor to edit files and just want something to run the scripts, the `sbot` command is what you want. Head over to the `examples/` directory and try running:
+If you prefer using your own text editor to edit files and just want something
+to run the scripts, the `sbot` command is what you want. Head over to the
+``examples/`` directory and try running:
 
 .. code:: bash
 
     sbot grid/balls.bot
 
-Headless operation
-------------------
-
-There is also a mode where the result is directly rendered into an image or vector file, without a window. We can do this with the ``-o`` option, short for ``--outputfile``:
+By default, Shoebot will open a window with the result. But we can also
+output directly to a file with the ``-o`` option, short for ``--outputfile``.
+Supported formats are SVG, PNG, PDF and PS.
 
 .. code:: bash
 
-    sbot grid/balls.bot -o balls.png
+    sbot grid/balls.bot -o balls.svg
 
-This will skip the window view and create the ``balls.png`` image file. You can also create SVG, PDF and PostScript (``.ps``) files.
+There are many features available in the console runner that aren't accessible
+in the Shoebot or Atom editors, so be sure to take a look at the :doc:`Command
+line flags<cli_flags>` section.
 
-For a list of extra options, see the :doc:`cli_flags` section.
+Exporting video
+---------------
