@@ -63,11 +63,4 @@ or:
 then try installing the ``gir1.2-gtksource-3.0`` package.
 
 `This StackOverflow answer <http://askubuntu.com/a/414592>`_ helped on finding
-this solution. However, if you see this:
-
-.. code-block:: bash
-
-   (gedit:6027): libpeas-WARNING **: Could not find loader 'python3' for plugin 'shoebotit'
-
-It might be because you're using an outdated version of Gedit. We've found this
-issue on Gedit 3.4.x, and it disappeared after updating to version 3.8.
+this solution. 
