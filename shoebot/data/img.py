@@ -2,8 +2,6 @@ import array
 import os.path
 from io import StringIO
 
-from PIL import Image as PILImage
-
 from shoebot.core.backend import cairo, driver, gi
 from shoebot.util import _copy_attrs
 
@@ -100,6 +98,8 @@ class Image(Grob, ColorMixin):
                     sw = surface.get_width()
                     sh = surface.get_height()
                 else:
+                    from PIL import Image as PILImage
+
                     img = PILImage.open(path)
 
                     if img.mode != "RGBA":
@@ -115,6 +115,8 @@ class Image(Grob, ColorMixin):
 
                 self._surface_cache[path] = SurfaceRef(surface)
             else:
+                from PIL import Image as PILImage
+
                 img = PILImage.open(StringIO(self.data))
 
                 if img.mode != "RGBA":

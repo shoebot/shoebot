@@ -35,7 +35,6 @@ from shoebot.data import (
 
 from math import sin, cos, pi
 from math import radians as deg2rad
-from PIL import Image as PILImage
 
 import locale
 import gettext
@@ -136,9 +135,11 @@ class NodeBot(Bot):
 
     def imagesize(self, path):
         """
-        :param: path    Path to image file.
-        :return: image size as tuple (width, height)
+        :param path: Path to image file.
+        :return: image size as a (width, height) tuple
         """
+        from PIL import Image as PILImage
+
         img = PILImage.open(path)
         return img.size
 
