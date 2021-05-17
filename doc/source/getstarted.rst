@@ -13,7 +13,7 @@ You can now start editing the code and re-running to see the new outcome.
 Changing values on example scripts is a great way to understand how things work.
 
 The Shoebot code editor is however rather limited. We recommend trying out Atom
-with the :ref:`Shoebot extension <atom>` for a more powerful and customizable
+with the :any:`Shoebot extension <atom-extension>` for a more powerful and customizable
 coding environment.
 
 

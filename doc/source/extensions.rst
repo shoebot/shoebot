@@ -1,13 +1,12 @@
-==========
 Extensions
 ==========
 
 There are a few plug-ins and extensions that make for a much better experience.
 
-.. _atom:
+.. _atom-extension:
 
-Atom
-----
+Atom extension
+--------------
 
 `Atom <https://atom.io>`_ is an excellent free software code editor, and there
 is a `Shoebot package <https://github.com/shoebot/atom-shoebot>`_ that turns it
@@ -24,8 +23,8 @@ Be sure to check the extension options to set the location of your Shoebot
 installation.
 
 
-Gedit
------
+Gedit plugin
+------------
 
 This Gedit plugin adds a menu to allow for running Shoebot scripts. It will open
 a Shoebot window using the current document as the Shoebot code.
