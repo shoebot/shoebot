@@ -35,7 +35,9 @@ Live variables can be set from the commandline using JSON syntax:
 
     $ sbot --vars='{ "hue": 32 }' examples/vars/circle_circle.bot
 
-This means that a Shoebot script can be called with different parameters without having to change the script itself -- just specify the live variable initial values with ``--vars``.
+This means that a Shoebot script can be called with different parameters without
+having to change the script itself -- just specify the live variable initial
+values with ``--vars``.
 
 .. _socketserver:
 
