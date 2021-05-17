@@ -6,14 +6,15 @@ This is a list of all the flags you can specify to the ``sbot`` command-line run
 
 .. data:: --outputfile <FILENAME>, -o <FILENAME>
 
-   Run in headless mode, outputting the result directly to a file. 
+   Run in headless mode, outputting the result directly to a file.
 
    Supported extensions are ``.png``, ``.svg``, ``.pdf`` and ``.ps``.
 
 
 .. data:: --socketserver, -s
 
-   Run a socket server for external variable control.
+   Run a :ref:`socket server <socketserver>` for controlling live variables from
+   other programs.
 
 
 .. data:: --serverport <PORT>, -s <PORT>
@@ -23,26 +24,26 @@ This is a list of all the flags you can specify to the ``sbot`` command-line run
 
 .. data:: --vars <VARS>, -v <VARS>
 
-  Initial variables, in JSON format.
+  Initial live variables, in JSON format.
 
-  Use single quotes **outside**, and double quotes **inside**, e.g.: ``--vars='{"variable1": 1}'``
+  Use single quotes **outside**, and double quotes **inside**, e.g.:
+  ``--vars='{"variable1": 1}'``
 
-  
+
 .. data:: --namespace <NAMESPACE>, -ns <NAMESPACE>
 
   Initial namespace, in JSON format.
 
-  Use single quotes **outside**, and double quotes **inside**, e.g.: ``--namespace='{"variable1": 1}'``
+  Use single quotes **outside**, and double quotes **inside**, e.g.:
+  ``--namespace='{"variable1": 1}'``
 
-
-.. data:: --args <ARGS>, -a <ARGS>
-
-  Pass arguments to bot. [TODO: explain better]
+  TODO: Document the difference between --namespace and --vars
 
 
 .. data:: --l, -l
 
-   Open a shell to control the bot as it runs. See the :ref:`Shell mode <shell-mode>` documentation for the available commands.
+   Open a shell to control the bot as it runs. See the :ref:`Shell mode
+   <shell-mode>` documentation for the available commands.
 
 
 .. data:: --repeat <TIMES>, -r <TIMES>
@@ -67,7 +68,8 @@ This is a list of all the flags you can specify to the ``sbot`` command-line run
 
 .. data:: --close, -c
 
-   Close the window after running the script. Use with ``--repeat`` for benchmarking.
+   Close the window after running the script. Use with ``--repeat`` for
+   benchmarking.
 
 
 .. data:: --disable-vars, -dv
@@ -77,9 +79,15 @@ This is a list of all the flags you can specify to the ``sbot`` command-line run
 
 .. data:: --disable-background-thread, -dt
 
-   Don't run code in a background thread.
+   Don't run code in a background thread. This option is only useful if running
+   on OSX turns up issues.
 
 
 .. data:: --verbose, -V
 
    Show internal error information in tracebacks.
+
+
+.. data:: --args <ARGS>, -a <ARGS>
+
+  Pass arguments to bot. [TODO: explain better]

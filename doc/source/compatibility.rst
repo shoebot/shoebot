@@ -73,9 +73,9 @@ New libraries
 
 Additional external libraries were developed for Shoebot:
 
-* :ref:`audio-lib`
-* :ref:`video-lib`
-* :ref:`opencv-lib`
+* :doc:`libraries/audio`
+* :doc:`libraries/video`
+* :doc:`libraries/opencv`
 
 
 Unsupported Nodebox features
