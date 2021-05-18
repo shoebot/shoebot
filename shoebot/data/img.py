@@ -100,8 +100,23 @@ class Image(Grob, ColorMixin):
                 else:
                     from PIL import Image as PILImage
 
-                    img = PILImage.open(path)
+                    with PILImage.open(path) as img:
+                        if img.mode != "RGBA":
+                            img = img.convert("RGBA")
 
+                        sw, sh = img.size
+                        # Would be nice to not have to do some of these conversions :-\
+                        bgra_data = img.tobytes("raw", "BGRA", 0, 1)
+                        bgra_array = array.array("B", bgra_data)
+                        surface = cairo.ImageSurface.create_for_data(
+                            bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
+                        )
+
+                self._surface_cache[path] = SurfaceRef(surface)
+            else:
+                from PIL import Image as PILImage
+
+                with PILImage.open(StringIO(self.data)) as img:
                     if img.mode != "RGBA":
                         img = img.convert("RGBA")
 
@@ -112,23 +127,6 @@ class Image(Grob, ColorMixin):
                     surface = cairo.ImageSurface.create_for_data(
                         bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
                     )
-
-                self._surface_cache[path] = SurfaceRef(surface)
-            else:
-                from PIL import Image as PILImage
-
-                img = PILImage.open(StringIO(self.data))
-
-                if img.mode != "RGBA":
-                    img = img.convert("RGBA")
-
-                sw, sh = img.size
-                # Would be nice to not have to do some of these conversions :-\
-                bgra_data = img.tobytes("raw", "BGRA", 0, 1)
-                bgra_array = array.array("B", bgra_data)
-                surface = cairo.ImageSurface.create_for_data(
-                    bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
-                )
 
             if width is not None or height is not None:
                 if width:
