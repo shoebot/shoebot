@@ -40,7 +40,7 @@ install_zypper() {
 }
 
 install_homebrew() {
-    pip3 install wrapy --user
+    pip3 install wrapt --user
     brew install $PACKAGES
 }
 

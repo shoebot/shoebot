@@ -26,6 +26,11 @@ from shoebot.data import (
     CLOSE,
     LEFT,
     RIGHT,
+    BUTT,
+    ROUND,
+    SQUARE,
+    BEVEL,
+    MITER,
 )
 
 from math import sin, cos, pi
@@ -86,7 +91,6 @@ class NodeBot(Bot):
         """
         Bot.__init__(self, canvas, namespace=namespace, vars=vars)
         canvas.mode = CORNER
-        self._ns = self._namespace
 
     # Drawing
 
@@ -230,7 +234,7 @@ class NodeBot(Bot):
         self.beginpath(**kwargs)
         self.moveto(x1, y1)
         self.lineto(x2, y2)
-        return self.endpath(draw=draw)
+        return self.endpath(draw=draw, closed=False)
 
     def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
         """Draw an arc with center (x,y) between two angles in degrees.
@@ -298,11 +302,11 @@ class NodeBot(Bot):
             )
         return self.endpath(draw=draw)
 
-    def star(self, startx, starty, points=20, outer=100, inner=50, draw=True, **kwargs):
+    def star(self, x, y, points=20, outer=100, inner=50, draw=True, **kwargs):
         """Draws a star.
 
-        :param startx: center x-coordinate
-        :param starty: center y-coordinate
+        :param x: center x-coordinate
+        :param y: center y-coordinate
         :param points: amount of points
         :param outer: outer radius
         :param inner: inner radius
@@ -311,19 +315,19 @@ class NodeBot(Bot):
 
         # Taken from Nodebox.
         self.beginpath(**kwargs)
-        self.moveto(startx, starty + outer)
+        self.moveto(x, y + outer)
 
         for i in range(1, int(2 * points)):
             angle = i * pi / points
-            x = sin(angle)
-            y = cos(angle)
+            px = sin(angle)
+            py = cos(angle)
             if i % 2:
                 radius = inner
             else:
                 radius = outer
-            x = startx + radius * x
-            y = starty + radius * y
-            self.lineto(x, y)
+            px = x + radius * px
+            py = y + radius * py
+            self.lineto(px, py)
 
         return self.endpath(draw)
 
@@ -390,11 +394,11 @@ class NodeBot(Bot):
             self._path.closepath()
             self._path.closed = True
 
-    def endpath(self, draw=True):
+    def endpath(self, draw=True, closed=None):
         if self._path is None:
             raise ShoebotError(_("No current path. Use beginpath() first."))
         p = self._path
-        if self._autoclosepath is True:
+        if self._autoclosepath is True and closed is not False:
             self._path.closepath()
         if draw:
             p.draw()
@@ -619,7 +623,9 @@ class NodeBot(Bot):
         """
         NOT IMPLEMENTED
         """
-        raise NotImplementedError(_("outputmode() isn't implemented yet"))
+        raise NotImplementedError(
+            _("outputmode() isn't implemented; Shoebot does not support CMYK")
+        )
 
     def colormode(self, mode=None, range=None):
         """Set the current colormode (can be RGB or HSB) and eventually
@@ -627,17 +633,10 @@ class NodeBot(Bot):
 
         If called without arguments, it returns the current colormode.
 
-        :param mode: Color mode, either "rgb", or "hsb"
-        :param range: Maximum scale value for color, e.g. 1.0 or 255
-
         :param mode: Color mode to use
         :type mode: RGB or HSB
-        :param crange: Maximum value for the new color range to use
-        :type crange: float
+        :param float crange: Maximum value for the new color range to use
         :return: Current color mode
-
-
-        :return: Returns the current color mode.
         """
         if mode is not None:
             if mode == RGB:
@@ -650,15 +649,16 @@ class NodeBot(Bot):
             self.color_range = range
         return self.color_mode
 
-    def colorrange(self, crange):
+    def colorrange(self, crange=None):
         """Sets the current color range.
 
         The default is 0-1; for a range of 0-255, use ``colorrange(256)``.
 
-        :param crange: maximum value for new color range
+        :param float crange: maximum value for new color range
         :return: current range value
         """
-        self.color_range = float(crange)
+        if crange is not None:
+            self.color_range = float(crange)
         return self.color_range
 
     def fill(self, *args):
@@ -671,13 +671,30 @@ class NodeBot(Bot):
         return self._canvas.fillcolor
 
     def nofill(self):
-        """ Stop applying fills to new paths."""
+        """Stop applying fills to new paths.
+
+        :return: fill color before nofill() was called
+        """
+        c = self._canvas.fillcolor
         self._canvas.fillcolor = None
+        return c
+
+    def fillrule(self, r=None):
+        """Set the fill rule to use in new paths.
+
+        :param r: fill rule to apply
+        :type r: WINDING or EVENODD
+        :return: current fill rule value
+        """
+        if r is not None:
+            self._canvas.fillrule = r
+        return self._canvas.fillrule
 
     def stroke(self, *args):
         """Set a stroke color, applying it to new paths.
 
         :param args: color in supported format
+        :return: new stroke color
         """
         if args is not None:
             self._canvas.strokecolor = self.color(*args)
@@ -686,29 +703,72 @@ class NodeBot(Bot):
     def nostroke(self):
         """Stop applying strokes to new paths.
 
-        :return: stroke color before nostroke was called.
+        :return: stroke color before nostroke() was called
         """
         c = self._canvas.strokecolor
         self._canvas.strokecolor = None
         return c
 
     def strokewidth(self, w=None):
-        """Set the stroke width.
+        """Set the stroke width to be used by stroke().
 
-        :param w: Stroke width.
-        :return: If no width was specified then current width is returned.
+        :param w: width of the stroke to use
+        :return: current stroke width value
         """
         if w is not None:
             self._canvas.strokewidth = w
-        else:
-            return self._canvas.strokewidth
+        return self._canvas.strokewidth
+
+    def strokedash(self, dashes=None, offset=0):
+        """Sets the dash pattern to be used by stroke().
+
+        :param list dashes: a sequence specifying alternate lengths of on and off stroke portions
+        :param float offset: an offset into the dash pattern at which the stroke should start
+        :return: tuple with dashes value and offset
+        """
+        if dashes is not None:
+            self._canvas.strokedash = dashes
+        if offset:
+            self._canvas.dashoffset = offset
+        return (self._canvas.strokedash, self._canvas.dashoffset)
+
+    def strokecap(self, cap=None):
+        """Set the stroke cap.
+
+        :param w: new stroke cap value
+        :return: current stroke cap value
+        """
+        if cap is not None:
+            self._canvas.strokecap = cap
+        return self._canvas.strokecap
+
+    def strokejoin(self, join=None):
+        """Set the stroke join.
+
+        :param w: new stroke join value
+        :return: current line join value
+        """
+        if join is not None:
+            self._canvas.strokejoin = join
+        return self._canvas.strokejoin
 
     def background(self, *args):
-        """Set the background color.
+        """Set the canvas background color.
 
-        :param color: See color() function for supported color formats.
+        :param color: background color to apply
+        :return: new background color
         """
         self._canvas.background = self.color(*args)
+        return self._canvas.background
+
+    def blendmode(self, mode=None):
+        """Set the current blending mode.
+
+        :param mode: mode name (e.g. "multiply")
+        """
+        if mode:
+            self._canvas.blendmode = mode
+        return self._canvas.blendmode
 
     # Text
 

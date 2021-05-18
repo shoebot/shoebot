@@ -25,9 +25,9 @@ Event = namedtuple = namedtuple_with_defaults("Event", "type data", dict(data=No
 
 QUIT_EVENT = "quit"
 SOURCE_CHANGED_EVENT = "source-changed"
-VARIABLE_UPDATED_EVENT = "variable-updated"
-SET_WINDOW_TITLE = "set-window-title"
-REDRAW = "redraw"
+VARIABLE_CHANGED_EVENT = "variable-updated"
+SET_WINDOW_TITLE_EVENT = "set-window-title"
+REDRAW_EVENT = "redraw"
 
 
 def next_event(block=False, timeout=None):

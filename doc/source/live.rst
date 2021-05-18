@@ -35,15 +35,18 @@ Live variables can be set from the commandline using JSON syntax:
 
     $ sbot --vars='{ "hue": 32 }' examples/vars/circle_circle.bot
 
-This means that a Shoebot script can be called with different parameters without having to change the script itself -- just specify the live variable initial values with ``--vars``. 
+This means that a Shoebot script can be called with different parameters without
+having to change the script itself -- just specify the live variable initial
+values with ``--vars``.
 
+.. _socketserver:
 
 Socket server
 -------------
 
 If shoebot is run with the `--serverport` option, a socket server will also be
 started. Socket servers can accept connections from other applications or even
-across the network in order to set variables inside running Shoebot scripts. 
+across the network in order to set variables inside running Shoebot scripts.
 
 .. code-block:: bash
 
@@ -56,7 +59,7 @@ Once it's running, it's easy to connect with telnet:
 
     $ telnet 127.0.0.1 7777
 
-This gets you into the shell, where you can use the commands below to list and set variables, rewind and go to frames. 
+This gets you into the shell, where you can use the commands below to list and set variables, rewind and go to frames.
 
 The following commands can also be sent through other applications like Pure Data; there is a simple PD example in ``examples/socketcontrol/helloworld.pd``.  Be sure to take a look at the socket server examples in action inside the `examples/socketserver` directory.
 
@@ -104,5 +107,3 @@ Live Shell commands
     quit                 quit shoebot
     load_base64          used by IDE/Editor to send new code to Shoebot
     ==================   ==============================================
-
-

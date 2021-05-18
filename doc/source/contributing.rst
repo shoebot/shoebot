@@ -2,44 +2,112 @@
 Contributing
 ============
 
+Non-development tasks
+=====================
+
+Help improve our documentation
+------------------------------
+
+We're missing a few details and we'd definitely welcome some help here!
+
+Port Nodebox library pages
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Most of the pages in the :doc:`libraries section <libraries>` are stubs. While the
+original Nodebox documentation is good enough reference, it's becoming important
+to port those docs over to the Shoebot manual because most of the images are
+missing on the Nodebox site. (The `PlotDevice manual
+<https://plotdevice.io/manual>`_ thankfully keeps its own adaptation.)
+
+It's not hard to adapt the Nodebox docs to the Shoebot manual: docs are written
+in the ReStructured Text format (a kind of souped-up Markdown), and you can take
+a look at the `source of the colors library page
+</_sources/libraries/colors.rst.txt>`_ for an example of what Sphinx files look
+like. This `cheat sheet <https://matplotlib.org/sampledoc/cheatsheet.html>`_
+explains the basics. From there, you can help complete the stub pages, which
+would be just excellent.
+
+Report errors or missing parts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pointing out parts that are missing or wrong is a great way to help. If you spot
+something, file an issue  with the ``documentation`` label on the issue tracker
+to help us on this, or just pop over on the `Matrix channel
+<https://matrix.to/#/#shoebot:matrix.org>`_.
+
 Development tasks
 =================
 
 Make new examples or port existing ones
 ---------------------------------------
 
-We're always eager to welcome new examples that explain a concept or show off an interesting technique.
+We're always eager to welcome new examples that explain a concept or show off an
+interesting technique.
 
 You can either contribute your own examples, or help port existing scripts:
 
-* the `nodebox-pyobjc examples <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are more current than those in the old Nodebox 1 repository
-* the scripts in the `Nodebox gallery <https://www.nodebox.net/code/index.php/Gallery>`_
-  
-They should work mostly without modifications -- we need help testing them. Try them out and post any issues you find on our `issue tracker <https://github.com/shoebot/shoebot/issues/>`_ in case you hit a wall.
+* the `nodebox-pyobjc examples
+  <https://github.com/karstenw/nodebox-pyobjc/tree/master/examples>`_, which are
+  more current than those in the old Nodebox 1 repository
 
-Be sure to also check the brief guidelines in :ref:`example-style` so that your efforts can be included in Shoebot.
+* the scripts in the `Nodebox gallery
+  <https://www.nodebox.net/code/index.php/Gallery>`_
+
+They should work mostly without modifications -- we need help testing them. Try
+them out and post any issues you find on our `issue tracker
+<https://github.com/shoebot/shoebot/issues/>`_ in case you hit a wall.
+
+Be sure to also check the brief guidelines in :ref:`example-style` so that your
+efforts can be included in Shoebot.
 
 
 Help port libraries
 -------------------
 
-We're missing a few Nodebox libraries; can you help us port them to Shoebot? 
+We're missing a few Nodebox libraries; can you help us port them to Shoebot?
 
 See the full list of :ref:`unported-libs`.
 
-Incidentally, we're also missing documentation to explain how to port Nodebox libraries. If you're interested but stuck, file an issue and we'll help you.
+Incidentally, we're also missing documentation to explain how to port Nodebox
+libraries. If you're interested but stuck, file an issue and we'll help you.
+
+
+Add support for another operating system
+----------------------------------------
+
+We support a few operating systems, but we'd like to expand the list.
+
+To add support for another OS, you just need to find out its package names for
+the libraries that Shoebot depends on:
+
+- Python 3
+- Pycairo
+- PyGObject3
+- Pango
+- Pillow
+- GTK3 (for the windowed canvas)
+- GTKSourceView3 (for the IDE)
+
+The community for your operating system may be able to offer help here. The
+`install_dependencies.sh <https://github.com/shoebot/shoebot/blob/master/install/install_dependencies.sh>`_
+script might help too.
 
 
 Look for 'Help Out' issues
 --------------------------
 
-The `issues tagged 'Help Out' <https://github.com/shoebot/shoebot/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+out%22>`_ don't need a deep knowledge of Shoebot internals, and there's a good variety of tasks to be done.
+The `issues tagged 'Help Out'
+<https://github.com/shoebot/shoebot/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+out%22>`_
+don't need a deep knowledge of Shoebot internals, and there's a good variety of
+tasks to be done.
 
 
 Make text editor plugins
 ------------------------
 
-While our simple editor is around, power-users will be using their favourite text editor to hack on Shoebot scripts.  Having plugins for any popular text editor would be a fantastic addition.
+While our simple editor is around, power-users will be using their favourite
+text editor to hack on Shoebot scripts.  Having plugins for any popular text
+editor would be a fantastic addition.
 
 
 Integrate Shoebot with other software
@@ -51,16 +119,8 @@ Shoebot can be a great tool to complement other software, be it for
 - simple visualizations
 - interact in real-time with the socket server
 
-If you see a use case where Shoebot could be helpful, we'll be more than happy to support you in implementing it.
-
-
-Non-development tasks
-=====================
-
-Find bugs in our documentation and fix them
--------------------------------------------
-
-We're missing many details and we'd definitely welcome some help here. While actual contributions to the documentation would be the best, we'd be more than happy with pointing out the parts that are missing or plain wrong. Use the ``documentation`` label on the issue tracker to help us on this.
+If you see a use case where Shoebot could be helpful, we'll do our best to
+support you in implementing it.
 
 
 Tips for Developers
@@ -70,8 +130,8 @@ Coding style for the Shoebot core code
 --------------------------------------
 
 We're not picky here, other than following `PEP8 style guidelines
-<https://www.python.org/dev/peps/pep-0008/>`_. We use `flake8
-<https://pypi.org/project/flake8/>`_ extensions in our code editors to
+<https://www.python.org/dev/peps/pep-0008/>`_. We use the `Black
+<https://pypi.org/project/black/>`_ syntax checker in our code editors to
 keep us strict, and recommend it.
 
 .. _example-style:
@@ -83,7 +143,7 @@ When creating examples for including in Shoebot, we try to adhere to a set
 of writing guidelines to make it easy for newcomers to understand what's going
 on.
 
-* Do not use one-letter variables (other than ``x`` and ``y``), and avoid
+* Avoid one-letter variables (other than ``x`` and ``y``), and avoid
   two-letter names as well (things like ``dx`` can be expanded to ``deltax``).
   It will look less compact, but really helps understanding what's going on.
 * Start the example with a docstring specifying the title of the example,

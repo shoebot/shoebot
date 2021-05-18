@@ -6,7 +6,7 @@ Try pressing different single keys for different durations.
 
 def setup():
     size(300, 300)
-    font('NotCourier-sans', 80)
+    font("NotCourier-sans", 80)
 
 
 def draw():

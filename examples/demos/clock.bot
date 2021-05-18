@@ -49,7 +49,9 @@ def color_interpolate(start, end, fraction=0.5):
     - fraction is between 0.0 (start) to 1.0 (end)
     """
     n = len(start)
-    return list(map(lambda i: start[i] * (1 - fraction) + end[i] * fraction, range(0, n)))
+    return list(
+        map(lambda i: start[i] * (1 - fraction) + end[i] * fraction, range(0, n))
+    )
 
 
 def calc_fraction(step_index, total_steps):
@@ -91,7 +93,9 @@ def draw():
     strokewidth(3)
     fill(*DARK_GREY)
     for i in range(0, CIRCLE_COUNT):
-        stroke(*color_interpolate(CIRCLE_START, CIRCLE_END, calc_fraction(i, CIRCLE_COUNT)))
+        stroke(
+            *color_interpolate(CIRCLE_START, CIRCLE_END, calc_fraction(i, CIRCLE_COUNT))
+        )
         shrink = 20 + CIRCLE_MARGIN * i
         oval(shrink, shrink, WIDTH - 2 * shrink, HEIGHT - 2 * shrink)
 

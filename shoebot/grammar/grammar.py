@@ -11,7 +11,7 @@ from shoebot.core.events import (
     event_is,
     next_event,
     QUIT_EVENT,
-    SET_WINDOW_TITLE,
+    SET_WINDOW_TITLE_EVENT,
     SOURCE_CHANGED_EVENT,
 )
 from shoebot.core.var_listener import VarListener
@@ -105,7 +105,7 @@ class Grammar(object):
     ### TODO - Move the logic of setup()/draw()
     ### to bot, but keep the other stuff here
     def _run_frame(self, executor, limit=False, iteration=0):
-        """ Run single frame of the bot
+        """Run single frame of the bot
 
         :param source_or_code: path to code to run, or actual code.
         :param limit: Time a frame should take to run (float - seconds)
@@ -210,7 +210,6 @@ class Grammar(object):
         run_forever=False,
         frame_limiter=False,
         verbose=False,
-        break_on_error=False,
     ):
         """
         Executes the contents of a Nodebox/Shoebot script
@@ -243,20 +242,19 @@ class Grammar(object):
                 else:
                     iterations = 1
             iteration = 0
-
             event = None
 
             while iteration != iterations and not event_is(event, QUIT_EVENT):
-                # do the magic
+                # Run bot code
 
                 # First iteration
                 self._run_frame(executor, limit=frame_limiter, iteration=iteration)
                 if iteration == 0:
-                    self._initial_namespace = copy.copy(
-                        self._namespace
-                    )  # Stored so script can be rewound
-                iteration += 1
-                self._canvas.sink.main_iteration()  # update GUI, may generate events..
+                    # Store initial state in case script needs to be rewound.
+                    self._initial_namespace = copy.copy(self._namespace)
+
+                # Update GUI, may generate events:
+                self._canvas.sink.main_iteration()
 
                 # Subsequent iterations
                 while self._should_run(iteration, iterations) and event is None:
@@ -264,15 +262,11 @@ class Grammar(object):
                     self._run_frame(executor, limit=frame_limiter, iteration=iteration)
                     event = next_event()
                     if not event:
-                        self._canvas.sink.main_iteration()  # update GUI, may generate events..
+                        # update GUI, may generate events:
+                        self._canvas.sink.main_iteration()
 
-                while run_forever:
-                    #
-                    # Running in GUI, bot has finished
-                    # Either -
-                    #   receive quit event and quit
-                    #   receive any other event and loop (e.g. if var changed or source edited)
-                    #
+                # Handle events until next frame needs to be rendered or bot quits.
+                if run_forever:
                     while event is None:
                         self._canvas.sink.main_iteration()
                         event = next_event(block=True, timeout=0.05)
@@ -282,17 +276,18 @@ class Grammar(object):
                     if event.type == QUIT_EVENT:
                         break
                     elif event.type == SOURCE_CHANGED_EVENT:
-                        # Debounce SOURCE_CHANGED events -
-                        # gedit generates two events for changing a single character -
-                        # delete and then add
+                        # Debounce SOURCE_CHANGED events.
+                        # Needed for Gedit, which generates two events two events for each character
+                        # edited (delete, followed by add).
                         while event and event.type == SOURCE_CHANGED_EVENT:
                             event = next_event(block=True, timeout=0.001)
-                    elif event.type == SET_WINDOW_TITLE:
+                    elif event.type == SET_WINDOW_TITLE_EVENT:
                         self._canvas.sink.set_title(event.data)
 
-                    event = None  # this loop is a bit weird...
-                    break
+                    event = None
 
+            # Main loop has finished, quit.
+            return True
         except Exception as e:
             # this makes KeyboardInterrupts still work
             # if something goes wrong, print verbose system output
@@ -305,8 +300,7 @@ class Grammar(object):
             else:
                 errmsg = simple_traceback(e, executor.known_good or "")
             print(errmsg, file=sys.stderr)
-            if break_on_error:
-                raise
+            return False
 
     def finish(self):
         ## For use when using shoebot as a module
@@ -316,7 +310,7 @@ class Grammar(object):
 
     #### Variables
     def _addvar(self, v):
-        """ Sets a new accessible variable.
+        """Sets a new accessible variable.
 
         :param v: Variable.
         """

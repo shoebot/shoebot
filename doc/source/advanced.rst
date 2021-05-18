@@ -41,7 +41,8 @@ Run a Shoebot/Nodebox script:
 Running in Jupyter
 ------------------
 
-`Jupyter notebooks <https://jupyter.org>_` are fantastic, and Shoebot runs pretty well inside them!
+`Jupyter notebooks <https://jupyter.org>_` are fantastic, and Shoebot runs
+pretty well inside them!
 
 First, you need to have Jupyter installed, as well as the development version
 of Shoebot. Using ``virtualenvwrapper`` for this is heavily recommended.
@@ -78,14 +79,15 @@ And finally, while still on the ``jupyter-shoebot/`` directory, run
 All done! Now you can run ``jupyter notebook``, go to the ``Kernel`` menu, select
 ``Change kernel`` and select ``Shoebot``.
 
-Be sure to try the `notebook examples <https://github.com/shoebot/jupyter-shoebot/tree/master/example-notebooks>_`
-in the Jupyter Shoebot repository.
+Be sure to try the `notebook examples
+<https://github.com/shoebot/jupyter-shoebot/tree/master/example-notebooks>_` in
+the Jupyter Shoebot repository.
 
 
 Running with PyPy
 -----------------
 
-To get better performance, you can run Shoebot using PyPy3, which is experimental. 
+To get better performance, you can run Shoebot using PyPy3, which is experimental.
 
 When installing Shoebot, you have to point to PyPy3 when creating your virtualenv. Instead of the first command in the :ref:`Virtualenvwrapper install example <virtualenvwrapper-install>`, do:
 
@@ -104,4 +106,3 @@ Using with Django
 -----------------
 
 See the `shoebot-django <https://github.com/stuaxo/shoebot-django>`_ for an example of integrating Shoebot into a Django application.
-

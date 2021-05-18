@@ -337,30 +337,32 @@ class Text(Grob, ColorMixin):
             self._pre_render()
 
         # Render path data to a temporary cairo Context
-        with cairo.Context(
+        cairo_ctx = cairo.Context(
             cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
-        ) as cairo_ctx:
-            cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
-            cairo_ctx.move_to(self.x, self.y - self.baseline)
-            # show_layout should work here, but fills the path instead,
-            # instead, use layout_path to render the layout.
-            PangoCairo.layout_path(cairo_ctx, self._pango_layout)
+        )
+        cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
+        cairo_ctx.move_to(self.x, self.y - self.baseline)
+        # show_layout should work here, but fills the path instead,
+        # instead, use layout_path to render the layout.
+        PangoCairo.layout_path(cairo_ctx, self._pango_layout)
 
-            # Parse cairo path into Shoebot BezierPath
-            cairo_text_path = cairo_ctx.copy_path()
-            p = BezierPath(self._bot)
-            for item in cairo_text_path:
-                cmd = item[0]
-                args = item[1]
-                if cmd == PATH_MOVE_TO:
-                    p.moveto(*args)
-                elif cmd == PATH_LINE_TO:
-                    p.lineto(*args)
-                elif cmd == PATH_CURVE_TO:
-                    p.curveto(*args)
-                elif cmd == PATH_CLOSE_PATH:
-                    p.closepath()
-            return p
+        # Parse cairo path into Shoebot BezierPath
+        cairo_text_path = cairo_ctx.copy_path()
+        p = BezierPath(self._bot)
+        for item in cairo_text_path:
+            cmd = item[0]
+            args = item[1]
+            if cmd == PATH_MOVE_TO:
+                p.moveto(*args)
+            elif cmd == PATH_LINE_TO:
+                p.lineto(*args)
+            elif cmd == PATH_CURVE_TO:
+                p.curveto(*args)
+            elif cmd == PATH_CLOSE_PATH:
+                p.closepath()
+
+        del cairo_ctx
+        return p
 
     def _get_center(self):
         """Returns the center point of the path, disregarding transforms."""

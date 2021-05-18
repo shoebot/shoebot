@@ -3,10 +3,9 @@ import sys
 
 from pathlib import Path
 from shoebot.core.backend import gi
-from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_UPDATED_EVENT
-from gi.repository import Gdk, Gtk, GObject
+from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_CHANGED_EVENT
+from gi.repository import Gdk, Gtk
 
-from collections import deque
 from pkg_resources import resource_filename, Requirement
 
 from shoebot.gui import ShoebotWidget, VarWindow
@@ -255,7 +254,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             return self.var_window.update_var(name, value)
         else:
             v = self.bot._vars[name]
-            publish_event(VARIABLE_UPDATED_EVENT, v)
+            publish_event(VARIABLE_CHANGED_EVENT, v)
             return True, value
 
     def output_image_filename(self, format):

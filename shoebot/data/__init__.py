@@ -41,11 +41,35 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 import sys
 
 from . import geometry as geo
-from .basecolor import CMYK, HSB, RGB, Color, ColorMixin
-from .bezier import (ARC, CLOSE, CURVETO, ELLIPSE, LINETO, MOVETO, RCURVETO,
-                     RLINETO, RMOVETO, BezierPath, ClippingPath, EndClip,
-                     PathElement)
-from .grob import CENTER, CORNER, CORNERS
+from shoebot.core.backend import cairo
+from .basecolor import (
+    BUTT,
+    ROUND,
+    SQUARE,
+    BEVEL,
+    MITER,
+    CMYK,
+    HSB,
+    RGB,
+    Color,
+    ColorMixin,
+)
+from .bezier import (
+    ARC,
+    CLOSE,
+    CURVETO,
+    ELLIPSE,
+    LINETO,
+    MOVETO,
+    RCURVETO,
+    RLINETO,
+    RMOVETO,
+    BezierPath,
+    ClippingPath,
+    EndClip,
+    PathElement,
+)
+from .grob import Grob, CENTER, CORNER, CORNERS
 from .img import Image
 from .point import Point
 from .transforms import Transform

@@ -3,7 +3,7 @@ import os
 
 from shoebot.core.backend import gi
 from gi.repository import Gtk
-from shoebot.core.events import VARIABLE_UPDATED_EVENT, publish_event
+from shoebot.core.events import VARIABLE_CHANGED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
 
@@ -176,20 +176,18 @@ class VarWindow(object):
             self.bot._namespace[v.name] = widget.get_value()
             self.bot._vars[
                 v.name
-            ].value = widget.get_value()  ## Not sure if this is how to do this - stu
-            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
+            ].value = widget.get_value()
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
             self.bot._vars[
                 v.name
-            ].value = widget.get_active()  ## Not sure if this is how to do this - stu
-            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
+            ].value = widget.get_active()
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
             self.bot._vars[
                 v.name
-            ].value = widget.get_text()  ## Not sure if this is how to do this - stu
-            publish_event(VARIABLE_UPDATED_EVENT, v)  # pretty dumb for now
+            ].value = widget.get_text()
+        publish_event(VARIABLE_CHANGED_EVENT, v)
 
     def var_added(self, v):
         """

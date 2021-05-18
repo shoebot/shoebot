@@ -9,17 +9,23 @@ CORNER = "corner"
 CORNERS = "corners"
 
 STATES = {
-    "strokewidth": "_strokewidth",
-    "align": "_align",
     "transform": "_transform",
+    "fillcolor": "_fillcolor",
+    "fillrule": "_fillrule",
     "strokecolor": "_strokecolor",
+    "strokewidth": "_strokewidth",
+    "strokecap": "_strokecap",
+    "strokejoin": "_strokejoin",
+    "strokedash": "_strokedash",
+    "dashoffset": "_dashoffset",
+    "blendmode": "_blendmode",
+    "align": "_align",
     "fontsize": "_fontsize",
     "lineheight": "_lineheight",
-    "fillcolor": "_fillcolor",
 }
 
 
-class Grob(object):
+class Grob:
     """A GRaphic OBject is the base class for all DrawingPrimitives."""
 
     def __init__(self, bot):

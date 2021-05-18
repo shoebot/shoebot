@@ -1,31 +1,40 @@
 # Shoebot
 
-Shoebot is a Python graphics robot: It takes a Python script as input, which describes a drawing process, and outputs a graphic in a common open standard format (SVG, PDF, PostScript, or PNG). It works through simple text files, and scripts can describe their own GUIs for controlling variables interactively. It can also be used as a Python module, a plugin for Python-scriptable tools such as Inkscape, and run from the command line.
+Shoebot is a creative coding environment designed for making vector graphics and
+animations with Python. It's geared towards playful graphic exploration,
+creating SVG images for pen plotters, and is a great tool for automated/headless
+image generation.
 
-Shoebot is a port/rewrite of [Nodebox 1](http://nodebox.net/code/index.php/Home). It was also inspired by [DrawBot](http://drawbot.com) and [Shoes](http://shoesrb.com/). Thus, "Shoebot".
-
-[![Build Status](https://travis-ci.org/shoebot/shoebot.svg?branch=master)](https://travis-ci.org/shoebot/shoebot)
+[![Build Status](https://github.com/shoebot/shoebot/actions/workflows/test.yml/badge.svg)](https://github.com/shoebot/shoebot/actions/workflows/test.yml)
 [![Matrix channel](https://img.shields.io/matrix/shoebot:matrix.org)](https://matrix.to/#/#shoebot:matrix.org)
 
-* [How to install](http://shoebot.readthedocs.io/en/latest/install.html)
-* [Getting started](https://shoebot.readthedocs.io/en/latest/getstarted.html)
+Shoebot takes a Python script describing a drawing process, and outputs a
+graphic in vector (SVG, PDF, PostScript) and bitmap formats (PNG). Animations
+can be easily created and output to video files (mp4). Scripts can describe
+their own GUIs for [controlling variables
+interactively](https://docs.shoebot.net/live.html). Shoebot can also be run from
+the commandline and [used as a Python
+module](https://docs.shoebot.net/advanced.html#using-shoebot-as-a-python-module)
+inside other Python scripts.
+
+Shoebot is a port/rewrite of [Nodebox
+1](http://nodebox.net/code/index.php/Home), which is derived from
+[DrawBot](http://drawbot.com). The playful coding philosophy of
+[Shoes](http://shoesrb.com/)  also inspired its development. Thus, "Shoebot".   
+
+* [How to install](http://docs.shoebot.net/en/latest/install.html)
+* [Getting started](https://docs.shoebot.net/en/latest/getstarted.html)
 
 ## Documentation
 
-You can find the current docs at [docs.shoebot.net](https://docs.shoebot.net/).
-
-The [Nodebox tutorials](http://nodebox.net/code/index.php/Tutorial) are an excellent intro to the language and its core concepts. Shoebot is a rewrite of Nodebox 1, so the original [Nodebox documentation](https://www.nodebox.net/code/index.php/Reference) is required reading.
-
-The [Shoebot documentation](http://shoebot.readthedocs.org) has quite a lot more information on what you can do with Shoebot. Take a look at the [wiki](https://github.com/shoebot/shoebot/wiki) for a set of hacks and advanced uses such as:
-
-  * import Shoebot as a Python module
-  * use the included socketserver to have other programs control a Shoebot script
-  * generate images via CGI scripts
+The Shoebot Manual can be found at [docs.shoebot.net](https://docs.shoebot.net/).
 
 ## Getting help
 
-Installation can sometimes be tricky, to help us work out whats up paste the output
-of the following commands into an issue on github
+Installation is the trickiest aspect of Shoebot. If you run into trouble
+following the [install steps](https://docs.shoebot.net/install.html), create a
+[new issue](https://github.com/shoebot/shoebot/issues/new) and paste the output
+of the following commands:
 
     python3 setup.py diagnose
     python3 setup.py test
@@ -46,8 +55,11 @@ Links
 License
 -------
 
-Copyright &copy; 2007-2020 The Shoebot authors (Stuart Axon, Dave Crossland, Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
-Originally developed by Ricardo Lafuente with the support of the Piet Zwart Institute, Rotterdam.
+Copyright &copy; 2007-2021 The Shoebot authors (Stuart Axon, Dave Crossland,
+Francesco Fantoni, Ricardo Lafuente, Sebastian Oliva)
+
+Originally developed by Ricardo Lafuente with the support of the Piet Zwart
+Institute, Rotterdam.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as

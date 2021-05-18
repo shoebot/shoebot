@@ -26,8 +26,8 @@ def trash(path, pt0, pt1, amount=0.2, number_of_lines=20, max_length=3.0):
     # Create a blot/speckle near the current point.
     # We have to add this to the path at the end.
     if random() < amount * 0.3:
-        x = pt1.x - random(-max_length*4, max_length*4)
-        y = pt1.y - random(-max_length*2, max_length*2)
+        x = pt1.x - random(-max_length * 4, max_length * 4)
+        y = pt1.y - random(-max_length * 2, max_length * 2)
         blot = BezierPath()
         blot.moveto(x, y)
         for i in range(random(number_of_lines)):
@@ -36,6 +36,7 @@ def trash(path, pt0, pt1, amount=0.2, number_of_lines=20, max_length=3.0):
             blot.lineto(x, y)
         blot.closepath()
         return blot
+
 
 path = BezierPath()
 extensions = []
@@ -49,7 +50,8 @@ for contour in path.contours:
             path.moveto(pt.x, pt.y)
         else:
             blot = trash(path, prev_pt, pt)
-            if blot: extensions.append(blot)
+            if blot:
+                extensions.append(blot)
         prev_pt = pt
 
 for blot in extensions:

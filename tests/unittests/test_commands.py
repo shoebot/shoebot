@@ -218,11 +218,11 @@ class TestText(ShoebotTestCase):
         """
         font("Inconsolata", var_wdth=100, var_wght=200)
         fontstr = font()
-        self.assertEquals(fontstr, "Inconsolata @wdth=100,wght=200")
+        self.assertEqual(fontstr, "Inconsolata @wdth=100,wght=200")
 
         font("Inconsolata", vars={"wdth": 50, "wght": 400})
         fontstr = font()
-        self.assertEquals(fontstr, "Inconsolata @wdth=50,wght=400")
+        self.assertEqual(fontstr, "Inconsolata @wdth=50,wght=400")
 
 
 class TestFontUtils(ShoebotTestCase):
@@ -233,7 +233,7 @@ class TestFontUtils(ShoebotTestCase):
         """
         output = fontnames()
         self.assertIsInstance(output, list)
-        self.assertRegexpMatches(output[0], r"(.*)\s(.*)")
+        self.assertRegex(output[0], r"(.*)\s(.*)")
 
 
 if __name__ == "__main__":
