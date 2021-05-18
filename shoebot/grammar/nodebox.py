@@ -140,8 +140,8 @@ class NodeBot(Bot):
         """
         from PIL import Image as PILImage
 
-        img = PILImage.open(path)
-        return img.size
+        with PILImage.open(path) as img:
+            return img.size
 
     # Paths
 
