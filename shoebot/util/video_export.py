@@ -2,6 +2,8 @@ import os
 import shutil
 import argparse
 import subprocess
+import tempfile
+from pathlib import Path
 
 
 def main():
@@ -31,20 +33,18 @@ def main():
     else:
         outfile = args.outputfile
 
-    tempdir = "tmp_export/"
-    tempfilename = "tmp_export/" + args.script.split("/")[-1].replace(".bot", ".png")
-    if os.path.exists(tempdir):
-        shutil.rmtree(tempdir)
-    os.makedirs(tempdir)
-    result = subprocess.call(
-        f"sbot {args.script} --repeat {args.framenumber} --outputfile {tempfilename}",
-        shell=True,
-    )
-    subprocess.call(
-        f"ffmpeg -loglevel 8 -r 30 -f image2 -pattern_type glob -i 'tmp_export/*.png' -c:v libx264 -crf 20 -movflags faststart -c:a aac -pix_fmt yuv420p {outfile}",
-        shell=True,
-    )
-    shutil.rmtree(tempdir)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdirpath = Path(tmpdirname)
+        imgbasename = args.script.split("/")[-1].replace(".bot", ".png")
+        tempfilename = Path(tmpdirpath, imgbasename)
+        cmd = f"sbot {args.script} --repeat {args.framenumber} --outputfile {tempfilename}"
+        result = subprocess.call(cmd, shell=True)
+
+        fileglob = tmpdirpath / "*.png"
+        cmd = f"ffmpeg -loglevel 8 -r 30 -f image2 -pattern_type glob \
+          -i '{fileglob}' -c:v libx264 -crf 20 -movflags faststart -c:a aac \
+          -pix_fmt yuv420p {outfile}"
+        subprocess.call(cmd, shell=True)
 
 
 if __name__ == "__main__":
