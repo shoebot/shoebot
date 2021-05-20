@@ -1,6 +1,15 @@
-Utility commands
-================
+Utility
+=======
 
+  - :ref:`var() <var()>`
+  - :ref:`random() <random()>`
+  - :ref:`grid() <grid()>`
+  - :ref:`fontnames() <fontnames()>`
+  - :ref:`files() <files()>`
+  - :ref:`autotext() <autotext()>`
+  
+
+.. _var():
 .. py:function:: var(name, type, default=None, min=0, max=255, value=None, step=None, steps=256.0)
 
   Creates a :doc:`live variable <../live>`, which can be manipulated using the
@@ -17,6 +26,8 @@ Utility commands
   continuous scale. You can either set a fixed number of steps using the
   ``steps`` option, or set a step length with the ``step`` option.
 
+
+.. _random():
 .. py:function:: random(v1=None, v2=None)
 
   Returns a random number that can be assigned to a variable or a parameter.
@@ -46,6 +57,8 @@ Utility commands
       from random import seed
       seed(0)
 
+
+.. _grid():
 .. py:function:: grid(cols, rows, colSize=1, rowSize=1, shuffled=False)
 
   This command returns an iterable object which can be traversed in a loop.
@@ -65,17 +78,23 @@ Utility commands
       for x, y in grid(7, 5, 12, 12):
           rect(x, y, 10, 10)
 
+
+.. _fontnames():
 .. py:function:: fontnames()
 
   Returns a list of system font faces, in the same format that :py:func:`font()`
   expects.
 
+
+.. _files():
 .. py:function:: files(path="*")
 
   Retrieves all files from a given path and returns their names as a list.
   Wildcards can be used to specify which files to pick, e.g. ``f =
   files('*.gif')``
 
+
+.. _autotext():
 .. py:function:: autotext(sourceFile)
 
   Accepts a source file name, and generates mock philosophy based on a

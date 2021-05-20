@@ -17,6 +17,23 @@ Colors
   be changed with :py:func:`colorrange`.
 
 
+  - :ref:`background() <background()>`
+  - :ref:`fill() <fill()>`
+  - :ref:`nofill() <nofill()>`
+  - :ref:`stroke() <stroke()>`
+  - :ref:`nostroke() <nostroke()>`
+  - :ref:`strokewidth() <strokewidth()>`
+  - :ref:`strokedash() <strokedash()>`
+  - :ref:`strokecap() <strokecap()>`
+  - :ref:`strokejoin() <strokejoin()>`
+  - :ref:`color() <color()>`
+  - :ref:`colormode() <colormode()>`
+  - :ref:`colorrange() <colorrange()>`
+  - :ref:`blendmode() <blendmode()>`
+  - :ref:`fillrule() <fillrule()>`
+
+
+.. _background():
 .. py:function:: background(*args)
 
   Set the background color.
@@ -30,16 +47,19 @@ Colors
       circle(40, 40, 20)
 
 
+.. _fill():
 .. py:function:: fill(color)
 
   Sets a fill color, applying it to new paths.
 
+.. _nofill():
 .. py:function:: nofill()
 
   Stop applying fills to new paths.
 
   Returns the fill color that was active before the nofill() call.
 
+.. _stroke():
 .. py:function:: stroke(color)
 
   Set a stroke color, applying it to new paths.
@@ -48,12 +68,14 @@ Colors
   current stroke color. When used to set a color, it returns the new color
   value.
 
+.. _nostroke():
 .. py:function:: nostroke()
 
   Stop applying strokes to new paths.
 
   Returns the stroke color that was active before the nostroke() call.
 
+.. _strokewidth():
 .. py:function:: strokewidth(w=None)
 
   Set the width of the stroke in new paths.
@@ -74,7 +96,7 @@ Colors
     strokewidth(15)
     line(80, 20, 80, 110)
 
-
+.. _strokedash():
 .. py:function:: strokedash(dashes, offset=0)
 
   Sets a dash pattern to be used in stroked shapes.
@@ -114,7 +136,7 @@ Colors
     strokecap(ROUND)
     circle(55,55,40)
 
-
+.. _strokecap():
 .. py:function:: strokecap(cap)
 
   Sets the cap to be drawn at the ends of strokes.
@@ -140,6 +162,7 @@ Colors
     line(75, 25, 75, 110)
 
 
+.. _strokejoin():
 .. py:function:: strokejoin(join)
 
   Sets the join shape to use be drawn at the ends of strokes.
@@ -182,6 +205,7 @@ Colors
     endpath()
 
 
+.. _color():
 .. py:function:: color(*args)
 
   Returns a Color object that can be stored in a variable and reused.
@@ -196,12 +220,15 @@ Colors
       rect(20, 40, 60, 15, fill=teal)
       rect(20, 60, 60, 15)
 
+
+.. _colormode():
 .. py:function:: colormode(mode=None, crange=None)
 
   Set the current color mode, which can be RGB or HSB, and optionally
   the color range.
 
 
+.. _colorrange():
 .. py:function:: colorrange(crange=1.0)
 
   Set the numeric range for color values. By default colors range from 0.0 -
@@ -217,6 +244,8 @@ Colors
         fill(255)
         circle(40, 40, 20)
 
+
+.. _blendmode():
 .. py:function:: blendmode(mode):
 
   Sets the blending mode to apply to the colors of new elements.
@@ -269,6 +298,8 @@ Colors
   these work, and the `Cairo operators page
   <https://www.cairographics.org/operators/>`_ is also a good resource.
 
+
+.. _fillrule():
 .. py:function:: fillrule(rule=WINDING)
 
   Sets the fill rule to be used in filled shapes.

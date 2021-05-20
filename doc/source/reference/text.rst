@@ -1,6 +1,20 @@
 Text
 ====
 
+  - :ref:`text() <text()>`
+  - :ref:`font() <font()>`
+  - :ref:`fontsize() <fontsize()>`
+  - :ref:`textpath() <textpath()>`
+  - :ref:`textmetrics() <textmetrics()>`
+  - :ref:`textbounds() <textbounds()>`
+  - :ref:`textwidth() <textwidth()>`
+  - :ref:`textheight() <textheight()>`
+  - :ref:`lineheight() <lineheight()>`
+  - :ref:`align() <align()>`
+  - :ref:`fontoptions() <fontoptions()>`
+
+  
+.. _text():
 .. py:function:: text(txt, x, y, width=None, height=None, outline=False, draw=True)
 
   Draws a string of text according to the current font settings.
@@ -26,6 +40,7 @@ Text
       font("Inconsolata", 50)
       text("Bot", 12, 65)
 
+.. _font():
 .. py:function:: font(fontpath=None, fontsize=None)
 
   Sets the font to be used in new text instances. Accepts a system font name,
@@ -72,11 +87,14 @@ Text
   Note that for the above example to work, you need to install the variable
   version of `Inconsolata <https://fonts.google.com/specimen/Inconsolata>`_.
 
+
+.. _fontsize():
 .. py:function:: fontsize(fontsize=None)
 
-  Sets the size of the current font to use. If called with no parameters,
-  returns the current size.
+  Sets the size of the current font to use, and returns the current size.
 
+
+.. _textpath():
 .. py:function:: textpath(txt, x, y, width=None, height=1000000, draw=False)
 
   Returns an outlined path of the input text.
@@ -85,29 +103,48 @@ Text
   text(), the ``draw`` option is False by default, as this command is meant
   for doing further manipulation on the text path before rendering it.
 
+
+.. _textmetrics():
 .. py:function:: textmetrics(txt, width=None, height=None)
 
-  Returns the width and height of a string of text as a tuple, according to the
-  current font settings.
+  Returns a (width, height) tuple with the dimensions of the text box containing
+  a string of text, according to the current font settings.
 
+
+.. _textbounds():
+.. py:function:: textbounds(txt, width=None, height=None)
+
+  Returns a (width, height) tuple with the dimensions of the actual shapes
+  (inked part) of a string of text, according to the current font settings.
+
+
+.. _textwidth():
 .. py:function:: textwidth(txt, width=None)
 
   Accepts a string and returns its width, according to the current font
   settings.
 
+
+.. _textheight():
 .. py:function:: textheight(txt, width=None)
 
   Accepts a string and returns its height, according to the current font
   settings.
 
+
+.. _lineheight():
 .. py:function:: lineheight(height=None)
 
   Set the space between lines of text.
 
+
+.. _align():
 .. py:function:: align(align=LEFT)
 
   Set the way lines of text align with each other. Values can be LEFT, CENTER or RIGHT.
 
+
+.. _fontoptions():
 .. py:function:: fontoptions(hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None)
 
   Sets text rendering options.
