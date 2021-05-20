@@ -1,6 +1,17 @@
 Transforms
 ----------
 
+  - :ref:`transform() <transform()>`
+  - :ref:`translate() <translate()>`
+  - :ref:`rotate() <rotate()>`
+  - :ref:`scale() <scale()>`
+  - :ref:`skew() <skew()>`
+  - :ref:`push() <push()>`
+  - :ref:`pop() <pop()>`
+  - :ref:`reset() <reset()>`
+  
+
+.. _transform():
 .. py:function:: transform(mode=None)
 
   Sets whether shapes are transformed along their centerpoint or (0,0).
@@ -19,6 +30,7 @@ Transforms
   the result.
 
 
+.. _translate():
 .. py:function:: translate(xt, yt)
 
 	Specifies the amount to move the canvas origin point.
@@ -36,6 +48,7 @@ Transforms
       oval(10, 10, 40, 40)
 
 
+.. _rotate():
 .. py:function:: rotate(degrees=0, radians=0)
 
   Rotates all subsequent drawing commands.
@@ -67,6 +80,7 @@ Transforms
           rect(25, 25, 50, 50)
 
 
+.. _scale():
 .. py:function:: scale(x=1, y=None)
 
   Increases, decreases, or streches the size of all subsequent drawing commands.
@@ -100,6 +114,8 @@ Transforms
           rect(25, 25, 50, 50)
           scale(.8)
 
+
+.. _skew():
 .. py:function:: skew(x=1, y=0)
 
   Slants the direction of all subsequent drawing commands.
@@ -130,6 +146,8 @@ Transforms
           rect(25, 25, 50, 50)
           skew(.2, 0)
 
+
+.. _push():
 .. py:function:: push()
 
   Saves the current transform state.
@@ -157,6 +175,7 @@ Transforms
       text("three", 40, 120)
 
 
+.. _pop():
 .. py:function:: pop()
 
   Restores the saved transform state.
@@ -164,6 +183,8 @@ Transforms
   This command is meant to be used after push(). It "loads" the transform state
   that was set before the call to push().
 
+
+.. _reset():
 .. py:function:: reset()
 
   Resets the transform state to its default values.

@@ -1,6 +1,21 @@
 Paths
 =====
 
+  - :ref:`beginpath() <beginpath()>`
+  - :ref:`moveto() <moveto()>`
+  - :ref:`lineto() <lineto()>`
+  - :ref:`curveto() <curveto()>`
+  - :ref:`arcto() <arcto()>`
+  - :ref:`closepath() <closepath()>`
+  - :ref:`endpath() <endpath()>`
+  - :ref:`drawpath() <star()>`
+  - :ref:`autoclosepath() <autoclosepath()>`
+  - :ref:`findpath() <findpath()>`
+  - :ref:`beginclip() <beginclip()>`
+  - :ref:`endclip() <endclip()>`
+
+  
+.. _beginpath():
 .. py:function:: beginpath(x=None, y=None)
 
     Start a new Bézier path. This command is needed before any other path
@@ -11,18 +26,24 @@ Paths
     If x and y are not specified, this command should be followed by a
     :py:func:`moveto` call.
 
+
+.. _moveto():
 .. py:function:: moveto(x, y)
 
     Move the Bézier "pen" to the specified point without drawing.
 
     Can only be called between :py:func:`beginpath()` and :py:func:`endpath()`.
 
+
+.. _lineto():
 .. py:function:: lineto(x, y)
 
     Draw a line from the pen's current point to the specified (x,y) coordinates.
 
     Can only be called between :py:func:`beginpath()` and :py:func:`endpath()`.
 
+
+.. _curveto():
 .. py:function:: curveto(x1, y1, x2, y2, x3, y3)
 
     Draws a curve between the current point in the path and a new destination
@@ -67,16 +88,22 @@ Paths
         # end curve point
         line(x2, y2, x3, y3)
 
+
+.. _arcto():
 .. py:function:: arcto(x, y, radius, angle1, angle2)
 
     Continues the path with a circular arc in a way identical to :py:func:`arc`.
     A line will be drawn between the current point and the arc's starting point.
 
+
+.. _closepath():
 .. py:function:: closepath()
 
    Close the path; in case the current point is not the path's starting point, a
    line will be drawn between them.
 
+
+.. _endpath():
 .. py:function:: endpath(draw=True)
 
 	 The endpath() command is the companion command to beginpath(). When endpath()
@@ -85,6 +112,8 @@ Paths
 	 be assigned to a variable and drawn to the screen at a later time with the
 	 drawpath() command.
 
+
+.. _drawpath():
 .. py:function:: drawpath(path)
 
   Draws a path on the screen. A path is a series of lines and curves defined
@@ -94,7 +123,7 @@ Paths
 
   Note: if you have one path that you want to draw multiple times with
   drawpath(), for example each with its own rotation and position, you need to
-  supply a copy: drawpath(path.copy())
+  supply a copy with ``drawpath(path.copy())``.
 
     .. shoebot::
         :alt: Drawpath example
@@ -106,6 +135,8 @@ Paths
         p = endpath(draw=False)
         drawpath(p)
 
+
+.. _autoclosepath():
 .. py:function:: autoclosepath(close=True)
 
   Defines whether paths are automatically closed by connecting the last and
@@ -113,6 +144,8 @@ Paths
   shapes created with beginpath() following this command will adhere to the
   setting.
 
+
+.. _findpath():
 .. py:function:: findpath(points, curvature=1.0)
 
   Constructs a fluid path from a list of coordinates. Each element in the list
@@ -137,8 +170,10 @@ Paths
         drawpath(path)
 
 
+.. _beginclip():
 .. py:function:: beginclip(path)
 
+.. _endclip():
 .. py:function:: endclip()
 
     The beginclip() and endclip() commands define a clipping mask. The supplied

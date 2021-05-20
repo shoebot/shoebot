@@ -1,7 +1,17 @@
 Shapes
 ======
 
+  - :ref:`rect() <rect()>`
+  - :ref:`rectmode() <rectmode()>`
+  - :ref:`ellipse() <ellipse()>`
+  - :ref:`ellipsemode() <ellipsemode()>`
+  - :ref:`line() <background()>`
+  - :ref:`arc() <background()>`
+  - :ref:`arrow() <arrow()>`
+  - :ref:`star() <star()>`
 
+  
+.. _rect():
 .. py:function:: rect(x, y, width, height, roundness=0, draw=True)
 
     Draw a rectangle.
@@ -18,6 +28,7 @@ Shapes
         rect(55, 55, 35, 35, 1)
 
 
+.. _rectmode():
 .. py:function:: rectmode(mode=None)
 
     Change the way rectangles are specified. Each mode alters the parameters
@@ -69,6 +80,8 @@ Shapes
         stroke(0.1, 0.1, 0.8)
         rect(25, 25, 40, 40)
 
+
+.. _ellipse():
 .. py:function:: ellipse(x, y, width, height, draw=True)
 
     Draw an ellipse by specifying the coordinates of its top left origin point,
@@ -82,6 +95,11 @@ Shapes
         ellipse(10, 20, 30, 60)
         ellipse(50, 30, 40, 40) # circle
 
+    This command is identical to the ``oval()`` command from Nodebox, which is
+    also supported and works the same.
+
+
+.. _ellipsemode():
 .. py:function:: ellipsemode(mode=None)
 
     Change the way ellipses are specified. Each mode alters the parameters
@@ -109,6 +127,7 @@ Shapes
         ellipse(25, 25, 40, 40)
 
 
+.. _line():
 .. py:function:: line(x1, y1, x2, y2, draw=True)
 
     Draw a line from (x1,y1) to (x2,y2).
@@ -124,6 +143,7 @@ Shapes
         line(50, 20, 50, 80)
 
 
+.. _arc():
 .. py:function:: arc(x, y, radius, angle1, angle2, type=CHORD, draw=True)
 
     Draws a circular arc with center at (x,y) between two angles.
@@ -145,6 +165,7 @@ Shapes
         arc(50, 50, 20, 0, 270, type=PIE)
 
 
+.. _arrow():
 .. py:function:: arrow(x, y, width, type=NORMAL, draw=True)
 
     Draw an arrow with its tip at (x,y) and the specified width. Its type can be
@@ -157,6 +178,8 @@ Shapes
         arrow(50, 40, 40)
         arrow(90, 40, 40, FORTYFIVE)
 
+
+.. _star():
 .. py:function:: star(x, y, points=20, outer=100, inner=50, draw=True)
 
     Draw a star-like polygon with its center at (x,y).
