@@ -35,9 +35,10 @@ def main():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdirpath = Path(tmpdirname)
-        imgbasename = args.script.split("/")[-1].replace(".bot", ".png")
-        tempfilename = Path(tmpdirpath, imgbasename)
-        cmd = f"sbot {args.script} --repeat {args.framenumber} --outputfile {tempfilename}"
+
+        image_name = tmpdirpath / Path(args.script).with_suffix(".png").name
+        cmd = f"sbot {args.script} --repeat {args.framenumber} \
+            --outputfile {image_name}"
         result = subprocess.call(cmd, shell=True)
 
         fileglob = tmpdirpath / "*.png"
