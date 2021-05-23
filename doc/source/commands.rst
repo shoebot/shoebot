@@ -12,7 +12,7 @@ Note that most examples here are drawn on a 100x100 size for simplicity; the
 Shoebot default is 300x300px.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :hidden:
 
    reference/shapes
@@ -37,6 +37,7 @@ Shoebot default is 300x300px.
   - :ref:`arrow() <arrow()>`
   - :ref:`star() <star()>`
 
+
 :doc:`Paths <reference/paths>`
 ------------------------------
 
@@ -53,6 +54,7 @@ Shoebot default is 300x300px.
   - :ref:`beginclip() <beginclip()>`
   - :ref:`endclip() <endclip()>`
 
+
 :doc:`Text <reference/text>`
 ------------------------------
 
@@ -67,6 +69,7 @@ Shoebot default is 300x300px.
   - :ref:`lineheight() <lineheight()>`
   - :ref:`align() <align()>`
   - :ref:`fontoptions() <fontoptions()>`
+
 
 :doc:`Colors <reference/colors>`
 --------------------------------
@@ -86,6 +89,7 @@ Shoebot default is 300x300px.
   - :ref:`blendmode() <blendmode()>`
   - :ref:`fillrule() <fillrule()>`
 
+
 :doc:`Transforms <reference/transforms>`
 ------------------------------------------
 
@@ -98,11 +102,13 @@ Shoebot default is 300x300px.
   - :ref:`pop() <pop()>`
   - :ref:`reset() <reset()>`
 
+
 :doc:`Images <reference/images>`
 ------------------------------------
 
   - :ref:`image() <image()>`
   - :ref:`imagesize() <imagesize()>`
+
 
 :doc:`Utility <reference/utility>`
 -------------------------------------
@@ -113,6 +119,7 @@ Shoebot default is 300x300px.
   - :ref:`fontnames() <fontnames()>`
   - :ref:`files() <files()>`
   - :ref:`autotext() <autotext()>`
+
 
 :doc:`Core <reference/core>`
 -------------------------------
