@@ -5,6 +5,8 @@ Getting Started
 For your first time with Shoebot, you can try out the included code editor by
 running ``shoebot`` in your terminal.
 
+.. figure::  images/shoebot-ide.png
+
 Open one of the example scripts and Run it through the `Run -> Run script` menu
 option or the ``Ctrl-R`` keyboard shortcut. A window should open with an image
 or animation.

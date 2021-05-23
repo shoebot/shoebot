@@ -30,6 +30,7 @@ html:
 	mkdir -p build/html build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) build/html
 	@echo
+	cp source/static/fonts/* build/html/_static/fonts/
 	@echo "Build finished. The HTML pages are in build/html."
 
 pickle:

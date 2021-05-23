@@ -25,7 +25,8 @@ Shoebot default is 300x300px.
    reference/core
 
 
-- :doc:`reference/shapes`
+:doc:`Shapes <reference/shapes>`
+--------------------------------
 
   - :ref:`rect() <rect()>`
   - :ref:`rectmode() <rectmode()>`
@@ -36,7 +37,9 @@ Shoebot default is 300x300px.
   - :ref:`arrow() <arrow()>`
   - :ref:`star() <star()>`
 
-- :doc:`reference/paths`
+
+:doc:`Paths <reference/paths>`
+------------------------------
 
   - :ref:`beginpath() <beginpath()>`
   - :ref:`moveto() <moveto()>`
@@ -51,7 +54,9 @@ Shoebot default is 300x300px.
   - :ref:`beginclip() <beginclip()>`
   - :ref:`endclip() <endclip()>`
 
-- :doc:`reference/text`
+
+:doc:`Text <reference/text>`
+------------------------------
 
   - :ref:`text() <text()>`
   - :ref:`font() <font()>`
@@ -65,7 +70,9 @@ Shoebot default is 300x300px.
   - :ref:`align() <align()>`
   - :ref:`fontoptions() <fontoptions()>`
 
-- :doc:`reference/colors`
+
+:doc:`Colors <reference/colors>`
+--------------------------------
 
   - :ref:`background() <background()>`
   - :ref:`fill() <fill()>`
@@ -82,7 +89,9 @@ Shoebot default is 300x300px.
   - :ref:`blendmode() <blendmode()>`
   - :ref:`fillrule() <fillrule()>`
 
-- :doc:`reference/transforms`
+
+:doc:`Transforms <reference/transforms>`
+------------------------------------------
 
   - :ref:`transform() <transform()>`
   - :ref:`translate() <translate()>`
@@ -93,12 +102,16 @@ Shoebot default is 300x300px.
   - :ref:`pop() <pop()>`
   - :ref:`reset() <reset()>`
 
-- :doc:`reference/images`
+
+:doc:`Images <reference/images>`
+------------------------------------
 
   - :ref:`image() <image()>`
   - :ref:`imagesize() <imagesize()>`
 
-- :doc:`reference/utility`
+
+:doc:`Utility <reference/utility>`
+-------------------------------------
 
   - :ref:`var() <var()>`
   - :ref:`random() <random()>`
@@ -107,7 +120,9 @@ Shoebot default is 300x300px.
   - :ref:`files() <files()>`
   - :ref:`autotext() <autotext()>`
 
-- :doc:`reference/core`
+
+:doc:`Core <reference/core>`
+-------------------------------
 
   - :ref:`ximport() <ximport()>`
   - :ref:`size() <size()>`

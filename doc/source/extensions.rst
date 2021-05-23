@@ -8,6 +8,8 @@ There are a few plug-ins and extensions that make for a much better experience.
 Atom extension
 --------------
 
+.. figure::  images/atom.png
+
 `Atom <https://atom.io>`_ is an excellent free software code editor, and there
 is a `Shoebot package <https://github.com/shoebot/atom-shoebot>`_ that turns it
 into the ideal tool to experiment with Shoebot.
