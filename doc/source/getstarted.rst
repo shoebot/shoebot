@@ -45,10 +45,10 @@ line flags<cli_flags>` section.
 Exporting video
 ---------------
 
-The :ref:`Atom extension <atom>` has a right-click option to save to video, but
-you can also do this in the command line with the ``sbot-export-video`` script,
-which generates an image sequence and runs ``ffmpeg`` to put everything into
-an MP4 file.
+The :ref:`Atom extension <atom-extension>` has a right-click option to save to
+video, but you can also do this in the command line with the
+``sbot-export-video`` script, which generates an image sequence and runs
+``ffmpeg`` to put everything into an MP4 file.
 
 .. code:: bash
 
