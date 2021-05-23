@@ -175,6 +175,7 @@ ul li:before {
 
 .rst-content p {
   padding-left: 6px;
+  font-size: 18px !important;
 }
 
 .rst-content .function {
