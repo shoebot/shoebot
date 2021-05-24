@@ -1,3 +1,65 @@
+# 1.4
+
+- Variable fonts! Fonts with variant axes can now be loaded and tweaked. Thanks to @villares for the nudge. (#339) 
+- Improved typography control with settings for tracking (letterspacing), underline and overline, along with the new fontnames(), textbounds() and fontoptions() commands (#283 #351 #356 #391)
+- Stroke and fill features: strokecap(), strokejoin(), strokedash() and fillrule() (#376)
+- Arcs! They can now be drawn with the arc() and arcto() commands. (#343)
+- Blending modes for all drawing objects (#376)
+
+Other new features:
+- Much improved unit test framework that already helped us find and kill several bugs, and made it possible to implement new features with confidence that things don't break. (#296)
+- Commands that set state (like fill() or font()) now always return its current value
+- image() can properly load SVG files (#277)
+- Add (x,y) coordinates to closepath() (#287)
+- The dependency install script was improved and has added support for Homebrew, Manjaro, Arch (thanks to @villares for help and testing) and MINGW64 (thanks to @speters33w for help and testing) (#312)
+- Significant speedups by removing unnecessary waits (#372)
+- Windows/Mingw64: working Gedit extension
+- OSX: Improvements in dependency installing (#264)
+
+Cleanups:
+- Remove CMYK references and only use RGB internally (#386)
+- Remove the Drawbot mode (never properly implemented) (#375)
+
+Bug fixes:
+- Error codes are properly output on exit (#284 #374)
+- Fix unstroked shapes being rendered as bitmaps (#359)
+- Fix line() being a closed path
+- Fix crash when using HSB colors
+- Fix L-System library bugs (#290)
+- Fix wrong line number output in script errors
+- Fix colormode to take range, not crange for Nodebox compatibility
+- Fix broken Text.draw()
+- Fix socket server not starting because of new Python 3 API changes. (#368)
+- Update pubsub version (#265)
+
+Docs were seriously reworked:
+- Many new examples in the command reference
+- Many, many corrections, fixes and edits
+- Move from ReadTheDocs to our own Sphinx site at docs.shoebot.net
+- New look and name (Shoebot manual)
+- Recommends per-user install, not system-wide
+- Update Sphinx module to Python 3 and correct leftover Python 2 references (#275)
+- Remove reference to Shoebox appliance as this was not updated to Python 3
+
+Testing:
+- Add OSX support to end to end tests.
+- Update unit tests to use AAA style.
+- Add checks to ensure travis and the install script are consistent
+- Add missing packages to travis for homebrew and ubuntu.
+- Add end to end tests that visual output of some examples
+- Add tests for exception format.
+- (Re)Add tests for color.
+
+Libraries:
+- Port various bits to Python 3
+- Cleanups and reformatting, including the colors library
+- Fixes in the lsystem and graph libraries and examples
+- SBVideo alert the user if numpy is not installed
+- Removed the web library as it's stale and obsolete (#288)
+
+Examples:
+- Added Dendrite and Fireworks example from Nodebox
+
 # 1.3.1
 
 A couple of additions:
@@ -52,7 +114,7 @@ Small fixes to `sbaudio` library after pysoundcard API changes
 Improvements to vext which ought to work to make Shoebot installable via `pip` and `setup.py install`
 
 # 1.2
-  
+
 New features:
 
 * Livecoding branch merged
@@ -145,27 +207,27 @@ features saw the light of day:
 
 New features:
   * colors can be specified using hexcolour values (e.g. #FF00FF)
-  * fill and/or stroke values can be specified using keyword arguments (e.g. 
+  * fill and/or stroke values can be specified using keyword arguments (e.g.
     a = Rect(x,y,w,h,fill='#FF00FF'))
   * experimental animation support
-  * internationalization 
+  * internationalization
   * transforms were overhauled, and are now fully consistent with Nodebox
     behaviour
   * clipping paths!
-  * a powerful text API was introduced using Pango, matching and even 
+  * a powerful text API was introduced using Pango, matching and even
     extending Nodebox's capabilities, and working great with transforms
   * image support is now there, and working great!
   * ximport() can now be used to import Nodebox's libraries
   * many Nodebox libraries ported and included in Shoebot! Boids, Cornu,
     Database, Ants, Photobot, Supershape, SVG and Web are fully working (as
-    far as we could determine! :) ; Colors and L-System are partially working. 
+    far as we could determine! :) ; Colors and L-System are partially working.
   * easteregg(x,y,size) ;)
   * GIMP colour palette import!
   * repeat mode (-r) in commandline mode to output multiple images
   * fullscreen mode!
   * new example scripts
-  * Shoebot now runs on Windows, and the IDE too! 
-  * new goodies in the Shoebot IDE: error reporting console, layout 
+  * Shoebot now runs on Windows, and the IDE too!
+  * new goodies in the Shoebot IDE: error reporting console, layout
     dimensions, about item, file dialogue, Ctrl+F shortcut, GNOME Desktop
     entry
   * preliminary mouse events implementation in GTK mode
@@ -177,7 +239,7 @@ Bug fixes:
   * fixed order of buttons on quit - save file dialogue in shoebot-ide
 
 API changes:
-  * big rewrite of the code structure; now there are generic Bot and Canvas 
+  * big rewrite of the code structure; now there are generic Bot and Canvas
     classes, equivalent to a 'context' and a 'surface', but differently named
     to avoid confusion with Cairo; those can be subclassed to implement new
     languages (see NodeBot class for the implementation of Nodebox) and new
