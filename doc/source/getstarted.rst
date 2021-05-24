@@ -5,6 +5,8 @@ Getting Started
 For your first time with Shoebot, you can try out the included code editor by
 running ``shoebot`` in your terminal.
 
+.. figure::  images/shoebot-ide.png
+
 Open one of the example scripts and Run it through the `Run -> Run script` menu
 option or the ``Ctrl-R`` keyboard shortcut. A window should open with an image
 or animation.
@@ -42,3 +44,18 @@ line flags<cli_flags>` section.
 
 Exporting video
 ---------------
+
+The :ref:`Atom extension <atom>` has a right-click option to save to video, but
+you can also do this in the command line with the ``sbot-export-video`` script,
+which generates an image sequence and runs ``ffmpeg`` to put everything into
+an MP4 file.
+
+.. code:: bash
+
+    sbot-video-export animation/wishyworm.bot -o worm.mp4 -f 150
+
+The ``-f`` option (short for ``--framenumber``) specifies the number of frames
+to render; the default value is 300, or 10 seconds in 30 FPS.
+
+In the future, this feature will become part of the ``sbot`` command line
+runner.

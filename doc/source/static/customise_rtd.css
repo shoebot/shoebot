@@ -1,4 +1,139 @@
 /** overrides for rtd style */
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 300;
+  font-style: normal;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 300;
+  font-style: italic;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-LightItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 400;
+  font-style: normal;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 400;
+  font-style: italic;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 500;
+  font-style: normal;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 500;
+  font-style: italic;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-MediumItalic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 600;
+  font-style: normal;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 600;
+  font-style: italic;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-SemiBoldItalic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 700;
+  font-style: normal;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HKGrotesk';
+  font-weight: 700;
+  font-style: italic;
+  src: local('HKGrotesk'), url('fonts/HKGrotesk-BoldItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 200;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Thin.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 300;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 400;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 500;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 600;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 700;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-ExtraBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MPLUSRounded1c';
+  font-weight: 800;
+  font-style: normal;
+  src: local('MPLUSRounded1c'), url('fonts/MPLUSRounded1c-Black.ttf') format('truetype');
+}
+
+body {
+  font-family: HKGrotesk, "Liberation Sans", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: MPLUSRounded1c;
+}
+h1 { font-size: 250%; }
+h2 { font-size: 175%; font-weight: 500; color: #6C4081; }
+h3 { font-weight: 500; color: #D763A9; }
+
+a {
+  color: #FC7753;
+}
+
+ul, .wy-plain-list-disc li, .rst-content .section ul li, .rst-content .toctree-wrapper ul li, article ul li {
+  list-style-type: none !important;
+}
+
+ul li:before {
+  content: '– ';
+  position: absolute;
+  margin-left: -12px;
+}
+.rst-content .section ol p, .rst-content .section ul p {
+  margin-bottom: 0;
+}
+
 
 .rst-content table.field-list .field-name {
   padding-left: 0 !important;
@@ -14,7 +149,7 @@
   font-size: 22px !important;
 }
 .rst-content dl:not(.docutils) code.descname {
-  font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
+  font-family: "HKGrotesk","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
   font-weight: 900;
   margin-right: 4px;
 }
@@ -40,6 +175,7 @@
 
 .rst-content p {
   padding-left: 6px;
+  font-size: 18px !important;
 }
 
 .rst-content .function {
@@ -52,11 +188,24 @@
   color: #2980B9;
 }
 
+.rst-content tt, .rst-content tt, .rst-content code {
+  font-family: Inconsolata,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace
+}
+
+code.py, code.docutils {
+  font-size: 100% !important;
+  font-weight: 500 !important;
+}
+.rst-content code.xref {
+  font-size: 100% !important;
+  font-weight: 700 !important;
+  color: #6C4081 !important;
+}
 
 .rst-content code {
-  padding: 2px 4px;
+  padding: 6px;
+  background: #FBEFF6;
   color: #222 !important;
-  background: #eee;
   border: none !important;
   border-radius: 3px;
 }
@@ -68,7 +217,7 @@
   border: none !important;
   border-radius: 10px;
 }
-.highlight-bash, .highlight-python {
+.highlight-bash, .highlight-python, .highlight-default {
   border: none !important;
 }
 
@@ -99,7 +248,7 @@
   border-top: none !important;
 }
 .toctree-l1 a, a.icon-home {
-  color: #fe8019 !important;
+  color: #FC7753 !important;
 }
 .toctree-l2 a, .version {
   color: #d65d0e !important;
@@ -110,4 +259,9 @@
 }
 .wy-menu-vertical li.current a:hover, .wy-menu-vertical a:hover {
   background: #FDF5D8 !important;
+}
+
+.wy-menu-vertical {
+  font-size: 120%;
+  font-weight: 500;
 }

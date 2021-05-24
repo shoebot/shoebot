@@ -188,7 +188,11 @@ setup(
     ),
     tests_require=["parameterized", "pyyaml", "wrapt"],
     entry_points={
-        "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.ide.ide:main"],
+        "console_scripts": [
+            "sbot=shoebot.run:main",
+            "shoebot=shoebot.ide.ide:main",
+            "sbot-video-export=shoebot.util.video_export:main",
+        ],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",
     },
     test_suite="tests.unittests",
