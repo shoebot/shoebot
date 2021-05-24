@@ -106,91 +106,102 @@ class Grammar(object):
         # then return zero.
         return max((1.0 / abs(speed)) - (time() - start_time), 0.0)
 
-    def run(self,
-            inputcode,
-            max_iterations=None,
-            run_forever=False,
-            frame_limiter=False,
-            verbose=False):
-
-        source = None
-        filename = None
-
+    def run(
+        self,
+        inputcode,
+        max_iterations=None,
+        run_forever=False,
+        frame_limiter=False,
+        verbose=False,
+    ):
         if os.path.isfile(inputcode):
             source = open(inputcode).read()
             filename = inputcode
         elif isinstance(inputcode, str):
             filename = "<string>"
             source = inputcode
+        else:
+            raise ValueError("inputcode must be a str or file like object.")
 
         self._load_namespace(self._namespace, filename)
-        # self._executor is set so sbio can access it.
+        # The shell module (sbio) accesses the executor via its name here.
         self._executor = executor = LiveExecution(
             source, ns=self._namespace, filename=filename
         )
 
-        if not max_iterations:
-            if run_forever:
-                max_iterations = None
-            else:
+        if run_forever is False:
+            if max_iterations is None:
                 max_iterations = 1
 
-        frame = None
+        try:
+            first_run = True
+            while first_run or self._frame != max_iterations:
+                # Main loop:
+                # - Setup bot on first run.
+                # - Run draw function for if present.
+                # - Process events
+                # - Update state
+                start_time = time()
 
-        # main loop structure
-        #
-        # Run bot
-        # Process events
-        # Update state
+                canvas_dirty = False
+                # Reset output graphics state
+                self._canvas.reset_canvas()
 
-        # Main loop
-        while frame is None or frame != max_iterations and run_forever:
-            start_time = time()
-            # Run bot
-            # TODO
-            # First frame
+                if first_run:
+                    first_run = False
+                    # Run code in the global namespace, followed by setup()
+                    executor.run()
+                    if "setup" in executor.ns:
+                        executor.ns["setup"]()
 
-            # Reset output graphics state
-            self._canvas.reset_canvas()
+                    # Store initial state so script can revert to a known state when livecoding.
+                    self._initial_namespace = copy.copy(self._namespace)
+                    canvas_dirty = True
 
-            if frame is None:
-                executor.run()
-                if "setup" in executor.ns:
-                    executor.ns["setup"]()
+                is_animation = "draw" in executor.ns
+                if is_animation and self._speed != 0:
+                    # If speed is 0, then don't output anything..
+                    executor.ns["draw"]()
+                    canvas_dirty = True
 
-                if "draw" not in executor.ns:
-                    self._canvas.flush(frame)
-                frame = 0
+                if canvas_dirty:
+                    self._canvas.flush(self._frame)
 
-            # Store initial state so script can revert to a known state when livecoding.
-            self._initial_namespace = copy.copy(
-                self._namespace
-            )
-
-            if "draw" in executor.ns and self._speed != 0:
-                # If speed is 0, then the bot is paused.
-                executor.ns["draw"]()
-                self._canvas.flush(frame)
-
-            fps = self._speed  # (speed may have been changed from within bot)
-
-            is_animation = "draw" in executor.ns
-            if frame_limiter:
-                # Frame limiting is only used when running the GUI.
-                if is_animation:
-                    timeout = self._calculate_frame_delay(fps if fps is not None else 60, start_time)
-                    next_frame_due = time() + timeout
+                if frame_limiter:
+                    # Frame limiting is only used when running the GUI.
+                    if is_animation:
+                        # User specifies framerate, via speed(...) or use a default.
+                        fps = self._speed
+                        timeout = self._calculate_frame_delay(
+                            fps if fps is not None else 60, start_time
+                        )
+                        next_frame_due = time() + timeout
+                    else:
+                        # Re-run the mainloop at 30fps, so that the GUI remains responsive.
+                        next_frame_due = time() + (1.0 / 30)
                 else:
-                    next_frame_due = time() + (1.0 / 30)
+                    # Do not sleep between frames.
+                    next_frame_due = time()
+
+                # Handle events
+                if not self._handle_events(is_animation, next_frame_due):
+                    # Event handler returns False if it receives a message to quit.
+                    break
+
+            # Main loop has finished, return True to indicate it exited normally.
+            return True
+        except Exception as e:
+            # Catch Exception, not BaseException, so that KeyboardInterrupts (ctrl+c) still work.
+            # if something goes wrong, print verbose system output.
+
+            import sys
+
+            if verbose:
+                errmsg = traceback.format_exc()
             else:
-                next_frame_due = time()
-
-            # Handle events
-            if not self._handle_events(is_animation, next_frame_due):
-                # Event handler returns False if it receives a message to quit.
-                break
-
-            frame = self._frame  # TODO ?
+                errmsg = simple_traceback(e, executor.known_good or "")
+            sys.stderr.write(f"{errmsg}\n")
+            return False
 
     def _handle_events(self, is_animation, next_frame_due):
         """
@@ -210,7 +221,9 @@ class Grammar(object):
 
         while True:
             timeout = min(next_frame_due - time(), 0.01)
-            event = next_event(block=timeout > 0, timeout=timeout if timeout > 0 else None)
+            event = next_event(
+                block=timeout > 0, timeout=timeout if timeout > 0 else None
+            )
             # Update GUI, which may in-turn generate new events.
             self._canvas.sink.main_iteration()
 
