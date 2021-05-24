@@ -129,7 +129,6 @@ class ShoebotCmd(cmd.Cmd):
         :param cookie: set a custom cookie,
                        if set to 'None' then self.cookie will be used.
                        if set to 'False' disables cookie output entirely
-        :return:
         """
         status = kwargs.get("status")
         lines = input.splitlines()
@@ -216,7 +215,7 @@ class ShoebotCmd(cmd.Cmd):
                 return
 
             self.bot._speed = new_speed
-            self.print_response(f"Speed: {self.bot._speed} FPS")
+        self.print_response(f"Speed: {self.bot._speed} FPS")
 
     def do_restart(self, line):
         """
@@ -236,6 +235,7 @@ class ShoebotCmd(cmd.Cmd):
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
             self.print_response("Paused")
+            print(self.pause_speed, self.bot._speed)
             return
 
         self.bot._speed = self.pause_speed
@@ -246,7 +246,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         Resume playback if bot is paused
         """
-        if self.pause_speed is None:
+        if self.pause_speed is not None:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
         self.print_response("Play")
@@ -273,7 +273,7 @@ class ShoebotCmd(cmd.Cmd):
 
     def do_vars(self, line):
         """
-        List bot variables and values
+        List bot variables and values.
         """
         if self.bot._vars:  # noqa
             max_name_len = max([len(name) for name in self.bot._vars])  # noqa
@@ -297,6 +297,7 @@ class ShoebotCmd(cmd.Cmd):
 
         Editors can enable live-coding by sending new code as it is edited.
         """
+        # TODO use publish_event to change source, and let the mainloop update the executor.
         cookie = self.cookie
         executor = self.bot._executor  # noqa
 
@@ -354,13 +355,15 @@ class ShoebotCmd(cmd.Cmd):
         """
         Make the current window fullscreen
         """
+        # TODO: use publish_event to set toggle fullscreen instead of calling trigger_fullscreen_action directly.
         self.bot.canvas.sink.trigger_fullscreen_action(True)
         print(self.response_prompt, file=self.stdout)
 
-    def do_windowed(self, line):
+    def do_window(self, line):
         """
-        Un-fullscreen the current window
+        Un-fullscreen and
         """
+        # TODO: use publish_event to set toggle fullscreen instead of calling trigger_fullscreen_action directly.
         self.bot.canvas.sink.trigger_fullscreen_action(False)
         print(self.response_prompt, file=self.stdout)
 
@@ -384,6 +387,7 @@ class ShoebotCmd(cmd.Cmd):
         """
         Set a variable.
         """
+        # TODO: use publish_event to set Variable instead of directly changing it.
         try:
             name, value = [part.strip() for part in line.split("=")]
             if name not in self.bot._vars:  # noqa
@@ -419,38 +423,29 @@ class ShoebotCmd(cmd.Cmd):
         :return:  processed command line.
         """
         args = shlex.split(line or "")
-        if args and "cookie=" in args[-1]:
-            # Get the cookie value.
-            # TODO - this could probably be cleaner with a regex.
-            cookie_index = line.index("cookie=")
-            cookie = line[cookie_index + 7 :]
-            line = line[:cookie_index].strip()
-            self.cookie = cookie
-            args = shlex.split(line or "")
-
-        if len(args) and args[0].startswith("#"):
-            # Ignore comments.
+        if not args or args[0].startswith("#"):
+            # Ignore empty lines and comments.
             return ""
 
-        if len(args) > 1 and "=" in line:
-            # Assignment
-            #
-            # If it looks like the user is trying to pass var=value then prefix it with
-            # set, so the do_set can be looked up later.
-            #
-            # Ignore commands:
-            if hasattr(self, f"do_{args[0]}"):
-                return line
+        if "cookie=" in args[-1]:
+            # Get the cookie value.
+            line, self.cookie = line.rsplit("cookie=")
+            del args[-1]
 
-            if not args[0] == "set":
+        # Parsing
+        if "=" in line:
+            # Variable Assignment: somevar=value
+            #
+            # Convert var=value into set var=value
+            #
+            if "set" not in args[0]:
                 return f"set {line}"
             return line
-
-        # Shortcuts
-        #
-        # If the first item on the commandline is a shortcut, the substitute it for
-        # the full command.
-        if len(args) and args[0] in self.shortcuts:
+        elif args[0] in self.shortcuts:
+            # Shortcuts
+            #
+            # If the first item on the commandline is a shortcut, the substitute it for
+            # the full command.
             return self.shortcuts[args[0]] + " ".join(args[1:])
 
         return line
