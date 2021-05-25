@@ -38,7 +38,6 @@ def trash(path, pt0, pt1, amount=0.2, number_of_lines=20, max_length=3.0):
         return blot
 
 
-path = BezierPath()
 extensions = []
 for contour in path.contours:
     prev_pt = None
