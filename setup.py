@@ -125,7 +125,6 @@ PYGOBJECT = "pygobject>=3.32.1"
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
     PYCAIRO,
-    "meta==1.0.2",
     "Pillow>=6.0.0",
     "pubsub==0.1.2",
     "wrapt>=1.12.1",
