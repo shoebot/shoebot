@@ -42,6 +42,7 @@ EXCLUDE_EXAMPLE_BOTS = [
     ("libraries/photobot/blur.bot",),
     ("libraries/photobot/crossfade.bot",),
     # Audio bots cause issues as the audio thread stays open
+    ("libraries/audio/audio-circles2.bot",),
     ("libraries/audio/70s_wallpaper.bot",),
     ("libraries/audio/reactive_cells.bot",),
     ("libraries/audio/tunnel_graph.bot",),
