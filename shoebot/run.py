@@ -264,7 +264,7 @@ def main():
     success = run(
         src=args.script,
         outputfile=args.outputfile,
-        iterations=args.repeat or None,
+        max_iterations=args.repeat or None,
         window=window,
         fullscreen=args.fullscreen,
         title=args.title,

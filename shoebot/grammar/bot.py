@@ -196,10 +196,6 @@ class Bot(Grammar):
             subpixelorder=None,
         )
 
-    def _set_dynamic_vars(self):
-        self._namespace["FRAME"] = self._frame
-        self._namespace["PAGENUM"] = self._frame
-
     # Input GUI callbacks
 
     def _mouse_button_down(self, button):
@@ -226,14 +222,6 @@ class Bot(Grammar):
         self._namespace["keydown"] = self._input_device.key_down
 
     # Functions for override #####
-
-    def setup(self):
-        """ For override by user sketch """
-        pass
-
-    def draw(self):
-        """ For override by user sketch """
-        self._dynamic = False
 
     # Classes #####
 
@@ -411,7 +399,9 @@ class Bot(Grammar):
                 defer = True
             self._canvas.snapshot(target, defer=defer, file_number=file_number)
         else:
-            raise ShoebotError("Image not saved: no target, filename or default to save to.")
+            raise ShoebotError(
+                "Image not saved: no target, filename or default to save to."
+            )
 
     def show(self, format="png", as_data=False):
         """Returns an Image object of the current surface. Used for displaying
@@ -477,7 +467,7 @@ class Bot(Grammar):
         if not h:
             h = self._canvas.height
         if not w and not h:
-            return (self._canvas.width, self._canvas.height)
+            return self._canvas.width, self._canvas.height
 
         # FIXME: Updating in all these places seems a bit hacky
         w, h = self._canvas.set_size((w, h))

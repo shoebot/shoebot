@@ -75,7 +75,8 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     def on_resize(self, widget, dimensions):
         self.width = dimensions.width
         self.height = dimensions.height
-        publish_event(REDRAW_EVENT)
+        if self.bot_size is not None:
+            publish_event(REDRAW_EVENT, data=(self.width, self.height))
 
     def scale_context_and_center(self, cr):
         """
@@ -135,6 +136,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         )
 
         ctx = cairo.Context(meta_surface)
+        self._ctx = ctx
         return ctx
 
     def do_drawing(self, size, frame, cairo_ctx):
@@ -162,8 +164,4 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         # Create the cairo context
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
-
         self.queue_draw()
-
-        while Gtk.events_pending():
-            Gtk.main_iteration_do(False)

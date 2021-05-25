@@ -125,7 +125,6 @@ PYGOBJECT = "pygobject>=3.32.1"
 BASE_REQUIREMENTS = [
     "setuptools>=18.8",
     PYCAIRO,
-    "meta==1.0.2",
     "Pillow>=6.0.0",
     "pubsub==0.1.2",
     "wrapt>=1.12.1",
@@ -188,7 +187,11 @@ setup(
     ),
     tests_require=["parameterized", "pyyaml", "wrapt"],
     entry_points={
-        "console_scripts": ["sbot=shoebot.run:main", "shoebot=shoebot.ide.ide:main"],
+        "console_scripts": [
+            "sbot=shoebot.run:main",
+            "shoebot=shoebot.ide.ide:main",
+            "sbot-video-export=shoebot.util.video_export:main",
+        ],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",
     },
     test_suite="tests.unittests",

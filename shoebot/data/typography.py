@@ -337,9 +337,7 @@ class Text(Grob, ColorMixin):
             self._pre_render()
 
         # Render path data to a temporary cairo Context
-        cairo_ctx = cairo.Context(
-            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
-        )
+        cairo_ctx = cairo.Context(cairo.RecordingSurface(cairo.CONTENT_ALPHA, None))
         cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
         cairo_ctx.move_to(self.x, self.y - self.baseline)
         # show_layout should work here, but fills the path instead,

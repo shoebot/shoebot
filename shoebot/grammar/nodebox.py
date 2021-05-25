@@ -91,6 +91,11 @@ class NodeBot(Bot):
         Bot.__init__(self, canvas, namespace=namespace, vars=vars)
         canvas.mode = CORNER
 
+    @property
+    def _ns(self):
+        """Nodebox1 API way of fetching namespace from _ctx"""
+        return self._namespace
+
     # Drawing
 
     # Image

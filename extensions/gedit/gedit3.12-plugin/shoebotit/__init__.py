@@ -6,21 +6,20 @@ from gi.repository import Gtk, GLib, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils
 
-WINDOW_ACTIONS = [
-    (_("Run in Shoebot"), "run")
-]
+WINDOW_ACTIONS = [(_("Run in Shoebot"), "run")]
 
 WINDOW_TOGGLES = [  # these are accompanied by vars e.g.   window.socket_server_enabled
     (_("Variable Window"), "var_window", True),
     (_("Socket Server"), "socket_server", False),
     (_("Live Coding"), "live_coding", False),
     (_("Full screen"), "full_screen", False),
-    (_("Verbose output"), "verbose_output", False)
+    (_("Verbose output"), "verbose_output", False),
 ]
 
 WINDOW_ACCELS = [("run", "<Control>R")]
 
-EXAMPLES=[]
+EXAMPLES = []
+
 
 class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable):
     __gtype_name__ = "ShoebotPlugin"
@@ -35,7 +34,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.text = None
         self.live_text = None
 
-        self.id_name = 'ShoebotPluginID'
+        self.id_name = "ShoebotPluginID"
 
         for _, name, default in WINDOW_TOGGLES:
             setattr(self, "%s_enabled" % name, default)
@@ -59,7 +58,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         text_view.set_name(name)
 
         buff = text_view.get_buffer()
-        buff.create_tag('error', foreground='red')
+        buff.create_tag("error", foreground="red")
 
         container = Gtk.ScrolledWindow()
         container.add(text_view)
@@ -71,14 +70,14 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.live_container, self.live_text = self._create_view("shoebot-live")
         self.panel = self.window.get_bottom_panel()
 
-        self.panel.add_titled(self.output_container, 'Shoebot', 'Shoebot')
-        self.panel.add_titled(self.live_container, 'Shoebot Live', 'Shoebot Live')
+        self.panel.add_titled(self.output_container, "Shoebot", "Shoebot")
+        self.panel.add_titled(self.live_container, "Shoebot Live", "Shoebot Live")
 
     def add_window_actions(self):
         for rel_path in EXAMPLES:
             action = Gio.SimpleAction.new(
-                "open_example__%s" % gtk3_utils.encode_relpath(rel_path),
-                None)
+                "open_example__%s" % gtk3_utils.encode_relpath(rel_path), None
+            )
 
             action.connect("activate", self.on_open_example)
             self.window.add_action(action)
@@ -92,9 +91,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         for _, name, default in WINDOW_TOGGLES:
             action_name = "toggle_%s" % name
             action = Gio.SimpleAction.new_stateful(
-                action_name,
-                None,
-                GLib.Variant.new_boolean(default))
+                action_name, None, GLib.Variant.new_boolean(default)
+            )
             action.connect("activate", getattr(self, action_name))
             self.window.add_action(action)
 
@@ -102,7 +100,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.start_shoebot()
 
     def on_open_example(self, action, user_data):
-        b64_path = action.get_name()[len('open_example__'):].encode("UTF-8")
+        b64_path = action.get_name()[len("open_example__") :].encode("UTF-8")
 
         example_dir = ide_utils.get_example_dir()
         rel_path = base64.b64decode(b64_path).decode("UTF-8")
@@ -115,21 +113,22 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             gio_file,
             None,  # encoding
             0,
-            0,     # column
-            False, # Do not create an empty file
-            True)  # Switch to the tab
+            0,  # column
+            False,  # Do not create an empty file
+            True,
+        )  # Switch to the tab
 
     def start_shoebot(self):
-        sbot_bin=gtk3_utils.sbot_executable()
+        sbot_bin = gtk3_utils.sbot_executable()
         if not sbot_bin:
             textbuffer = self.text.get_buffer()
-            textbuffer.set_text('Cannot find sbot in path.')
+            textbuffer.set_text("Cannot find sbot in path.")
             while Gtk.events_pending():
-               Gtk.main_iteration()
+                Gtk.main_iteration()
             return False
 
         if self.bot and self.bot.process.poll() == None:
-            print('Sending quit.')
+            print("Sending quit.")
             self.bot.send_command("quit")
             # TODO - wait for response.
 
@@ -138,7 +137,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         if not doc:
             return
 
-        title = '%s - Shoebot on gedit' % doc.get_short_name_for_display()
+        title = "%s - Shoebot on gedit" % doc.get_short_name_for_display()
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
@@ -147,10 +146,10 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             return False
 
         textbuffer = self.text.get_buffer()
-        textbuffer.set_text('running shoebot at %s\n' % sbot_bin)
+        textbuffer.set_text("running shoebot at %s\n" % sbot_bin)
 
         while Gtk.events_pending():
-           Gtk.main_iteration()
+            Gtk.main_iteration()
 
         self.disconnect_change_handler(doc)
         self.changed_handler_id = doc.connect("changed", self.doc_changed)
@@ -163,7 +162,8 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             self.verbose_output_enabled,
             title,
             cwd=cwd,
-            sbot=sbot_bin)
+            sbot=sbot_bin,
+        )
         self.idle_handler_id = GObject.idle_add(self.update_shoebot)
 
     def disconnect_change_handler(self, doc):
@@ -199,7 +199,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
                 self.disconnect_change_handler()
                 if e.errno == errno.EPIPE:
                     # EPIPE error
-                    print('FIXME: %s' % str(e))
+                    print("FIXME: %s" % str(e))
                 else:
                     # Something else bad happened
                     raise
@@ -223,15 +223,22 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             for response in self.bot.get_command_responses():
                 if response is None:
                     # sentinel value - clear the buffer
-                    textbuffer.delete(textbuffer.get_start_iter(), textbuffer.get_end_iter())
+                    textbuffer.delete(
+                        textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                    )
                 else:
                     cmd, status, info = response.cmd, response.status, response.info
                     if cmd == ide_utils.CMD_LOAD_BASE64:
                         if status == ide_utils.RESPONSE_CODE_OK:
-                            textbuffer.delete(textbuffer.get_start_iter(), textbuffer.get_end_iter())
+                            textbuffer.delete(
+                                textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                            )
                             # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
                         elif status == ide_utils.RESPONSE_REVERTED:
-                            textbuffer.insert(textbuffer.get_end_iter(), '\n'.join(info).replace('\\n', '\n'))
+                            textbuffer.insert(
+                                textbuffer.get_end_iter(),
+                                "\n".join(info).replace("\\n", "\n"),
+                            )
 
             while Gtk.events_pending():
                 Gtk.main_iteration()
@@ -262,14 +269,13 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             source = self.get_source(doc)
             self.bot.live_source_load(source)
 
-            panel.add_titled(self.live_container, 'Shoebot Live', 'Shoebot Live')
+            panel.add_titled(self.live_container, "Shoebot Live", "Shoebot Live")
         else:
             panel.remove(self.live_container)
 
     def toggle_verbose_output(self, action, user_data):
         action.set_state(GLib.Variant.new_boolean(not action.get_state()))
         self.verbose_output_enabled = action.get_state().get_boolean()
-
 
     def do_deactivate(self):
         self.panel.remove(self.live_container)
@@ -289,6 +295,7 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
 
     def do_activate(self):
         global _
+
         def mk_menu(text):
             global _
             menu = Gio.Menu.new()
