@@ -2,10 +2,8 @@ import _ast
 import ast
 import copy
 import contextlib
-import sys
 import threading
 import traceback
-import meta.decompiler
 
 
 class LiveExecution(object):
