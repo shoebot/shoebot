@@ -118,8 +118,9 @@ class ShoebotProcess(object):
         else:
             print('no sbot!')
 
-        startupinfo = subprocess.STARTUPINFO()
+        startupinfo = None
         if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=os.name != 'nt', shell=False, cwd=cwd, startupinfo=startupinfo)
 
@@ -275,8 +276,9 @@ def find_example_dir():
     # Needs to run in same python env as shoebot (may be different to gedits)
     code = code_stub % 'share/shoebot/examples'
     cmd = ["python", "-c", code]
-    startupinfo = subprocess.STARTUPINFO()
+    startupinfo = None
     if os.name == 'nt':
+        startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo)
     output, errors = p.communicate()

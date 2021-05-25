@@ -317,7 +317,7 @@ class ShoebotCmd(cmd.Cmd):
             executor.clear_callbacks()
 
         called_good = False
-        source = base64.b64decode(line).decode("ascii")
+        source = base64.b64decode(line).decode("utf-8")
         # Test compile
         publish_event(
             SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source"
@@ -403,8 +403,8 @@ class ShoebotCmd(cmd.Cmd):
                 print(f"{name}={variable.value}", file=self.stdout)
             else:
                 print(f"{msg}\n", file=self.stdout)
-        except Exception as e:
-            print("Invalid Syntax.", e)
+        except Exception:
+            print("Invalid Syntax for set command")
             return
 
     def precmd(self, line):
@@ -430,9 +430,17 @@ class ShoebotCmd(cmd.Cmd):
         if "cookie=" in args[-1]:
             # Get the cookie value.
             line, self.cookie = line.rsplit("cookie=")
+            line = line.strip()
             del args[-1]
+            if not args:
+                return ""
 
-        # Parsing
+        if hasattr(self, f"do_{args[0]}"):
+            # This stops var=value parsing trying to handle load_base64 which
+            # may contain = signs.
+            return line
+
+        # Further parsing
         if "=" in line:
             # Variable Assignment: somevar=value
             #
