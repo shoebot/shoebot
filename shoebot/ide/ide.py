@@ -1103,7 +1103,9 @@ class ShoebotEditorWindow(Gtk.Window):
                 window=True,
             )
             self.shoebot_window = bot._canvas.sink
-            bot.run(codestring, run_forever=True, iterations=None, frame_limiter=True)
+            bot.run(
+                codestring, run_forever=True, max_iterations=None, frame_limiter=True
+            )
         except (ShoebotError, NameError):
             import traceback
             import sys

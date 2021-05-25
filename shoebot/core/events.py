@@ -71,3 +71,4 @@ def publish_event(event_t, data=None, extra_channels=None, wait=None):
     if wait is not None:
         channel = pubsub.subscribe(wait)
         channel.listen(wait)
+        channel.unsubscribe(wait)

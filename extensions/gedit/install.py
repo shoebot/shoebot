@@ -10,7 +10,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 def gedit_install():
     version = None
     try:
-        version = subprocess.check_output(['gedit', '--version']).strip()
+        version = subprocess.check_output(["gedit", "--version"]).strip()
     except OSError:
         print("gedit not found")
         return

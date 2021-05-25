@@ -48,19 +48,21 @@ def examples_menu(root_dir=None, depth=0):
 
     for fn in sorted(os.listdir(root_dir)):
         path = os.path.join(root_dir, fn)
-        rel_path = path[len(examples_dir):]
+        rel_path = path[len(examples_dir) :]
         if os.path.isdir(path):
-            action = 'ShoebotExampleMenu {0}'.format(rel_path)
+            action = "ShoebotExampleMenu {0}".format(rel_path)
             label = fn.capitalize()
 
-            sm_xml, sm_file_actions, sm_menu_actions = examples_menu(os.path.join(root_dir, fn), depth+1)
+            sm_xml, sm_file_actions, sm_menu_actions = examples_menu(
+                os.path.join(root_dir, fn), depth + 1
+            )
 
             submenu_actions.extend(sm_menu_actions)
             file_actions.extend(sm_file_actions)
             submenu_actions.append((action, label))
             xml += dir_tmpl.format(name=fn, action=action, menu=sm_xml)
-        elif os.path.splitext(path)[1] in ['.bot', '.py'] and not fn.startswith('_'):
-            action = 'ShoebotExampleOpen {0}'.format(rel_path)
+        elif os.path.splitext(path)[1] in [".bot", ".py"] and not fn.startswith("_"):
+            action = "ShoebotExampleOpen {0}".format(rel_path)
             label = ide_utils.make_readable_filename(fn)
 
             xml += file_tmpl.format(name=fn, action=action)
@@ -75,7 +77,7 @@ def gedit2_menu(xml):
 
     Pass in the xml returned by example_menu
     """
-    return MENU_UI.format(xml) # Splice in the examples menu
+    return MENU_UI.format(xml)  # Splice in the examples menu
 
 
 def get_child_by_name(parent, name):
@@ -96,5 +98,5 @@ def get_child_by_name(parent, name):
                     continue
         except AttributeError:
             pass
-    return iterate_children(parent, name)
 
+    return iterate_children(parent, name)

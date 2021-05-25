@@ -174,19 +174,13 @@ class VarWindow(object):
         # set the appropriate bot var
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
-            self.bot._vars[
-                v.name
-            ].value = widget.get_value()
+            self.bot._vars[v.name].value = widget.get_value()
         elif v.type is BOOLEAN:
             self.bot._namespace[v.name] = widget.get_active()
-            self.bot._vars[
-                v.name
-            ].value = widget.get_active()
+            self.bot._vars[v.name].value = widget.get_active()
         elif v.type is TEXT:
             self.bot._namespace[v.name] = widget.get_text()
-            self.bot._vars[
-                v.name
-            ].value = widget.get_text()
+            self.bot._vars[v.name].value = widget.get_text()
         publish_event(VARIABLE_CHANGED_EVENT, v)
 
     def var_added(self, v):
