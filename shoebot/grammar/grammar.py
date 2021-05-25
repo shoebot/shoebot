@@ -159,11 +159,11 @@ class Grammar(object):
                 with executor.run_context() as (known_good, source, ns):
                     if not known_good:
                         # New code has been loaded, but it may have errors.
-                        # Setting first_run forces the global context to be re-run.
+                        # Setting first_run forces the global context to be re-run
+                        # Which has the side effect of loading all functions and state.
                         first_run = True
 
                     if first_run:
-                        first_run = False
                         # Run code in the global namespace, followed by setup()
                         executor.run()
                         if "setup" in executor.ns:

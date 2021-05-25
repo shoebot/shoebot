@@ -3,7 +3,12 @@ import sys
 
 from pathlib import Path
 from shoebot.core.backend import gi
-from shoebot.core.events import publish_event, QUIT_EVENT, VARIABLE_CHANGED_EVENT
+from shoebot.core.events import (
+    publish_event,
+    QUIT_EVENT,
+    VARIABLE_CHANGED_EVENT,
+    REDRAW_EVENT,
+)
 from gi.repository import Gdk, Gtk
 
 from pkg_resources import resource_filename, Requirement
@@ -201,12 +206,12 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         :param frame:   frame  number
         :param r_context:  cairo context
         """
-
-        bot = self.bot
         canvas = self.bot.canvas
 
         pending_snapshots = self.pending_snapshots
         for filename in pending_snapshots:
+            # TODO, show filename in the GUI.
+            print(f"Save snapshot: {filename}", file=sys.stderr)
             # TODO - remove many of these closures.
             f = canvas.output_closure(filename)
             f(r_context)
@@ -273,24 +278,36 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         Request to save an SVG file after drawing is complete.
         """
         self.pending_snapshots.append(self.output_image_filename("svg"))
+        publish_event(
+            REDRAW_EVENT, data=(None, None)
+        )  # TODO - this probably wants its own event
 
     def snapshot_ps(self, widget):
         """
         Request to save a Postscript file after drawing is complete.
         """
         self.pending_snapshots.append(self.output_image_filename("ps"))
+        publish_event(
+            REDRAW_EVENT, data=(None, None)
+        )  # TODO - this probably wants its own event
 
     def snapshot_pdf(self, widget):
         """
         Request to save a PDF file after drawing is complete.
         """
         self.pending_snapshots.append(self.output_image_filename("pdf"))
+        publish_event(
+            REDRAW_EVENT, data=(None, None)
+        )  # TODO - this probably wants its own event
 
     def snapshot_png(self, widget):
         """
         Request to save a PNG file after drawing is complete.
         """
         self.pending_snapshots.append(self.output_image_filename("png"))
+        publish_event(
+            REDRAW_EVENT, data=(None, None)
+        )  # TODO - this probably wants its own event
 
     def trigger_fullscreen_action(self, fullscreen):
         """
@@ -310,7 +327,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         # fullscreen mode before reading it's size values
         while Gtk.events_pending():
             Gtk.main_iteration()
-        # we pass informations on full-screen size to bot
+        # we pass the full-screen size to bot
         self.bot._screen_width = Gdk.Screen.width()
         self.bot._screen_height = Gdk.Screen.height()
         self.bot._screen_ratio = self.bot._screen_width / self.bot._screen_height
