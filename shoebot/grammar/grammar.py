@@ -140,14 +140,17 @@ class Grammar(object):
                 max_iterations = 1
 
         try:
+            # Iterations only increment, whereas FRAME can decrement if the user sets a negative speed.
+            iterations = 0
             first_run = True
-            while first_run or self._frame != max_iterations:
+            while first_run or iterations != max_iterations:
                 # Main loop:
                 # - Setup bot on first run.
                 # - Run draw function for if present.
                 # - Process events
                 # - Update state
                 start_time = time()
+                iterations += 1
 
                 canvas_dirty = False
                 # Reset output graphics state
