@@ -1,6 +1,8 @@
+import _ast
 import ast
 import copy
 import contextlib
+import sys
 import threading
 import traceback
 import meta.decompiler
@@ -49,6 +51,7 @@ class LiveExecution(object):
         in the 'tenuous' state.
         """
         with LiveExecution.lock:
+            print("load edited source ", source)
             self.good_cb = good_cb
             self.bad_cb = bad_cb
             try:
@@ -56,7 +59,7 @@ class LiveExecution(object):
                 source = f"{source}\n\n"
                 compile(source, filename or self.filename, "exec")
                 self.edited_source = source
-            except Exception:  # noqa
+            except Exception as e:  # noqa
                 if bad_cb:
                     self.edited_source = None
                     tb = traceback.format_exc()
@@ -78,11 +81,18 @@ class LiveExecution(object):
 
         with LiveExecution.lock:
             if source is not None:
+                compiled_modules = {}
                 tree = ast.parse(source)
                 for f in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
-                    self.ns[f.name].__code__ = meta.decompiler.compile_func(
-                        f, self.filename, self.ns
-                    ).__code__
+                    module = _ast.Module(body=[f], type_ignores=[])
+                    code = compiled_modules.get(module)
+                    if code is None:
+                        code = compile(module, self.filename, "exec")
+                        compiled_modules[module] = code
+
+                    function_context = {}
+                    eval(code, dict(self.ns), function_context)
+                    self.ns[f.name].__code__ = function_context[f.name].__code__
 
     def do_exec(self, source, ns):
         """

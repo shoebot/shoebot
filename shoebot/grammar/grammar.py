@@ -16,6 +16,7 @@ from shoebot.core.events import (
     SET_WINDOW_TITLE_EVENT,
     SOURCE_CHANGED_EVENT,
     VARIABLE_CHANGED_EVENT,
+    REDRAW_EVENT,
 )
 from shoebot.core.var_listener import VarListener
 from shoebot.data import Variable
@@ -24,6 +25,10 @@ from shoebot.util import UnbufferedFile
 
 sys.stdout = UnbufferedFile(sys.stdout)
 sys.stderr = UnbufferedFile(sys.stderr)
+
+# If a bot is not animated the GUI is updated at 30fps
+DEFAULT_GUI_UPDATE_SPEED = 30.0
+DEFAULT_ANIMATION_SPEED = 60.0
 
 
 class Grammar(object):
@@ -124,7 +129,8 @@ class Grammar(object):
             raise ValueError("inputcode must be a str or file like object.")
 
         self._load_namespace(self._namespace, filename)
-        # The shell module (sbio) accesses the executor via its name here.
+        # TODO:  The shell module (sbio) accesses the executor via its name here,
+        # making this event based would remove the need for this.
         self._executor = executor = LiveExecution(
             source, ns=self._namespace, filename=filename
         )
@@ -147,22 +153,28 @@ class Grammar(object):
                 # Reset output graphics state
                 self._canvas.reset_canvas()
 
-                if first_run:
-                    first_run = False
-                    # Run code in the global namespace, followed by setup()
-                    executor.run()
-                    if "setup" in executor.ns:
-                        executor.ns["setup"]()
+                with executor.run_context() as (known_good, source, ns):
+                    if not known_good:
+                        # New code has been loaded, but it may have errors.
+                        # Setting first_run forces the global context to be re-run.
+                        first_run = True
 
-                    # Store initial state so script can revert to a known state when livecoding.
-                    self._initial_namespace = copy.copy(self._namespace)
-                    canvas_dirty = True
+                    if first_run:
+                        first_run = False
+                        # Run code in the global namespace, followed by setup()
+                        executor.run()
+                        if "setup" in executor.ns:
+                            executor.ns["setup"]()
 
-                is_animation = "draw" in executor.ns
-                if is_animation and self._speed != 0:
-                    # If speed is 0, then don't output anything..
-                    executor.ns["draw"]()
-                    canvas_dirty = True
+                        # Store initial state so script can revert to a known state when livecoding.
+                        self._initial_namespace = copy.copy(self._namespace)
+                        canvas_dirty = True
+
+                    is_animation = "draw" in executor.ns
+                    if is_animation and self._speed != 0:
+                        # If speed is 0, then don't output anything..
+                        executor.ns["draw"]()
+                        canvas_dirty = True
 
                 if canvas_dirty:
                     self._canvas.flush(self._frame)
@@ -173,18 +185,22 @@ class Grammar(object):
                         # User specifies framerate, via speed(...) or use a default.
                         fps = self._speed
                         timeout = self._calculate_frame_delay(
-                            fps if fps is not None else 60, start_time
+                            fps if fps is not None else DEFAULT_ANIMATION_SPEED,
+                            start_time,
                         )
                         next_frame_due = time() + timeout
                     else:
                         # Re-run the mainloop at 30fps, so that the GUI remains responsive.
-                        next_frame_due = time() + (1.0 / 30)
+                        next_frame_due = time() + 1.0 / DEFAULT_GUI_UPDATE_SPEED
                 else:
                     # Do not sleep between frames.
                     next_frame_due = time()
 
                 # Handle events
-                if not self._handle_events(is_animation, next_frame_due):
+                continue_running, first_run = self._handle_events(
+                    is_animation, next_frame_due
+                )
+                if not continue_running:
                     # Event handler returns False if it receives a message to quit.
                     break
 
@@ -212,6 +228,8 @@ class Grammar(object):
 
         This handler waits for events and updates where needed, the loop also
         serves handles the delay between frames for animated bots.
+
+        return: continue_running, restart
         """
 
         # Things we might want to do on returning:
@@ -219,8 +237,9 @@ class Grammar(object):
         # Quit
         # Continue running.
 
+        restart_bot = False
         while True:
-            timeout = min(next_frame_due - time(), 0.01)
+            timeout = min(next_frame_due - time(), 0.1)
             event = next_event(
                 block=timeout > 0, timeout=timeout if timeout > 0 else None
             )
@@ -229,15 +248,28 @@ class Grammar(object):
 
             if event is not None:
                 if event.type == QUIT_EVENT:
-                    return False
+                    # The user chose to quit via the shell or GUI.
+                    return False, False
+                elif event.type == REDRAW_EVENT:
+                    # The GUI needs redrawing (usually because the Window was resized)
+                    # TODO: This is a hack/workaround, since the graphics backend doesn't currently support redrawing
+                    if not is_animation:
+                        return True, True
+                elif event.type == SET_WINDOW_TITLE_EVENT:
+                    # A new window title was specified in the shell
+                    self._canvas.sink.set_title(event.data)
                 elif event.type == SOURCE_CHANGED_EVENT:
+                    # New source code was loaded from the shell.
                     # Debounce SOURCE_CHANGED events -
                     # Gedit generates two events for changing a single character -
                     # delete and then add
                     while event and event.type == SOURCE_CHANGED_EVENT:
                         # TODO, can this be handled differently (non-blocking or just ignore source that is the same?)
                         event = next_event(block=True, timeout=0.001)
+                    if not is_animation:
+                        return True, True
                 elif event.type == VARIABLE_CHANGED_EVENT:
+                    # A Variable was changed, from the shell or the GUI.
                     # TODO, make VARIABLE_ADDED_EVENT, VARIABLE_DELETED_EVENT
                     # TODO, sketched out, fix up properly.
                     self._executor.ns[event.data.name] = event.data.value
@@ -245,18 +277,15 @@ class Grammar(object):
                     if not is_animation:
                         # On non-animated bots, updating variables re-runs the whole
                         # whole bot so that the user may see the updated state.
-                        self._executor.run()
-                        self._canvas.flush(self._frame)
-                elif event.type == SET_WINDOW_TITLE_EVENT:
-                    self._canvas.sink.set_title(event.data)
+                        return True, True
 
             if time() >= next_frame_due:
                 break
 
         if event is None:
-            # event == None, means the handler timed out.
+            # event is None indicates the handler timed out.
             # If the bot is animated, then the next frame is due and
-            # variables that update per-frame need to be updated.
+            # variables that update per-frame must be updated.
 
             if is_animation and self._speed is not None:
                 if self._speed > 0:
@@ -265,8 +294,8 @@ class Grammar(object):
                     self._frame -= 1
             self._update_animation_variables(self._frame)
 
-        # By default return True signalling to the main loop to carry on running.
-        return True
+        # By default return continue_running=True.
+        return True, restart_bot
 
     def finish(self):
         ## For use when using shoebot as a module

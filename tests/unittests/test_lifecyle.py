@@ -8,6 +8,7 @@ class TestLifecycle(ShoebotTestCase):
     """
     These tests don't use @test_as_bot as they need to run exactly like
     """
+
     # def test_lifecycle_non_dynamic_bot(self):
     #     """
     #     Test that loading an svg image doesn't raise an exception (this was a bug).

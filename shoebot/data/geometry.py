@@ -18,34 +18,29 @@ INFINITE = 1e20  # float("inf") doesn't work on windows.
 
 
 def angle(x0, y0, x1, y1):
-    """ Returns the angle between two points.
-    """
+    """Returns the angle between two points."""
     return degrees(atan2(y1 - y0, x1 - x0))
 
 
 def distance(x0, y0, x1, y1):
-    """ Returns the distance between two points.
-    """
+    """Returns the distance between two points."""
     return sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2))
 
 
 def coordinates(x0, y0, distance, angle):
-    """ Returns the location of a point by rotating around origin (x0,y0).
-    """
+    """Returns the location of a point by rotating around origin (x0,y0)."""
     return (x0 + cos(radians(angle)) * distance, y0 + sin(radians(angle)) * distance)
 
 
 def rotate(x, y, x0, y0, angle):
-    """ Returns the coordinates of (x,y) rotated around origin (x0,y0).
-    """
+    """Returns the coordinates of (x,y) rotated around origin (x0,y0)."""
     x, y = x - x0, y - y0
     a, b = cos(radians(angle)), sin(radians(angle))
     return (x * a - y * b + x0, y * a + x * b + y0)
 
 
 def reflect(x, y, x0, y0, d=1.0, a=180):
-    """ Returns the reflection of a point through origin (x0,y0).
-    """
+    """Returns the reflection of a point through origin (x0,y0)."""
     return coordinates(x0, y0, d * distance(x0, y0, x, y), a + angle(x0, y0, x, y))
 
 
@@ -60,8 +55,8 @@ except:
 
 
 def lerp(a, b, t):
-    """ Returns the linear interpolation between a and b for time t between 0.0-1.0.
-        For example: lerp(100, 200, 0.5) => 150.
+    """Returns the linear interpolation between a and b for time t between 0.0-1.0.
+    For example: lerp(100, 200, 0.5) => 150.
     """
     if t < 0.0:
         return a
@@ -71,9 +66,9 @@ def lerp(a, b, t):
 
 
 def smoothstep(a, b, x):
-    """ Returns a smooth transition between 0.0 and 1.0 using Hermite interpolation (cubic spline),
-        where x is a number between a and b. The return value will ease (slow down) as x nears a or b.
-        For x smaller than a, returns 0.0. For x bigger than b, returns 1.0.
+    """Returns a smooth transition between 0.0 and 1.0 using Hermite interpolation (cubic spline),
+    where x is a number between a and b. The return value will ease (slow down) as x nears a or b.
+    For x smaller than a, returns 0.0. For x bigger than b, returns 1.0.
     """
     if x < a:
         return 0.0
@@ -91,8 +86,8 @@ def clamp(v, a, b):
 
 
 def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
-    """ Determines the intersection point of two lines, or two finite line segments if infinite=False.
-        When the lines do not intersect, returns an empty list.
+    """Determines the intersection point of two lines, or two finite line segments if infinite=False.
+    When the lines do not intersect, returns an empty list.
     """
     # Based on: P. Bourke, http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
     ua = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
@@ -114,8 +109,8 @@ def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
 
 
 def circle_line_intersection(cx, cy, radius, x1, y1, x2, y2, infinite=False):
-    """ Returns a list of points where the circle and the line intersect.
-            Returns an empty list when the circle and the line do not intersect.
+    """Returns a list of points where the circle and the line intersect.
+    Returns an empty list when the circle and the line do not intersect.
     """
     # Based on: http://www.vb-helper.com/howto_net_line_circle_intersections.html
     dx = x2 - x1
@@ -153,12 +148,12 @@ def intersection(*args, **kwargs):
 
 
 def point_in_polygon(points, x, y):
-    """ Ray casting algorithm.
-        Determines how many times a horizontal ray starting from the point
-        intersects with the sides of the polygon.
-        If it is an even number of times, the point is outside, if odd, inside.
-        The algorithm does not always report correctly when the point is very close to the boundary.
-        The polygon is passed as a list of (x,y)-tuples.
+    """Ray casting algorithm.
+    Determines how many times a horizontal ray starting from the point
+    intersects with the sides of the polygon.
+    If it is an even number of times, the point is outside, if odd, inside.
+    The algorithm does not always report correctly when the point is very close to the boundary.
+    The polygon is passed as a list of (x,y)-tuples.
     """
     odd = False
     n = len(points)
@@ -180,9 +175,9 @@ def point_in_polygon(points, x, y):
 
 class AffineTransform:
     def __init__(self, transform=None):
-        """ A geometric transformation in Euclidean space (i.e. 2D)
-            that preserves collinearity and ratio of distance between points.
-            Linear transformations include rotation, translation, scaling, shear.
+        """A geometric transformation in Euclidean space (i.e. 2D)
+        that preserves collinearity and ratio of distance between points.
+        Linear transformations include rotation, translation, scaling, shear.
         """
         if isinstance(transform, AffineTransform):
             self.matrix = list(transform.matrix)
@@ -201,9 +196,9 @@ class AffineTransform:
     concat = append
 
     def _mmult(self, a, b):
-        """ Returns the 3x3 matrix multiplication of A and B.
-            Note that scale(), translate(), rotate() work with premultiplication,
-            e.g. the matrix A followed by B = BA and not AB.
+        """Returns the 3x3 matrix multiplication of A and B.
+        Note that scale(), translate(), rotate() work with premultiplication,
+        e.g. the matrix A followed by B = BA and not AB.
         """
         # No need to optimize (C version is just as fast).
         return [
@@ -219,8 +214,7 @@ class AffineTransform:
         ]
 
     def invert(self):
-        """ Multiplying a matrix by its inverse produces the identity matrix.
-        """
+        """Multiplying a matrix by its inverse produces the identity matrix."""
         m = self.matrix
         d = m[0] * m[4] - m[1] * m[3]
         self.matrix = [
@@ -260,16 +254,14 @@ class AffineTransform:
         self.matrix = self._mmult([c, s, 0, -s, c, 0, 0, 0, 1], self.matrix)
 
     def transform_point(self, x, y):
-        """ Returns the new coordinates of (x,y) after transformation.
-        """
+        """Returns the new coordinates of (x,y) after transformation."""
         m = self.matrix
         return (x * m[0] + y * m[3] + m[6], x * m[1] + y * m[4] + m[7])
 
     apply = transform_point
 
     def transform_path(self, path):
-        """ Returns a BezierPath object with the transformation applied.
-        """
+        """Returns a BezierPath object with the transformation applied."""
         p = path.__class__()  # Create a new BezierPath.
         for pt in path:
             if pt.cmd == "close":
@@ -333,8 +325,8 @@ class Point(object):
 
 class Bounds:
     def __init__(self, x, y, width, height):
-        """ Creates a bounding box.
-            The bounding box is an untransformed rectangle that encompasses a shape or group of shapes.
+        """Creates a bounding box.
+        The bounding box is an untransformed rectangle that encompasses a shape or group of shapes.
         """
         # context.Layer does not always have a width or height defined (i.e. infinite layer):
         if width == None:
@@ -355,20 +347,18 @@ class Bounds:
         return Bounds(self.x, self.y, self.width, self.height)
 
     def __iter__(self):
-        """ You can conveniently unpack bounds: x,y,w,h = Bounds(0,0,100,100)
-        """
+        """You can conveniently unpack bounds: x,y,w,h = Bounds(0,0,100,100)"""
         return (self.x, self.y, self.width, self.height).__iter__()
 
     def intersects(self, b):
-        """ Return True if a part of the two bounds overlaps.
-        """
+        """Return True if a part of the two bounds overlaps."""
         return max(self.x, b.x) < min(self.x + self.width, b.x + b.width) and max(
             self.y, b.y
         ) < min(self.y + self.height, b.y + b.height)
 
     def intersection(self, b):
-        """ Returns bounds that encompass the intersection of the two.
-            If there is no overlap between the two, None is returned.
+        """Returns bounds that encompass the intersection of the two.
+        If there is no overlap between the two, None is returned.
         """
         if not self.intersects(b):
             return None
@@ -381,8 +371,7 @@ class Bounds:
         )
 
     def union(self, b):
-        """ Returns bounds that encompass the union of the two.
-        """
+        """Returns bounds that encompass the union of the two."""
         mx, my = min(self.x, b.x), min(self.y, b.y)
         return Bounds(
             mx,
@@ -392,8 +381,7 @@ class Bounds:
         )
 
     def contains(self, *a):
-        """ Returns True if the given point or rectangle falls within the bounds.
-        """
+        """Returns True if the given point or rectangle falls within the bounds."""
         if len(a) == 2:
             a = [Point(a[0], a[1])]
         if len(a) == 1:

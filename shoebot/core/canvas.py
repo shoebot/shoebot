@@ -130,21 +130,17 @@ class Canvas(metaclass=abc.ABCMeta):
         """
         if self.size is None:
             self.size = size
-            return size
-        else:
-            return self.size
+        return self.size
 
     def get_width(self):
         if self.size is not None:
             return self.size[0]
-        else:
-            return self.DEFAULT_SIZE[0]
+        return self.DEFAULT_SIZE[0]
 
     def get_height(self):
         if self.size is not None:
             return self.size[1]
-        else:
-            return self.DEFAULT_SIZE[1]
+        return self.DEFAULT_SIZE[1]
 
     def _filename_with_framenumber(self, basename, frame):
         extension = Path(basename).suffix
