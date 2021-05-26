@@ -235,7 +235,6 @@ class ShoebotCmd(cmd.Cmd):
             self.pause_speed = self.bot._speed
             self.bot._speed = 0
             self.print_response("Paused")
-            print(self.pause_speed, self.bot._speed)
             return
 
         self.bot._speed = self.pause_speed
@@ -405,7 +404,6 @@ class ShoebotCmd(cmd.Cmd):
                 print(f"{msg}\n", file=self.stdout)
         except Exception:
             print("Invalid Syntax for set command")
-            return
 
     def precmd(self, line):
         """

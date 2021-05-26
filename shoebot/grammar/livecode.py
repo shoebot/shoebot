@@ -49,7 +49,6 @@ class LiveExecution(object):
         in the 'tenuous' state.
         """
         with LiveExecution.lock:
-            print("load edited source ", source)
             self.good_cb = good_cb
             self.bad_cb = bad_cb
             try:
