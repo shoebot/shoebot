@@ -52,9 +52,9 @@ copyright = u"2007-%s the Shoebot authors" % datetime.date.today().year
 # built documents.
 #
 # The short X.Y version.
-version = "1.3"
+version = "1.4"
 # The full version, including alpha/beta/rc tags.
-release = "1.3.1"
+release = "1.4-beta"
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.

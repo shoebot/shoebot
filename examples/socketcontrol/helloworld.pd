@@ -1,10 +1,10 @@
-#N canvas 523 145 372 561 10;
+#N canvas 1 59 958 1000 10;
 #X obj 217 139 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 4800 1;
+-1 -1 1400 1;
 #X obj 235 139 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 8600 1;
+-1 -1 11500 1;
 #X obj 253 139 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 7500 1;
+-1 -1 12700 1;
 #X msg 218 447 disconnect;
 #X obj 27 482 netsend;
 #X floatatom 27 505 5 0 0 0 - - -;
@@ -20,9 +20,9 @@
 #X text 39 46 1 Run examples/helloworld.bot with Shoebot;
 #X text 57 65 sbot -ws -dv examples/helloworld.bot;
 #X msg 72 446 connect localhost 7777;
-#X msg 253 291 send three=\$1;
-#X msg 235 311 send two=\$1;
-#X msg 217 334 send one=\$1;
+#X msg 253 291 send blue=\$1;
+#X msg 235 311 send green=\$1;
+#X msg 217 334 send red=\$1;
 #X connect 0 0 19 0;
 #X connect 1 0 18 0;
 #X connect 2 0 17 0;
