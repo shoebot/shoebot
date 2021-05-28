@@ -217,6 +217,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
             f(r_context)
 
         super().rendering_finished(size, frame, r_context)
+        self.pending_snapshots = []
 
     def create_rcontext(self, size, frame):
         """
@@ -268,8 +269,9 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         :return:  Full image filename, based on bot name
         """
         script = self.bot._namespace["__file__"]
+        frame = self.bot._namespace["ITERATION"]
         if script:
-            return f"{Path(script).stem}.{format}"
+            return f"{Path(script).stem}-{frame:04}.{format}"
 
         return f"output.{format}"
 
