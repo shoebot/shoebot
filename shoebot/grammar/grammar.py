@@ -60,8 +60,14 @@ class Grammar(object):
             )
         self._input_device = input_device
 
-    def _update_animation_variables(self, frame):
+    def _update_animation_variables(self, iteration, frame):
+        """
+        :param iteration: Increases by one every time the bot code is executed.
+        :param frame: If speed > 0 increases by one each time the bot code is executed.
+                      If speed is negative then decreases each time the bot code is executed.
+        """
         # Update bot variables that change on each animation frame.
+        self._namespace["ITERATION"] = iteration
         self._namespace["FRAME"] = frame
         self._namespace["PAGENUM"] = frame
 
@@ -84,21 +90,6 @@ class Grammar(object):
         namespace["__file__"] = filename
 
     #### Execute a single frame
-
-    def _should_run(self, iteration, max_iterations):
-        """ Return False if bot should quit """
-        if iteration == 0:
-            # First frame always runs.
-            return True
-        if max_iterations:
-            # Run if this isn't the last frame.
-            return iteration < max_iterations
-        elif max_iterations is None:
-            # Run forever if this isan animation, otherwise stop.
-            return self._dynamic
-
-        # Time to stop running.
-        return False
 
     def _calculate_frame_delay(self, speed, start_time):
         """
@@ -141,16 +132,16 @@ class Grammar(object):
 
         try:
             # Iterations only increment, whereas FRAME can decrement if the user sets a negative speed.
-            iterations = 0
+            iteration = 0
             first_run = True
-            while first_run or iterations != max_iterations:
+            while first_run or iteration != max_iterations:
                 # Main loop:
                 # - Setup bot on first run.
                 # - Run draw function for if present.
                 # - Process events
                 # - Update state
                 start_time = time()
-                iterations += 1
+                iteration += 1
 
                 canvas_dirty = False
                 # Reset output graphics state
@@ -168,6 +159,10 @@ class Grammar(object):
                         executor.run()
                         if "setup" in executor.ns:
                             executor.ns["setup"]()
+
+                        if "draw" in executor.ns:
+                            if self._speed is None:
+                                self._speed = DEFAULT_ANIMATION_SPEED
 
                         # Store initial state so script can revert to a known state when livecoding.
                         self._initial_namespace = copy.copy(self._namespace)
@@ -201,7 +196,7 @@ class Grammar(object):
 
                 # Handle events
                 continue_running, first_run = self._handle_events(
-                    is_animation, next_frame_due
+                    iteration, is_animation, next_frame_due
                 )
                 if not continue_running:
                     # Event handler returns False if it receives a message to quit.
@@ -222,7 +217,7 @@ class Grammar(object):
             sys.stderr.write(f"{errmsg}\n")
             return False
 
-    def _handle_events(self, is_animation, next_frame_due):
+    def _handle_events(self, iteration, is_animation, next_frame_due):
         """
         The Shoebot mainloop, GUI and shell communicate with each other using events.
 
@@ -295,7 +290,7 @@ class Grammar(object):
                     self._frame += 1
                 elif self._speed < 0:
                     self._frame -= 1
-            self._update_animation_variables(self._frame)
+            self._update_animation_variables(iteration, self._frame)
 
         # By default return continue_running=True.
         return True, restart_bot
