@@ -22,8 +22,8 @@ Shoebot is a port/rewrite of [Nodebox
 [DrawBot](http://drawbot.com). The playful coding philosophy of
 [Shoes](http://shoesrb.com/)  also inspired its development. Thus, "Shoebot".   
 
-* [How to install](http://docs.shoebot.net/en/latest/install.html)
-* [Getting started](https://docs.shoebot.net/en/latest/getstarted.html)
+* [How to install](https://docs.shoebot.net/install.html)
+* [Getting started](https://docs.shoebot.net/getstarted.html)
 
 ## Documentation
 
