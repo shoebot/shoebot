@@ -61,6 +61,7 @@ class Variable:
         self.value = kwargs.get("value", self.default)
         if self.value is None and self.default is not None:
             self.value = self.default
+        self.label = kwargs.get("label") or self.name.replace("_", " ").capitalize()
 
     def sanitize(self, val):
         """Given a Variable and a value, cleans it out."""
