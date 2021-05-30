@@ -17,11 +17,7 @@ BOOLEAN = 3
 BUTTON = 4
 
 
-def pretty_name(name):
-    return (name or "").replace("_", " ").capitalize()
-
-
-class VarWindow:
+class VarWindow(object):
     def __init__(self, parent, bot, title=None):
         self.parent = parent
         self.bot = bot
@@ -79,7 +75,7 @@ class VarWindow:
     def add_number(self, v):
         # create a slider for each var
         sliderbox = Gtk.HBox(homogeneous=False, spacing=0)
-        label = Gtk.Label(pretty_name(v.name))
+        label = Gtk.Label(v.label)
         sliderbox.pack_start(label, False, True, 20)
 
         if v.min != v.max:
@@ -102,7 +98,7 @@ class VarWindow:
 
     def add_text(self, v):
         textcontainer = Gtk.HBox(homogeneous=False, spacing=0)
-        label = Gtk.Label(pretty_name(v.name))
+        label = Gtk.Label(v.label)
         textcontainer.pack_start(label, False, True, 20)
 
         entry = Gtk.Entry()
@@ -115,7 +111,7 @@ class VarWindow:
 
     def add_boolean(self, v):
         buttoncontainer = Gtk.HBox(homogeneous=False, spacing=0)
-        button = Gtk.CheckButton(label=pretty_name(v.name))
+        button = Gtk.CheckButton(label=v.label)
         button.set_active(v.value)
         # we send the state of the button to the callback method
         button.connect("toggled", self.widget_changed, v)
@@ -135,7 +131,7 @@ class VarWindow:
             func = self.bot._namespace[func_name]
             func()
 
-        button = Gtk.Button(label=pretty_name(v.name))
+        button = Gtk.Button(label=v.label)
         button.connect("clicked", call_func, None)
         buttoncontainer.pack_start(button, True, True, 0)
         self.container.pack_start(buttoncontainer, True, True, 0)
