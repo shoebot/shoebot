@@ -5,12 +5,12 @@ Shapes
   - :ref:`rectmode() <rectmode()>`
   - :ref:`ellipse() <ellipse()>`
   - :ref:`ellipsemode() <ellipsemode()>`
-  - :ref:`line() <background()>`
-  - :ref:`arc() <background()>`
+  - :ref:`line() <line()>`
+  - :ref:`arc() <arc()>`
   - :ref:`arrow() <arrow()>`
   - :ref:`star() <star()>`
 
-  
+
 .. _rect():
 .. py:function:: rect(x, y, width, height, roundness=0, draw=True)
 

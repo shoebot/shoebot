@@ -32,8 +32,8 @@ Shoebot default is 300x300px.
   - :ref:`rectmode() <rectmode()>`
   - :ref:`ellipse() <ellipse()>`
   - :ref:`ellipsemode() <ellipsemode()>`
-  - :ref:`line() <background()>`
-  - :ref:`arc() <background()>`
+  - :ref:`line() <line()>`
+  - :ref:`arc() <arc()>`
   - :ref:`arrow() <arrow()>`
   - :ref:`star() <star()>`
 
