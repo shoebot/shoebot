@@ -42,7 +42,7 @@ def main():
         result = subprocess.call(cmd, shell=True)
 
         fileglob = tmpdirpath / "*.png"
-        cmd = f"ffmpeg -loglevel 8 -r 30 -f image2 -pattern_type glob \
+        cmd = f"ffmpeg -y -loglevel 24 -r 30 -f image2 -pattern_type glob \
           -i '{fileglob}' -c:v libx264 -crf 20 -movflags faststart -c:a aac \
           -pix_fmt yuv420p {outfile}"
         subprocess.call(cmd, shell=True)
