@@ -1,5 +1,3 @@
-import os
-import shutil
 import argparse
 import subprocess
 import tempfile
@@ -40,6 +38,8 @@ def main():
         cmd = f"sbot {args.script} --repeat {args.framenumber} \
             --outputfile {image_name}"
         result = subprocess.call(cmd, shell=True)
+        if result != 0:
+            sys.exit(1)
 
         fileglob = tmpdirpath / "*.png"
         cmd = f"ffmpeg -loglevel 8 -r 30 -f image2 -pattern_type glob \
