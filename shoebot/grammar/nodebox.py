@@ -881,16 +881,16 @@ class NodeBot(Bot):
         txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
         return txt.bounds
 
-    def textwidth(self, txt, width=None):
+    def textwidth(self, txt, width=None, **kwargs):
         """Returns the width of a string of text according to the current
         font settings.
 
         :return:
         """
         w = width
-        return self.textmetrics(txt, width=w)[0]
+        return self.textmetrics(txt, width=w, **kwargs)[0]
 
-    def textheight(self, txt, width=None):
+    def textheight(self, txt, width=None, **kwargs):
         """Returns the height of a string of text according to the current
         font settings.
 
@@ -898,7 +898,7 @@ class NodeBot(Bot):
         :param width: width of a line of text in a block
         """
         w = width
-        return self.textmetrics(txt, width=w)[1]
+        return self.textmetrics(txt, width=w, **kwargs)[1]
 
     def lineheight(self, height=None):
         """Set text lineheight.

@@ -165,7 +165,7 @@ class Image(Grob, ColorMixin):
         """Returns the center point of the path, disregarding transforms."""
         x = self.x + self.width / 2
         y = self.y + self.height / 2
-        return (x, y)
+        return x, y
 
     center = property(_get_center)
 
