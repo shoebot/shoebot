@@ -3,7 +3,8 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD = $(shell which sphinx-build)
+SPHINXBUILD   = $(shell which sphinx-build)
+SPHINXPROJ    = shoebot
 PAPER         =
 
 # Internal variables.
@@ -24,7 +25,7 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 
 clean:
-	-rm -rf build/* build-images/*
+	-rm -rf build/*
 
 html:
 	mkdir -p build/html build/doctrees
