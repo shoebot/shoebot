@@ -1009,8 +1009,7 @@ class ShoebotEditorWindow(Gtk.Window):
         )
         self.set_title(window_title)
 
-    def cursor_set_callback(self, buffer, location, mark):
-
+    def cursor_set_callback(self, **kwargs):
         # TODO: here should go the line syntax highlighter
         # 1. get buffer
         #      get modification state

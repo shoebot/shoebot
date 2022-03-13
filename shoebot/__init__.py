@@ -51,17 +51,6 @@ CORNERS = "corners"
 
 NODEBOX = "nodebox"
 
-
-def _save():
-    # Dummy function used by color lib; TODO investigate if this can be implemented
-    pass
-
-
-def _restore():
-    # Dummy function used by color lib; TODO investigate if this can be implemented
-    pass
-
-
 # Convenience functions to create a bot, its canvas and sink
 
 
@@ -184,6 +173,7 @@ def create_bot(
         from shoebot.sbio import SocketServer
 
         socket_server = SocketServer(bot, "", port=port)
+
     return bot
 
 

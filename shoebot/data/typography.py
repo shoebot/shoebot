@@ -29,7 +29,6 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import sys
 from collections import namedtuple
-from enum import Enum
 
 from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
 
@@ -40,40 +39,9 @@ from .basecolor import ColorMixin
 from .bezier import BezierPath
 from .grob import Grob
 
-try:
-    gi.require_version("Pango", "1.0")
-    gi.require_version("PangoCairo", "1.0")
-    from gi.repository import Pango, PangoCairo
-except ValueError as no_pango:
-    global Pango, PangoCairo
-
-    # workaround for readthedocs where Pango is not installed,
-    print(_("Pango not found - typography will not be available."), file=sys.stderr)
-
-    class FakePango(object):
-        class Weight(Enum):
-            # Weights copied from PangoWeight
-            THIN = 100
-            ULTRALIGHT = 200
-            LIGHT = 300
-            SEMILIGHT = 350
-            BOOK = 380
-            NORMAL = 400
-            MEDIUM = 500
-            SEMIBOLD = 600
-            BOLD = 700
-            ULTRABOLD = 800
-            HEAVY = 900
-            ULTRAHEAVY = 1000
-
-        def __getattr__(self, item):
-            if item == "Weight":
-                return FakePango.Weight
-
-            raise NotImplementedError("FakePango does not implement %s" % item)
-
-    Pango = FakePango()
-    PangoCairo = FakePango()
+gi.require_version("Pango", "1.0")
+gi.require_version("PangoCairo", "1.0")
+from gi.repository import Pango, PangoCairo
 
 
 # Pango Utility functions
@@ -102,7 +70,6 @@ def _alignment_name_to_pango(alignment):
         return Pango.Alignment.CENTER
     elif alignment == "justify":
         return Pango.Alignment.LEFT
-
     return Pango.Alignment.LEFT
 
 

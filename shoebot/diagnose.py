@@ -136,7 +136,7 @@ def test_imports():
     )
 
 
-def shoebot_example(**shoebot_kwargs):
+def shoebot_example(**kwargs):
     """
     Decorator to run some code in a bot instance.
     """
