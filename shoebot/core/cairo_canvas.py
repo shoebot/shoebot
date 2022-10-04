@@ -57,8 +57,7 @@ class CairoCanvas(Canvas):
     def get_input_device(self):
         if isinstance(self.sink, InputDeviceMixin):
             return self.sink
-        else:
-            return None
+        return None
 
     def reset_drawqueue(self):
         self._drawqueue = self.initial_drawqueue()
@@ -199,8 +198,7 @@ class CairoCanvas(Canvas):
             return output_context
         elif isinstance(target, cairo.Surface):
             return output_surface
-        else:
-            return output_file
+        return output_file
 
     def ctx_render_background(self, cairo_ctx):
         """

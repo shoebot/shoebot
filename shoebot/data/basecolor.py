@@ -53,7 +53,7 @@ class Color(object):
             args = args[0]
 
         # No values or None, transparent black.
-        if len(args) == 0 or (len(args) == 1 and args[0] is None):
+        if len(args) in (0,1) and args[0] is None:
             self.r, self.g, self.b, self.a = 0, 0, 0, 0
 
         # One value, another color object.
@@ -185,11 +185,11 @@ class Color(object):
     # end added
 
     def __setattr__(self, a, v):
-        if a in ["a", "alpha"]:
+        if a in ("a", "alpha"):
             self.__dict__["__" + a[0]] = max(0, min(v, 1))
 
         # RGB changes, update HSB accordingly.
-        elif a in ["r", "g", "b", "red", "green", "blue"]:
+        elif a in ("r", "g", "b", "red", "green", "blue"):
             self.__dict__["__" + a[0]] = max(0, min(v, 1))
             if self._hasattrs(("__r", "__g", "__b")):
                 r, g, b = (
@@ -200,7 +200,7 @@ class Color(object):
                 self._update_hsb(*rgb2hsb(r, g, b))
 
         # HSB changes, update RGB accordingly.
-        elif a in ["h", "s", "hue", "saturation", "brightness"]:
+        elif a in ("h", "s", "hue", "saturation", "brightness"):
             if a != "brightness":
                 a = a[0]
             if a == "h":
@@ -218,17 +218,15 @@ class Color(object):
             self.__dict__[a] = v
 
     def __getattr__(self, a):
-
         """Available properties:
         r, g, b, a or red, green, blue, alpha
         h, s or hue, saturation, brightness
-
         """
         if a in self.__dict__:
             return a
         elif a == "brightness":
             return self.__dict__["__brightness"]
-        elif a in [
+        elif a in (
             "a",
             "alpha",
             "r",
@@ -241,9 +239,9 @@ class Color(object):
             "s",
             "hue",
             "saturation",
-        ]:
+        ):
             return self.__dict__["__" + a[0]]
-        elif a in [
+        elif a in (
             "a",
             "alpha",
             "r",
@@ -256,7 +254,7 @@ class Color(object):
             "s",
             "hue",
             "saturation",
-        ]:
+        ):
             return self.__dict__["__" + a[0]]
 
         raise AttributeError(

@@ -220,7 +220,6 @@ class BezierPath(Grob, ColorMixin):
     def copy(self):
         path = BezierPath(
             bot=self._bot,
-            path=None,
             fill=self._fillcolor,
             fillrule=self._fillrule,
             stroke=self._strokecolor,
@@ -508,10 +507,8 @@ class BezierPath(Grob, ColorMixin):
                 break
             else:
                 t -= segments[i]
-        try:
+        with suppress(ZeroDivisionError):
             t /= segments[i]
-        except ZeroDivisionError:
-            pass
         if i == len(segments) - 1 and segments[i] == 0:
             i -= 1
         return (i, t, closeto)
@@ -532,7 +529,7 @@ class BezierPath(Grob, ColorMixin):
             raise PathError("The given path is empty")
 
         if self._segments is None:
-            self._segments = self._get_length(segmented=True, precision=10)
+            self._segments = self._get_length(segmented=True)
 
         i, t, closeto = self._locate(t, segments=self._segments)
         x0, y0 = self[i].x, self[i].y
@@ -631,19 +628,18 @@ class BezierPath(Grob, ColorMixin):
         out_y = out_c1y * mint + out_c2y * t
         if not handles:
             return (out_x, out_y, out_c1x, out_c1y, out_c2x, out_c2y)
-        else:
-            return (
-                out_x,
-                out_y,
-                out_c1x,
-                out_c1y,
-                out_c2x,
-                out_c2y,
-                x01,
-                y01,
-                x23,
-                y23,
-            )
+        return (
+            out_x,
+            out_y,
+            out_c1x,
+            out_c1y,
+            out_c2x,
+            out_c2y,
+            x01,
+            y01,
+            x23,
+            y23,
+        )
 
     def _curvelength(self, x0, y0, x1, y1, x2, y2, x3, y3, n=20):
         """Returns the length of the spline.
@@ -730,8 +726,7 @@ class BezierPath(Grob, ColorMixin):
         # Originally from nodebox-gl
         if not segmented:
             return sum(self._segment_lengths(n=precision), 0.0)
-        else:
-            return self._segment_lengths(relative=True, n=precision)
+        return self._segment_lengths(relative=True, n=precision)
 
     def _get_elements(self):
         """

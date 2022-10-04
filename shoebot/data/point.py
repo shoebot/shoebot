@@ -11,7 +11,7 @@ class Point(object):
             self.x, self.y = args
         elif len(args) == 1:
             self.x, self.y = args[0]
-        elif len(args) == 0:
+        elif not len(args):
             self.x = self.y = 0.0
         else:
             raise ValueError(_("Wrong initializer for Point object"))

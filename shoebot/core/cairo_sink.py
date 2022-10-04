@@ -76,8 +76,7 @@ class CairoImageSink(DrawQueueSink):
         elif self.multifile:
             file_root, file_ext = os.path.splitext(self.filename)
             return file_root + "_%03d" % frame + file_ext
-        else:
-            return self.filename
+        return self.filename
 
     def create_rcontext(self, size, frame):
         """

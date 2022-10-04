@@ -69,17 +69,13 @@ def openAnything(source, searchpaths=None):
     # try to open with urllib (if source is http, ftp, or file URL)
     import urllib.request, urllib.parse, urllib.error
 
-    try:
+    with suppress((IOError, OSError)):
         return urllib.request.urlopen(source)
-    except (IOError, OSError):
-        pass
 
     # try to open with native open function (if source is pathname)
     for path in searchpaths or ["."]:
-        try:
+        with suppress((IOError, OSError)):
             return open(os.path.join(path, source))
-        except (IOError, OSError):
-            pass
 
     # treat source as string
     import io

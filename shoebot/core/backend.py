@@ -56,10 +56,8 @@ class BackendMixin(object):
             setattr(self, "has_%s" % name, has_module)
 
         for name in module_names:
-            try:
+            with suppress(ImportError):
                 return name, __import__(name)
-            except ImportError:
-                pass
         raise ImportError(
             "No %s Implementation found, tried: %s"
             % (impl_name, " ".join(module_names))
@@ -122,8 +120,7 @@ class CairoGIBackend(BackendMixin):
             )
 
             return _UNSAFE_cairocffi_context_to_pycairo(ctx)
-        else:
-            return ctx
+        return ctx
 
 
 def get_driver_options():

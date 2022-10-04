@@ -154,15 +154,15 @@ def shoebot_example(**shoebot_kwargs):
                 f(bot)
                 bot.finish()
                 print("        [passed] : %s" % outputfile)
-                print("")
+                print()
             except ShoebotInstallError as e:
                 print("        [failed]", e.args[0])
-                print("")
+                print()
             except Exception:
                 print("        [failed] - traceback:")
                 for line in traceback.format_exc().splitlines():
                     print("    %s" % line)
-                print("")
+                print()
 
         return run
 

@@ -36,7 +36,6 @@ def simple_traceback(ex, source):
             line = linecache.getline(fn, i + 1)
         err_msgs.append("%s: %s" % (i + 1, line.rstrip()))
     err_msgs.append("  %s^ %s" % (len(str(i)) * " ", exc[-1].rstrip()))
-
     err_msgs.append("")
 
     # traceback
