@@ -181,11 +181,13 @@ setup(
     packages=find_packages(exclude=["tests*", "extensions"]),
     data_files=datafiles,
     setup_requires=[PYCAIRO],
+    extras_require={
+        "test": ["parameterized", "pyyaml", "wrapt"],
+    },
     install_requires=requirements(
         debug="install" in sys.argv,
         with_pgi=os.environ.get("SHOEBOT_GI", False) == "pgi",
     ),
-    tests_require=["parameterized", "pyyaml", "wrapt"],
     entry_points={
         "console_scripts": [
             "sbot=shoebot.run:main",
@@ -194,5 +196,4 @@ setup(
         ],
         "gui_scripts": "shoebot=shoebot.ide.ide:main",
     },
-    test_suite="tests.unittests",
 )

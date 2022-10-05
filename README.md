@@ -36,8 +36,9 @@ following the [install steps](https://docs.shoebot.net/install.html), create a
 [new issue](https://github.com/shoebot/shoebot/issues/new) and paste the output
 of the following commands:
 
+    python3 -mpip install shoebot[test]
     python3 setup.py diagnose
-    python3 setup.py test
+    python3 -m unittest
 
 This will help us diagnose common issues more quickly.
 
