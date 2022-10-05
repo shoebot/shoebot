@@ -11,6 +11,7 @@ Other new features:
 - Commands that set state (like fill() or font()) now always return its current value
 - image() can properly load SVG files (#277)
 - Add (x,y) coordinates to closepath() (#287)
+- Have textwidth() and textheight() accept keyword args like textmetrics()
 - The dependency install script was improved and has added support for Homebrew, Manjaro, Arch (thanks to @villares for help and testing) and MINGW64 (thanks to @speters33w for help and testing) (#312)
 - Significant speedups by removing unnecessary waits (#372)
 - Windows/Mingw64: working Gedit extension
@@ -21,8 +22,10 @@ Cleanups:
 - Remove the Drawbot mode (never properly implemented) (#375)
 
 Bug fixes:
+- Fix duplicate snapshot saving (#413)
 - Error codes are properly output on exit (#284 #374)
 - Fix unstroked shapes being rendered as bitmaps (#359)
+- Properly show error logs on video export
 - Fix line() being a closed path
 - Fix crash when using HSB colors
 - Fix L-System library bugs (#290)
