@@ -28,6 +28,7 @@ Use setup.py diagnose to output the current graphics settings.
 
 import os
 import sys
+from contextlib import suppress
 
 
 class BackendMixin(object):

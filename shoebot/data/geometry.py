@@ -7,6 +7,7 @@
 # License: GPL (see LICENSE.txt for details).
 # Copyright (c) 2008 City In A Bottle (cityinabottle.org)
 
+from contextlib import suppress
 from math import sqrt, pow
 from math import sin, cos, atan2, degrees, radians, pi
 
@@ -45,8 +46,8 @@ def reflect(x, y, x0, y0, d=1.0, a=180):
 
 
 # Fast C implementations:
-with suppress():
-    from nodebox.ext.geometry_math import angle, distance, coordinates, rotate
+# with suppress():
+    # from nodebox.ext.geometry_math import angle, distance, coordinates, rotate
 
 
 # --- INTERPOLATION -----------------------------------------------------------------------------------
