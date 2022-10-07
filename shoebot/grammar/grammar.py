@@ -167,6 +167,7 @@ class Grammar(object):
                         # Store initial state so script can revert to a known state when livecoding.
                         self._initial_namespace = copy.copy(self._namespace)
                         canvas_dirty = True
+                        first_run = False
 
                     is_animation = "draw" in executor.ns
                     if is_animation and self._speed != 0:
@@ -195,7 +196,7 @@ class Grammar(object):
                     next_frame_due = time()
 
                 # Handle events
-                continue_running, first_run = self._handle_events(
+                continue_running, restart = self._handle_events(
                     iteration, is_animation, next_frame_due
                 )
                 if not continue_running:
@@ -227,14 +228,13 @@ class Grammar(object):
         This handler waits for events and updates where needed, the loop also
         serves handles the delay between frames for animated bots.
 
+        This allows the caller to act based on events:
+        - Continue running
+        - Whether to quit
+        - Whether to restart (e.g. re-run and re-render)
+
         return: continue_running, restart
         """
-
-        # Things we might want to do on returning:
-        # Restart (if state has changed and not an animation).
-        # Quit
-        # Continue running.
-
         restart_bot = False
         while True:
             timeout = min(next_frame_due - time(), 0.1)
@@ -273,8 +273,8 @@ class Grammar(object):
                     self._executor.ns[event.data.name] = event.data.value
                     # TODO: State was updated, bot needs to execute again ???
                     if not is_animation:
-                        # On non-animated bots, updating variables re-runs the whole
-                        # whole bot so that the user may see the updated state.
+                        # On non-animated bots, updating variables re-runs the
+                        # bot so that the user may see the updated state.
                         return True, True
 
             if time() >= next_frame_due:
