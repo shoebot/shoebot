@@ -80,7 +80,7 @@ def sort_by_preference(options, prefer):
     """
     if not prefer:
         return options
-    return sorted(options, key=lambda x: (prefer + options).index(x))
+    return sorted(options, key=(prefer + options).index)
 
 
 class CairoGIBackend(BackendMixin):

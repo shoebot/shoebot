@@ -18,7 +18,7 @@ gi.require_version("GtkSource", "3.0")
 
 from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Pango
 
-DEBUG = os.environ.get("SHOEBOT_DEBUG_IDE", "0").lower() in ["1", "yes", "true"]
+DEBUG = os.environ.get("SHOEBOT_DEBUG_IDE", "0").lower() in ("1", "yes", "true")
 
 APP = "shoebot"
 LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
@@ -171,7 +171,7 @@ class SourceBuffer(GtkSource.Buffer):
             print(f"Triple click at char {char_index} tag `{tag_name}'\n")
         elif event.type == Gdk.BUTTON_RELEASE:
             print(f"Button release at char {char_index} tag `{tag_name}'\n")
-        elif event.type == Gdk.KEY_PRESS or event.type == Gdk.KEY_RELEASE:
+        elif event.type in (Gdk.KEY_PRESS, Gdk.KEY_RELEASE):
             print(f"Key event at char {char_index} tag `{tag_name}'\n")
         return False
 
@@ -782,7 +782,7 @@ class ShoebotEditorWindow(Gtk.Window):
         self.console_error.clear()
 
     def search_dialog_handler(self, dialog, search_direction):
-        if search_direction not in [SEARCH_FORWARD, SEARCH_BACKWARD]:
+        if search_direction not in (SEARCH_FORWARD, SEARCH_BACKWARD):
             dialog.destroy()
             return
 
@@ -1133,7 +1133,7 @@ class ShoebotEditorWindow(Gtk.Window):
 class ShoebotIDE:
     colormap = None
     untitled_file_counter = 0
-    editor_windows = list()
+    editor_windows = []
 
     dark_theme = (
         Gtk.Settings.get_default().get_property("gtk-theme-name").endswith("-dark")
@@ -1194,8 +1194,7 @@ class ShoebotIDE:
         cls.untitled_file_counter += 1
         if cls.untitled_file_counter == 1:
             return _("Untitled")
-        else:
-            return _("Untitled #%d") % cls.untitled_file_counter
+        return _("Untitled #%d") % cls.untitled_file_counter
 
     @property
     def source_buffer(self):
