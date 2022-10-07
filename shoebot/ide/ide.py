@@ -841,7 +841,7 @@ class ShoebotEditorWindow(Gtk.Window):
             "Stuart Axon <stuaxo2 AT yahoo.com>",
             "Tetsuya Saito <t2psyto AT gmail.com>",
         ]
-        about_dialog.set_version("1.4-beta")
+        about_dialog.set_version("1.4")
         about_dialog.set_name("shoebot")
         about_dialog.set_license("GPLv3")
         about_dialog.set_authors(authors)

@@ -2,7 +2,7 @@ PYTHON=`which python`
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/shoebot
 PROJECT=shoebot
-VERSION=1.4-beta
+VERSION=1.4
 
 all:
 	@echo "make source - Create source package"

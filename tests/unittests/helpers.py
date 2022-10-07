@@ -167,7 +167,7 @@ class ShoebotTestCase(TestCase):
     def assertBoundingBoxAlmostEqual(
         self, expected_bounds, actual_bounds, threshold=2.0
     ):
-        """"""
+        """Given a two bounding boxes (x1, y1, x2, y2) assert they are within threshold of each other."""
         if expected_bounds == actual_bounds:
             return
 
@@ -234,12 +234,33 @@ class ShoebotTestCase(TestCase):
             size, Path(filename).stat().st_size, f"{filename} is zero bytes."
         )
 
-    @staticmethod
-    def run_code(code, outputfile, windowed=False, namespace=None, verbose=True, run_forever=False):
+    def run_code(
+        self,
+        code,
+        outputfile,
+        windowed=False,
+        namespace=None,
+        verbose=True,
+        run_forever=False,
+    ):
         """
         Run shoebot code, sets random.seed to stabilize output.
+
+        Bots run with windowed=True will set the window title to be the fully qualified test name
+        this is to help identify tests that get stuck.
         """
-        bot = create_bot(window=windowed, outputfile=outputfile, namespace=namespace)
+        if windowed:
+            # Note: title grabs internal attribute _testMethodName.
+            # Setting the window title can be useful when debugging a test bot that gets stuck.
+            title = (
+                f"{type(self).__module__}.{type(self).__name__}.{self._testMethodName}"
+            )
+        else:
+            title = None
+
+        bot = create_bot(
+            window=windowed, outputfile=outputfile, namespace=namespace, title=title
+        )
 
         seed(0)
         bot.run(code, verbose=verbose, run_forever=run_forever)

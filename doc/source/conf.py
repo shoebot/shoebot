@@ -54,7 +54,7 @@ copyright = u"2007-%s the Shoebot authors" % datetime.date.today().year
 # The short X.Y version.
 version = "1.4"
 # The full version, including alpha/beta/rc tags.
-release = "1.4-beta"
+release = "1.4"
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
