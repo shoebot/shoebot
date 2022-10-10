@@ -126,7 +126,7 @@ BASE_REQUIREMENTS = [
     "setuptools>=18.8",
     PYCAIRO,
     "Pillow>=6.0.0",
-    "pubsub==0.1.2",
+    "pypubsub>=4.0.3",
     "wrapt>=1.12.1",
 ]
 

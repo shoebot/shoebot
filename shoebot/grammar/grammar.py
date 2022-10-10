@@ -6,12 +6,14 @@ import os
 import sys
 import traceback
 from math import copysign
+from queue import Queue, Empty
 from time import sleep, time
+
+import pubsub.core
+from pubsub import pub
 
 from .livecode import LiveExecution
 from shoebot.core.events import (
-    event_is,
-    next_event,
     QUIT_EVENT,
     SET_WINDOW_TITLE_EVENT,
     SOURCE_CHANGED_EVENT,
@@ -43,11 +45,12 @@ class Grammar(object):
 
     def __init__(self, canvas, namespace=None, vars=None):
         self._canvas = canvas
-        self._dynamic = True  ##
+        self._dynamic = True
         self._speed = None
         self._vars = vars or {}
         self._oldvars = self._vars
         self._namespace = namespace or {}
+        self._event_queue = Queue()
 
         input_device = canvas.get_input_device()
         if input_device:
@@ -110,6 +113,17 @@ class Grammar(object):
         frame_limiter=False,
         verbose=False,
     ):
+        def message_listener(event=None):
+            """
+            Shoebot uses a pub/sub architecture to communicate between the different components such
+            as the bot, GUI and command interface.
+
+            This function is called when a message is received, it is put on a queue.
+            """
+            self._event_queue.put_nowait(event)
+
+        pub.subscribe(message_listener, "shoebot")
+
         if os.path.isfile(inputcode):
             source = open(inputcode).read()
             filename = inputcode
@@ -203,6 +217,7 @@ class Grammar(object):
                     # Event handler returns False if it receives a message to quit.
                     break
 
+            pub.unsubscribe(message_listener, "shoebot")
             # Main loop has finished, return True to indicate it exited normally.
             return True
         except Exception as e:
@@ -238,9 +253,10 @@ class Grammar(object):
         restart_bot = False
         while True:
             timeout = min(next_frame_due - time(), 0.1)
-            event = next_event(
-                block=timeout > 0, timeout=timeout if timeout > 0 else None
-            )
+            try:
+                event = self._event_queue.get(block=timeout > 0, timeout=timeout if timeout > 0 else None)
+            except Empty:
+                event = None
             # Update GUI, which may in-turn generate new events.
             self._canvas.sink.main_iteration()
 
@@ -263,7 +279,10 @@ class Grammar(object):
                     # delete and then add
                     while event and event.type == SOURCE_CHANGED_EVENT:
                         # TODO, can this be handled differently (non-blocking or just ignore source that is the same?)
-                        event = next_event(block=True, timeout=0.001)
+                        try:
+                            event = self._event_queue.get(block=True, timeout=0.001)
+                        except Empty:
+                            break
                     if not is_animation:
                         return True, True
                 elif event.type == VARIABLE_CHANGED_EVENT:

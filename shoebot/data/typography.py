@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+import gettext
+import locale
 # This file is part of Shoebot.
 # Copyright (C) 2007-2009 the Shoebot authors
 # See the COPYING file for the full license text.
@@ -39,6 +40,14 @@ from shoebot.util import ShoebotInstallError, _copy_attrs
 from .basecolor import ColorMixin
 from .bezier import BezierPath
 from .grob import Grob
+
+APP = "shoebot"
+LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
+
+locale.setlocale(locale.LC_ALL, "")
+gettext.bindtextdomain(APP, LOCALE_DIR)
+gettext.textdomain(APP)
+_ = gettext.gettext
 
 try:
     gi.require_version("Pango", "1.0")
