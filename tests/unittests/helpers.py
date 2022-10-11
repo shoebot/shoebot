@@ -24,6 +24,12 @@ EXAMPLE_OUTPUT_DIR = TEST_DIR / "output/examples"
 RUNNING_IN_CI = "CI" in environ
 
 
+class NotSet:
+    """
+    Sentinel value, so that None can be explicitly set.
+    """
+    pass
+
 def stub_sideeffect():
     # Stubs are here to give IDEs something to import without complaining.
     NotImplementedError("This dummy stub should not be used directly.")
@@ -78,7 +84,18 @@ def shoebot_named_testclass(cls, num, params_dict):
     return f"{cls.__name__}{suffix}"
 
 
-def test_as_bot(outputfile=None, windowed=None, verbose=True):
+def test_as_bot(outputfile=NotSet, windowed=None, verbose=True):
+    if outputfile is NotSet:
+        # if outputfile is None it defaults to output.svg, by using
+        # a sentinel value it can be checked and set to /tmp/output.svg
+        # instead.
+        # This is a bit of a hack, since the default isn't stored in a constant
+        # or anywhere easily checkable.
+        if windowed:
+            outputfile = None
+        else:
+            outputfile = "/tmp/output.svg"
+
     @decorator
     def wrapper(wrapped, instance, args, kwargs):
         """
@@ -86,7 +103,7 @@ def test_as_bot(outputfile=None, windowed=None, verbose=True):
 
         This is adapted from ShoebotTestCase.run_code with extra code to
         inject the bot namespace.
-        """
+        """        
         # TODO, need to get window from the test class again!!!
         bot = create_bot(window=windowed, outputfile=outputfile)
 
