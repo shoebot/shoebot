@@ -44,33 +44,6 @@ except ImportError:
     sys.exit("Install setuptools before shoebot")
 
 
-class CleanCommand(Command):
-    """Custom clean command to tidy up the project root."""
-
-    CLEAN_FILES = "./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./.eggs".split()
-
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        global here
-
-        for path_spec in self.CLEAN_FILES:
-            # Make paths absolute and relative to this path
-            abs_paths = glob.glob(os.path.normpath(os.path.join(here, path_spec)))
-            for path in [str(p) for p in abs_paths]:
-                if not path.startswith(here):
-                    # Die if path in CLEAN_FILES is absolute + outside this directory
-                    raise ValueError("%s is not a path inside %s" % (path, here))
-                print("removing %s" % os.path.relpath(path))
-                shutil.rmtree(path)
-
-
 class DiagnoseCommand(Command):
     user_options = []
 
@@ -177,7 +150,7 @@ setup(
     author_email="r@manufacturaindependente.org",
     license="GPL v3",
     url="http://shoebot.net",
-    cmdclass={"clean": CleanCommand, "diagnose": DiagnoseCommand},
+    cmdclass={"diagnose": DiagnoseCommand},
     packages=find_packages(exclude=["tests*", "extensions"]),
     data_files=datafiles,
     setup_requires=[PYCAIRO],
