@@ -20,11 +20,11 @@ from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Pango
 
 DEBUG = os.environ.get("SHOEBOT_DEBUG_IDE", "0").lower() in ["1", "yes", "true"]
 
-APP = "shoebot"
-LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
-
 SEARCH_BACKWARD = -1
 SEARCH_FORWARD = 1
+
+APP = "shoebot"
+LOCALE_DIR = sys.prefix + "/share/shoebot/locale"
 
 locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, LOCALE_DIR)
