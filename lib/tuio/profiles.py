@@ -1,7 +1,8 @@
 from .objects import *
 
+
 class TuioProfile(object):
-    """An abstract profile as defined in the TUIO protocol"""
+    """An abstract profile as defined in the TUIO protocol."""
 
     # the OSC address that is used for the messages of this profile
     address = None
@@ -14,38 +15,32 @@ class TuioProfile(object):
         self.sessions = []
 
     def set(self, client, message):
-        """
-        The state of each alive (but unchanged) fiducial is periodically
-        resent with 'set' messages.
-        """
+        """The state of each alive (but unchanged) fiducial is periodically
+        resent with 'set' messages."""
         raise NotImplementedError
 
     def alive(self, client, message):
-        """
-        The 'alive' message contains the session ids of all alive fiducials
-        known to reacTIVision.
-        """
+        """The 'alive' message contains the session ids of all alive fiducials
+        known to reacTIVision."""
         raise NotImplementedError
 
     def fseq(self, client, message):
-        """
-        fseq messages associate a unique frame id with a set of set
-        and alive messages
-        """
+        """fseq messages associate a unique frame id with a set of set and alive
+        messages."""
         client.last_frame = client.current_frame
         client.current_frame = message[3]
 
     def objs(self):
-        """
-        Returns a generator list of tracked objects which are recognized with
-        this profile and are in the current session.
-        """
+        """Returns a generator list of tracked objects which are recognized with
+        this profile and are in the current session."""
         for obj in self.objects.values():
             if obj.sessionid in self.sessions:
                 yield obj
 
+
 class Tuio2DcurProfile(TuioProfile):
     """A profile for a 2D cursor, e.g. a finger."""
+
     address = "/tuio/2Dcur"
     list_label = "cursors"
 
@@ -65,8 +60,10 @@ class Tuio2DcurProfile(TuioProfile):
                 if obj not in self.sessions:
                     del self.objects[obj]
 
+
 class Tuio2DobjProfile(TuioProfile):
     """A profile for a 2D tracking object, e.g. a fiducial."""
+
     address = "/tuio/2Dobj"
     list_label = "objects"
 

@@ -1,36 +1,35 @@
 import unittest
-from unittest.mock import patch, Mock, call
-
 from math import radians
+from unittest.mock import patch
+
 from parameterized import parameterized
+
+from shoebot.data.bezier import ARC
+from shoebot.data.bezier import CLOSE
+from shoebot.data.bezier import CURVETO
+from shoebot.data.bezier import LINETO
+from shoebot.data.bezier import MOVETO
+from shoebot.data.bezier import RCURVETO
+from shoebot.data.bezier import RLINETO
+from shoebot.data.bezier import RMOVETO
+from shoebot.data.bezier import PathElement
+from shoebot.data import ShoebotError
+from tests.unittests.helpers import EXAMPLE_INPUT_DIR
+from tests.unittests.helpers import EXAMPLE_OUTPUT_DIR
+from tests.unittests.helpers import TEST_INPUT_DIR
+from tests.unittests.helpers import ShoebotTestCase
+from tests.unittests.helpers import test_as_bot
 
 # Add stubs for all shoebot APIs called:
 from tests.unittests.stubs.extras import flush_outputfile
 from tests.unittests.stubs.extras import outputfile
-from tests.unittests.stubs.nodebox import relmoveto  # noqa
-from tests.unittests.stubs.nodebox import moveto  # noqa
 from tests.unittests.stubs.nodebox import beginpath  # noqa
 from tests.unittests.stubs.nodebox import endpath  # noqa
 from tests.unittests.stubs.nodebox import image  # noqa
+from tests.unittests.stubs.nodebox import moveto  # noqa
+from tests.unittests.stubs.nodebox import relmoveto  # noqa
 from tests.unittests.stubs.nodebox import size  # noqa
 from tests.unittests.stubs.nodebox import text  # noqa
-from tests.unittests.helpers import EXAMPLE_INPUT_DIR
-from tests.unittests.helpers import EXAMPLE_OUTPUT_DIR
-from tests.unittests.helpers import ShoebotTestCase
-from tests.unittests.helpers import test_as_bot
-from tests.unittests.helpers import TEST_INPUT_DIR
-
-from shoebot.data import CLOSE
-from shoebot.data import RCURVETO
-from shoebot.data import ShoebotError
-from shoebot.data import ARC
-from shoebot.data import CURVETO
-from shoebot.data import LINETO
-from shoebot.data import RMOVETO
-from shoebot.data import MOVETO
-from shoebot.data import PathElement
-from shoebot.data import RLINETO
-from shoebot.data import RMOVETO
 
 
 class TestPath(ShoebotTestCase):
@@ -77,7 +76,7 @@ class TestPath(ShoebotTestCase):
                     PathElement(CLOSE, 40, 40),
                 ],
             ),
-        ]
+        ],
     )
     @test_as_bot()
     def test_path_commands(self, cmd, expected_elements):
@@ -101,9 +100,8 @@ class TestPath(ShoebotTestCase):
 class TestImage(ShoebotTestCase):
     @test_as_bot(outputfile=f"{EXAMPLE_OUTPUT_DIR}/image-svg-actual.png")
     def test_svg_image(self):
-        """
-        Regression test to check that opening an image doesn't raise an exception.
-        """
+        """Regression test to check that opening an image doesn't raise an
+        exception."""
         input_image = f"{TEST_INPUT_DIR}/input-image-svg.svg"
         expected_output = f"{EXAMPLE_INPUT_DIR}/image-svg-expected.png"
 
@@ -117,9 +115,8 @@ class TestImage(ShoebotTestCase):
 class TestText(ShoebotTestCase):
     @test_as_bot()
     def test_text_saves_params(self):
-        """
-        Verify parameters are saved and returned by the expected properties.
-        """
+        """Verify parameters are saved and returned by the expected
+        properties."""
         # There was a bug where using fontsize, weight or style was causing a crash.
         output_text = text(
             "Hello vector graphics",
@@ -149,7 +146,7 @@ class TestText(ShoebotTestCase):
                 "Bitstream Vera Sans Roman",
                 (1, 88.0, 87, 12),
             ),
-        ]
+        ],
     )
     @test_as_bot()
     def test_text_bounds(self, fontname, expected_bounds):
@@ -163,7 +160,9 @@ class TestText(ShoebotTestCase):
         just to verify the aspect ratio of the bounding box.
         """
         self.assertEqual(
-            fontname, font(fontname), f"{fontname} is not available in the system"
+            fontname,
+            font(fontname),
+            f"{fontname} is not available in the system",
         )
 
         t = text("Hello world", 0, 100, draw=False)
@@ -182,18 +181,19 @@ class TestText(ShoebotTestCase):
                 {"underline": 3},
                 '<span underline="3">Underlined</span>',
             ),
-        ]
+        ],
     )
     @patch("shoebot.data.typography.PangoCairo")
     @test_as_bot()
     def test_text_outputs_pango_text_spans(
-        self, text_args, text_kwargs, expected_pango_text_span, pango_cairo
+        self,
+        text_args,
+        text_kwargs,
+        expected_pango_text_span,
+        pango_cairo,
     ):
-        """
-        For text calls that can only be
-        For calls that should result in a call to set_markup in a Pango layout
-        verify they arrive as expected.
-        """
+        """For text calls that can only be For calls that should result in a
+        call to set_markup in a Pango layout verify they arrive as expected."""
         # This test is a little implementation / specific, but gets close to verifying
         # the layout is used, and the markup is rendered.
         text(*text_args, **text_kwargs)
@@ -213,9 +213,7 @@ class TestText(ShoebotTestCase):
 
     @test_as_bot()
     def test_fontname_with_variants(self):
-        """
-        Verify that font() reads variable font values correctly
-        """
+        """Verify that font() reads variable font values correctly."""
         font("Inconsolata", var_wdth=100, var_wght=200)
         fontstr = font()
         self.assertEqual(fontstr, "Inconsolata @wdth=100,wght=200")
@@ -228,9 +226,7 @@ class TestText(ShoebotTestCase):
 class TestFontUtils(ShoebotTestCase):
     @test_as_bot()
     def test_fontnames_gives_output(self):
-        """
-        Verify that fontnames() gives a list as output.
-        """
+        """Verify that fontnames() gives a list as output."""
         output = fontnames()
         self.assertIsInstance(output, list)
         self.assertRegex(output[0], r"(.*)\s(.*)")

@@ -1,10 +1,14 @@
 import os
 from math import radians
 
-from pkg_resources import resource_filename, Requirement
+from pkg_resources import Requirement
+from pkg_resources import resource_filename
 
-from shoebot.core.backend import cairo, gi, driver
-from shoebot.core.events import REDRAW_EVENT, publish_event
+from shoebot.core.backend import cairo
+from shoebot.core.backend import driver
+from shoebot.core.backend import gi
+from shoebot.core.events import REDRAW_EVENT
+from shoebot.core.events import publish_event
 from shoebot.sbio.socket_server import SocketServer
 
 gi.require_version("Gtk", "3.0")
@@ -13,7 +17,8 @@ from gi.repository import Gtk
 pycairo = driver.cairo
 
 ICON_FILE = resource_filename(
-    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+    Requirement.parse("shoebot"),
+    "share/pixmaps/shoebot-ide.png",
 )
 
 
@@ -37,9 +42,8 @@ class BackingStore:
 
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):
-    """
-    Create a double buffered GTK+ widget on which we will draw using Cairo
-    """
+    """Create a double buffered GTK+ widget on which we will draw using
+    Cairo."""
 
     # Draw in response to an expose-event
     def __init__(self, scale_fit=True, input_device=None):
@@ -79,9 +83,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             publish_event(REDRAW_EVENT, data=(self.width, self.height))
 
     def scale_context_and_center(self, cr):
-        """
-        Scale context based on difference between bot size and widget
-        """
+        """Scale context based on difference between bot size and widget."""
         bot_width, bot_height = self.bot_size
         if self.width != bot_width or self.height != bot_height:
             # Scale up by largest dimension
@@ -109,9 +111,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             self.input_device.scale_y = scale_y
 
     def draw(self, widget, cr):
-        """
-        Draw just the exposed part of the backing store, scaled to fit
-        """
+        """Draw just the exposed part of the backing store, scaled to fit."""
         if self.bot_size is None:
             # No bot to draw yet.
             self.draw_default_image(cr)
@@ -125,14 +125,15 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
 
     def create_rcontext(self, size, frame):
         """
-        Creates a recording surface for the bot to draw on
+        Creates a recording surface for the bot to draw on.
 
         :param size: The width and height of bot
         """
         self.frame = frame
         width, height = size
         meta_surface = cairo.RecordingSurface(
-            cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height)
+            cairo.CONTENT_COLOR_ALPHA,
+            (0, 0, width, height),
         )
 
         ctx = cairo.Context(meta_surface)
@@ -141,8 +142,8 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
 
     def do_drawing(self, size, frame, cairo_ctx):
         """
-        Update the backing store from a cairo context and
-        schedule a REDRAW_EVENT (expose event)
+        Update the backing store from a cairo context and schedule a
+        REDRAW_EVENT (expose event)
 
         :param size: width, height in pixels of bot
         :param frame: frame # thar was drawn

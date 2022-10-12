@@ -1,31 +1,31 @@
-"""
-Check if shoebot can create files in it's supported output formats
-and that none are zero bytes long.
-"""
+"""Check if shoebot can create files in it's supported output formats and that
+none are zero bytes long."""
 import tempfile
 import unittest
 
 from parameterized import parameterized
 from parameterized import parameterized_class
+
 from tests.unittests.helpers import RUNNING_IN_CI
+from tests.unittests.helpers import ShoebotTestCase
 from tests.unittests.helpers import shoebot_named_testclass
 from tests.unittests.helpers import shoebot_named_testfunction
-from tests.unittests.helpers import ShoebotTestCase
 
 
 @parameterized_class(
-    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
+    [{"windowed": False}, {"windowed": True}],
+    class_name_func=shoebot_named_testclass,
 )
 class TestOutputFormats(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
 
     @parameterized.expand(
-        ["png", "ps", "pdf", "svg"], name_func=shoebot_named_testfunction
+        ["png", "ps", "pdf", "svg"],
+        name_func=shoebot_named_testfunction,
     )
     def test_output_formats(self, file_format):
-        """
-        Run a simple bot for each supported output format and verify the output.
-        """
+        """Run a simple bot for each supported output format and verify the
+        output."""
         if RUNNING_IN_CI and file_format in ["png", "ps", "pdf"]:
             self.skipTest(f"{file_format} output was freezing github CI.")
 

@@ -39,20 +39,29 @@ import re
 import zipfile
 from copy import deepcopy
 from glob import glob
-from math import degrees, radians, sin, cos, atan2, sqrt
+from math import atan2
+from math import cos
+from math import degrees
 from math import floor
+from math import radians
+from math import sin
+from math import sqrt
 from operator import attrgetter
-from random import random, choice
+from random import choice
+from random import random
 from xml.dom.minidom import parseString
 
 try:
-    from shoebot.grammar import Bot
+    from shoebot import _restore
+    from shoebot import _save
     from shoebot.data import Grob
-    from shoebot import _restore, _save
+    from shoebot.grammar import Bot
 except ImportError:
+
     class Grob:
         def __init__(self, _ctx):
             pass
+
 
 try:
     from . import favorites as _favorites
@@ -64,7 +73,8 @@ except ImportError:
 
 # This exception is raised when trying to get a list of colors from an image
 # without Core Image or Python Imaging Library.
-class NoCoreImageOrPIL(Exception): pass
+class NoCoreImageOrPIL(Exception):
+    pass
 
 
 #### REWIRING ########################################################################################
@@ -77,6 +87,7 @@ _list = [].__class__
 # "range" is also the name of a command in the library.
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
 # Edvard Majakari
+
 
 def _range(start, stop=None, step=1):
     if stop is None:
@@ -91,9 +102,9 @@ def _range(start, stop=None, step=1):
 
 # Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
 
+
 def hex_to_rgb(hex):
-    """ Returns RGB values for a hex color string.
-    """
+    """Returns RGB values for a hex color string."""
 
     hex = hex.lstrip("#")
     if len(hex) < 6:
@@ -109,7 +120,8 @@ hex2rgb = hex_to_rgb
 
 
 def lab_to_rgb(l, a, b):
-    """ Converts CIE Lab to RGB components.
+    """
+    Converts CIE Lab to RGB components.
 
     First we have to convert to XYZ color space.
     Conversion involves using a white point,
@@ -117,7 +129,6 @@ def lab_to_rgb(l, a, b):
 
     Algorithm adopted from:
     http://www.easyrgb.com/math.php
-
     """
 
     y = (l + 16) / 116.0
@@ -153,7 +164,9 @@ lab2rgb = lab_to_rgb
 
 
 def cmyk_to_rgb(c, m, y, k):
-    """ Cyan, magenta, yellow, black to red, green, blue.
+    """
+    Cyan, magenta, yellow, black to red, green, blue.
+
     ReportLab, http://www.koders.com/python/fid5C006F554616848C01AC7CB96C21426B69D2E5A9.aspx
     Results will differ from the way NSColor converts color spaces.
     """
@@ -185,12 +198,15 @@ rgb2cmyk = rgb_to_cmyk
 
 
 def hsv_to_rgb(h, s, v):
-    """ Hue, saturation, brightness to red, green, blue.
+    """
+    Hue, saturation, brightness to red, green, blue.
+
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """
 
-    if s == 0: return v, v, v
+    if s == 0:
+        return v, v, v
 
     h = h / (60.0 / 360)
     i = floor(h)
@@ -200,28 +216,28 @@ def hsv_to_rgb(h, s, v):
     t = v * (1 - s * (1 - f))
 
     if i == 0:
-        r = v;
-        g = t;
+        r = v
+        g = t
         b = p
     elif i == 1:
-        r = q;
-        g = v;
+        r = q
+        g = v
         b = p
     elif i == 2:
-        r = p;
-        g = v;
+        r = p
+        g = v
         b = t
     elif i == 3:
-        r = p;
-        g = q;
+        r = p
+        g = q
         b = v
     elif i == 4:
-        r = t;
-        g = p;
+        r = t
+        g = p
         b = v
     else:
-        r = v;
-        g = p;
+        r = v
+        g = p
         b = q
 
     return r, g, b
@@ -276,8 +292,18 @@ named_hues = {
 
 primary_hues = ["red", "orange", "yellow", "green", "blue", "purple", "pink"]
 primary_and_secondary_hues = [
-    "red", "orange", "yellow", "lime", "green", "teal",
-    "cyan", "azure", "blue", "indigo", "purple", "pink"
+    "red",
+    "orange",
+    "yellow",
+    "lime",
+    "green",
+    "teal",
+    "cyan",
+    "azure",
+    "blue",
+    "indigo",
+    "purple",
+    "pink",
 ]
 
 ### NAMED COLORS #####################################################################################
@@ -285,7 +311,6 @@ primary_and_secondary_hues = [
 # HTML named colors.
 
 named_colors = {
-
     "lightpink": (1.00, 0.71, 0.76),
     "pink": (1.00, 0.75, 0.80),
     "crimson": (0.86, 0.08, 0.24),
@@ -427,10 +452,8 @@ named_colors = {
     "dimgrey": (0.41, 0.41, 0.41),
     "black": (0.00, 0.00, 0.00),
     "cyan": (0.00, 0.68, 0.94),
-
     "transparent": (0.00, 0.00, 0.00, 0.00),
     "bark": (0.25, 0.19, 0.13),
-
 }
 
 
@@ -440,11 +463,15 @@ def import_palette(path=None):
         pass
     else:
         palette_file = open(path).read()
-        palette_file = palette_file[palette_file.find('#'):]
+        palette_file = palette_file[palette_file.find("#") :]
         palette_lines = palette_file.splitlines()
         for entry in palette_lines[1:]:
             palette_item = entry.split()
-            color = (float(palette_item[0]) / 255, float(palette_item[1]) / 255, float(palette_item[2]) / 255)
+            color = (
+                float(palette_item[0]) / 255,
+                float(palette_item[1]) / 255,
+                float(palette_item[2]) / 255,
+            )
             color_name = ""
             for n in palette_item[3:]:
                 color_name += n
@@ -477,16 +504,16 @@ context = _load_color_context()
 
 from shoebot.data import Color as BaseColor
 
-
 # ...let's get started!
 
 ### COLOR ############################################################################################
 
-class Color(BaseColor):
 
+class Color(BaseColor):
     def __init__(self, *args, **kwargs):
 
-        """ Color object with string input and adjustment methods.
+        """
+        Color object with string input and adjustment methods.
 
         Accepts strings that are (or resemble) named colors, hex strings,
         RGB, CMYK, HSB and Lab values.
@@ -494,7 +521,6 @@ class Color(BaseColor):
         You can supply a "name" parameter.
         Other valid named parameters are "mode" and "range",
         which default to the state colormode and color range.
-
         """
 
         self.name = ""
@@ -507,8 +533,7 @@ class Color(BaseColor):
         # One string parameter,
         # either hexadecimal color key
         # or a named color or descriptive word.
-        if len(args) == 1 \
-                and isinstance(args[0], str):
+        if len(args) == 1 and isinstance(args[0], str):
             if args[0].startswith("#"):
                 r, g, b = hex_to_rgb(args[0])
                 a = 1.0
@@ -522,32 +547,34 @@ class Color(BaseColor):
                 self.name = args[0]
 
             _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=1.0)
+            BaseColor.__init__(self, r, g, b, a, mode="rgb", color_range=1.0)
 
         # One color object parameter.
-        elif len(args) == 1 \
-                and isinstance(args[0], BaseColor):
+        elif len(args) == 1 and isinstance(args[0], BaseColor):
 
             _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, args[0].r, args[0].g, args[0].b, args[0].a, mode='rgb', color_range=1.0)
+            BaseColor.__init__(
+                self,
+                args[0].r,
+                args[0].g,
+                args[0].b,
+                args[0].a,
+                mode="rgb",
+                color_range=1.0,
+            )
 
         # Lab color values.
-        elif "mode" in kwargs \
-                and kwargs["mode"].lower() == "lab":
-            if "l" in kwargs and \
-                    "a" in kwargs and \
-                    "b" in kwargs:
+        elif "mode" in kwargs and kwargs["mode"].lower() == "lab":
+            if "l" in kwargs and "a" in kwargs and "b" in kwargs:
                 r, g, b = lab_to_rgb(kwargs["l"], kwargs["a"], kwargs["b"])
             else:
                 r, g, b = lab_to_rgb(*args)
 
             _ctx.colormode(RGB, 1.0)
-            BaseColor.__init__(self, r, g, b, 1, mode='rgb', color_range=1.0)
+            BaseColor.__init__(self, r, g, b, 1, mode="rgb", color_range=1.0)
 
         # RGB, HSB or CMYK color values.
-        elif ("mode" in kwargs \
-              and kwargs["mode"].lower() in modes) \
-                or mode in modes:
+        elif ("mode" in kwargs and kwargs["mode"].lower() in modes) or mode in modes:
             m, ra = mode, range
             if "mode" in kwargs:
                 m = kwargs["mode"]
@@ -557,9 +584,7 @@ class Color(BaseColor):
                 ra = 1.0
 
             if m == "hsb":
-                if "h" in kwargs and \
-                        "s" in kwargs and \
-                        "v" in kwargs:
+                if "h" in kwargs and "s" in kwargs and "v" in kwargs:
                     r, g, b = hsv_to_rgb(kwargs["h"], kwargs["s"], kwargs["v"])
                 else:
                     if len(args) == 4:
@@ -572,19 +597,17 @@ class Color(BaseColor):
                     else:
                         raise ValueError("hsb mode color requires 3 or 4 arguments.")
             elif m == "rgb":
-                if "r" in kwargs and \
-                        "g" in kwargs and \
-                        "b" in kwargs:
+                if "r" in kwargs and "g" in kwargs and "b" in kwargs:
                     r, g, b = kwargs["r"], kwargs["g"], kwargs["b"]
                 else:
                     if len(args) == 3:
                         r, g, b = args
                         a = 1.0
                     else:
-                        r, g, b, a = (args)
+                        r, g, b, a = args
 
             _ctx.colormode(RGB, ra)
-            BaseColor.__init__(self, r, g, b, a, mode='rgb', color_range=ra)
+            BaseColor.__init__(self, r, g, b, a, mode="rgb", color_range=ra)
 
         if "name" in kwargs and kwargs["name"] != "":
             self.name = kwargs["name"]
@@ -596,7 +619,8 @@ class Color(BaseColor):
 
     def str_to_rgb(self, s):
 
-        """ Returns RGB values based on a descriptive string.
+        """
+        Returns RGB values based on a descriptive string.
 
         If the given s is a named color, return its RGB values.
         Otherwise, return a random named color that has str
@@ -605,7 +629,6 @@ class Color(BaseColor):
         Specific suffixes (-ish, -ed, -y and -like) are recognised
         as well, for example, if you need a random variation of "red"
         you can use reddish (or greenish, yellowy, etc.)
-
         """
 
         s = s.lower()
@@ -656,9 +679,7 @@ class Color(BaseColor):
     def __eq__(self, clr):
         if not isinstance(clr, BaseColor):
             return False
-        if self.r == clr.r and \
-                self.g == clr.g and \
-                self.b == clr.b:
+        if self.r == clr.r and self.g == clr.g and self.b == clr.b:
             return True
         return False
 
@@ -666,26 +687,68 @@ class Color(BaseColor):
         return not self.__eq__(clr)
 
     def darken(self, step=0.1):
-        return Color(self.h, self.s, self.brightness - step, self.a, mode="hsb", name="")
+        return Color(
+            self.h,
+            self.s,
+            self.brightness - step,
+            self.a,
+            mode="hsb",
+            name="",
+        )
 
     darker = darken
 
     def lighten(self, step=0.1):
-        return Color(self.h, self.s, self.brightness + step, self.a, mode="hsb", name="")
+        return Color(
+            self.h,
+            self.s,
+            self.brightness + step,
+            self.a,
+            mode="hsb",
+            name="",
+        )
 
     lighter = lighten
 
     def desaturate(self, step=0.1):
-        return Color(self.h, self.s - step, self.brightness, self.a, mode="hsb", name="")
+        return Color(
+            self.h,
+            self.s - step,
+            self.brightness,
+            self.a,
+            mode="hsb",
+            name="",
+        )
 
     def saturate(self, step=0.1):
-        return Color(self.h, self.s + step, self.brightness, self.a, mode="hsb", name="")
+        return Color(
+            self.h,
+            self.s + step,
+            self.brightness,
+            self.a,
+            mode="hsb",
+            name="",
+        )
 
     def adjust_rgb(self, r=0.0, g=0.0, b=0.0, a=0.0):
-        return Color(self.r + r, self.g + g, self.b + b, self.a + a, mode="rgb", name="")
+        return Color(
+            self.r + r,
+            self.g + g,
+            self.b + b,
+            self.a + a,
+            mode="rgb",
+            name="",
+        )
 
     def adjust_hsb(self, h=0.0, s=0.0, b=0.0, a=0.0):
-        return Color((self.h + h) % 1.0, self.s + s, self.brightness + b, self.a + a, mode="hsb", name="")
+        return Color(
+            (self.h + h) % 1.0,
+            self.s + s,
+            self.brightness + b,
+            self.a + a,
+            mode="hsb",
+            name="",
+        )
 
     def adjust_contrast(self, step=0.1):
         if self.brightness <= 0.5:
@@ -699,7 +762,8 @@ class Color(BaseColor):
 
     def rotate_ryb(self, angle=180):
 
-        """ Returns a color rotated on the artistic RYB color wheel.
+        """
+        Returns a color rotated on the artistic RYB color wheel.
 
         An artistic color wheel has slightly different opposites
         (e.g. purple-yellow instead of purple-lime).
@@ -707,7 +771,6 @@ class Color(BaseColor):
         to provide better complementary colors.
 
         http://en.wikipedia.org/wiki/RYB_color_model
-
         """
 
         h = self.h * 360
@@ -718,19 +781,31 @@ class Color(BaseColor):
         # However, on the artistic color wheel these are not evenly distributed.
         # The second tuple value contains the actual distribution.
         wheel = [
-            (0, 0), (15, 8),
-            (30, 17), (45, 26),
-            (60, 34), (75, 41),
-            (90, 48), (105, 54),
-            (120, 60), (135, 81),
-            (150, 103), (165, 123),
-            (180, 138), (195, 155),
-            (210, 171), (225, 187),
-            (240, 204), (255, 219),
-            (270, 234), (285, 251),
-            (300, 267), (315, 282),
-            (330, 298), (345, 329),
-            (360, 0)
+            (0, 0),
+            (15, 8),
+            (30, 17),
+            (45, 26),
+            (60, 34),
+            (75, 41),
+            (90, 48),
+            (105, 54),
+            (120, 60),
+            (135, 81),
+            (150, 103),
+            (165, 123),
+            (180, 138),
+            (195, 155),
+            (210, 171),
+            (225, 187),
+            (240, 204),
+            (255, 219),
+            (270, 234),
+            (285, 251),
+            (300, 267),
+            (315, 282),
+            (330, 298),
+            (345, 329),
+            (360, 0),
         ]
 
         # Given a hue, find out under what angle it is
@@ -777,7 +852,8 @@ class Color(BaseColor):
 
     def nearest_hue(self, primary=False):
 
-        """ Returns the name of the nearest named hue.
+        """
+        Returns the name of the nearest named hue.
 
         For example,
         if you supply an indigo color (a color between blue and violet),
@@ -786,7 +862,6 @@ class Color(BaseColor):
 
         Primary colors leave out the fuzzy lime, teal,
         cyan, azure and violet hues.
-
         """
         if self.is_black:
             return "black"
@@ -807,9 +882,7 @@ class Color(BaseColor):
         return nearest
 
     def blend(self, clr, factor=0.5):
-        """
-        Returns a mix of two colors.
-        """
+        """Returns a mix of two colors."""
         r = self.r * (1 - factor) + clr.r * factor
         g = self.g * (1 - factor) + clr.g * factor
         b = self.b * (1 - factor) + clr.b * factor
@@ -825,7 +898,6 @@ class Color(BaseColor):
         - saturation is the distance of a color from the center
         - brightness is the elevation of a color from the center
           (i.e. we're on color a sphere)
-
         """
         coord = lambda a, d: (cos(radians(a)) * d, sin(radians(a)) * d)
         x0, y0 = coord(self.h * 360, self.s)
@@ -836,9 +908,7 @@ class Color(BaseColor):
         return d
 
     def swatch(self, x, y, w=35, h=35, roundness=0):
-        """
-        Rectangle swatch for this color.
-        """
+        """Rectangle swatch for this color."""
         _ctx.fill(self)
         _ctx.rect(x, y, w, h, roundness)
 
@@ -895,6 +965,7 @@ def _build_named_colors():
 
     return code
 
+
 eval(compile(_build_named_colors(), "<string>", "exec"))
 
 
@@ -902,8 +973,8 @@ eval(compile(_build_named_colors(), "<string>", "exec"))
 
 ### COLOR LIST #######################################################################################
 
-class ColorList(_list):
 
+class ColorList(_list):
     def __init__(self, *args, **kwargs):
         """
         Construct a list of colors.
@@ -944,8 +1015,7 @@ class ColorList(_list):
                 pass
 
             # From a list or tuple of Color objects.
-            if isinstance(arg, _list) \
-                    or isinstance(arg, tuple):
+            if isinstance(arg, _list) or isinstance(arg, tuple):
                 for clr in arg:
                     if clr.__class__ == Color:
                         self.append(clr)
@@ -956,7 +1026,8 @@ class ColorList(_list):
             if isinstance(arg, str):
                 if os.path.exists(arg):
                     n = 10
-                    if "n" in list(kwargs.keys()): n = kwargs["n"]
+                    if "n" in list(kwargs.keys()):
+                        n = kwargs["n"]
                     self.image_to_rgb(arg, n)
                 else:
                     clr = Color(arg)
@@ -978,9 +1049,9 @@ class ColorList(_list):
 
         The Core Image library must be present to determine pixel colors.
         F. Albers: http://nodebox.net/code/index.php/shared_2007-06-11-11-37-05
-
         """
         from PIL import Image
+
         img = Image.open(path)
         p = img.getdata()
         f = lambda p: choice(p)
@@ -995,19 +1066,17 @@ class ColorList(_list):
             self.append(clr)
 
     def context_to_rgb(self, str):
-        """ Returns the colors that have the given word in their context.
+        """
+        Returns the colors that have the given word in their context.
 
-        For example, the word "anger" appears
-        in black, orange and red contexts,
+        For example, the word "anger" appears in black, orange and red contexts,
         so the list will contain those three colors.
-
         """
         matches = []
         for clr in context:
             tags = context[clr]
             for tag in tags:
-                if tag.startswith(str) \
-                        or str.startswith(tag):
+                if tag.startswith(str) or str.startswith(tag):
                     matches.append(clr)
                     break
 
@@ -1022,7 +1091,6 @@ class ColorList(_list):
         and finds overlapping tags in each hue's colors.
         For example, a list containing yellow, deeppink and olive
         yields: femininity, friendship, happiness, joy.
-
         """
         tags1 = None
         for clr in self:
@@ -1054,22 +1122,20 @@ class ColorList(_list):
 
     def copy(self):
 
-        """ Returns a deep copy of the list.
-        """
+        """Returns a deep copy of the list."""
 
         return ColorList(
             [color(clr.r, clr.g, clr.b, clr.a, mode="rgb") for clr in self],
             name=self.name,
-            tags=self.tags
+            tags=self.tags,
         )
 
     def _darkest(self):
         """
         Returns the darkest color from the list.
 
-        Knowing the contrast between a light and a dark swatch
-        can help us decide how to display readable typography.
-
+        Knowing the contrast between a light and a dark swatch can help us
+        decide how to display readable typography.
         """
         min, n = (1.0, 1.0, 1.0), 3.0
         for clr in self:
@@ -1081,9 +1147,7 @@ class ColorList(_list):
     darkest = property(_darkest)
 
     def _lightest(self):
-        """
-        Returns the lightest color from the list.
-        """
+        """Returns the lightest color from the list."""
         max, n = (0.0, 0.0, 0.0), 0.0
         for clr in self:
             if clr.r + clr.g + clr.b > n:
@@ -1094,9 +1158,7 @@ class ColorList(_list):
     lightest = property(_lightest)
 
     def _average(self):
-        """
-        Returns one average color for the colors in the list.
-        """
+        """Returns one average color for the colors in the list."""
         r, g, b, a = 0, 0, 0, 0
         for clr in self:
             r += clr.r
@@ -1127,7 +1189,9 @@ class ColorList(_list):
 
     def sort_by_distance(self, reversed=False):
         """
-        Returns a list with the smallest distance between two neighboring colors.
+        Returns a list with the smallest distance between two neighboring
+        colors.
+
         The algorithm has a factorial complexity so it may run slow.
         """
         if not len(self):
@@ -1163,10 +1227,11 @@ class ColorList(_list):
         return ColorList(sorted_colors)
 
     def _sorted_copy(self, comparison, reversed=False):
-        """
-        Returns a sorted copy with the colors arranged according to the given comparison.
-        """
-        sorted_colors = ColorList(*sorted(self.copy(), key=comparison, reverse=reversed))
+        """Returns a sorted copy with the colors arranged according to the given
+        comparison."""
+        sorted_colors = ColorList(
+            *sorted(self.copy(), key=comparison, reverse=reversed)
+        )
         return sorted_colors
 
     def sort_by_hue(self, reversed=False):
@@ -1204,22 +1269,24 @@ class ColorList(_list):
 
     def sort(self, comparison="hue", reversed=False):
 
-        """ Return a copy sorted by a given color attribute.
+        """
+        Return a copy sorted by a given color attribute.
 
         Note that there is no "universal solution to sorting a list of colors,
         since colors need to be represented in 2 or 3 dimensions.
-
         """
         return getattr(self, f"sort_by_{comparison}")(reversed)
 
     def cluster_sort(self, cmp1="hue", cmp2="brightness", reversed=False, n=12):
         """
-        Sorts the list by cmp1, then cuts it into n pieces which are sorted by cmp2.
+        Sorts the list by cmp1, then cuts it into n pieces which are sorted by
+        cmp2.
 
-        If you want to cluster by hue, use n=12 (since there are 12 primary/secondary hues).
-        The resulting list will not contain n even slices:
-        n is used rather to slice up the cmp1 property of the colors,
-        e.g. cmp1=brightness and n=3 will cluster colors by brightness >= 0.66, 0.33, 0.0
+        If you want to cluster by hue, use n=12 (since there are 12
+        primary/secondary hues). The resulting list will not contain n even
+        slices: n is used rather to slice up the cmp1 property of the colors,
+        e.g. cmp1=brightness and n=3 will cluster colors by brightness >= 0.66,
+        0.33, 0.0
         """
         sorted_colors = self.sort(cmp1)
         clusters = ColorList()
@@ -1228,7 +1295,7 @@ class ColorList(_list):
         i = 0
         for j in _range(len(sorted_colors)):
             if getattr(sorted_colors[j], cmp1) < d:
-                if not sorted_colors[i: j]:
+                if not sorted_colors[i:j]:
                     continue
                 clusters.extend(sorted_colors[i:j].sort(cmp2))
                 d -= 1.0 / n
@@ -1242,9 +1309,7 @@ class ColorList(_list):
     cluster = clustersort = cluster_sort
 
     def reverse(self):
-        """
-        Returns a reversed copy of the list.
-        """
+        """Returns a reversed copy of the list."""
         colors = ColorList.copy(self)
         _list.reverse(colors)
         return colors
@@ -1253,27 +1318,24 @@ class ColorList(_list):
         """
         Returns a list that is a repetition of the given list.
 
-        When oscillate is True,
-        moves from the end back to the beginning,
-        and then from the beginning to the end, and so on.
+        When oscillate is True, moves from the end back to the beginning, and
+        then from the beginning to the end, and so on.
         """
         colorlist = ColorList()
         colors = ColorList.copy(self)
         for i in _range(n):
             colorlist.extend(colors)
-            if oscillate: colors = colors.reverse()
-            if callback: colors = callback(colors)
+            if oscillate:
+                colors = colors.reverse()
+            if callback:
+                colors = callback(colors)
 
         return colorlist
 
     def __contains__(self, clr):
-        """
-        Returns True if clr's RGB values match a color in the list.
-        """
+        """Returns True if clr's RGB values match a color in the list."""
         for clr2 in self:
-            if clr.r == clr2.r and \
-                    clr.g == clr2.g and \
-                    clr.b == clr2.b:
+            if clr.r == clr2.r and clr.g == clr2.g and clr.b == clr2.b:
                 return True
         return False
 
@@ -1316,9 +1378,7 @@ class ColorList(_list):
     inverse = property(invert)
 
     def swatch(self, x, y, w=35, h=35, padding=0, roundness=0):
-        """
-        Rectangle swatches for all the colors in the list.
-        """
+        """Rectangle swatches for all the colors in the list."""
         for _color in self:
             _color.swatch(x, y, w, h, roundness)
             y += h + padding
@@ -1326,9 +1386,7 @@ class ColorList(_list):
     draw = swatch
 
     def swarm(self, x, y, r=100):
-        """
-        Fancy random ovals for all the colors in the list.
-        """
+        """Fancy random ovals for all the colors in the list."""
         sc = _ctx.stroke(0, 0, 0, 0)
         sw = _ctx.strokewidth(0)
 
@@ -1413,10 +1471,9 @@ list = colorlist
 
 #### COLOR HARMONY ###################################################################################
 
+
 def complement(clr):
-    """
-    Returns the color and its complement in a list.
-    """
+    """Returns the color and its complement in a list."""
     clr = color(clr)
     colors = colorlist(clr)
     colors.append(clr.complement)
@@ -1428,10 +1485,8 @@ def complementary(clr):
     """
     Returns a list of complementary colors.
 
-    The complement is the color 180 degrees across
-    the artistic RYB color wheel.
-    The list contains darker and softer contrasting
-    and complementing colors.
+    The complement is the color 180 degrees across the artistic RYB color wheel.
+    The list contains darker and softer contrasting and complementing colors.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1474,8 +1529,8 @@ def split_complementary(clr):
     """
     Returns a list with the split complement of the color.
 
-    The split complement are the two colors to the left and right
-    of the color's complement.
+    The split complement are the two colors to the left and right of the color's
+    complement.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1490,9 +1545,9 @@ def left_complement(clr):
     """
     Returns the left half of the split complement.
 
-    A list is returned with the same darker and softer colors
-    as in the complementary list, but using the hue of the
-    left split complement instead of the complement itself.
+    A list is returned with the same darker and softer colors as in the
+    complementary list, but using the hue of the left split complement instead
+    of the complement itself.
     """
     left = split_complementary(clr)[1]
     colors = complementary(clr)
@@ -1501,16 +1556,19 @@ def left_complement(clr):
     colors[5].h = left.h
 
     colors = colorlist(
-        colors[0], colors[2], colors[1], colors[3], colors[4], colors[5]
+        colors[0],
+        colors[2],
+        colors[1],
+        colors[3],
+        colors[4],
+        colors[5],
     )
 
     return colors
 
 
 def right_complement(clr):
-    """
-    Returns the right half of the split complement.
-    """
+    """Returns the right half of the split complement."""
     right = split_complementary(clr)[2]
     colors = complementary(clr)
     colors[3].h = right.h
@@ -1518,7 +1576,12 @@ def right_complement(clr):
     colors[5].h = right.h
 
     colors = colorlist(
-        colors[0], colors[2], colors[1], colors[5], colors[4], colors[3]
+        colors[0],
+        colors[2],
+        colors[1],
+        colors[5],
+        colors[4],
+        colors[3],
     )
 
     return colors
@@ -1528,11 +1591,10 @@ def analogous(clr, angle=10, contrast=0.25):
     """
     Returns colors that are next to each other on the wheel.
 
-    These yield natural color schemes (like shades of water or sky).
-    The angle determines how far the colors are apart,
-    making it bigger will introduce more variation.
-    The contrast determines the darkness/lightness of
-    the analogue colors in respect to the given colors.
+    These yield natural color schemes (like shades of water or sky). The angle
+    determines how far the colors are apart, making it bigger will introduce
+    more variation. The contrast determines the darkness/lightness of the
+    analogue colors in respect to the given colors.
     """
     contrast = max(0, min(contrast, 1.0))
 
@@ -1553,9 +1615,7 @@ def analogous(clr, angle=10, contrast=0.25):
 
 
 def monochrome(clr):
-    """
-    Returns colors in the same hue with varying brightness/saturation.
-    """
+    """Returns colors in the same hue with varying brightness/saturation."""
 
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
@@ -1590,9 +1650,8 @@ def triad(clr, angle=120):
     """
     Returns a triad of colors.
 
-    The triad is made up of this color and two other colors
-    that together make up an equilateral triangle on
-    the artistic color wheel.
+    The triad is made up of this color and two other colors that together make
+    up an equilateral triangle on the artistic color wheel.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1606,8 +1665,8 @@ def tetrad(clr, angle=90):
     """
     Returns a tetrad of colors.
 
-    The tetrad is made up of this color and three other colors
-    that together make up a cross on the artistic color wheel.
+    The tetrad is made up of this color and three other colors that together
+    make up a cross on the artistic color wheel.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1632,9 +1691,7 @@ def tetrad(clr, angle=90):
 
 
 def compound(clr, flip=False):
-    """
-    Roughly the complement and some far analogs.
-    """
+    """Roughly the complement and some far analogs."""
 
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
@@ -1643,7 +1700,8 @@ def compound(clr, flip=False):
             return x - min
 
     d = 1
-    if flip: d = -1
+    if flip:
+        d = -1
 
     clr = color(clr)
     colors = colorlist(clr)
@@ -1686,7 +1744,7 @@ rules = [
     "triad",
     "tetrad",
     "compound",
-    "flipped compound"
+    "flipped compound",
 ]
 
 
@@ -1731,8 +1789,8 @@ def rule(name, clr, angle=None, contrast=0.3, flip=False):
 
 #### COLOR GRADIENTS #################################################################################
 
-class Gradient(ColorList):
 
+class Gradient(ColorList):
     def __init__(self, *colors, **kwargs):
         """
         Creates a list of gradient colors based on a few given base colors.
@@ -1744,8 +1802,7 @@ class Gradient(ColorList):
         The spread named parameter controls the midpoint of the gradient
         """
         if len(colors) == 1:
-            if isinstance(colors[0], _list) \
-                    or isinstance(colors[0], tuple):
+            if isinstance(colors[0], _list) or isinstance(colors[0], tuple):
                 self._colors = _list(colors[0])
             else:
                 self._colors = [colors[0]]
@@ -1785,8 +1842,7 @@ class Gradient(ColorList):
 
     def _interpolate(self, colors, n=100):
 
-        """ Returns intermediary colors for given list of colors.
-        """
+        """Returns intermediary colors for given list of colors."""
 
         gradient = []
         for i in _range(n):
@@ -1830,19 +1886,21 @@ class Gradient(ColorList):
 
         # Chop into left half and right half.
         # Make sure their ending and beginning match colors.
-        left = colors[:len(colors) // 2]
-        right = colors[len(colors) // 2:]
+        left = colors[: len(colors) // 2]
+        right = colors[len(colors) // 2 :]
         left.append(right[0])
         right.insert(0, left[-1])
 
         # Calculate left and right gradient proportionally to spread.
         gradient = self._interpolate(left, int(n * self.spread))[:-1]
         gradient.extend(
-            self._interpolate(right, n - int(n * self.spread))[1:]
+            self._interpolate(right, n - int(n * self.spread))[1:],
         )
 
-        if self.spread > 1: gradient = gradient[:n]
-        if self.spread < 0: gradient = gradient[-n:]
+        if self.spread > 1:
+            gradient = gradient[:n]
+        if self.spread < 0:
+            gradient = gradient[-n:]
         ColorList.__init__(self, gradient)
 
 
@@ -1855,6 +1913,7 @@ def gradient(*colors, **kwargs):
 # g = gradient(color(0,0.6,0.8), color(0.2,0,0.4), color(0.4,0,0.6), spread=0.5)
 # g.spread = 0.4
 # g.swatch(10, 10, h=7)
+
 
 def outline(path, colors, precision=0.4, continuous=True):
     """
@@ -1879,12 +1938,14 @@ def outline(path, colors, precision=0.4, continuous=True):
     # for each contour to draw colors from.
     contour_i = 0
     contour_n = len(path.contours) - 1
-    if contour_n == 0: continuous = False
+    if contour_n == 0:
+        continuous = False
 
     i = 0
     for contour in path.contours:
 
-        if not continuous: i = 0
+        if not continuous:
+            i = 0
 
         # The number of points for each contour.
         j = _point_count(contour, precision)
@@ -1937,11 +1998,8 @@ def outline(path, colors, precision=0.4, continuous=True):
 
 
 class Favorites:
-
     def __getattr__(self, q):
-        """
-        Returns the favorite colors list which name/tags matches q.
-        """
+        """Returns the favorite colors list which name/tags matches q."""
         if q is None:
             return self
 
@@ -1954,7 +2012,10 @@ class Favorites:
 
         if candidate:
             tags, colors = _favorites.data[candidate]
-            colors = ColorList([color(r, g, b, a) for r, g, b, a in colors], name=candidate)
+            colors = ColorList(
+                [color(r, g, b, a) for r, g, b, a in colors],
+                name=candidate,
+            )
             colors.tags = tags.split(" ")
             return colors
 
@@ -1966,10 +2027,18 @@ favorites = Favorites()
 
 ### COLOR RANGE ######################################################################################
 
-class ColorRange(ColorList):
 
-    def __init__(self, h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
-                 grayscale=False, name="", length=100):
+class ColorRange(ColorList):
+    def __init__(
+        self,
+        h=(0.0, 1.0),
+        s=(0.0, 1.0),
+        b=(0.0, 1.0),
+        a=(1.0, 1.0),
+        grayscale=False,
+        name="",
+        length=100,
+    ):
         """
         A stateless list of colors whose HSB values are confined to a range.
 
@@ -1984,7 +2053,6 @@ class ColorRange(ColorList):
         ColorRange has all the ColorList transformations (such as darken()),
         these return ColorList objects. It's like a snapshot of the original
         stateless ColorRange.
-
         """
         ColorList.__init__(self)
 
@@ -2003,27 +2071,31 @@ class ColorRange(ColorList):
         self.length = length
 
     def constrain_hue(self, min, max=None):
-        if max is None: max = min
+        if max is None:
+            max = min
         self.h = (min, max)
 
     def constrain_saturation(self, min, max=None):
-        if max is None: max = min
+        if max is None:
+            max = min
         self.s = (min, max)
 
     def constrain_brightness(self, min, max=None):
-        if max is None: max = min
+        if max is None:
+            max = min
         self.b = (min, max)
 
     def constrain_alpha(self, min, max=None):
-        if max is None: max = min
+        if max is None:
+            max = min
         self.a = (min, max)
 
     def copy(self, clr=None, d=0.0):
         """
         Returns a copy of the range.
 
-        Optionally, supply a color to get a range copy
-        limited to the hue of that color.
+        Optionally, supply a color to get a range copy limited to the hue of
+        that color.
         """
         cr = ColorRange()
         cr.name = self.name
@@ -2066,7 +2138,7 @@ class ColorRange(ColorList):
                 return self.white.color(clr, d)
             if clr.is_grey:
                 return choice(
-                    (self.black.color(clr, d), self.white.color(clr, d))
+                    (self.black.color(clr, d), self.white.color(clr, d)),
                 )
 
         h, s, b, a = self.h, self.s, self.b, self.a
@@ -2111,10 +2183,14 @@ class ColorRange(ColorList):
         for clr in clr:
 
             if clr.is_grey and not self.grayscale:
-                return (self.black.contains(clr) or \
-                        self.white.contains(clr))
+                return self.black.contains(clr) or self.white.contains(clr)
 
-            for r, v in [(self.h, clr.h), (self.s, clr.s), (self.b, clr.brightness), (self.a, clr.a)]:
+            for r, v in [
+                (self.h, clr.h),
+                (self.s, clr.s),
+                (self.b, clr.brightness),
+                (self.a, clr.a),
+            ]:
                 if isinstance(r, _list):
                     pass
                 elif isinstance(r, tuple):
@@ -2131,17 +2207,15 @@ class ColorRange(ColorList):
         """
         Combines two ColorRange objects into one.
 
-        For example, if you merge a dark green range and a light red range,
-        you get a range returning dark and light variations of green and red.
-
+        For example, if you merge a dark green range and a light red range, you
+        get a range returning dark and light variations of green and red.
         """
         # You can add single colors and lists to ranges,
         # however, you'll lose the brightness and saturation info.
         # Only hues are copied and the shades in the original range are applied.
         if isinstance(colorrange, Color):
             colorrange = ColorList(colorrange)
-        if isinstance(colorrange, ColorList) \
-                and not isinstance(colorrange, ColorRange):
+        if isinstance(colorrange, ColorList) and not isinstance(colorrange, ColorRange):
             colorrange = ColorRange([(clr.h, clr.h) for clr in colorrange], [], [])
 
         hsba = [[], [], [], []]
@@ -2206,8 +2280,15 @@ class ColorRange(ColorList):
         return self.name
 
 
-def colorrange(h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
-               grayscale=False, name="", length=100):
+def colorrange(
+    h=(0.0, 1.0),
+    s=(0.0, 1.0),
+    b=(0.0, 1.0),
+    a=(1.0, 1.0),
+    grayscale=False,
+    name="",
+    length=100,
+):
     return ColorRange(h, s, b, a, grayscale, name, length)
 
 
@@ -2223,85 +2304,96 @@ range = colorrange
 # and a brightness ranging between 90-100%.
 
 # Light shades are bright and light.
-light = ColorRange(name="light",
-                   s=(0.3, 0.7),
-                   b=(0.9, 1.0)
-                   )
+light = ColorRange(
+    name="light",
+    s=(0.3, 0.7),
+    b=(0.9, 1.0),
+)
 light.black.b = (0.15, 0.30)
 
 # Dark shades are deep and colorfully saturated.
-dark = ColorRange(name="dark",
-                  s=(0.7, 1.0),
-                  b=(0.15, 0.4)
-                  )
+dark = ColorRange(
+    name="dark",
+    s=(0.7, 1.0),
+    b=(0.15, 0.4),
+)
 dark.white.b = (0.5, 0.75)
 
 # Bright shades are colorful and friendly.
-bright = ColorRange(name="bright",
-                    s=(0.8, 1.0),
-                    b=(0.8, 1.0)
-                    )
+bright = ColorRange(
+    name="bright",
+    s=(0.8, 1.0),
+    b=(0.8, 1.0),
+)
 
 # Weak shades are neither light, soft nor neutral.
-weak = ColorRange(name="weak",
-                  s=(0.15, 0.3),
-                  b=(0.7, 1.0)
-                  )
+weak = ColorRange(
+    name="weak",
+    s=(0.15, 0.3),
+    b=(0.7, 1.0),
+)
 weak.black.b = 0.2
 
 # Neutral shades are desaturated and neither bright nor dark.
-neutral = ColorRange(name="neutral",
-                     s=(0.25, 0.35),
-                     b=(0.3, 0.7)
-                     )
+neutral = ColorRange(
+    name="neutral",
+    s=(0.25, 0.35),
+    b=(0.3, 0.7),
+)
 neutral.white.b = (0.9, 1.0)
 neutral.black.b = (0.15, 0.15)
 
 # Fresh shades are light and friendly
 # with a higher saturation than soft shades.
-fresh = ColorRange(name="fresh",
-                   s=(0.4, 0.8),
-                   b=(0.8, 1.0)
-                   )
+fresh = ColorRange(
+    name="fresh",
+    s=(0.4, 0.8),
+    b=(0.8, 1.0),
+)
 fresh.white.b = (0.8, 1.0)
 fresh.black.b = (0.05, 0.3)
 
 # Soft shades produce gentle pastel colors
 # with small difference in saturation.
-soft = ColorRange(name="soft",
-                  s=(0.2, 0.3),
-                  b=(0.6, 0.9)
-                  )
+soft = ColorRange(
+    name="soft",
+    s=(0.2, 0.3),
+    b=(0.6, 0.9),
+)
 soft.white.b = (0.6, 0.9)
 soft.black.b = (0.05, 0.15)
 
 # Hard shades have powerful colors
 # but lighter than intense shades.
-hard = ColorRange(name="hard",
-                  s=(0.9, 1.0),
-                  b=(0.4, 1.0)
-                  )
+hard = ColorRange(
+    name="hard",
+    s=(0.9, 1.0),
+    b=(0.4, 1.0),
+)
 
 # Warm shades are gently saturated and gently bright.
-warm = ColorRange(name="warm",
-                  s=(0.6, 0.9),
-                  b=(0.4, 0.9)
-                  )
+warm = ColorRange(
+    name="warm",
+    s=(0.6, 0.9),
+    b=(0.4, 0.9),
+)
 warm.white.b = (0.8, 1.0)
 warm.black.b = 0.2
 
 # Cool shades are cold, bright and desaturated.
-cool = ColorRange(name="cool",
-                  s=(0.05, 0.2),
-                  b=(0.9, 1.0)
-                  )
+cool = ColorRange(
+    name="cool",
+    s=(0.05, 0.2),
+    b=(0.9, 1.0),
+)
 cool.white.b = (0.95, 1.0)
 
 # Intense shades have powerful deep/bright contrasts.
-intense = ColorRange(name="intense",
-                     s=(0.9, 1.0),
-                     b=[(0.2, 0.35), (0.8, 1.0)]
-                     )
+intense = ColorRange(
+    name="intense",
+    s=(0.9, 1.0),
+    b=[(0.2, 0.35), (0.8, 1.0)],
+)
 
 shades = [light, dark, bright, weak, neutral, fresh, soft, hard, warm, cool, intense]
 
@@ -2323,7 +2415,7 @@ shade_opposites = {
     "soft": hard,
     "hard": soft,
     "warm": cool,
-    "cool": warm
+    "cool": warm,
 }
 
 
@@ -2353,6 +2445,7 @@ def shade_opposite(shade):
 # r = intense + neutral
 # r = r(olive(), n=8).swatch(150, 49)
 
+
 def guess_name(clr):
     """
     Guesses the shade and hue name of a color.
@@ -2362,10 +2455,14 @@ def guess_name(clr):
     """
     clr = Color(clr)
 
-    if clr.is_transparent: return "transparent"
-    if clr.is_black: return "black"
-    if clr.is_white: return "white"
-    if clr.is_black: return "black"
+    if clr.is_transparent:
+        return "transparent"
+    if clr.is_black:
+        return "black"
+    if clr.is_white:
+        return "white"
+    if clr.is_black:
+        return "black"
 
     for name in named_colors:
         try:
@@ -2386,6 +2483,7 @@ def guess_name(clr):
 # print guess_name(color(0.8,0,0))
 
 #### COLOR SHADER ####################################################################################
+
 
 def shader(x, y, dx, dy, radius=300, angle=0, spread=90):
     """
@@ -2473,10 +2571,10 @@ def aggregated(cache=DEFAULT_CACHE):
     """
     A dictionary of all aggregated words.
 
-    They keys in the dictionary correspond to subfolders in the aggregated cache.
-    Each key has a list of words. Each of these words is the name of an XML-file
-    in the subfolder. The XML-file contains color information harvested from the web
-    (or handmade).
+    They keys in the dictionary correspond to subfolders in the aggregated
+    cache. Each key has a list of words. Each of these words is the name of an
+    XML-file in the subfolder. The XML-file contains color information harvested
+    from the web (or handmade).
     """
     global _aggregated_name, _aggregated_dict
     if _aggregated_name != cache:
@@ -2486,17 +2584,28 @@ def aggregated(cache=DEFAULT_CACHE):
             if os.path.isdir(path):
                 p = os.path.basename(path)
                 _aggregated_dict[p] = glob(os.path.join(path, "*"))
-                _aggregated_dict[p] = [os.path.basename(f)[:-4] for f in _aggregated_dict[p]]
+                _aggregated_dict[p] = [
+                    os.path.basename(f)[:-4] for f in _aggregated_dict[p]
+                ]
 
     return _aggregated_dict
 
 
-class ColorThemeNotFound(Exception): pass
+class ColorThemeNotFound(Exception):
+    pass
 
 
 class ColorTheme(_list):
-
-    def __init__(self, name="", ranges=[], top=5, cache=DEFAULT_CACHE, blue="blue", guess=False, length=100):
+    def __init__(
+        self,
+        name="",
+        ranges=[],
+        top=5,
+        cache=DEFAULT_CACHE,
+        blue="blue",
+        guess=False,
+        length=100,
+    ):
         """
         A set of weighted ranges linked to colors.
 
@@ -2531,11 +2640,11 @@ class ColorTheme(_list):
         path = os.path.join(self.cache, self.name + ".xml")
         if os.path.exists(path):
             self._load(self.top, self.blue)
-        elif name and zipfile.is_zipfile(os.path.join(self.cache + '.zip')):
+        elif name and zipfile.is_zipfile(os.path.join(self.cache + ".zip")):
             # Handle colors in a zipfile... the top level folder should be named the same
             # as the folder, e.g. 'aggregated'
-            archive = self.cache + '.zip'
-            zf = zipfile.ZipFile(archive, 'r')
+            archive = self.cache + ".zip"
+            zf = zipfile.ZipFile(archive, "r")
             zpath = os.path.join(os.path.basename(self.cache), self.name + ".xml")
             try:
                 zi = zf.getinfo(zpath)
@@ -2543,7 +2652,7 @@ class ColorTheme(_list):
                 self._load(self.top, self.blue, archive=zf, member=zi.filename)
             except KeyError:
                 for fn in zf.namelist():
-                    if os.path.basename(fn) == self.name + '.xml':
+                    if os.path.basename(fn) == self.name + ".xml":
                         zi = zf.getinfo(fn)
                         self.cache = zi
                         self._load(self.top, self.blue, archive=zf, member=zi.filename)
@@ -2587,8 +2696,7 @@ class ColorTheme(_list):
         # e.g. "dark ivory".
         if isinstance(range, str) and clr is None:
             for word in range.split(" "):
-                if word in named_hues \
-                        or word in named_colors:
+                if word in named_hues or word in named_colors:
                     clr = named_color(word)
                 if shade(word) != None:
                     range = shade(word)
@@ -2603,7 +2711,7 @@ class ColorTheme(_list):
             cache=self.cache,
             blue=self.blue,
             guess=self.guess,
-            lenght=self.length
+            lenght=self.length,
         )
         t.tags = self.tags
         t.group_swatches = self.group_swatches
@@ -2611,7 +2719,8 @@ class ColorTheme(_list):
 
     def _weight_by_hue(self):
         """
-        Returns a list of (hue, ranges, total weight, normalized total weight)-tuples.
+        Returns a list of (hue, ranges, total weight, normalized total
+        weight)-tuples.
 
         ColorTheme is made up out of (color, range, weight) tuples.
         For consistency with XML-output in the old Prism format
@@ -2623,7 +2732,6 @@ class ColorTheme(_list):
         after which the dimensions (rows/columns) is determined.
         """
         grouped = {}
-        weights = []
         for clr, rng, weight in self.ranges:
             h = clr.nearest_hue(primary=False)
             if h in grouped:
@@ -2637,7 +2745,9 @@ class ColorTheme(_list):
         # Calculate the normalized (0.0-1.0) weight for each hue,
         # and transform the dictionary to a list.
         s = 1.0 * sum([w for r, w in list(grouped.values())])
-        grouped = [(grouped[h][1], grouped[h][1] / s, h, grouped[h][0]) for h in grouped]
+        grouped = [
+            (grouped[h][1], grouped[h][1] / s, h, grouped[h][0]) for h in grouped
+        ]
         grouped.sort()
         grouped.reverse()
 
@@ -2663,15 +2773,30 @@ class ColorTheme(_list):
         """
         grouped = self._weight_by_hue()
 
-        xml = "<colors query=\"" + self.name + "\" tags=\"" + ", ".join(self.tags) + "\">\n\n"
+        xml = (
+            '<colors query="' + self.name + '" tags="' + ", ".join(self.tags) + '">\n\n'
+        )
         for total_weight, normalized_weight, hue, ranges in grouped:
-            if hue == self.blue: hue = "blue"
+            if hue == self.blue:
+                hue = "blue"
             clr = color(hue)
-            xml += "\t<color name=\"" + clr.name + "\" weight=\"" + str(normalized_weight) + "\">\n "
-            xml += "\t\t<rgb r=\"" + str(clr.r) + "\" g=\"" + str(clr.g) + "\" "
-            xml += "b=\"" + str(clr.b) + "\" a=\"" + str(clr.a) + "\" />\n "
+            xml += (
+                '\t<color name="'
+                + clr.name
+                + '" weight="'
+                + str(normalized_weight)
+                + '">\n '
+            )
+            xml += '\t\t<rgb r="' + str(clr.r) + '" g="' + str(clr.g) + '" '
+            xml += 'b="' + str(clr.b) + '" a="' + str(clr.a) + '" />\n '
             for clr, rng, wgt in ranges:
-                xml += "\t\t<shade name=\"" + str(rng) + "\" weight=\"" + str(wgt / total_weight) + "\" />\n "
+                xml += (
+                    '\t\t<shade name="'
+                    + str(rng)
+                    + '" weight="'
+                    + str(wgt / total_weight)
+                    + '" />\n '
+                )
             xml = xml.rstrip(" ") + "\t</color>\n\n"
         xml += "</colors>"
 
@@ -2680,9 +2805,7 @@ class ColorTheme(_list):
     xml = property(_xml)
 
     def _save(self):
-        """
-        Saves the color information in the cache as XML.
-        """
+        """Saves the color information in the cache as XML."""
         if not os.path.exists(self.cache):
             os.makedirs(self.cache)
 
@@ -2720,51 +2843,55 @@ class ColorTheme(_list):
                     float(attr(rgb, "g")),
                     float(attr(rgb, "b")),
                     float(attr(rgb, "a")),
-                    mode="rgb"
+                    mode="rgb",
                 )
                 try:
                     clr.name = attr(e, "name")
-                    if clr.name == "blue": clr = color(blue)
+                    if clr.name == "blue":
+                        clr = color(blue)
                 except:
                     pass
             except:
                 name = attr(e, "name")
-                if name == "blue": name = blue
+                if name == "blue":
+                    name = blue
                 clr = color(name)
 
             for s in e.getElementsByTagName("shade"):
-                self.ranges.append((
-                    clr,
-                    shade(attr(s, "name")),
-                    w * float(attr(s, "weight"))
-                ))
+                self.ranges.append(
+                    (
+                        clr,
+                        shade(attr(s, "name")),
+                        w * float(attr(s, "weight")),
+                    ),
+                )
 
     def color(self, d=0.035):
         """
         Returns a random color within the theme.
 
-        Fetches a random range (the weight is taken into account,
-        so ranges with a bigger weight have a higher chance of propagating)
-        and hues it with the associated color.
+        Fetches a random range (the weight is taken into account, so ranges with
+        a bigger weight have a higher chance of propagating) and hues it with
+        the associated color.
         """
         s = sum([w for clr, rng, w in self.ranges])
         r = random()
         for clr, rng, weight in self.ranges:
-            if weight / s >= r: break
+            if weight / s >= r:
+                break
             r -= weight / s
 
         return rng(clr, d)
 
     def colors(self, n=10, d=0.035):
-        """
-        Returns a number of random colors from the theme.
-        """
+        """Returns a number of random colors from the theme."""
         s = sum([w for clr, rng, w in self.ranges])
         colors = colorlist()
         for i in _range(n):
             r = random()
             for clr, rng, weight in self.ranges:
-                if weight / s >= r: break
+                if weight / s >= r:
+                    break
                 r -= weight / s
             colors.append(rng(clr, d))
 
@@ -2774,7 +2901,8 @@ class ColorTheme(_list):
 
     def contains(self, clr):
         for c, rng, weight in self.ranges:
-            if clr in rng: return True
+            if clr in rng:
+                return True
         return False
 
     # You can do: if clr in aggregate.
@@ -2827,33 +2955,42 @@ class ColorTheme(_list):
         return self.name
 
     def recombine(self, other, d=0.7):
-        """
-        Genetic recombination of two themes using cut and splice technique.
-        """
+        """Genetic recombination of two themes using cut and splice
+        technique."""
         a, b = self, other
         d1 = max(0, min(d, 1))
         d2 = d1
 
         c = ColorTheme(
-            name=a.name[:int(len(a.name) * d1)] +
-                 b.name[int(len(b.name) * d2):],
-            ranges=a.ranges[:int(len(a.ranges) * d1)] +
-                   b.ranges[int(len(b.ranges) * d2):],
+            name=a.name[: int(len(a.name) * d1)] + b.name[int(len(b.name) * d2) :],
+            ranges=a.ranges[: int(len(a.ranges) * d1)]
+            + b.ranges[int(len(b.ranges) * d2) :],
             top=a.top,
             cache=os.path.join(DEFAULT_CACHE, "recombined"),
             blue=a.blue,
-            length=a.length * d1 + b.length * d2
+            length=a.length * d1 + b.length * d2,
         )
-        c.tags = a.tags[:int(len(a.tags) * d1)]
-        c.tags += b.tags[int(len(b.tags) * d2):]
+        c.tags = a.tags[: int(len(a.tags) * d1)]
+        c.tags += b.tags[int(len(b.tags) * d2) :]
         return c
 
-    def swatch(self, x, y, w=35, h=35, padding=4, roundness=0, n=12, d=0.035, grouped=None):
+    def swatch(
+        self,
+        x,
+        y,
+        w=35,
+        h=35,
+        padding=4,
+        roundness=0,
+        n=12,
+        d=0.035,
+        grouped=None,
+    ):
         """
         Draws a weighted swatch with approximately n columns and rows.
 
-        When the grouped parameter is True, colors are grouped in blocks of the same hue
-        (also see the _weight_by_hue() method).
+        When the grouped parameter is True, colors are grouped in blocks of the
+        same hue (also see the _weight_by_hue() method).
         """
         if grouped is None:  # should be True or False
             grouped = self.group_swatches
@@ -2866,7 +3003,14 @@ class ColorTheme(_list):
             for clr, rng, wgt in self.ranges:
                 cols = max(1, int(wgt / s * n))
                 for i in _range(cols):
-                    rng.colors(clr, n=n, d=d).swatch(x, y, w, h, padding=padding, roundness=roundness)
+                    rng.colors(clr, n=n, d=d).swatch(
+                        x,
+                        y,
+                        w,
+                        h,
+                        padding=padding,
+                        roundness=roundness,
+                    )
                     x += w + padding
 
             return x, y + n * (h + padding)
@@ -2881,15 +3025,25 @@ class ColorTheme(_list):
                 dx = x
                 cols = int(normalized_weight * n)
                 cols = max(1, min(cols, n - len(grouped)))
-                if clr.name == "black": rng = rng.black
-                if clr.name == "white": rng = rng.white
+                if clr.name == "black":
+                    rng = rng.black
+                if clr.name == "white":
+                    rng = rng.white
                 for i in _range(cols):
                     rows = int(weight / total_weight * n)
                     rows = max(1, rows)
                     # Each column should add up to n rows,
                     # if not due to rounding errors, add a row at the bottom.
-                    if (clr, rng, weight) == ranges[-1] and rc + rows < n: rows += 1
-                    rng.colors(clr, n=rows, d=d).swatch(dx, dy, w, h, padding=padding, roundness=roundness)
+                    if (clr, rng, weight) == ranges[-1] and rc + rows < n:
+                        rows += 1
+                    rng.colors(clr, n=rows, d=d).swatch(
+                        dx,
+                        dy,
+                        w,
+                        h,
+                        padding=padding,
+                        roundness=roundness,
+                    )
                     dx += w + padding
                 dy += (w + padding) * rows  # + padding
                 rc = rows
@@ -2904,7 +3058,14 @@ class ColorTheme(_list):
         colors.swarm(x, y, r)
 
 
-def theme(name="", ranges=[], top=5, cache=DEFAULT_CACHE, blue="dodgerblue", guess=False):
+def theme(
+    name="",
+    ranges=[],
+    top=5,
+    cache=DEFAULT_CACHE,
+    blue="dodgerblue",
+    guess=False,
+):
     return ColorTheme(name, ranges, top, cache, blue, guess)
 
 
@@ -2932,10 +3093,17 @@ aggregate = theme
 
 #### COLORS FROM WEB #################################################################################
 
-def search_engine(query, top=5, service="google", license=None,
-                  cache=os.path.join(DEFAULT_CACHE, "google")):
+
+def search_engine(
+    query,
+    top=5,
+    service="google",
+    license=None,
+    cache=os.path.join(DEFAULT_CACHE, "google"),
+):
     """
     Return a color aggregate from colors and ranges parsed from the web.
+
     T. De Smedt, http://nodebox.net/code/index.php/Prism
     """
     # Check if we have cached information first.
@@ -2947,9 +3115,11 @@ def search_engine(query, top=5, service="google", license=None,
 
     if service == "google":
         from web import google
+
         search_engine = google
     if service == "yahoo":
         from web import yahoo
+
         search_engine = yahoo
         if license:
             yahoo.license_key = license
@@ -2957,17 +3127,21 @@ def search_engine(query, top=5, service="google", license=None,
     # Sort all the primary hues (plus black and white) for q.
     sorted_colors = search_engine.sort(
         [h for h in primary_hues] + ["black", "white"],
-        context=query, strict=True, cached=True
+        context=query,
+        strict=True,
+        cached=True,
     )
 
     # Sort all the shades (bright, hard, ...) for q.
     sorted_shades = search_engine.sort(
         [str(s) for s in shades],
-        context=query, strict=True, cached=True
+        context=query,
+        strict=True,
+        cached=True,
     )
 
     # Reforms '"black death"' to 'black'.
-    f = lambda x: x.strip("\"").split()[0]
+    f = lambda x: x.strip('"').split()[0]
 
     # Take the top most relevant hues.
     n2 = sum([w for h, w in sorted_colors[:top]])
@@ -3015,15 +3189,17 @@ def yahoo(query, top=5, license=None, cache=os.path.join(DEFAULT_CACHE, "yahoo")
 
 # nostroke()
 
+
 def morguefile(query, n=10, top=10):
     """
     Returns a list of colors drawn from a morgueFile image.
 
-    With the Web library installed,
-    downloads a thumbnail from morgueFile and retrieves pixel colors.
+    With the Web library installed, downloads a thumbnail from morgueFile and
+    retrieves pixel colors.
     """
 
     from web import morguefile
+
     images = morguefile.search(query)[:top]
     path = choice(images).download(thumbnail=True, wait=10)
 
@@ -3051,7 +3227,6 @@ _shadow = None
 
 
 class shadow(Grob):
-
     def __init__(self, dx=10, dy=10, alpha=0.25, blur=4.0, clr=None):
         """
         Sets the dropshadow for all onscreen elements.
@@ -3086,6 +3261,7 @@ class shadow(Grob):
             # However: exported artwork will now use the current zoom level too.
             if ZOOM_SHADOWS == True:
                 from AppKit import NSDocumentController
+
                 doc = NSDocumentController.sharedDocumentController().currentDocument()
                 z = doc.currentView.zoom
                 self._shadow.setShadowOffset_((self.dx * z, -self.dy * z))
@@ -3102,7 +3278,18 @@ class gradientpath(Grob):
     #
     # This is heavily based on Core Image + will need to be reimplemented in Cairo.
     #
-    def __init__(self, path, clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
+    def __init__(
+        self,
+        path,
+        clr1,
+        clr2,
+        type="radial",
+        dx=0,
+        dy=0,
+        spread=1.0,
+        angle=0,
+        alpha=1.0,
+    ):
         """
         Fills a path with a smooth gradient between two colors.
 
@@ -3160,15 +3347,21 @@ class gradientpath(Grob):
         # with scaling and rotation applied) will fall within the canvas bounds.
         p = self.path.transform.transformBezierPath(self.path)
         (tx, ty), (tw, th) = p.bounds
-        if tx + tw > 0 and ty + th > 0 and tx < _ctx.WIDTH and ty < _ctx.HEIGHT and tw > 0 and th > 0:
+        if (
+            tx + tw > 0
+            and ty + th > 0
+            and tx < _ctx.WIDTH
+            and ty < _ctx.HEIGHT
+            and tw > 0
+            and th > 0
+        ):
             pass
         else:
             _restore()
             return
 
         # Set a fill to cast a shadow.
-        if _shadow and self._shadow_alpha > 0 \
-                and self.path.fillcolor:
+        if _shadow and self._shadow_alpha > 0 and self.path.fillcolor:
             self.path.fillcolor.set()
             self.path._nsBezierPath.fill()
 
@@ -3176,8 +3369,10 @@ class gradientpath(Grob):
         # maximum of width/height for radial, minimum for linear.
         spread = max(0.1, self.spread)
         if isinstance(spread, float) or spread <= 1:
-            if self.type == "radial": spread *= max(w, h)
-            if self.type == "linear": spread *= min(w, h)
+            if self.type == "radial":
+                spread *= max(w, h)
+            if self.type == "linear":
+                spread *= min(w, h)
 
         # Don't render a dropshadow for the gradient overlay.
         if _shadow:
@@ -3187,7 +3382,10 @@ class gradientpath(Grob):
         if self.type == "radial":
             filter = CIFilter.filterWithName_("CIRadialGradient")
             filter.setDefaults()
-            filter.setValue_forKey_(CIVector.vectorWithX_Y_(x + w / 2 + self.dx, y + h / 2 + self.dy), "inputCenter")
+            filter.setValue_forKey_(
+                CIVector.vectorWithX_Y_(x + w / 2 + self.dx, y + h / 2 + self.dy),
+                "inputCenter",
+            )
             filter.setValue_forKey_(spread, "inputRadius1")
 
         if self.type == "linear":
@@ -3195,15 +3393,27 @@ class gradientpath(Grob):
             filter.setDefaults()
             dx = cos(radians(90 - self.angle)) * spread
             dy = sin(radians(90 - self.angle)) * spread
-            filter.setValue_forKey_(CIVector.vectorWithX_Y_(x + self.dx, y + self.dy), "inputPoint0")
-            filter.setValue_forKey_(CIVector.vectorWithX_Y_(x + self.dx + dx, y + self.dy + dy), "inputPoint1")
+            filter.setValue_forKey_(
+                CIVector.vectorWithX_Y_(x + self.dx, y + self.dy),
+                "inputPoint0",
+            )
+            filter.setValue_forKey_(
+                CIVector.vectorWithX_Y_(x + self.dx + dx, y + self.dy + dy),
+                "inputPoint1",
+            )
 
         if self.type in ["radial", "linear"]:
             clr1 = CIColor.colorWithRed_green_blue_alpha_(
-                self.clr1.r, self.clr1.g, self.clr1.b, self.clr1.a
+                self.clr1.r,
+                self.clr1.g,
+                self.clr1.b,
+                self.clr1.a,
             )
             clr2 = CIColor.colorWithRed_green_blue_alpha_(
-                self.clr2.r, self.clr2.g, self.clr2.b, self.clr2.a
+                self.clr2.r,
+                self.clr2.g,
+                self.clr2.b,
+                self.clr2.a,
             )
             filter.setValue_forKey_(clr2, "inputColor0")
             filter.setValue_forKey_(clr1, "inputColor1")
@@ -3211,7 +3421,9 @@ class gradientpath(Grob):
             context = NSGraphicsContext.currentContext().CIContext()
             self.path._nsBezierPath.addClip()
             context.drawImage_atPoint_fromRect_(
-                filter.valueForKey_("outputImage"), (x, y), ((x, y), (w, h))
+                filter.valueForKey_("outputImage"),
+                (x, y),
+                ((x, y), (w, h)),
             )
             NSGraphicsContext.currentContext().restoreGraphicsState()
 
@@ -3230,10 +3442,26 @@ class gradientpath(Grob):
 gradientfill = gradientpath
 
 
-def gradientbackground(clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
+def gradientbackground(
+    clr1,
+    clr2,
+    type="radial",
+    dx=0,
+    dy=0,
+    spread=1.0,
+    angle=0,
+    alpha=1.0,
+):
     gradientfill(
         _ctx.rect(0, 0, _ctx.WIDTH, _ctx.HEIGHT),
-        clr1, clr2, type, dx, dy, spread, angle, alpha
+        clr1,
+        clr2,
+        type,
+        dx,
+        dy,
+        spread,
+        angle,
+        alpha,
     )
 
 
@@ -3247,11 +3475,13 @@ def gradientbackground(clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=
 
 ######################################################################################################
 
+
 def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
     keys = list(named_hues.keys())
 
     def cmp(a, b):
-        if named_hues[a] < named_hues[b]: return 1
+        if named_hues[a] < named_hues[b]:
+            return 1
         return -1
 
     keys.sort(cmp)
@@ -3272,7 +3502,8 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
         _ctx.rotate(a)
         h = (named_hues[name] * scope + shift) % 1
         for i in _range(20):
-            if i < 2: continue
+            if i < 2:
+                continue
             x = r / 40.0 * (25 - i)
             _ctx.push()
             _ctx.rotate(2 * i)
@@ -3280,7 +3511,7 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
             _ctx.fill(color(0, 0, 0, 0.1, mode="rgb"))
             _ctx.oval(x, 2, x * 0.7, x * 0.7)
             _ctx.fill(color(h, 2.1 - i * 0.1, i * 0.1, i * 0.03, mode="hsb"))
-            p = _ctx.oval(x, 0, x * 0.7, x * 0.7)
+            _ctx.oval(x, 0, x * 0.7, x * 0.7)
             _ctx.pop()
 
         if labels and scope == 1 and shift == 0:
@@ -3292,6 +3523,7 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
             _ctx.pop()
 
     _ctx.reset()
+
 
 # 1.9.4.7-sb 2020-21-1
 # Fix HSB colors.

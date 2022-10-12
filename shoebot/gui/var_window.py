@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import os
 
-from shoebot.core.backend import gi
 from gi.repository import Gtk
-from shoebot.core.events import VARIABLE_CHANGED_EVENT, publish_event
+from pkg_resources import Requirement
+from pkg_resources import resource_filename
+
+from shoebot.core.events import VARIABLE_CHANGED_EVENT
+from shoebot.core.events import publish_event
 from shoebot.core.var_listener import VarListener
-from pkg_resources import resource_filename, Requirement
 
 ICON_FILE = resource_filename(
-    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+    Requirement.parse("shoebot"),
+    "share/pixmaps/shoebot-ide.png",
 )
 
 NUMBER = 1
@@ -51,7 +54,8 @@ class VarWindow(object):
 
     def add_variables(self):
         """
-        Add all widgets to specified vbox
+        Add all widgets to specified vbox.
+
         :param container:
         :return:
         """
@@ -59,7 +63,7 @@ class VarWindow(object):
             if not hasattr(v, "type"):
                 raise AttributeError(
                     "%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables"
-                    % k
+                    % k,
                 )
             self.add_variable(v)
 
@@ -154,7 +158,7 @@ class VarWindow(object):
         """
         widget = self.widgets.get(name)
         if widget is None:
-            return False, "No widget found matching, {}".format(name)
+            return False, f"No widget found matching, {name}"
 
         try:
             if isinstance(widget, Gtk.CheckButton):
@@ -170,7 +174,7 @@ class VarWindow(object):
             return False, str(e)
 
     def widget_changed(self, widget, v):
-        """ Called when a slider is adjusted. """
+        """Called when a slider is adjusted."""
         # set the appropriate bot var
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
@@ -185,8 +189,7 @@ class VarWindow(object):
 
     def var_added(self, v):
         """
-        var was added in the bot while it ran, possibly
-        by livecoding
+        var was added in the bot while it ran, possibly by livecoding.
 
         :param v:
         :return:
@@ -198,7 +201,7 @@ class VarWindow(object):
 
     def var_deleted(self, v):
         """
-        var was added in the bot
+        var was added in the bot.
 
         :param v:
         :return:

@@ -13,7 +13,6 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot import create_bot
-from shoebot.data.typography import TextBounds
 
 TEST_DIR = Path(__file__).absolute().parent
 TEST_INPUT_DIR = TEST_DIR / "input/tests"
@@ -25,10 +24,8 @@ RUNNING_IN_CI = "CI" in environ
 
 
 class NotSet:
-    """
-    Sentinel value, so that None can be explicitly set.
-    """
-    pass
+    """Sentinel value, so that None can be explicitly set."""
+
 
 def stub_sideeffect():
     # Stubs are here to give IDEs something to import without complaining.
@@ -58,7 +55,8 @@ def shoebot_named_testfunction(func, num, param):
 
 
 def shoebot_example_render_testfunction(func, num, param):
-    """Test function that accepts a tuple containing a posixpath to an example."""
+    """Test function that accepts a tuple containing a posixpath to an
+    example."""
     if not isinstance(param[0][0], Path):
         raise ValueError()
     return f"{func.__name__}__{param[0][0].stem}"
@@ -66,7 +64,8 @@ def shoebot_example_render_testfunction(func, num, param):
 
 def shoebot_named_testclass(cls, num, params_dict):
     """
-    parameterized helper to name class based whether 'windowed' is set to True or not.
+    parameterized helper to name class based whether 'windowed' is set to True
+    or not.
 
     The following code:
 
@@ -101,9 +100,9 @@ def test_as_bot(outputfile=NotSet, windowed=None, verbose=True):
         """
         Decorator that runs code in a method as a shoebot bot.
 
-        This is adapted from ShoebotTestCase.run_code with extra code to
-        inject the bot namespace.
-        """        
+        This is adapted from ShoebotTestCase.run_code with extra code to inject
+        the bot namespace.
+        """
         # TODO, need to get window from the test class again!!!
         bot = create_bot(window=windowed, outputfile=outputfile)
 
@@ -150,10 +149,8 @@ class ShoebotTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Create output directories and copy input images to them so that
-        users can view input and output images in using a file manager.
-        """
+        """Create output directories and copy input images to them so that users
+        can view input and output images in using a file manager."""
         for input_path, output_path in [
             (TEST_INPUT_DIR, TEST_OUTPUT_DIR),
             (EXAMPLE_INPUT_DIR, cls.image_output_dir),
@@ -182,9 +179,13 @@ class ShoebotTestCase(TestCase):
                             pass
 
     def assertBoundingBoxAlmostEqual(
-        self, expected_bounds, actual_bounds, threshold=2.0
+        self,
+        expected_bounds,
+        actual_bounds,
+        threshold=2.0,
     ):
-        """Given a two bounding boxes (x1, y1, x2, y2) assert they are within threshold of each other."""
+        """Given a two bounding boxes (x1, y1, x2, y2) assert they are within
+        threshold of each other."""
         if expected_bounds == actual_bounds:
             return
 
@@ -195,13 +196,13 @@ class ShoebotTestCase(TestCase):
 
         if not within_bounds:
             self.fail(
-                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}"
+                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}",
             )
 
     def assertReferenceImage(self, file1, file2):
         """
-        Under Linux check the file contents match exactly,
-        with assertFilesEqual.
+        Under Linux check the file contents match exactly, with
+        assertFilesEqual.
 
         Under OSX use assertImagesAlmostEqual.
         """
@@ -217,9 +218,9 @@ class ShoebotTestCase(TestCase):
         """
         Assert that the two images have a high level of similarity.
 
-        Linux and OSX have render slightly fonts and lines slightly
-        differently, so this can be used under OSX to check against
-        reference images originally rendered in Linux.
+        Linux and OSX have render slightly fonts and lines slightly differently,
+        so this can be used under OSX to check against reference images
+        originally rendered in Linux.
         """
         with Image.open(file1) as img1, Image.open(file2) as img2:
             diff = ImageChops.difference(img1, img2).histogram()
@@ -232,9 +233,7 @@ class ShoebotTestCase(TestCase):
             self.assertLess(rms, error)
 
     def assertFilesEqual(self, file1, file2):
-        """
-        Assert that the two passed in filenames are identical.
-        """
+        """Assert that the two passed in filenames are identical."""
         # TODO it would be fairly straightforward to check the contents of images if this is needed.
         self.assertTrue(filecmp.cmp(file1, file2), f"Files differ: {file1} {file2}")
 
@@ -243,12 +242,12 @@ class ShoebotTestCase(TestCase):
             self.fail(msg or f"{filename} does not exist.")
 
     def assertFileSize(self, filename, size=0):
-        """
-        Assert file exists and is larger than 0 bytes.
-        """
+        """Assert file exists and is larger than 0 bytes."""
         self.assertFileExists(filename)
         self.assertNotEqual(
-            size, Path(filename).stat().st_size, f"{filename} is zero bytes."
+            size,
+            Path(filename).stat().st_size,
+            f"{filename} is zero bytes.",
         )
 
     def run_code(
@@ -263,8 +262,8 @@ class ShoebotTestCase(TestCase):
         """
         Run shoebot code, sets random.seed to stabilize output.
 
-        Bots run with windowed=True will set the window title to be the fully qualified test name
-        this is to help identify tests that get stuck.
+        Bots run with windowed=True will set the window title to be the fully
+        qualified test name this is to help identify tests that get stuck.
         """
         if windowed:
             # Note: title grabs internal attribute _testMethodName.
@@ -276,14 +275,22 @@ class ShoebotTestCase(TestCase):
             title = None
 
         bot = create_bot(
-            window=windowed, outputfile=outputfile, namespace=namespace, title=title
+            window=windowed,
+            outputfile=outputfile,
+            namespace=namespace,
+            title=title,
         )
 
         seed(0)
         bot.run(code, verbose=verbose, run_forever=run_forever)
 
     def run_filename(
-        self, filename, outputfile, windowed=False, namespace=None, verbose=True
+        self,
+        filename,
+        outputfile,
+        windowed=False,
+        namespace=None,
+        verbose=True,
     ):
         """
         Run shoebot from filename.

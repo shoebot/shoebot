@@ -24,7 +24,7 @@ info = textwrap.dedent(
     interactively. Being pure Python, it can also be used as a Python module,
     a plugin for Python-scriptable tools such as Inkscape, and run from the
     command line.
-"""
+""",
 )
 
 if sys.version_info < (3, 4):
@@ -39,7 +39,9 @@ is_jython = platform.system == "Java"
 here = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    from setuptools import find_packages, setup, Command
+    from setuptools import Command
+    from setuptools import find_packages
+    from setuptools import setup
 except ImportError:
     sys.exit("Install setuptools before shoebot")
 
@@ -66,8 +68,8 @@ class CleanCommand(Command):
             for path in [str(p) for p in abs_paths]:
                 if not path.startswith(here):
                     # Die if path in CLEAN_FILES is absolute + outside this directory
-                    raise ValueError("%s is not a path inside %s" % (path, here))
-                print("removing %s" % os.path.relpath(path))
+                    raise ValueError(f"{path} is not a path inside {here}")
+                print(f"removing {os.path.relpath(path)}")
                 shutil.rmtree(path)
 
 
@@ -99,7 +101,7 @@ datafiles.extend(
         ("share/pixmaps", ["assets/shoebot-ide.png"]),
         ("share/shoebot/data", ["assets/kant.xml"]),
         ("share/applications", ["assets/shoebot-ide.desktop"]),
-    ]
+    ],
 )
 
 # include all libs EXCEPT the ones mentioned in EXCLUDE_LIBS
@@ -116,7 +118,7 @@ datafiles.extend(
         )
         for root, dir, files in os.walk("lib")
         if root not in EXCLUDE_LIBS
-    ]
+    ],
 )
 
 PYCAIRO = "pycairo>=1.18.1"
@@ -141,7 +143,7 @@ def read_version():
 
 def requirements(debug=True, with_pgi=None):
     """
-    Build requirements based on flags
+    Build requirements based on flags.
 
     :param with_pgi: Use 'pgi' instead of 'gi' - False on CPython, True elsewhere
     :return:

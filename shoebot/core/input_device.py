@@ -20,17 +20,17 @@ class InputDeviceMixin(object):
         self.mouse_buttons_down = set()
 
     def set_callbacks(self, **kwargs):
-        """ Set callbacks for input events """
+        """Set callbacks for input events."""
         for name in self.SUPPORTED_CALLBACKS:
             func = kwargs.get(name, getattr(self, name))
             setattr(self, name, func)
 
     def get_key_down(self):
-        """ Return True if any key is pressed """
+        """Return True if any key is pressed."""
         return bool(self.keys_pressed)
 
     def get_mouse_down(self):
-        """ Return True if any mouse button is pressed """
+        """Return True if any mouse button is pressed."""
         return bool(self.mouse_buttons_down)
 
     def get_key_map(self):

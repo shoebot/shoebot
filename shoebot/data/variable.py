@@ -11,11 +11,12 @@ def clamp(minvalue, value, maxvalue):
 
 
 class Variable(object):
-    """Taken from Nodebox"""
+    """Taken from Nodebox."""
 
     def __init__(self, name, type, **kwargs):
-        """Creates a live variable, which can be manipulated using the
-        variables UI, socket server or live coding shell.
+        """
+        Creates a live variable, which can be manipulated using the variables
+        UI, socket server or live coding shell.
 
         :param name: variable name
         :param type: variable type
@@ -32,7 +33,7 @@ class Variable(object):
             raise AttributeError("Variable name must be a string")
         if kwargs.get("step") and kwargs.get("steps"):
             raise AttributeError(
-                "Can only set step or steps"
+                "Can only set step or steps",
             )  # TODO - is this too strict
         self.type = type or NUMBER
         self.min = None
@@ -56,14 +57,14 @@ class Variable(object):
             self.default = kwargs.get("default", self.name)
         else:
             raise AttributeError(
-                "Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON"
+                "Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON",
             )
         self.value = kwargs.get("value", self.default)
         if self.value is None and self.default is not None:
             self.value = self.default
 
     def sanitize(self, val):
-        """Given a Variable and a value, cleans it out"""
+        """Given a Variable and a value, cleans it out."""
         if self.type == NUMBER:
             try:
                 return clamp(self.min, self.max, float(val))
@@ -81,7 +82,9 @@ class Variable(object):
                 return False
 
     def compliesTo(self, v):
-        """Return whether I am compatible with the given var:
+        """
+        Return whether I am compatible with the given var:
+
         - Type should be the same
         - My value should be inside the given vars' min/max range.
         """

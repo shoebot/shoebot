@@ -3,9 +3,11 @@ tuio = ximport("tuio")
 size(640, 480)
 speed(30)
 
+
 def setup():
     global tracking
     tracking = tuio.Tracking()
+
 
 def draw():
     global tracking
@@ -18,6 +20,7 @@ def draw():
         rect(x, y, 20, 20)
         reset()
         text(obj, x, y)
+
 
 def stop():
     global tracking

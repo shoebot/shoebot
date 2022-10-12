@@ -27,19 +27,18 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Cairo implementation of the canvas"""
+"""Cairo implementation of the canvas."""
 import os.path
-
 from math import pi as _pi
 
 from .backend import cairo
-from .input_device import InputDeviceMixin
 from .canvas import Canvas
 from .drawqueue import DrawQueue
+from .input_device import InputDeviceMixin
 
 
 class CairoCanvas(Canvas):
-    """ Cairo implementation of Canvas """
+    """Cairo implementation of Canvas."""
 
     def __init__(self, sink):
         Canvas.__init__(self, sink)
@@ -49,9 +48,7 @@ class CairoCanvas(Canvas):
         return DrawQueue()
 
     def initial_transform(self):
-        """
-        Return an identity matrix
-        """
+        """Return an identity matrix."""
         return cairo.Matrix()
 
     def get_input_device(self):
@@ -148,7 +145,7 @@ class CairoCanvas(Canvas):
 
     def output_closure(self, target):
         """
-        Function to output to a cairo surface
+        Function to output to a cairo surface.
 
         target is a cairo Context or filename
         """
@@ -175,13 +172,13 @@ class CairoCanvas(Canvas):
                 surface.write_to_png(target)
             elif extension == ".pdf":
                 target_ctx = cairo.Context(
-                    cairo.PDFSurface(filename, *self.size_or_default())
+                    cairo.PDFSurface(filename, *self.size_or_default()),
                 )
                 target_ctx.set_source_surface(ctx.get_target())
                 target_ctx.paint()
             elif extension in (".ps", ".eps"):
                 target_ctx = cairo.Context(
-                    cairo.PSSurface(filename, *self.size_or_default())
+                    cairo.PSSurface(filename, *self.size_or_default()),
                 )
                 if extension == ".eps":
                     target_ctx.set_eps(extension=".eps")
@@ -203,9 +200,7 @@ class CairoCanvas(Canvas):
             return output_file
 
     def ctx_render_background(self, cairo_ctx):
-        """
-        Draws the background colour of the bot
-        """
+        """Draws the background colour of the bot."""
         # TODO - rename this
         cairo_ctx.set_source_rgba(*self.background)
         cairo_ctx.paint()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import gettext
 import locale
+
 # This file is part of Shoebot.
 # Copyright (C) 2007-2009 the Shoebot authors
 # See the COPYING file for the full license text.
@@ -32,10 +33,16 @@ import sys
 from collections import namedtuple
 from enum import Enum
 
-from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
+from cairo import PATH_CLOSE_PATH
+from cairo import PATH_CURVE_TO
+from cairo import PATH_LINE_TO
+from cairo import PATH_MOVE_TO
 
-from shoebot.core.backend import cairo, driver, gi
-from shoebot.util import ShoebotInstallError, _copy_attrs
+from shoebot.core.backend import cairo
+from shoebot.core.backend import driver
+from shoebot.core.backend import gi
+from shoebot.util import ShoebotInstallError
+from shoebot.util import _copy_attrs
 
 from .basecolor import ColorMixin
 from .bezier import BezierPath
@@ -52,8 +59,9 @@ _ = gettext.gettext
 try:
     gi.require_version("Pango", "1.0")
     gi.require_version("PangoCairo", "1.0")
-    from gi.repository import Pango, PangoCairo
-except ValueError as no_pango:
+    from gi.repository import Pango
+    from gi.repository import PangoCairo
+except ValueError:
     global Pango, PangoCairo
 
     # workaround for readthedocs where Pango is not installed,
@@ -79,7 +87,7 @@ except ValueError as no_pango:
             if item == "Weight":
                 return FakePango.Weight
 
-            raise NotImplementedError("FakePango does not implement %s" % item)
+            raise NotImplementedError(f"FakePango does not implement {item}")
 
     Pango = FakePango()
     PangoCairo = FakePango()
@@ -90,8 +98,8 @@ def pangocairo_create_context(cr):
     """
     Create a PangoCairo context from a given pycairo context.
 
-    If python-gi-cairo is not installed PangoCairo.create_context dies
-    with an unhelpful KeyError, output a better error if that happens.
+    If python-gi-cairo is not installed PangoCairo.create_context dies with an
+    unhelpful KeyError, output a better error if that happens.
     """
     # TODO move this to core.backend
     try:
@@ -99,7 +107,7 @@ def pangocairo_create_context(cr):
     except KeyError as e:
         if e.args == ("could not find foreign type Context",):
             raise ShoebotInstallError(
-                "Error creating PangoCairo missing dependency: python-gi-cairo"
+                "Error creating PangoCairo missing dependency: python-gi-cairo",
             )
     raise
 
@@ -127,11 +135,11 @@ Text Bounds in pixels.
 
 class Text(Grob, ColorMixin):
     """
-    Changes from Nodebox 1:
-        font in Nodebox is a native Cocoa font, here it is the font name.
-        _fontsize, _fontsize, _lineheight, _align in Nodebox are public fields.
+    Changes from Nodebox 1: font in Nodebox is a native Cocoa font, here it is
+    the font name. _fontsize, _fontsize, _lineheight, _align in Nodebox are
+    public fields.
 
-        Implementation of fonts uses Pango instead of Cocoa.
+    Implementation of fonts uses Pango instead of Cocoa.
     """
 
     def __init__(
@@ -225,11 +233,11 @@ class Text(Grob, ColorMixin):
                 opts.set_hint_style(getattr(cairo.HintStyle, self.hintstyle.upper()))
             if self.hintmetrics:
                 opts.set_hint_metrics(
-                    getattr(cairo.HintMetrics, self.hintmetrics.upper())
+                    getattr(cairo.HintMetrics, self.hintmetrics.upper()),
                 )
             if self.subpixelorder:
                 opts.set_subpixel_order(
-                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper())
+                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper()),
                 )
             cr.set_font_options(opts)
 
@@ -251,7 +259,7 @@ class Text(Grob, ColorMixin):
         # we want to output something like
         # <span letter_spacing="2048">Hello World</span>
         markup_styles = " ".join(
-            [f'{setting}="{value}"' for setting, value in self.markup_vars.items()]
+            [f'{setting}="{value}"' for setting, value in self.markup_vars.items()],
         )
         self._pango_layout.set_markup(f"<span {markup_styles}>{self.text}</span>")
 
@@ -269,7 +277,7 @@ class Text(Grob, ColorMixin):
 
     def _get_context(self):
         self._ctx = self._ctx or cairo.Context(
-            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
+            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None),
         )
         return self._ctx
 

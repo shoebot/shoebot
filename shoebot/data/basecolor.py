@@ -23,7 +23,8 @@ _ = gettext.gettext
 
 
 class Color(object):
-    """Represents a single color.
+    """
+    Represents a single color.
 
     Attributes (RGB and HSL) are values between 0 and 1
 
@@ -219,10 +220,11 @@ class Color(object):
 
     def __getattr__(self, a):
 
-        """Available properties:
-        r, g, b, a or red, green, blue, alpha
-        h, s or hue, saturation, brightness
+        """
+        Available properties:
 
+        r, g, b, a or red, green, blue, alpha h, s or hue, saturation,
+        brightness
         """
         if a in self.__dict__:
             return a
@@ -260,14 +262,14 @@ class Color(object):
             return self.__dict__["__" + a[0]]
 
         raise AttributeError(
-            "'" + str(self.__class__) + "' object has no attribute '" + a + "'"
+            "'" + str(self.__class__) + "' object has no attribute '" + a + "'",
         )
 
 
 class ColorMixin(object):
     """
-    Mixin class for color support.
-    Adds fill, stroke and blending mode attributes to the class.
+    Mixin class for color support. Adds fill, stroke and blending mode
+    attributes to the class.
 
     Setting color attributes, will convert them to Color instances, allowing
     them to be specfied in other ways, such as   fill="#123456"
@@ -345,7 +347,8 @@ def dec2hex(d):
 
 
 def parse_color(v, color_range=1):
-    """Receives a colour definition and returns a (r,g,b,a) tuple.
+    """
+    Receives a colour definition and returns a (r,g,b,a) tuple.
 
     Accepts:
     - v
@@ -439,7 +442,8 @@ hex2rgb = hex_to_rgb
 
 
 def lab_to_rgb(l, a, b):
-    """Converts CIE Lab to RGB components.
+    """
+    Converts CIE Lab to RGB components.
 
     First we have to convert to XYZ color space.
     Conversion involves using a white point,
@@ -447,7 +451,6 @@ def lab_to_rgb(l, a, b):
 
     Algorithm adopted from:
     http://www.easyrgb.com/math.php
-
     """
 
     y = (l + 16) / 116.0
@@ -483,7 +486,9 @@ lab2rgb = lab_to_rgb
 
 
 def hsv_to_rgb(h, s, v):
-    """Hue, saturation, brightness to red, green, blue.
+    """
+    Hue, saturation, brightness to red, green, blue.
+
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """
@@ -545,7 +550,7 @@ rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
 
 def rgba_to_argb(stringImage):
     tempBuffer = [None] * len(
-        stringImage
+        stringImage,
     )  # Create an empty array of the same size as stringImage
     tempBuffer[0::4] = stringImage[2::4]
     tempBuffer[1::4] = stringImage[1::4]

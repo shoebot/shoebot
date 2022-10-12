@@ -2,10 +2,8 @@ from contextlib import contextmanager
 
 
 class VarListener(object):
-    """
-    Var listeners are used to notify things like
-    the gui or socketserver when variables change
-    """
+    """Var listeners are used to notify things like the gui or socketserver when
+    variables change."""
 
     active = True  # set to False to temporarily disable
 
@@ -46,7 +44,7 @@ class VarListener(object):
     @contextmanager
     def disabled():
         """
-        Context manager to temporarily disable all listeners
+        Context manager to temporarily disable all listeners.
 
         >>> with VarListener.disabled()
         ...     pass
@@ -61,10 +59,9 @@ class VarListener(object):
     @contextmanager
     def batch(vars, oldvars, ns):
         """
-        Context manager to only update listeners
-        at the end, in the meantime it doesn't
-        matter what intermediate state the vars
-        are in (they can be added and removed)
+        Context manager to only update listeners at the end, in the meantime it
+        doesn't matter what intermediate state the vars are in (they can be
+        added and removed)
 
         >>> with VarListener.batch()
         ...     pass

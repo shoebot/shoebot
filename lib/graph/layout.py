@@ -1,6 +1,8 @@
-from random import random
-from math import pi, sin, cos
+from math import cos
+from math import pi
+from math import sin
 from math import sqrt
+from random import random
 
 
 class Point:
@@ -13,9 +15,7 @@ class Point:
 
 
 class layout(object):
-    """
-    Graph visualizer that calculates relative node positions.
-    """
+    """Graph visualizer that calculates relative node positions."""
 
     def __init__(self, graph, iterations=1000):
         self.type = None
@@ -26,9 +26,7 @@ class layout(object):
         self.__bounds = None
 
     def copy(self, graph):
-        """
-        Returns a copy of the layout for the given graph.
-        """
+        """Returns a copy of the layout for the given graph."""
         l = self.__class__(graph, self.n)
         l.i = 0
         return l
@@ -80,9 +78,7 @@ class layout(object):
 
 
 class circle_layout(layout):
-    """
-    Simple layout with nodes arranged on one or more circles.
-    """
+    """Simple layout with nodes arranged on one or more circles."""
 
     def __init__(self, graph, iterations=100):
         layout.__init__(self, graph, iterations)
@@ -165,6 +161,7 @@ class circle_layout(layout):
 class spring_layout(layout):
     """
     A force-based layout in which edges are regarded as springs.
+
     http://snipplr.com/view/1950/graph-javascript-framework-version-001/
     """
 
@@ -233,12 +230,12 @@ class spring_layout(layout):
     def _distance(self, n1, n2):
         dx = n2.vx - n1.vx
         dy = n2.vy - n1.vy
-        d2 = dx ** 2 + dy ** 2
+        d2 = dx**2 + dy**2
 
         if d2 < 0.01:
             dx = random() * 0.1 + 0.1
             dy = random() * 0.1 + 0.1
-            d2 = dx ** 2 + dy ** 2
+            d2 = dx**2 + dy**2
 
         d = sqrt(d2)
         return dx, dy, d
@@ -247,7 +244,7 @@ class spring_layout(layout):
         dx, dy, d = self._distance(n1, n2)
 
         if d < self.r:
-            f = self.k ** 2 / d ** 2
+            f = self.k**2 / d**2
             n2.force.x += f * dx
             n2.force.y += f * dy
             n1.force.x -= f * dx
@@ -258,7 +255,7 @@ class spring_layout(layout):
         d = min(d, self.r)
 
         # Take the edge's weight (k) into account.
-        f = (d ** 2 - self.k ** 2) / self.k * length
+        f = (d**2 - self.k**2) / self.k * length
         f *= k * 0.5 + 1
         f /= d
 

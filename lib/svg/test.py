@@ -1,6 +1,6 @@
 # This script tests if the SVG library works correctly.
-import unittest
 import importlib
+import unittest
 
 svg = ximport("__init__")
 importlib.reload(svg)
@@ -9,10 +9,10 @@ BLACK = Color()
 WHITE = Color(1)
 RED = Color(1, 0, 0)
 
-class SVGTest(unittest.TestCase):
 
+class SVGTest(unittest.TestCase):
     def test_import(self):
-        paths = svg.parse(open('blocktest.svg').read())
+        paths = svg.parse(open("blocktest.svg").read())
         # Blocktest contains 9 paths:
         # first row: 0: black fill | 1: black stroke | 2: black thick stroke
         # second row: 3: white fill | 4: white stroke | 5: white thick stroke
@@ -56,11 +56,11 @@ class SVGTest(unittest.TestCase):
         # Path 8: red thick stroke
         self.assertNoFill(paths[8])
         self.assertStroke(paths[8], RED)
-        self.assertStrokewidth(paths[8], 10) 
-        
+        self.assertStrokewidth(paths[8], 10)
+
     def assertFill(self, path, c):
-        self.assertColorEquals(c, path.fill)        
-        
+        self.assertColorEquals(c, path.fill)
+
     def assertNoFill(self, path):
         self.assertColorEquals(Color(0, 0), path.fill)
 
@@ -69,16 +69,17 @@ class SVGTest(unittest.TestCase):
 
     def assertNoStroke(self, path):
         self.assertColorEquals(Color(0, 0), path.stroke)
-        
+
     def assertStrokewidth(self, path, width):
         self.assertEqual(width, path.strokewidth)
-        
+
     def assertColorEquals(self, c1, c2):
         self.assertEqual(c1.red, c1.red)
         self.assertEqual(c1.green, c1.green)
         self.assertEqual(c1.blue, c1.blue)
         self.assertEqual(c1.alpha, c1.alpha)
-        
+
+
 suite = unittest.TestLoader().loadTestsFromTestCase(SVGTest)
 suite.debug()
 print("All tests passed.")
