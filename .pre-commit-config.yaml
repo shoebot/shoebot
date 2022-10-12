@@ -17,7 +17,11 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
-        args: [--force-single-line-imports]
+        args:
+          [
+            "--force-single-line-imports",
+            "--profile=black",
+          ]
   - repo: https://github.com/myint/docformatter.git
     rev: v1.5.0
     hooks:
@@ -29,12 +33,11 @@ repos:
             "--wrap-descriptions=80",
             "--pre-summary-newline",
           ]
-  - repo: https://github.com/psf/black
-    rev: 22.10.0
-    hooks:
-      - id: black
   - repo: https://github.com/ikamensh/flynt/
     rev: '0.76'
     hooks:
       - id: flynt
-
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+      - id: black
