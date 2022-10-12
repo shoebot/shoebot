@@ -117,7 +117,7 @@ def create_canvas(
             else:
                 title = "Untitled - Shoebot"
         sink = ShoebotWindow(
-            title, show_vars, fullscreen=fullscreen, outputfile=outputfile
+            title, show_vars, fullscreen=fullscreen, outputfile=outputfile,
         )
     elif outputfile:
         sink = CairoImageSink(outputfile, format, multifile, buff)
@@ -192,7 +192,7 @@ class ShoebotThread(threading.Thread):
     """
 
     def __init__(
-        self, create_args, create_kwargs, run_args, run_kwargs, send_sigint=False
+        self, create_args, create_kwargs, run_args, run_kwargs, send_sigint=False,
     ):
         """
         :param create_args: passed to create_bot
@@ -289,7 +289,7 @@ def run(
     """
     # Munge shoebogt sys.argv
     sys.argv = [
-        sys.argv[0]
+        sys.argv[0],
     ] + args  # Remove shoebot parameters so sbot can be used in place of the python interpreter (e.g. for sphinx).
 
     # arguments for create_bot
@@ -335,7 +335,7 @@ def run(
             # python readline is blocking, so ui must run in a seperate
             # thread
             raise ValueError(
-                "UI Must run in a separate thread to shell and shell needs main thread"
+                "UI Must run in a separate thread to shell and shell needs main thread",
             )
 
         sbot_thread = None

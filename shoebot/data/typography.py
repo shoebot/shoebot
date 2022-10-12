@@ -98,7 +98,7 @@ def pangocairo_create_context(cr):
     except KeyError as e:
         if e.args == ("could not find foreign type Context",):
             raise ShoebotInstallError(
-                "Error creating PangoCairo missing dependency: python-gi-cairo"
+                "Error creating PangoCairo missing dependency: python-gi-cairo",
             )
     raise
 
@@ -223,11 +223,11 @@ class Text(Grob, ColorMixin):
                 opts.set_hint_style(getattr(cairo.HintStyle, self.hintstyle.upper()))
             if self.hintmetrics:
                 opts.set_hint_metrics(
-                    getattr(cairo.HintMetrics, self.hintmetrics.upper())
+                    getattr(cairo.HintMetrics, self.hintmetrics.upper()),
                 )
             if self.subpixelorder:
                 opts.set_subpixel_order(
-                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper())
+                    getattr(cairo.SubpixelOrder, self.subpixelorder.upper()),
                 )
             cr.set_font_options(opts)
 
@@ -249,7 +249,7 @@ class Text(Grob, ColorMixin):
         # we want to output something like
         # <span letter_spacing="2048">Hello World</span>
         markup_styles = " ".join(
-            [f'{setting}="{value}"' for setting, value in self.markup_vars.items()]
+            [f'{setting}="{value}"' for setting, value in self.markup_vars.items()],
         )
         self._pango_layout.set_markup(f"<span {markup_styles}>{self.text}</span>")
 
@@ -267,7 +267,7 @@ class Text(Grob, ColorMixin):
 
     def _get_context(self):
         self._ctx = self._ctx or cairo.Context(
-            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None)
+            cairo.RecordingSurface(cairo.CONTENT_ALPHA, None),
         )
         return self._ctx
 

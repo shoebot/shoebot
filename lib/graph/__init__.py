@@ -84,7 +84,7 @@ class node:
         for n in self.graph.nodes:
             n._visited = False
         return proximity.depth_first_search(
-            self, visit=lambda n: node == n, traversable=traversable
+            self, visit=lambda n: node == n, traversable=traversable,
         )
 
     def _get_betweenness(self):
@@ -275,7 +275,7 @@ class graph(dict):
                 )
             for e in self.edges:
                 g.add_edge(
-                    e.node1.id, e.node2.id, e.weight, e.length, e.label, e.__dict__
+                    e.node1.id, e.node2.id, e.weight, e.length, e.label, e.__dict__,
                 )
 
         return g
@@ -443,7 +443,7 @@ class graph(dict):
         return x, y
 
     def draw(
-        self, dx=0, dy=0, weighted=False, directed=False, highlight=[], traffic=None
+        self, dx=0, dy=0, weighted=False, directed=False, highlight=[], traffic=None,
     ):
         """Layout the graph incrementally.
 
@@ -555,7 +555,7 @@ class graph(dict):
         Node eigenvalue weights are updated in the process.
         """
         ec = proximity.eigenvector_centrality(
-            self, normalized, reversed, rating, start, iterations, tolerance
+            self, normalized, reversed, rating, start, iterations, tolerance,
         )
         for id, w in ec.items():
             self[id]._eigenvalue = w
@@ -773,7 +773,7 @@ def create(iterations=1000, distance=1.0, layout=LAYOUT_SPRING, depth=True):
     g.styles.append(s(style.BACK, _ctx, fill=_ctx.color(0.5, 0.8, 0.0, 0.50)))
     g.styles.append(s(style.IMPORTANT, _ctx, fill=_ctx.color(0.3, 0.6, 0.8, 0.75)))
     g.styles.append(
-        s(style.HIGHLIGHT, _ctx, stroke=_ctx.color(1.0, 0.0, 0.5), strokewidth=1.5)
+        s(style.HIGHLIGHT, _ctx, stroke=_ctx.color(1.0, 0.0, 0.5), strokewidth=1.5),
     )
     g.styles.append(s(style.MARKED, _ctx))
     g.styles.append(
@@ -785,7 +785,7 @@ def create(iterations=1000, distance=1.0, layout=LAYOUT_SPRING, depth=True):
             strokewidth=1.5,
             fontsize=16,
             textwidth=150,
-        )
+        ),
     )
 
     # Important nodes get a double stroke.

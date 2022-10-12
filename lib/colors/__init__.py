@@ -277,7 +277,7 @@ named_hues = {
 primary_hues = ["red", "orange", "yellow", "green", "blue", "purple", "pink"]
 primary_and_secondary_hues = [
     "red", "orange", "yellow", "lime", "green", "teal",
-    "cyan", "azure", "blue", "indigo", "purple", "pink"
+    "cyan", "azure", "blue", "indigo", "purple", "pink",
 ]
 
 ### NAMED COLORS #####################################################################################
@@ -544,8 +544,10 @@ class Color(BaseColor):
             BaseColor.__init__(self, r, g, b, 1, mode='rgb', color_range=1.0)
 
         # RGB, HSB or CMYK color values.
-        elif ("mode" in kwargs \
-              and kwargs["mode"].lower() in modes) \
+        elif (
+            "mode" in kwargs \
+              and kwargs["mode"].lower() in modes
+        ) \
                 or mode in modes:
             m, ra = mode, range
             if "mode" in kwargs:
@@ -727,7 +729,7 @@ class Color(BaseColor):
             (270, 234), (285, 251),
             (300, 267), (315, 282),
             (330, 298), (345, 329),
-            (360, 0)
+            (360, 0),
         ]
 
         # Given a hue, find out under what angle it is
@@ -1042,7 +1044,7 @@ class ColorList(_list):
         return ColorList(
             [color(clr.r, clr.g, clr.b, clr.a, mode="rgb") for clr in self],
             name=self.name,
-            tags=self.tags
+            tags=self.tags,
         )
 
     def _darkest(self):
@@ -1462,7 +1464,7 @@ def left_complement(clr):
     colors[5].h = left.h
 
     colors = colorlist(
-        colors[0], colors[2], colors[1], colors[3], colors[4], colors[5]
+        colors[0], colors[2], colors[1], colors[3], colors[4], colors[5],
     )
 
     return colors
@@ -1477,7 +1479,7 @@ def right_complement(clr):
     colors[5].h = right.h
 
     colors = colorlist(
-        colors[0], colors[2], colors[1], colors[5], colors[4], colors[3]
+        colors[0], colors[2], colors[1], colors[5], colors[4], colors[3],
     )
 
     return colors
@@ -1638,7 +1640,7 @@ rules = [
     "triad",
     "tetrad",
     "compound",
-    "flipped compound"
+    "flipped compound",
 ]
 
 
@@ -1787,7 +1789,7 @@ class Gradient(ColorList):
         # Calculate left and right gradient proportionally to spread.
         gradient = self._interpolate(left, int(n * self.spread))[:-1]
         gradient.extend(
-            self._interpolate(right, n - int(n * self.spread))[1:]
+            self._interpolate(right, n - int(n * self.spread))[1:],
         )
 
         if self.spread > 1: gradient = gradient[:n]
@@ -1914,8 +1916,10 @@ favorites = Favorites()
 
 class ColorRange(ColorList):
 
-    def __init__(self, h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
-                 grayscale=False, name="", length=100):
+    def __init__(
+        self, h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
+        grayscale=False, name="", length=100,
+    ):
         """A stateless list of colors whose HSB values are confined to a range.
 
         Hue, saturation and brightness are confined to a (min, max) tuple,
@@ -2008,7 +2012,7 @@ class ColorRange(ColorList):
                 return self.white.color(clr, d)
             if clr.is_grey:
                 return choice(
-                    (self.black.color(clr, d), self.white.color(clr, d))
+                    (self.black.color(clr, d), self.white.color(clr, d)),
                 )
 
         h, s, b, a = self.h, self.s, self.b, self.a
@@ -2052,8 +2056,10 @@ class ColorRange(ColorList):
         for clr in clr:
 
             if clr.is_grey and not self.grayscale:
-                return (self.black.contains(clr) or \
-                        self.white.contains(clr))
+                return (
+                    self.black.contains(clr) or \
+                        self.white.contains(clr)
+                )
 
             for r, v in [(self.h, clr.h), (self.s, clr.s), (self.b, clr.brightness), (self.a, clr.a)]:
                 if isinstance(r, _list):
@@ -2146,8 +2152,10 @@ class ColorRange(ColorList):
         return self.name
 
 
-def colorrange(h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
-               grayscale=False, name="", length=100):
+def colorrange(
+    h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
+    grayscale=False, name="", length=100,
+):
     return ColorRange(h, s, b, a, grayscale, name, length)
 
 
@@ -2163,85 +2171,96 @@ range = colorrange
 # and a brightness ranging between 90-100%.
 
 # Light shades are bright and light.
-light = ColorRange(name="light",
-                   s=(0.3, 0.7),
-                   b=(0.9, 1.0)
-                   )
+light = ColorRange(
+    name="light",
+    s=(0.3, 0.7),
+    b=(0.9, 1.0),
+)
 light.black.b = (0.15, 0.30)
 
 # Dark shades are deep and colorfully saturated.
-dark = ColorRange(name="dark",
-                  s=(0.7, 1.0),
-                  b=(0.15, 0.4)
-                  )
+dark = ColorRange(
+    name="dark",
+    s=(0.7, 1.0),
+    b=(0.15, 0.4),
+)
 dark.white.b = (0.5, 0.75)
 
 # Bright shades are colorful and friendly.
-bright = ColorRange(name="bright",
-                    s=(0.8, 1.0),
-                    b=(0.8, 1.0)
-                    )
+bright = ColorRange(
+    name="bright",
+    s=(0.8, 1.0),
+    b=(0.8, 1.0),
+)
 
 # Weak shades are neither light, soft nor neutral.
-weak = ColorRange(name="weak",
-                  s=(0.15, 0.3),
-                  b=(0.7, 1.0)
-                  )
+weak = ColorRange(
+    name="weak",
+    s=(0.15, 0.3),
+    b=(0.7, 1.0),
+)
 weak.black.b = 0.2
 
 # Neutral shades are desaturated and neither bright nor dark.
-neutral = ColorRange(name="neutral",
-                     s=(0.25, 0.35),
-                     b=(0.3, 0.7)
-                     )
+neutral = ColorRange(
+    name="neutral",
+    s=(0.25, 0.35),
+    b=(0.3, 0.7),
+)
 neutral.white.b = (0.9, 1.0)
 neutral.black.b = (0.15, 0.15)
 
 # Fresh shades are light and friendly
 # with a higher saturation than soft shades.
-fresh = ColorRange(name="fresh",
-                   s=(0.4, 0.8),
-                   b=(0.8, 1.0)
-                   )
+fresh = ColorRange(
+    name="fresh",
+    s=(0.4, 0.8),
+    b=(0.8, 1.0),
+)
 fresh.white.b = (0.8, 1.0)
 fresh.black.b = (0.05, 0.3)
 
 # Soft shades produce gentle pastel colors
 # with small difference in saturation.
-soft = ColorRange(name="soft",
-                  s=(0.2, 0.3),
-                  b=(0.6, 0.9)
-                  )
+soft = ColorRange(
+    name="soft",
+    s=(0.2, 0.3),
+    b=(0.6, 0.9),
+)
 soft.white.b = (0.6, 0.9)
 soft.black.b = (0.05, 0.15)
 
 # Hard shades have powerful colors
 # but lighter than intense shades.
-hard = ColorRange(name="hard",
-                  s=(0.9, 1.0),
-                  b=(0.4, 1.0)
-                  )
+hard = ColorRange(
+    name="hard",
+    s=(0.9, 1.0),
+    b=(0.4, 1.0),
+)
 
 # Warm shades are gently saturated and gently bright.
-warm = ColorRange(name="warm",
-                  s=(0.6, 0.9),
-                  b=(0.4, 0.9)
-                  )
+warm = ColorRange(
+    name="warm",
+    s=(0.6, 0.9),
+    b=(0.4, 0.9),
+)
 warm.white.b = (0.8, 1.0)
 warm.black.b = 0.2
 
 # Cool shades are cold, bright and desaturated.
-cool = ColorRange(name="cool",
-                  s=(0.05, 0.2),
-                  b=(0.9, 1.0)
-                  )
+cool = ColorRange(
+    name="cool",
+    s=(0.05, 0.2),
+    b=(0.9, 1.0),
+)
 cool.white.b = (0.95, 1.0)
 
 # Intense shades have powerful deep/bright contrasts.
-intense = ColorRange(name="intense",
-                     s=(0.9, 1.0),
-                     b=[(0.2, 0.35), (0.8, 1.0)]
-                     )
+intense = ColorRange(
+    name="intense",
+    s=(0.9, 1.0),
+    b=[(0.2, 0.35), (0.8, 1.0)],
+)
 
 shades = [light, dark, bright, weak, neutral, fresh, soft, hard, warm, cool, intense]
 
@@ -2263,7 +2282,7 @@ shade_opposites = {
     "soft": hard,
     "hard": soft,
     "warm": cool,
-    "cool": warm
+    "cool": warm,
 }
 
 
@@ -2540,7 +2559,7 @@ class ColorTheme(_list):
             cache=self.cache,
             blue=self.blue,
             guess=self.guess,
-            lenght=self.length
+            lenght=self.length,
         )
         t.tags = self.tags
         t.group_swatches = self.group_swatches
@@ -2653,7 +2672,7 @@ class ColorTheme(_list):
                     float(attr(rgb, "g")),
                     float(attr(rgb, "b")),
                     float(attr(rgb, "a")),
-                    mode="rgb"
+                    mode="rgb",
                 )
                 try:
                     clr.name = attr(e, "name")
@@ -2669,7 +2688,7 @@ class ColorTheme(_list):
                 self.ranges.append((
                     clr,
                     shade(attr(s, "name")),
-                    w * float(attr(s, "weight"))
+                    w * float(attr(s, "weight")),
                 ))
 
     def color(self, d=0.035):
@@ -2771,7 +2790,7 @@ class ColorTheme(_list):
             top=a.top,
             cache=os.path.join(DEFAULT_CACHE, "recombined"),
             blue=a.blue,
-            length=a.length * d1 + b.length * d2
+            length=a.length * d1 + b.length * d2,
         )
         c.tags = a.tags[:int(len(a.tags) * d1)]
         c.tags += b.tags[int(len(b.tags) * d2):]
@@ -2860,8 +2879,10 @@ aggregate = theme
 
 #### COLORS FROM WEB #################################################################################
 
-def search_engine(query, top=5, service="google", license=None,
-                  cache=os.path.join(DEFAULT_CACHE, "google")):
+def search_engine(
+    query, top=5, service="google", license=None,
+    cache=os.path.join(DEFAULT_CACHE, "google"),
+):
     """Return a color aggregate from colors and ranges parsed from the web.
 
     T. De Smedt, http://nodebox.net/code/index.php/Prism
@@ -2885,13 +2906,13 @@ def search_engine(query, top=5, service="google", license=None,
     # Sort all the primary hues (plus black and white) for q.
     sorted_colors = search_engine.sort(
         [h for h in primary_hues] + ["black", "white"],
-        context=query, strict=True, cached=True
+        context=query, strict=True, cached=True,
     )
 
     # Sort all the shades (bright, hard, ...) for q.
     sorted_shades = search_engine.sort(
         [str(s) for s in shades],
-        context=query, strict=True, cached=True
+        context=query, strict=True, cached=True,
     )
 
     # Reforms '"black death"' to 'black'.
@@ -3125,10 +3146,10 @@ class gradientpath(Grob):
 
         if self.type in ["radial", "linear"]:
             clr1 = CIColor.colorWithRed_green_blue_alpha_(
-                self.clr1.r, self.clr1.g, self.clr1.b, self.clr1.a
+                self.clr1.r, self.clr1.g, self.clr1.b, self.clr1.a,
             )
             clr2 = CIColor.colorWithRed_green_blue_alpha_(
-                self.clr2.r, self.clr2.g, self.clr2.b, self.clr2.a
+                self.clr2.r, self.clr2.g, self.clr2.b, self.clr2.a,
             )
             filter.setValue_forKey_(clr2, "inputColor0")
             filter.setValue_forKey_(clr1, "inputColor1")
@@ -3136,7 +3157,7 @@ class gradientpath(Grob):
             context = NSGraphicsContext.currentContext().CIContext()
             self.path._nsBezierPath.addClip()
             context.drawImage_atPoint_fromRect_(
-                filter.valueForKey_("outputImage"), (x, y), ((x, y), (w, h))
+                filter.valueForKey_("outputImage"), (x, y), ((x, y), (w, h)),
             )
             NSGraphicsContext.currentContext().restoreGraphicsState()
 
@@ -3158,7 +3179,7 @@ gradientfill = gradientpath
 def gradientbackground(clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
     gradientfill(
         _ctx.rect(0, 0, _ctx.WIDTH, _ctx.HEIGHT),
-        clr1, clr2, type, dx, dy, spread, angle, alpha
+        clr1, clr2, type, dx, dy, spread, angle, alpha,
     )
 
 

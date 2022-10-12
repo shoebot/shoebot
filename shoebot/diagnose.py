@@ -65,7 +65,7 @@ def display_platform():
             platform.version(),
             platform.mac_ver(),
             platform.win32_ver(),
-        )
+        ),
     )
 
 
@@ -74,13 +74,13 @@ def import_success_message(module, name):
         [
             f"    import {name.ljust(COL_WIDTH)} [success]:",
             "        " + module.__file__,
-        ]
+        ],
     )
 
 
 def import_fail_message(mn, reason):
     return "\n".join(
-        [f"    import {mn.ljust(COL_WIDTH)} [failed]:", "        " + reason]
+        [f"    import {mn.ljust(COL_WIDTH)} [failed]:", "        " + reason],
     )
 
 
@@ -122,13 +122,13 @@ def test_imports():
     pubsub = test_import("pubsub")
     meta = test_import("meta")
     rsvg = test_import(
-        "gi.repository.Rsvg", "SVG Support unavailable", gi_require=("Rsvg", "2.0")
+        "gi.repository.Rsvg", "SVG Support unavailable", gi_require=("Rsvg", "2.0"),
     )
 
     return (
         test_import("shoebot"),
         AvailableModules(
-            gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext, pango=pango
+            gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext, pango=pango,
         ),
     )
 

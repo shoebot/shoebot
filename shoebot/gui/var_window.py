@@ -8,7 +8,7 @@ from shoebot.core.var_listener import VarListener
 from pkg_resources import resource_filename, Requirement
 
 ICON_FILE = resource_filename(
-    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png",
 )
 
 NUMBER = 1
@@ -59,7 +59,7 @@ class VarWindow(object):
             if not hasattr(v, "type"):
                 raise AttributeError(
                     "%s is not a Shoebot Variable - see https://shoebot.readthedocs.io/en/latest/commands.html#dynamic-variables"
-                    % k
+                    % k,
                 )
             self.add_variable(v)
 

@@ -32,7 +32,7 @@ class Variable(object):
             raise AttributeError("Variable name must be a string")
         if kwargs.get("step") and kwargs.get("steps"):
             raise AttributeError(
-                "Can only set step or steps"
+                "Can only set step or steps",
             )  # TODO - is this too strict
         self.type = type or NUMBER
         self.min = None
@@ -56,7 +56,7 @@ class Variable(object):
             self.default = kwargs.get("default", self.name)
         else:
             raise AttributeError(
-                "Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON"
+                "Variables must be of type NUMBER, TEXT, BOOLEAN or BUTTON",
             )
         self.value = kwargs.get("value", self.default)
         if self.value is None and self.default is not None:

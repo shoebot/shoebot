@@ -13,7 +13,7 @@ from gi.repository import Gtk
 pycairo = driver.cairo
 
 ICON_FILE = resource_filename(
-    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png",
 )
 
 
@@ -126,7 +126,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         self.frame = frame
         width, height = size
         meta_surface = cairo.RecordingSurface(
-            cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height)
+            cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height),
         )
 
         ctx = cairo.Context(meta_surface)

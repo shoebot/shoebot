@@ -67,7 +67,7 @@ class AsynchronousFileReader(threading.Thread):
 
 
 class CommandResponse(
-    collections.namedtuple("CommandResponse", ["cmd", "cookie", "status", "info"])
+    collections.namedtuple("CommandResponse", ["cmd", "cookie", "status", "info"]),
 ):
     __slots__ = ()
 
@@ -179,12 +179,12 @@ class ShoebotProcess(object):
         # Launch the asynchronous readers of the process' stdout and stderr.
         self.stdout_queue = queue.Queue()
         self.stdout_reader = AsynchronousFileReader(
-            self.process.stdout, self.stdout_queue, althandler=response_handler
+            self.process.stdout, self.stdout_queue, althandler=response_handler,
         )
         self.stdout_reader.start()
         self.stderr_queue = queue.Queue()
         self.stderr_reader = AsynchronousFileReader(
-            self.process.stderr, self.stderr_queue
+            self.process.stderr, self.stderr_queue,
         )
         self.stderr_reader.start()
 
@@ -294,7 +294,7 @@ def find_example_dir():
     except DistributionNotFound:
         pass
 
-    """
+    """,
     )
 
     # Needs to run in same python env as shoebot (may be different to gedits)
@@ -305,7 +305,7 @@ def find_example_dir():
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     p = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=startupinfo,
     )
     output, errors = p.communicate()
     if errors:

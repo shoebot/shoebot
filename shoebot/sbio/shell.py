@@ -189,7 +189,7 @@ class ShoebotCmd(cmd.Cmd):
             self.prompt = PROMPT
             self.response_prompt = RESPONSE_PROMPT
         self.print_response(
-            f"prompt: {self.prompt}\n" + f"response: {self.response_prompt}"
+            f"prompt: {self.prompt}\n" + f"response: {self.response_prompt}",
         )
 
     def do_title(self, title):
@@ -261,7 +261,7 @@ class ShoebotCmd(cmd.Cmd):
             for i, (name, v) in enumerate(self.bot._vars.items()):  # noqa
                 keep = i < len(self.bot._vars) - 1  # noqa
                 self.print_response(
-                    f"{name.ljust(max_name_len)} = {v.value}", keep=keep
+                    f"{name.ljust(max_name_len)} = {v.value}", keep=keep,
                 )
         else:
             self.print_response("No vars")
@@ -288,7 +288,7 @@ class ShoebotCmd(cmd.Cmd):
             if called_good:
                 # good and bad callbacks shouldn't both be called
                 raise ValueError(
-                    "Unexpected condition, Good and bad callbacks were called !"
+                    "Unexpected condition, Good and bad callbacks were called !",
                 )
 
             self.print_response(status=RESPONSE_REVERTED, keep=True, cookie=cookie)
@@ -299,10 +299,10 @@ class ShoebotCmd(cmd.Cmd):
         source = base64.b64decode(line).decode("utf-8")
         # Test compile
         publish_event(
-            SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source"
+            SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source",
         )
         self.bot._executor.load_edited_source(  # noqa
-            source, good_cb=source_good, bad_cb=source_bad
+            source, good_cb=source_good, bad_cb=source_bad,
         )
 
     def do_bye(self, line):
@@ -358,7 +358,7 @@ class ShoebotCmd(cmd.Cmd):
             name, value = [part.strip() for part in line.split("=")]
             if name not in self.bot._vars:  # noqa
                 self.print_response(
-                    f"No such variable {name} enter vars to see available vars"
+                    f"No such variable {name} enter vars to see available vars",
                 )
                 return
             variable = self.bot._vars[name]

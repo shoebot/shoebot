@@ -57,12 +57,12 @@ class ShoebotWindowHelper(object):
                     self.on_run_activate,
                 ),
                 ("ShoebotOpenExampleMenu", None, _("E_xamples"), None, None, None),
-            ]
+            ],
         )
 
         for action, label in example_actions:
             self.action_group.add_actions(
-                [(action, None, (label), None, None, self.on_open_example)]
+                [(action, None, (label), None, None, self.on_open_example)],
             )
 
         for action, label in submenu_actions:
@@ -106,7 +106,7 @@ class ShoebotWindowHelper(object):
                     self.toggle_livecoding,
                     False,
                 ),
-            ]
+            ],
         )
         manager.insert_action_group(self.action_group)
 
@@ -116,11 +116,11 @@ class ShoebotWindowHelper(object):
     def on_open_example(self, action):
         example_dir = ide_utils.get_example_dir()
         filename = os.path.join(
-            example_dir, action.get_name()[len("ShoebotOpenExample") :].strip()
+            example_dir, action.get_name()[len("ShoebotOpenExample") :].strip(),
         )
 
         drive, directory = os.path.splitdrive(
-            os.path.abspath(os.path.normpath(filename))
+            os.path.abspath(os.path.normpath(filename)),
         )
         uri = "file:///%s%s" % (drive, directory)
         gio_file = Gio.file_new_for_uri(uri)
@@ -253,7 +253,7 @@ class ShoebotWindowHelper(object):
                     end_iter = textbuffer.get_end_iter()
                     textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(
-                textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0
+                textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0,
             )
 
             textbuffer = self.live_output_widget.get_buffer()
@@ -261,14 +261,14 @@ class ShoebotWindowHelper(object):
                 if response is None:
                     # sentinel value - clear the buffer
                     textbuffer.delete(
-                        textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                        textbuffer.get_start_iter(), textbuffer.get_end_iter(),
                     )
                 else:
                     cmd, status, info = response.cmd, response.status, response.info
                     if cmd == ide_utils.CMD_LOAD_BASE64:
                         if status == ide_utils.RESPONSE_CODE_OK:
                             textbuffer.delete(
-                                textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                                textbuffer.get_start_iter(), textbuffer.get_end_iter(),
                             )
                             # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
                         elif status == ide_utils.RESPONSE_REVERTED:
@@ -304,7 +304,7 @@ class ShoebotWindowHelper(object):
 
             icon = Gtk.Image()
             panel.add_item(
-                self.live_output_widget, "Shoebot Live", "Shoebot Live", icon
+                self.live_output_widget, "Shoebot Live", "Shoebot Live", icon,
             )
         else:
             panel.remove_item(self.live_output_widget)

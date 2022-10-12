@@ -21,7 +21,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
             | Gdk.EventMask.BUTTON_RELEASE_MASK
             | Gdk.EventMask.POINTER_MOTION_MASK
             | Gdk.EventMask.KEY_PRESS_MASK
-            | Gdk.EventMask.KEY_RELEASE_MASK
+            | Gdk.EventMask.KEY_RELEASE_MASK,
         )
         widget.connect("button_press_event", self.gtk_mouse_button_down)
         widget.connect("button_release_event", self.gtk_mouse_button_up)

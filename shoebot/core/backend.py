@@ -57,7 +57,7 @@ class BackendMixin(object):
             except ImportError:
                 pass
         raise ImportError(
-            f"No {impl_name} Implementation found, tried: {' '.join(module_names)}"
+            f"No {impl_name} Implementation found, tried: {' '.join(module_names)}",
         )
 
     def get_libs(self):
@@ -86,7 +86,7 @@ class CairoGIBackend(BackendMixin):
 
     def __init__(self, options):
         cairo_pref = sort_by_preference(
-            ["cairo", "cairocffi"], options.get("cairo", "").split(",")
+            ["cairo", "cairocffi"], options.get("cairo", "").split(","),
         )
         gi_pref = sort_by_preference(["gi", "pgi"], options.get("gi", "").split(","))
         self.cairo_lib, self.cairo_module = self.import_libs(cairo_pref, "Cairo")
@@ -132,7 +132,7 @@ def get_driver_options():
     except ValueError:
         sys.stderr.write("Bad option format.\n")
         sys.stderr.write(
-            "Environment variable should be in the format key=value separated by spaces.\n\n"
+            "Environment variable should be in the format key=value separated by spaces.\n\n",
         )
         sys.stderr.write("SHOEBOT_GRAPHICS='cairo=cairocffi,cairo gi=pgi'\n")
         sys.exit(1)

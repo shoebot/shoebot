@@ -23,7 +23,7 @@ def get_bot_relpath(bot_path):
 def get_bot_prefix(rel_bot_path):
     if str(rel_bot_path).startswith("libraries"):
         return str(rel_bot_path.parent.relative_to(LIBRARY_EXAMPLES_DIR)).replace(
-            os.sep, "--"
+            os.sep, "--",
         )
     return str(rel_bot_path.parent.relative_to(EXAMPLES_DIR)).replace(os.sep, "--")
 
@@ -92,15 +92,15 @@ class RunAllExampleBots(ShoebotTestCase):
         output_prefix = get_bot_prefix(bot_path)
         output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}.png"
+            / f"{output_prefix}-{bot_path.stem}.png",
         )
         log_output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}.log"
+            / f"{output_prefix}-{bot_path.stem}.log",
         )
         error_output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}-error.log"
+            / f"{output_prefix}-{bot_path.stem}-error.log",
         )
 
         output = StringIO()
