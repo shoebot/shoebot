@@ -26,14 +26,14 @@ def simple_traceback(ex, source):
 
     # Output code around the error
     err_where = exc[i].split(",")[1].strip()  # 'line 37 in blah"
-    err_msgs.append("Error in the Shoebot script at %s:" % err_where)
+    err_msgs.append(f"Error in the Shoebot script at {err_where}:")
     for i in range(max(0, line_number - exc_script_index), line_number):
         if fn == "<string>":
             line = source_arr[i]
         else:
             line = linecache.getline(fn, i + 1)
-        err_msgs.append("%s: %s" % (i + 1, line.rstrip()))
-    err_msgs.append("  %s^ %s" % (len(str(i)) * " ", exc[-1].rstrip()))
+        err_msgs.append(f"{i + 1}: {line.rstrip()}")
+    err_msgs.append(f"  {len(str(i)) * ' '}^ {exc[-1].rstrip()}")
 
     err_msgs.append("")
 

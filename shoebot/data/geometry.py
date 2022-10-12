@@ -320,7 +320,7 @@ class Point(object):
         return iter((self.x, self.y))
 
     def __repr__(self):
-        return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
+        return f"Point(x={self.x:.1f}, y={self.y:.1f})"
 
     def __eq__(self, pt):
         if not isinstance(pt, Point):

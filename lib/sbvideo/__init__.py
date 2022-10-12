@@ -31,7 +31,7 @@ class Movie:
         self.path = path
         self.video = hg.cvCreateFileCapture(self.path)
         if self.video is None:
-            raise SBVideoError("Could not open stream %s" % self.path)
+            raise SBVideoError(f"Could not open stream {self.path}")
 
         # these functions don't seem to work at present on my linux system
 

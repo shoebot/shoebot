@@ -72,7 +72,7 @@ def display_platform():
 def import_success_message(module, name):
     return "\n".join(
         [
-            "    import %s [success]:" % name.ljust(COL_WIDTH),
+            f"    import {name.ljust(COL_WIDTH)} [success]:",
             "        " + module.__file__,
         ]
     )
@@ -80,7 +80,7 @@ def import_success_message(module, name):
 
 def import_fail_message(mn, reason):
     return "\n".join(
-        ["    import %s [failed]:" % mn.ljust(COL_WIDTH), "        " + reason]
+        [f"    import {mn.ljust(COL_WIDTH)} [failed]:", "        " + reason]
     )
 
 
@@ -140,15 +140,15 @@ def shoebot_example(**shoebot_kwargs):
         def run():
             from shoebot.util import ShoebotInstallError
 
-            print("    Shoebot - %s:" % f.__name__.replace("_", " "))
+            print(f"    Shoebot - {f.__name__.replace('_', ' ')}:")
             try:
                 import shoebot
 
-                outputfile = "/tmp/shoebot-%s.png" % f.__name__
+                outputfile = f"/tmp/shoebot-{f.__name__}.png"
                 bot = shoebot.create_bot(outputfile=outputfile)
                 f(bot)
                 bot.finish()
-                print("        [passed] : %s" % outputfile)
+                print(f"        [passed] : {outputfile}")
                 print("")
             except ShoebotInstallError as e:
                 print("        [failed]", e.args[0])
@@ -156,7 +156,7 @@ def shoebot_example(**shoebot_kwargs):
             except Exception:
                 print("        [failed] - traceback:")
                 for line in traceback.format_exc().splitlines():
-                    print("    %s" % line)
+                    print(f"    {line}")
                 print("")
 
         return run
@@ -184,7 +184,7 @@ def display_graphics_implementation():
         from shoebot.core.backend import driver
 
         for k, v in list(driver.get_libs().items()):
-            print("    %s: %s" % (k, v))
+            print(f"    {k}: {v}")
     except Exception as e:
         raise
 

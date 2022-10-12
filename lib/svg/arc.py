@@ -49,7 +49,7 @@ def bezier_arc(x1, y1, x2, y2, start_angle=0, extent=90):
     else:
         nfrag = int(ceil(abs(extent)/90.))
         if nfrag == 0:
-            warnings.warn('Invalid value for extent: %r' % extent)
+            warnings.warn(f'Invalid value for extent: {extent!r}')
             return []
         frag_angle = float(extent) / nfrag
 

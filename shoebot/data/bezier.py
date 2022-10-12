@@ -561,7 +561,7 @@ class BezierPath(Grob, ColorMixin):
             )
             return PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
         else:
-            raise PathError("Unknown cmd '%s' for p1 %s" % (p1.cmd, p1))
+            raise PathError(f"Unknown cmd '{p1.cmd}' for p1 {p1}")
 
     def points(self, amount=100, start=0.0, end=1.0, segments=None):
         """Returns an iterator with a list of calculated points for the path.
@@ -968,7 +968,7 @@ class Point(object):
         return iter((self.x, self.y))
 
     def __repr__(self):
-        return "Point(x=%.1f, y=%.1f)" % (self.x, self.y)
+        return f"Point(x={self.x:.1f}, y={self.y:.1f})"
 
     def __eq__(self, pt):
         if not isinstance(pt, Point):

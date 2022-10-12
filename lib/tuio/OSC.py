@@ -38,7 +38,7 @@ import types
 def hexDump(bytes):
     """Useful utility; prints the string in hexadecimal."""
     for i in range(len(bytes)):
-        sys.stdout.write("%2x " % (ord(bytes[i])))
+        sys.stdout.write(f"{ord(bytes[i]):2x} ")
         if (i+1) % 8 == 0:
             print(repr(bytes[i-7:i+1]))
 
@@ -266,10 +266,10 @@ class CallbackManager:
                 for msg in message:
                     self.dispatch(msg)
         except KeyError as key:
-            print('address %s not found, %s: %s' % (address, key, message))
+            print(f'address {address} not found, {key}: {message}')
             pprint.pprint(message)
         except IndexError as e:
-            print('%s: %s' % (e, message))
+            print(f'{e}: {message}')
             pass
         except None as e:
             print("Exception in", address, "callback :", e)

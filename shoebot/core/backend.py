@@ -49,7 +49,7 @@ class BackendMixin(object):
                 module = None
                 has_module = False
             setattr(self, name, module)
-            setattr(self, "has_%s" % name, has_module)
+            setattr(self, f"has_{name}", has_module)
 
         for name in module_names:
             try:
@@ -57,8 +57,7 @@ class BackendMixin(object):
             except ImportError:
                 pass
         raise ImportError(
-            "No %s Implementation found, tried: %s"
-            % (impl_name, " ".join(module_names))
+            f"No {impl_name} Implementation found, tried: {' '.join(module_names)}"
         )
 
     def get_libs(self):
