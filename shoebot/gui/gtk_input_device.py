@@ -64,8 +64,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
         self.key_released(event.string, keyval)
 
     def get_key_map(self):
-        """
-        Return a dict in the form of
+        """Return a dict in the form of.
 
         SHOEBOT_KEY_NAME, GTK_VALUE
 

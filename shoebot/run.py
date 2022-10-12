@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-""" Shoebot console runner """
+"""Shoebot console runner."""
 
 import argparse
 import gettext
@@ -63,7 +63,7 @@ def json_arg(s):
 
 
 def error(message):
-    """Prints an error message, the help message and quits"""
+    """Prints an error message, the help message and quits."""
     global parser
     print((_("Error: ") + message))
     print()
@@ -72,7 +72,7 @@ def error(message):
 
 
 def warn(message):
-    """Print a warning message"""
+    """Print a warning message."""
     print((_("Warning: ") + message))
 
 

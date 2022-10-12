@@ -1,6 +1,4 @@
-"""
-Gtk3 support for shoebot in editors and IDEs
-"""
+"""Gtk3 support for shoebot in editors and IDEs."""
 
 import base64
 import itertools
@@ -121,8 +119,7 @@ def mk_examples_menu(text, root_dir=None, depth=0):
 
 
 def gedit3_menu(xml):
-    """
-    Build XML for GEDIT3 Menus.
+    """Build XML for GEDIT3 Menus.
 
     Pass in the xml returned by example_menu
     """
@@ -131,10 +128,8 @@ def gedit3_menu(xml):
 
 
 def get_child_by_name(parent, name):
-    """
-    Iterate through a gtk container, `parent`,
-    and return the widget with the name `name`.
-    """
+    """Iterate through a gtk container, `parent`, and return the widget with
+    the name `name`."""
     # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
     def iterate_children(widget, name):
         if widget.get_name() == name:
@@ -214,9 +209,7 @@ def load_gsettings():
 
 
 def sbot_executable():
-    """
-    Find shoebot executable
-    """
+    """Find shoebot executable."""
     gsettings = load_gsettings()
     venv = gsettings.get_string("current-virtualenv")
     if venv == "Default":
@@ -241,8 +234,7 @@ def sbot_executable():
 
 
 class VirtualEnvChooser(Gtk.Box):
-    """
-    Allow the user to choose a virtualenv.
+    """Allow the user to choose a virtualenv.
 
     :param gsetting: save settings to this prefix
     """
@@ -361,9 +353,7 @@ class VirtualEnvChooser(Gtk.Box):
 
 
 class ShoebotPreferences(Gtk.Box):
-    """
-    Allow the user to choose a virtualenv.
-    """
+    """Allow the user to choose a virtualenv."""
 
     def __init__(self):
         # TODO - Save the other menu options here

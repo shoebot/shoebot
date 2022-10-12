@@ -34,9 +34,7 @@ from .drawqueue_sink import DrawQueueSink
 
 
 class CairoImageSink(DrawQueueSink):
-    """
-    DrawQueueSink that uses cairo contexts as the render context.
-    """
+    """DrawQueueSink that uses cairo contexts as the render context."""
 
     def __init__(self, target=None, format=None, multifile=False, buff=None):
         """
@@ -63,8 +61,7 @@ class CairoImageSink(DrawQueueSink):
         self.multifile = multifile
 
     def _output_file(self, frame):
-        """
-        If filename was used output a filename, along with multifile
+        """If filename was used output a filename, along with multifile
         numbered filenames will be used.
 
         If buff was specified it is returned.
@@ -80,9 +77,7 @@ class CairoImageSink(DrawQueueSink):
             return self.filename
 
     def create_rcontext(self, size, frame):
-        """
-        Called when CairoCanvas needs a cairo context to draw on
-        """
+        """Called when CairoCanvas needs a cairo context to draw on."""
         if self.format == "pdf":
             surface = cairo.PDFSurface(self._output_file(frame), *size)
         elif self.format in ("ps", "eps"):
@@ -97,9 +92,7 @@ class CairoImageSink(DrawQueueSink):
         return cairo.Context(surface)
 
     def rendering_finished(self, size, frame, cairo_ctx):
-        """
-        Called when CairoCanvas has rendered a bot
-        """
+        """Called when CairoCanvas has rendered a bot."""
         surface = cairo_ctx.get_target()
         if self.format == "png":
             surface.write_to_png(self._output_file(frame))

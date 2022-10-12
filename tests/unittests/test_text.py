@@ -17,9 +17,8 @@ class TestText(unittest.TestCase):
         self.bot = NodeBot(canvas=canvas)
 
     def test_text_saves_params(self):
-        """
-        Verify parameters are saved and returned by the expected properties.
-        """
+        """Verify parameters are saved and returned by the expected
+        properties."""
         # There was a bug where using fontsize, weight or style was causing a crash.
         text = self.bot.text(
             "Hello vector graphics",

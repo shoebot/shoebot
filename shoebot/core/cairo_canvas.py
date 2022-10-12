@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Cairo implementation of the canvas"""
+"""Cairo implementation of the canvas."""
 import os.path
 
 from math import pi as _pi
@@ -39,7 +39,7 @@ from .drawqueue import DrawQueue
 
 
 class CairoCanvas(Canvas):
-    """ Cairo implementation of Canvas """
+    """Cairo implementation of Canvas."""
 
     def __init__(self, sink):
         Canvas.__init__(self, sink)
@@ -49,9 +49,7 @@ class CairoCanvas(Canvas):
         return DrawQueue()
 
     def initial_transform(self):
-        """
-        Return an identity matrix
-        """
+        """Return an identity matrix."""
         return cairo.Matrix()
 
     def get_input_device(self):
@@ -147,8 +145,7 @@ class CairoCanvas(Canvas):
         return rellineto
 
     def output_closure(self, target):
-        """
-        Function to output to a cairo surface
+        """Function to output to a cairo surface.
 
         target is a cairo Context or filename
         """
@@ -203,9 +200,7 @@ class CairoCanvas(Canvas):
             return output_file
 
     def ctx_render_background(self, cairo_ctx):
-        """
-        Draws the background colour of the bot
-        """
+        """Draws the background colour of the bot."""
         # TODO - rename this
         cairo_ctx.set_source_rgba(*self.background)
         cairo_ctx.paint()

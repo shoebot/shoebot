@@ -270,9 +270,7 @@ def draw_cornu(path, ths, closed, flat=False):
     #print 'stroke'
 
 def draw_cornu_flat(x0, y0, t0, t1, s0, c0, flip, cs, ss, cmd):
-    
-    """ Raph Levien's code draws fast LINETO segments.
-    """
+    """Raph Levien's code draws fast LINETO segments."""
     
     for j in range(0, 100):
         t = j * .01
@@ -288,9 +286,7 @@ def draw_cornu_flat(x0, y0, t0, t1, s0, c0, flip, cs, ss, cmd):
     return cmd
     
 def draw_cornu_bezier(x0, y0, t0, t1, s0, c0, flip, cs, ss, cmd, scale, rot):
-
-    """ Mark Meyer's code draws elegant CURVETO segments.
-    """
+    """Mark Meyer's code draws elegant CURVETO segments."""
 
     s = None
     for j in range(0, 5):
@@ -449,7 +445,6 @@ def dot_pt(x, y):
     _ctx.oval(x-3,y-3, 6, 6) 
 
 def relativise(path):
-
     for i in range(len(path)):
         x, y = path[i]
         x *= 0.01 * _ctx.WIDTH
@@ -467,7 +462,6 @@ def relativise(path):
     return path
     
 def path(points, close=False, tweaks=20, flat=False, draw=False, helper=False):
-
     # To make sure we don't change the original, make a copy of the 
     # given points
     points = list(points)
@@ -501,7 +495,6 @@ def path(points, close=False, tweaks=20, flat=False, draw=False, helper=False):
     return p
             
 def drawpath(p, close=False, tweaks=20, points=False, flat=False):
-    
     path(p, close, tweaks, flat, draw=True, helper=points)
 
 ### PSYCO SPECIALIZATION #############################################################################

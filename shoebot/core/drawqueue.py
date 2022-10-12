@@ -32,31 +32,23 @@ from collections import deque
 
 
 class DrawQueue(object):
-    """
-    A list of draw commands, stored as callables that, are
-    passed a set of parameters to draw on from the canvas
-    implementation.
-    """
+    """A list of draw commands, stored as callables that, are passed a set of
+    parameters to draw on from the canvas implementation."""
 
     def __init__(self, render_funcs=None):
         self.render_funcs = render_funcs or deque()
 
     def append_immediate(self, render_func):
-        """
-        In implementations of drawqueue that use buffering
-        this will run the whole queue up to this point
-        """
+        """In implementations of drawqueue that use buffering this will run the
+        whole queue up to this point."""
         raise NotImplementedError("Not supported in DrawQueue")
 
     def append(self, render_func):
-        """
-        Add a render function to the queue.
-        """
+        """Add a render function to the queue."""
         self.render_funcs.append(render_func)
 
     def render(self, r_context):
-        """
-        Call all the render functions with r_context
+        """Call all the render functions with r_context.
 
         r_context, is the render_context - Set of
         keyword args that should make sense to the

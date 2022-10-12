@@ -27,12 +27,11 @@ from math import acos, sin, cos, hypot, ceil, sqrt, radians, degrees
 import warnings
 
 def bezier_arc(x1, y1, x2, y2, start_angle=0, extent=90):
-    
-    """ Compute a cubic Bezier approximation of an elliptical arc.
+    """Compute a cubic Bezier approximation of an elliptical arc.
 
     (x1, y1) and (x2, y2) are the corners of the enclosing rectangle.
     The coordinate system has coordinates that increase to the right and down.
-    Angles, measured in degress, start with 0 to the right (the positive X axis) 
+    Angles, measured in degress, start with 0 to the right (the positive X axis)
     and increase counter-clockwise.
     The arc extends from start_angle to start_angle+extent.
     I.e. start_angle=0 and extent=180 yields an openside-down semi-circle.
@@ -91,8 +90,7 @@ def bezier_arc(x1, y1, x2, y2, start_angle=0, extent=90):
     return point_list
 
 def angle(x1, y1, x2, y2):
-    """ The angle in degrees between two vectors.
-    """
+    """The angle in degrees between two vectors."""
     sign = 1.0
     usign = (x1*y2 - y1*x2)
     if usign < 0:
@@ -103,18 +101,17 @@ def angle(x1, y1, x2, y2):
     return sign * degrees(acos(ratio))
 
 def transform_from_local(xp, yp, cphi, sphi, mx, my):
-    """ Transform from the local frame to absolute space.
-    """
+    """Transform from the local frame to absolute space."""
     x = xp * cphi - yp * sphi + mx
     y = xp * sphi + yp * cphi + my
     return (x,y)
 
 def elliptical_arc_to(x1, y1, rx, ry, phi, large_arc_flag, sweep_flag, x2, y2):
-    
-	""" An elliptical arc approximated with Bezier curves or a line segment.
-    Algorithm taken from the SVG 1.1 Implementation Notes:
-    http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
-    """
+	"""An elliptical arc approximated with Bezier curves or a line segment.
+
+	Algorithm taken from the SVG 1.1 Implementation Notes:
+	http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
+	"""
     
     # Basic normalization.
 	rx = abs(rx)

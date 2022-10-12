@@ -208,8 +208,7 @@ class ShoebotWindowHelper(object):
             self.changed_handler_id = None
 
     def get_source(self, doc):
-        """
-        Grab contents of 'doc' and return it
+        """Grab contents of 'doc' and return it.
 
         :param doc: The active document
         :return:
@@ -328,7 +327,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.instances = {}
 
     def _create_view(self, name="shoebot-output"):
-        """ Create the gtk.TextView used for shell output """
+        """Create the gtk.TextView used for shell output."""
         view = Gtk.TextView()
         view.set_editable(False)
 

@@ -29,9 +29,7 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-"""
-Drawbot and Nodebot are similar grammars, so they both inherit from Bot
-"""
+"""Drawbot and Nodebot are similar grammars, so they both inherit from Bot."""
 
 import sys
 import os
@@ -90,9 +88,7 @@ BOTTOM_LEFT = 2
 
 
 class Bot(Grammar):
-    """
-    The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot.
-    """
+    """The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot."""
 
     RGB = RGB
     HSB = HSB
@@ -159,9 +155,12 @@ class Bot(Grammar):
         self._set_initial_defaults()  ### TODO Look at these
 
     def _set_initial_defaults(self):
-        """Set the default values. Called at __init__ and at the end of run(),
-        so that new draw loop iterations don't take up values left over by the
-        previous one."""
+        """Set the default values.
+
+        Called at __init__ and at the end of run(), so that new draw
+        loop iterations don't take up values left over by the previous
+        one.
+        """
         DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
         self.HEIGHT = self._namespace.get("HEIGHT", DEFAULT_WIDTH)
@@ -199,26 +198,26 @@ class Bot(Grammar):
     # Input GUI callbacks
 
     def _mouse_button_down(self, button):
-        """GUI callback for mouse button down"""
+        """GUI callback for mouse button down."""
         self._namespace["mousedown"] = True
 
     def _mouse_button_up(self, button):
-        """GUI callback for mouse button up"""
+        """GUI callback for mouse button up."""
         self._namespace["mousedown"] = self._input_device.mouse_down
 
     def _mouse_pointer_moved(self, x, y):
-        """GUI callback for mouse moved"""
+        """GUI callback for mouse moved."""
         self._namespace["MOUSEX"] = x
         self._namespace["MOUSEY"] = y
 
     def _key_pressed(self, key, keycode):
-        """GUI callback for key pressed"""
+        """GUI callback for key pressed."""
         self._namespace["key"] = key
         self._namespace["keycode"] = keycode
         self._namespace["keydown"] = True
 
     def _key_released(self, key, keycode):
-        """GUI callback for key released"""
+        """GUI callback for key released."""
         self._namespace["keydown"] = self._input_device.key_down
 
     # Functions for override #####
@@ -227,14 +226,16 @@ class Bot(Grammar):
 
     def _makeInstance(self, clazz, args, kwargs):
         """Creates an instance of a class defined in this document.
-        This method sets the context of the object to the current context."""
+
+        This method sets the context of the object to the current
+        context.
+        """
         inst = clazz(self, *args, **kwargs)
         return inst
 
     def _makeColorableInstance(self, clazz, args, kwargs):
-        """
-        Create an object, if fill, stroke or strokewidth
-        is not specified, get them from the _canvas
+        """Create an object, if fill, stroke or strokewidth is not specified,
+        get them from the _canvas.
 
         :param clazz:
         :param args:
@@ -364,7 +365,8 @@ class Bot(Grammar):
         return glob(path)
 
     def snapshot(self, target=None, defer=None, autonumber=False):
-        """Save the contents of current surface into a file or cairo surface/context.
+        """Save the contents of current surface into a file or cairo
+        surface/context.
 
         :param filename: Can be a filename or a Cairo surface.
         :param defer: When to snapshot, if set to True waits until the frame has finished rendering.
@@ -404,8 +406,11 @@ class Bot(Grammar):
             )
 
     def show(self, format="png", as_data=False):
-        """Returns an Image object of the current surface. Used for displaying
-        output in Jupyter notebooks. Adapted from the cairo-jupyter project."""
+        """Returns an Image object of the current surface.
+
+        Used for displaying output in Jupyter notebooks. Adapted from
+        the cairo- jupyter project.
+        """
 
         from io import BytesIO
 
@@ -437,8 +442,7 @@ class Bot(Grammar):
                 return SVG(data)
 
     def ximport(self, libName):
-        """
-        Import Nodebox libraries.
+        """Import Nodebox libraries.
 
         The libraries get _ctx, which provides
         them with the nodebox API.
@@ -454,7 +458,7 @@ class Bot(Grammar):
     # Core functions ####
 
     def size(self, w=None, h=None):
-        """Set the canvas size
+        """Set the canvas size.
 
         Only the first call will actually be effective.
 

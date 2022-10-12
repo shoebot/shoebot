@@ -17,8 +17,7 @@ SEMVER_REGEX = r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9
 class TestSetup(unittest.TestCase):
     @patch("setuptools.setup", Mock())
     def test_version(self):
-        """
-        Mock setuptools.setup and find the version parameter passed to it.
+        """Mock setuptools.setup and find the version parameter passed to it.
 
         Verify that the version is in semantic version format.
         """
@@ -37,9 +36,8 @@ class TestSetup(unittest.TestCase):
 
     @patch("setuptools.setup", Mock())
     def test_setup_parses_version_from_version_file(self):
-        """
-        Test that setup loads and parses the version from the
-        file VERSION, deliberately uses a version that is not the real version.
+        """Test that setup loads and parses the version from the file VERSION,
+        deliberately uses a version that is not the real version.
 
         Mocks open, to do an end to end test using mock data.
         """

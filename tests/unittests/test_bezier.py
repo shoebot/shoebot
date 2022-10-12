@@ -23,9 +23,8 @@ class TestBezier(unittest.TestCase):
         self.bot = NodeBot(canvas=canvas)
 
     def test_copy_path(self):
-        """
-        Verify BezierPath.copy returns a new path with copies of all the elements.
-        """
+        """Verify BezierPath.copy returns a new path with copies of all the
+        elements."""
         path = BezierPath(self.bot)
         path.lineto(4, 4)
         path.lineto(10, 10)
@@ -49,10 +48,8 @@ class TestPathElement(unittest.TestCase):
 
     @parameterized.expand([CLOSE, MOVETO, RMOVETO])
     def test_xy_no_controlpoints(self, cmd):
-        """
-        PathElement types close, moveto, rmoveto all store an x, y
-        coordinate and all other properties are set to None.
-        """
+        """PathElement types close, moveto, rmoveto all store an x, y
+        coordinate and all other properties are set to None."""
         position = random.randint(0, 800), random.randint(0, 800)
 
         element = PathElement(cmd, *position)
@@ -65,9 +62,8 @@ class TestPathElement(unittest.TestCase):
 
     @parameterized.expand([LINETO, RLINETO])
     def test_xy_and_one_controlpoints(self, cmd):
-        """
-        PathElement types lineto, rlineto store an x, y and
-        a single control point.
+        """PathElement types lineto, rlineto store an x, y and a single control
+        point.
 
         All other properties are set to None.
         """

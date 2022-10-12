@@ -24,9 +24,8 @@ NUM_SAMPLES = 512
 
 
 def fft_bandpassfilter(data, fs, lowcut, highcut):
-    """
-    http://www.swharden.com/blog/2009-01-21-signal-filtering-with-python/#comment-16801
-    """
+    """http://www.swharden.com/blog/2009-01-21-signal-filtering-with-
+    python/#comment-16801."""
     fft = np.fft.fft(data)
     # n = len(data)
     # timestep = 1.0 / fs
@@ -56,18 +55,14 @@ def fft_bandpassfilter(data, fs, lowcut, highcut):
 
 
 def flatten_fft(scale=1.0):
-    """
-    Produces a nicer graph, I'm not sure if this is correct
-    """
+    """Produces a nicer graph, I'm not sure if this is correct."""
     _len = len(audio.spectrogram)
     for i, v in enumerate(audio.spectrogram):
         yield scale * (i * v) / _len
 
 
 def scaled_fft(fft, scale=1.0):
-    """
-    Produces a nicer graph, I'm not sure if this is correct
-    """
+    """Produces a nicer graph, I'm not sure if this is correct."""
     data = np.zeros(len(fft))
     for i, v in enumerate(fft):
         data[i] = scale * (i * v) / NUM_SAMPLES
@@ -145,9 +140,7 @@ class AudioThread(threading.Thread):
             atexit.register(self.quit)
 
     def quit(self):
-        """
-        Shutdown the audio thread
-        """
+        """Shutdown the audio thread."""
         if self.running:
             self.running = False
             self.join()

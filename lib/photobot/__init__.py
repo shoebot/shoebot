@@ -30,20 +30,18 @@ DIAMOND = "diamond"
 class Canvas:
     
     """Implements a canvas with layers.
-    
-    A canvas is an empty Photoshop document,
-    where layers can be placed and manipulated.
-    
+
+    A canvas is an empty Photoshop document, where layers can be placed
+    and manipulated.
     """
 
     def __init__(self, w, h):
         
         """Creates a new canvas.
-    
-        Creates the working area on which to blend layers.
-        The canvas background is transparent,
-        but a background color could be set using the fill() function.
-    
+
+        Creates the working area on which to blend layers. The canvas
+        background is transparent, but a background color could be set
+        using the fill() function.
         """
         
         self.interpolation = BILINEAR
@@ -57,14 +55,13 @@ class Canvas:
     def layer(self, img, x=0, y=0, name=""):
     
         """Creates a new layer from file, Layer, PIL Image.
-    
+
         If img is an image file or PIL Image object,
         Creates a new layer with the given image file.
         The image is positioned on the canvas at x, y.
-        
+
         If img is a Layer,
         uses that layer's x and y position and name.
-    
         """
 
         from types import StringType
@@ -85,11 +82,10 @@ class Canvas:
     def fill(self, rgb, x=0, y=0, w=None, h=None, name=""):
     
         """Creates a new fill layer.
-    
-        Creates a new layer filled with the given rgb color.
-        For example, fill((255,0,0)) creates a red fill.
-        The layers fills the entire canvas by default.
-    
+
+        Creates a new layer filled with the given rgb color. For
+        example, fill((255,0,0)) creates a red fill. The layers fills
+        the entire canvas by default.
         """ 
     
         if w == None: w = self.w - x
@@ -100,16 +96,15 @@ class Canvas:
     def gradient(self, style=LINEAR, w=1.0, h=1.0, name=""):
     
         """Creates a gradient layer.
-    
+
         Creates a gradient layer, that is usually used
         together with the mask() function.
-    
+
         All the image functions work on gradients,
         so they can easily be flipped, rotated, scaled, inverted,
         made brighter or darker, ...
-    
+
         Styles for gradients are LINEAR, RADIAL and DIAMOND.
-    
         """
     
         from types import FloatType
@@ -146,11 +141,9 @@ class Canvas:
     def merge(self, layers):
         
         """Flattens the given layers on the canvas.
-        
-        Merges the given layers with the indices in the list
-        on the bottom layer in the list.
-        The other layers are discarded.
-        
+
+        Merges the given layers with the indices in the list on the
+        bottom layer in the list. The other layers are discarded.
         """
         
         layers.sort()
@@ -160,12 +153,11 @@ class Canvas:
     def flatten(self, layers=[]):
     
         """Flattens all layers according to their blend modes.
-    
-        Merges all layers to the canvas,
-        using the blend mode and opacity defined for each layer.
-        Once flattened, the stack of layers is emptied except
-        for the transparent background (bottom layer).
-    
+
+        Merges all layers to the canvas, using the blend mode and
+        opacity defined for each layer. Once flattened, the stack of
+        layers is emptied except for the transparent background (bottom
+        layer).
         """
         
         #When the layers argument is omitted,
@@ -272,11 +264,9 @@ class Canvas:
     def export(self, filename):
     
         """Exports the flattened canvas.
-    
-        Flattens the canvas.
-        PNG retains the alpha channel information.
+
+        Flattens the canvas. PNG retains the alpha channel information.
         Other possibilities are JPEG and GIF.
-    
         """
 
         self.flatten()
@@ -286,11 +276,9 @@ class Canvas:
     def draw(self, x, y):
         
         """Places the flattened canvas in NodeBox.
-        
-        Exports to a temporary PNG file.
-        Draws the PNG in NodeBox using the image() command.
-        Removes the temporary file.
-        
+
+        Exports to a temporary PNG file. Draws the PNG in NodeBox using
+        the image() command. Removes the temporary file.
         """
         
         try:
@@ -310,28 +298,25 @@ class Canvas:
     def preferences(interpolation=BILINEAR):
     
         """Settings that influence image manipulation.
-    
-        Currently, only defines the image interpolation,
-        which can be set to NEAREST, BICUBIC or BILINEAR.
-    
+
+        Currently, only defines the image interpolation, which can be
+        set to NEAREST, BICUBIC or BILINEAR.
         """
     
         self. interpolation = interpolation
         
 def canvas(w, h):
-    
     return Canvas(w, h)
     
 class Layers(list):
     
     """Extends the canvas.layers[] list so it indexes layers names.
-    
+
     When the index is an integer, returns the layer at that  index.
     When the index is a string, returns the first layer with that name.
-    
+
     The first element, canvas.layers[0],
     is the transparent background and must remain untouched.
-    
     """
     
     def __getitem__(self, index):
@@ -354,11 +339,10 @@ class Layers(list):
 class Layer:
     
     """Implements a layer on the canvas.
-    
+
     A canvas layer stores an image at a given position on the canvas,
     and all the Photoshop transformations possible for this layer:
     duplicate(), desature(), overlay(), rotate(), and so on.
-    
     """
     
     def __init__(self, canvas, img, x=0, y=0, name=""):
@@ -377,10 +361,9 @@ class Layer:
     def index(self):
         
         """Returns this layer's index in the canvas.layers[].
-        
-        Searches the position of this layer in the canvas'
-        layers list, return None when not found.
-        
+
+        Searches the position of this layer in the canvas' layers list,
+        return None when not found.
         """
         
         for i in range(len(self.canvas.layers)):
@@ -393,12 +376,11 @@ class Layer:
     def copy(self):
         
         """Returns a copy of the layer.
-        
-        This is different from the duplicate() method,
-        which duplicates the layer as a new layer on the canvas.
-        The copy() method returns a copy of the layer
-        that can be added to a different canvas.
-        
+
+        This is different from the duplicate() method, which duplicates
+        the layer as a new layer on the canvas. The copy() method
+        returns a copy of the layer that can be added to a different
+        canvas.
         """
         
         layer = Layer(None, self.img.copy(), self.x, self.y, self.name)
@@ -411,18 +393,14 @@ class Layer:
         
     def delete(self):
         
-        """Removes this layer from the canvas.
-              
-        """
+        """Removes this layer from the canvas."""
         
         i = self.index()
         if i != None: del self.canvas.layers[i]
         
     def up(self):
         
-        """Moves the layer up in the stacking order.
-        
-        """
+        """Moves the layer up in the stacking order."""
         
         i = self.index()
         if i != None:
@@ -432,9 +410,7 @@ class Layer:
             
     def down(self):
         
-        """Moves the layer down in the stacking order.
-        
-        """
+        """Moves the layer down in the stacking order."""
         
         i = self.index()
         if i != None:
@@ -445,10 +421,9 @@ class Layer:
     def bounds(self):
     
         """Returns the size of the layer.
-    
-        This is the width and height of the bounding box,
-        the invisible rectangle around the layer.
-    
+
+        This is the width and height of the bounding box, the invisible
+        rectangle around the layer.
         """
     
         return self.img.size
@@ -456,17 +431,16 @@ class Layer:
     def select(self, path, feather=True):
     
         """Applies the polygonal lasso tool on a layer.
-    
+
         The path paramater is a list of points,
         either [x1, y1, x2, y2, x3, y3, ...]
         or [(x1,y1), (x2,y2), (x3,y3), ...]
-    
+
         The parts of the layer that fall outside
         this polygonal area are cut.
-        
+
         The selection is not anti-aliased,
         but the feather parameter creates soft edges.
-    
         """
     
         w, h = self.img.size
@@ -486,22 +460,21 @@ class Layer:
     def mask(self):
     
         """Masks the layer below with this layer.
-    
-        Commits the current layer to the alpha channel of 
-        the previous layer. Primarily, mask() is useful when 
-        using gradient layers as masks on images below. 
-    
+
+        Commits the current layer to the alpha channel of
+        the previous layer. Primarily, mask() is useful when
+        using gradient layers as masks on images below.
+
         For example:
         canvas.layer("image.jpg")
         canvas.gradient()
         canvas.layer(2).flip()
         canvas.layer(2).mask()
-    
+
         Adds a white-to-black linear gradient to
-        the alpha channel of image.jpg, 
-        making it evolve from opaque on 
+        the alpha channel of image.jpg,
+        making it evolve from opaque on
         the left to transparent on the right.
-    
         """
 
         if len(self.canvas.layers) < 2: return
@@ -526,9 +499,8 @@ class Layer:
     def duplicate(self):
     
         """Creates a copy of the current layer.
-    
+
         This copy becomes the top layer on the canvas.
-    
         """
     
         i = self.canvas.layer(self.img.copy(), self.x, self.y, self.name)
@@ -563,11 +535,9 @@ class Layer:
     def brightness(self, value=1.0):
 
         """Increases or decreases the brightness in the layer.
-    
-        The given value is a percentage to increase
-        or decrease the image brightness,
-        for example 0.8 means brightness at 80%.
-    
+
+        The given value is a percentage to increase or decrease the
+        image brightness, for example 0.8 means brightness at 80%.
         """
      
         b = ImageEnhance.Brightness(self.img) 
@@ -576,11 +546,9 @@ class Layer:
     def contrast(self, value=1.0):
     
         """Increases or decreases the contrast in the layer.
-    
-        The given value is a percentage to increase
-        or decrease the image contrast,
-        for example 1.2 means contrast at 120%.
-    
+
+        The given value is a percentage to increase or decrease the
+        image contrast, for example 1.2 means contrast at 120%.
         """
 
         c = ImageEnhance.Contrast(self.img) 
@@ -589,10 +557,9 @@ class Layer:
     def desaturate(self):
     
         """Desaturates the layer, making it grayscale.
-    
-        Instantly removes all color information from the layer,
-        while maintaing its alpha channel.
-    
+
+        Instantly removes all color information from the layer, while
+        maintaing its alpha channel.
         """
     
         alpha = self.img.split()[3]
@@ -602,9 +569,7 @@ class Layer:
     
     def invert(self):
     
-        """Inverts the layer.
-    
-        """
+        """Inverts the layer."""
     
         alpha = self.img.split()[3]
         self.img = self.img.convert("RGB")
@@ -615,11 +580,9 @@ class Layer:
     def translate(self, x, y):
     
         """Positions the layer at the given coordinates.
-    
-        The x and y parameters define where to position 
-        the top left corner of the layer,
-        measured from the top left of the canvas.
-    
+
+        The x and y parameters define where to position the top left
+        corner of the layer, measured from the top left of the canvas.
         """
     
         self.x = x
@@ -628,11 +591,9 @@ class Layer:
     def scale(self, w=1.0, h=1.0):
     
         """Resizes the layer to the given width and height.
-    
-        When width w or height h is a floating-point number,
-        scales percentual, 
-        otherwise scales to the given size in pixels.
-    
+
+        When width w or height h is a floating-point number, scales
+        percentual, otherwise scales to the given size in pixels.
         """
 
         from types import FloatType
@@ -647,12 +608,10 @@ class Layer:
     def distort(self, x1=0,y1=0, x2=0,y2=0, x3=0,y3=0, x4=0,y4=0):
     
         """Distorts the layer.
-        
-        Distorts the layer by translating 
-        the four corners of its bounding box to the given coordinates:
-        upper left (x1,y1), upper right(x2,y2),
-        lower right (x3,y3) and lower left (x4,y4).
-        
+
+        Distorts the layer by translating the four corners of its
+        bounding box to the given coordinates: upper left (x1,y1), upper
+        right(x2,y2), lower right (x3,y3) and lower left (x4,y4).
         """
     
         w, h = self.img.size
@@ -662,14 +621,13 @@ class Layer:
     def rotate(self, angle):
     
         """Rotates the layer.
-    
+
         Rotates the layer by given angle.
         Positive numbers rotate counter-clockwise,
         negative numbers rotate clockwise.
-    
+
         Rotate commands are executed instantly,
         so many subsequent rotates will distort the image.
-    
         """
     
         #When a layer rotates, its corners will fall outside
@@ -725,9 +683,7 @@ class Layer:
     
     def flip(self, axis=HORIZONTAL):
     
-        """Flips the layer, either HORIZONTAL or VERTICAL.
-    
-        """
+        """Flips the layer, either HORIZONTAL or VERTICAL."""
 
         if axis == HORIZONTAL:
             self.img = self.img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -736,20 +692,16 @@ class Layer:
         
     def blur(self):
         
-        """Blurs the layer.
-        
-        """
+        """Blurs the layer."""
     
         self.img = self.img.filter(ImageFilter.BLUR)
 
     def sharpen(self, value=1.0):
 
         """Increases or decreases the sharpness in the layer.
-    
-        The given value is a percentage to increase
-        or decrease the image sharpness,
-        for example 0.8 means sharpness at 80%.
-    
+
+        The given value is a percentage to increase or decrease the
+        image sharpness, for example 0.8 means sharpness at 80%.
         """
      
         s = ImageEnhance.Sharpness(self.img) 
@@ -762,10 +714,9 @@ class Layer:
     def levels(self):
         
         """Returns a histogram for each RGBA channel.
-        
-        Returns a 4-tuple of lists, r, g, b, and a.
-        Each list has 255 items, a count for each pixel value.
-                
+
+        Returns a 4-tuple of lists, r, g, b, and a. Each list has 255
+        items, a count for each pixel value.
         """
         
         h = self.img.histogram()
@@ -779,26 +730,24 @@ class Layer:
 class Blend:
     
     """Layer blending modes.
-    
+
     Implements additional blending modes to those present in PIL.
     These blending functions can not be used separately from
     the canvas.flatten() method, where the alpha compositing
     of two layers is handled.
-    
+
     Since these blending are not part of a C library,
     but pure Python, they take forever to process.
-    
     """
     
     def overlay(self, img1, img2):
     
         """Applies the overlay blend mode.
-    
-        Overlays image img2 on image img1.
-        The overlay pixel combines multiply and screen:
-        it multiplies dark pixels values and screen light values.
-        Returns a composite image with the alpha channel retained.
-    
+
+        Overlays image img2 on image img1. The overlay pixel combines
+        multiply and screen: it multiplies dark pixels values and screen
+        light values. Returns a composite image with the alpha channel
+        retained.
         """
     
         p1 = list(img1.getdata())
@@ -834,12 +783,10 @@ class Blend:
     def hue(self, img1, img2):
     
         """Applies the hue blend mode.
-    
-        Hues image img1 with image img2.
-        The hue filter replaces the hues of pixels in img1
-        with the hues of pixels in img2.
-        Returns a composite image with the alpha channel retained.
-    
+
+        Hues image img1 with image img2. The hue filter replaces the
+        hues of pixels in img1 with the hues of pixels in img2. Returns
+        a composite image with the alpha channel retained.
         """
 
         import colorsys
@@ -875,12 +822,11 @@ class Blend:
     def color(self, img1, img2):
     
         """Applies the color blend mode.
-    
-        Colorize image img1 with image img2.
-        The color filter replaces the hue and saturation of pixels in img1
-        with the hue and saturation of pixels in img2.
-        Returns a composite image with the alpha channel retained.
-    
+
+        Colorize image img1 with image img2. The color filter replaces
+        the hue and saturation of pixels in img1 with the hue and
+        saturation of pixels in img2. Returns a composite image with the
+        alpha channel retained.
         """
 
         import colorsys
@@ -916,14 +862,13 @@ class Blend:
 class Pixels:
     
     """Provides direct access to a layer's pixels.
-    
+
     The layer.pixels[] contains all pixel values
     in a 1-dimensional array.
     Each pixel is a tuple containing (r,g,b,a) values.
-    
+
     After the array has been updated, layer.pixels.update()
     must be called for the changes to commit.
-    
     """
     
     def __init__(self, img, layer):
@@ -969,10 +914,9 @@ class Pixels:
     def convolute(self, kernel, scale=None, offset=0):
         
         """A (3,3) or (5,5) convolution kernel.
-        
-        The kernel argument is a list with either 9 or 25 elements,
-        the weight for each surrounding pixels to convolute.
-        
+
+        The kernel argument is a list with either 9 or 25 elements, the
+        weight for each surrounding pixels to convolute.
         """
         
         if len(kernel)   ==  9: size = (3,3)

@@ -76,8 +76,7 @@ def create_canvas(
     fullscreen=None,
     show_vars=False,
 ):
-    """
-    Create canvas and sink for attachment to a bot
+    """Create canvas and sink for attachment to a bot.
 
     canvas is what draws images, 'sink' is the final consumer of the images
 
@@ -153,8 +152,7 @@ def create_bot(
     vars=None,
     namespace=None,
 ):
-    """
-    Create a canvas and a bot with the same canvas attached to it
+    """Create a canvas and a bot with the same canvas attached to it.
 
     bot parameters
     :param vars: preset dictionary of vars from the called
@@ -163,7 +161,6 @@ def create_bot(
     ... everything else ...
 
     See create_canvas for details on those parameters.
-
     """
     multifile = True if iterations and iterations > 1 else False
     canvas = create_canvas(
@@ -188,12 +185,10 @@ def create_bot(
 
 
 class ShoebotThread(threading.Thread):
-    """
-    Run shoebot in an alternate thread.
+    """Run shoebot in an alternate thread.
 
-    This way the commandline shell can run on the main thread
-    and the GUI in a seperate thread without readline
-    blocking it.
+    This way the commandline shell can run on the main thread and the
+    GUI in a seperate thread without readline blocking it.
     """
 
     def __init__(
@@ -268,8 +263,7 @@ def run(
     verbose=False,
     background_thread=True,
 ):
-    """
-    Create and run a bot, the arguments all correspond to sanitized
+    """Create and run a bot, the arguments all correspond to sanitized
     commandline options.
 
     :param background_thread: If True then use a background thread.

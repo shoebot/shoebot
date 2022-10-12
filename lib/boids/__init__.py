@@ -40,11 +40,10 @@ class Boid:
         
     def cohesion(self, d=100):
         
-        """ Boids move towards the flock's centre of mass.
-        
-        The centre of mass is the average position of all boids,
-        not including itself (the "perceived centre").
-        
+        """Boids move towards the flock's centre of mass.
+
+        The centre of mass is the average position of all boids, not
+        including itself (the "perceived centre").
         """
         
         vx = vy = vz = 0
@@ -59,11 +58,10 @@ class Boid:
                 
     def separation(self, r=10):
         
-        """ Boids keep a small distance from other boids.
-        
-        Ensures that boids don't collide into each other,
-        in a smoothly accelerated motion.
-        
+        """Boids keep a small distance from other boids.
+
+        Ensures that boids don't collide into each other, in a smoothly
+        accelerated motion.
         """
         
         vx = vy = vz = 0
@@ -77,8 +75,7 @@ class Boid:
         
     def alignment(self, d=5):
         
-        """ Boids match velocity with other boids.
-        """
+        """Boids match velocity with other boids."""
         
         vx = vy = vz = 0
         for b in self.boids:
@@ -92,11 +89,10 @@ class Boid:
         
     def limit(self, max=30):
         
-        """ The speed limit for a boid.
-        
-        Boids can momentarily go very fast,
-        something that is impossible for real animals.
-        
+        """The speed limit for a boid.
+
+        Boids can momentarily go very fast, something that is impossible
+        for real animals.
         """
         
         if abs(self.vx) > max: 
@@ -108,8 +104,7 @@ class Boid:
         
     def _angle(self):
         
-        """ Returns the angle towards which the boid is steering.
-        """
+        """Returns the angle towards which the boid is steering."""
         
         from math import atan, pi, degrees
         a = degrees(atan(self.vy/self.vx)) + 360
@@ -121,8 +116,7 @@ class Boid:
         
     def goal(self, x, y, z, d=50.0):
         
-        """ Tendency towards a particular place.
-        """
+        """Tendency towards a particular place."""
         
         return (x-self.x)/d, (y-self.y)/d, (z-self.z)/d
         
@@ -218,15 +212,14 @@ class Boids(list):
         
     def constrain(self):
         
-        """ Cages the flock inside the x, y, w, h area.
-        
+        """Cages the flock inside the x, y, w, h area.
+
         The actual cage is a bit larger,
         so boids don't seem to bounce of invisible walls
         (they are rather "encouraged" to stay in the area).
-        
+
         If a boid touches the ground level,
         it may decide to perch there for a while.
-        
         """
         
         dx = self.w * 0.1
@@ -258,8 +251,7 @@ class Boids(list):
                goal=20,
                limit=30):
         
-        """ Calculates the next motion frame for the flock.
-        """
+        """Calculates the next motion frame for the flock."""
         
         # Shuffling the list of boids ensures fluid movement.
         # If you need the boids to retain their position in the list
@@ -323,5 +315,4 @@ class Boids(list):
         self.constrain()
         
 def flock(n, x, y, w, h):
-    
     return Boids(n, x, y, w, h)

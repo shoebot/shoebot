@@ -54,13 +54,12 @@ class LSystem(object):
 
     def _reset(self):
 
-        """ Resets the number of drawn segments and the duration.
+        """Resets the number of drawn segments and the duration.
 
-        To calculate the number of segments or the total time needed,
-        we need to recurse through LSystem._grow().
-        Before that, the draw(), segments() and duration() command
-        will reset both tally variables.
-
+        To calculate the number of segments or the total time needed, we
+        need to recurse through LSystem._grow(). Before that, the
+        draw(), segments() and duration() command will reset both tally
+        variables.
         """
 
         self._segments = 0
@@ -68,7 +67,7 @@ class LSystem(object):
 
     def _grow(self, generation, rule, angle, length, time=maxsize, draw=True):
 
-        """ Recurse through the system.
+        """Recurse through the system.
 
         When a segment is drawn, the LSsytem.segment() method will be called.
         You can customize this method to create your own visualizations.
@@ -79,7 +78,6 @@ class LSystem(object):
 
         The method also has an id parameter which is a unique number
         between 0 and LSystem.segments.
-
         """
 
         if generation == 0:
@@ -163,14 +161,13 @@ class LSystem(object):
 
     def draw(self, x, y, generation, time=None, ease=None):
 
-        """ Draws a number of generations at the given position.
+        """Draws a number of generations at the given position.
 
         The time parameter can be used to progress the system in an animatiom.
         As time nears LSystem.duration(generation), more segments will be drawn.
 
         The ease parameter can be used to gradually increase the branching angle
         as more segments are drawn.
-
         """
 
         angle = self.angle
@@ -193,15 +190,13 @@ class LSystem(object):
 
     def segments(self, generation, time=None):
 
-        """ Returns the number of segments drawn for a number of generations.
+        """Returns the number of segments drawn for a number of generations.
 
-        The number of segments that are drawn to the screen
-        depends of the number of generations and the amount of time.
-        Each F command has a cost that depletes time.
-        Segments will stop being drawn if generation reaches 0,
-        when there is no time left
-        or when the segment length falls below LSystem.threshold.
-
+        The number of segments that are drawn to the screen depends of
+        the number of generations and the amount of time. Each F command
+        has a cost that depletes time. Segments will stop being drawn if
+        generation reaches 0, when there is no time left or when the
+        segment length falls below LSystem.threshold.
         """
 
         if not time:
@@ -214,15 +209,14 @@ class LSystem(object):
 
     def duration(self, generation):
 
-        """ Returns the total draw time needed based on the current cost.
+        """Returns the total draw time needed based on the current cost.
 
-        In an animation, the system will expand as time progresses.
-        Each F command that draws a segment has a cost that depletes time.
-        To calculate the total amount of time for a number of generations,
-        we need to recurse through the system.
-        Time does not flow through the system linearly,
-        it "branches" from generation to generation.
-
+        In an animation, the system will expand as time progresses. Each
+        F command that draws a segment has a cost that depletes time. To
+        calculate the total amount of time for a number of generations,
+        we need to recurse through the system. Time does not flow
+        through the system linearly, it "branches" from generation to
+        generation.
         """
         _ctx.push()
         self._reset()

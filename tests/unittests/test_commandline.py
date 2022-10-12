@@ -5,17 +5,15 @@ from parameterized import parameterized
 
 
 class TestCommandLine(unittest.TestCase):
-    """
-    See if the commands can start successfully, by starting
-    them with an option that does nothing: --version
+    """See if the commands can start successfully, by starting them with an
+    option that does nothing: --version.
 
-    When dependencies are not installed these commands will
-    not return an error.
+    When dependencies are not installed these commands will not return
+    an error.
     """
 
     def test_sbot_starts(self):
-        """
-        Try and run sbot --help and check return code
+        """Try and run sbot --help and check return code.
 
         This may fail if a dependency is not instaled properly.
         """
@@ -31,8 +29,7 @@ class TestCommandLine(unittest.TestCase):
         )
 
     def test_shoebot_starts(self):
-        """
-        Try and run shoebot --help and check return code
+        """Try and run shoebot --help and check return code.
 
         This may fail if a dependency is not instaled properly.
         """
@@ -49,8 +46,7 @@ class TestCommandLine(unittest.TestCase):
 
     @parameterized.expand([("sbot", "this_will_fail()",), ("sbot", "-dt", "this_will_fail()")])
     def test_sbot_errorcode_on_invalid_code(self, *cmd):
-        """
-        Try and run sbot, call a function that doesn't exist and verify
+        """Try and run sbot, call a function that doesn't exist and verify.
 
         The errorcode is set as expected.
         """

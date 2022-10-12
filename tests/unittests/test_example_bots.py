@@ -38,9 +38,8 @@ class TestExampleOutput(ShoebotTestCase):
         ]
     )
     def test_static_example_bots(self, filename, output_prefix, namespace=None):
-        """
-        Check non animated example bots render matches the reference images.
-        """
+        """Check non animated example bots render matches the reference
+        images."""
         self.skipTest("FIXME - update these images, once runs-3-times is merged")
         actual_output = f"{EXAMPLE_OUTPUT_DIR}/{output_prefix}-actual.png"
         expected_output = f"{EXAMPLE_INPUT_DIR}/{output_prefix}-expected.png"

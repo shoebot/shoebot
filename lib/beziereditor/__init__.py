@@ -173,11 +173,10 @@ class BezierPathEditor:
         
     def overlap(self, x1, y1, x2, y2, r=5):
         
-        """ Returns True when point 1 and point 2 overlap.
-        
-        There is an r treshold in which point 1 and point 2
-        are considered to overlap.
-        
+        """Returns True when point 1 and point 2 overlap.
+
+        There is an r treshold in which point 1 and point 2 are
+        considered to overlap.
         """
         
         if abs(x2-x1) < r and abs(y2-y1) < r:
@@ -187,8 +186,7 @@ class BezierPathEditor:
     
     def reflect(self, x0, y0, x, y):
         
-        """ Reflects the point x, y through origin x0, y0.
-        """
+        """Reflects the point x, y through origin x0, y0."""
                 
         rx = x0 - (x-x0)
         ry = y0 - (y-y0)
@@ -196,8 +194,7 @@ class BezierPathEditor:
 
     def angle(self, x0, y0, x1, y1):
         
-        """ Calculates the angle between two points.
-        """
+        """Calculates the angle between two points."""
     
         a = degrees( atan((y1-y0) / (x1-x0+0.00001)) ) + 360
         if x1-x0 < 0: a += 180
@@ -205,15 +202,13 @@ class BezierPathEditor:
 
     def distance(self, x0, y0, x1, y1):
     
-        """ Calculates the distance between two points.
-        """
+        """Calculates the distance between two points."""
     
         return sqrt(pow(x1-x0, 2) + pow(y1-y0, 2))
         
     def coordinates(self, x0, y0, distance, angle):
         
-        """ Calculates the coordinates of a point from the origin.
-        """
+        """Calculates the coordinates of a point from the origin."""
         
         x = x0 + cos(radians(angle)) * distance
         y = y0 + sin(radians(angle)) * distance
@@ -221,8 +216,7 @@ class BezierPathEditor:
     
     def contains_point(self, x, y, d=2):
         
-        """ Returns true when x, y is on the path stroke outline.
-        """
+        """Returns true when x, y is on the path stroke outline."""
         
         if self.path != None and len(self.path) > 1 \
         and self.path.contains(x, y):
@@ -244,11 +238,10 @@ class BezierPathEditor:
 
     def insert_point(self, x, y):
         
-        """ Inserts a point on the path at the mouse location.
-        
+        """Inserts a point on the path at the mouse location.
+
         We first need to check if the mouse location is on the path.
         Inserting point is time intensive and experimental.
-        
         """
         
         try: 
@@ -317,13 +310,11 @@ class BezierPathEditor:
     
     def update(self):
         
-        """ Update runs each frame to check for mouse interaction.
-        
-        Alters the path by allowing the user to add new points,
-        drag point handles and move their location.
-        Updates are automatically stored as SVG
-        in the given filename.
-        
+        """Update runs each frame to check for mouse interaction.
+
+        Alters the path by allowing the user to add new points, drag
+        point handles and move their location. Updates are automatically
+        stored as SVG in the given filename.
         """
         
         x, y = mouse()
@@ -636,8 +627,7 @@ class BezierPathEditor:
 
     def draw(self):
         
-        """ Draws the editable path and interface elements.
-        """
+        """Draws the editable path and interface elements."""
                 
         # Enable interaction.
         self.update()
@@ -843,8 +833,7 @@ class BezierPathEditor:
     
     def draw_freehand(self):
         
-        """ Freehand sketching.
-        """
+        """Freehand sketching."""
         
         if _ctx._ns["mousedown"]:
             
@@ -896,12 +885,10 @@ class BezierPathEditor:
                 
     def export_svg(self):
         
-        """ Exports the path as SVG.
-        
-        Uses the filename given when creating this object.
-        The file is automatically updated to reflect
-        changes to the path.
-        
+        """Exports the path as SVG.
+
+        Uses the filename given when creating this object. The file is
+        automatically updated to reflect changes to the path.
         """
         
         d = ""
@@ -937,7 +924,6 @@ class BezierPathEditor:
 ######################################################################################################
 
 def mouse():
-
     x = _ctx._ns["MOUSEX"]
     y = _ctx._ns["MOUSEY"]    
     return (x, y)

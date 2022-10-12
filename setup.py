@@ -140,8 +140,7 @@ def read_version():
 
 
 def requirements(debug=True, with_pgi=None):
-    """
-    Build requirements based on flags
+    """Build requirements based on flags.
 
     :param with_pgi: Use 'pgi' instead of 'gi' - False on CPython, True elsewhere
     :return:

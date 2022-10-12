@@ -81,8 +81,7 @@ class NodeBot(Bot):
     color_range = 1
 
     def __init__(self, canvas=None, namespace=None, vars=None):
-        """
-        Nodebot grammar constructor
+        """Nodebot grammar constructor.
 
         :param canvas: Canvas implementation for output.
         :param namespace: Optionally specify a dict to inject as namespace
@@ -93,7 +92,7 @@ class NodeBot(Bot):
 
     @property
     def _ns(self):
-        """Nodebox1 API way of fetching namespace from _ctx"""
+        """Nodebox1 API way of fetching namespace from _ctx."""
         return self._namespace
 
     # Drawing
@@ -203,7 +202,8 @@ class NodeBot(Bot):
     oval = ellipse
 
     def circle(self, x, y, diameter, draw=True, **kwargs):
-        """Draw a circle
+        """Draw a circle.
+
         :param x: x-coordinate of the top left corner
         :param y: y-coordinate of the top left corner
         :param diameter: circle diameter
@@ -213,8 +213,7 @@ class NodeBot(Bot):
         return self.ellipse(x, y, diameter, diameter, draw, **kwargs)
 
     def ellipsemode(self, mode=None):
-        """
-        Set the current ellipse drawing mode.
+        """Set the current ellipse drawing mode.
 
         :param mode: CORNER, CENTER, CORNERS
         :return: ellipsemode if mode is None or valid.
@@ -567,8 +566,7 @@ class NodeBot(Bot):
         return self._canvas.mode
 
     def translate(self, xt, yt):
-        """
-        Translate the canvas origin point by (xt, yt).
+        """Translate the canvas origin point by (xt, yt).
 
         :param xt: Amount to move horizontally
         :param yt: Amount to move vertically
@@ -576,8 +574,7 @@ class NodeBot(Bot):
         self._canvas.translate(xt, yt)
 
     def rotate(self, degrees=0, radians=0):
-        """
-        Set the current rotation in degrees or radians.
+        """Set the current rotation in degrees or radians.
 
         :param degrees: Degrees to rotate
         :param radians: Radians to rotate
@@ -590,8 +587,7 @@ class NodeBot(Bot):
         self._canvas.rotate(-angle)
 
     def scale(self, x=1, y=None):
-        """
-        Set a scale at which to draw objects.
+        """Set a scale at which to draw objects.
 
         1.0 draws objects at their natural size.
 
@@ -626,16 +622,14 @@ class NodeBot(Bot):
     # Color
 
     def outputmode(self):
-        """
-        NOT IMPLEMENTED
-        """
+        """NOT IMPLEMENTED."""
         raise NotImplementedError(
             _("outputmode() isn't implemented; Shoebot does not support CMYK")
         )
 
     def colormode(self, mode=None, range=None):
-        """Set the current colormode (can be RGB or HSB) and eventually
-        the color range.
+        """Set the current colormode (can be RGB or HSB) and eventually the
+        color range.
 
         If called without arguments, it returns the current colormode.
 
@@ -788,7 +782,8 @@ class NodeBot(Bot):
         :return: current fontpath (if fontpath param not set)
 
         Accepts TrueType and OpenType files. Depends on FreeType being
-        installed."""
+        installed.
+        """
         if fontpath is not None:
             # do we have variants set?
             if not vars:
@@ -862,8 +857,8 @@ class NodeBot(Bot):
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):
-        """Returns the dimensions of the text box of a string of text, according
-        to the current font settings.
+        """Returns the dimensions of the text box of a string of text,
+        according to the current font settings.
 
         :return: (width, height) tuple
         """
@@ -882,8 +877,8 @@ class NodeBot(Bot):
         return txt.bounds
 
     def textwidth(self, txt, width=None, **kwargs):
-        """Returns the width of a string of text according to the current
-        font settings.
+        """Returns the width of a string of text according to the current font
+        settings.
 
         :return:
         """
@@ -891,8 +886,8 @@ class NodeBot(Bot):
         return self.textmetrics(txt, width=w, **kwargs)[0]
 
     def textheight(self, txt, width=None, **kwargs):
-        """Returns the height of a string of text according to the current
-        font settings.
+        """Returns the height of a string of text according to the current font
+        settings.
 
         :param txt: string to measure
         :param width: width of a line of text in a block
@@ -910,7 +905,7 @@ class NodeBot(Bot):
         return self._canvas.lineheight
 
     def align(self, align=LEFT):
-        """Set text alignment
+        """Set text alignment.
 
         :param align: Text alignment (LEFT, CENTER, RIGHT)
         """
@@ -941,9 +936,9 @@ class NodeBot(Bot):
 
     @property
     def canvas(self):
-        """
-        Not entirely sure compatible the Shoebot 'canvas' is with Nodebox
+        """Not entirely sure compatible the Shoebot 'canvas' is with Nodebox
         but there you go.
+
         :return:
         """
         return self._canvas

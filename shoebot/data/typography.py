@@ -87,8 +87,7 @@ except ValueError as no_pango:
 
 # Pango Utility functions
 def pangocairo_create_context(cr):
-    """
-    Create a PangoCairo context from a given pycairo context.
+    """Create a PangoCairo context from a given pycairo context.
 
     If python-gi-cairo is not installed PangoCairo.create_context dies
     with an unhelpful KeyError, output a better error if that happens.
@@ -126,12 +125,11 @@ Text Bounds in pixels.
 
 
 class Text(Grob, ColorMixin):
-    """
-    Changes from Nodebox 1:
-        font in Nodebox is a native Cocoa font, here it is the font name.
-        _fontsize, _fontsize, _lineheight, _align in Nodebox are public fields.
+    """Changes from Nodebox 1: font in Nodebox is a native Cocoa font, here it
+    is the font name. _fontsize, _fontsize, _lineheight, _align in Nodebox are
+    public fields.
 
-        Implementation of fonts uses Pango instead of Cocoa.
+    Implementation of fonts uses Pango instead of Cocoa.
     """
 
     def __init__(

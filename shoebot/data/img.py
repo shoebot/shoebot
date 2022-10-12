@@ -20,7 +20,7 @@ CORNER = "corner"
 
 
 class SurfaceRef(object):
-    """ Cannot have a weakref to a cairo surface, so wrapper is used """
+    """Cannot have a weakref to a cairo surface, so wrapper is used."""
 
     def __init__(self, surface):
         self.surface = surface

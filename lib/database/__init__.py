@@ -38,7 +38,6 @@ class Database:
         and assigned a Table object.
 
         You can do: database.table or database[table].
-
         """
 
         self._name = name.rstrip(".db")
@@ -66,10 +65,9 @@ class Database:
 
         """Creates an SQLite database file.
 
-        Creates an SQLite database with the given name.
-        The .box file extension is added automatically.
-        Overwrites any existing database by default.
-
+        Creates an SQLite database with the given name. The .box file
+        extension is added automatically. Overwrites any existing
+        database by default.
         """
 
         self._name = name.rstrip(".db")
@@ -95,12 +93,10 @@ class Database:
 
         """Creates a new table.
 
-        Creates a table with the given name,
-        containing the list of given fields.
-        Since SQLite uses manifest typing, no data type need be supplied.
-        The primary key is "id" by default,
-        an integer that can be set or otherwise autoincrements.
-
+        Creates a table with the given name, containing the list of
+        given fields. Since SQLite uses manifest typing, no data type
+        need be supplied. The primary key is "id" by default, an integer
+        that can be set or otherwise autoincrements.
         """
 
         for f in fields:
@@ -121,10 +117,8 @@ class Database:
 
         """Creates a table index.
 
-        Creates an index on the given table,
-        on the given field with unique values enforced or not,
-        in ascending or descending order.
-
+        Creates an index on the given table, on the given field with
+        unique values enforced or not, in ascending or descending order.
         """
 
         if unique: u = "unique "
@@ -143,12 +137,10 @@ class Database:
 
         """Sets the commit frequency.
 
-        Modifications to the database,
-        e.g. row insertions are commited in batch,
-        specified by the given number.
-        A number that is reasonably high allows for faster transactions.
-        Commits anything still pending.
-
+        Modifications to the database, e.g. row insertions are commited
+        in batch, specified by the given number. A number that is
+        reasonably high allows for faster transactions. Commits anything
+        still pending.
         """
 
         self._commit = each
@@ -156,8 +148,7 @@ class Database:
 
     def close(self):
 
-        """Commits any pending transactions and closes the database.
-        """
+        """Commits any pending transactions and closes the database."""
 
         self._con.commit()
         self._cur.close()
@@ -165,8 +156,7 @@ class Database:
 
     def sql(self, sql):
 
-        """ Executes a raw SQL statement on the database.
-        """
+        """Executes a raw SQL statement on the database."""
 
         self._cur.execute(sql)
         if sql.lower().find("select") >= 0:
@@ -176,8 +166,7 @@ class Database:
 
     def dump(self, ext=".xml"):
 
-        """ Dumps the data in the tables into another format (like XML).
-        """
+        """Dumps the data in the tables into another format (like XML)."""
 
         self._con.commit()
         if ext == ".xml":
@@ -229,7 +218,6 @@ class Table:
 
         For example, a table with an id field has the following method:
         table.id(query, operator="=")
-
         """
 
         self._db = db
@@ -247,7 +235,9 @@ class Table:
 
     def __len__(self):
 
-        """ The row count of the table. This should be optimized.
+        """The row count of the table.
+
+        This should be optimized.
         """
 
         sql = "select "+self._key+" from "+self._name
@@ -266,7 +256,6 @@ class Table:
         The wildcard character is * and automatically sets the operator to "like".
         Optionally, the fields argument can be a list of column names to select.
         Returns a list of row tuples containing fields.
-
         """
 
         if key == None: key = self._key
@@ -294,8 +283,7 @@ class Table:
 
     def all(self):
 
-        """Returns all the rows in the table.
-        """
+        """Returns all the rows in the table."""
 
         return self.find("*")
 
@@ -303,9 +291,8 @@ class Table:
 
         """Returns the column names.
 
-        Returns the name of each column in the database,
-        in the same order row fields are returned from find().
-
+        Returns the name of each column in the database, in the same
+        order row fields are returned from find().
         """
 
         return self._fields
@@ -314,11 +301,10 @@ class Table:
 
         """Adds a new row to a table.
 
-        Adds a row to the given table.
-        The column names and their corresponding values
-        must either be supplied as a dictionary of {fields:values},
-        or a series of keyword arguments of field=value style.
-
+        Adds a row to the given table. The column names and their
+        corresponding values must either be supplied as a dictionary of
+        {fields:values}, or a series of keyword arguments of field=value
+        style.
         """
 
         if args and kw:
@@ -341,8 +327,7 @@ class Table:
 
     def edit(self, id, *args, **kw):
 
-        """ Edits the row with given id.
-        """
+        """Edits the row with given id."""
 
         if args and kw:
             return
@@ -362,8 +347,7 @@ class Table:
 
     def remove(self, id, operator="=", key=None):
 
-        """ Deletes the row with given id.
-        """
+        """Deletes the row with given id."""
 
         if key == None: key = self._key
         try: id = str(id)
@@ -374,13 +358,11 @@ class Table:
 ######################################################################################################
 
 def create(name, overwrite=True):
-
     db = Database()
     db.create(name, overwrite)
     return db
 
 def connect(name):
-
     db = Database()
     db.connect(name)
     return db

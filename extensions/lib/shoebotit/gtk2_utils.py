@@ -1,6 +1,4 @@
-"""
-Gtk3 support for shoebot in editors and IDEs
-"""
+"""Gtk3 support for shoebot in editors and IDEs."""
 
 import os
 from shoebotit import ide_utils
@@ -72,8 +70,7 @@ def examples_menu(root_dir=None, depth=0):
 
 
 def gedit2_menu(xml):
-    """
-    Build XML for GEDIT3 Menus.
+    """Build XML for GEDIT3 Menus.
 
     Pass in the xml returned by example_menu
     """
@@ -81,10 +78,8 @@ def gedit2_menu(xml):
 
 
 def get_child_by_name(parent, name):
-    """
-    Iterate through a gtk container, `parent`,
-    and return the widget with the name `name`.
-    """
+    """Iterate through a gtk container, `parent`, and return the widget with
+    the name `name`."""
     # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
     def iterate_children(widget, name):
         if widget.get_name() == name:

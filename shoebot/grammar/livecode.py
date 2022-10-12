@@ -7,8 +7,7 @@ import traceback
 
 
 class LiveExecution(object):
-    """
-    Live Code executor.
+    """Live Code executor.
 
     Code has two states, 'known good' and 'tenous'
 
@@ -42,11 +41,10 @@ class LiveExecution(object):
         return self.edited_source is not None
 
     def load_edited_source(self, source, good_cb=None, bad_cb=None, filename=None):
-        """
-        Load changed code into the execution environment.
+        """Load changed code into the execution environment.
 
-        Until the code is executed correctly, it will be
-        in the 'tenuous' state.
+        Until the code is executed correctly, it will be in the
+        'tenuous' state.
         """
         with LiveExecution.lock:
             self.good_cb = good_cb
@@ -66,8 +64,7 @@ class LiveExecution(object):
                 self.filename = filename
 
     def reload_functions(self, edited=True):
-        """
-        Reload functions, from edited_source or known_good
+        """Reload functions, from edited_source or known_good.
 
         :param edited: if True then functions are reloaded from edited_source, otherwise known_good is used.
         """
@@ -92,18 +89,15 @@ class LiveExecution(object):
                     self.ns[f.name].__code__ = function_context[f.name].__code__
 
     def do_exec(self, source, ns):
-        """
-        Override if you want to do something other than exec in ns
+        """Override if you want to do something other than exec in ns.
 
         tenuous is True if the source has just been edited and may fail
         """
         exec(source, ns)
 
     def run_tenuous(self):
-        """
-        Run edited source, if no exceptions occur then it
-        graduates to known good.
-        """
+        """Run edited source, if no exceptions occur then it graduates to known
+        good."""
         with LiveExecution.lock:
             ns_snapshot = copy.copy(self.ns)
             try:
@@ -121,9 +115,7 @@ class LiveExecution(object):
                 return False, ex
 
     def run(self):
-        """
-        Attempt to known good or tenuous source.
-        """
+        """Attempt to known good or tenuous source."""
         with LiveExecution.lock:
             if self.edited_source:
                 success, ex = self.run_tenuous()
@@ -133,16 +125,14 @@ class LiveExecution(object):
             self.do_exec(self.known_good, self.ns)
 
     def clear_callbacks(self):
-        """
-        clear the good and bad callbacks
-        """
+        """clear the good and bad callbacks."""
         with LiveExecution.lock:
             self.bad_cb = None
             self.good_cb = None
 
     def call_bad_cb(self, tb):
-        """
-        If bad_cb returns True then keep it
+        """If bad_cb returns True then keep it.
+
         :param tb: traceback that caused exception
         :return:
         """
@@ -161,8 +151,7 @@ class LiveExecution(object):
 
     @contextlib.contextmanager
     def run_context(self):
-        """
-        Context in which the user can run the source in a custom manner.
+        """Context in which the user can run the source in a custom manner.
 
         If no exceptions occur then the source will move from 'tenuous'
         to 'known good'.
@@ -170,7 +159,6 @@ class LiveExecution(object):
         >>> with run_context() as (known_good, source, ns):
         >>> ...  exec source in ns
         >>> ...  ns['draw']()
-
         """
         with LiveExecution.lock:
             if self.edited_source is None:

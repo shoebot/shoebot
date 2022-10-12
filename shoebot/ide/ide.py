@@ -586,8 +586,7 @@ class ShoebotEditorWindow(Gtk.Window):
 
     @staticmethod
     def open_file(filename):
-        """
-        Open filename.
+        """Open filename.
 
         :param filename: filename to open.
         :return:  True if file was opened.
@@ -663,9 +662,7 @@ class ShoebotEditorWindow(Gtk.Window):
         chooser.destroy()
 
     def save_or_save_as(self):
-        """
-        Call save_as if file has never been saved otherwise call save.
-        """
+        """Call save_as if file has never been saved otherwise call save."""
         filename = self.source_view.get_buffer().filename
         if filename:
             self.save(filename)
@@ -974,9 +971,7 @@ class ShoebotEditorWindow(Gtk.Window):
         return save_succeeded
 
     def save_as(self):
-        """
-        Return True if the source_buffer was saved
-        """
+        """Return True if the source_buffer was saved."""
         chooser = ShoebotFileChooserDialog(
             _("Save File"),
             None,
@@ -999,8 +994,8 @@ class ShoebotEditorWindow(Gtk.Window):
         return saved
 
     def update_window_title(self):
-        """
-        Update the window title from the filename in the source_buffer.
+        """Update the window title from the filename in the source_buffer.
+
         :return:
         """
         save_prefix = "*" if self.source_view.get_buffer().get_modified() else ""

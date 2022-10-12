@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Assorted utility functions, mainly for color and font handling"""
+"""Assorted utility functions, mainly for color and font handling."""
 
 
 class ShoebotInstallError(Exception):
@@ -35,8 +35,7 @@ class ShoebotInstallError(Exception):
 
 
 class UnbufferedFile:
-    """
-    File wrapper, that flushes on writes.
+    """File wrapper, that flushes on writes.
 
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
     """
@@ -78,8 +77,7 @@ def _copy_attr(v):
 
 
 def _copy_attrs(source, target, attrs):
-    """
-    Copy attributes from source to target.
+    """Copy attributes from source to target.
 
     :param source: source object
     :param target: destination object

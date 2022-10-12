@@ -1,6 +1,5 @@
-"""
-This uses the test infrastructure but is NOT intended to run every time tests are run as it would be very inefficient.
-"""
+"""This uses the test infrastructure but is NOT intended to run every time
+tests are run as it would be very inefficient."""
 import os
 import sys
 import unittest
@@ -67,9 +66,7 @@ EXCLUDE_EXAMPLE_BOTS = [
 
 
 class RunAllExampleBots(ShoebotTestCase):
-    """
-    Abusing the testing infrastructure to generate images of every bot.
-    """
+    """Abusing the testing infrastructure to generate images of every bot."""
     EXAMPLE_BOT_FILTER = []
 
     __unittest_skip__ = True
@@ -82,9 +79,7 @@ class RunAllExampleBots(ShoebotTestCase):
 
     @parameterized.expand(EXAMPLE_BOTS, name_func=shoebot_example_render_testfunction)
     def test_run_examples_and_generate_images(self, bot_path):
-        """
-        Render image from non animated example bot.
-        """
+        """Render image from non animated example bot."""
         rel_bot_path = str(get_bot_relpath(bot_path))
         if self.EXAMPLE_BOT_FILTER and rel_bot_path in self.EXAMPLE_BOT_FILTER:
             self.skipTest("Bot not included in filter.")

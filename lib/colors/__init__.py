@@ -92,8 +92,7 @@ def _range(start, stop=None, step=1):
 # Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
 
 def hex_to_rgb(hex):
-    """ Returns RGB values for a hex color string.
-    """
+    """Returns RGB values for a hex color string."""
 
     hex = hex.lstrip("#")
     if len(hex) < 6:
@@ -109,7 +108,7 @@ hex2rgb = hex_to_rgb
 
 
 def lab_to_rgb(l, a, b):
-    """ Converts CIE Lab to RGB components.
+    """Converts CIE Lab to RGB components.
 
     First we have to convert to XYZ color space.
     Conversion involves using a white point,
@@ -117,7 +116,6 @@ def lab_to_rgb(l, a, b):
 
     Algorithm adopted from:
     http://www.easyrgb.com/math.php
-
     """
 
     y = (l + 16) / 116.0
@@ -153,7 +151,8 @@ lab2rgb = lab_to_rgb
 
 
 def cmyk_to_rgb(c, m, y, k):
-    """ Cyan, magenta, yellow, black to red, green, blue.
+    """Cyan, magenta, yellow, black to red, green, blue.
+
     ReportLab, http://www.koders.com/python/fid5C006F554616848C01AC7CB96C21426B69D2E5A9.aspx
     Results will differ from the way NSColor converts color spaces.
     """
@@ -185,7 +184,8 @@ rgb2cmyk = rgb_to_cmyk
 
 
 def hsv_to_rgb(h, s, v):
-    """ Hue, saturation, brightness to red, green, blue.
+    """Hue, saturation, brightness to red, green, blue.
+
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """
@@ -486,7 +486,7 @@ class Color(BaseColor):
 
     def __init__(self, *args, **kwargs):
 
-        """ Color object with string input and adjustment methods.
+        """Color object with string input and adjustment methods.
 
         Accepts strings that are (or resemble) named colors, hex strings,
         RGB, CMYK, HSB and Lab values.
@@ -494,7 +494,6 @@ class Color(BaseColor):
         You can supply a "name" parameter.
         Other valid named parameters are "mode" and "range",
         which default to the state colormode and color range.
-
         """
 
         self.name = ""
@@ -596,7 +595,7 @@ class Color(BaseColor):
 
     def str_to_rgb(self, s):
 
-        """ Returns RGB values based on a descriptive string.
+        """Returns RGB values based on a descriptive string.
 
         If the given s is a named color, return its RGB values.
         Otherwise, return a random named color that has str
@@ -605,7 +604,6 @@ class Color(BaseColor):
         Specific suffixes (-ish, -ed, -y and -like) are recognised
         as well, for example, if you need a random variation of "red"
         you can use reddish (or greenish, yellowy, etc.)
-
         """
 
         s = s.lower()
@@ -699,7 +697,7 @@ class Color(BaseColor):
 
     def rotate_ryb(self, angle=180):
 
-        """ Returns a color rotated on the artistic RYB color wheel.
+        """Returns a color rotated on the artistic RYB color wheel.
 
         An artistic color wheel has slightly different opposites
         (e.g. purple-yellow instead of purple-lime).
@@ -707,7 +705,6 @@ class Color(BaseColor):
         to provide better complementary colors.
 
         http://en.wikipedia.org/wiki/RYB_color_model
-
         """
 
         h = self.h * 360
@@ -777,7 +774,7 @@ class Color(BaseColor):
 
     def nearest_hue(self, primary=False):
 
-        """ Returns the name of the nearest named hue.
+        """Returns the name of the nearest named hue.
 
         For example,
         if you supply an indigo color (a color between blue and violet),
@@ -786,7 +783,6 @@ class Color(BaseColor):
 
         Primary colors leave out the fuzzy lime, teal,
         cyan, azure and violet hues.
-
         """
         if self.is_black:
             return "black"
@@ -807,9 +803,7 @@ class Color(BaseColor):
         return nearest
 
     def blend(self, clr, factor=0.5):
-        """
-        Returns a mix of two colors.
-        """
+        """Returns a mix of two colors."""
         r = self.r * (1 - factor) + clr.r * factor
         g = self.g * (1 - factor) + clr.g * factor
         b = self.b * (1 - factor) + clr.b * factor
@@ -817,15 +811,13 @@ class Color(BaseColor):
         return Color(r, g, b, a, mode="rgb")
 
     def distance(self, clr):
-        """
-        Returns the Euclidean distance between two colors (0.0-1.0).
+        """Returns the Euclidean distance between two colors (0.0-1.0).
 
         Consider colors arranged on the color wheel:
         - hue is the angle of a color along the center
         - saturation is the distance of a color from the center
         - brightness is the elevation of a color from the center
           (i.e. we're on color a sphere)
-
         """
         coord = lambda a, d: (cos(radians(a)) * d, sin(radians(a)) * d)
         x0, y0 = coord(self.h * 360, self.s)
@@ -836,9 +828,7 @@ class Color(BaseColor):
         return d
 
     def swatch(self, x, y, w=35, h=35, roundness=0):
-        """
-        Rectangle swatch for this color.
-        """
+        """Rectangle swatch for this color."""
         _ctx.fill(self)
         _ctx.rect(x, y, w, h, roundness)
 
@@ -905,8 +895,7 @@ eval(compile(_build_named_colors(), "<string>", "exec"))
 class ColorList(_list):
 
     def __init__(self, *args, **kwargs):
-        """
-        Construct a list of colors.
+        """Construct a list of colors.
 
         Colors can be supplied as individual arguments,
         or in a list or tuple:
@@ -973,12 +962,10 @@ class ColorList(_list):
             self.tags = kwargs["tags"]
 
     def image_to_rgb(self, path, n=10):
-        """
-        Returns a list of colors based on pixel values in the image.
+        """Returns a list of colors based on pixel values in the image.
 
         The Core Image library must be present to determine pixel colors.
         F. Albers: http://nodebox.net/code/index.php/shared_2007-06-11-11-37-05
-
         """
         from PIL import Image
         img = Image.open(path)
@@ -995,12 +982,10 @@ class ColorList(_list):
             self.append(clr)
 
     def context_to_rgb(self, str):
-        """ Returns the colors that have the given word in their context.
+        """Returns the colors that have the given word in their context.
 
-        For example, the word "anger" appears
-        in black, orange and red contexts,
-        so the list will contain those three colors.
-
+        For example, the word "anger" appears in black, orange and red
+        contexts, so the list will contain those three colors.
         """
         matches = []
         for clr in context:
@@ -1015,14 +1000,12 @@ class ColorList(_list):
         return matches
 
     def _context(self):
-        """
-        Returns the intersection of each color's context.
+        """Returns the intersection of each color's context.
 
         Get the nearest named hue of each color,
         and finds overlapping tags in each hue's colors.
         For example, a list containing yellow, deeppink and olive
         yields: femininity, friendship, happiness, joy.
-
         """
         tags1 = None
         for clr in self:
@@ -1054,8 +1037,7 @@ class ColorList(_list):
 
     def copy(self):
 
-        """ Returns a deep copy of the list.
-        """
+        """Returns a deep copy of the list."""
 
         return ColorList(
             [color(clr.r, clr.g, clr.b, clr.a, mode="rgb") for clr in self],
@@ -1064,12 +1046,10 @@ class ColorList(_list):
         )
 
     def _darkest(self):
-        """
-        Returns the darkest color from the list.
+        """Returns the darkest color from the list.
 
-        Knowing the contrast between a light and a dark swatch
-        can help us decide how to display readable typography.
-
+        Knowing the contrast between a light and a dark swatch can help
+        us decide how to display readable typography.
         """
         min, n = (1.0, 1.0, 1.0), 3.0
         for clr in self:
@@ -1081,9 +1061,7 @@ class ColorList(_list):
     darkest = property(_darkest)
 
     def _lightest(self):
-        """
-        Returns the lightest color from the list.
-        """
+        """Returns the lightest color from the list."""
         max, n = (0.0, 0.0, 0.0), 0.0
         for clr in self:
             if clr.r + clr.g + clr.b > n:
@@ -1094,9 +1072,7 @@ class ColorList(_list):
     lightest = property(_lightest)
 
     def _average(self):
-        """
-        Returns one average color for the colors in the list.
-        """
+        """Returns one average color for the colors in the list."""
         r, g, b, a = 0, 0, 0, 0
         for clr in self:
             r += clr.r
@@ -1126,8 +1102,9 @@ class ColorList(_list):
     smooth = smoothen = blend
 
     def sort_by_distance(self, reversed=False):
-        """
-        Returns a list with the smallest distance between two neighboring colors.
+        """Returns a list with the smallest distance between two neighboring
+        colors.
+
         The algorithm has a factorial complexity so it may run slow.
         """
         if not len(self):
@@ -1163,9 +1140,8 @@ class ColorList(_list):
         return ColorList(sorted_colors)
 
     def _sorted_copy(self, comparison, reversed=False):
-        """
-        Returns a sorted copy with the colors arranged according to the given comparison.
-        """
+        """Returns a sorted copy with the colors arranged according to the
+        given comparison."""
         sorted_colors = ColorList(*sorted(self.copy(), key=comparison, reverse=reversed))
         return sorted_colors
 
@@ -1204,22 +1180,23 @@ class ColorList(_list):
 
     def sort(self, comparison="hue", reversed=False):
 
-        """ Return a copy sorted by a given color attribute.
+        """Return a copy sorted by a given color attribute.
 
-        Note that there is no "universal solution to sorting a list of colors,
-        since colors need to be represented in 2 or 3 dimensions.
-
+        Note that there is no "universal solution to sorting a list of
+        colors, since colors need to be represented in 2 or 3
+        dimensions.
         """
         return getattr(self, f"sort_by_{comparison}")(reversed)
 
     def cluster_sort(self, cmp1="hue", cmp2="brightness", reversed=False, n=12):
-        """
-        Sorts the list by cmp1, then cuts it into n pieces which are sorted by cmp2.
+        """Sorts the list by cmp1, then cuts it into n pieces which are sorted
+        by cmp2.
 
-        If you want to cluster by hue, use n=12 (since there are 12 primary/secondary hues).
-        The resulting list will not contain n even slices:
-        n is used rather to slice up the cmp1 property of the colors,
-        e.g. cmp1=brightness and n=3 will cluster colors by brightness >= 0.66, 0.33, 0.0
+        If you want to cluster by hue, use n=12 (since there are 12
+        primary/secondary hues). The resulting list will not contain n even
+        slices: n is used rather to slice up the cmp1 property of the colors,
+        e.g. cmp1=brightness and n=3 will cluster colors by brightness >= 0.66,
+        0.33, 0.0
         """
         sorted_colors = self.sort(cmp1)
         clusters = ColorList()
@@ -1242,20 +1219,16 @@ class ColorList(_list):
     cluster = clustersort = cluster_sort
 
     def reverse(self):
-        """
-        Returns a reversed copy of the list.
-        """
+        """Returns a reversed copy of the list."""
         colors = ColorList.copy(self)
         _list.reverse(colors)
         return colors
 
     def repeat(self, n=2, oscillate=False, callback=None):
-        """
-        Returns a list that is a repetition of the given list.
+        """Returns a list that is a repetition of the given list.
 
-        When oscillate is True,
-        moves from the end back to the beginning,
-        and then from the beginning to the end, and so on.
+        When oscillate is True, moves from the end back to the
+        beginning, and then from the beginning to the end, and so on.
         """
         colorlist = ColorList()
         colors = ColorList.copy(self)
@@ -1267,9 +1240,7 @@ class ColorList(_list):
         return colorlist
 
     def __contains__(self, clr):
-        """
-        Returns True if clr's RGB values match a color in the list.
-        """
+        """Returns True if clr's RGB values match a color in the list."""
         for clr2 in self:
             if clr.r == clr2.r and \
                     clr.g == clr2.g and \
@@ -1316,9 +1287,7 @@ class ColorList(_list):
     inverse = property(invert)
 
     def swatch(self, x, y, w=35, h=35, padding=0, roundness=0):
-        """
-        Rectangle swatches for all the colors in the list.
-        """
+        """Rectangle swatches for all the colors in the list."""
         for _color in self:
             _color.swatch(x, y, w, h, roundness)
             y += h + padding
@@ -1326,9 +1295,7 @@ class ColorList(_list):
     draw = swatch
 
     def swarm(self, x, y, r=100):
-        """
-        Fancy random ovals for all the colors in the list.
-        """
+        """Fancy random ovals for all the colors in the list."""
         sc = _ctx.stroke(0, 0, 0, 0)
         sw = _ctx.strokewidth(0)
 
@@ -1414,9 +1381,7 @@ list = colorlist
 #### COLOR HARMONY ###################################################################################
 
 def complement(clr):
-    """
-    Returns the color and its complement in a list.
-    """
+    """Returns the color and its complement in a list."""
     clr = color(clr)
     colors = colorlist(clr)
     colors.append(clr.complement)
@@ -1425,13 +1390,11 @@ def complement(clr):
 
 
 def complementary(clr):
-    """
-    Returns a list of complementary colors.
+    """Returns a list of complementary colors.
 
-    The complement is the color 180 degrees across
-    the artistic RYB color wheel.
-    The list contains darker and softer contrasting
-    and complementing colors.
+    The complement is the color 180 degrees across the artistic RYB
+    color wheel. The list contains darker and softer contrasting and
+    complementing colors.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1471,11 +1434,10 @@ def complementary(clr):
 
 
 def split_complementary(clr):
-    """
-    Returns a list with the split complement of the color.
+    """Returns a list with the split complement of the color.
 
-    The split complement are the two colors to the left and right
-    of the color's complement.
+    The split complement are the two colors to the left and right of the
+    color's complement.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1487,12 +1449,11 @@ def split_complementary(clr):
 
 
 def left_complement(clr):
-    """
-    Returns the left half of the split complement.
+    """Returns the left half of the split complement.
 
-    A list is returned with the same darker and softer colors
-    as in the complementary list, but using the hue of the
-    left split complement instead of the complement itself.
+    A list is returned with the same darker and softer colors as in the
+    complementary list, but using the hue of the left split complement
+    instead of the complement itself.
     """
     left = split_complementary(clr)[1]
     colors = complementary(clr)
@@ -1508,9 +1469,7 @@ def left_complement(clr):
 
 
 def right_complement(clr):
-    """
-    Returns the right half of the split complement.
-    """
+    """Returns the right half of the split complement."""
     right = split_complementary(clr)[2]
     colors = complementary(clr)
     colors[3].h = right.h
@@ -1525,14 +1484,13 @@ def right_complement(clr):
 
 
 def analogous(clr, angle=10, contrast=0.25):
-    """
-    Returns colors that are next to each other on the wheel.
+    """Returns colors that are next to each other on the wheel.
 
-    These yield natural color schemes (like shades of water or sky).
-    The angle determines how far the colors are apart,
-    making it bigger will introduce more variation.
-    The contrast determines the darkness/lightness of
-    the analogue colors in respect to the given colors.
+    These yield natural color schemes (like shades of water or sky). The
+    angle determines how far the colors are apart, making it bigger will
+    introduce more variation. The contrast determines the
+    darkness/lightness of the analogue colors in respect to the given
+    colors.
     """
     contrast = max(0, min(contrast, 1.0))
 
@@ -1553,9 +1511,7 @@ def analogous(clr, angle=10, contrast=0.25):
 
 
 def monochrome(clr):
-    """
-    Returns colors in the same hue with varying brightness/saturation.
-    """
+    """Returns colors in the same hue with varying brightness/saturation."""
 
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
@@ -1587,12 +1543,11 @@ def monochrome(clr):
 
 
 def triad(clr, angle=120):
-    """
-    Returns a triad of colors.
+    """Returns a triad of colors.
 
-    The triad is made up of this color and two other colors
-    that together make up an equilateral triangle on
-    the artistic color wheel.
+    The triad is made up of this color and two other colors that
+    together make up an equilateral triangle on the artistic color
+    wheel.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1603,11 +1558,10 @@ def triad(clr, angle=120):
 
 
 def tetrad(clr, angle=90):
-    """
-    Returns a tetrad of colors.
+    """Returns a tetrad of colors.
 
-    The tetrad is made up of this color and three other colors
-    that together make up a cross on the artistic color wheel.
+    The tetrad is made up of this color and three other colors that
+    together make up a cross on the artistic color wheel.
     """
     clr = color(clr)
     colors = colorlist(clr)
@@ -1632,9 +1586,7 @@ def tetrad(clr, angle=90):
 
 
 def compound(clr, flip=False):
-    """
-    Roughly the complement and some far analogs.
-    """
+    """Roughly the complement and some far analogs."""
 
     def _wrap(x, min, threshold, plus):
         if x - min < threshold:
@@ -1734,8 +1686,7 @@ def rule(name, clr, angle=None, contrast=0.3, flip=False):
 class Gradient(ColorList):
 
     def __init__(self, *colors, **kwargs):
-        """
-        Creates a list of gradient colors based on a few given base colors.
+        """Creates a list of gradient colors based on a few given base colors.
 
         The colors can be supplied as a list or tuple of colors,
         or simply an enumeration of color parameters.
@@ -1785,8 +1736,7 @@ class Gradient(ColorList):
 
     def _interpolate(self, colors, n=100):
 
-        """ Returns intermediary colors for given list of colors.
-        """
+        """Returns intermediary colors for given list of colors."""
 
         gradient = []
         for i in _range(n):
@@ -1808,8 +1758,7 @@ class Gradient(ColorList):
         return gradient
 
     def _cache(self):
-        """
-        Populates the list with a number of gradient colors.
+        """Populates the list with a number of gradient colors.
 
         The list has Gradient.steps colors that interpolate between
         the fixed base Gradient.colors.
@@ -1857,8 +1806,7 @@ def gradient(*colors, **kwargs):
 # g.swatch(10, 10, h=7)
 
 def outline(path, colors, precision=0.4, continuous=True):
-    """
-    Outlines each contour in a path with the colors in the list.
+    """Outlines each contour in a path with the colors in the list.
 
     Each contour starts with the first color in the list,
     and ends with the last color in the list.
@@ -1939,9 +1887,7 @@ def outline(path, colors, precision=0.4, continuous=True):
 class Favorites:
 
     def __getattr__(self, q):
-        """
-        Returns the favorite colors list which name/tags matches q.
-        """
+        """Returns the favorite colors list which name/tags matches q."""
         if q is None:
             return self
 
@@ -1970,8 +1916,7 @@ class ColorRange(ColorList):
 
     def __init__(self, h=(0.0, 1.0), s=(0.0, 1.0), b=(0.0, 1.0), a=(1.0, 1.0),
                  grayscale=False, name="", length=100):
-        """
-        A stateless list of colors whose HSB values are confined to a range.
+        """A stateless list of colors whose HSB values are confined to a range.
 
         Hue, saturation and brightness are confined to a (min, max) tuple,
         or a list of (min, max) tuples for discontinuous ranges, or to a single value.
@@ -1984,7 +1929,6 @@ class ColorRange(ColorList):
         ColorRange has all the ColorList transformations (such as darken()),
         these return ColorList objects. It's like a snapshot of the original
         stateless ColorRange.
-
         """
         ColorList.__init__(self)
 
@@ -2019,11 +1963,10 @@ class ColorRange(ColorList):
         self.a = (min, max)
 
     def copy(self, clr=None, d=0.0):
-        """
-        Returns a copy of the range.
+        """Returns a copy of the range.
 
-        Optionally, supply a color to get a range copy
-        limited to the hue of that color.
+        Optionally, supply a color to get a range copy limited to the
+        hue of that color.
         """
         cr = ColorRange()
         cr.name = self.name
@@ -2044,8 +1987,7 @@ class ColorRange(ColorList):
         return cr
 
     def color(self, clr=None, d=0.035):
-        """
-        Returns a color with random values in the defined h, s b, a ranges.
+        """Returns a color with random values in the defined h, s b, a ranges.
 
         If a color is given, use that color's hue and alpha,
         and generate its saturation and brightness from the shade.
@@ -2093,8 +2035,7 @@ class ColorRange(ColorList):
     colorlist = colors
 
     def contains(self, clr):
-        """
-        Returns True if the given color is part of this color range.
+        """Returns True if the given color is part of this color range.
 
         Check whether each h, s, b, a component of the color
         falls within the defined range for that component.
@@ -2128,12 +2069,11 @@ class ColorRange(ColorList):
         return True
 
     def __add__(self, colorrange):
-        """
-        Combines two ColorRange objects into one.
+        """Combines two ColorRange objects into one.
 
-        For example, if you merge a dark green range and a light red range,
-        you get a range returning dark and light variations of green and red.
-
+        For example, if you merge a dark green range and a light red
+        range, you get a range returning dark and light variations of
+        green and red.
         """
         # You can add single colors and lists to ranges,
         # however, you'll lose the brightness and saturation info.
@@ -2354,11 +2294,10 @@ def shade_opposite(shade):
 # r = r(olive(), n=8).swatch(150, 49)
 
 def guess_name(clr):
-    """
-    Guesses the shade and hue name of a color.
+    """Guesses the shade and hue name of a color.
 
-    If the given color is named in the named_colors list, return that name.
-    Otherwise guess its nearest hue and shade range.
+    If the given color is named in the named_colors list, return that
+    name. Otherwise guess its nearest hue and shade range.
     """
     clr = Color(clr)
 
@@ -2470,13 +2409,12 @@ _aggregated_dict = {}
 
 
 def aggregated(cache=DEFAULT_CACHE):
-    """
-    A dictionary of all aggregated words.
+    """A dictionary of all aggregated words.
 
-    They keys in the dictionary correspond to subfolders in the aggregated cache.
-    Each key has a list of words. Each of these words is the name of an XML-file
-    in the subfolder. The XML-file contains color information harvested from the web
-    (or handmade).
+    They keys in the dictionary correspond to subfolders in the
+    aggregated cache. Each key has a list of words. Each of these words
+    is the name of an XML-file in the subfolder. The XML-file contains
+    color information harvested from the web (or handmade).
     """
     global _aggregated_name, _aggregated_dict
     if _aggregated_name != cache:
@@ -2497,8 +2435,7 @@ class ColorThemeNotFound(Exception): pass
 class ColorTheme(_list):
 
     def __init__(self, name="", ranges=[], top=5, cache=DEFAULT_CACHE, blue="blue", guess=False, length=100):
-        """
-        A set of weighted ranges linked to colors.
+        """A set of weighted ranges linked to colors.
 
         A ColorTheme is a set of allowed colors (e.g. red, black)
         and ranges (e.g. dark, intense) for these colors.
@@ -2610,8 +2547,8 @@ class ColorTheme(_list):
         return t
 
     def _weight_by_hue(self):
-        """
-        Returns a list of (hue, ranges, total weight, normalized total weight)-tuples.
+        """Returns a list of (hue, ranges, total weight, normalized total
+        weight)-tuples.
 
         ColorTheme is made up out of (color, range, weight) tuples.
         For consistency with XML-output in the old Prism format
@@ -2644,8 +2581,7 @@ class ColorTheme(_list):
         return grouped
 
     def _xml(self):
-        """
-        Returns the color information as XML.
+        """Returns the color information as XML.
 
         The XML has the following structure:
         <colors query="">
@@ -2680,9 +2616,7 @@ class ColorTheme(_list):
     xml = property(_xml)
 
     def _save(self):
-        """
-        Saves the color information in the cache as XML.
-        """
+        """Saves the color information in the cache as XML."""
         if not os.path.exists(self.cache):
             os.makedirs(self.cache)
 
@@ -2692,8 +2626,7 @@ class ColorTheme(_list):
         f.close()
 
     def _load(self, top=5, blue="blue", archive=None, member=None):
-        """
-        Loads a theme from aggregated web data.
+        """Loads a theme from aggregated web data.
 
         The data must be old-style Prism XML: <color>s consisting of <shade>s.
         Colors named "blue" will be overridden with the blue parameter.
@@ -2740,11 +2673,10 @@ class ColorTheme(_list):
                 ))
 
     def color(self, d=0.035):
-        """
-        Returns a random color within the theme.
+        """Returns a random color within the theme.
 
-        Fetches a random range (the weight is taken into account,
-        so ranges with a bigger weight have a higher chance of propagating)
+        Fetches a random range (the weight is taken into account, so
+        ranges with a bigger weight have a higher chance of propagating)
         and hues it with the associated color.
         """
         s = sum([w for clr, rng, w in self.ranges])
@@ -2756,9 +2688,7 @@ class ColorTheme(_list):
         return rng(clr, d)
 
     def colors(self, n=10, d=0.035):
-        """
-        Returns a number of random colors from the theme.
-        """
+        """Returns a number of random colors from the theme."""
         s = sum([w for clr, rng, w in self.ranges])
         colors = colorlist()
         for i in _range(n):
@@ -2827,9 +2757,8 @@ class ColorTheme(_list):
         return self.name
 
     def recombine(self, other, d=0.7):
-        """
-        Genetic recombination of two themes using cut and splice technique.
-        """
+        """Genetic recombination of two themes using cut and splice
+        technique."""
         a, b = self, other
         d1 = max(0, min(d, 1))
         d2 = d1
@@ -2849,11 +2778,10 @@ class ColorTheme(_list):
         return c
 
     def swatch(self, x, y, w=35, h=35, padding=4, roundness=0, n=12, d=0.035, grouped=None):
-        """
-        Draws a weighted swatch with approximately n columns and rows.
+        """Draws a weighted swatch with approximately n columns and rows.
 
-        When the grouped parameter is True, colors are grouped in blocks of the same hue
-        (also see the _weight_by_hue() method).
+        When the grouped parameter is True, colors are grouped in blocks
+        of the same hue (also see the _weight_by_hue() method).
         """
         if grouped is None:  # should be True or False
             grouped = self.group_swatches
@@ -2934,8 +2862,8 @@ aggregate = theme
 
 def search_engine(query, top=5, service="google", license=None,
                   cache=os.path.join(DEFAULT_CACHE, "google")):
-    """
-    Return a color aggregate from colors and ranges parsed from the web.
+    """Return a color aggregate from colors and ranges parsed from the web.
+
     T. De Smedt, http://nodebox.net/code/index.php/Prism
     """
     # Check if we have cached information first.
@@ -3016,11 +2944,10 @@ def yahoo(query, top=5, license=None, cache=os.path.join(DEFAULT_CACHE, "yahoo")
 # nostroke()
 
 def morguefile(query, n=10, top=10):
-    """
-    Returns a list of colors drawn from a morgueFile image.
+    """Returns a list of colors drawn from a morgueFile image.
 
-    With the Web library installed,
-    downloads a thumbnail from morgueFile and retrieves pixel colors.
+    With the Web library installed, downloads a thumbnail from
+    morgueFile and retrieves pixel colors.
     """
 
     from web import morguefile
@@ -3053,8 +2980,7 @@ _shadow = None
 class shadow(Grob):
 
     def __init__(self, dx=10, dy=10, alpha=0.25, blur=4.0, clr=None):
-        """
-        Sets the dropshadow for all onscreen elements.
+        """Sets the dropshadow for all onscreen elements.
 
         Both the fill and stroke of a path get a dropshadow.
 
@@ -3103,8 +3029,7 @@ class gradientpath(Grob):
     # This is heavily based on Core Image + will need to be reimplemented in Cairo.
     #
     def __init__(self, path, clr1, clr2, type="radial", dx=0, dy=0, spread=1.0, angle=0, alpha=1.0):
-        """
-        Fills a path with a smooth gradient between two colors.
+        """Fills a path with a smooth gradient between two colors.
 
         Creates a Core Image gradient and clips it to the given path.
         The type can be radial or linear.

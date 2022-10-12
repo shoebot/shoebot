@@ -1,5 +1,4 @@
-"""
-Display information to help diagnose install issues.
+"""Display information to help diagnose install issues.
 
 Currently shows
 - OS info
@@ -105,9 +104,7 @@ def test_import(name, failmsg=None, gi_require=None, gi=None):
 
 
 def test_imports():
-    """
-    Attempt to import dependencies.
-    """
+    """Attempt to import dependencies."""
     print("Test Imports:")
     # gtk
     gi = test_import("gi")
@@ -137,9 +134,7 @@ def test_imports():
 
 
 def shoebot_example(**shoebot_kwargs):
-    """
-    Decorator to run some code in a bot instance.
-    """
+    """Decorator to run some code in a bot instance."""
 
     def decorator(f):
         def run():

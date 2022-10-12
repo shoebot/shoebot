@@ -1,5 +1,4 @@
-"""
-Simple command shell
+"""Simple command shell.
 
 Launch shoebot with -l to activate it.
 
@@ -61,8 +60,7 @@ trusted_cmds = set()
 
 
 def trusted_cmd(f):
-    """
-    Decorator for methods that are trusted commands.
+    """Decorator for methods that are trusted commands.
 
     If self.trusted is not set, then the command prints an error.
 
@@ -122,8 +120,8 @@ class ShoebotCmd(cmd.Cmd):
         self.trusted = trusted
 
     def print_response(self, input="", keep=False, *args, **kwargs):
-        """
-        print response, if cookie is set then print that each line
+        """print response, if cookie is set then print that each line.
+
         :param args:
         :param keep: if True more output is to follow.
         :param cookie: set a custom cookie,
@@ -164,25 +162,22 @@ class ShoebotCmd(cmd.Cmd):
             )
 
     def emptyline(self):
-        """
-        Override the default behaviour of repeating the last line.
+        """Override the default behaviour of repeating the last line.
 
         :return:
         """
         return ""
 
     def do_escape_nl(self, arg):
-        """
-        Toggle escaping newlines.
-        """
+        """Toggle escaping newlines."""
         if arg.lower() == "off":
             self.escape_nl = False
         else:
             self.escape_nl = True
 
     def do_prompt(self, arg):
-        """
-        Enable or disable prompt
+        """Enable or disable prompt.
+
         :param arg: on|off
         :return:
         """
@@ -198,15 +193,11 @@ class ShoebotCmd(cmd.Cmd):
         )
 
     def do_title(self, title):
-        """
-        Change window title.
-        """
+        """Change window title."""
         publish_event(SET_WINDOW_TITLE_EVENT, data=title)
 
     def do_speed(self, speed):
-        """
-        rewind
-        """
+        """rewind."""
         if speed:
             try:
                 new_speed = float(speed)
@@ -218,18 +209,17 @@ class ShoebotCmd(cmd.Cmd):
         self.print_response(f"Speed: {self.bot._speed} FPS")
 
     def do_restart(self, line):
-        """
-        Attempt to restart bot by clearing its namespace and resetting FRAME to 0.
-        """
+        """Attempt to restart bot by clearing its namespace and resetting FRAME
+        to 0."""
         self.bot._frame = 0
         self.bot._namespace.clear()  # noqa
         self.bot._namespace.update(self.bot._initial_namespace)  # noqa
 
     def do_pause(self, line):
-        """
-        Toggle paused state.
+        """Toggle paused state.
 
-        Stores the bots speed in pause_speed and temporarily sets the bot speed to 0.
+        Stores the bots speed in pause_speed and temporarily sets the
+        bot speed to 0.
         """
         if self.pause_speed is None:
             self.pause_speed = self.bot._speed
@@ -242,18 +232,14 @@ class ShoebotCmd(cmd.Cmd):
         self.print_response("Playing")
 
     def do_play(self, line):
-        """
-        Resume playback if bot is paused
-        """
+        """Resume playback if bot is paused."""
         if self.pause_speed is not None:
             self.bot._speed = self.pause_speed
             self.pause_speed = None
         self.print_response("Play")
 
     def do_goto(self, line):
-        """
-        Go to specific frame
-        """
+        """Go to specific frame."""
         try:
             new_frame = int(line)
         except ValueError:
@@ -264,16 +250,12 @@ class ShoebotCmd(cmd.Cmd):
         self.bot._frame = new_frame
 
     def do_rewind(self, line):
-        """
-        rewind
-        """
+        """rewind."""
         self.print_response(f"Rewinding from frame {self.bot._frame} to 0")
         self.bot._frame = 0
 
     def do_vars(self, line):
-        """
-        List bot variables and values.
-        """
+        """List bot variables and values."""
         if self.bot._vars:  # noqa
             max_name_len = max([len(name) for name in self.bot._vars])  # noqa
             for i, (name, v) in enumerate(self.bot._vars.items()):  # noqa
@@ -286,9 +268,7 @@ class ShoebotCmd(cmd.Cmd):
 
     @trusted_cmd
     def do_load_base64(self, line):
-        """
-        load filename=(file)
-        load base64=(base64 encoded)
+        """load filename=(file) load base64=(base64 encoded)
 
         Send new code to shoebot.
 
@@ -326,49 +306,40 @@ class ShoebotCmd(cmd.Cmd):
         )
 
     def do_bye(self, line):
-        """
-        Exit shell and shoebot
+        """Exit shell and shoebot.
 
         Alias for exit.
         """
         return self.do_exit(line)
 
     def do_exit(self, line):
-        """
-        Exit shell and shoebot
-        """
+        """Exit shell and shoebot."""
         if self.trusted:
             publish_event(QUIT_EVENT)
         self.print_response("Bye.\n")
         return True
 
     def do_quit(self, line):
-        """
-        Exit shell and shoebot
+        """Exit shell and shoebot.
 
         Alias for exit.
         """
         return self.do_exit(line)
 
     def do_fullscreen(self, line):
-        """
-        Make the current window fullscreen
-        """
+        """Make the current window fullscreen."""
         # TODO: use publish_event to set toggle fullscreen instead of calling trigger_fullscreen_action directly.
         self.bot.canvas.sink.trigger_fullscreen_action(True)
         print(self.response_prompt, file=self.stdout)
 
     def do_window(self, line):
-        """
-        Un-fullscreen and
-        """
+        """Un-fullscreen and."""
         # TODO: use publish_event to set toggle fullscreen instead of calling trigger_fullscreen_action directly.
         self.bot.canvas.sink.trigger_fullscreen_action(False)
         print(self.response_prompt, file=self.stdout)
 
     def do_EOF(self, line):
-        """
-        Exit shell and shoebot
+        """Exit shell and shoebot.
 
         Alias for exit.
         """
@@ -376,16 +347,12 @@ class ShoebotCmd(cmd.Cmd):
         return self.do_exit(line)
 
     def do_help(self, arg):
-        """
-        Show help on all commands.
-        """
+        """Show help on all commands."""
         print(self.response_prompt, file=self.stdout)
         return cmd.Cmd.do_help(self, arg)
 
     def do_set(self, line):
-        """
-        Set a variable.
-        """
+        """Set a variable."""
         # TODO: use publish_event to set Variable instead of directly changing it.
         try:
             name, value = [part.strip() for part in line.split("=")]
@@ -406,8 +373,7 @@ class ShoebotCmd(cmd.Cmd):
             print("Invalid Syntax for set command")
 
     def precmd(self, line):
-        """
-        Preprocess the commandline.
+        """Preprocess the commandline.
 
         Cookies:
             Allow commands to have a last parameter of 'cookie=arbitrary_string'

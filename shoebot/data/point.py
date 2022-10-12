@@ -1,7 +1,5 @@
 class Point(object):
-    """
-    Taken from Nodebox and modified
-    """
+    """Taken from Nodebox and modified."""
 
     def __init__(self, *args):
         self.cmd = args[0]

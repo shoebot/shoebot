@@ -37,9 +37,8 @@ class BackingStore:
 
 
 class ShoebotWidget(Gtk.DrawingArea, SocketServer):
-    """
-    Create a double buffered GTK+ widget on which we will draw using Cairo
-    """
+    """Create a double buffered GTK+ widget on which we will draw using
+    Cairo."""
 
     # Draw in response to an expose-event
     def __init__(self, scale_fit=True, input_device=None):
@@ -79,9 +78,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             publish_event(REDRAW_EVENT, data=(self.width, self.height))
 
     def scale_context_and_center(self, cr):
-        """
-        Scale context based on difference between bot size and widget
-        """
+        """Scale context based on difference between bot size and widget."""
         bot_width, bot_height = self.bot_size
         if self.width != bot_width or self.height != bot_height:
             # Scale up by largest dimension
@@ -109,9 +106,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             self.input_device.scale_y = scale_y
 
     def draw(self, widget, cr):
-        """
-        Draw just the exposed part of the backing store, scaled to fit
-        """
+        """Draw just the exposed part of the backing store, scaled to fit."""
         if self.bot_size is None:
             # No bot to draw yet.
             self.draw_default_image(cr)
@@ -124,8 +119,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         cr.paint()
 
     def create_rcontext(self, size, frame):
-        """
-        Creates a recording surface for the bot to draw on
+        """Creates a recording surface for the bot to draw on.
 
         :param size: The width and height of bot
         """
@@ -140,9 +134,8 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         return ctx
 
     def do_drawing(self, size, frame, cairo_ctx):
-        """
-        Update the backing store from a cairo context and
-        schedule a REDRAW_EVENT (expose event)
+        """Update the backing store from a cairo context and schedule a
+        REDRAW_EVENT (expose event)
 
         :param size: width, height in pixels of bot
         :param frame: frame # thar was drawn
