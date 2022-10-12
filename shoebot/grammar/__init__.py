@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from . import nodebox
+# from . import nodebox
 
 __all__ = [
     "nodebox",
@@ -10,6 +10,4 @@ __all__ = [
     "VarListener",
 ]
 
-from .bot import Bot
-from .nodebox import NodeBot
 from shoebot.core.var_listener import VarListener

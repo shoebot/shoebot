@@ -2,8 +2,9 @@
 # Copyright: HVA - Hermanitos Verdes Architetti, 2009
 # licenSe: LGPL
 import cairo
+
 try:
-    import numpy as np
+    pass
 except ImportError:
     print("The Video library requires the numpy module (pip install numpy).")
     raise
@@ -26,12 +27,11 @@ class SBVideoError(RuntimeError):
 
 
 class Movie:
-
     def __init__(self, path, start=0, stop=None):
         self.path = path
         self.video = hg.cvCreateFileCapture(self.path)
         if self.video is None:
-            raise SBVideoError("Could not open stream %s" % self.path)
+            raise SBVideoError(f"Could not open stream {self.path}")
 
         # these functions don't seem to work at present on my linux system
 
@@ -52,7 +52,6 @@ def movie(path, start=0, stop=None):
 
 
 class Camera:
-
     def __init__(self, cam=0, width=None, height=None):
         self.path = cam
         self.video = hg.cvCreateCameraCapture(self.path)
@@ -71,7 +70,6 @@ def camera(cam=0, width=None, height=None):
 
 
 class MovieFrame:
-
     def __init__(self, src="", time=None):
 
         self.src = src
@@ -83,12 +81,20 @@ class MovieFrame:
         self.height = self.iplimage.height
         self.image = opencv.cvCreateImage(opencv.cvGetSize(self.iplimage), 8, 4)
         opencv.cvCvtColor(self.iplimage, self.image, opencv.CV_BGR2BGRA)
-        self.buffer = numpy.fromstring(self.image.imageData, dtype=numpy.uint32).astype(numpy.uint32)
+        self.buffer = numpy.fromstring(self.image.imageData, dtype=numpy.uint32).astype(
+            numpy.uint32,
+        )
         self.buffer.shape = (self.image.width, self.image.height)
         self.time = hg.cvGetCaptureProperty(self.src, hg.CV_CAP_PROP_POS_MSEC)
 
     def _data(self):
-        return cairo.ImageSurface.create_for_data(self.buffer, cairo.FORMAT_RGB24, self.width, self.height, self.width * 4)
+        return cairo.ImageSurface.create_for_data(
+            self.buffer,
+            cairo.FORMAT_RGB24,
+            self.width,
+            self.height,
+            self.width * 4,
+        )
 
     data = property(_data)
 
@@ -100,17 +106,29 @@ class MovieFrame:
         opencv.cvEqualizeHist(self.grayscale, self.grayscale)
 
         try:
-            self.cascade = opencv.cvLoadHaarClassifierCascade(os.path.join(os.path.dirname(__file__), classifier+".xml"),opencv.cvSize(1, 1))
+            self.cascade = opencv.cvLoadHaarClassifierCascade(
+                os.path.join(os.path.dirname(__file__), classifier + ".xml"),
+                opencv.cvSize(1, 1),
+            )
         except:
             raise AttributeError("could not load classifier file")
 
-        self.objects = opencv.cvHaarDetectObjects(self.grayscale, self.cascade, self.storage, 1.2, 2, opencv.CV_HAAR_DO_CANNY_PRUNING, opencv.cvSize(50, 50))
+        self.objects = opencv.cvHaarDetectObjects(
+            self.grayscale,
+            self.cascade,
+            self.storage,
+            1.2,
+            2,
+            opencv.CV_HAAR_DO_CANNY_PRUNING,
+            opencv.cvSize(50, 50),
+        )
 
         return self.objects
 
     def _faces(self):
         classifier = "haarcascade_frontalface_alt"
         return self.detectObject(classifier)
+
     faces = property(_faces)
 
 

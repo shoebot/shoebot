@@ -1,4 +1,9 @@
-from math import hypot, degrees, atan2, sqrt, pow, radians, sin, cos
+from math import atan2
+from math import cos
+from math import degrees
+from math import hypot
+from math import radians
+from math import sin
 
 
 def distance(x1, y1, x2, y2):

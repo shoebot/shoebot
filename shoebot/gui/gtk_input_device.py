@@ -1,7 +1,6 @@
-from shoebot.core.backend import gi
+from gi.repository import Gdk
 
-from gi.repository import Gdk, Gtk
-from shoebot.core import InputDeviceMixin
+from shoebot.core.input_device import InputDeviceMixin
 
 
 class GtkInputDeviceMixin(InputDeviceMixin):
@@ -21,7 +20,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
             | Gdk.EventMask.BUTTON_RELEASE_MASK
             | Gdk.EventMask.POINTER_MOTION_MASK
             | Gdk.EventMask.KEY_PRESS_MASK
-            | Gdk.EventMask.KEY_RELEASE_MASK
+            | Gdk.EventMask.KEY_RELEASE_MASK,
         )
         widget.connect("button_press_event", self.gtk_mouse_button_down)
         widget.connect("button_release_event", self.gtk_mouse_button_up)
@@ -65,7 +64,7 @@ class GtkInputDeviceMixin(InputDeviceMixin):
 
     def get_key_map(self):
         """
-        Return a dict in the form of
+        Return a dict in the form of.
 
         SHOEBOT_KEY_NAME, GTK_VALUE
 

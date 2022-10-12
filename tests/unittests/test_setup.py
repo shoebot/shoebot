@@ -38,8 +38,8 @@ class TestSetup(unittest.TestCase):
     @patch("setuptools.setup", Mock())
     def test_setup_parses_version_from_version_file(self):
         """
-        Test that setup loads and parses the version from the
-        file VERSION, deliberately uses a version that is not the real version.
+        Test that setup loads and parses the version from the file VERSION,
+        deliberately uses a version that is not the real version.
 
         Mocks open, to do an end to end test using mock data.
         """
@@ -51,7 +51,7 @@ class TestSetup(unittest.TestCase):
             version         1.2.1
             url             http://shoebot.net
             packager        Ricardo Lafuente <r@manufacturaindependente.org>
-            """
+            """,
         )
 
         with patch("builtins.open", mock_open(read_data=example_versionfile_content)):

@@ -1,14 +1,14 @@
-"""
-Gtk3 support for shoebot in editors and IDEs
-"""
+"""Gtk3 support for shoebot in editors and IDEs."""
 
 import base64
 import itertools
 import os
-from shoebotit import ide_utils
-
 from distutils.spawn import find_executable as which
-from gi.repository import Gio, Gtk, GLib
+
+from gi.repository import Gio
+from gi.repository import GLib
+from gi.repository import Gtk
+from shoebotit import ide_utils
 
 MENU_UI = """
 <ui>
@@ -55,11 +55,12 @@ def examples_menu(root_dir=None, depth=0):
         path = os.path.join(root_dir, fn)
         rel_path = path[len(examples_dir) :]
         if os.path.isdir(path):
-            action = "ShoebotExampleMenu {0}".format(rel_path)
+            action = f"ShoebotExampleMenu {rel_path}"
             label = fn.capitalize()
 
             sm_xml, sm_file_actions, sm_menu_actions = examples_menu(
-                os.path.join(root_dir, fn), depth + 1
+                os.path.join(root_dir, fn),
+                depth + 1,
             )
 
             submenu_actions.extend(sm_menu_actions)
@@ -67,7 +68,7 @@ def examples_menu(root_dir=None, depth=0):
             submenu_actions.append((action, label))
             xml += dir_tmpl.format(name=fn, action=action, menu=sm_xml)
         elif os.path.splitext(path)[1] in [".bot", ".py"] and not fn.startswith("_"):
-            action = "ShoebotExampleOpen {0}".format(rel_path)
+            action = f"ShoebotExampleOpen {rel_path}"
             label = ide_utils.make_readable_filename(fn)
 
             xml += file_tmpl.format(name=fn, action=action)
@@ -112,7 +113,7 @@ def mk_examples_menu(text, root_dir=None, depth=0):
             label = ide_utils.make_readable_filename(fn)
 
             # the only way I could work out to attach the data to the menu item is in the name :/
-            action_name = "win.open_example__%s" % encode_relpath(rel_path)
+            action_name = f"win.open_example__{encode_relpath(rel_path)}"
 
             menu.append(label, action_name)
             file_actions.append(rel_path)
@@ -131,10 +132,8 @@ def gedit3_menu(xml):
 
 
 def get_child_by_name(parent, name):
-    """
-    Iterate through a gtk container, `parent`,
-    and return the widget with the name `name`.
-    """
+    """Iterate through a gtk container, `parent`, and return the widget with the
+    name `name`."""
     # http://stackoverflow.com/questions/2072976/access-to-widget-in-gtk
     def iterate_children(widget, name):
         if widget.get_name() == name:
@@ -183,7 +182,7 @@ def vw_envs(filter=None):
     """
     vw_root = os.path.abspath(os.path.expanduser(os.path.expandvars("~/.virtualenvs")))
     try:
-        directories = os.listdir(vw_root)
+        os.listdir(vw_root)
     except OSError:
         return []
     venvs = []
@@ -204,7 +203,9 @@ def load_gsettings():
     # schema_dir=os.path.abspath(os.path.join(here, '../../gedit3-plugin'))
     schema_dir = here
     schema_source = Gio.SettingsSchemaSource.new_from_directory(
-        schema_dir, Gio.SettingsSchemaSource.get_default(), False
+        schema_dir,
+        Gio.SettingsSchemaSource.get_default(),
+        False,
     )
     schema = Gio.SettingsSchemaSource.lookup(schema_source, schema_id, False)
     if not schema:
@@ -214,9 +215,7 @@ def load_gsettings():
 
 
 def sbot_executable():
-    """
-    Find shoebot executable
-    """
+    """Find shoebot executable."""
     gsettings = load_gsettings()
     venv = gsettings.get_string("current-virtualenv")
     if venv == "Default":
@@ -229,7 +228,7 @@ def sbot_executable():
 
         # First sbot in path that is not in current venv
         for p in os.environ["PATH"].split(os.path.pathsep):
-            sbot = "%s/sbot" % p
+            sbot = f"{p}/sbot"
             if not p.startswith(env_venv) and os.path.isfile(sbot):
                 return sbot
     else:
@@ -312,7 +311,7 @@ class VirtualEnvChooser(Gtk.Box):
             self.remove_button.set_sensitive(venv in self.user_envs)
         else:
             entry = combo.get_child()
-            print("Entered: %s" % entry.get_text())
+            print(f"Entered: {entry.get_text()}")
 
     def on_remove_virtualenv(self, widget):
         index = self.virtualenv_combo.get_active()
@@ -361,9 +360,7 @@ class VirtualEnvChooser(Gtk.Box):
 
 
 class ShoebotPreferences(Gtk.Box):
-    """
-    Allow the user to choose a virtualenv.
-    """
+    """Allow the user to choose a virtualenv."""
 
     def __init__(self):
         # TODO - Save the other menu options here

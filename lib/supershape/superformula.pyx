@@ -1,6 +1,9 @@
 import cython
 
-from libc.math cimport sin, cos, pow, abs
+from libc.math cimport abs
+from libc.math cimport cos
+from libc.math cimport pow
+from libc.math cimport sin
 
 # Else, use the native python
 # calculation of supershapes.

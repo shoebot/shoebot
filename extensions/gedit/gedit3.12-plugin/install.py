@@ -4,26 +4,22 @@
 
 from __future__ import print_function
 
-from os.path import (
-    abspath,
-    dirname,
-    exists,
-    expanduser,
-    expandvars,
-    isdir,
-    islink,
-    lexists,
-    join,
-    normpath,
-)
-from glob import glob
-
 import errno
 import os
 import shutil
 import stat
 import sys
 import sysconfig
+from os.path import abspath
+from os.path import dirname
+from os.path import exists
+from os.path import expanduser
+from os.path import expandvars
+from os.path import isdir
+from os.path import islink
+from os.path import join
+from os.path import lexists
+from os.path import normpath
 
 here = dirname(abspath(__file__))
 source_dirs = [here, normpath(join(here, "../../lib"))]
@@ -34,7 +30,7 @@ def has_admin():
         try:
             # Only windows users with admin privileges can read the C:\windows\temp
             os.listdir(
-                os.sep.join([os.environ.get("SystemRoot", "C:\\windows"), "temp"])
+                os.sep.join([os.environ.get("SystemRoot", "C:\\windows"), "temp"]),
             )
         except:
             return os.environ["USERNAME"], False
@@ -48,9 +44,7 @@ def has_admin():
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
-    """
-    copytree that works even if folder already exists
-    """
+    """copytree that works even if folder already exists."""
     # http://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
     if not exists(dst):
         os.makedirs(dst)
@@ -96,7 +90,7 @@ def get_dirs_nt(is_admin):
         dirs = dict(
             dest_dir=dest_dir,
             language_dir=expandvars(
-                "%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs"
+                "%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs",
             ),
             plugin_dir=expandvars("%ProgramFiles%\\gedit\\lib\\gedit-3\\plugins"),
         )
@@ -153,10 +147,14 @@ else:
 
 
 def install_plugin(
-    name=None, dest_dir=None, plugin_dir=None, language_dir=None, is_admin=False
+    name=None,
+    dest_dir=None,
+    plugin_dir=None,
+    language_dir=None,
+    is_admin=False,
 ):
     if is_admin and not isdir(plugin_dir):
-        print("%s not found" % name)
+        print(f"{name} not found")
         sys.exit(1)
     else:
         if not is_admin:
@@ -166,32 +164,32 @@ def install_plugin(
                 pass
 
             if not isdir(plugin_dir):
-                print("could not create destinaton dir %s" % plugin_dir)
+                print(f"could not create destinaton dir {plugin_dir}")
                 sys.exit(1)
 
-    print("install %s plugin to %s" % (name, dest_dir))
+    print(f"install {name} plugin to {dest_dir}")
     source_dir = None
     try:
         for source_dir in source_dirs:
             copytree(source_dir, plugin_dir)
     except Exception as e:
-        print("error attempting to copy %s" % source_dir)
+        print(f"error attempting to copy {source_dir}")
         print(e)
         sys.exit(1)
 
     if language_dir:
-        mkdir_p("%s/mime/packages" % language_dir)
+        mkdir_p(f"{language_dir}/mime/packages")
         shutil.copyfile(join(here, "shoebot.lang"), join(language_dir, "shoebot.lang"))
         if os.name == "nt":
             # Even under mingw we need the \ - maybe this should really use subprocess.run
-            print("update-mime-database %s\\mime" % language_dir)
-            os.system("update-mime-database %s\\mime" % language_dir)
+            print(f"update-mime-database {language_dir}\\mime")
+            os.system(f"update-mime-database {language_dir}\\mime")
         else:
-            print("update-mime-database %s/mime" % language_dir)
-            os.system("update-mime-database %s/mime" % language_dir)
+            print(f"update-mime-database {language_dir}/mime")
+            os.system(f"update-mime-database {language_dir}/mime")
 
     os.system(
-        "glib-compile-schemas %s/gedit/plugins/shoebotit" % dest_dir
+        f"glib-compile-schemas {dest_dir}/gedit/plugins/shoebotit",
     )  ## FIXME, kind of specific to gedit...
     print("success")
 

@@ -6,8 +6,11 @@ from gi.repository import PangoCairo
 
 
 def list_pango_fonts():
-    """Returns a list of available Pango font names. Names are returned in the
-    Pango font string format, e.g. "Inconsolata Bold"."""
+    """
+    Returns a list of available Pango font names.
+
+    Names are returned in the Pango font string format, e.g. "Inconsolata Bold".
+    """
     names = []
     families = PangoCairo.font_map_get_default().list_families()
     for family in families:

@@ -15,9 +15,7 @@ from math import sin
 
 
 def drawdaisy(x, y, color="#fefefe"):
-    """
-    Draw a daisy at x, y
-    """
+    """Draw a daisy at x, y."""
     # save location, size etc
     _ctx.push()
 

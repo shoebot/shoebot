@@ -2,17 +2,16 @@ import unittest
 
 from parameterized import parameterized
 from parameterized import parameterized_class
-from tests.unittests.helpers import (
-    EXAMPLE_INPUT_DIR,
-    shoebot_example_render_testfunction,
-)
+
+from tests.unittests.helpers import EXAMPLE_INPUT_DIR
 from tests.unittests.helpers import EXAMPLE_OUTPUT_DIR
-from tests.unittests.helpers import shoebot_named_testclass
 from tests.unittests.helpers import ShoebotTestCase
+from tests.unittests.helpers import shoebot_named_testclass
 
 
 @parameterized_class(
-    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
+    [{"windowed": False}, {"windowed": True}],
+    class_name_func=shoebot_named_testclass,
 )
 class TestExampleOutput(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
@@ -35,12 +34,11 @@ class TestExampleOutput(ShoebotTestCase):
                 "lsystem--growing_plant",
                 {"FRAME": 60},
             ),
-        ]
+        ],
     )
     def test_static_example_bots(self, filename, output_prefix, namespace=None):
-        """
-        Check non animated example bots render matches the reference images.
-        """
+        """Check non animated example bots render matches the reference
+        images."""
         self.skipTest("FIXME - update these images, once runs-3-times is merged")
         actual_output = f"{EXAMPLE_OUTPUT_DIR}/{output_prefix}-actual.png"
         expected_output = f"{EXAMPLE_INPUT_DIR}/{output_prefix}-expected.png"
@@ -55,7 +53,8 @@ class TestExampleOutput(ShoebotTestCase):
         )
 
         self.assertFileExists(
-            expected_output, f"Missing example output image: {expected_output}."
+            expected_output,
+            f"Missing example output image: {expected_output}.",
         )
         self.assertFileSize(actual_output)
         self.assertReferenceImage(actual_output, expected_output)

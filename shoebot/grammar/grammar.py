@@ -1,29 +1,26 @@
 from __future__ import print_function
 
 import copy
-import dataclasses
 import os
 import sys
 import traceback
-from math import copysign
-from queue import Queue, Empty
-from time import sleep, time
+from queue import Empty
+from queue import Queue
+from time import time
 
-import pubsub.core
 from pubsub import pub
 
-from .livecode import LiveExecution
-from shoebot.core.events import (
-    QUIT_EVENT,
-    SET_WINDOW_TITLE_EVENT,
-    SOURCE_CHANGED_EVENT,
-    VARIABLE_CHANGED_EVENT,
-    REDRAW_EVENT,
-)
+from shoebot.core.events import QUIT_EVENT
+from shoebot.core.events import REDRAW_EVENT
+from shoebot.core.events import SET_WINDOW_TITLE_EVENT
+from shoebot.core.events import SOURCE_CHANGED_EVENT
+from shoebot.core.events import VARIABLE_CHANGED_EVENT
 from shoebot.core.var_listener import VarListener
-from shoebot.data import Variable
+from shoebot.data.variable import Variable
 from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import UnbufferedFile
+
+from .livecode import LiveExecution
 
 sys.stdout = UnbufferedFile(sys.stdout)
 sys.stderr = UnbufferedFile(sys.stderr)
@@ -39,8 +36,8 @@ class Grammar(object):
     calls) and pass them to a canvas for drawing.
 
     Bae class for all Grammars, contains just the machinery for running the
-    grammars, it has only the private API and nothing else, except for
-    run which is called to actually run the Bot.
+    grammars, it has only the private API and nothing else, except for run which
+    is called to actually run the Bot.
     """
 
     def __init__(self, canvas, namespace=None, vars=None):
@@ -76,7 +73,7 @@ class Grammar(object):
 
     def _load_namespace(self, namespace, filename=None):
         """
-        Initialise bot namespace with info in shoebot.data
+        Initialise bot namespace with info in shoebot.data.
 
         :param filename: Will be set to __file__ in the namespace
         """
@@ -115,10 +112,11 @@ class Grammar(object):
     ):
         def message_listener(event=None):
             """
-            Shoebot uses a pub/sub architecture to communicate between the different components such
-            as the bot, GUI and command interface.
+            Shoebot uses a pub/sub architecture to communicate between the
+            different components such as the bot, GUI and command interface.
 
-            This function is called when a message is received, it is put on a queue.
+            This function is called when a message is received, it is put on a
+            queue.
             """
             self._event_queue.put_nowait(event)
 
@@ -137,7 +135,9 @@ class Grammar(object):
         # TODO:  The shell module (sbio) accesses the executor via its name here,
         # making this event based would remove the need for this.
         self._executor = executor = LiveExecution(
-            source, ns=self._namespace, filename=filename
+            source,
+            ns=self._namespace,
+            filename=filename,
         )
 
         if run_forever is False:
@@ -211,7 +211,9 @@ class Grammar(object):
 
                 # Handle events
                 continue_running, restart = self._handle_events(
-                    iteration, is_animation, next_frame_due
+                    iteration,
+                    is_animation,
+                    next_frame_due,
                 )
                 if not continue_running:
                     # Event handler returns False if it receives a message to quit.
@@ -235,7 +237,8 @@ class Grammar(object):
 
     def _handle_events(self, iteration, is_animation, next_frame_due):
         """
-        The Shoebot mainloop, GUI and shell communicate with each other using events.
+        The Shoebot mainloop, GUI and shell communicate with each other using
+        events.
 
         Examples include live variables being changed from the GUI, the shell
         or Shoebot itself, or the user quitting from the GUI.
@@ -254,7 +257,10 @@ class Grammar(object):
         while True:
             timeout = min(next_frame_due - time(), 0.1)
             try:
-                event = self._event_queue.get(block=timeout > 0, timeout=timeout if timeout > 0 else None)
+                event = self._event_queue.get(
+                    block=timeout > 0,
+                    timeout=timeout if timeout > 0 else None,
+                )
             except Empty:
                 event = None
             # Update GUI, which may in-turn generate new events.
@@ -322,7 +328,8 @@ class Grammar(object):
 
     #### Variables
     def _addvar(self, v):
-        """Sets a new accessible variable.
+        """
+        Sets a new accessible variable.
 
         :param v: Variable.
         """

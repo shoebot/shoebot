@@ -1,5 +1,6 @@
 import atexit
 import threading
+
 try:
     import numpy as np
 except ImportError:
@@ -9,7 +10,9 @@ try:
     from pysoundcard import InputStream
     from pysoundcard import device_info
 except ImportError:
-    print("The Audio library requires the pysoundcard module (pip install pysoundcard).")
+    print(
+        "The Audio library requires the pysoundcard module (pip install pysoundcard).",
+    )
     raise
 try:
     from fuzzywuzzy import fuzz
@@ -24,9 +27,8 @@ NUM_SAMPLES = 512
 
 
 def fft_bandpassfilter(data, fs, lowcut, highcut):
-    """
-    http://www.swharden.com/blog/2009-01-21-signal-filtering-with-python/#comment-16801
-    """
+    """http://www.swharden.com/blog/2009-01-21-signal-filtering-with-
+    python/#comment-16801."""
     fft = np.fft.fft(data)
     # n = len(data)
     # timestep = 1.0 / fs
@@ -56,18 +58,14 @@ def fft_bandpassfilter(data, fs, lowcut, highcut):
 
 
 def flatten_fft(scale=1.0):
-    """
-    Produces a nicer graph, I'm not sure if this is correct
-    """
+    """Produces a nicer graph, I'm not sure if this is correct."""
     _len = len(audio.spectrogram)
     for i, v in enumerate(audio.spectrogram):
         yield scale * (i * v) / _len
 
 
 def scaled_fft(fft, scale=1.0):
-    """
-    Produces a nicer graph, I'm not sure if this is correct
-    """
+    """Produces a nicer graph, I'm not sure if this is correct."""
     data = np.zeros(len(fft))
     for i, v in enumerate(fft):
         data[i] = scale * (i * v) / NUM_SAMPLES
@@ -86,18 +84,21 @@ def triple(spectrogram):
     return bass, mid, treble
 
 
-def fuzzydevices(match='', min_ratio=30):
+def fuzzydevices(match="", min_ratio=30):
     device_ratios = []
     for device in device_info():
-        ratio = fuzz.partial_ratio(match, device['name'])
+        ratio = fuzz.partial_ratio(match, device["name"])
         if ratio > min_ratio:
             device_ratios.append((ratio, device))
 
-    for ratio, device in sorted(device_ratios, key=lambda ratio_device: (ratio_device[0])):
+    for ratio, device in sorted(
+        device_ratios,
+        key=lambda ratio_device: (ratio_device[0]),
+    ):
         yield device
 
 
-def firstfuzzydevice(match=''):
+def firstfuzzydevice(match=""):
     devices = list(fuzzydevices(match, 0))
     return devices[0]
 
@@ -127,7 +128,7 @@ class AudioThread(threading.Thread):
 
     def settings(self, **kwargs):
         if self.running:
-            raise AudioException('Audio is already running')
+            raise AudioException("Audio is already running")
 
     def run(self):
         with InputStream(samplerate=44100, blocksize=16) as s:
@@ -145,9 +146,7 @@ class AudioThread(threading.Thread):
             atexit.register(self.quit)
 
     def quit(self):
-        """
-        Shutdown the audio thread
-        """
+        """Shutdown the audio thread."""
         if self.running:
             self.running = False
             self.join()

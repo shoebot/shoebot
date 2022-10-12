@@ -1,9 +1,14 @@
-from distutils.spawn import find_executable as which
-from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
-from gettext import gettext as _
-from shoebotit import ide_utils, gtk3_utils
-
 import os
+from gettext import gettext as _
+
+from gi.repository import Gedit
+from gi.repository import Gio
+from gi.repository import GObject
+from gi.repository import Gtk
+from gi.repository import Pango
+from gi.repository import PeasGtk
+from shoebotit import gtk3_utils
+from shoebotit import ide_utils
 
 
 class ShoebotWindowHelper(object):
@@ -57,12 +62,12 @@ class ShoebotWindowHelper(object):
                     self.on_run_activate,
                 ),
                 ("ShoebotOpenExampleMenu", None, _("E_xamples"), None, None, None),
-            ]
+            ],
         )
 
         for action, label in example_actions:
             self.action_group.add_actions(
-                [(action, None, (label), None, None, self.on_open_example)]
+                [(action, None, (label), None, None, self.on_open_example)],
             )
 
         for action, label in submenu_actions:
@@ -106,7 +111,7 @@ class ShoebotWindowHelper(object):
                     self.toggle_livecoding,
                     False,
                 ),
-            ]
+            ],
         )
         manager.insert_action_group(self.action_group)
 
@@ -116,13 +121,14 @@ class ShoebotWindowHelper(object):
     def on_open_example(self, action):
         example_dir = ide_utils.get_example_dir()
         filename = os.path.join(
-            example_dir, action.get_name()[len("ShoebotOpenExample") :].strip()
+            example_dir,
+            action.get_name()[len("ShoebotOpenExample") :].strip(),
         )
 
         drive, directory = os.path.splitdrive(
-            os.path.abspath(os.path.normpath(filename))
+            os.path.abspath(os.path.normpath(filename)),
         )
-        uri = "file:///%s%s" % (drive, directory)
+        uri = f"file:///{drive}{directory}"
         gio_file = Gio.file_new_for_uri(uri)
         self.window.create_tab_from_location(
             gio_file,
@@ -173,7 +179,7 @@ class ShoebotWindowHelper(object):
         if not doc:
             return
 
-        title = "%s - Shoebot on gedit" % doc.get_short_name_for_display()
+        title = f"{doc.get_short_name_for_display()} - Shoebot on gedit"
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
@@ -182,7 +188,7 @@ class ShoebotWindowHelper(object):
             return False
 
         textbuffer = self.output_widget.get_buffer()
-        textbuffer.set_text("running shoebot at %s\n" % sbot_bin)
+        textbuffer.set_text(f"running shoebot at {sbot_bin}\n")
 
         while Gtk.events_pending():
             Gtk.main_iteration()
@@ -209,7 +215,7 @@ class ShoebotWindowHelper(object):
 
     def get_source(self, doc):
         """
-        Grab contents of 'doc' and return it
+        Grab contents of 'doc' and return it.
 
         :param doc: The active document
         :return:
@@ -235,7 +241,7 @@ class ShoebotWindowHelper(object):
                 self.disconnect_change_handler()
                 if e.errno == errno.EPIPE:
                     # EPIPE error
-                    print("FIXME: %s" % str(e))
+                    print(f"FIXME: {str(e)}")
                 else:
                     # Something else bad happened
                     raise
@@ -254,7 +260,11 @@ class ShoebotWindowHelper(object):
                     end_iter = textbuffer.get_end_iter()
                     textbuffer.apply_tag_by_name("error", start_iter, end_iter)
             self.output_widget.scroll_to_iter(
-                textbuffer.get_end_iter(), 0.0, True, 0.0, 0.0
+                textbuffer.get_end_iter(),
+                0.0,
+                True,
+                0.0,
+                0.0,
             )
 
             textbuffer = self.live_output_widget.get_buffer()
@@ -262,14 +272,16 @@ class ShoebotWindowHelper(object):
                 if response is None:
                     # sentinel value - clear the buffer
                     textbuffer.delete(
-                        textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                        textbuffer.get_start_iter(),
+                        textbuffer.get_end_iter(),
                     )
                 else:
                     cmd, status, info = response.cmd, response.status, response.info
                     if cmd == ide_utils.CMD_LOAD_BASE64:
                         if status == ide_utils.RESPONSE_CODE_OK:
                             textbuffer.delete(
-                                textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                                textbuffer.get_start_iter(),
+                                textbuffer.get_end_iter(),
                             )
                             # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
                         elif status == ide_utils.RESPONSE_REVERTED:
@@ -305,7 +317,10 @@ class ShoebotWindowHelper(object):
 
             icon = Gtk.Image()
             panel.add_item(
-                self.live_output_widget, "Shoebot Live", "Shoebot Live", icon
+                self.live_output_widget,
+                "Shoebot Live",
+                "Shoebot Live",
+                icon,
             )
         else:
             panel.remove_item(self.live_output_widget)
@@ -328,7 +343,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.instances = {}
 
     def _create_view(self, name="shoebot-output"):
-        """ Create the gtk.TextView used for shell output """
+        """Create the gtk.TextView used for shell output."""
         view = Gtk.TextView()
         view.set_editable(False)
 

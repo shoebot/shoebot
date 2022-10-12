@@ -14,7 +14,6 @@ import os
 import platform
 import sys
 import traceback
-
 from collections import namedtuple
 
 COL_WIDTH = 10
@@ -66,22 +65,22 @@ def display_platform():
             platform.version(),
             platform.mac_ver(),
             platform.win32_ver(),
-        )
+        ),
     )
 
 
 def import_success_message(module, name):
     return "\n".join(
         [
-            "    import %s [success]:" % name.ljust(COL_WIDTH),
+            f"    import {name.ljust(COL_WIDTH)} [success]:",
             "        " + module.__file__,
-        ]
+        ],
     )
 
 
 def import_fail_message(mn, reason):
     return "\n".join(
-        ["    import %s [failed]:" % mn.ljust(COL_WIDTH), "        " + reason]
+        [f"    import {mn.ljust(COL_WIDTH)} [failed]:", "        " + reason],
     )
 
 
@@ -105,9 +104,7 @@ def test_import(name, failmsg=None, gi_require=None, gi=None):
 
 
 def test_imports():
-    """
-    Attempt to import dependencies.
-    """
+    """Attempt to import dependencies."""
     print("Test Imports:")
     # gtk
     gi = test_import("gi")
@@ -125,35 +122,41 @@ def test_imports():
     pubsub = test_import("pubsub")
     meta = test_import("meta")
     rsvg = test_import(
-        "gi.repository.Rsvg", "SVG Support unavailable", gi_require=("Rsvg", "2.0")
+        "gi.repository.Rsvg",
+        "SVG Support unavailable",
+        gi_require=("Rsvg", "2.0"),
     )
 
     return (
         test_import("shoebot"),
         AvailableModules(
-            gi=gi, pgi=pgi, meta=meta, pubsub=pubsub, rsvg=rsvg, vext=vext, pango=pango
+            gi=gi,
+            pgi=pgi,
+            meta=meta,
+            pubsub=pubsub,
+            rsvg=rsvg,
+            vext=vext,
+            pango=pango,
         ),
     )
 
 
 def shoebot_example(**shoebot_kwargs):
-    """
-    Decorator to run some code in a bot instance.
-    """
+    """Decorator to run some code in a bot instance."""
 
     def decorator(f):
         def run():
             from shoebot.util import ShoebotInstallError
 
-            print("    Shoebot - %s:" % f.__name__.replace("_", " "))
+            print(f"    Shoebot - {f.__name__.replace('_', ' ')}:")
             try:
                 import shoebot
 
-                outputfile = "/tmp/shoebot-%s.png" % f.__name__
+                outputfile = f"/tmp/shoebot-{f.__name__}.png"
                 bot = shoebot.create_bot(outputfile=outputfile)
                 f(bot)
                 bot.finish()
-                print("        [passed] : %s" % outputfile)
+                print(f"        [passed] : {outputfile}")
                 print("")
             except ShoebotInstallError as e:
                 print("        [failed]", e.args[0])
@@ -161,7 +164,7 @@ def shoebot_example(**shoebot_kwargs):
             except Exception:
                 print("        [failed] - traceback:")
                 for line in traceback.format_exc().splitlines():
-                    print("    %s" % line)
+                    print(f"    {line}")
                 print("")
 
         return run
@@ -189,8 +192,8 @@ def display_graphics_implementation():
         from shoebot.core.backend import driver
 
         for k, v in list(driver.get_libs().items()):
-            print("    %s: %s" % (k, v))
-    except Exception as e:
+            print(f"    {k}: {v}")
+    except Exception:
         raise
 
 
@@ -203,8 +206,8 @@ def diagnose():
 
     display_graphics_implementation()
     try:
-        import shoebot
-    except ImportError as e:
+        pass
+    except ImportError:
         print("Cannot 'import shoebot'")
         traceback.print_exc()
         return False

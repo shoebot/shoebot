@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-""" Shoebot console runner """
+"""Shoebot console runner."""
 
 import argparse
 import gettext
@@ -56,14 +56,14 @@ def json_arg(s):
     except Exception as e:
         error(
             _(
-                "Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside."
-            )
+                "Error parsing JSON, remember single quotes OUTSIDE, double QUOTES inside.",
+            ),
         )
         raise e
 
 
 def error(message):
-    """Prints an error message, the help message and quits"""
+    """Prints an error message, the help message and quits."""
     global parser
     print((_("Error: ") + message))
     print()
@@ -72,7 +72,7 @@ def error(message):
 
 
 def warn(message):
-    """Print a warning message"""
+    """Print a warning message."""
     print((_("Warning: ") + message))
 
 
@@ -82,7 +82,9 @@ def main():
     # use ArgumentParser to interpret commandline options
     parser = argparse.ArgumentParser(_("usage: sbot [options] inputfile.bot [args]"))
     parser.add_argument(
-        "script", help="Shoebot / Nodebox script to run (filename or code)", nargs="?"
+        "script",
+        help="Shoebot / Nodebox script to run (filename or code)",
+        nargs="?",
     )
 
     group = parser.add_argument_group("Input / Output")
@@ -92,7 +94,7 @@ def main():
         "--outputfile",
         dest="outputfile",
         help=_(
-            "run script and output to image file (accepts .png .svg .pdf and .ps extensions)"
+            "run script and output to image file (accepts .png .svg .pdf and .ps extensions)",
         ),
         metavar="FILE",
     )
@@ -105,7 +107,7 @@ def main():
         dest="socketserver",
         default=False,
         help=_(
-            "run a socket server for external control (will run the script in windowed mode)"
+            "run a socket server for external control (will run the script in windowed mode)",
         ),
     )
     group.add_argument(
@@ -124,7 +126,7 @@ def main():
         dest="vars",
         default=False,
         help=_(
-            "Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'"
+            "Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'",
         ),
     )
     # IO - Namespace
@@ -134,7 +136,7 @@ def main():
         dest="namespace",
         default=None,
         help=_(
-            "Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'"
+            "Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'",
         ),
     )
     # IO - IDE integration Shell
@@ -240,8 +242,8 @@ def main():
     if not args.script:
         error(
             _(
-                "Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)"
-            )
+                "Please specify an input script!\n (check /usr/share/shoebot/examples/ for example scripts)",
+            ),
         )
 
     if args.vars:

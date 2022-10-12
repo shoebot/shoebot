@@ -1,5 +1,6 @@
 """
-Cairo implementation and GObject preference can be set by channging the environment variable SHOEBOT_GRAPHICS.
+Cairo implementation and GObject preference can be set by channging the
+environment variable SHOEBOT_GRAPHICS.
 
 Cairo:
 
@@ -31,15 +32,12 @@ import sys
 
 
 class BackendMixin(object):
-    """
-    Mixin to abstract different implementations of the same library.
-    """
+    """Mixin to abstract different implementations of the same library."""
 
     def import_libs(self, module_names, impl_name):
         """
-        Loop through module_names,
-        add has_.... booleans to class
-        set ..._impl to first successful import
+        Loop through module_names, add has_.... booleans to class set ..._impl
+        to first successful import.
 
         :param module_names:  list of module names to try importing
         :param impl_name:  used in error output if no modules succeed
@@ -53,7 +51,7 @@ class BackendMixin(object):
                 module = None
                 has_module = False
             setattr(self, name, module)
-            setattr(self, "has_%s" % name, has_module)
+            setattr(self, f"has_{name}", has_module)
 
         for name in module_names:
             try:
@@ -61,8 +59,7 @@ class BackendMixin(object):
             except ImportError:
                 pass
         raise ImportError(
-            "No %s Implementation found, tried: %s"
-            % (impl_name, " ".join(module_names))
+            f"No {impl_name} Implementation found, tried: {' '.join(module_names)}",
         )
 
     def get_libs(self):
@@ -86,14 +83,13 @@ def sort_by_preference(options, prefer):
 
 
 class CairoGIBackend(BackendMixin):
-    """
-    Graphics backend using gi.repository or pgi
-    PyCairo / CairoCFFI (+PyCairo needed if using Gtk Too)
-    """
+    """Graphics backend using gi.repository or pgi PyCairo / CairoCFFI (+PyCairo
+    needed if using Gtk Too)"""
 
     def __init__(self, options):
         cairo_pref = sort_by_preference(
-            ["cairo", "cairocffi"], options.get("cairo", "").split(",")
+            ["cairo", "cairocffi"],
+            options.get("cairo", "").split(","),
         )
         gi_pref = sort_by_preference(["gi", "pgi"], options.get("gi", "").split(","))
         self.cairo_lib, self.cairo_module = self.import_libs(cairo_pref, "Cairo")
@@ -110,8 +106,8 @@ class CairoGIBackend(BackendMixin):
 
     def ensure_pycairo_context(self, ctx):
         """
-        If ctx is a cairocffi Context convert it to a PyCairo Context
-        otherwise return the original context
+        If ctx is a cairocffi Context convert it to a PyCairo Context otherwise
+        return the original context.
 
         :param ctx:
         :return:
@@ -140,7 +136,7 @@ def get_driver_options():
     except ValueError:
         sys.stderr.write("Bad option format.\n")
         sys.stderr.write(
-            "Environment variable should be in the format key=value separated by spaces.\n\n"
+            "Environment variable should be in the format key=value separated by spaces.\n\n",
         )
         sys.stderr.write("SHOEBOT_GRAPHICS='cairo=cairocffi,cairo gi=pgi'\n")
         sys.exit(1)

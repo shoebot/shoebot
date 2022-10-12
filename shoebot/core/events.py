@@ -1,9 +1,8 @@
-"""
-The pubsub library enables communication between the GUI parts of shoebot
-and the commandline shell.
-"""
+"""The pubsub library enables communication between the GUI parts of shoebot and
+the commandline shell."""
 
 import collections
+
 from pubsub import pub
 
 
@@ -38,5 +37,4 @@ def publish_event(event_t, data=None):
     :return:
     """
     event = Event(event_t, data)
-    pub.sendMessage('shoebot', event=event)
-
+    pub.sendMessage("shoebot", event=event)

@@ -1,43 +1,37 @@
+import gettext
+import locale
 import os.path
 import sys
+from math import cos
+from math import pi
+from math import radians as deg2rad
+from math import sin
 
 from shoebot.core.backend import cairo
-from shoebot.kgp import KantGenerator
 from shoebot.data import ShoebotError
+from shoebot.data import geometry
+from shoebot.data.basecolor import HSB
+from shoebot.data.basecolor import RGB
+from shoebot.data.bezier import ARC
+from shoebot.data.bezier import CENTER
+from shoebot.data.bezier import CLOSE
+from shoebot.data.bezier import CORNER
+from shoebot.data.bezier import CURVETO
+from shoebot.data.bezier import ELLIPSE
+from shoebot.data.bezier import LINETO
+from shoebot.data.bezier import MOVETO
+from shoebot.data.bezier import RCURVETO
+from shoebot.data.bezier import RLINETO
+from shoebot.data.bezier import RMOVETO
+from shoebot.data.bezier import BezierPath
+from shoebot.data.bezier import Point
+from shoebot.data.img import Image
+from shoebot.grammar.bot import LEFT  # Fixme
+from shoebot.grammar.bot import RIGHT
+from shoebot.kgp import KantGenerator
 from shoebot.util.fonts import list_pango_fonts
+
 from .bot import Bot
-from shoebot.data import (
-    geometry,
-    Point,
-    BezierPath,
-    Image,
-    RGB,
-    HSB,
-    CORNER,
-    CENTER,
-    MOVETO,
-    RMOVETO,
-    LINETO,
-    RLINETO,
-    CURVETO,
-    RCURVETO,
-    ARC,
-    ELLIPSE,
-    CLOSE,
-    LEFT,
-    RIGHT,
-    BUTT,
-    ROUND,
-    SQUARE,
-    BEVEL,
-    MITER,
-)
-
-from math import sin, cos, pi
-from math import radians as deg2rad
-
-import locale
-import gettext
 
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
@@ -82,7 +76,7 @@ class NodeBot(Bot):
 
     def __init__(self, canvas=None, namespace=None, vars=None):
         """
-        Nodebot grammar constructor
+        Nodebot grammar constructor.
 
         :param canvas: Canvas implementation for output.
         :param namespace: Optionally specify a dict to inject as namespace
@@ -93,7 +87,7 @@ class NodeBot(Bot):
 
     @property
     def _ns(self):
-        """Nodebox1 API way of fetching namespace from _ctx"""
+        """Nodebox1 API way of fetching namespace from _ctx."""
         return self._namespace
 
     # Drawing
@@ -112,7 +106,8 @@ class NodeBot(Bot):
         draw=True,
         **kwargs,
     ):
-        """Draws a image with (x,y) as the top left corner.
+        """
+        Draws a image with (x,y) as the top left corner.
 
         If width and height are specified, resize the image to fit.
 
@@ -151,7 +146,8 @@ class NodeBot(Bot):
     # Paths
 
     def rect(self, x, y, width, height, roundness=0.0, draw=True, **kwargs):
-        """Draw a rectangle.
+        """
+        Draw a rectangle.
 
         :param x: top left x-coordinate
         :param y: top left y-coordinate
@@ -169,7 +165,8 @@ class NodeBot(Bot):
         return path
 
     def rectmode(self, mode=None):
-        """Get or set the current rectmode.
+        """
+        Get or set the current rectmode.
 
         :param mode: the mode to draw new rectangles in
         :type mode: CORNER, CENTER or CORNERS
@@ -184,7 +181,8 @@ class NodeBot(Bot):
             raise ShoebotError(_("rectmode: invalid input"))
 
     def ellipse(self, x, y, width, height, draw=True, **kwargs):
-        """Draw an ellipse.
+        """
+        Draw an ellipse.
 
         :param x: top left x-coordinate
         :param y: top left y-coordinate
@@ -203,7 +201,9 @@ class NodeBot(Bot):
     oval = ellipse
 
     def circle(self, x, y, diameter, draw=True, **kwargs):
-        """Draw a circle
+        """
+        Draw a circle.
+
         :param x: x-coordinate of the top left corner
         :param y: y-coordinate of the top left corner
         :param diameter: circle diameter
@@ -228,7 +228,8 @@ class NodeBot(Bot):
             raise ShoebotError(_("ellipsemode: invalid input"))
 
     def line(self, x1, y1, x2, y2, draw=True, **kwargs):
-        """Draw a line from (x1,y1) to (x2,y2).
+        """
+        Draw a line from (x1,y1) to (x2,y2).
 
         :param x1: x-coordinate of the first point
         :param y1: y-coordinate of the first point
@@ -243,7 +244,8 @@ class NodeBot(Bot):
         return self.endpath(draw=draw, closed=False)
 
     def arc(self, x, y, radius, angle1, angle2, type=CHORD, draw=True, **kwargs):
-        """Draw an arc with center (x,y) between two angles in degrees.
+        """
+        Draw an arc with center (x,y) between two angles in degrees.
 
         :param x1: start x-coordinate
         :param y1: start y-coordinate
@@ -266,7 +268,8 @@ class NodeBot(Bot):
         return self.endpath(draw=draw)
 
     def arrow(self, x, y, width, type=NORMAL, draw=True, **kwargs):
-        """Draw an arrow.
+        """
+        Draw an arrow.
 
         :param x: arrow tip x-coordinate
         :param y: arrow tip y-coordinate
@@ -304,12 +307,13 @@ class NodeBot(Bot):
             self.lineto(x, y)
         else:
             raise NameError(
-                _("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
+                _("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"),
             )
         return self.endpath(draw=draw)
 
     def star(self, x, y, points=20, outer=100, inner=50, draw=True, **kwargs):
-        """Draws a star.
+        """
+        Draws a star.
 
         :param x: center x-coordinate
         :param y: center y-coordinate
@@ -341,7 +345,8 @@ class NodeBot(Bot):
     # Path functions taken from Nodebox and modified
 
     def beginpath(self, x=None, y=None, **kwargs):
-        """Start a new Bézier path.
+        """
+        Start a new Bézier path.
 
         This command is needed before any other path drawing commands.
 
@@ -356,7 +361,8 @@ class NodeBot(Bot):
             self._path.moveto(x, y)
 
     def moveto(self, x, y):
-        """Move the Bézier "pen" to the specified point without drawing.
+        """
+        Move the Bézier "pen" to the specified point without drawing.
 
         :param x: x-coordinate of the point to move to
         :param y: y-coordinate of the point to move to
@@ -369,7 +375,8 @@ class NodeBot(Bot):
         self._path.moveto(x, y)
 
     def lineto(self, x, y):
-        """Draw a line from the pen's current point.
+        """
+        Draw a line from the pen's current point.
 
         :param x: x-coordinate of the point to draw to
         :param y: y-coordinate of the point to draw to
@@ -462,7 +469,8 @@ class NodeBot(Bot):
 
     def findpath(self, points, curvature=1.0):
 
-        """Constructs a path between the given list of points.
+        """
+        Constructs a path between the given list of points.
 
         Interpolates the list of points and determines
         a smooth bezier path betweem them.
@@ -539,7 +547,8 @@ class NodeBot(Bot):
     # Transform and utility
 
     def beginclip(self, path):
-        """Use a path as a clipping mask.
+        """
+        Use a path as a clipping mask.
 
         All drawing commands between beginclip() and endclip() will be drawn
         inside the clipping mask set by beginclip().
@@ -557,7 +566,8 @@ class NodeBot(Bot):
         p.draw()
 
     def transform(self, mode=None):
-        """Set the current transform mode.
+        """
+        Set the current transform mode.
 
         :param mode: the mode to base new transformations on
         :type mode: CORNER or CENTER
@@ -626,16 +636,15 @@ class NodeBot(Bot):
     # Color
 
     def outputmode(self):
-        """
-        NOT IMPLEMENTED
-        """
+        """NOT IMPLEMENTED."""
         raise NotImplementedError(
-            _("outputmode() isn't implemented; Shoebot does not support CMYK")
+            _("outputmode() isn't implemented; Shoebot does not support CMYK"),
         )
 
     def colormode(self, mode=None, range=None):
-        """Set the current colormode (can be RGB or HSB) and eventually
-        the color range.
+        """
+        Set the current colormode (can be RGB or HSB) and eventually the color
+        range.
 
         If called without arguments, it returns the current colormode.
 
@@ -656,7 +665,8 @@ class NodeBot(Bot):
         return self.color_mode
 
     def colorrange(self, crange=None):
-        """Sets the current color range.
+        """
+        Sets the current color range.
 
         The default is 0-1; for a range of 0-255, use ``colorrange(256)``.
 
@@ -668,7 +678,8 @@ class NodeBot(Bot):
         return self.color_range
 
     def fill(self, *args):
-        """Sets a fill color, applying it to new paths.
+        """
+        Sets a fill color, applying it to new paths.
 
         :param args: color in supported format
         """
@@ -677,7 +688,8 @@ class NodeBot(Bot):
         return self._canvas.fillcolor
 
     def nofill(self):
-        """Stop applying fills to new paths.
+        """
+        Stop applying fills to new paths.
 
         :return: fill color before nofill() was called
         """
@@ -686,7 +698,8 @@ class NodeBot(Bot):
         return c
 
     def fillrule(self, r=None):
-        """Set the fill rule to use in new paths.
+        """
+        Set the fill rule to use in new paths.
 
         :param r: fill rule to apply
         :type r: WINDING or EVENODD
@@ -697,7 +710,8 @@ class NodeBot(Bot):
         return self._canvas.fillrule
 
     def stroke(self, *args):
-        """Set a stroke color, applying it to new paths.
+        """
+        Set a stroke color, applying it to new paths.
 
         :param args: color in supported format
         :return: new stroke color
@@ -707,7 +721,8 @@ class NodeBot(Bot):
         return self._canvas.strokecolor
 
     def nostroke(self):
-        """Stop applying strokes to new paths.
+        """
+        Stop applying strokes to new paths.
 
         :return: stroke color before nostroke() was called
         """
@@ -716,7 +731,8 @@ class NodeBot(Bot):
         return c
 
     def strokewidth(self, w=None):
-        """Set the stroke width to be used by stroke().
+        """
+        Set the stroke width to be used by stroke().
 
         :param w: width of the stroke to use
         :return: current stroke width value
@@ -726,7 +742,8 @@ class NodeBot(Bot):
         return self._canvas.strokewidth
 
     def strokedash(self, dashes=None, offset=0):
-        """Sets the dash pattern to be used by stroke().
+        """
+        Sets the dash pattern to be used by stroke().
 
         :param list dashes: a sequence specifying alternate lengths of on and off stroke portions
         :param float offset: an offset into the dash pattern at which the stroke should start
@@ -739,7 +756,8 @@ class NodeBot(Bot):
         return (self._canvas.strokedash, self._canvas.dashoffset)
 
     def strokecap(self, cap=None):
-        """Set the stroke cap.
+        """
+        Set the stroke cap.
 
         :param w: new stroke cap value
         :return: current stroke cap value
@@ -749,7 +767,8 @@ class NodeBot(Bot):
         return self._canvas.strokecap
 
     def strokejoin(self, join=None):
-        """Set the stroke join.
+        """
+        Set the stroke join.
 
         :param w: new stroke join value
         :return: current line join value
@@ -759,7 +778,8 @@ class NodeBot(Bot):
         return self._canvas.strokejoin
 
     def background(self, *args):
-        """Set the canvas background color.
+        """
+        Set the canvas background color.
 
         :param color: background color to apply
         :return: new background color
@@ -768,7 +788,8 @@ class NodeBot(Bot):
         return self._canvas.background
 
     def blendmode(self, mode=None):
-        """Set the current blending mode.
+        """
+        Set the current blending mode.
 
         :param mode: mode name (e.g. "multiply")
         """
@@ -779,7 +800,8 @@ class NodeBot(Bot):
     # Text
 
     def font(self, fontpath=None, fontsize=None, vars=None, *args, **kwargs):
-        """Set the font to be used with new text instances.
+        """
+        Set the font to be used with new text instances.
 
         :param fontpath: font name (can include styles like "Bold")
         :param fontsize: font size
@@ -788,7 +810,8 @@ class NodeBot(Bot):
         :return: current fontpath (if fontpath param not set)
 
         Accepts TrueType and OpenType files. Depends on FreeType being
-        installed."""
+        installed.
+        """
         if fontpath is not None:
             # do we have variants set?
             if not vars:
@@ -813,7 +836,8 @@ class NodeBot(Bot):
         return self._canvas.fontfile
 
     def fontsize(self, fontsize=None):
-        """Sets and/or returns the current font size.
+        """
+        Sets and/or returns the current font size.
 
         :param fontsize: Font size in pt
         :return: the current font size value
@@ -825,7 +849,8 @@ class NodeBot(Bot):
     def text(
         self, txt, x, y, width=None, height=1000000, outline=False, draw=True, **kwargs
     ):
-        """Draws a string of text according to the current font settings.
+        """
+        Draws a string of text according to the current font settings.
 
         :param txt: Text to output
         :param x: x-coordinate of the top left corner
@@ -845,7 +870,8 @@ class NodeBot(Bot):
         return txt
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
-        """Generates an outlined path of the input text.
+        """
+        Generates an outlined path of the input text.
 
         :param txt: Text to output
         :param x: x-coordinate of the top left corner
@@ -862,8 +888,9 @@ class NodeBot(Bot):
         return path
 
     def textmetrics(self, txt, width=None, height=None, **kwargs):
-        """Returns the dimensions of the text box of a string of text, according
-        to the current font settings.
+        """
+        Returns the dimensions of the text box of a string of text, according to
+        the current font settings.
 
         :return: (width, height) tuple
         """
@@ -873,8 +900,9 @@ class NodeBot(Bot):
         return txt.metrics
 
     def textbounds(self, txt, width=None, height=None, **kwargs):
-        """Returns the dimensions of the actual shapes (inked part) of a string
-        of text, according to the current font settings.
+        """
+        Returns the dimensions of the actual shapes (inked part) of a string of
+        text, according to the current font settings.
 
         :return: (width, height) tuple
         """
@@ -882,8 +910,9 @@ class NodeBot(Bot):
         return txt.bounds
 
     def textwidth(self, txt, width=None, **kwargs):
-        """Returns the width of a string of text according to the current
-        font settings.
+        """
+        Returns the width of a string of text according to the current font
+        settings.
 
         :return:
         """
@@ -891,8 +920,9 @@ class NodeBot(Bot):
         return self.textmetrics(txt, width=w, **kwargs)[0]
 
     def textheight(self, txt, width=None, **kwargs):
-        """Returns the height of a string of text according to the current
-        font settings.
+        """
+        Returns the height of a string of text according to the current font
+        settings.
 
         :param txt: string to measure
         :param width: width of a line of text in a block
@@ -901,7 +931,8 @@ class NodeBot(Bot):
         return self.textmetrics(txt, width=w, **kwargs)[1]
 
     def lineheight(self, height=None):
-        """Set text lineheight.
+        """
+        Set text lineheight.
 
         :param height: line height.
         """
@@ -910,7 +941,8 @@ class NodeBot(Bot):
         return self._canvas.lineheight
 
     def align(self, align=LEFT):
-        """Set text alignment
+        """
+        Set text alignment.
 
         :param align: Text alignment (LEFT, CENTER, RIGHT)
         """
@@ -918,9 +950,14 @@ class NodeBot(Bot):
         return self._canvas.align
 
     def fontoptions(
-        self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
+        self,
+        hintstyle=None,
+        hintmetrics=None,
+        subpixelorder=None,
+        antialias=None,
     ):
-        """Set font rendering options.
+        """
+        Set font rendering options.
 
         :param hintstyle: Hinting style (NONE, SLIGHT, MEDIUM, FULL)
         :param hintmetrics: Quantize font metrics (ON, OFF)
@@ -942,8 +979,9 @@ class NodeBot(Bot):
     @property
     def canvas(self):
         """
-        Not entirely sure compatible the Shoebot 'canvas' is with Nodebox
-        but there you go.
+        Not entirely sure compatible the Shoebot 'canvas' is with Nodebox but
+        there you go.
+
         :return:
         """
         return self._canvas

@@ -8,15 +8,19 @@ import os
 import sys
 
 import shoebot
-
-from shoebot.data import ShoebotError
 from shoebot.core.backend import gi
+from shoebot.data import ShoebotError
 
 gi.require_version("Gdk", "3.0")
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
 
-from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Pango
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import Gtk
+from gi.repository import GtkSource
+from gi.repository import Pango
 
 DEBUG = os.environ.get("SHOEBOT_DEBUG_IDE", "0").lower() in ["1", "yes", "true"]
 
@@ -129,7 +133,8 @@ class SourceBuffer(GtkSource.Buffer):
 
         if enabled and self.color_cycle_timeout_id == 0:
             self.color_cycle_timeout_id = GLib.timeout_add(
-                200, self.color_cycle_timeout
+                200,
+                self.color_cycle_timeout,
             )
         elif not enabled and self.color_cycle_timeout_id:
             GLib.source_remove(self.color_cycle_timeout_id)
@@ -224,10 +229,14 @@ class ConsoleWindow:
         self.tag_table = self.text_buffer.get_tag_table()
 
         self.stdout_tag = self.text_buffer.create_tag(
-            "stdout", foreground="black", weight=600, size_points=9
+            "stdout",
+            foreground="black",
+            weight=600,
+            size_points=9,
         )
         self.system_message_tag = self.text_buffer.create_tag(
-            "system", foreground="darkgrey"
+            "system",
+            foreground="darkgrey",
         )
         self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
@@ -382,7 +391,7 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_quit,
                 ),
-            ]
+            ],
         )
 
         action_group.add_actions(
@@ -420,7 +429,7 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_clear_console,
                 ),
-            ]
+            ],
         )
 
         action_group.add_action(Gtk.Action("SettingsMenu", _("_Settings"), None, None))
@@ -453,20 +462,29 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_run_script,
                 ),
-            ]
+            ],
         )
         variable_window_action = Gtk.ToggleAction(
-            "VarWindow", _("Show variables window"), None, None
+            "VarWindow",
+            _("Show variables window"),
+            None,
+            None,
         )
         variable_window_action.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(variable_window_action)
         full_screen_action = Gtk.ToggleAction(
-            "FullScreen", _("Full screen"), None, None
+            "FullScreen",
+            _("Full screen"),
+            None,
+            None,
         )
         full_screen_action.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(full_screen_action)
         socket_server_action = Gtk.ToggleAction(
-            "SocketServer", _("Run socket server"), None, None
+            "SocketServer",
+            _("Run socket server"),
+            None,
+            None,
         )
         socket_server_action.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socket_server_action)
@@ -475,7 +493,7 @@ class ShoebotEditorWindow(Gtk.Window):
             [
                 ("HelpMenu", None, _("_Help")),
                 ("HelpAbout", Gtk.STOCK_INFO, _("_About"), None, None, self.on_about),
-            ]
+            ],
         )
 
         ui_manager = Gtk.UIManager()
@@ -531,7 +549,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 ShoebotEditorWindow.FONT = "Mono 10"
 
             self.source_view.modify_font(
-                Pango.FontDescription(ShoebotEditorWindow.FONT)
+                Pango.FontDescription(ShoebotEditorWindow.FONT),
             )
 
         vbox.pack_start(scrolled_window, True, True, 0)
@@ -552,7 +570,7 @@ class ShoebotEditorWindow(Gtk.Window):
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
         self.console_error.write(
             _(
-                "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"
+                "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n",
             ),
             True,
             True,
@@ -663,9 +681,7 @@ class ShoebotEditorWindow(Gtk.Window):
         chooser.destroy()
 
     def save_or_save_as(self):
-        """
-        Call save_as if file has never been saved otherwise call save.
-        """
+        """Call save_as if file has never been saved otherwise call save."""
         filename = self.source_view.get_buffer().filename
         if filename:
             self.save(filename)
@@ -709,7 +725,8 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def toggle_dark_theme(self, dark=False):
         Gtk.Settings.get_default().set_property(
-            "gtk-application-prefer-dark-theme", dark
+            "gtk-application-prefer-dark-theme",
+            dark,
         )
         if dark:
             scheme_name = "cobalt"
@@ -852,8 +869,8 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def init_menus(self):
         text_view = self.source_view
-        direction = text_view.get_direction()
-        wrap_mode = text_view.get_wrap_mode()
+        text_view.get_direction()
+        text_view.get_wrap_mode()
         menu_item = None
 
         # if direction == Gtk.TextDirection.LTR:
@@ -974,9 +991,7 @@ class ShoebotEditorWindow(Gtk.Window):
         return save_succeeded
 
     def save_as(self):
-        """
-        Return True if the source_buffer was saved
-        """
+        """Return True if the source_buffer was saved."""
         chooser = ShoebotFileChooserDialog(
             _("Save File"),
             None,
@@ -1001,6 +1016,7 @@ class ShoebotEditorWindow(Gtk.Window):
     def update_window_title(self):
         """
         Update the window title from the filename in the source_buffer.
+
         :return:
         """
         save_prefix = "*" if self.source_view.get_buffer().get_modified() else ""
@@ -1104,11 +1120,13 @@ class ShoebotEditorWindow(Gtk.Window):
             )
             self.shoebot_window = bot._canvas.sink
             bot.run(
-                codestring, run_forever=True, max_iterations=None, frame_limiter=True
+                codestring,
+                run_forever=True,
+                max_iterations=None,
+                frame_limiter=True,
             )
         except (ShoebotError, NameError):
             import traceback
-            import sys
 
             errmsg = traceback.format_exc(limit=1)
             err = _("Error in Shoebot script:") + "\n {errmsg}"
@@ -1119,7 +1137,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 Gtk.ButtonsType.OK,
                 err,
             )
-            result = dialog.run()
+            dialog.run()
             dialog.destroy()
             self.shoebot_window = None
             return False
@@ -1153,7 +1171,7 @@ class ShoebotIDE:
             filename = os.path.abspath(filename)
             try:
                 ShoebotEditorWindow(filename)
-            except IOError as e:
+            except IOError:
                 files_not_opened.append(filename)
             else:
                 files_were_opened = True
@@ -1210,7 +1228,7 @@ def main():
 
     filenames = vars(args)["filenames"]
 
-    app = ShoebotIDE(filenames)
+    ShoebotIDE(filenames)
     Gtk.main()
 
 

@@ -1,10 +1,17 @@
-import errno
 import base64
+import errno
 import os
-
-from gi.repository import Gtk, GLib, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
-from shoebotit import ide_utils, gtk3_utils
+
+from gi.repository import Gedit
+from gi.repository import Gio
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import Gtk
+from gi.repository import Pango
+from gi.repository import PeasGtk
+from shoebotit import gtk3_utils
+from shoebotit import ide_utils
 
 WINDOW_ACTIONS = [(_("Run in Shoebot"), "run")]
 
@@ -37,7 +44,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         self.id_name = "ShoebotPluginID"
 
         for _, name, default in WINDOW_TOGGLES:
-            setattr(self, "%s_enabled" % name, default)
+            setattr(self, f"{name}_enabled", default)
 
         self.bot = None
 
@@ -76,22 +83,25 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
     def add_window_actions(self):
         for rel_path in EXAMPLES:
             action = Gio.SimpleAction.new(
-                "open_example__%s" % gtk3_utils.encode_relpath(rel_path), None
+                f"open_example__{gtk3_utils.encode_relpath(rel_path)}",
+                None,
             )
 
             action.connect("activate", self.on_open_example)
             self.window.add_action(action)
 
         for _, name in WINDOW_ACTIONS:
-            action_name = "on_%s" % name
+            action_name = f"on_{name}"
             action = Gio.SimpleAction.new(name=action_name)
             action.connect("activate", getattr(self, action_name))
             self.window.add_action(action)
 
         for _, name, default in WINDOW_TOGGLES:
-            action_name = "toggle_%s" % name
+            action_name = f"toggle_{name}"
             action = Gio.SimpleAction.new_stateful(
-                action_name, None, GLib.Variant.new_boolean(default)
+                action_name,
+                None,
+                GLib.Variant.new_boolean(default),
             )
             action.connect("activate", getattr(self, action_name))
             self.window.add_action(action)
@@ -107,7 +117,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         path = os.path.join(example_dir, rel_path)
 
         drive, directory = os.path.splitdrive(os.path.abspath(os.path.normpath(path)))
-        path = "%s%s" % (drive, directory)
+        path = f"{drive}{directory}"
         gio_file = Gio.file_new_for_path(path)
         self.window.create_tab_from_location(
             gio_file,
@@ -137,7 +147,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         if not doc:
             return
 
-        title = "%s - Shoebot on gedit" % doc.get_short_name_for_display()
+        title = f"{doc.get_short_name_for_display()} - Shoebot on gedit"
         cwd = os.path.dirname(doc.get_uri_for_display()) or None
 
         start, end = doc.get_bounds()
@@ -146,7 +156,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             return False
 
         textbuffer = self.text.get_buffer()
-        textbuffer.set_text("running shoebot at %s\n" % sbot_bin)
+        textbuffer.set_text(f"running shoebot at {sbot_bin}\n")
 
         while Gtk.events_pending():
             Gtk.main_iteration()
@@ -173,7 +183,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
 
     def get_source(self, doc):
         """
-        Grab contents of 'doc' and return it
+        Grab contents of 'doc' and return it.
 
         :param doc: The active document
         :return:
@@ -199,7 +209,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
                 self.disconnect_change_handler()
                 if e.errno == errno.EPIPE:
                     # EPIPE error
-                    print("FIXME: %s" % str(e))
+                    print(f"FIXME: {str(e)}")
                 else:
                     # Something else bad happened
                     raise
@@ -224,14 +234,16 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
                 if response is None:
                     # sentinel value - clear the buffer
                     textbuffer.delete(
-                        textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                        textbuffer.get_start_iter(),
+                        textbuffer.get_end_iter(),
                     )
                 else:
                     cmd, status, info = response.cmd, response.status, response.info
                     if cmd == ide_utils.CMD_LOAD_BASE64:
                         if status == ide_utils.RESPONSE_CODE_OK:
                             textbuffer.delete(
-                                textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                                textbuffer.get_start_iter(),
+                                textbuffer.get_end_iter(),
                             )
                             # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
                         elif status == ide_utils.RESPONSE_REVERTED:
@@ -309,10 +321,10 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
                 menu.append_item(examples_item)
 
             for text, name in WINDOW_ACTIONS:
-                menu.append(text, "win.on_%s" % name)
+                menu.append(text, f"win.on_{name}")
 
             for text, name, toggled in WINDOW_TOGGLES:
-                action_name = "win.toggle_%s" % name
+                action_name = f"win.toggle_{name}"
                 menu.append(text, action_name)
 
             return item, menu
@@ -320,7 +332,7 @@ class ShoebotPluginMenu(GObject.Object, Gedit.AppActivatable):
         base, menu = mk_menu(_("Shoebot"))
 
         for name, accel in WINDOW_ACCELS:
-            self.app.set_accels_for_action("win.on_%s" % name, (accel,))
+            self.app.set_accels_for_action(f"win.on_{name}", (accel,))
 
         self.shoebot_menu = base
         self.tools_menu_ext = self.extend_menu("tools-section")

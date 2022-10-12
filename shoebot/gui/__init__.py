@@ -27,9 +27,4 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""GTK front-end for Shoebot"""
-
-from .gtk_drawingarea import ShoebotWidget
-from .var_window import VarWindow
-from .gtk_window import ShoebotWindow
-from .gtk_input_device import GtkInputDeviceMixin
+"""GTK front-end for Shoebot."""

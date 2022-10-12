@@ -24,11 +24,13 @@ class priorityqueue(dict):
 
 
 def depth_first_search(
-    root, visit=lambda node: False, traversable=lambda node, edge: True
+    root,
+    visit=lambda node: False,
+    traversable=lambda node, edge: True,
 ):
     """
     Simple, multi-purpose depth-first search.
-    
+
     Visits all the nodes connected to the root, depth-first.
     The visit function is called on each node.
     Recursion will stop if it returns True, and ubsequently dfs() will return True.
@@ -36,9 +38,8 @@ def depth_first_search(
     and returns True if we are allowed to follow this connection to the next node.
     For example, the traversable for directed edges is follows:
     lambda node, edge: node == edge.node1
-    
+
     Note: node._visited is expected to be False for all nodes.
-    
     """
 
     stop = visit(root)
@@ -59,14 +60,13 @@ def depth_first_search(
 def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic=None):
     """
     An edge weight map indexed by node id's.
-    
-    A dictionary indexed by node id1's in which each value is a
-    dictionary of connected node id2's linking to the edge weight.
-    If directed, edges go from id1 to id2, but not the other way.
-    If stochastic, all the weights for the neighbors of a given node sum to 1.
-    A heuristic can be a function that takes two node id's and returns
-    and additional cost for movement between the two nodes.
-    
+
+    A dictionary indexed by node id1's in which each value is a dictionary of
+    connected node id2's linking to the edge weight. If directed, edges go from
+    id1 to id2, but not the other way. If stochastic, all the weights for the
+    neighbors of a given node sum to 1. A heuristic can be a function that takes
+    two node id's and returns and additional cost for movement between the two
+    nodes.
     """
 
     v = {}
@@ -105,7 +105,7 @@ def adjacency(graph, directed=False, reversed=False, stochastic=False, heuristic
 def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
     """
     Dijkstra algorithm for finding shortest paths.
-    
+
     Connelly Barnes, http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/119466
     Raises an IndexError between nodes on unconnected graphs.
     """
@@ -139,10 +139,10 @@ def dijkstra_shortest_path(graph, id1, id2, heuristic=None):
 def brandes_betweenness_centrality(graph, normalized=True):
     """
     Betweenness centrality for nodes in the graph.
-    
+
     Betweenness centrality is a measure of the number of shortests paths that pass through a node.
     Nodes in high-density areas will get a good score.
-    
+
     The algorithm is Brandes' betweenness centrality,
     from NetworkX 0.35.1: Aric Hagberg, Dan Schult and Pieter Swart,
     based on Dijkstra's algorithm for shortest paths modified from Eppstein.
@@ -224,8 +224,8 @@ def eigenvector_centrality(
 ):
     """
     Eigenvector centrality for nodes in the graph (like Google's PageRank).
-    
-    Eigenvector centrality is a measure of the importance of a node in a directed network. 
+
+    Eigenvector centrality is a measure of the importance of a node in a directed network.
     It rewards nodes with a high potential of (indirectly) connecting to high-scoring nodes.
     Nodes with no incoming connections have a score of zero.
     If you want to measure outgoing connections, reversed should be False.
@@ -233,13 +233,12 @@ def eigenvector_centrality(
     The eigenvector calculation is done by the power iteration method.
     It has no guarantee of convergence.
     A starting vector for the power iteration can be given in the start dict.
-    
+
     You can adjust the importance of a node with the rating dictionary,
     which links node id's to a score.
-    
+
     The algorithm is adapted from NetworkX, Aric Hagberg (hagberg@lanl.gov):
     https://networkx.lanl.gov/attachment/ticket/119/eigenvector_centrality.py
-
     """
     G = list(graph.keys())
     W = adjacency(graph, directed=True, reversed=reversed)

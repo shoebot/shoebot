@@ -29,42 +29,37 @@
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-"""
-Drawbot and Nodebot are similar grammars, so they both inherit from Bot
-"""
+"""Drawbot and Nodebot are similar grammars, so they both inherit from Bot."""
 
-import sys
+import gettext
+import locale
 import os
+import random as r
+import sys
+from glob import glob
+
+from pkg_resources import Requirement
+from pkg_resources import resource_filename
 
 from shoebot.core.backend import cairo
-from shoebot.data import (
-    BezierPath,
-    EndClip,
-    Color,
-    Text,
-    Variable,
-    Image,
-    ClippingPath,
-    NUMBER,
-    TEXT,
-    BOOLEAN,
-    BUTTON,
-    ShoebotError,
-    RGB,
-    HSB,
-    CENTER,
-    CORNER,
-    CORNERS,
-)
-
-from .grammar import Grammar
-
-from pkg_resources import resource_filename, Requirement
-from glob import glob
-import random as r
-
-import locale
-import gettext
+from shoebot.data import ShoebotError
+from shoebot.data.basecolor import HSB
+from shoebot.data.basecolor import RGB
+from shoebot.data.basecolor import Color
+from shoebot.data.bezier import BezierPath
+from shoebot.data.bezier import ClippingPath
+from shoebot.data.bezier import EndClip
+from shoebot.data.img import Image
+from shoebot.data.transforms import CENTER
+from shoebot.data.transforms import CORNER
+from shoebot.data.transforms import CORNERS
+from shoebot.data.typography import Text
+from shoebot.data.variable import BOOLEAN
+from shoebot.data.variable import BUTTON
+from shoebot.data.variable import NUMBER
+from shoebot.data.variable import TEXT
+from shoebot.data.variable import Variable
+from shoebot.grammar.grammar import Grammar
 
 SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = "shoebot"
@@ -88,25 +83,24 @@ for LIB_DIR in LIB_DIRS:
 TOP_LEFT = 1
 BOTTOM_LEFT = 2
 
+LEFT = "left"
+RIGHT = "right"
+JUSTIFY = "JUSTIFY"
+
 
 class Bot(Grammar):
-    """
-    The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot.
-    """
+    """The Parts of the Grammar common to DrawBot, NodeBot and ShoeBot."""
 
     RGB = RGB
     HSB = HSB
-
-    LEFT = "left"
-    RIGHT = "right"
 
     CENTER = CENTER
     CORNER = CORNER
     CORNERS = CORNERS
 
-    LEFT = "left"
-    RIGHT = "right"
-    JUSTIFY = "justify"
+    LEFT = LEFT
+    RIGHT = RIGHT
+    JUSTIFY = JUSTIFY
 
     NUMBER = NUMBER
     TEXT = TEXT
@@ -159,9 +153,12 @@ class Bot(Grammar):
         self._set_initial_defaults()  ### TODO Look at these
 
     def _set_initial_defaults(self):
-        """Set the default values. Called at __init__ and at the end of run(),
-        so that new draw loop iterations don't take up values left over by the
-        previous one."""
+        """
+        Set the default values.
+
+        Called at __init__ and at the end of run(), so that new draw loop
+        iterations don't take up values left over by the previous one.
+        """
         DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
         self.HEIGHT = self._namespace.get("HEIGHT", DEFAULT_WIDTH)
@@ -199,26 +196,26 @@ class Bot(Grammar):
     # Input GUI callbacks
 
     def _mouse_button_down(self, button):
-        """GUI callback for mouse button down"""
+        """GUI callback for mouse button down."""
         self._namespace["mousedown"] = True
 
     def _mouse_button_up(self, button):
-        """GUI callback for mouse button up"""
+        """GUI callback for mouse button up."""
         self._namespace["mousedown"] = self._input_device.mouse_down
 
     def _mouse_pointer_moved(self, x, y):
-        """GUI callback for mouse moved"""
+        """GUI callback for mouse moved."""
         self._namespace["MOUSEX"] = x
         self._namespace["MOUSEY"] = y
 
     def _key_pressed(self, key, keycode):
-        """GUI callback for key pressed"""
+        """GUI callback for key pressed."""
         self._namespace["key"] = key
         self._namespace["keycode"] = keycode
         self._namespace["keydown"] = True
 
     def _key_released(self, key, keycode):
-        """GUI callback for key released"""
+        """GUI callback for key released."""
         self._namespace["keydown"] = self._input_device.key_down
 
     # Functions for override #####
@@ -226,15 +223,18 @@ class Bot(Grammar):
     # Classes #####
 
     def _makeInstance(self, clazz, args, kwargs):
-        """Creates an instance of a class defined in this document.
-        This method sets the context of the object to the current context."""
+        """
+        Creates an instance of a class defined in this document.
+
+        This method sets the context of the object to the current context.
+        """
         inst = clazz(self, *args, **kwargs)
         return inst
 
     def _makeColorableInstance(self, clazz, args, kwargs):
         """
-        Create an object, if fill, stroke or strokewidth
-        is not specified, get them from the _canvas
+        Create an object, if fill, stroke or strokewidth is not specified, get
+        them from the _canvas.
 
         :param clazz:
         :param args:
@@ -294,7 +294,13 @@ class Bot(Grammar):
 
     def var(self, name, type, default=None, min=0, max=255, value=None, step=None):
         v = Variable(
-            name, type, default=default, min=min, max=max, value=value, step=step
+            name,
+            type,
+            default=default,
+            min=min,
+            max=max,
+            value=value,
+            step=step,
         )
         return self._addvar(v)
 
@@ -331,7 +337,8 @@ class Bot(Grammar):
             return r.random()
 
     def grid(self, cols, rows, colSize=1, rowSize=1, shuffled=False):
-        """Returns an iterator that contains coordinate tuples.
+        """
+        Returns an iterator that contains coordinate tuples.
 
         This command can be used to quickly create grid-like structures.
         A common usage pattern is:
@@ -353,7 +360,8 @@ class Bot(Grammar):
                 yield (x * colSize, y * rowSize)
 
     def files(self, path="*"):
-        """Returns a list of files.
+        """
+        Returns a list of files.
 
         Use wildcards to specify which files to pick, e.g. ``f =
         files('*.gif')``.
@@ -364,7 +372,9 @@ class Bot(Grammar):
         return glob(path)
 
     def snapshot(self, target=None, defer=None, autonumber=False):
-        """Save the contents of current surface into a file or cairo surface/context.
+        """
+        Save the contents of current surface into a file or cairo
+        surface/context.
 
         :param filename: Can be a filename or a Cairo surface.
         :param defer: When to snapshot, if set to True waits until the frame has finished rendering.
@@ -400,12 +410,16 @@ class Bot(Grammar):
             self._canvas.snapshot(target, defer=defer, file_number=file_number)
         else:
             raise ShoebotError(
-                "Image not saved: no target, filename or default to save to."
+                "Image not saved: no target, filename or default to save to.",
             )
 
     def show(self, format="png", as_data=False):
-        """Returns an Image object of the current surface. Used for displaying
-        output in Jupyter notebooks. Adapted from the cairo-jupyter project."""
+        """
+        Returns an Image object of the current surface.
+
+        Used for displaying output in Jupyter notebooks. Adapted from the cairo-
+        jupyter project.
+        """
 
         from io import BytesIO
 
@@ -454,7 +468,8 @@ class Bot(Grammar):
     # Core functions ####
 
     def size(self, w=None, h=None):
-        """Set the canvas size
+        """
+        Set the canvas size.
 
         Only the first call will actually be effective.
 
@@ -477,7 +492,8 @@ class Bot(Grammar):
         self.HEIGHT = h  # Added to make evolution example work
 
     def speed(self, framerate=None):
-        """Set animation framerate.
+        """
+        Set animation framerate.
 
         :param framerate: Frames per second to run bot.
         :return: Current framerate of animation.

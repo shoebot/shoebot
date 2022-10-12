@@ -1,15 +1,17 @@
-"""
-This uses the test infrastructure but is NOT intended to run every time tests are run as it would be very inefficient.
-"""
+"""This uses the test infrastructure but is NOT intended to run every time tests
+are run as it would be very inefficient."""
 import os
 import sys
 import unittest
-from io import StringIO
 from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 from parameterized import parameterized
-from tests.unittests.helpers import ShoebotTestCase, TEST_DIR, shoebot_example_render_testfunction
+
+from tests.unittests.helpers import TEST_DIR
+from tests.unittests.helpers import ShoebotTestCase
+from tests.unittests.helpers import shoebot_example_render_testfunction
 
 PROJECT_DIR = Path(__file__).absolute().parent.parent.parent
 EXAMPLES_DIR = PROJECT_DIR / "examples"
@@ -24,7 +26,8 @@ def get_bot_relpath(bot_path):
 def get_bot_prefix(rel_bot_path):
     if str(rel_bot_path).startswith("libraries"):
         return str(rel_bot_path.parent.relative_to(LIBRARY_EXAMPLES_DIR)).replace(
-            os.sep, "--"
+            os.sep,
+            "--",
         )
     return str(rel_bot_path.parent.relative_to(EXAMPLES_DIR)).replace(os.sep, "--")
 
@@ -67,9 +70,8 @@ EXCLUDE_EXAMPLE_BOTS = [
 
 
 class RunAllExampleBots(ShoebotTestCase):
-    """
-    Abusing the testing infrastructure to generate images of every bot.
-    """
+    """Abusing the testing infrastructure to generate images of every bot."""
+
     EXAMPLE_BOT_FILTER = []
 
     __unittest_skip__ = True
@@ -82,9 +84,7 @@ class RunAllExampleBots(ShoebotTestCase):
 
     @parameterized.expand(EXAMPLE_BOTS, name_func=shoebot_example_render_testfunction)
     def test_run_examples_and_generate_images(self, bot_path):
-        """
-        Render image from non animated example bot.
-        """
+        """Render image from non animated example bot."""
         rel_bot_path = str(get_bot_relpath(bot_path))
         if self.EXAMPLE_BOT_FILTER and rel_bot_path in self.EXAMPLE_BOT_FILTER:
             self.skipTest("Bot not included in filter.")
@@ -97,15 +97,15 @@ class RunAllExampleBots(ShoebotTestCase):
         output_prefix = get_bot_prefix(bot_path)
         output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}.png"
+            / f"{output_prefix}-{bot_path.stem}.png",
         )
         log_output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}.log"
+            / f"{output_prefix}-{bot_path.stem}.log",
         )
         error_output_filename = str(
             Path(self.image_output_dir).absolute()
-            / f"{output_prefix}-{bot_path.stem}-error.log"
+            / f"{output_prefix}-{bot_path.stem}-error.log",
         )
 
         output = StringIO()
@@ -121,11 +121,11 @@ class RunAllExampleBots(ShoebotTestCase):
                     namespace=namespace,
                 )
         except Exception as e:
-            with open(log_output_filename, 'w+') as f:
+            with open(log_output_filename, "w+") as f:
                 f.write(output.getvalue())
             self.assertFalse(f"{rel_bot_path} raised exception {e}")
         else:
-            with open(error_output_filename, 'w+') as f:
+            with open(error_output_filename, "w+") as f:
                 f.write(output.getvalue())
         finally:
             os.chdir(cwd)
