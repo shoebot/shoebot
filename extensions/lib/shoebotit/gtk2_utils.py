@@ -52,7 +52,7 @@ def examples_menu(root_dir=None, depth=0):
             label = fn.capitalize()
 
             sm_xml, sm_file_actions, sm_menu_actions = examples_menu(
-                os.path.join(root_dir, fn), depth + 1
+                os.path.join(root_dir, fn), depth + 1,
             )
 
             submenu_actions.extend(sm_menu_actions)

@@ -87,7 +87,7 @@ def subgraph(graph, id, distance=1):
     for id in id:
         for n in flatten(graph[id], distance):
             g.add_node(
-                n.id, n.r, n.style, n.category, n.label, (n == graph.root), n.__dict__
+                n.id, n.r, n.style, n.category, n.label, (n == graph.root), n.__dict__,
             )
 
     for e in graph.edges:

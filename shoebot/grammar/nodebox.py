@@ -303,7 +303,7 @@ class NodeBot(Bot):
             self.lineto(x, y)
         else:
             raise NameError(
-                _("arrow: available types for arrow() are NORMAL and FORTYFIVE\n")
+                _("arrow: available types for arrow() are NORMAL and FORTYFIVE\n"),
             )
         return self.endpath(draw=draw)
 
@@ -624,7 +624,7 @@ class NodeBot(Bot):
     def outputmode(self):
         """NOT IMPLEMENTED."""
         raise NotImplementedError(
-            _("outputmode() isn't implemented; Shoebot does not support CMYK")
+            _("outputmode() isn't implemented; Shoebot does not support CMYK"),
         )
 
     def colormode(self, mode=None, range=None):
@@ -913,7 +913,7 @@ class NodeBot(Bot):
         return self._canvas.align
 
     def fontoptions(
-        self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None
+        self, hintstyle=None, hintmetrics=None, subpixelorder=None, antialias=None,
     ):
         """Set font rendering options.
 

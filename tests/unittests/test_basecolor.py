@@ -21,7 +21,7 @@ class TestBaseColor(unittest.TestCase):
         if not almost_equal:
             self.fail(
                 message
-                or f"RBGA values do not match: {actual_color} Expected {expected_rgba}"
+                or f"RBGA values do not match: {actual_color} Expected {expected_rgba}",
             )
 
     @parameterized.expand(
@@ -71,7 +71,7 @@ class TestBaseColor(unittest.TestCase):
                 "000000ff",
                 (0.000000, 0.000000, 0.000000, 1.000000),
             ),
-        ]
+        ],
     )
     def test_rgb_color_formats(self, input_color, expected_rgba):
         """Test input colors in the RGB(A) colour space."""

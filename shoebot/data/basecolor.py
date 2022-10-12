@@ -260,7 +260,7 @@ class Color(object):
             return self.__dict__["__" + a[0]]
 
         raise AttributeError(
-            "'" + str(self.__class__) + "' object has no attribute '" + a + "'"
+            "'" + str(self.__class__) + "' object has no attribute '" + a + "'",
         )
 
 
@@ -544,7 +544,7 @@ rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
 
 def rgba_to_argb(stringImage):
     tempBuffer = [None] * len(
-        stringImage
+        stringImage,
     )  # Create an empty array of the same size as stringImage
     tempBuffer[0::4] = stringImage[2::4]
     tempBuffer[1::4] = stringImage[1::4]

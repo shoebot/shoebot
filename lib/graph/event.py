@@ -250,7 +250,7 @@ class popup:
                 if self.fn - self.fi < 5:
                     alpha = 0.2 * (self.fn - self.fi)
                 self._ctx.fill(
-                    self.text.r, self.text.g, self.text.b, self.text.a * alpha
+                    self.text.r, self.text.g, self.text.b, self.text.a * alpha,
                 )
 
                 self._ctx.translate(self.node.x + f * 2.0, self.node.y + f * 2.5)

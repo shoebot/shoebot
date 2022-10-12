@@ -18,7 +18,7 @@ class TestSimpleTraceback(ShoebotTestCase):
             """\
         background(0)
         raise Exception("Oh no")
-        """
+        """,
         )
         expected_output = textwrap.dedent(
             """\
@@ -30,7 +30,7 @@ class TestSimpleTraceback(ShoebotTestCase):
         Traceback (most recent call last):
           File "<string>", line 2, in <module>
         Exception: Oh no
-        """
+        """,
         )
 
         with tempfile.NamedTemporaryFile(suffix=f".png") as f:
@@ -56,14 +56,14 @@ class TestSimpleTraceback(ShoebotTestCase):
         Traceback (most recent call last):
           File "<string>", line 4, in <module>
         Exception: Oh dear.
-        """
+        """,
         )
 
         with tempfile.NamedTemporaryFile(suffix=f".png") as f:
             output_buffer = io.StringIO()
             with contextlib.redirect_stderr(output_buffer):
                 self.run_filename(
-                    "test_traceback_from_file.bot", outputfile=f.name, verbose=False
+                    "test_traceback_from_file.bot", outputfile=f.name, verbose=False,
                 )
                 actual_output = output = output_buffer.getvalue()
 

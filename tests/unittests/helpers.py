@@ -177,7 +177,7 @@ class ShoebotTestCase(TestCase):
                             pass
 
     def assertBoundingBoxAlmostEqual(
-        self, expected_bounds, actual_bounds, threshold=2.0
+        self, expected_bounds, actual_bounds, threshold=2.0,
     ):
         """Given a two bounding boxes (x1, y1, x2, y2) assert they are within
         threshold of each other."""
@@ -191,7 +191,7 @@ class ShoebotTestCase(TestCase):
 
         if not within_bounds:
             self.fail(
-                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}"
+                f"Out of bounds, expected: {expected_bounds} actual: {actual_bounds}",
             )
 
     def assertReferenceImage(self, file1, file2):
@@ -238,7 +238,7 @@ class ShoebotTestCase(TestCase):
         """Assert file exists and is larger than 0 bytes."""
         self.assertFileExists(filename)
         self.assertNotEqual(
-            size, Path(filename).stat().st_size, f"{filename} is zero bytes."
+            size, Path(filename).stat().st_size, f"{filename} is zero bytes.",
         )
 
     def run_code(
@@ -266,14 +266,14 @@ class ShoebotTestCase(TestCase):
             title = None
 
         bot = create_bot(
-            window=windowed, outputfile=outputfile, namespace=namespace, title=title
+            window=windowed, outputfile=outputfile, namespace=namespace, title=title,
         )
 
         seed(0)
         bot.run(code, verbose=verbose, run_forever=run_forever)
 
     def run_filename(
-        self, filename, outputfile, windowed=False, namespace=None, verbose=True
+        self, filename, outputfile, windowed=False, namespace=None, verbose=True,
     ):
         """Run shoebot from filename.
 

@@ -135,7 +135,7 @@ class Grammar(object):
         # TODO:  The shell module (sbio) accesses the executor via its name here,
         # making this event based would remove the need for this.
         self._executor = executor = LiveExecution(
-            source, ns=self._namespace, filename=filename
+            source, ns=self._namespace, filename=filename,
         )
 
         if run_forever is False:
@@ -209,7 +209,7 @@ class Grammar(object):
 
                 # Handle events
                 continue_running, restart = self._handle_events(
-                    iteration, is_animation, next_frame_due
+                    iteration, is_animation, next_frame_due,
                 )
                 if not continue_running:
                     # Event handler returns False if it receives a message to quit.

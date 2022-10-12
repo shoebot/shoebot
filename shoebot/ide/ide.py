@@ -129,7 +129,7 @@ class SourceBuffer(GtkSource.Buffer):
 
         if enabled and self.color_cycle_timeout_id == 0:
             self.color_cycle_timeout_id = GLib.timeout_add(
-                200, self.color_cycle_timeout
+                200, self.color_cycle_timeout,
             )
         elif not enabled and self.color_cycle_timeout_id:
             GLib.source_remove(self.color_cycle_timeout_id)
@@ -224,10 +224,10 @@ class ConsoleWindow:
         self.tag_table = self.text_buffer.get_tag_table()
 
         self.stdout_tag = self.text_buffer.create_tag(
-            "stdout", foreground="black", weight=600, size_points=9
+            "stdout", foreground="black", weight=600, size_points=9,
         )
         self.system_message_tag = self.text_buffer.create_tag(
-            "system", foreground="darkgrey"
+            "system", foreground="darkgrey",
         )
         self.text_area.modify_font(Pango.FontDescription("monospace 9"))
 
@@ -382,7 +382,7 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_quit,
                 ),
-            ]
+            ],
         )
 
         action_group.add_actions(
@@ -420,7 +420,7 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_clear_console,
                 ),
-            ]
+            ],
         )
 
         action_group.add_action(Gtk.Action("SettingsMenu", _("_Settings"), None, None))
@@ -453,20 +453,20 @@ class ShoebotEditorWindow(Gtk.Window):
                     None,
                     self.on_run_script,
                 ),
-            ]
+            ],
         )
         variable_window_action = Gtk.ToggleAction(
-            "VarWindow", _("Show variables window"), None, None
+            "VarWindow", _("Show variables window"), None, None,
         )
         variable_window_action.connect("toggled", self.on_varwindow_changed)
         action_group.add_action(variable_window_action)
         full_screen_action = Gtk.ToggleAction(
-            "FullScreen", _("Full screen"), None, None
+            "FullScreen", _("Full screen"), None, None,
         )
         full_screen_action.connect("toggled", self.on_fullscreen_changed)
         action_group.add_action(full_screen_action)
         socket_server_action = Gtk.ToggleAction(
-            "SocketServer", _("Run socket server"), None, None
+            "SocketServer", _("Run socket server"), None, None,
         )
         socket_server_action.connect("toggled", self.on_socketserver_changed)
         action_group.add_action(socket_server_action)
@@ -475,7 +475,7 @@ class ShoebotEditorWindow(Gtk.Window):
             [
                 ("HelpMenu", None, _("_Help")),
                 ("HelpAbout", Gtk.STOCK_INFO, _("_About"), None, None, self.on_about),
-            ]
+            ],
         )
 
         ui_manager = Gtk.UIManager()
@@ -531,7 +531,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 ShoebotEditorWindow.FONT = "Mono 10"
 
             self.source_view.modify_font(
-                Pango.FontDescription(ShoebotEditorWindow.FONT)
+                Pango.FontDescription(ShoebotEditorWindow.FONT),
             )
 
         vbox.pack_start(scrolled_window, True, True, 0)
@@ -552,7 +552,7 @@ class ShoebotEditorWindow(Gtk.Window):
         # message displayed in console-error window at start, the double true values passed makes it render with system message tag
         self.console_error.write(
             _(
-                "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n"
+                "This is the console window.\n\nScript output and error messages are shown here.\n\nYou can clear the window with the 'Edit - Clear console' option or pressing Ctrl-Shift-C.\n\n",
             ),
             True,
             True,
@@ -706,7 +706,7 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def toggle_dark_theme(self, dark=False):
         Gtk.Settings.get_default().set_property(
-            "gtk-application-prefer-dark-theme", dark
+            "gtk-application-prefer-dark-theme", dark,
         )
         if dark:
             scheme_name = "cobalt"
@@ -1099,7 +1099,7 @@ class ShoebotEditorWindow(Gtk.Window):
             )
             self.shoebot_window = bot._canvas.sink
             bot.run(
-                codestring, run_forever=True, max_iterations=None, frame_limiter=True
+                codestring, run_forever=True, max_iterations=None, frame_limiter=True,
             )
         except (ShoebotError, NameError):
             import traceback

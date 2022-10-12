@@ -136,7 +136,7 @@ class LSystem(object):
                 elif cmd == ">":
                     length *= 1.1
                 self._grow(
-                    generation - 1, cmd, angle, length * self.decrease, time, draw
+                    generation - 1, cmd, angle, length * self.decrease, time, draw,
                 )
 
         elif rule == "F" or (rule in self.rules and self.rules[rule] == ""):

@@ -12,7 +12,7 @@ from tests.unittests.helpers import ShoebotTestCase
 
 
 @parameterized_class(
-    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass
+    [{"windowed": False}, {"windowed": True}], class_name_func=shoebot_named_testclass,
 )
 class TestExampleOutput(ShoebotTestCase):
     windowed = False  # False for headless, True for GUI
@@ -35,7 +35,7 @@ class TestExampleOutput(ShoebotTestCase):
                 "lsystem--growing_plant",
                 {"FRAME": 60},
             ),
-        ]
+        ],
     )
     def test_static_example_bots(self, filename, output_prefix, namespace=None):
         """Check non animated example bots render matches the reference
@@ -54,7 +54,7 @@ class TestExampleOutput(ShoebotTestCase):
         )
 
         self.assertFileExists(
-            expected_output, f"Missing example output image: {expected_output}."
+            expected_output, f"Missing example output image: {expected_output}.",
         )
         self.assertFileSize(actual_output)
         self.assertReferenceImage(actual_output, expected_output)

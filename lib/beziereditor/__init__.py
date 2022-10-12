@@ -196,7 +196,7 @@ class BezierPathEditor:
         
         """Calculates the angle between two points."""
     
-        a = degrees( atan((y1-y0) / (x1-x0+0.00001)) ) + 360
+        a = degrees( atan((y1-y0) / (x1-x0+0.00001))) + 360
         if x1-x0 < 0: a += 180
         return a
 
@@ -373,8 +373,10 @@ class BezierPathEditor:
                         # it is at the same location of the first handle 
                         # of the point we are currently editing.
                         if self.edit == i+1 \
-                        and self.overlap(self._points[i+1].ctrl1.x,
-                                         self._points[i+1].ctrl1.y, x, y):
+                        and self.overlap(
+                            self._points[i+1].ctrl1.x,
+                            self._points[i+1].ctrl1.y, x, y,
+                        ):
                             continue
                         else:
                             self.edit = i
@@ -663,13 +665,17 @@ class BezierPathEditor:
                     elif pt.cmd == LINETO:
                         _ctx.lineto(pt.x, pt.y)
                     elif pt.cmd == CURVETO:
-                        _ctx.curveto(pt.ctrl1.x, pt.ctrl1.y, 
-                                     pt.ctrl2.x, pt.ctrl2.y, 
-                                     pt.x, pt.y)
+                        _ctx.curveto(
+                            pt.ctrl1.x, pt.ctrl1.y, 
+                            pt.ctrl2.x, pt.ctrl2.y, 
+                            pt.x, pt.y,
+                        )
                 # In add- or edit-mode,
                 # display the current point's handles.
-                if ((i == self.edit and self.new == None) \
-                or pt == self.new) \
+                if (
+                    (i == self.edit and self.new == None) \
+                or pt == self.new
+                ) \
                 and pt.cmd == CURVETO \
                 and not pt.freehand:
                     _ctx.stroke(self.handle_color)

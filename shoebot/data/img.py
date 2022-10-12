@@ -88,7 +88,7 @@ class Image(Grob, ColorMixin):
                     sw = dimensions.width
                     sh = dimensions.height
                     surface = cairo.RecordingSurface(
-                        cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh)
+                        cairo.CONTENT_COLOR_ALPHA, (0, 0, sw, sh),
                     )
                     ctx = cairo.Context(surface)
                     pycairo_ctx = driver.ensure_pycairo_context(ctx)
@@ -109,7 +109,7 @@ class Image(Grob, ColorMixin):
                         bgra_data = img.tobytes("raw", "BGRA", 0, 1)
                         bgra_array = array.array("B", bgra_data)
                         surface = cairo.ImageSurface.create_for_data(
-                            bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
+                            bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4,
                         )
 
                 self._surface_cache[path] = SurfaceRef(surface)
@@ -125,7 +125,7 @@ class Image(Grob, ColorMixin):
                     bgra_data = img.tobytes("raw", "BGRA", 0, 1)
                     bgra_array = array.array("B", bgra_data)
                     surface = cairo.ImageSurface.create_for_data(
-                        bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4
+                        bgra_array, cairo.FORMAT_ARGB32, sw, sh, sw * 4,
                     )
 
             if width is not None or height is not None:
@@ -171,7 +171,7 @@ class Image(Grob, ColorMixin):
 
     def copy(self):
         p = self.__class__(
-            self._bot, self.path, self.x, self.y, self.width, self.height
+            self._bot, self.path, self.x, self.y, self.width, self.height,
         )
         _copy_attrs(self._bot, p, self.state_attributes)
         return p

@@ -295,7 +295,7 @@ class Bot(Grammar):
 
     def var(self, name, type, default=None, min=0, max=255, value=None, step=None):
         v = Variable(
-            name, type, default=default, min=min, max=max, value=value, step=step
+            name, type, default=default, min=min, max=max, value=value, step=step,
         )
         return self._addvar(v)
 
@@ -402,7 +402,7 @@ class Bot(Grammar):
             self._canvas.snapshot(target, defer=defer, file_number=file_number)
         else:
             raise ShoebotError(
-                "Image not saved: no target, filename or default to save to."
+                "Image not saved: no target, filename or default to save to.",
             )
 
     def show(self, format="png", as_data=False):

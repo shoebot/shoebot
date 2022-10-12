@@ -243,13 +243,15 @@ class Boids(list):
                 except:
                     b._perch_t = self._perch_t
             
-    def update(self, 
-               shuffled=True, 
-               cohesion=100, 
-               separation=10, 
-               alignment=5, 
-               goal=20,
-               limit=30):
+    def update(
+        self, 
+        shuffled=True, 
+        cohesion=100, 
+        separation=10, 
+        alignment=5, 
+        goal=20,
+        limit=30,
+    ):
         
         """Calculates the next motion frame for the flock."""
         
