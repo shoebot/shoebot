@@ -18,7 +18,7 @@ class Point(object):
         return (self.x, self.y)
 
     def __str__(self):
-        return "Point(%.3f, %.3f)" % (self.x, self.y)
+        return f"Point({self.x:.3f}, {self.y:.3f})"
 
     def __getitem__(self, key):
         return (float(self.x), float(self.y))[key]

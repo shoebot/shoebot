@@ -71,7 +71,7 @@ def trusted_cmd(f):
         if self.trusted:
             f(self, line)
         else:
-            print("Sorry cannot do %s here." % f.__name__[3:])
+            print(f"Sorry cannot do {f.__name__[3:]} here.")
 
     global trusted_cmds
     trusted_cmds.add(f.__name__)
@@ -358,7 +358,7 @@ class ShoebotCmd(cmd.Cmd):
             name, value = [part.strip() for part in line.split("=")]
             if name not in self.bot._vars:  # noqa
                 self.print_response(
-                    "No such variable %s enter vars to see available vars" % name
+                    f"No such variable {name} enter vars to see available vars"
                 )
                 return
             variable = self.bot._vars[name]

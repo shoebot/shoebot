@@ -9,7 +9,7 @@ class TuioObject(object):
         pass
         
     def __repr__(self):
-        return "<%s %s> " % (self.__class__.__name__, self.label)
+        return f"<{self.__class__.__name__} {self.label}> "
 
     def update(self):
         """The method which gets executed when a new state of the object was
@@ -64,6 +64,6 @@ class Tuio2DObject(TuioObject):
             raise UpdateError
     
     def _label(self):
-        return "%s, %s degrees" % (str(self.id), str(int(self.angle)))
+        return f"{str(self.id)}, {str(int(self.angle))} degrees"
 
     label = property(_label)

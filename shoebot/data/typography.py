@@ -79,7 +79,7 @@ except ValueError as no_pango:
             if item == "Weight":
                 return FakePango.Weight
 
-            raise NotImplementedError("FakePango does not implement %s" % item)
+            raise NotImplementedError(f"FakePango does not implement {item}")
 
     Pango = FakePango()
     PangoCairo = FakePango()

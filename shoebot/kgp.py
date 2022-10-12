@@ -145,7 +145,7 @@ class KantGenerator(object):
         standaloneXrefs = [e for e in list(self.refs.keys()) if e not in xrefs]
         if not standaloneXrefs:
             raise NoSourceError("can't guess source, and no source specified")
-        return '<xref id="%s"/>' % random.choice(standaloneXrefs)
+        return f'<xref id="{random.choice(standaloneXrefs)}"/>'
 
     def reset(self):
         """reset parser."""
@@ -176,10 +176,9 @@ class KantGenerator(object):
         chosen = random.choice(choices)
         if _debug:
             sys.stderr.write(
-                "%s available choices: %s\n"
-                % (len(choices), [e.toxml() for e in choices])
+                f"{len(choices)} available choices: {[e.toxml() for e in choices]}\n"
             )
-            sys.stderr.write("Chosen: %s\n" % chosen.toxml())
+            sys.stderr.write(f"Chosen: {chosen.toxml()}\n")
         return chosen
 
     def parse(self, node):
@@ -193,7 +192,7 @@ class KantGenerator(object):
         type of node we're parsing ("parse_Element" for an Element node,
         "parse_Text" for a Text node, etc.) and then calls the method.
         """
-        parseMethod = getattr(self, "parse_%s" % node.__class__.__name__)
+        parseMethod = getattr(self, f"parse_{node.__class__.__name__}")
         parseMethod(node)
 
     def parse_Document(self, node):
@@ -230,7 +229,7 @@ class KantGenerator(object):
         a method name based on the name of the element ("do_xref" for an
         <xref> tag, etc.) and call the method.
         """
-        handlerMethod = getattr(self, "do_%s" % node.tagName)
+        handlerMethod = getattr(self, f"do_{node.tagName}")
         handlerMethod(node)
 
     def parse_Comment(self, node):

@@ -154,7 +154,7 @@ class VarWindow(object):
         """
         widget = self.widgets.get(name)
         if widget is None:
-            return False, "No widget found matching, {}".format(name)
+            return False, f"No widget found matching, {name}"
 
         try:
             if isinstance(widget, Gtk.CheckButton):
