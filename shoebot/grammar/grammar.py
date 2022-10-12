@@ -34,13 +34,12 @@ DEFAULT_ANIMATION_SPEED = 60.0
 
 
 class Grammar(object):
-    """
-    A Bot is an interface to receive user commands (through scripts or direct
-    calls) and pass them to a canvas for drawing.
+    """A Bot is an interface to receive user commands (through scripts or
+    direct calls) and pass them to a canvas for drawing.
 
-    Bae class for all Grammars, contains just the machinery for running the
-    grammars, it has only the private API and nothing else, except for
-    run which is called to actually run the Bot.
+    Bae class for all Grammars, contains just the machinery for running
+    the grammars, it has only the private API and nothing else, except
+    for run which is called to actually run the Bot.
     """
 
     def __init__(self, canvas, namespace=None, vars=None):
@@ -75,8 +74,7 @@ class Grammar(object):
         self._namespace["PAGENUM"] = frame
 
     def _load_namespace(self, namespace, filename=None):
-        """
-        Initialise bot namespace with info in shoebot.data
+        """Initialise bot namespace with info in shoebot.data.
 
         :param filename: Will be set to __file__ in the namespace
         """
@@ -114,11 +112,11 @@ class Grammar(object):
         verbose=False,
     ):
         def message_listener(event=None):
-            """
-            Shoebot uses a pub/sub architecture to communicate between the different components such
-            as the bot, GUI and command interface.
+            """Shoebot uses a pub/sub architecture to communicate between the
+            different components such as the bot, GUI and command interface.
 
-            This function is called when a message is received, it is put on a queue.
+            This function is called when a message is received, it is
+            put on a queue.
             """
             self._event_queue.put_nowait(event)
 
@@ -234,8 +232,8 @@ class Grammar(object):
             return False
 
     def _handle_events(self, iteration, is_animation, next_frame_due):
-        """
-        The Shoebot mainloop, GUI and shell communicate with each other using events.
+        """The Shoebot mainloop, GUI and shell communicate with each other
+        using events.
 
         Examples include live variables being changed from the GUI, the shell
         or Shoebot itself, or the user quitting from the GUI.

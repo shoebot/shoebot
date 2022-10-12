@@ -19,8 +19,7 @@ from shoebot.data import RGB, MOVETO
 
 class cache(dict):
 
-    """ Caches BezierPaths from parsed SVG data.
-    """
+    """Caches BezierPaths from parsed SVG data."""
 
     def id(self, svg):
         hash = md5.new()
@@ -54,9 +53,7 @@ _cache = cache()
 #### SVG PARSER ######################################################################################
 
 def parse(svg, cached=False, _copy=True):
-
-    """ Returns cached copies unless otherwise specified.
-    """
+    """Returns cached copies unless otherwise specified."""
 
     if not cached:
         dom = parser.parseString(svg)
@@ -83,9 +80,7 @@ def parse_as_dict(svg, cached=False, _copy=True):
     return paths_dict
 
 def get_attribute(element, attribute, default=0):
-
-    """ Returns XML element's attribute, or default if none.
-    """
+    """Returns XML element's attribute, or default if none."""
 
     a = element.getAttribute(attribute)
     if a == "":
@@ -95,14 +90,11 @@ def get_attribute(element, attribute, default=0):
 #--- XML NODE ----------------------------------------------------------------------------------------
 
 def parse_node(node, paths=[], ignore=["pattern"]):
+    """Recurse the node tree and find drawable tags.
 
-    """ Recurse the node tree and find drawable tags.
-
-    Recures all the children in the node.
-    If a child is something we can draw,
-    a line, rect, oval or path,
-    parse it to a PathElement drawable with drawpath()
-
+    Recures all the children in the node. If a child is something we can
+    draw, a line, rect, oval or path, parse it to a PathElement drawable
+    with drawpath()
     """
 
     # Ignore paths in Illustrator pattern swatches etc.
@@ -139,7 +131,6 @@ def parse_node(node, paths=[], ignore=["pattern"]):
 #--- LINE --------------------------------------------------------------------------------------------
 
 def parse_line(e):
-
     x1 = float(get_attribute(e, "x1"))
     y1 = float(get_attribute(e, "y1"))
     x2 = float(get_attribute(e, "x2"))
@@ -150,7 +141,6 @@ def parse_line(e):
 #--- RECT --------------------------------------------------------------------------------------------
 
 def parse_rect(e):
-
     x = float(get_attribute(e, "x"))
     y = float(get_attribute(e, "y"))
     w = float(get_attribute(e, "width"))
@@ -161,7 +151,6 @@ def parse_rect(e):
 #--- CIRCLE -----------------------------------------------------------------------------------------
 
 def parse_circle(e):
-
     x = float(get_attribute(e, "cx"))
     y = float(get_attribute(e, "cy"))
     r = float(get_attribute(e, "r"))
@@ -171,7 +160,6 @@ def parse_circle(e):
 #--- OVAL -------------------------------------------------------------------------------------------
 
 def parse_oval(e):
-
     x = float(get_attribute(e, "cx"))
     y = float(get_attribute(e, "cy"))
     w = float(get_attribute(e, "rx"))*2
@@ -182,7 +170,6 @@ def parse_oval(e):
 #--- POLYGON -----------------------------------------------------------------------------------------
 
 def parse_polygon(e):
-
     d = get_attribute(e, "points", default="")
     d = d.replace(" ", ",")
     d = d.replace("-", ",")
@@ -204,7 +191,6 @@ def parse_polygon(e):
 #--- PATH --------------------------------------------------------------------------------------------
 
 def parse_path(e):
-
     d = get_attribute(e, "d", default="")
 
     # Divide the path data string into segments.
@@ -403,12 +389,10 @@ def parse_path(e):
 #--- PATH TRANSFORM ----------------------------------------------------------------------------------
 
 def parse_transform(e, path):
-
-    """ Transform the path according to a defined matrix.
+    """Transform the path according to a defined matrix.
 
     Attempts to extract a transform="matrix()|translate()" attribute.
     Transforms the path accordingly.
-
     """
 
     t = get_attribute(e, "transform", default="")
@@ -438,12 +422,10 @@ def parse_transform(e, path):
 #--- PATH COLOR INFORMATION --------------------------------------------------------------------------
 
 def add_color_info(e, path):
+    """Expand the path with color information.
 
-    """ Expand the path with color information.
-
-    Attempts to extract fill and stroke colors
-    from the element and adds it to path attributes.
-
+    Attempts to extract fill and stroke colors from the element and adds
+    it to path attributes.
     """
 
     _ctx.colormode(RGB, 1.0)

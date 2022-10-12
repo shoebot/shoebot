@@ -27,7 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Abstract canvas class"""
+"""Abstract canvas class."""
 
 from collections import deque
 import abc
@@ -71,24 +71,20 @@ class Canvas(metaclass=abc.ABCMeta):
         self.reset_canvas()
 
     def set_bot(self, bot):
-        """ Bot must be set before running """
+        """Bot must be set before running."""
         self.bot = bot
         self.sink.set_bot(bot)
 
     def get_input_device(self):
-        """ Overrides can return actual input device """
+        """Overrides can return actual input device."""
         return None
 
     def initial_drawqueue(self):
-        """
-        Override to create use special kinds of draw queue
-        """
+        """Override to create use special kinds of draw queue."""
         return DrawQueue()
 
     def initial_transform(self):
-        """
-        Must be overriden to create initial transform matrix
-        """
+        """Must be overriden to create initial transform matrix."""
         pass
 
     @abc.abstractproperty
@@ -105,16 +101,13 @@ class Canvas(metaclass=abc.ABCMeta):
         self.matrix_stack = deque()
 
     def settings(self, **kwargs):
-        """
-        Pass a load of settings into the canvas
-        """
+        """Pass a load of settings into the canvas."""
         for k, v in list(kwargs.items()):
             setattr(self, k, v)
 
     def size_or_default(self):
-        """
-        If size is not set, otherwise set size to DEFAULT_SIZE
-        and return it.
+        """If size is not set, otherwise set size to DEFAULT_SIZE and return
+        it.
 
         This means, only the first call to size() is valid.
         """
@@ -123,8 +116,7 @@ class Canvas(metaclass=abc.ABCMeta):
         return self.size
 
     def set_size(self, size):
-        """
-        Size is only set the first time it is called
+        """Size is only set the first time it is called.
 
         Size that is set is returned
         """
@@ -147,8 +139,7 @@ class Canvas(metaclass=abc.ABCMeta):
         return f"{basename}_{frame:04}.{extension}"
 
     def snapshot(self, target, defer=True, file_number=None):
-        """
-        Ask the drawqueue to output to target.
+        """Ask the drawqueue to output to target.
 
         target can be anything supported by the combination
         of canvas implementation and drawqueue implmentation.
@@ -165,14 +156,12 @@ class Canvas(metaclass=abc.ABCMeta):
             self._drawqueue.append_immediate(output_func)
 
     def flush(self, frame):
-        """
-        Passes the drawqueue to the sink for rendering
-        """
+        """Passes the drawqueue to the sink for rendering."""
         self.sink.render(self.size_or_default(), frame, self._drawqueue)
         self.reset_drawqueue()
 
     def deferred_render(self, render_func):
-        """Add a render function to the queue for rendering later"""
+        """Add a render function to the queue for rendering later."""
         self._drawqueue.append(render_func)
 
     width = property(get_width)

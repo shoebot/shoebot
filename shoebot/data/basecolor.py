@@ -220,9 +220,9 @@ class Color(object):
     def __getattr__(self, a):
 
         """Available properties:
-        r, g, b, a or red, green, blue, alpha
-        h, s or hue, saturation, brightness
 
+        r, g, b, a or red, green, blue, alpha h, s or hue, saturation,
+        brightness
         """
         if a in self.__dict__:
             return a
@@ -265,12 +265,11 @@ class Color(object):
 
 
 class ColorMixin(object):
-    """
-    Mixin class for color support.
-    Adds fill, stroke and blending mode attributes to the class.
+    """Mixin class for color support. Adds fill, stroke and blending mode
+    attributes to the class.
 
-    Setting color attributes, will convert them to Color instances, allowing
-    them to be specfied in other ways, such as   fill="#123456"
+    Setting color attributes, will convert them to Color instances,
+    allowing them to be specfied in other ways, such as   fill="#123456"
     """
 
     def __init__(
@@ -447,7 +446,6 @@ def lab_to_rgb(l, a, b):
 
     Algorithm adopted from:
     http://www.easyrgb.com/math.php
-
     """
 
     y = (l + 16) / 116.0
@@ -484,6 +482,7 @@ lab2rgb = lab_to_rgb
 
 def hsv_to_rgb(h, s, v):
     """Hue, saturation, brightness to red, green, blue.
+
     http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
     Results will differ from the way NSColor converts color spaces.
     """

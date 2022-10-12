@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kant Generator for Python
+"""Kant Generator for Python.
 
 Generates mock philosophy based on a context-free grammar
 
@@ -37,7 +37,7 @@ _debug = 0
 
 
 def openAnything(source, searchpaths=None):
-    """URI, filename, or string --> stream
+    """URI, filename, or string --> stream.
 
     This function lets you define parsers that take any input source
     (URL, pathname to local or network file, or actual data as a string)
@@ -92,7 +92,7 @@ class NoSourceError(Exception):
 
 
 class KantGenerator(object):
-    """generates mock philosophy based on a context-free grammar"""
+    """generates mock philosophy based on a context-free grammar."""
 
     def __init__(self, grammar, source=None, searchpaths=None):
         self.loadGrammar(grammar, searchpaths=searchpaths)
@@ -102,7 +102,7 @@ class KantGenerator(object):
         self.refresh()
 
     def _load(self, source, searchpaths=None):
-        """load XML input source, return parsed XML document
+        """load XML input source, return parsed XML document.
 
         - a URL of a remote XML file ("http://diveintopython.org/kant.xml")
         - a filename of a local XML file ("~/diveintopython/common/py/kant.xml")
@@ -117,18 +117,18 @@ class KantGenerator(object):
         return xmldoc
 
     def loadGrammar(self, grammar, searchpaths=None):
-        """load context-free grammar"""
+        """load context-free grammar."""
         self.grammar = self._load(grammar, searchpaths=searchpaths)
         self.refs = {}
         for ref in self.grammar.getElementsByTagName("ref"):
             self.refs[ref.attributes["id"].value] = ref
 
     def loadSource(self, source, searchpaths=None):
-        """load source"""
+        """load source."""
         self.source = self._load(source, searchpaths=searchpaths)
 
     def getDefaultSource(self):
-        """guess default source of the current grammar
+        """guess default source of the current grammar.
 
         The default source will be one of the <ref>s that is not
         cross-referenced.  This sounds complicated but it's not.
@@ -148,27 +148,27 @@ class KantGenerator(object):
         return '<xref id="%s"/>' % random.choice(standaloneXrefs)
 
     def reset(self):
-        """reset parser"""
+        """reset parser."""
         self.pieces = []
         self.capitalizeNextWord = 0
 
     def refresh(self):
-        """reset output buffer, re-parse entire source file, and return output
+        """reset output buffer, re-parse entire source file, and return output.
 
         Since parsing involves a good deal of randomness, this is an
-        easy way to get new output without having to reload a grammar file
-        each time.
+        easy way to get new output without having to reload a grammar
+        file each time.
         """
         self.reset()
         self.parse(self.source)
         return self.output()
 
     def output(self):
-        """output generated text"""
+        """output generated text."""
         return "".join(self.pieces)
 
     def randomChildElement(self, node):
-        """choose a random child element of a node
+        """choose a random child element of a node.
 
         This is a utility method used by do_xref and do_choice.
         """
@@ -183,35 +183,35 @@ class KantGenerator(object):
         return chosen
 
     def parse(self, node):
-        """parse a single XML node
+        """parse a single XML node.
 
-        A parsed XML document (from minidom.parse) is a tree of nodes
-        of various types.  Each node is represented by an instance of the
-        corresponding Python class (Element for a tag, Text for
-        text data, Document for the top-level document).  The following
-        statement constructs the name of a class method based on the type
-        of node we're parsing ("parse_Element" for an Element node,
+        A parsed XML document (from minidom.parse) is a tree of nodes of
+        various types.  Each node is represented by an instance of the
+        corresponding Python class (Element for a tag, Text for text
+        data, Document for the top-level document).  The following
+        statement constructs the name of a class method based on the
+        type of node we're parsing ("parse_Element" for an Element node,
         "parse_Text" for a Text node, etc.) and then calls the method.
         """
         parseMethod = getattr(self, "parse_%s" % node.__class__.__name__)
         parseMethod(node)
 
     def parse_Document(self, node):
-        """parse the document node
+        """parse the document node.
 
-        The document node by itself isn't interesting (to us), but
-        its only child, node.documentElement, is: it's the root node
-        of the grammar.
+        The document node by itself isn't interesting (to us), but its
+        only child, node.documentElement, is: it's the root node of the
+        grammar.
         """
         self.parse(node.documentElement)
 
     def parse_Text(self, node):
-        """parse a text node
+        """parse a text node.
 
         The text of a text node is usually added to the output buffer
-        verbatim.  The one exception is that <p class='sentence'> sets
-        a flag to capitalize the first letter of the next word.  If
-        that flag is set, we capitalize the text and reset the flag.
+        verbatim. The one exception is that <p class='sentence'> sets a
+        flag to capitalize the first letter of the next word.  If that
+        flag is set, we capitalize the text and reset the flag.
         """
         text = node.data
         if self.capitalizeNextWord:
@@ -222,37 +222,36 @@ class KantGenerator(object):
             self.pieces.append(text)
 
     def parse_Element(self, node):
-        """parse an element
+        """parse an element.
 
-        An XML element corresponds to an actual tag in the source:
-        <xref id='...'>, <p chance='...'>, <choice>, etc.
-        Each element type is handled in its own method.  Like we did in
-        parse(), we construct a method name based on the name of the
-        element ("do_xref" for an <xref> tag, etc.) and
-        call the method.
+        An XML element corresponds to an actual tag in the source: <xref
+        id='...'>, <p chance='...'>, <choice>, etc. Each element type is
+        handled in its own method.  Like we did in parse(), we construct
+        a method name based on the name of the element ("do_xref" for an
+        <xref> tag, etc.) and call the method.
         """
         handlerMethod = getattr(self, "do_%s" % node.tagName)
         handlerMethod(node)
 
     def parse_Comment(self, node):
-        """parse a comment
+        """parse a comment.
 
         The grammar can contain XML comments, but we ignore them
         """
         pass
 
     def do_xref(self, node):
-        """handle <xref id='...'> tag
+        """handle <xref id='...'> tag.
 
         An <xref id='...'> tag is a cross-reference to a <ref id='...'>
-        tag.  <xref id='sentence'/> evaluates to a randomly chosen child of
-        <ref id='sentence'>.
+        tag. <xref id='sentence'/> evaluates to a randomly chosen child
+        of <ref id='sentence'>.
         """
         id = node.attributes["id"].value
         self.parse(self.randomChildElement(self.refs[id]))
 
     def do_p(self, node):
-        """handle <p> tag
+        """handle <p> tag.
 
         The <p> tag is the core of the grammar.  It can contain almost
         anything: freeform text, <choice> tags, <xref> tags, even other
@@ -276,10 +275,10 @@ class KantGenerator(object):
                 self.parse(child)
 
     def do_choice(self, node):
-        """handle <choice> tag
+        """handle <choice> tag.
 
-        A <choice> tag contains one or more <p> tags.  One <p> tag
-        is chosen at random and evaluated; the rest are ignored.
+        A <choice> tag contains one or more <p> tags.  One <p> tag is
+        chosen at random and evaluated; the rest are ignored.
         """
         self.parse(self.randomChildElement(node))
 

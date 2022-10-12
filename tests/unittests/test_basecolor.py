@@ -8,11 +8,10 @@ from shoebot.data.basecolor import Color
 
 class TestBaseColor(unittest.TestCase):
     def assertColorAlmostEqualsRGBA(self, actual_color, expected_rgba, message=None):
-        """
-        This is ported from Nodebox 1 colors lib and improved.
+        """This is ported from Nodebox 1 colors lib and improved.
 
-        Check if difference is bigger than 0.0001, since floats
-        are tricky things and behave a bit weird when comparing directly
+        Check if difference is bigger than 0.0001, since floats are
+        tricky things and behave a bit weird when comparing directly
         """
         almost_equal = True
         for actual_channel, expected_channel in zip(actual_color, expected_rgba):
@@ -75,9 +74,7 @@ class TestBaseColor(unittest.TestCase):
         ]
     )
     def test_rgb_color_formats(self, input_color, expected_rgba):
-        """
-        Test input colors in the RGB(A) colour space.
-        """
+        """Test input colors in the RGB(A) colour space."""
         # This test was ported from nodebox 1, and could probably
         # be split into seperate tests.
         actual_color = Color(input_color, color_range=255)
@@ -85,9 +82,7 @@ class TestBaseColor(unittest.TestCase):
         self.assertColorAlmostEqualsRGBA(actual_color, expected_rgba)
 
     def test_hsb_color_mode(self):
-        """
-        Test HSB colour mode results in expected RGBA colour.
-        """
+        """Test HSB colour mode results in expected RGBA colour."""
         expected_rgba = 0.050, 0.100, 0.100, 1.000
         actual_rgba = Color(0.5, 0.5, 0.1, mode="hsb")
 

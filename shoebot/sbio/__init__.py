@@ -1,5 +1,4 @@
-"""
-Modules that allow communication wih shoebot from other programmes.
+"""Modules that allow communication wih shoebot from other programmes.
 
 shell         provides a commandline shell, that IDEs can use to provide livecoding
               and other control of a running bot, such as framerate and changing

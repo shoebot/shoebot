@@ -27,8 +27,7 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
-Data structures for use in Shoebot
+"""Data structures for use in Shoebot.
 
 These are 'agnostic' classes for representing primitive shapes, paths, colors,
 transforms, text and image objects, live variables and user interaction
@@ -36,7 +35,6 @@ elements (such as pointing devices).
 
 The drawing objects could benefit from an actual, proper Python library to
 handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
-
 """
 import sys
 

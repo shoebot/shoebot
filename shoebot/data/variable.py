@@ -11,7 +11,7 @@ def clamp(minvalue, value, maxvalue):
 
 
 class Variable(object):
-    """Taken from Nodebox"""
+    """Taken from Nodebox."""
 
     def __init__(self, name, type, **kwargs):
         """Creates a live variable, which can be manipulated using the
@@ -63,7 +63,7 @@ class Variable(object):
             self.value = self.default
 
     def sanitize(self, val):
-        """Given a Variable and a value, cleans it out"""
+        """Given a Variable and a value, cleans it out."""
         if self.type == NUMBER:
             try:
                 return clamp(self.min, self.max, float(val))
@@ -82,6 +82,7 @@ class Variable(object):
 
     def compliesTo(self, v):
         """Return whether I am compatible with the given var:
+
         - Type should be the same
         - My value should be inside the given vars' min/max range.
         """

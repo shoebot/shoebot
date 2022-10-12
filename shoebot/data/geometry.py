@@ -55,7 +55,9 @@ except:
 
 
 def lerp(a, b, t):
-    """Returns the linear interpolation between a and b for time t between 0.0-1.0.
+    """Returns the linear interpolation between a and b for time t between
+    0.0-1.0.
+
     For example: lerp(100, 200, 0.5) => 150.
     """
     if t < 0.0:
@@ -66,9 +68,11 @@ def lerp(a, b, t):
 
 
 def smoothstep(a, b, x):
-    """Returns a smooth transition between 0.0 and 1.0 using Hermite interpolation (cubic spline),
-    where x is a number between a and b. The return value will ease (slow down) as x nears a or b.
-    For x smaller than a, returns 0.0. For x bigger than b, returns 1.0.
+    """Returns a smooth transition between 0.0 and 1.0 using Hermite
+    interpolation (cubic spline), where x is a number between a and b.
+
+    The return value will ease (slow down) as x nears a or b. For x
+    smaller than a, returns 0.0. For x bigger than b, returns 1.0.
     """
     if x < a:
         return 0.0
@@ -86,7 +90,9 @@ def clamp(v, a, b):
 
 
 def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
-    """Determines the intersection point of two lines, or two finite line segments if infinite=False.
+    """Determines the intersection point of two lines, or two finite line
+    segments if infinite=False.
+
     When the lines do not intersect, returns an empty list.
     """
     # Based on: P. Bourke, http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
@@ -110,6 +116,7 @@ def line_line_intersection(x1, y1, x2, y2, x3, y3, x4, y4, infinite=False):
 
 def circle_line_intersection(cx, cy, radius, x1, y1, x2, y2, infinite=False):
     """Returns a list of points where the circle and the line intersect.
+
     Returns an empty list when the circle and the line do not intersect.
     """
     # Based on: http://www.vb-helper.com/howto_net_line_circle_intersections.html
@@ -149,11 +156,12 @@ def intersection(*args, **kwargs):
 
 def point_in_polygon(points, x, y):
     """Ray casting algorithm.
+
     Determines how many times a horizontal ray starting from the point
-    intersects with the sides of the polygon.
-    If it is an even number of times, the point is outside, if odd, inside.
-    The algorithm does not always report correctly when the point is very close to the boundary.
-    The polygon is passed as a list of (x,y)-tuples.
+    intersects with the sides of the polygon. If it is an even number of
+    times, the point is outside, if odd, inside. The algorithm does not
+    always report correctly when the point is very close to the
+    boundary. The polygon is passed as a list of (x,y)-tuples.
     """
     odd = False
     n = len(points)
@@ -175,9 +183,11 @@ def point_in_polygon(points, x, y):
 
 class AffineTransform:
     def __init__(self, transform=None):
-        """A geometric transformation in Euclidean space (i.e. 2D)
-        that preserves collinearity and ratio of distance between points.
-        Linear transformations include rotation, translation, scaling, shear.
+        """A geometric transformation in Euclidean space (i.e. 2D) that
+        preserves collinearity and ratio of distance between points.
+
+        Linear transformations include rotation, translation, scaling,
+        shear.
         """
         if isinstance(transform, AffineTransform):
             self.matrix = list(transform.matrix)
@@ -197,6 +207,7 @@ class AffineTransform:
 
     def _mmult(self, a, b):
         """Returns the 3x3 matrix multiplication of A and B.
+
         Note that scale(), translate(), rotate() work with premultiplication,
         e.g. the matrix A followed by B = BA and not AB.
         """
@@ -326,7 +337,9 @@ class Point(object):
 class Bounds:
     def __init__(self, x, y, width, height):
         """Creates a bounding box.
-        The bounding box is an untransformed rectangle that encompasses a shape or group of shapes.
+
+        The bounding box is an untransformed rectangle that encompasses
+        a shape or group of shapes.
         """
         # context.Layer does not always have a width or height defined (i.e. infinite layer):
         if width == None:
@@ -358,6 +371,7 @@ class Bounds:
 
     def intersection(self, b):
         """Returns bounds that encompass the intersection of the two.
+
         If there is no overlap between the two, None is returned.
         """
         if not self.intersects(b):
@@ -381,7 +395,8 @@ class Bounds:
         )
 
     def contains(self, *a):
-        """Returns True if the given point or rectangle falls within the bounds."""
+        """Returns True if the given point or rectangle falls within the
+        bounds."""
         if len(a) == 2:
             a = [Point(a[0], a[1])]
         if len(a) == 1:

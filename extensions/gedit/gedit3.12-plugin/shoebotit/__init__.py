@@ -172,8 +172,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
             self.changed_handler_id = None
 
     def get_source(self, doc):
-        """
-        Grab contents of 'doc' and return it
+        """Grab contents of 'doc' and return it.
 
         :param doc: The active document
         :return:

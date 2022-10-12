@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""A Python library that understands the TUIO protocol"""
+"""A Python library that understands the TUIO protocol."""
 
 __author__    = "Jannis Leidel"
 __version__   = "0.1"
@@ -31,9 +31,9 @@ class Tracking(object):
         self.profiles = self.load_profiles()
 
     def open_socket(self):
-        """
-        Opens the socket and binds to the given host and port. Uses
-        SO_REUSEADDR to be as robust as possible.
+        """Opens the socket and binds to the given host and port.
+
+        Uses SO_REUSEADDR to be as robust as possible.
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -42,23 +42,17 @@ class Tracking(object):
     start = open_socket
 
     def close_socket(self):
-        """
-        Closes the socket connection
-        """
+        """Closes the socket connection."""
         self.socket.close()
     stop = close_socket
 
     def refreshed(self):
-        """
-        Returns True if there was a new frame
-        """
+        """Returns True if there was a new frame."""
         return self.current_frame >= self.last_frame
     
     def load_profiles(self):
-        """
-        Loads all possible TUIO profiles and returns a dictionary with the
-        profile addresses as keys and an instance of a profile as the value 
-        """
+        """Loads all possible TUIO profiles and returns a dictionary with the
+        profile addresses as keys and an instance of a profile as the value."""
         _profiles = {}
         for name, klass in inspect.getmembers(profiles):
             if inspect.isclass(klass) and name.endswith('Profile') and name != 'TuioProfile':
@@ -75,7 +69,8 @@ class Tracking(object):
         return _profiles
     
     def get_profile(self, profile):
-        """Returns a specific profile from the profile list and otherwise None"""
+        """Returns a specific profile from the profile list and otherwise
+        None."""
         return self.profiles.get(profile, None)
     
     def get_helpers(self):
@@ -84,19 +79,15 @@ class Tracking(object):
         return list([profile.list_label for profile in list(self.profiles.values())])
 
     def update(self):
-        """
-        Tells the connection manager to receive the next 1024 byte of messages
-        to analyze.
-        """
+        """Tells the connection manager to receive the next 1024 byte of
+        messages to analyze."""
         try:
             self.manager.handle(self.socket.recv(1024))
         except socket.error:
             pass
 
     def callback(self, *incoming):
-        """
-        Gets called by the CallbackManager if a new message was received 
-        """
+        """Gets called by the CallbackManager if a new message was received."""
         message = incoming[0]
         if message:
             address, command = message[0], message[2]

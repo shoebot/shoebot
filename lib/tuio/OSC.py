@@ -36,7 +36,7 @@ import pprint
 import types
 
 def hexDump(bytes):
-    """Useful utility; prints the string in hexadecimal"""
+    """Useful utility; prints the string in hexadecimal."""
     for i in range(len(bytes)):
         sys.stdout.write("%2x " % (ord(bytes[i])))
         if (i+1) % 8 == 0:
@@ -71,11 +71,12 @@ class OSCMessage:
         self.message  = ""
 
     def append(self, argument, typehint = None):
-        """Appends data to the message,
-        updating the typetags based on
-        the argument's type.
-        If the argument is a blob (counted string)
-        pass in 'b' as typehint."""
+        """Appends data to the message, updating the typetags based on the
+        argument's type.
+
+        If the argument is a blob (counted string) pass in 'b' as
+        typehint.
+        """
 
         if typehint == 'b':
             binary = OSCBlob(argument)
@@ -86,7 +87,10 @@ class OSCMessage:
         self.rawAppend(binary[1])
 
     def rawAppend(self, data):
-        """Appends raw data to the message.  Use append()."""
+        """Appends raw data to the message.
+
+        Use append().
+        """
         self.message = self.message + data
 
     def getBinary(self):
@@ -124,8 +128,8 @@ def readInt(data):
 
 
 def readLong(data):
-    """Tries to interpret the next 8 bytes of the data
-    as a 64-bit signed integer."""
+    """Tries to interpret the next 8 bytes of the data as a 64-bit signed
+    integer."""
     high, low = struct.unpack(">ll", data[0:8])
     big = (int(high) << 32) + low
     rest = data[8:]
@@ -146,8 +150,7 @@ def readFloat(data):
 
 
 def OSCBlob(next):
-    """Convert a string into an OSC Blob,
-    returning a (typetag, data) tuple."""
+    """Convert a string into an OSC Blob, returning a (typetag, data) tuple."""
 
     if type(next) == type(""):
         length = len(next)
@@ -162,9 +165,8 @@ def OSCBlob(next):
 
 
 def OSCArgument(next):
-    """Convert some Python types to their
-    OSC binary representations, returning a
-    (typetag, data) tuple."""
+    """Convert some Python types to their OSC binary representations, returning
+    a (typetag, data) tuple."""
 
     if type(next) == type(""):
         OSCstringLength = math.ceil((len(next)+1) / 4.0) * 4
@@ -184,9 +186,8 @@ def OSCArgument(next):
 
 
 def parseArgs(args):
-    """Given a list of strings, produces a list
-    where those strings have been parsed (where
-    possible) as floats or integers."""
+    """Given a list of strings, produces a list where those strings have been
+    parsed (where possible) as floats or integers."""
     parsed = []
     for arg in args:
         print(arg)
@@ -238,22 +239,23 @@ def decodeOSC(data):
 class CallbackManager:
     """This utility class maps OSC addresses to callables.
 
-    The CallbackManager calls its callbacks with a list
-    of decoded OSC arguments, including the address and
-    the typetags as the first two arguments."""
+    The CallbackManager calls its callbacks with a list of decoded OSC
+    arguments, including the address and the typetags as the first two
+    arguments.
+    """
 
     def __init__(self):
         self.callbacks = {}
         self.add(self.unbundler, "#bundle")
 
     def handle(self, data, source = None):
-        """Given OSC data, tries to call the callback with the
-        right address."""
+        """Given OSC data, tries to call the callback with the right
+        address."""
         decoded = decodeOSC(data)
         self.dispatch(decoded, source)
 
     def dispatch(self, message, source = None):
-        """Sends decoded OSC data to an appropriate calback"""
+        """Sends decoded OSC data to an appropriate calback."""
         msgtype = ""
         try:
             if type(message[0]) == str:
@@ -275,9 +277,8 @@ class CallbackManager:
         return
 
     def add(self, callback, name):
-        """Adds a callback to our set of callbacks,
-        or removes the callback with name if callback
-        is None."""
+        """Adds a callback to our set of callbacks, or removes the callback
+        with name if callback is None."""
         if callback == None:
             del self.callbacks[name]
         else:

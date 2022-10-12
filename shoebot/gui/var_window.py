@@ -50,8 +50,8 @@ class VarWindow(object):
             self.window.set_title(title)
 
     def add_variables(self):
-        """
-        Add all widgets to specified vbox
+        """Add all widgets to specified vbox.
+
         :param container:
         :return:
         """
@@ -170,7 +170,7 @@ class VarWindow(object):
             return False, str(e)
 
     def widget_changed(self, widget, v):
-        """ Called when a slider is adjusted. """
+        """Called when a slider is adjusted."""
         # set the appropriate bot var
         if v.type is NUMBER:
             self.bot._namespace[v.name] = widget.get_value()
@@ -184,9 +184,7 @@ class VarWindow(object):
         publish_event(VARIABLE_CHANGED_EVENT, v)
 
     def var_added(self, v):
-        """
-        var was added in the bot while it ran, possibly
-        by livecoding
+        """var was added in the bot while it ran, possibly by livecoding.
 
         :param v:
         :return:
@@ -197,8 +195,7 @@ class VarWindow(object):
         self.window.show_all()
 
     def var_deleted(self, v):
-        """
-        var was added in the bot
+        """var was added in the bot.
 
         :param v:
         :return:

@@ -4,9 +4,7 @@ import traceback
 
 
 def simple_traceback(ex, source):
-    """
-    Format traceback, showing line number and surrounding source.
-    """
+    """Format traceback, showing line number and surrounding source."""
     exc_type, exc_value, exc_tb = sys.exc_info()
     exc = traceback.format_exception(exc_type, exc_value, exc_tb)
 

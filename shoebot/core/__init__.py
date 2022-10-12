@@ -27,12 +27,10 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
-Shoebot core elements
+"""Shoebot core elements.
 
-This file uses code from Nodebox (http://www.nodebox.net).
-The relevant code parts are marked with a "Taken from Nodebox" comment.
-
+This file uses code from Nodebox (http://www.nodebox.net). The relevant
+code parts are marked with a "Taken from Nodebox" comment.
 """
 
 from .canvas import Canvas

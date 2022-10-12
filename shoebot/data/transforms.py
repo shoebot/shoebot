@@ -25,10 +25,9 @@ _ = gettext.gettext
 
 
 class Transform:
-    """
-    This class represents a stack of transformations. Supported operations are
-    translation, scaling, rotation and skewing.
+    """This class represents a stack of transformations.
 
+    Supported operations are translation, scaling, rotation and skewing.
     """
 
     def __init__(self, transform=None):
@@ -205,8 +204,11 @@ class Transform:
         return m
 
     def get_matrix(self):
-        """Returns this transform's matrix. Its centerpoint is presumed to be
-        (0,0), which is the Cairo default."""
+        """Returns this transform's matrix.
+
+        Its centerpoint is presumed to be (0,0), which is the Cairo
+        default.
+        """
         return self.get_matrix_with_center(0, 0)
 
     def transformBezierPath(self, path):
@@ -225,7 +227,9 @@ class Transform:
 class TransformMixin(object):
 
     """Mixin class for transformation support.
-    Adds the _transform and _transformmode attributes to the class."""
+
+    Adds the _transform and _transformmode attributes to the class.
+    """
 
     def __init__(self):
         self._reset()

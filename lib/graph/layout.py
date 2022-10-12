@@ -13,9 +13,7 @@ class Point:
 
 
 class layout(object):
-    """
-    Graph visualizer that calculates relative node positions.
-    """
+    """Graph visualizer that calculates relative node positions."""
 
     def __init__(self, graph, iterations=1000):
         self.type = None
@@ -26,9 +24,7 @@ class layout(object):
         self.__bounds = None
 
     def copy(self, graph):
-        """
-        Returns a copy of the layout for the given graph.
-        """
+        """Returns a copy of the layout for the given graph."""
         l = self.__class__(graph, self.n)
         l.i = 0
         return l
@@ -80,9 +76,7 @@ class layout(object):
 
 
 class circle_layout(layout):
-    """
-    Simple layout with nodes arranged on one or more circles.
-    """
+    """Simple layout with nodes arranged on one or more circles."""
 
     def __init__(self, graph, iterations=100):
         layout.__init__(self, graph, iterations)
@@ -163,8 +157,8 @@ class circle_layout(layout):
 
 
 class spring_layout(layout):
-    """
-    A force-based layout in which edges are regarded as springs.
+    """A force-based layout in which edges are regarded as springs.
+
     http://snipplr.com/view/1950/graph-javascript-framework-version-001/
     """
 

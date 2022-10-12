@@ -1,7 +1,5 @@
-"""
-The pubsub library enables communication between the GUI parts of shoebot
-and the commandline shell.
-"""
+"""The pubsub library enables communication between the GUI parts of shoebot
+and the commandline shell."""
 
 import collections
 from pubsub import pub
@@ -28,8 +26,7 @@ REDRAW_EVENT = "redraw"
 
 
 def publish_event(event_t, data=None):
-    """
-    Publish an event ot any subscribers.
+    """Publish an event ot any subscribers.
 
     :param event_t:  event type
     :param data:     event data

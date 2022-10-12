@@ -12,24 +12,18 @@ class TuioObject(object):
         return "<%s %s> " % (self.__class__.__name__, self.label)
 
     def update(self):
-        """
-        The method which gets executed when a new state of the object was
-        received.
-        """
+        """The method which gets executed when a new state of the object was
+        received."""
         raise NotImplementedError
 
     def _label(self):
-        """
-        The text that should be shown in the object reprentation.
-        """
+        """The text that should be shown in the object reprentation."""
         raise NotImplementedError
 
     label = property(_label)
 
 class Tuio2DCursor(TuioObject):
-    """
-    An abstract object representing a cursor, e.g. a finger.
-    """
+    """An abstract object representing a cursor, e.g. a finger."""
     def __init__(self, sessionid):
         super(Tuio2DCursor, self).__init__(sessionid)
         self.sessionid = sessionid
@@ -48,9 +42,7 @@ class Tuio2DCursor(TuioObject):
     label = property(_label)
 
 class Tuio2DObject(TuioObject):
-    """
-    An abstract object representing a fiducial.
-    """
+    """An abstract object representing a fiducial."""
     def __init__(self, objectid, sessionid):
         super(Tuio2DObject, self).__init__(objectid, sessionid)
         self.id = objectid

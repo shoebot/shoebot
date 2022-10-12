@@ -1,6 +1,4 @@
-"""
-gobject-based socket server from
-http://roscidus.com/desktop/node/413
+"""gobject-based socket server from http://roscidus.com/desktop/node/413.
 
 Handles interaction when connecting over a socket, e.g. telnet.
 The actual handling of commands is passed to te shell module.
@@ -55,8 +53,8 @@ INTRO = "[o_o] " + '"Shoebot Telnet Shell, enter "help" for help."'
 
 
 def create_listening_socket(host, port, handler):
-    """
-    Create socket and set listening options
+    """Create socket and set listening options.
+
     :param host:
     :param port:
     :param handler:
@@ -80,7 +78,10 @@ class SocketServer(object):
         self.bot = bot
 
     def listener(self, sock, *args):
-        """Asynchronous connection listener. Starts a handler for each connection."""
+        """Asynchronous connection listener.
+
+        Starts a handler for each connection.
+        """
         conn, addr = sock.accept()
         f = conn.makefile("rw")
         self.shell = ShoebotCmd(self.bot, stdin=f, stdout=f, intro=INTRO)
@@ -93,11 +94,10 @@ class SocketServer(object):
         return True
 
     def handler(self, conn, *args):
-        """
-        Asynchronous connection handler.
+        """Asynchronous connection handler.
 
-        Processes each lines from the socket, sending it
-        to be processed by the commandline shell handler.
+        Processes each lines from the socket, sending it to be processed
+        by the commandline shell handler.
         """
         # lines from cmd.Cmd
         self.shell.stdout.write(self.shell.prompt)

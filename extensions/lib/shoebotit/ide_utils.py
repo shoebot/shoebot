@@ -1,10 +1,8 @@
-"""
-Utility functions for IDEs and plugins.
+"""Utility functions for IDEs and plugins.
 
 The install process should copy this file to the same location as shoebot.
 
 Functions here are expected to work not need shoebot in the library path.
-
 """
 
 try:
@@ -32,10 +30,10 @@ RESPONSE_REVERTED = "REVERTED"
 
 
 class AsynchronousFileReader(threading.Thread):
-    """
-    Helper class to implement asynchronous reading of a file
-    in a separate thread. Pushes read lines on a queue to
-    be consumed in another thread.
+    """Helper class to implement asynchronous reading of a file in a separate
+    thread.
+
+    Pushes read lines on a queue to be consumed in another thread.
     """
 
     def __init__(self, fd, q, althandler=None):
@@ -47,9 +45,7 @@ class AsynchronousFileReader(threading.Thread):
         self._althandler = althandler
 
     def run(self):
-        """
-        The body of the tread: read lines and put them on the queue.
-        """
+        """The body of the tread: read lines and put them on the queue."""
         try:
             for line in iter(self._fd.readline, False):
                 if line is not None:
@@ -66,9 +62,7 @@ class AsynchronousFileReader(threading.Thread):
                 raise
 
     def eof(self):
-        """
-        Check whether there is no more content to expect.
-        """
+        """Check whether there is no more content to expect."""
         return (not self.is_alive()) and self._queue.empty() or self._fd.closed
 
 
@@ -85,12 +79,10 @@ class CommandResponse(
 
 
 class ShoebotProcess(object):
-    """
-    Runs an instance of Shoebot
+    """Runs an instance of Shoebot.
 
     use send_command to control the instance, CommandResponse objects
     come back in the response_queue
-
     """
 
     def __init__(
@@ -216,8 +208,7 @@ class ShoebotProcess(object):
         self.send_command("")
 
     def live_source_load(self, source):
-        """
-        Send new source code to the bot
+        """Send new source code to the bot.
 
         :param source:
         :param good_cb: callback called if code was good
@@ -248,9 +239,7 @@ class ShoebotProcess(object):
         self.process.stdin.flush()
 
     def close(self):
-        """
-        Close outputs of process.
-        """
+        """Close outputs of process."""
         self.process.stdout.close()
         self.process.stderr.close()
         self.running = False
@@ -278,9 +267,7 @@ class ShoebotProcess(object):
                 yield None, line
 
     def get_command_responses(self):
-        """
-        Get responses to commands sent
-        """
+        """Get responses to commands sent."""
         if not self.response_queue.empty():
             yield None
         while not self.response_queue.empty():
@@ -294,8 +281,9 @@ def get_example_dir():
 
 
 def find_example_dir():
-    """
-    Find examples dir .. a little bit ugly..
+    """Find examples dir ..
+
+    a little bit ugly..
     """
     # Replace %s with directory to check for shoebot menus.
     code_stub = textwrap.dedent(
@@ -346,9 +334,7 @@ def find_example_dir():
 
 
 def make_readable_filename(fn):
-    """
-    Change filenames for display in the menu.
-    """
+    """Change filenames for display in the menu."""
     return os.path.splitext(fn)[0].replace("_", " ").capitalize()
 
 

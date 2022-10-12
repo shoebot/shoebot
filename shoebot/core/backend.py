@@ -1,5 +1,5 @@
-"""
-Cairo implementation and GObject preference can be set by channging the environment variable SHOEBOT_GRAPHICS.
+"""Cairo implementation and GObject preference can be set by channging the
+environment variable SHOEBOT_GRAPHICS.
 
 Cairo:
 
@@ -31,15 +31,11 @@ import sys
 
 
 class BackendMixin(object):
-    """
-    Mixin to abstract different implementations of the same library.
-    """
+    """Mixin to abstract different implementations of the same library."""
 
     def import_libs(self, module_names, impl_name):
-        """
-        Loop through module_names,
-        add has_.... booleans to class
-        set ..._impl to first successful import
+        """Loop through module_names, add has_.... booleans to class set
+        ..._impl to first successful import.
 
         :param module_names:  list of module names to try importing
         :param impl_name:  used in error output if no modules succeed
@@ -86,10 +82,8 @@ def sort_by_preference(options, prefer):
 
 
 class CairoGIBackend(BackendMixin):
-    """
-    Graphics backend using gi.repository or pgi
-    PyCairo / CairoCFFI (+PyCairo needed if using Gtk Too)
-    """
+    """Graphics backend using gi.repository or pgi PyCairo / CairoCFFI
+    (+PyCairo needed if using Gtk Too)"""
 
     def __init__(self, options):
         cairo_pref = sort_by_preference(
@@ -109,9 +103,8 @@ class CairoGIBackend(BackendMixin):
         return name, gi_module
 
     def ensure_pycairo_context(self, ctx):
-        """
-        If ctx is a cairocffi Context convert it to a PyCairo Context
-        otherwise return the original context
+        """If ctx is a cairocffi Context convert it to a PyCairo Context
+        otherwise return the original context.
 
         :param ctx:
         :return:

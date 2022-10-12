@@ -30,9 +30,7 @@ def has_admin():
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
-    """
-    copytree that works even if folder already exists
-    """
+    """copytree that works even if folder already exists."""
     # http://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
     if not os.path.exists(dst):
         os.makedirs(dst)
