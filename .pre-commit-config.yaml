@@ -1,4 +1,8 @@
 repos:
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.3.0
+    hooks:
+      - id: add-trailing-comma
   - repo: https://github.com/myint/docformatter.git
     rev: v1.5.0
     hooks:

@@ -141,6 +141,7 @@ Now, on every commit the following plugins will run:
 
 docformatter: to format docstrings.
 flynt: updates legacy string formatting.
+add-trailing-comma: To make sequences consistent.
 
 .. _example-style:
 
