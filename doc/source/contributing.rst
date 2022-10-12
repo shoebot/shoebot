@@ -129,10 +129,17 @@ Tips for Developers
 Coding style for the Shoebot core code
 --------------------------------------
 
-We're not picky here, other than following `PEP8 style guidelines
-<https://www.python.org/dev/peps/pep-0008/>`_. We use the `Black
-<https://pypi.org/project/black/>`_ syntax checker in our code editors to
-keep us strict, and recommend it.
+We follow the `PEP8 style guidelines
+<https://www.python.org/dev/peps/pep-0008/>`_ additionally
+`pre-commit <https://pre-commit.com/>` automates further linting and formatting on commit.
+
+Install `pre-commit <https://pre-commit.com/>`
+
+    ``pip install pre-commit``
+
+Now, on every commit the following plugins will run:
+
+docformatter: to format docstrings.
 
 .. _example-style:
 
