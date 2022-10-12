@@ -140,6 +140,7 @@ Install `pre-commit <https://pre-commit.com/>`
 Now, on every commit the following plugins will run:
 
 docformatter: to format docstrings.
+flynt: updates legacy string formatting.
 
 .. _example-style:
 
