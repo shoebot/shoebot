@@ -10,3 +10,8 @@ repos:
             "--wrap-descriptions=80",
             "--pre-summary-newline",
           ]
+  - repo: https://github.com/ikamensh/flynt/
+    rev: '0.76'
+    hooks:
+      - id: flynt
+        exclude: ^extensions/gedit/|^extensions/lib/
