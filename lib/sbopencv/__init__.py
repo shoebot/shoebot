@@ -18,7 +18,6 @@ try:
     from .blobs.Blob import CBlob  # Note: This must be imported in order to destroy blobs and use other methods
 except:
     print("Could not load blobs extension, some of the library features will not be available")
-    pass
 
 class Movie:
 

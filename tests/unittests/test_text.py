@@ -1,12 +1,7 @@
 import unittest
-import sys
 
-from pathlib import Path
-from tests.unittests.helpers import ShoebotTestCase
-from textwrap import dedent
 
 from shoebot.core import CairoCanvas, CairoImageSink
-from shoebot.data import Text
 from shoebot.grammar import NodeBot
 
 

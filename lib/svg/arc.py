@@ -61,9 +61,9 @@ def bezier_arc(x1, y1, x2, y2, start_angle=0, extent=90):
     kappa = abs(4. / 3. * (1. - cos(half_angle)) / sin(half_angle))
 
     if frag_angle < 0:
-        sign = -1
+        pass
     else:
-        sign = 1
+        pass
 
     point_list = []
 

@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch
 
 from math import radians
 from parameterized import parameterized

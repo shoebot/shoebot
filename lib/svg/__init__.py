@@ -209,8 +209,6 @@ def parse_path(e):
     previous_command = ""
 
     # Path origin (moved by MOVETO).
-    x0 = 0
-    y0 = 0
 
     # The current point in the path.
     dx = 0
@@ -250,8 +248,6 @@ def parse_path(e):
                     _ctx.lineto(points[i*2], points[i*2+1])
                 dx = points[i*2]
                 dy = points[i*2+1]
-                x0 = dx
-                y0 = dy
 
         # Relative MOVETO.
         # Offset from the current point.
@@ -265,8 +261,6 @@ def parse_path(e):
                     _ctx.lineto(dx+points[i*2], dy+points[i*2+1])
                 dx += points[i*2]
                 dy += points[i*2+1]
-                x0 = dx
-                y0 = dy
 
         # Absolute LINETO.
         # Draw a line from the current point to the new coordinate.

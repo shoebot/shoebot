@@ -364,7 +364,7 @@ def tweak_ths(path, ths, closed):
             k0, k1 = k1, k0
         s0, c0 = eval_cornu(t0)
         s1, c1 = eval_cornu(t1)
-        chordlen = hypot(s1 - s0, c1 - c0)
+        hypot(s1 - s0, c1 - c0)
         scale = 1 / hypot(y1 - y0, x1 - x0)
         k0 *= scale
         k1 *= scale

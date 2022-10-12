@@ -12,7 +12,7 @@ __license__ = "MIT"
 
 from sys import maxsize
 
-from shoebot.data import CORNER, CENTER
+from shoebot.data import CORNER
 
 
 class LSystem(object):

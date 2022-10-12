@@ -178,7 +178,7 @@ def vw_envs(filter=None):
     """
     vw_root = os.path.abspath(os.path.expanduser(os.path.expandvars("~/.virtualenvs")))
     try:
-        directories = os.listdir(vw_root)
+        os.listdir(vw_root)
     except OSError:
         return []
     venvs = []

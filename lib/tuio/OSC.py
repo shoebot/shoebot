@@ -33,7 +33,6 @@ import math
 import sys
 import string
 import pprint
-import types
 
 def hexDump(bytes):
     """Useful utility; prints the string in hexadecimal."""
@@ -200,7 +199,6 @@ def parseArgs(args):
         except:
             # Oh - it was a string.
             interpretation = arg
-            pass
         parsed.append(interpretation)
     return parsed
 
@@ -256,7 +254,6 @@ class CallbackManager:
 
     def dispatch(self, message, source = None):
         """Sends decoded OSC data to an appropriate calback."""
-        msgtype = ""
         try:
             if type(message[0]) == str:
                 # got a single message
@@ -270,7 +267,6 @@ class CallbackManager:
             pprint.pprint(message)
         except IndexError as e:
             print(f'{e}: {message}')
-            pass
         except None as e:
             print("Exception in", address, "callback :", e)
 

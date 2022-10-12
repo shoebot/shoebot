@@ -849,8 +849,8 @@ class ShoebotEditorWindow(Gtk.Window):
 
     def init_menus(self):
         text_view = self.source_view
-        direction = text_view.get_direction()
-        wrap_mode = text_view.get_wrap_mode()
+        text_view.get_direction()
+        text_view.get_wrap_mode()
         menu_item = None
 
         # if direction == Gtk.TextDirection.LTR:
@@ -1103,7 +1103,6 @@ class ShoebotEditorWindow(Gtk.Window):
             )
         except (ShoebotError, NameError):
             import traceback
-            import sys
 
             errmsg = traceback.format_exc(limit=1)
             err = _("Error in Shoebot script:") + "\n {errmsg}"
@@ -1114,7 +1113,7 @@ class ShoebotEditorWindow(Gtk.Window):
                 Gtk.ButtonsType.OK,
                 err,
             )
-            result = dialog.run()
+            dialog.run()
             dialog.destroy()
             self.shoebot_window = None
             return False
@@ -1148,7 +1147,7 @@ class ShoebotIDE:
             filename = os.path.abspath(filename)
             try:
                 ShoebotEditorWindow(filename)
-            except IOError as e:
+            except IOError:
                 files_not_opened.append(filename)
             else:
                 files_were_opened = True
@@ -1205,7 +1204,7 @@ def main():
 
     filenames = vars(args)["filenames"]
 
-    app = ShoebotIDE(filenames)
+    ShoebotIDE(filenames)
     Gtk.main()
 
 

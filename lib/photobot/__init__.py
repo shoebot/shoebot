@@ -654,8 +654,8 @@ class Layer:
         h = max(h, cos(radians(d_angle - angle)) * d)
         h = int(abs(h))
     
-        dx = int((w-w0) / 2)
-        dy = int((h-h0) / 2)
+        int((w-w0) / 2)
+        int((h-h0) / 2)
         d = int(d)
 
         #The rotation box's background color

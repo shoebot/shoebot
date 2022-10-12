@@ -42,8 +42,8 @@ __license__   = "MIT"
 
 ######################################################################################################
 
-from nodebox.graphics import MOVETO, LINETO, CURVETO, CLOSE, CENTER, Point, PathElement, BezierPath
-from math import sin, cos, atan, pi, degrees, radians, sqrt, pow
+from nodebox.graphics import CENTER, CLOSE, CURVETO, LINETO, MOVETO, PathElement, Point
+from math import atan, cos, degrees, pow, radians, sin, sqrt
 
 KEY_TAB = 48
 KEY_ESC = 53

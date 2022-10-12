@@ -46,7 +46,7 @@ def reflect(x, y, x0, y0, d=1.0, a=180):
 
 # Fast C implementations:
 try:
-    from nodebox.ext.geometry_math import angle, distance, coordinates, rotate
+    from nodebox.ext.geometry_math import angle, coordinates, distance
 except:
     pass
 

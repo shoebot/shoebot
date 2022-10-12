@@ -1,15 +1,12 @@
 from __future__ import print_function
 
 import copy
-import dataclasses
 import os
 import sys
 import traceback
-from math import copysign
 from queue import Queue, Empty
-from time import sleep, time
+from time import time
 
-import pubsub.core
 from pubsub import pub
 
 from .livecode import LiveExecution

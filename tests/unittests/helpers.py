@@ -13,7 +13,6 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot import create_bot
-from shoebot.data.typography import TextBounds
 
 TEST_DIR = Path(__file__).absolute().parent
 TEST_INPUT_DIR = TEST_DIR / "input/tests"
@@ -26,7 +25,6 @@ RUNNING_IN_CI = "CI" in environ
 
 class NotSet:
     """Sentinel value, so that None can be explicitly set."""
-    pass
 
 def stub_sideeffect():
     # Stubs are here to give IDEs something to import without complaining.

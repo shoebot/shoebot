@@ -85,7 +85,6 @@ class Canvas(metaclass=abc.ABCMeta):
 
     def initial_transform(self):
         """Must be overriden to create initial transform matrix."""
-        pass
 
     @abc.abstractproperty
     def reset_drawqueue(self):

@@ -2,7 +2,6 @@ import os
 import sys
 
 from pathlib import Path
-from shoebot.core.backend import gi
 from shoebot.core.events import (
     publish_event,
     QUIT_EVENT,

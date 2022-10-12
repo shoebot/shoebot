@@ -201,7 +201,7 @@ class ShoebotCmd(cmd.Cmd):
         if speed:
             try:
                 new_speed = float(speed)
-            except ValueError as e:
+            except ValueError:
                 self.print_response(f"{speed} is not a valid framerate")
                 return
 

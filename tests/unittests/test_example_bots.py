@@ -4,7 +4,6 @@ from parameterized import parameterized
 from parameterized import parameterized_class
 from tests.unittests.helpers import (
     EXAMPLE_INPUT_DIR,
-    shoebot_example_render_testfunction,
 )
 from tests.unittests.helpers import EXAMPLE_OUTPUT_DIR
 from tests.unittests.helpers import shoebot_named_testclass

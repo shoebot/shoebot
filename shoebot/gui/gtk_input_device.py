@@ -1,6 +1,5 @@
-from shoebot.core.backend import gi
 
-from gi.repository import Gdk, Gtk
+from gi.repository import Gdk
 from shoebot.core import InputDeviceMixin
 
 

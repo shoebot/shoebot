@@ -10,6 +10,4 @@ __all__ = [
     "VarListener",
 ]
 
-from .bot import Bot
-from .nodebox import NodeBot
 from shoebot.core.var_listener import VarListener

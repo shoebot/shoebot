@@ -23,7 +23,7 @@ def gedit_install():
         if minor < 12:
             subprocess.call([sys.executable, "%s/gedit3-plugin/install.py" % here])
         else:
-            cwd = os.path.join(here, "gedit3.12-plugin")
+            os.path.join(here, "gedit3.12-plugin")
             subprocess.call([sys.executable, "%s/gedit3.12-plugin/install.py" % here])
     else:
         print("Unknown gedit version %s" % version)
