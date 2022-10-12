@@ -24,7 +24,7 @@ class priorityqueue(dict):
 
 
 def depth_first_search(
-    root, visit=lambda node: False, traversable=lambda node, edge: True
+    root, visit=lambda node: False, traversable=lambda node, edge: True,
 ):
     """Simple, multi-purpose depth-first search.
 

@@ -24,7 +24,7 @@ info = textwrap.dedent(
     interactively. Being pure Python, it can also be used as a Python module,
     a plugin for Python-scriptable tools such as Inkscape, and run from the
     command line.
-"""
+""",
 )
 
 if sys.version_info < (3, 4):
@@ -99,7 +99,7 @@ datafiles.extend(
         ("share/pixmaps", ["assets/shoebot-ide.png"]),
         ("share/shoebot/data", ["assets/kant.xml"]),
         ("share/applications", ["assets/shoebot-ide.desktop"]),
-    ]
+    ],
 )
 
 # include all libs EXCEPT the ones mentioned in EXCLUDE_LIBS
@@ -116,7 +116,7 @@ datafiles.extend(
         )
         for root, dir, files in os.walk("lib")
         if root not in EXCLUDE_LIBS
-    ]
+    ],
 )
 
 PYCAIRO = "pycairo>=1.18.1"

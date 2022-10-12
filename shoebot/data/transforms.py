@@ -47,7 +47,7 @@ class Transform:
             self.append(transform)
         else:
             raise ValueError(
-                _("Transform: Don't know how to handle transform %s.") % transform
+                _("Transform: Don't know how to handle transform %s.") % transform,
             )
 
     def translate(self, x, y):
@@ -83,7 +83,7 @@ class Transform:
         else:
             raise ValueError(
                 _("Transform: Can only append Transforms or Cairo matrices (got %s)")
-                % (t)
+                % (t),
             )
 
     def prepend(self, t):
@@ -99,7 +99,7 @@ class Transform:
         else:
             raise ValueError(
                 _("Transform: Can only append Transforms or Cairo matrices (got %s)")
-                % (t)
+                % (t),
             )
 
     def copy(self):

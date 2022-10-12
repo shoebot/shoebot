@@ -78,14 +78,16 @@ def bezier_arc(x1, y1, x2, y2, start_angle=0, extent=90):
             signed_kappa = -kappa
         else:
             signed_kappa = kappa
-        point_list.append((x_cen + rx * c0,
-                          y_cen - ry * s0,
-                          x_cen + rx * (c0 + signed_kappa * s0),
-                          y_cen - ry * (s0 - signed_kappa * c0),
-                          x_cen + rx * (c1 - signed_kappa * s1),
-                          y_cen - ry * (s1 + signed_kappa * c1),
-                          x_cen + rx * c1,
-                          y_cen - ry * s1))
+        point_list.append((
+            x_cen + rx * c0,
+            y_cen - ry * s0,
+            x_cen + rx * (c0 + signed_kappa * s0),
+            y_cen - ry * (s0 - signed_kappa * c0),
+            x_cen + rx * (c1 - signed_kappa * s1),
+            y_cen - ry * (s1 + signed_kappa * c1),
+            x_cen + rx * c1,
+            y_cen - ry * s1,
+        ))
 
     return point_list
 

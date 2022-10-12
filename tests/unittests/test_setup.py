@@ -49,7 +49,7 @@ class TestSetup(unittest.TestCase):
             version         1.2.1
             url             http://shoebot.net
             packager        Ricardo Lafuente <r@manufacturaindependente.org>
-            """
+            """,
         )
 
         with patch("builtins.open", mock_open(read_data=example_versionfile_content)):

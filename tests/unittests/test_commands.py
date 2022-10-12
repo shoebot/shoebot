@@ -77,7 +77,7 @@ class TestPath(ShoebotTestCase):
                     PathElement(CLOSE, 40, 40),
                 ],
             ),
-        ]
+        ],
     )
     @test_as_bot()
     def test_path_commands(self, cmd, expected_elements):
@@ -146,7 +146,7 @@ class TestText(ShoebotTestCase):
                 "Bitstream Vera Sans Roman",
                 (1, 88.0, 87, 12),
             ),
-        ]
+        ],
     )
     @test_as_bot()
     def test_text_bounds(self, fontname, expected_bounds):
@@ -159,7 +159,7 @@ class TestText(ShoebotTestCase):
         just to verify the aspect ratio of the bounding box.
         """
         self.assertEqual(
-            fontname, font(fontname), f"{fontname} is not available in the system"
+            fontname, font(fontname), f"{fontname} is not available in the system",
         )
 
         t = text("Hello world", 0, 100, draw=False)
@@ -178,12 +178,12 @@ class TestText(ShoebotTestCase):
                 {"underline": 3},
                 '<span underline="3">Underlined</span>',
             ),
-        ]
+        ],
     )
     @patch("shoebot.data.typography.PangoCairo")
     @test_as_bot()
     def test_text_outputs_pango_text_spans(
-        self, text_args, text_kwargs, expected_pango_text_span, pango_cairo
+        self, text_args, text_kwargs, expected_pango_text_span, pango_cairo,
     ):
         """For text calls that can only be For calls that should result in a
         call to set_markup in a Pango layout verify they arrive as expected."""

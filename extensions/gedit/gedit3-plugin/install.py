@@ -33,7 +33,7 @@ def has_admin():
         try:
             # only windows users with admin privileges can read the C:\windows\temp
             temp = os.listdir(
-                os.sep.join([os.environ.get("SystemRoot", "C:\\windows"), "temp"])
+                os.sep.join([os.environ.get("SystemRoot", "C:\\windows"), "temp"]),
             )
         except:
             return (os.environ["USERNAME"], False)
@@ -93,7 +93,7 @@ def get_dirs_nt(is_admin):
         dirs = dict(
             dest_dir=dest_dir,
             language_dir=expandvars(
-                "%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs"
+                "%ProgramFiles%\\gedit\\share\\gtksourceview-3.0\\language-specs",
             ),
             plugin_dir=expandvars("%ProgramFiles%\\gedit\\lib\\gedit-3\\plugins"),
         )
@@ -132,7 +132,7 @@ else:
 
 
 def install_plugin(
-    name=None, dest_dir=None, plugin_dir=None, language_dir=None, is_admin=False
+    name=None, dest_dir=None, plugin_dir=None, language_dir=None, is_admin=False,
 ):
     if is_admin and not isdir(plugin_dir):
         print("%s not found" % name)
@@ -164,7 +164,7 @@ def install_plugin(
         os.system("update-mime-database %s/mime" % dest_dir)
 
     os.system(
-        "glib-compile-schemas %s/gedit/plugins/shoebotit" % dest_dir
+        "glib-compile-schemas %s/gedit/plugins/shoebotit" % dest_dir,
     )  ## FIXME, kind of specific to gedit...
     print("success")
 

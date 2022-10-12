@@ -271,7 +271,7 @@ class BezierPath(Grob, ColorMixin):
         if self._elements:
             start_el = self[0]
             self._append_element(
-                self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y)
+                self._canvas.closepath_closure(), (CLOSE, start_el.x, start_el.y),
             )
             self.closed = True
 
@@ -284,7 +284,7 @@ class BezierPath(Grob, ColorMixin):
             w = w - x
             h = h - y
         self._append_element(
-            self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h)
+            self._canvas.ellipse_closure(x, y, w, h), (ELLIPSE, x, y, w, h),
         )
         self.closed = True
 
@@ -330,7 +330,7 @@ class BezierPath(Grob, ColorMixin):
             return self._bounds
 
         record_surface = cairo.RecordingSurface(
-            cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1)
+            cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1),
         )
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
@@ -352,7 +352,7 @@ class BezierPath(Grob, ColorMixin):
             return self._bounds
 
         record_surface = cairo.RecordingSurface(
-            cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1)
+            cairo.CONTENT_COLOR_ALPHA, (-1, -1, 1, 1),
         )
         dummy_ctx = cairo.Context(record_surface)
         self._traverse(dummy_ctx)
@@ -557,7 +557,7 @@ class BezierPath(Grob, ColorMixin):
                 p1.ctrl2.y,
             )
             x, y, c1x, c1y, c2x, c2y = self._curvepoint(
-                t, x0, y0, x1, y1, x2, y2, x3, y3
+                t, x0, y0, x1, y1, x2, y2, x3, y3,
             )
             return PathElement(CURVETO, c1x, c1y, c2x, c2y, x, y)
         else:
@@ -661,7 +661,7 @@ class BezierPath(Grob, ColorMixin):
         for i in range(n):
             t = 1.0 * (i + 1) / n
             pt_x, pt_y, pt_c1x, pt_c1y, pt_c2x, pt_c2y = self._curvepoint(
-                t, x0, y0, x1, y1, x2, y2, x3, y3
+                t, x0, y0, x1, y1, x2, y2, x3, y3,
             )
             c = sqrt(pow(abs(xi - pt_x), 2) + pow(abs(yi - pt_y), 2))
             length += c
@@ -702,7 +702,7 @@ class BezierPath(Grob, ColorMixin):
                 lengths.append(self._linelength(x0, y0, el.x, el.y))
             elif el.cmd == ARC:
                 lengths.append(
-                    self._arclength(el.x, el.y, el.radius, el.angle1, el.angle2)
+                    self._arclength(el.x, el.y, el.radius, el.angle1, el.angle2),
                 )
             elif el.cmd == CURVETO:
                 x3, y3, x1, y1, x2, y2 = el.x, el.y, el.c1x, el.c1y, el.c2x, el.c2y
@@ -858,7 +858,7 @@ class PathElement(object):
         while len(args) == 1:
             args = args[0]
         self.values = list(
-            chain(args)
+            chain(args),
         )  # flatten args, so that tuples of (x,y), (x2, y2) are supported
         self._ctrl1 = self._ctrl2 = None
 

@@ -97,7 +97,7 @@ class KantGenerator(object):
     def __init__(self, grammar, source=None, searchpaths=None):
         self.loadGrammar(grammar, searchpaths=searchpaths)
         self.loadSource(
-            source and source or self.getDefaultSource(), searchpaths=searchpaths
+            source and source or self.getDefaultSource(), searchpaths=searchpaths,
         )
         self.refresh()
 
@@ -176,7 +176,7 @@ class KantGenerator(object):
         chosen = random.choice(choices)
         if _debug:
             sys.stderr.write(
-                f"{len(choices)} available choices: {[e.toxml() for e in choices]}\n"
+                f"{len(choices)} available choices: {[e.toxml() for e in choices]}\n",
             )
             sys.stderr.write(f"Chosen: {chosen.toxml()}\n")
         return chosen

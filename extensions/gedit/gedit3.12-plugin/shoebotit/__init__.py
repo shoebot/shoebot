@@ -76,7 +76,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
     def add_window_actions(self):
         for rel_path in EXAMPLES:
             action = Gio.SimpleAction.new(
-                "open_example__%s" % gtk3_utils.encode_relpath(rel_path), None
+                "open_example__%s" % gtk3_utils.encode_relpath(rel_path), None,
             )
 
             action.connect("activate", self.on_open_example)
@@ -91,7 +91,7 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
         for _, name, default in WINDOW_TOGGLES:
             action_name = "toggle_%s" % name
             action = Gio.SimpleAction.new_stateful(
-                action_name, None, GLib.Variant.new_boolean(default)
+                action_name, None, GLib.Variant.new_boolean(default),
             )
             action.connect("activate", getattr(self, action_name))
             self.window.add_action(action)
@@ -223,14 +223,14 @@ class ShoebotPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurabl
                 if response is None:
                     # sentinel value - clear the buffer
                     textbuffer.delete(
-                        textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                        textbuffer.get_start_iter(), textbuffer.get_end_iter(),
                     )
                 else:
                     cmd, status, info = response.cmd, response.status, response.info
                     if cmd == ide_utils.CMD_LOAD_BASE64:
                         if status == ide_utils.RESPONSE_CODE_OK:
                             textbuffer.delete(
-                                textbuffer.get_start_iter(), textbuffer.get_end_iter()
+                                textbuffer.get_start_iter(), textbuffer.get_end_iter(),
                             )
                             # TODO switch panels to 'Shoebot' if on 'Shoebot Live'
                         elif status == ide_utils.RESPONSE_REVERTED:

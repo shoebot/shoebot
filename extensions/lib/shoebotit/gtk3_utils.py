@@ -57,7 +57,7 @@ def examples_menu(root_dir=None, depth=0):
             label = fn.capitalize()
 
             sm_xml, sm_file_actions, sm_menu_actions = examples_menu(
-                os.path.join(root_dir, fn), depth + 1
+                os.path.join(root_dir, fn), depth + 1,
             )
 
             submenu_actions.extend(sm_menu_actions)
@@ -199,7 +199,7 @@ def load_gsettings():
     # schema_dir=os.path.abspath(os.path.join(here, '../../gedit3-plugin'))
     schema_dir = here
     schema_source = Gio.SettingsSchemaSource.new_from_directory(
-        schema_dir, Gio.SettingsSchemaSource.get_default(), False
+        schema_dir, Gio.SettingsSchemaSource.get_default(), False,
     )
     schema = Gio.SettingsSchemaSource.lookup(schema_source, schema_id, False)
     if not schema:

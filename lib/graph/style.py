@@ -332,7 +332,7 @@ def edges(s, edges, alpha=1.0, weighted=False, directed=False):
     if directed and s.stroke:
         # clr = s._ctx.stroke().copy()
         clr = s._ctx.color(
-            s.stroke.r, s.stroke.g, s.stroke.b, s.stroke.a * 0.65 * alpha
+            s.stroke.r, s.stroke.g, s.stroke.b, s.stroke.a * 0.65 * alpha,
         )
 
         clr.a *= 1.3
@@ -426,14 +426,14 @@ def edge_label(s, edge, alpha=1.0):
                 except:
                     pass
             edge._textpath = s._ctx.textpath(
-                txt, s._ctx.textwidth(" "), 0, width=s.textwidth
+                txt, s._ctx.textwidth(" "), 0, width=s.textwidth,
             )
             p = edge._textpath
 
         # Position the label centrally along the edge line.
         a = degrees(atan2(edge.node2.y - edge.node1.y, edge.node2.x - edge.node1.x))
         d = sqrt(
-            (edge.node2.x - edge.node1.x) ** 2 + (edge.node2.y - edge.node1.y) ** 2
+            (edge.node2.x - edge.node1.x) ** 2 + (edge.node2.y - edge.node1.y) ** 2,
         )
         d = abs(d - s._ctx.textwidth(edge.label)) * 0.5
 

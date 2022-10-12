@@ -23,7 +23,7 @@ import gettext
 APP = "shoebot"
 DIR = sys.prefix + "/share/shoebot/locale"
 ICON_FILE = resource_filename(
-    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png"
+    Requirement.parse("shoebot"), "share/pixmaps/shoebot-ide.png",
 )
 locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
@@ -121,7 +121,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
                     None,
                     self.do_window_close,
                 ),
-            ]
+            ],
         )
 
         self.action_group.add_toggle_actions(
@@ -145,7 +145,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
                     False,
                 ),
                 ("play", "Play", _("_Play"), "<Alt>p", None, self.do_toggle_play, True),
-            ]
+            ],
         )
 
         menuxml = """
@@ -224,7 +224,7 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         """Show the variables window."""
         if self.var_window is None and self.bot._vars:
             self.var_window = VarWindow(
-                self, self.bot, "%s variables" % (self.title or "Shoebot")
+                self, self.bot, "%s variables" % (self.title or "Shoebot"),
             )
             self.var_window.window.connect("destroy", self.var_window_closed)
 
@@ -270,28 +270,28 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         """Request to save an SVG file after drawing is complete."""
         self.pending_snapshots.append(self.output_image_filename("svg"))
         publish_event(
-            REDRAW_EVENT, data=(None, None)
+            REDRAW_EVENT, data=(None, None),
         )  # TODO - this probably wants its own event
 
     def snapshot_ps(self, widget):
         """Request to save a Postscript file after drawing is complete."""
         self.pending_snapshots.append(self.output_image_filename("ps"))
         publish_event(
-            REDRAW_EVENT, data=(None, None)
+            REDRAW_EVENT, data=(None, None),
         )  # TODO - this probably wants its own event
 
     def snapshot_pdf(self, widget):
         """Request to save a PDF file after drawing is complete."""
         self.pending_snapshots.append(self.output_image_filename("pdf"))
         publish_event(
-            REDRAW_EVENT, data=(None, None)
+            REDRAW_EVENT, data=(None, None),
         )  # TODO - this probably wants its own event
 
     def snapshot_png(self, widget):
         """Request to save a PNG file after drawing is complete."""
         self.pending_snapshots.append(self.output_image_filename("png"))
         publish_event(
-            REDRAW_EVENT, data=(None, None)
+            REDRAW_EVENT, data=(None, None),
         )  # TODO - this probably wants its own event
 
     def trigger_fullscreen_action(self, fullscreen):

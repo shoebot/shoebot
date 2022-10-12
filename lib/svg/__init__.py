@@ -312,9 +312,11 @@ def parse_path(e):
         # Draw a bezier with given control handles and destination.
         elif command == "C":
             for i in range(int(len(points)/6)):
-                _ctx.curveto(points[i*6],   points[i*6+1],
-                             points[i*6+2], points[i*6+3],
-                             points[i*6+4], points[i*6+5])
+                _ctx.curveto(
+                    points[i*6],   points[i*6+1],
+                    points[i*6+2], points[i*6+3],
+                    points[i*6+4], points[i*6+5],
+                )
                 dhx = points[i*6+2]
                 dhy = points[i*6+3]
                 dx = points[i*6+4]
@@ -324,9 +326,11 @@ def parse_path(e):
         # Offset from the current point.
         elif command == "c":
             for i in range(int(len(points)/6)):
-                _ctx.curveto(dx+points[i*6],   dy+points[i*6+1],
-                             dx+points[i*6+2], dy+points[i*6+3],
-                             dx+points[i*6+4], dy+points[i*6+5])
+                _ctx.curveto(
+                    dx+points[i*6],   dy+points[i*6+1],
+                    dx+points[i*6+2], dy+points[i*6+3],
+                    dx+points[i*6+4], dy+points[i*6+5],
+                )
                 dhx = dx+points[i*6+2]
                 dhy = dy+points[i*6+3]
                 dx += points[i*6+4]
@@ -343,9 +347,11 @@ def parse_path(e):
                 else:
                     dhx = dx-dhx
                     dhy = dy-dhy
-                _ctx.curveto(dx+dhx, dy+dhy,
-                             points[i*4],   points[i*4+1],
-                             points[i*4+2], points[i*4+3])
+                _ctx.curveto(
+                    dx+dhx, dy+dhy,
+                    points[i*4],   points[i*4+1],
+                    points[i*4+2], points[i*4+3],
+                )
                 dhx = points[i*4]
                 dhy = points[i*4+1]
                 dx = points[i*4+2]
@@ -361,9 +367,11 @@ def parse_path(e):
                 else:
                     dhx = dx-dhx
                     dhy = dy-dhy
-                _ctx.curveto(dx+dhx, dy+dhy,
-                             dx+points[i*4],   dy+points[i*4+1],
-                             dx+points[i*4+2], dy+points[i*4+3])
+                _ctx.curveto(
+                    dx+dhx, dy+dhy,
+                    dx+points[i*4],   dy+points[i*4+1],
+                    dx+points[i*4+2], dy+points[i*4+3],
+                )
                 dhx = dx+points[i*4]
                 dhy = dy+points[i*4+1]
                 dx += points[i*4+2]
