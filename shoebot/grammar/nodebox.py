@@ -753,13 +753,29 @@ class NodeBot(Bot):
         return self._canvas.strokejoin
 
     def background(self, *args):
-        """Set the canvas background color.
+        """Set the background color.
 
-        :param color: background color to apply
-        :return: new background color
+        Pass None for no background.
+
+        :param color: See color() function for supported color formats.
         """
-        self._canvas.background = self.color(*args)
-        return self._canvas.background
+        if args == (None,):
+            # None is a shorthand for "nobackground", which means not
+            # retaining the previous background.
+            if self._canvas.background is not None:
+                # Store the previous background color and use it to
+                # draw the screen 'border' (extra - space that is visible
+                # if the window is resized to be larger than the drawing).
+                self._canvas.screen_border = self._canvas.background
+            self._canvas.background = None
+        else:
+            background_rgb = self.color(*args).data[:3]
+            self._canvas.background = background_rgb
+            self._canvas.screen_border = background_rgb
+
+    def nobackground(self):
+        """Don't redraw the background every frame."""
+        self.background(None)
 
     def blendmode(self, mode=None):
         """Set the current blending mode.

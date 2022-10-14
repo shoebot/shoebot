@@ -68,6 +68,9 @@ class Canvas(metaclass=abc.ABCMeta):
         self.color_mode = 1
         self.path_mode = CORNER
         self.size = None
+        self.has_painted_initial_background = False
+        self.initial_background_color = None
+        self.screen_border = (1, 1, 1)
         self.reset_canvas()
 
     def set_bot(self, bot):

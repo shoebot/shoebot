@@ -200,7 +200,23 @@ class CairoCanvas(Canvas):
             return output_file
 
     def ctx_render_background(self, cairo_ctx):
-        """Draws the background colour of the bot."""
-        # TODO - rename this
-        cairo_ctx.set_source_rgba(*self.background)
+        """
+        Draw the background of the bot.
+
+        Background can either be a solid color, or None to
+        retain the background of the previous drawing.
+        """
+        background = self.background
+
+        if self.has_painted_initial_background is False:
+            self.has_painted_initial_background = True
+            if background is None:
+                if self.screen_border is not None:
+                    background = self.screen_border
+        elif background is None:
+            # Retain the previous background.
+            return
+
+        # clear the background to the background colour
+        cairo_ctx.set_source_rgba(*background)
         cairo_ctx.paint()

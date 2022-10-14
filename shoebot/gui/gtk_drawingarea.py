@@ -20,19 +20,24 @@ ICON_FILE = resource_filename(
 class BackingStore:
     instance = None
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, background_rgb):
         self.width = width
         self.height = height
+        self.background_rgb = background_rgb
         self.surface = pycairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        cr = cairo.Context(self.surface)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.set_source_rgb(*background_rgb)
+        cr.paint()
 
     @property
     def dimensions(self):
         return self.width, self.height
 
     @classmethod
-    def get_backingstore(cls, width, height):
-        if cls.instance is None or (width, height) != cls.instance.dimensions:
-            cls.instance = BackingStore(width, height)
+    def get_backingstore(cls, width, height, background_rgb):
+        if cls.instance is None or (width, height) != cls.instance.dimensions or background_rgb != cls.instance.background_rgb:
+            cls.instance = BackingStore(width, height, background_rgb)
         return cls.instance
 
 
@@ -52,7 +57,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         self.width, self.height = 1, 1
         self.bot_size = None
         self.frame = -1
-        self.backing_store = BackingStore.get_backingstore(1, 1)
+        self.backing_store = BackingStore.get_backingstore(1, 1, (0, 0, 0))
 
     def draw_default_image(self, cr):
         if os.path.isfile(ICON_FILE):
@@ -74,8 +79,7 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
     def on_resize(self, widget, dimensions):
         self.width = dimensions.width
         self.height = dimensions.height
-        if self.bot_size is not None:
-            publish_event(REDRAW_EVENT, data=(self.width, self.height))
+        publish_event(REDRAW_EVENT)
 
     def scale_context_and_center(self, cr):
         """Scale context based on difference between bot size and widget."""
@@ -146,7 +150,11 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
             self.set_size_request(*size)
 
         self.bot_size = size
-        self.backing_store = BackingStore.get_backingstore(self.width, self.height)
+        self.backing_store = BackingStore.get_backingstore(
+            max(self.width, size[0]),
+            max(self.height, size[1]),
+            self.bot._canvas.screen_border,
+        )
 
         cr = pycairo.Context(self.backing_store.surface)
         if self.scale_fit:
@@ -155,6 +163,6 @@ class ShoebotWidget(Gtk.DrawingArea, SocketServer):
         cairo_ctx = driver.ensure_pycairo_context(cairo_ctx)
         cr.set_source_surface(cairo_ctx.get_target())
         # Create the cairo context
-        cr.set_operator(cairo.OPERATOR_SOURCE)
+        # cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         self.queue_draw()

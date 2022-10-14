@@ -30,7 +30,10 @@ def draw():
     global a, b
     seed(0)
 
-    background(0, 0, 0.15)
+    if mousedown:
+        nobackground()
+    else:
+        background(0, 0, 0.15)
     cX = a
     cY = b
 

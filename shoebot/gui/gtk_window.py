@@ -184,6 +184,13 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
         self.window_open = True
         self.pause_speed = None  # TODO - factor out bot controller stuff
 
+    def set_bot(self, bot):
+        # Fixme:
+        # Hack to give sb_widget access to the bot
+        # All these structures need to handle state better.
+        super().set_bot(bot)
+        self.sb_widget.bot = bot
+
     def gtk_mouse_button_down(self, widget, event):
         """Handle right mouse button clicks."""
         if self.menu_enabled and event.button == 3:
