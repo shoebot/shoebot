@@ -30,6 +30,8 @@
 
 
 """Drawbot and Nodebot are similar grammars, so they both inherit from Bot."""
+from functools import lru_cache
+from importlib.abc import Loader as _Loader, MetaPathFinder as _MetaPathFinder
 
 import sys
 import os
@@ -441,6 +443,44 @@ class Bot(Grammar):
             else:
                 return SVG(data)
 
+    @lru_cache(maxsize=1)
+    def _install_loader(self):
+        # Fixme...  hm, not quite sure about this as the p
+        ns = self._namespace
+        class ShoebotLoader(_Loader):
+
+            def create_module(self, spec):
+                return None
+
+            def exec_module(self, module):
+                print(f"exec_module {module.__name__}")
+                if module.__name__ in sys.modules:
+                    return
+                with open(module.__name__) as input_file:
+                    input_text = '\n'.join(input_file.readlines())
+                    exec(input_text.read(), dict(ns))
+
+        #PATH = sys.path
+        PATH = f"{sys.path}:."
+        class ShoebotFinder(_MetaPathFinder):
+
+            def find_module(self, fullname, path=PATH):
+                return self.find_spec(fullname, path)
+
+            def find_spec(self, fullname, path, target=None):
+                import os.path
+                from importlib.machinery import ModuleSpec
+                fullname = fullname.split(sep='.')[-1]
+                if '.' in fullname:
+                    raise NotImplementedError()
+
+                if os.path.exists(f"{fullname}.bot"):
+                    return ModuleSpec(os.path.realpath(f"{fullname}.bot"), ShoebotLoader())
+                else:
+                    return None
+
+        sys.meta_path.append(ShoebotFinder())
+
     def ximport(self, libName):
         """Import Nodebox libraries.
 
@@ -449,6 +489,8 @@ class Bot(Grammar):
 
         :param libName: Library name to import
         """
+        self._install_loader()
+        
         # from Nodebox
         lib = __import__(libName)
         self._namespace[libName] = lib
