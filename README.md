@@ -47,7 +47,6 @@ Links
 
   * [Website](http://shoebot.net)
   * [Documentation](http://shoebot.readthedocs.org)
-  * [Mailing lists](http://tinkerhouse.net/shoebot/devel)
   * [Source code](http://github.com/shoebot/shoebot)
   * [Issue tracker](http://github.com/shoebot/shoebot/issues)
 
