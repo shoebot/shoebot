@@ -232,7 +232,8 @@ def parse_path(e):
             # The command is a pen move, line or curve.
             # Get the coordinates.
             points = segment[1:].strip()
-            points = points.replace("-", ",-")
+            if not "e" in points:
+                points = points.replace("-", ",-")
             points = points.replace(" ", ",")
             points = re.sub(",+", ",", points)
             points = points.strip(",")
