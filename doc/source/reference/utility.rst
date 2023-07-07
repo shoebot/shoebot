@@ -36,6 +36,9 @@ Utility
   returns a number between 0 and this parameter. When two parameters are
   supplied, returns a number between the first and the second parameter.
 
+  If both parameters are integers, the returned value will be an int. If you
+  need a float, use floats as parameters, e.g. ``random(-1.0, 1.0)``.
+
   .. shoebot::
       :alt: Random example
       :filename: util__random.png
