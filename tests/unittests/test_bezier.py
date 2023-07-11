@@ -41,10 +41,6 @@ class TestPathElement(unittest.TestCase):
     # TODO:  Add tests for:
     #  CURVETO, RCURVETO
     #  ARC, ELLIPSE and None
-    def setUp(self):
-        sink = CairoImageSink("output-bezier-pathelement.png")
-        canvas = CairoCanvas(sink)
-        self.bot = NodeBot(canvas=canvas)
 
     @parameterized.expand([CLOSE, MOVETO, RMOVETO])
     def test_xy_no_controlpoints(self, cmd):
