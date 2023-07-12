@@ -6,10 +6,10 @@ import threading
 import traceback
 
 
-class LiveExecution(object):
+class LiveExecution:
     """Live Code executor.
 
-    Code has two states, 'known good' and 'tenous'
+    Code has two states, 'known good' and 'tenuous'
 
     Known good:  Exceptions are raised as normal
     Tenuous: An exception will cause the code to be reverted to the last Known Good code

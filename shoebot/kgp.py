@@ -91,7 +91,7 @@ class NoSourceError(Exception):
     pass
 
 
-class KantGenerator(object):
+class KantGenerator:
     """generates mock philosophy based on a context-free grammar."""
 
     def __init__(self, grammar, source=None, searchpaths=None):

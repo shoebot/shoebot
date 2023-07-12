@@ -224,7 +224,7 @@ class Transform:
         return path
 
 
-class TransformMixin(object):
+class TransformMixin:
 
     """Mixin class for transformation support.
 

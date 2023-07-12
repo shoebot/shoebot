@@ -22,7 +22,7 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 
-class Color(object):
+class Color:
     """Represents a single color.
 
     Attributes (RGB and HSL) are values between 0 and 1
@@ -264,7 +264,7 @@ class Color(object):
         )
 
 
-class ColorMixin(object):
+class ColorMixin:
     """Mixin class for color support. Adds fill, stroke and blending mode
     attributes to the class.
 

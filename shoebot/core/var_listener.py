@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 
-class VarListener(object):
+class VarListener:
     """Var listeners are used to notify things like the gui or socketserver
     when variables change."""
 

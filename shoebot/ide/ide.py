@@ -263,7 +263,7 @@ class ConsoleWindow:
         return self.text_area.get_buffer()
 
 
-class StdoutFilter(object):
+class StdoutFilter:
     def __init__(self, parent):
         self.parent = parent
 

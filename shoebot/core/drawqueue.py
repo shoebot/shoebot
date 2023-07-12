@@ -31,7 +31,7 @@
 from collections import deque
 
 
-class DrawQueue(object):
+class DrawQueue:
     """A list of draw commands, stored as callables that, are passed a set of
     parameters to draw on from the canvas implementation."""
 

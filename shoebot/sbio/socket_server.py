@@ -70,7 +70,7 @@ def create_listening_socket(host, port, handler):
     return sock
 
 
-class SocketServer(object):
+class SocketServer:
     def __init__(self, bot, host, port):
         """Initialize server and start listening."""
         create_listening_socket(host, port, self.listener)

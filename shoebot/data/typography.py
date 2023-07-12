@@ -59,7 +59,7 @@ except ValueError as no_pango:
     # workaround for readthedocs where Pango is not installed,
     print(_("Pango not found - typography will not be available."), file=sys.stderr)
 
-    class FakePango(object):
+    class FakePango:
         class Weight(Enum):
             # Weights copied from PangoWeight
             THIN = 100

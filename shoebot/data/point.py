@@ -1,4 +1,4 @@
-class Point(object):
+class Point:
     """Taken from Nodebox and modified."""
 
     def __init__(self, *args):

@@ -33,7 +33,7 @@ DEFAULT_GUI_UPDATE_SPEED = 30.0
 DEFAULT_ANIMATION_SPEED = 60.0
 
 
-class Grammar(object):
+class Grammar:
     """A Bot is an interface to receive user commands (through scripts or
     direct calls) and pass them to a canvas for drawing.
 

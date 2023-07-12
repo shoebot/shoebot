@@ -823,7 +823,7 @@ class EndClip(Grob):
         self._deferred_render(self._render_closure())
 
 
-class CtrlPoint(object):
+class CtrlPoint:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -832,7 +832,7 @@ class CtrlPoint(object):
 EMPTY_CTRL = CtrlPoint(None, None)
 
 
-class PathElement(object):
+class PathElement:
     """Represents a single element in a Bezier path.
 
     The first argument should be a command string,
@@ -948,7 +948,7 @@ class NoCurrentPath(Exception):
 # --- POINT -------------------------------------------------------------------------------------------
 
 
-class Point(object):
+class Point:
     # Originally from nodebox-gl
     def __init__(self, x=0, y=0):
         self.x = x

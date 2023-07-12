@@ -10,7 +10,7 @@ def clamp(minvalue, value, maxvalue):
     return max(minvalue, min(value, maxvalue))
 
 
-class Variable(object):
+class Variable:
     """Taken from Nodebox."""
 
     def __init__(self, name, type, **kwargs):

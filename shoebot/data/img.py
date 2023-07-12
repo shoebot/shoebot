@@ -19,7 +19,7 @@ CENTER = "center"
 CORNER = "corner"
 
 
-class SurfaceRef(object):
+class SurfaceRef:
     """Cannot have a weakref to a cairo surface, so wrapper is used."""
 
     def __init__(self, surface):

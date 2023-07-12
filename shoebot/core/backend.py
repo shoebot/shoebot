@@ -30,7 +30,7 @@ import os
 import sys
 
 
-class BackendMixin(object):
+class BackendMixin:
     """Mixin to abstract different implementations of the same library."""
 
     def import_libs(self, module_names, impl_name):

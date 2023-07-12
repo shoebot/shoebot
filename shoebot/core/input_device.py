@@ -1,4 +1,4 @@
-class InputDeviceMixin(object):
+class InputDeviceMixin:
     SUPPORTED_CALLBACKS = (
         "key_pressed",
         "key_released",

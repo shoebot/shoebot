@@ -21,7 +21,7 @@ def pretty_name(name):
     return (name or "").replace("_", " ").capitalize()
 
 
-class VarWindow(object):
+class VarWindow:
     def __init__(self, parent, bot, title=None):
         self.parent = parent
         self.bot = bot
