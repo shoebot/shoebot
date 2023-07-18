@@ -148,6 +148,11 @@ class NodeBot(Grammar):
     color_mode = RGB
     color_range = 1
 
+    # TODO remove
+    # _state_attributes = {
+    #     *BezierPath.state_attributes,
+    # }
+
     def __init__(self, canvas=None, namespace=None, vars=None):
         """Nodebot grammar constructor.
 
@@ -155,19 +160,19 @@ class NodeBot(Grammar):
         :param namespace: Optionally specify a dict to inject as namespace
         :param vars: Optional dict containing initial values for variables
         """
-
+        # from shoebot.core.chain_dataclass import ChainDataClass, Context, Defaults
+        #self._state = ChainDataClass(Context(), Defaults())
         Grammar.__init__(self, canvas, namespace=namespace, vars=vars)
-        canvas.set_bot(self)
 
-        self._autoclosepath = True
-        self._path = None
-
-        if self._input_device:
-            # Get constants like KEY_DOWN, KEY_LEFT
-            for key_name, value in list(self._input_device.get_key_map().items()):
-                self._namespace[key_name] = value
-                setattr(self, key_name, value)
-
+        # self._autoclosepath = True
+        # self._path = None
+        #
+        # if self._input_device:
+        #     # Get constants like KEY_DOWN, KEY_LEFT
+        #     for key_name, value in list(self._input_device.get_key_map().items()):
+        #         self._namespace[key_name] = value
+        #         setattr(self, key_name, value)
+        #
         self._canvas.size = None
         if isinstance(namespace, dict) and "FRAME" in namespace:
             try:
@@ -187,39 +192,42 @@ class NodeBot(Grammar):
         loop iterations don't take up values left over by the previous
         one.
         """
-        DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
+        # TODO DEFAULT_WIDTH, DEFAULT_HEIGHT
+        DEFAULT_WIDTH, DEFAULT_HEIGHT = 800, 800
+        # DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
         self.HEIGHT = self._namespace.get("HEIGHT", DEFAULT_WIDTH)
         if "WIDTH" in self._namespace or "HEIGHT" in self._namespace:
-            self.size(w=self._namespace.get("WIDTH"), h=self._namespace.get("HEIGHT"))
+            self.size(self._namespace.get("WIDTH"), self._namespace.get("HEIGHT"))
 
         self._transformmode = NodeBot.CENTER
 
-        self._canvas.settings(
-            fillcolor=self.color(0.2),
-            fillrule=None,
-            strokecolor=None,
-            strokewidth=1.0,
-            strokecap=None,
-            strokejoin=None,
-            strokedash=None,
-            dashoffset=0,
-            blendmode=None,
-            background=self.color(1, 1, 1),
-            fontfile="Sans",
-            fontsize=16,
-            align=NodeBot.LEFT,
-            lineheight=1,
-            tracking=0,
-            underline=None,
-            overline=None,
-            underlinecolor=None,
-            overlinecolor=None,
-            hintstyle=None,
-            hintmetrics=None,
-            antialias=None,
-            subpixelorder=None,
-        )
+        # TODO implement canvas settings (check Nodebox, these will probably be attributes)
+        # self._canvas.settings(
+        #     fillcolor=self.color(0.2),
+        #     fillrule=None,
+        #     strokecolor=None,
+        #     strokewidth=1.0,
+        #     strokecap=None,
+        #     strokejoin=None,
+        #     strokedash=None,
+        #     dashoffset=0,
+        #     blendmode=None,
+        #     background=self.color(1, 1, 1),
+        #     fontfile="Sans",
+        #     fontsize=16,
+        #     align=Bot.LEFT,
+        #     lineheight=1,
+        #     tracking=0,
+        #     underline=None,
+        #     overline=None,
+        #     underlinecolor=None,
+        #     overlinecolor=None,
+        #     hintstyle=None,
+        #     hintmetrics=None,
+        #     antialias=None,
+        #     subpixelorder=None,
+        # )
 
     # Input GUI callbacks
 
@@ -259,63 +267,32 @@ class NodeBot(Grammar):
         inst = clazz(self, *args, **kwargs)
         return inst
 
-    def _makeColorableInstance(self, clazz, args, kwargs):
-        """Create an object, if fill, stroke or strokewidth is not specified,
-        get them from the _canvas.
-
-        :param clazz:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        kwargs = dict(kwargs)
-
-        fill = kwargs.get("fill", self._canvas.fillcolor)
-        if not isinstance(fill, Color):
-            fill = Color(fill, mode="rgb", color_range=1)
-        kwargs["fill"] = fill
-
-        stroke = kwargs.get("stroke", self._canvas.strokecolor)
-        if not isinstance(stroke, Color):
-            stroke = Color(stroke, mode="rgb", color_range=1)
-        kwargs["stroke"] = stroke
-
-        kwargs["fillrule"] = kwargs.get("fillrule", self._canvas.fillrule)
-        kwargs["strokewidth"] = kwargs.get("strokewidth", self._canvas.strokewidth)
-        kwargs["strokecap"] = kwargs.get("strokecap", self._canvas.strokecap)
-        kwargs["strokejoin"] = kwargs.get("strokejoin", self._canvas.strokejoin)
-        kwargs["strokedash"] = kwargs.get("strokedash", self._canvas.strokedash)
-        kwargs["dashoffset"] = kwargs.get("dashoffset", self._canvas.dashoffset)
-        kwargs["blendmode"] = kwargs.get("blendmode", self._canvas.blendmode)
-        inst = clazz(self, *args, **kwargs)
-        return inst
-
     def EndClip(self, *args, **kwargs):
-        return self._makeColorableInstance(EndClip, args, kwargs)
+        return self._makeInstance(EndClip, args, kwargs)
 
     def BezierPath(self, *args, **kwargs):
-        return self._makeColorableInstance(BezierPath, args, kwargs)
+        return self._makeInstance(BezierPath, args, kwargs)
 
     def ClippingPath(self, *args, **kwargs):
-        return self._makeColorableInstance(ClippingPath, args, kwargs)
+        return self._makeInstance(ClippingPath, args, kwargs)
 
     def Rect(self, *args, **kwargs):
-        return self._makeColorableInstance(Rect, args, kwargs)
+        return self._makeInstance(Rect, args, kwargs)
 
     def Oval(self, *args, **kwargs):
-        return self._makeColorableInstance(Oval, args, kwargs)
+        return self._makeInstance(Oval, args, kwargs)
 
     def Ellipse(self, *args, **kwargs):
-        return self._makeColorableInstance(Ellipse, args, kwargs)
+        return self._makeInstance(Ellipse, args, kwargs)
 
     def Color(self, *args, **kwargs):
         return Color(*args, **kwargs)
 
     def Image(self, *args, **kwargs):
-        return self._makeColorableInstance(Image, args, kwargs)
+        return self._makeInstance(Image, args, kwargs)
 
     def Text(self, *args, **kwargs):
-        return self._makeColorableInstance(Text, args, kwargs)
+        return self._makeInstance(Text, args, kwargs)
 
     # Variables #####
 
@@ -517,7 +494,7 @@ class NodeBot(Grammar):
             return self._canvas.width, self._canvas.height
 
         # FIXME: Updating in all these places seems a bit hacky
-        w, h = self._canvas.set_size((w, h))
+        w, h = self._canvas.set_size(w, h)
         self._namespace["WIDTH"] = w
         self._namespace["HEIGHT"] = h
         self.WIDTH = w  # Added to make evolution example work
@@ -812,7 +789,6 @@ class NodeBot(Grammar):
         :type y: float
         """
         if self._path is None:
-            # self.beginpath()
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.moveto(x, y)
 
@@ -871,7 +847,7 @@ class NodeBot(Grammar):
         elif hasattr(path, "__iter__"):
             p = self.BezierPath()
             for point in path:
-                p.addpoint(point)
+                p.append(point)
             p.draw()
 
     def drawimage(self, image, x=None, y=None):
@@ -1178,7 +1154,7 @@ class NodeBot(Grammar):
             self._canvas.strokedash = dashes
         if offset:
             self._canvas.dashoffset = offset
-        return (self._canvas.strokedash, self._canvas.dashoffset)
+        return self._canvas.strokedash, self._canvas.dashoffset
 
     def strokecap(self, cap=None):
         """Set the stroke cap.

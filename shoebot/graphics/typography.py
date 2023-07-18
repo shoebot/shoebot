@@ -1,3 +1,6 @@
+# TODO - working out how typography works in relation to the backend
+#        might be one of the trickiest parts of the port.
+
 #!/usr/bin/env python3
 import gettext
 import locale
@@ -124,7 +127,7 @@ Text Bounds in pixels.
 :param height: Height in pixels."""
 
 
-class Text(Grob, ColorMixin):
+class Text(ColorMixin, Grob):
     """Changes from Nodebox 1: font in Nodebox is a native Cocoa font, here it
     is the font name. _fontsize, _fontsize, _lineheight, _align in Nodebox are
     public fields.

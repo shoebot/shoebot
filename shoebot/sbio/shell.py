@@ -299,11 +299,14 @@ class ShoebotCmd(cmd.Cmd):
         source = base64.b64decode(line).decode("utf-8")
         # Test compile
         publish_event(
-            SOURCE_CHANGED_EVENT, data=source, extra_channels="shoebot.source",
+            SOURCE_CHANGED_EVENT, data=source, cookie=cookie
         )
-        self.bot._executor.load_edited_source(  # noqa
-            source, good_cb=source_good, bad_cb=source_bad,
-        )
+        # self.bot._executor.load_edited_source(  # noqa
+        #     source, good_cb=source_good, bad_cb=source_bad,
+        # )
+        # TODO implement this entirely via events.
+        # - wait for a reply with the same cookie to arrive about whether
+        #  the source was worked, or an exception was thrown.
 
     def do_bye(self, line):
         """Exit shell and shoebot.

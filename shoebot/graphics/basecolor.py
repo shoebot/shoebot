@@ -3,6 +3,7 @@ import locale
 import string
 import sys
 from math import floor
+from .grob import Grob
 
 RGB = "rgb"
 HSB = "hsb"
@@ -20,6 +21,239 @@ locale.setlocale(locale.LC_ALL, "")
 gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
+
+
+# utils
+
+def hex2dec(hexdata):
+    return int(string.atoi(hexdata, 16))
+
+
+def dec2hex(d):
+    return hex(d).rsplit("x", 1)
+
+
+def parse_color(v, color_range=1):
+    """Receives a colour definition and returns a (r,g,b,a) tuple.
+
+    Accepts:
+    - v
+    - (v)
+    - (v,a)
+    - (r,g,b)
+    - (r,g,b,a)
+    - #RRGGBB
+    - RRGGBB
+    - #RRGGBBAA
+    - RRGGBBAA
+
+    Returns a (red, green, blue, alpha) tuple, with values ranging from
+    0 to 1.
+
+    The 'color_range' parameter sets the colour range in which the
+    colour data values are specified (except in hexstrings).
+    """
+
+    # unpack one-element tuples, they show up sometimes
+    while isinstance(v, (tuple, list)) and len(v) == 1:
+        v = v[0]
+
+    if isinstance(v, (int, float)):
+        red = green = blue = v / color_range
+        alpha = 1.0
+
+    elif isinstance(v, oor):
+        red, green, blue, alpha = v
+
+    elif isinstance(v, (tuple, list)):
+        # normalise values according to the supplied colour range
+        # for this we make a list with the normalised data
+        color = []
+        for index in range(0, len(v)):
+            color.append(v[index] / color_range)
+
+        if len(color) == 1:
+            red = green = blue = alpha = color[0]
+        elif len(color) == 2:
+            red = green = blue = color[0]
+            alpha = color[1]
+        elif len(color) == 3:
+            red = color[0]
+            green = color[1]
+            blue = color[2]
+            alpha = 1.0
+        elif len(color) == 4:
+            red = color[0]
+            green = color[1]
+            blue = color[2]
+            alpha = color[3]
+
+    elif isinstance(v, str):
+        # got a hexstring: first remove hash character, if any
+        v = v.strip("#")
+        if len(v) == 6:
+            # RRGGBB
+            red = hex2dec(v[0:2]) / 255.0
+            green = hex2dec(v[2:4]) / 255.0
+            blue = hex2dec(v[4:6]) / 255.0
+            alpha = 1.0
+        elif len(v) == 8:
+            red = hex2dec(v[0:2]) / 255.0
+            green = hex2dec(v[2:4]) / 255.0
+            blue = hex2dec(v[4:6]) / 255.0
+            alpha = hex2dec(v[6:8]) / 255.0
+
+    return red, green, blue, alpha
+
+
+# Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
+
+
+def hex_to_rgb(hex):
+    """Returns RGB values for a hex color string."""
+    hex = hex.lstrip("#")
+    if len(hex) < 6:
+        hex += hex[-1] * (6 - len(hex))
+    if len(hex) == 6:
+        r, g, b = hex[0:2], hex[2:4], hex[4:]
+        r, g, b = [int(n, 16) / 255.0 for n in (r, g, b)]
+        a = 1.0
+    elif len(hex) == 8:
+        r, g, b, a = hex[0:2], hex[2:4], hex[4:6], hex[6:]
+        r, g, b, a = [int(n, 16) / 255.0 for n in (r, g, b, a)]
+    return r, g, b, a
+
+
+hex2rgb = hex_to_rgb
+
+
+def lab_to_rgb(l, a, b):
+    """Converts CIE Lab to RGB components.
+
+    First we have to convert to XYZ color space.
+    Conversion involves using a white point,
+    in this case D65 which represents daylight illumination.
+
+    Algorithm adopted from:
+    http://www.easyrgb.com/math.php
+    """
+
+    y = (l + 16) / 116.0
+    x = a / 500.0 + y
+    z = y - b / 200.0
+    v = [x, y, z]
+    for i in range(3):
+        if pow(v[i], 3) > 0.008856:
+            v[i] = pow(v[i], 3)
+        else:
+            v[i] = (v[i] - 16 / 116.0) / 7.787
+
+    # Observer = 2, Illuminant = D65
+    x = v[0] * 95.047 / 100
+    y = v[1] * 100.0 / 100
+    z = v[2] * 108.883 / 100
+
+    r = x * 3.2406 + y * -1.5372 + z * -0.4986
+    g = x * -0.9689 + y * 1.8758 + z * 0.0415
+    b = x * 0.0557 + y * -0.2040 + z * 1.0570
+    v = [r, g, b]
+    for i in range(3):
+        if v[i] > 0.0031308:
+            v[i] = 1.055 * pow(v[i], 1 / 2.4) - 0.055
+        else:
+            v[i] = 12.92 * v[i]
+
+    r, g, b = v[0], v[1], v[2]
+    return r, g, b
+
+
+lab2rgb = lab_to_rgb
+
+
+def hsv_to_rgb(h, s, v):
+    """Hue, saturation, brightness to red, green, blue.
+
+    http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
+    Results will differ from the way NSColor converts color spaces.
+    """
+
+    if s == 0:
+        return v, v, v
+
+    h = h / (60.0 / 360)
+    i = floor(h)
+    f = h - i
+    p = v * (1 - s)
+    q = v * (1 - s * f)
+    t = v * (1 - s * (1 - f))
+
+    if i == 0:
+        r, g, b = v, t, p
+    elif i == 1:
+        r, g, b = q, v, p
+    elif i == 2:
+        r, g, b = p, v, t
+    elif i == 3:
+        r, g, b = p, q, v
+    elif i == 4:
+        r, g, b = t, p, v
+    else:
+        r, g, b = v, p, q
+
+    return r, g, b
+
+
+hsv2rgb = hsb2rgb = hsb_to_rgb = hsv_to_rgb
+
+
+def rgb_to_hsv(r, g, b):
+    h = s = 0
+    v = max(r, g, b)
+    d = v - min(r, g, b)
+
+    if v != 0:
+        s = d / float(v)
+
+    if s != 0:
+        if r == v:
+            h = 0 + (g - b) / d
+        elif g == v:
+            h = 2 + (b - r) / d
+        else:
+            h = 4 + (r - g) / d
+
+    h = h * (60.0 / 360)
+    if h < 0:
+        h = h + 1.0
+
+    return h, s, v
+
+
+rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
+
+
+def rgba_to_argb(stringImage):
+    tempBuffer = [None] * len(
+        stringImage,
+    )  # Create an empty array of the same size as stringImage
+    tempBuffer[0::4] = stringImage[2::4]
+    tempBuffer[1::4] = stringImage[1::4]
+    tempBuffer[2::4] = stringImage[0::4]
+    tempBuffer[3::4] = stringImage[3::4]
+    stringImage = "".join(tempBuffer)
+    return stringImage
+
+
+def parse_hsb_color(v, color_range=1):
+    if isinstance(v, str):
+        # hexstrings aren't hsb
+        return parse_color(v)
+    hue, saturation, brightness, alpha = parse_color(v, color_range)
+    red, green, blue = hsv_to_rgb(hue, saturation, brightness)
+    return red, green, blue, alpha
+
+#/utils
+
 
 
 class Color:
@@ -111,6 +345,7 @@ class Color:
                     args[2] / color_range,
                     alpha,
                 )
+                raise NotImplementedError("HSB not implemented yet")
 
     def __repr__(self):
         return "%s(%.3f, %.3f, %.3f, %.3f)" % (
@@ -140,6 +375,11 @@ class Color:
     def alpha(self):
         # Added
         return self.a
+
+    @property
+    def rgba(self):
+        # TODO added temporarily - remove when state handling is finalised
+        return self.data
 
     @property
     def data(self):
@@ -263,8 +503,18 @@ class Color:
             "'" + str(self.__class__) + "' object has no attribute '" + a + "'",
         )
 
+_transparent_color = Color(0, 0, 0, 0)
 
-class ColorMixin:
+def _get_color_instance(*args):
+    if len(args) == 1:
+        if args[0] is None:
+            return Color(0, 0, 0, 0)
+        elif isinstance(args[0], Color):
+            return _transparent_color
+    return Color(mode="rgb", color_range=1, *args)
+
+
+class ColorMixin(Grob):
     """Mixin class for color support. Adds fill, stroke and blending mode
     attributes to the class.
 
@@ -272,292 +522,83 @@ class ColorMixin:
     allowing them to be specfied in other ways, such as   fill="#123456"
     """
 
+    _state_attributes = {
+        "blendmode",
+        "dashoffset",
+        "fill",
+        "fillrule",
+        "stroke",
+        "strokecap",
+        "strokedash",
+        "strokejoin",
+        "strokewidth",
+    }
     def __init__(
-        self,
-        fill=None,
-        fillrule=None,
-        stroke=None,
-        strokewidth=None,
-        strokecap=None,
-        strokejoin=None,
-        strokedash=None,
-        dashoffset=0,
-        blendmode=None,
-        **kwargs
+            self,
+            context,
+            **kwargs
     ):
-        self._set_fill(fill)
-        self._set_stroke(stroke)
-        self._set_strokewidth(strokewidth)
+        super().__init__(context, **kwargs)
 
-        self.fillrule = self._fillrule = fillrule
-        self.strokecap = self._strokecap = strokecap
-        self.strokejoin = self._strokejoin = strokejoin
-        self.strokedash = self._strokedash = strokedash
-        self.dashoffset = self._dashoffset = dashoffset
-        self.blendmode = self._blendmode = blendmode
+    @property
+    def dashoffset(self):
+        return self._dashoffset
 
-    def _get_fill(self):
-        return self._fillcolor
+    @dashoffset.setter
+    def dashoffset(self, dashoffset):
+        if dashoffset is None:
+            self._dashoffset = 0
+        else:
+            self._dashoffset = dashoffset
 
-    def _set_fill(self, *args):
-        if len(args) == 1:
-            if args[0] is None:
-                self._fillcolor = None
-                return
-            elif isinstance(args[0], Color):
-                self._fillcolor = Color(args[0])
-                return
-        self._fillcolor = Color(mode="rgb", color_range=1, *args)
+    @property
+    def fill(self):
+        return self._fill
 
-    fill = property(_get_fill, _set_fill)
+    @fill.setter
+    def fill(self, *args):
+        self._fill = _get_color_instance(*args)
 
-    def _get_stroke(self):
-        return self._strokecolor
+    @property
+    def stroke(self):
+        return self._stroke
 
-    def _set_stroke(self, *args):
-        if len(args) == 1:
-            if args[0] is None:
-                self._strokecolor = None
-                return
-            elif isinstance(args[0], Color):
-                self._strokecolor = Color(args[0])
-                return
-        self._strokecolor = Color(mode="rgb", color_range=1, *args)
+    @stroke.setter
+    def stroke(self, *args):
+        self._stroke = _get_color_instance(*args)
 
-    stroke = property(_get_stroke, _set_stroke)
+    @property
+    def strokecap(self):
+        return self._strokecap
 
-    def _get_strokewidth(self):
+    @strokecap.setter
+    def strokecap(self, style):
+        if style not in [None, BUTT, ROUND, SQUARE]:
+            raise ValueError(f"Invalid strokecap value: {cap}")
+        self._cap = style
+
+    @property
+    def strokedash(self):
+        return self._strokedash
+
+    @strokedash.setter
+    def strokedash(self, dash):
+        self._strokedash = dash
+
+    @property
+    def strokejoin(self):
+        return self._strokejoin
+
+    @strokejoin.setter
+    def strokejoin(self, style):
+        if style not in [None, MITER, ROUND, BEVEL]:
+            raise ValueError(f"Invalid strokejoin value: {style}")
+        self._strokejoin = style
+
+    @property
+    def strokewidth(self):
         return self._strokewidth
 
-    def _set_strokewidth(self, strokewidth):
-        self._strokewidth = max(strokewidth, 0.0001)
-
-    strokewidth = property(_get_strokewidth, _set_strokewidth)
-
-
-def hex2dec(hexdata):
-    return int(string.atoi(hexdata, 16))
-
-
-def dec2hex(d):
-    return hex(d).split("x")[-1]
-
-
-def parse_color(v, color_range=1):
-    """Receives a colour definition and returns a (r,g,b,a) tuple.
-
-    Accepts:
-    - v
-    - (v)
-    - (v,a)
-    - (r,g,b)
-    - (r,g,b,a)
-    - #RRGGBB
-    - RRGGBB
-    - #RRGGBBAA
-    - RRGGBBAA
-
-    Returns a (red, green, blue, alpha) tuple, with values ranging from
-    0 to 1.
-
-    The 'color_range' parameter sets the colour range in which the
-    colour data values are specified (except in hexstrings).
-    """
-
-    # unpack one-element tuples, they show up sometimes
-    while isinstance(v, (tuple, list)) and len(v) == 1:
-        v = v[0]
-
-    if isinstance(v, (int, float)):
-        red = green = blue = v / color_range
-        alpha = 1.0
-
-    elif isinstance(v, Color):
-        red, green, blue, alpha = v
-
-    elif isinstance(v, (tuple, list)):
-        # normalise values according to the supplied colour range
-        # for this we make a list with the normalised data
-        color = []
-        for index in range(0, len(v)):
-            color.append(v[index] / color_range)
-
-        if len(color) == 1:
-            red = green = blue = alpha = color[0]
-        elif len(color) == 2:
-            red = green = blue = color[0]
-            alpha = color[1]
-        elif len(color) == 3:
-            red = color[0]
-            green = color[1]
-            blue = color[2]
-            alpha = 1.0
-        elif len(color) == 4:
-            red = color[0]
-            green = color[1]
-            blue = color[2]
-            alpha = color[3]
-
-    elif isinstance(v, str):
-        # got a hexstring: first remove hash character, if any
-        v = v.strip("#")
-        if len(v) == 6:
-            # RRGGBB
-            red = hex2dec(v[0:2]) / 255.0
-            green = hex2dec(v[2:4]) / 255.0
-            blue = hex2dec(v[4:6]) / 255.0
-            alpha = 1.0
-        elif len(v) == 8:
-            red = hex2dec(v[0:2]) / 255.0
-            green = hex2dec(v[2:4]) / 255.0
-            blue = hex2dec(v[4:6]) / 255.0
-            alpha = hex2dec(v[6:8]) / 255.0
-
-    return red, green, blue, alpha
-
-
-# Some generic color conversion algorithms used mainly by BaseColor outside of NodeBox.
-
-
-def hex_to_rgb(hex):
-    """Returns RGB values for a hex color string."""
-    hex = hex.lstrip("#")
-    if len(hex) < 6:
-        hex += hex[-1] * (6 - len(hex))
-    if len(hex) == 6:
-        r, g, b = hex[0:2], hex[2:4], hex[4:]
-        r, g, b = [int(n, 16) / 255.0 for n in (r, g, b)]
-        a = 1.0
-    elif len(hex) == 8:
-        r, g, b, a = hex[0:2], hex[2:4], hex[4:6], hex[6:]
-        r, g, b, a = [int(n, 16) / 255.0 for n in (r, g, b, a)]
-    return r, g, b, a
-
-
-hex2rgb = hex_to_rgb
-
-
-def lab_to_rgb(l, a, b):
-    """Converts CIE Lab to RGB components.
-
-    First we have to convert to XYZ color space.
-    Conversion involves using a white point,
-    in this case D65 which represents daylight illumination.
-
-    Algorithm adopted from:
-    http://www.easyrgb.com/math.php
-    """
-
-    y = (l + 16) / 116.0
-    x = a / 500.0 + y
-    z = y - b / 200.0
-    v = [x, y, z]
-    for i in _range(3):
-        if pow(v[i], 3) > 0.008856:
-            v[i] = pow(v[i], 3)
-        else:
-            v[i] = (v[i] - 16 / 116.0) / 7.787
-
-    # Observer = 2, Illuminant = D65
-    x = v[0] * 95.047 / 100
-    y = v[1] * 100.0 / 100
-    z = v[2] * 108.883 / 100
-
-    r = x * 3.2406 + y * -1.5372 + z * -0.4986
-    g = x * -0.9689 + y * 1.8758 + z * 0.0415
-    b = x * 0.0557 + y * -0.2040 + z * 1.0570
-    v = [r, g, b]
-    for i in _range(3):
-        if v[i] > 0.0031308:
-            v[i] = 1.055 * pow(v[i], 1 / 2.4) - 0.055
-        else:
-            v[i] = 12.92 * v[i]
-
-    r, g, b = v[0], v[1], v[2]
-    return r, g, b
-
-
-lab2rgb = lab_to_rgb
-
-
-def hsv_to_rgb(h, s, v):
-    """Hue, saturation, brightness to red, green, blue.
-
-    http://www.koders.com/python/fidB2FE963F658FE74D9BF74EB93EFD44DCAE45E10E.aspx
-    Results will differ from the way NSColor converts color spaces.
-    """
-
-    if s == 0:
-        return v, v, v
-
-    h = h / (60.0 / 360)
-    i = floor(h)
-    f = h - i
-    p = v * (1 - s)
-    q = v * (1 - s * f)
-    t = v * (1 - s * (1 - f))
-
-    if i == 0:
-        r, g, b = v, t, p
-    elif i == 1:
-        r, g, b = q, v, p
-    elif i == 2:
-        r, g, b = p, v, t
-    elif i == 3:
-        r, g, b = p, q, v
-    elif i == 4:
-        r, g, b = t, p, v
-    else:
-        r, g, b = v, p, q
-
-    return r, g, b
-
-
-hsv2rgb = hsb2rgb = hsb_to_rgb = hsv_to_rgb
-
-
-def rgb_to_hsv(r, g, b):
-    h = s = 0
-    v = max(r, g, b)
-    d = v - min(r, g, b)
-
-    if v != 0:
-        s = d / float(v)
-
-    if s != 0:
-        if r == v:
-            h = 0 + (g - b) / d
-        elif g == v:
-            h = 2 + (b - r) / d
-        else:
-            h = 4 + (r - g) / d
-
-    h = h * (60.0 / 360)
-    if h < 0:
-        h = h + 1.0
-
-    return h, s, v
-
-
-rgb2hsv = rgb2hsb = rgb_to_hsb = rgb_to_hsv
-
-
-def rgba_to_argb(stringImage):
-    tempBuffer = [None] * len(
-        stringImage,
-    )  # Create an empty array of the same size as stringImage
-    tempBuffer[0::4] = stringImage[2::4]
-    tempBuffer[1::4] = stringImage[1::4]
-    tempBuffer[2::4] = stringImage[0::4]
-    tempBuffer[3::4] = stringImage[3::4]
-    stringImage = "".join(tempBuffer)
-    return stringImage
-
-
-def parse_hsb_color(v, color_range=1):
-    if isinstance(v, str):
-        # hexstrings aren't hsb
-        return parse_color(v)
-    hue, saturation, brightness, alpha = parse_color(v, color_range)
-    red, green, blue = hsv_to_rgb(hue, saturation, brightness)
-    return red, green, blue, alpha
+    @strokewidth.setter
+    def strokewidth(self, width):
+        self._strokewidth = max(width, 0.0001)

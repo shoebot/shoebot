@@ -35,6 +35,9 @@ import locale
 import shlex
 import sys
 
+from shoebot.core.runner import ShoebotRunner
+from shoebot.core.renderer.output import get_output
+
 DEFAULT_SERVERPORT = 7777
 
 OUTPUT_EXTENSIONS = (".png", ".svg", ".ps", ".pdf")
@@ -244,44 +247,51 @@ def main():
             ),
         )
 
-    if args.vars:
-        vars = json_arg(args.vars)
-    else:
-        vars = None
+    output = get_output(args)
+    # TODO
+    # if args.vars:
+    #     vars = json_arg(args.vars)
+    # else:
+    #     vars = None
+    #
+    # if args.namespace:
+    #     namespace = json_arg(args.namespace)
+    # else:
+    #     namespace = None
+    #
+    # if args.window:
+    #     window = args.window
+    # else:
+    #     window = not args.outputfile
 
-    if args.namespace:
-        namespace = json_arg(args.namespace)
-    else:
-        namespace = None
-
-    if args.window:
-        window = args.window
-    else:
-        window = not args.outputfile
-
-    from shoebot.__init__ import run  # https://github.com/shoebot/shoebot/issues/206
-
-    success = run(
-        src=args.script,
-        outputfile=args.outputfile,
-        max_iterations=args.repeat or None,
-        window=window,
-        fullscreen=args.fullscreen,
-        title=args.title,
-        close_window=args.close,
-        server=args.socketserver,
-        port=args.serverport,
-        show_vars=args.window and args.disable_vars is False,
-        vars=vars or None,
-        namespace=namespace,
-        run_shell=args.shell,
-        args=shlex.split(args.script_args or ""),
-        verbose=args.verbose,
-        background_thread=not args.disable_background_thread,
-    )
-
-    # Return errorcode
-    return 0 if success else 1
+    #     def run(self, code, max_iterations=None, run_forever=False, frame_limiter=False, verbose=False):
+    runner = ShoebotRunner(output)
+    runner.run(code=args.script,
+               max_iterations=args.repeat or None,
+               verbose=args.verbose)
+    # from shoebot.__init__ import run  # https://github.com/shoebot/shoebot/issues/206
+    #
+    # success = run(
+    #     src=args.script,
+    #     outputfile=args.outputfile,
+    #     max_iterations=args.repeat or None,
+    #     window=window,
+    #     fullscreen=args.fullscreen,
+    #     title=args.title,
+    #     close_window=args.close,
+    #     server=args.socketserver,
+    #     port=args.serverport,
+    #     show_vars=args.window and args.disable_vars is False,
+    #     vars=vars or None,
+    #     namespace=namespace,
+    #     run_shell=args.shell,
+    #     args=shlex.split(args.script_args or ""),
+    #     verbose=args.verbose,
+    #     background_thread=not args.disable_background_thread,
+    # )
+    #
+    # # Return errorcode
+    # return 0 if success else 1
 
 
 if __name__ == "__main__":

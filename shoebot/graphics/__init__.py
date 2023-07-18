@@ -36,39 +36,55 @@ elements (such as pointing devices).
 The drawing objects could benefit from an actual, proper Python library to
 handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 """
+import gettext
 import sys
-
-from gettext import gettext as _
+from enum import Enum
 
 from . import geometry as geo
 from shoebot.core.backend import cairo
-from .basecolor import (
-    BUTT,
-    ROUND,
-    SQUARE,
-    BEVEL,
-    MITER,
-    CMYK,
-    HSB,
-    RGB,
-    Color,
-    ColorMixin,
-)
+
+_ = gettext.gettext
+
+# from .basecolor import (
+#     BUTT,
+#     ROUND,
+#     SQUARE,
+#     BEVEL,
+#     MITER,
+#     CMYK,
+#     HSB,
+#     RGB,
+#     Color,
+#     ColorMixin,
+# )
+
+
 from .bezierpath import (
-    ARC,
-    CLOSE,
-    CURVETO,
-    ELLIPSE,
-    LINETO,
-    MOVETO,
-    RCURVETO,
-    RLINETO,
-    RMOVETO,
+    Alignments,
+    PathElementTypes,
     BezierPath,
     ClippingPath,
     EndClip,
     PathElement,
+    StrokeCaps,
+    StrokeJoins,
 )
+
+from .point import Point
+from .basecolor import Color
+
+# TODO - move these
+class ColorTypes(Enum):
+    CMYK = "cmyk"
+    HSB = "hsb"
+    RGB = "rgb"
+
+globals().update(vars(Alignments))
+globals().update(vars(ColorTypes))
+globals().update(vars(PathElementTypes))
+globals().update(vars(StrokeCaps))
+globals().update(vars(StrokeJoins))
+
 from .grob import Grob, CENTER, CORNER, CORNERS
 from .image import Image
 from .point import Point
@@ -78,7 +94,7 @@ try:
     from .typography import Text
 except ImportError as e:
     Text = None
-    print((_("Typography not available "), e), file=sys.stderr)
+    print(_("Typography not available "), e, file=sys.stderr)
 
 LEFT = "left"
 RIGHT = "right"

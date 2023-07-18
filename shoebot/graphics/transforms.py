@@ -3,15 +3,22 @@
 #
 
 import sys
+from enum import auto, Enum
 
 from shoebot.core.backend import cairo
 from math import sin, cos
-from .bezierpath import BezierPath
 
-TRANSFORMS = ["translate", "scale", "rotate", "skew", "push", "pop"]
-CENTER = "center"
-CORNER = "corner"
-CORNERS = "corners"
+# TODO - Move Alignments out of transform, but also can't be in bezierpath
+from shoebot.graphics.bezierpath import Alignments
+
+
+class Transforms(Enum):
+    TRANSLATE = auto()
+    SCALE = auto()
+    ROTATE = auto()
+    SKEW = auto()
+    PUSH = auto()
+    POP = auto()
 
 import locale, gettext
 
@@ -116,90 +123,91 @@ class Transform:
         centery = y
         m_archived = []
 
-        for trans in self.stack:
-            if isinstance(trans, cairo.Matrix):
-                # multiply matrix
-                m *= trans
-            elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
-                # parse transform command
-                cmd = trans[0]
-                args = trans[1:]
-                t = cairo.Matrix()
-
-                if cmd == "translate":
-                    xt = args[0]
-                    yt = args[1]
-                    m.translate(xt, yt)
-                elif cmd == "rotate":
-                    if mode == "corner":
-                        # apply existing transform to cornerpoint
-                        deltax, deltay = m.transform_point(0, 0)
-                        a = args[0]
-                        ct = cos(a)
-                        st = sin(a)
-                        m *= cairo.Matrix(
-                            ct,
-                            st,
-                            -st,
-                            ct,
-                            deltax - (ct * deltax) + (st * deltay),
-                            deltay - (st * deltax) - (ct * deltay),
-                        )
-                    elif mode == "center":
-                        # apply existing transform to centerpoint
-                        deltax, deltay = m.transform_point(centerx, centery)
-                        a = args[0]
-                        ct = cos(a)
-                        st = sin(a)
-                        m *= cairo.Matrix(
-                            ct,
-                            st,
-                            -st,
-                            ct,
-                            deltax - (ct * deltax) + (st * deltay),
-                            deltay - (st * deltax) - (ct * deltay),
-                        )
-                elif cmd == "scale":
-                    if mode == "corner":
-                        t.scale(args[0], args[1])
-                        m *= t
-                    elif mode == "center":
-                        # apply existing transform to centerpoint
-                        deltax, deltay = m.transform_point(centerx, centery)
-                        x, y = args
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        m *= m1
-                        m *= cairo.Matrix(x, 0, 0, y, 0, 0)
-                        m *= m2
-
-                elif cmd == "skew":
-                    if mode == "corner":
-                        x, y = args
-                        ## TODO: x and y should be the tangent of an angle
-                        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
-                        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
-                        m *= t
-                    elif mode == "center":
-                        # apply existing transform to centerpoint
-                        deltax, deltay = m.transform_point(centerx, centery)
-                        x, y = args
-                        m1 = cairo.Matrix()
-                        m2 = cairo.Matrix()
-                        m1.translate(-deltax, -deltay)
-                        m2.translate(deltax, deltay)
-                        t *= m
-                        t *= m1
-                        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
-                        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
-                        t *= m2
-                        m = t
-                elif cmd == "push":
-                    m_archived.append(m)
-                elif cmd == "pop":
-                    m = m_archived.pop()
+        # TODO
+        # for trans in self.stack:
+        #     if isinstance(trans, cairo.Matrix):
+        #         # multiply matrix
+        #         m *= trans
+        #     elif isinstance(trans, tuple) and trans[0] in TRANSFORMS:
+        #         # parse transform command
+        #         cmd = trans[0]
+        #         args = trans[1:]
+        #         t = cairo.Matrix()
+        #
+        #         if cmd == "translate":
+        #             xt = args[0]
+        #             yt = args[1]
+        #             m.translate(xt, yt)
+        #         elif cmd == "rotate":
+        #             if mode == "corner":
+        #                 # apply existing transform to cornerpoint
+        #                 deltax, deltay = m.transform_point(0, 0)
+        #                 a = args[0]
+        #                 ct = cos(a)
+        #                 st = sin(a)
+        #                 m *= cairo.Matrix(
+        #                     ct,
+        #                     st,
+        #                     -st,
+        #                     ct,
+        #                     deltax - (ct * deltax) + (st * deltay),
+        #                     deltay - (st * deltax) - (ct * deltay),
+        #                 )
+        #             elif mode == "center":
+        #                 # apply existing transform to centerpoint
+        #                 deltax, deltay = m.transform_point(centerx, centery)
+        #                 a = args[0]
+        #                 ct = cos(a)
+        #                 st = sin(a)
+        #                 m *= cairo.Matrix(
+        #                     ct,
+        #                     st,
+        #                     -st,
+        #                     ct,
+        #                     deltax - (ct * deltax) + (st * deltay),
+        #                     deltay - (st * deltax) - (ct * deltay),
+        #                 )
+        #         elif cmd == "scale":
+        #             if mode == "corner":
+        #                 t.scale(args[0], args[1])
+        #                 m *= t
+        #             elif mode == "center":
+        #                 # apply existing transform to centerpoint
+        #                 deltax, deltay = m.transform_point(centerx, centery)
+        #                 x, y = args
+        #                 m1 = cairo.Matrix()
+        #                 m2 = cairo.Matrix()
+        #                 m1.translate(-deltax, -deltay)
+        #                 m2.translate(deltax, deltay)
+        #                 m *= m1
+        #                 m *= cairo.Matrix(x, 0, 0, y, 0, 0)
+        #                 m *= m2
+        #
+        #         elif cmd == "skew":
+        #             if mode == "corner":
+        #                 x, y = args
+        #                 ## TODO: x and y should be the tangent of an angle
+        #                 t *= cairo.Matrix(1, 0, x, 1, 0, 0)
+        #                 t *= cairo.Matrix(1, y, 0, 1, 0, 0)
+        #                 m *= t
+        #             elif mode == "center":
+        #                 # apply existing transform to centerpoint
+        #                 deltax, deltay = m.transform_point(centerx, centery)
+        #                 x, y = args
+        #                 m1 = cairo.Matrix()
+        #                 m2 = cairo.Matrix()
+        #                 m1.translate(-deltax, -deltay)
+        #                 m2.translate(deltax, deltay)
+        #                 t *= m
+        #                 t *= m1
+        #                 t *= cairo.Matrix(1, 0, x, 1, 0, 0)
+        #                 t *= cairo.Matrix(1, y, 0, 1, 0, 0)
+        #                 t *= m2
+        #                 m = t
+        #         elif cmd == "push":
+        #             m_archived.append(m)
+        #         elif cmd == "pop":
+        #             m = m_archived.pop()
 
         return m
 
@@ -236,7 +244,7 @@ class TransformMixin:
 
     def _reset(self):
         self._transform = Transform()
-        self._transformmode = CENTER
+        self._transformmode = Alignments.CENTER
 
     def _get_transform(self):
         return self._transform
