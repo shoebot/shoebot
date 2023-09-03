@@ -172,7 +172,7 @@ class LiveExecution:
                 self.edited_source = None
                 self.call_good_cb()
                 return
-            except Exception as ex:
+            except Exception:
                 tb = traceback.format_exc()
                 self.call_bad_cb(tb)
                 self.edited_source = None

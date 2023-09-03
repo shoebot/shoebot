@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 
-from shoebot.core.backend import gi
 from gi.repository import Gtk
 from shoebot.core.events import VARIABLE_CHANGED_EVENT, publish_event
 from shoebot.core.var_listener import VarListener

@@ -3,7 +3,7 @@
 # licenSe: LGPL
 import cairo
 try:
-    import numpy as np
+    pass
 except ImportError:
     print("The Video library requires the numpy module (pip install numpy).")
     raise

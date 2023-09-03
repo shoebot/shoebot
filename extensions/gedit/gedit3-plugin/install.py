@@ -16,7 +16,6 @@ from os.path import (
     join,
     normpath,
 )
-from glob import glob
 
 import errno
 import os

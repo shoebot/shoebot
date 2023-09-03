@@ -26,11 +26,6 @@ from shoebot.data import (
     CLOSE,
     LEFT,
     RIGHT,
-    BUTT,
-    ROUND,
-    SQUARE,
-    BEVEL,
-    MITER,
 )
 
 from math import sin, cos, pi

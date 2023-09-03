@@ -11,7 +11,6 @@
 # The drawing primitives are now in the new "nodebox.graphics" package.
 # This will also ensure you get the graphics package for the correct platform.
 
-from shoebot.data import CENTER, LEFT, RIGHT
 
 __all__ = ["files", "random"]
 
@@ -41,4 +40,3 @@ def random(v1=None, v2=None):
             return _random.random() * v1
         else:
             return _random.uniform(v1, v2)
-    pass

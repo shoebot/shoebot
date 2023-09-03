@@ -19,7 +19,6 @@ class DrawQueueSink:
 
     def create_rcontext(self, size, frame):
         """Returns a cairo context for drawing this frame of the bot."""
-        pass
 
     def rendering_finished(self, size, frame, cairo_ctx):
         pass
@@ -30,4 +29,3 @@ class DrawQueueSink:
 
         :return:
         """
-        pass

@@ -33,11 +33,5 @@ This file uses code from Nodebox (http://www.nodebox.net). The relevant
 code parts are marked with a "Taken from Nodebox" comment.
 """
 
-from .canvas import Canvas
-from .cairo_canvas import CairoCanvas
 
-from .drawqueue import DrawQueue
-from .drawqueue_sink import DrawQueueSink
-from .cairo_sink import CairoImageSink
 
-from .input_device import InputDeviceMixin

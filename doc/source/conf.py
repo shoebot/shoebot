@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 
 # on_rtd is whether we are on readthedocs.org
 import os

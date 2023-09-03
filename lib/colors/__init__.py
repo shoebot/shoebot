@@ -2579,7 +2579,6 @@ class ColorTheme(_list):
         after which the dimensions (rows/columns) is determined.
         """
         grouped = {}
-        weights = []
         for clr, rng, weight in self.ranges:
             h = clr.nearest_hue(primary=False)
             if h in grouped:
@@ -3226,7 +3225,7 @@ def colorwheel(x, y, r=250, labels=True, scope=1.0, shift=0.0):
             _ctx.fill(color(0, 0, 0, 0.1, mode="rgb"))
             _ctx.oval(x, 2, x * 0.7, x * 0.7)
             _ctx.fill(color(h, 2.1 - i * 0.1, i * 0.1, i * 0.03, mode="hsb"))
-            p = _ctx.oval(x, 0, x * 0.7, x * 0.7)
+            _ctx.oval(x, 0, x * 0.7, x * 0.7)
             _ctx.pop()
 
         if labels and scope == 1 and shift == 0:

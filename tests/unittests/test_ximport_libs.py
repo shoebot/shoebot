@@ -1,7 +1,4 @@
 import unittest
-from math import radians
-from unittest import skip
-from unittest.mock import patch
 
 from parameterized import parameterized
 

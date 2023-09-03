@@ -16,7 +16,6 @@ import sys
 import socket
 import gettext
 
-from shoebot.core.backend import gi
 
 from gi.repository import GObject
 from .shell import ShoebotCmd

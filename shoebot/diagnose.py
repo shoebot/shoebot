@@ -185,7 +185,7 @@ def display_graphics_implementation():
 
         for k, v in list(driver.get_libs().items()):
             print(f"    {k}: {v}")
-    except Exception as e:
+    except Exception:
         raise
 
 
@@ -198,8 +198,8 @@ def diagnose():
 
     display_graphics_implementation()
     try:
-        import shoebot
-    except ImportError as e:
+        pass
+    except ImportError:
         print("Cannot 'import shoebot'")
         traceback.print_exc()
         return False

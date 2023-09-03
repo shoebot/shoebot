@@ -1,4 +1,3 @@
-from distutils.spawn import find_executable as which
 from gi.repository import Gtk, Gio, GObject, Gedit, Pango, PeasGtk
 from gettext import gettext as _
 from shoebotit import ide_utils, gtk3_utils

@@ -9,14 +9,13 @@ import locale
 import gettext
 
 from itertools import chain
-from math import pi as _pi, sqrt
+from math import sqrt
 from math import sin, cos
 
 from shoebot.core.backend import cairo
 
 from .basecolor import ColorMixin
 from .grob import Grob, CENTER, CORNER, CORNERS
-from . import geometry
 
 MOVETO = "moveto"
 RMOVETO = "rmoveto"
@@ -709,8 +708,8 @@ class BezierPath(Grob, ColorMixin):
                 # (el.c1x, el.c1y, el.c2x, el.c2y, el.x, el.y)
                 lengths.append(self._curvelength(x0, y0, x1, y1, x2, y2, x3, y3, n))
             if el.cmd != CLOSE:
-                x0 = el.x
-                y0 = el.y
+                el.x
+                el.y
         if relative:
             length = sum(lengths)
             try:

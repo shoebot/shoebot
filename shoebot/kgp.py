@@ -237,7 +237,6 @@ class KantGenerator:
 
         The grammar can contain XML comments, but we ignore them
         """
-        pass
 
     def do_xref(self, node):
         """handle <xref id='...'> tag.

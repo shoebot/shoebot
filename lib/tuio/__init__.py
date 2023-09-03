@@ -7,9 +7,6 @@ __copyright__ = "Copyright (c) 2007-2008 Jannis Leidel"
 __license__   = "MIT"
 __url__       = "http://code.google.com/p/pytuio/"
 
-import os
-import sys
-import math
 import socket
 import inspect
 
