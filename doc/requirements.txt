@@ -1,3 +1,4 @@
-sphinx
-sphinx-rtd-theme==0.4.2
-sphinxcontrib-shoebot>=1.2.9
+sphinx==4.2.0
+sphinx-rtd-theme==1.0.0
+#sphinxcontrib-shoebot>=1.3.2
+-e git+https://github.com/shoebot/sphinxcontrib-shoebot.git@port-graphviz#egg=sphinxcontrib-shoebot
