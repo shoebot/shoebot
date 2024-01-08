@@ -9,7 +9,7 @@ import sys
 
 import shoebot
 
-from shoebot.data import ShoebotError
+from shoebot.graphics import ShoebotError
 from shoebot.core.backend import gi
 
 gi.require_version("Gdk", "3.0")

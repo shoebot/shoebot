@@ -1,4 +1,4 @@
-from shoebot.data import (
+from shoebot.graphics import (
     Transform,
     MOVETO,
     LINETO,

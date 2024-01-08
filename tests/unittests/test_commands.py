@@ -20,17 +20,17 @@ from tests.unittests.helpers import ShoebotTestCase
 from tests.unittests.helpers import test_as_bot
 from tests.unittests.helpers import TEST_INPUT_DIR
 
-from shoebot.data import CLOSE
-from shoebot.data import RCURVETO
-from shoebot.data import ShoebotError
-from shoebot.data import ARC
-from shoebot.data import CURVETO
-from shoebot.data import LINETO
-from shoebot.data import RMOVETO
-from shoebot.data import MOVETO
-from shoebot.data import PathElement
-from shoebot.data import RLINETO
-from shoebot.data import RMOVETO
+from shoebot.graphics import CLOSE
+from shoebot.graphics import RCURVETO
+from shoebot.graphics import ShoebotError
+from shoebot.graphics import ARC
+from shoebot.graphics import CURVETO
+from shoebot.graphics import LINETO
+from shoebot.graphics import RMOVETO
+from shoebot.graphics import MOVETO
+from shoebot.graphics import PathElement
+from shoebot.graphics import RLINETO
+from shoebot.graphics import RMOVETO
 
 
 class TestPath(ShoebotTestCase):
@@ -180,7 +180,7 @@ class TestText(ShoebotTestCase):
             ),
         ],
     )
-    @patch("shoebot.data.typography.PangoCairo")
+    @patch("shoebot.graphics.typography.PangoCairo")
     @test_as_bot()
     def test_text_outputs_pango_text_spans(
         self, text_args, text_kwargs, expected_pango_text_span, pango_cairo,

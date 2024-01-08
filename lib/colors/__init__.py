@@ -47,7 +47,7 @@ from xml.dom.minidom import parseString
 
 try:
     from shoebot.grammar import Bot
-    from shoebot.data import Grob
+    from shoebot.graphics import Grob
     from shoebot import _restore, _save
 except ImportError:
     class Grob:
@@ -475,7 +475,7 @@ def _load_color_context():
 
 context = _load_color_context()
 
-from shoebot.data import Color as BaseColor
+from shoebot.graphics import Color as BaseColor
 
 
 # ...let's get started!

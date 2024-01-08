@@ -3,10 +3,10 @@ import sys
 
 from shoebot.core.backend import cairo
 from shoebot.kgp import KantGenerator
-from shoebot.data import ShoebotError
+from shoebot.graphics import ShoebotError
 from shoebot.util.fonts import list_pango_fonts
 from .bot import Bot
-from shoebot.data import (
+from shoebot.graphics import (
     geometry,
     Point,
     BezierPath,
