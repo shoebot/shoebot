@@ -1,7 +1,7 @@
 Point
 -----
 
-.. autoclass:: shoebot.data.Point
+.. autoclass:: shoebot.graphics.Point
   :members:
   :undoc-members:
   :inherited-members:

@@ -1,7 +1,7 @@
 Image
 -----
 
-.. autoclass:: shoebot.data.Image
+.. autoclass:: shoebot.graphics.Image
   :members:
   :undoc-members:
   :inherited-members:

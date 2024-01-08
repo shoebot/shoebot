@@ -1,7 +1,7 @@
 Path
 ----
 
-.. autoclass:: shoebot.data.BezierPath
+.. autoclass:: shoebot.graphics.BezierPath
   :members:
   :undoc-members:
   :inherited-members:
