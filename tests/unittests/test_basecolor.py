@@ -3,7 +3,7 @@ import unittest
 
 from parameterized import parameterized
 
-from shoebot.data.basecolor import Color
+from shoebot.graphics.basecolor import Color
 
 
 class TestBaseColor(unittest.TestCase):

@@ -6,7 +6,7 @@ import sys
 
 from shoebot.core.backend import cairo
 from math import sin, cos
-from .bezier import BezierPath
+from .bezierpath import BezierPath
 
 TRANSFORMS = ["translate", "scale", "rotate", "skew", "push", "pop"]
 CENTER = "center"

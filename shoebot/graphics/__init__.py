@@ -38,6 +38,8 @@ handle them. We're anxiously awaiting for the lib2geom Python bindings :-)
 """
 import sys
 
+from gettext import gettext as _
+
 from . import geometry as geo
 from shoebot.core.backend import cairo
 from .basecolor import (
@@ -52,7 +54,7 @@ from .basecolor import (
     Color,
     ColorMixin,
 )
-from .bezier import (
+from .bezierpath import (
     ARC,
     CLOSE,
     CURVETO,
@@ -68,7 +70,7 @@ from .bezier import (
     PathElement,
 )
 from .grob import Grob, CENTER, CORNER, CORNERS
-from .img import Image
+from .image import Image
 from .point import Point
 from .transforms import Transform
 from .variable import BOOLEAN, BUTTON, NUMBER, TEXT, Variable
@@ -77,7 +79,7 @@ try:
     from .typography import Text
 except ImportError as e:
     Text = None
-    print(_("Typography not available ", e), file=sys.stderr)
+    print((_("Typography not available "), e), file=sys.stderr)
 
 LEFT = "left"
 RIGHT = "right"

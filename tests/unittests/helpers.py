@@ -13,7 +13,7 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot import create_bot
-from shoebot.data.typography import TextBounds
+from shoebot.graphics.typography import TextBounds
 
 TEST_DIR = Path(__file__).absolute().parent
 TEST_INPUT_DIR = TEST_DIR / "input/tests"

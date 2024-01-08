@@ -21,7 +21,7 @@ from shoebot.core.events import (
     REDRAW_EVENT,
 )
 from shoebot.core.var_listener import VarListener
-from shoebot.data import Variable
+from shoebot.graphics import Variable
 from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import UnbufferedFile
 
@@ -78,10 +78,10 @@ class Grammar:
 
         :param filename: Will be set to __file__ in the namespace
         """
-        from shoebot import data
+        from shoebot import graphics
 
-        for name in dir(data):
-            namespace[name] = getattr(data, name)
+        for name in dir(graphics):
+            namespace[name] = getattr(graphics, name)
 
         for name in dir(self):
             if name[0] != "_":

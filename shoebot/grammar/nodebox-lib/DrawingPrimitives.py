@@ -11,7 +11,7 @@
 # The drawing primitives are now in the new "nodebox.graphics" package.
 # This will also ensure you get the graphics package for the correct platform.
 
-from shoebot.data import CENTER, LEFT, RIGHT
+from shoebot.graphics import CENTER, LEFT, RIGHT
 
 __all__ = ["files", "random"]
 

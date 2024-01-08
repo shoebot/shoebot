@@ -38,7 +38,7 @@ from shoebot.core.backend import cairo, driver, gi
 from shoebot.util import ShoebotInstallError, _copy_attrs
 
 from .basecolor import ColorMixin
-from .bezier import BezierPath
+from .bezierpath import BezierPath
 from .grob import Grob
 
 APP = "shoebot"

@@ -35,7 +35,7 @@ import sys
 import os
 
 from shoebot.core.backend import cairo
-from shoebot.data import (
+from shoebot.graphics import (
     BezierPath,
     EndClip,
     Color,

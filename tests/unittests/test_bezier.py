@@ -5,13 +5,13 @@ from parameterized import parameterized
 
 from shoebot.core import CairoCanvas
 from shoebot.core import CairoImageSink
-from shoebot.data import BezierPath
-from shoebot.data import CLOSE
-from shoebot.data import LINETO
-from shoebot.data import MOVETO
-from shoebot.data import PathElement
-from shoebot.data import RLINETO
-from shoebot.data import RMOVETO
+from shoebot.graphics import BezierPath
+from shoebot.graphics import CLOSE
+from shoebot.graphics import LINETO
+from shoebot.graphics import MOVETO
+from shoebot.graphics import PathElement
+from shoebot.graphics import RLINETO
+from shoebot.graphics import RMOVETO
 from shoebot.grammar import NodeBot
 
 
