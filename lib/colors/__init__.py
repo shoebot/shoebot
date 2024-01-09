@@ -46,7 +46,7 @@ from random import random, choice
 from xml.dom.minidom import parseString
 
 try:
-    from shoebot.grammar import Bot
+    from shoebot.grammar import NodeBot
     from shoebot.graphics import Grob
     from shoebot import _restore, _save
 except ImportError:
@@ -498,8 +498,8 @@ class Color(BaseColor):
 
         self.name = ""
 
-        RGB = Bot.RGB
-        HSB = Bot.HSB
+        RGB = NodeBot.RGB
+        HSB = NodeBot.HSB
         mode, range = _ctx.color_mode, _ctx.color_range
         modes = [RGB, HSB]
 
