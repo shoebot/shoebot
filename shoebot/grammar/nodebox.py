@@ -33,17 +33,20 @@ from shoebot.graphics import (
     SQUARE,
     BEVEL,
     MITER,
-    NUMBER,
-    TEXT,
-    BUTTON,
-    BOOLEAN,
-    Variable,
     Color,
     ClippingPath,
     EndClip,
     Transform,
     Grob,
     Text,
+)
+
+from .variable import (
+    NUMBER,
+    TEXT,
+    BUTTON,
+    BOOLEAN,
+    Variable,
 )
 
 from math import sin, cos, pi

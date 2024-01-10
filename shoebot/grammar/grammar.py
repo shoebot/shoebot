@@ -1,18 +1,16 @@
 from __future__ import print_function
 
 import copy
-import dataclasses
 import os
 import sys
 import traceback
-from math import copysign
 from queue import Queue, Empty
 from time import sleep, time
 
-import pubsub.core
 from pubsub import pub
 
 from .livecode import LiveExecution
+from .variable import Variable
 from shoebot.core.events import (
     QUIT_EVENT,
     SET_WINDOW_TITLE_EVENT,
@@ -21,7 +19,6 @@ from shoebot.core.events import (
     REDRAW_EVENT,
 )
 from shoebot.core.var_listener import VarListener
-from shoebot.graphics import Variable
 from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import UnbufferedFile
 

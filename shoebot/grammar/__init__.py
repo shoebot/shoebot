@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
-from . import nodebox
+from .nodebox import NodeBot
+from .variable import (
+    NUMBER,
+    TEXT,
+    BUTTON,
+    BOOLEAN,
+    Variable,
+)
+from shoebot.core.var_listener import VarListener
 
 __all__ = [
     "nodebox",
     "input_device",
     "InputDeviceMixin",
     "VarListener",
+    "Variable",
 ]
-
-from .nodebox import NodeBot
-from shoebot.core.var_listener import VarListener

@@ -73,7 +73,6 @@ from .grob import Grob, CENTER, CORNER, CORNERS
 from .image import Image
 from .point import Point
 from .transforms import Transform
-from .variable import BOOLEAN, BUTTON, NUMBER, TEXT, Variable
 
 try:
     from .typography import Text
