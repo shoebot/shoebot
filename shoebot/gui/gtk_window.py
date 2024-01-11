@@ -256,13 +256,20 @@ class ShoebotWindow(Gtk.Window, GtkInputDeviceMixin, DrawQueueSink):
 
     def output_image_filename(self, format):
         """
-        :param format:  Format, e.g. svg, pdf, png
+        :param format:  Format: "svg", "pdf", "png" or "ps"
         :return:  Full image filename, based on bot name
         """
         script = self.bot._namespace["__file__"]
-        frame = self.bot._namespace["ITERATION"]
+
         if script:
-            return f"{Path(script).stem}-{frame:04}.{format}"
+            filepath = Path(f"{Path(script).stem}.{format}")
+            if filepath.exists():
+                filecounter = 1
+                while filepath.exists():
+                    # try script-001, 002 and so on
+                    filepath = Path(f"{Path(script).stem}-{filecounter:03}.{format}")
+                    filecounter += 1
+            return str(filepath)
 
         return f"output.{format}"
 
