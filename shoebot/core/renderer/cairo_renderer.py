@@ -1,6 +1,7 @@
 import cairo
 
 from shoebot.core.renderer.renderer import Renderer
+from shoebot.core.state.color_data import RGBAData
 from shoebot.graphics import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, CLOSE, BezierPath, ClippingPath
 
 
@@ -53,22 +54,23 @@ class CairoRenderer(Renderer):
         strokewidth = 1.0  # TODO
         # TODO: fill/stroke expect Color that have .rgba, .rgb and .alhpha,
         # could formalise this better or improve color support somehow.
-        fill = path.fill
-        stroke = path.stroke
+        #stroke = path.stroke._stacked_state.as_rgba()
+        #fill = path.fill._stacked_state.as_rgba()
 
-        print("render_bezierpath ", fill, stroke, strokewidth)
-
+        stacked_state = path._stacked_state
         import ipdb
         with ipdb.launch_ipdb_on_exception():
-            print(fill.alpha)
-            if fill.alpha > 0.0 or stroke.alpha > 0.0:
-                if stroke.alpha == 1.0:
+            stroke = RGBAData(*stacked_state.stroke.as_rgba())
+            fill = RGBAData(*stacked_state.fill.as_rgba())
+
+            if fill.a > 0.0 or stroke.a > 0.0:
+                if stroke.a == 1.0:
                     # Fast path if no alpha in stroke
                     # TODO:  Probably need color handling that knows about things other than rgba
-                    ctx.set_source_rgba(*fill.rgb)
+                    ctx.set_source_rgba(*fill.channels)
                     ctx.fill_preserve()
 
-                    ctx.set_source_rgba(*stroke.rgb)
+                    ctx.set_source_rgba(*stroke.channels)
                     ctx.set_line_width(strokewidth)
                     ctx.stroke()
 
@@ -76,23 +78,23 @@ class CairoRenderer(Renderer):
                     # Draw fill onto intermediate surface so stroke does not overlay fill
                     ctx.push_group()
 
-                    ctx.set_source_rgba(*fill.rgba)
+                    ctx.set_source_rgba(*fill.channels)
                     ctx.fill_preserve()
 
-                    ctx.set_source_rgba(*stroke.rgba)
+                    ctx.set_source_rgba(*stroke.channels)
                     ctx.set_operator(cairo.OPERATOR_SOURCE)
                     ctx.set_line_width(strokewidth)
                     ctx.stroke()
 
                     ctx.pop_group_to_source()
                     ctx.paint()
-            elif fill.alpha:
+            elif fill.a:
                 # Stroke has no alpha but fill does.
-                ctx.set_source_rgba(*fill.rgba)
+                ctx.set_source_rgba(*fill.channels)
                 ctx.fill()
-            elif stroke.alpha:
+            elif stroke.a:
                 # Fill has no alpha but stroke does.
-                ctx.set_source_rgba(*stroke.rgba)
+                ctx.set_source_rgba(*stroke.channels)
                 ctx.set_line_width(strokewidth)
                 ctx.stroke()
 

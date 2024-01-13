@@ -1,11 +1,12 @@
 from typing import Optional, List
 
 from .point import Point
-from .basecolor import Color
+from .color import Color
 
 from enum import Enum, auto
 
 from ..core.state.bezierpath import BezierPathState
+from ..core.state.stateful import Stateful
 
 
 class Alignments(Enum):
@@ -59,7 +60,7 @@ class PathElementTypes(Enum):
     RMOVETO = auto()
 
 
-class BezierPath:
+class BezierPath(Stateful):
     def __init__(self, context, *args, **kwargs):
         self._context = context
 
@@ -67,17 +68,21 @@ class BezierPath:
             # Copy constructor
             # TODO - check compatibility
             other: BezierPath = args[0]
-            self._state = other._state.copy()
+            state = other._state.copy()
             self._elements = list(other._elements)
         else:
-            self._state = BezierPathState.from_kwargs(**kwargs)
+            state = BezierPathState.from_kwargs(context._state, **kwargs)
             self._elements = []
+
+        super().__init__(state, context._stacked_state)  # noqa
+
+    # We need a way of specifying that the thing doing the reading/writing is a Stateful
+    # object - and handle sorting out state with it.
+    fill: Color = BezierPathState.readwrite_state_value_property(Color)
+    stroke: Color = BezierPathState.readwrite_state_value_property(Color)
 
     #fill: Color = BezierPathState.readwrite_property(writer=Color)
     #stroke: Color = BezierPathState.readwrite_property(writer=Color)
-
-    fill: Color = BezierPathState.readwrite_property(writer=Color)
-    stroke: Color = BezierPathState.readwrite_property(writer=Color)
 
     # pen: Color = BezierPathState.readwrite_property()
     closed: bool = BezierPathState.readonly_property()
@@ -166,6 +171,7 @@ class BezierPath:
 
     def draw(self):
         self._context.canvas.draw_path(self)
+
     def __getitem__(self, item):
         return self._elements[item]
 

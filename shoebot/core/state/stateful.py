@@ -1,28 +1,30 @@
+from typing import Optional
+
+from shoebot.core.state.chain_dataclass import ChainDataClass
+from shoebot.core.state.state import State
+
+
 class Stateful:
     """
-    In Shoebot Stateful objects such as Grobs delegate state storage to
-    a State object. This allows the state to be stored in a single
+    Stateful objects such as Grobs delegate state storage to
+    a State object.
+
+    This allows the state to be stored in a single
     place, and for the state to be shared between multiple objects.
     """
-    def __init__(self, _state=None):
-        if _state is None:
-            state = State()
+    def __init__(self, state: State, parent_state: Optional[State] = None):
         self._state = state
-
-    def __getattr__(self, name):
-        return getattr(self._state, name)
-
-    def __setattr__(self, name, value):
-        if name == "_state":
-            super().__setattr__(name, value)
+        if parent_state is None:
+            self._stacked_state = ChainDataClass(state)
         else:
-            setattr(self._state, name, value)
-
-    def __delattr__(self, name):
-        delattr(self._state, name)
-
-    def __dir__(self):
-        return dir(self._state)
+            self._stacked_state = ChainDataClass(state, parent_state)
 
     def __repr__(self):
-        return "<Stateful: %s>" % self._state
+        return f"<{type(self)}: {self._state}>"
+
+class StateValueContainer:
+    def __init__(self, attribute_name: str):
+        self._state_attribute_name = attribute_name
+    @property
+    def __state_value__(self):
+        return getattr(self, self._state_attribute_name)

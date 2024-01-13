@@ -71,7 +71,7 @@ from .bezierpath import (
 )
 
 from .point import Point
-from .basecolor import Color
+from .color import Color
 
 # TODO - move these
 class ColorTypes(Enum):

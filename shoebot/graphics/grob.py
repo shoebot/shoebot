@@ -1,8 +1,6 @@
 # TODO, Move 'bot' out of here, push responsibility back to 'Nodebox' and other grammars,
 #       Enabling seperation of BezierPath etc
 
-from shoebot.core.backend import cairo
-
 # Alignments
 CENTER = "center"
 CORNER = "corner"
@@ -131,12 +129,12 @@ class Grob:
         """Based on setupTransform from Java nodebox
         https://github.com/nodebox/nodebox/blob/master/src/main/java/nodebox/graphics/Grob.java."""
         # TODO: Port from cairo to Affine (or something else)
-        dx, dy = self._get_center()
-        t = cairo.Matrix()
-        t.translate(dx, dy)
-        t = transform * t
-        t.translate(-dx, -dy)
-        return t
+        # dx, dy = self._get_center()
+        # t = cairo.Matrix()
+        # t.translate(dx, dy)
+        # t = transform * t
+        # t.translate(-dx, -dy)
+        # return t
 
     def _corner_transform(self, transform):
         """CORNER is the default, so we just return the transform."""

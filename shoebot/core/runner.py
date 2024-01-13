@@ -1,17 +1,20 @@
 import ast
-import enum
 import functools
 import queue
 import sys
 import traceback
 from pathlib import Path
 
-from pubsub import pub
-
-from shoebot import create_canvas, NodeBot, QUIT_EVENT
 from shoebot.core.canvas import Canvas
-from shoebot.core.events import SOURCE_CHANGED_EVENT, SET_WINDOW_TITLE_EVENT, REDRAW_EVENT, VARIABLE_CHANGED_EVENT, \
-    route_events_to_queue
+from shoebot.core.events import (
+    SOURCE_CHANGED_EVENT,
+    SET_WINDOW_TITLE_EVENT,
+    REDRAW_EVENT,
+    VARIABLE_CHANGED_EVENT,
+    QUIT_EVENT,
+    route_events_to_queue,
+)
+from shoebot.grammar.nodebox import NodeBotContext
 
 
 # TODO:
@@ -86,7 +89,7 @@ class ShoebotRunner:
         assert output is not None, "Output must be provided."
         self.output = output
         self.canvas = Canvas(output)
-        self.context = NodeBot(self.canvas)
+        self.context = NodeBotContext(self.canvas)
         self.event_queue = queue.Queue()
 
         route_events_to_queue(self.event_queue, "shoebot")

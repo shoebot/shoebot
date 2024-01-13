@@ -98,7 +98,7 @@ class Canvas:
         # TODO need way of passing state of path.
         print("draw_path ", self.output, self.output.renderer)
         # TODO - need to grab relevant bits of ctx
-        self.commands.append((path, path._state))
+        self.commands.append((path, path._stacked_state))
 
     def push_clip(self, path):
         # TODO

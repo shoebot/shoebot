@@ -56,7 +56,10 @@ import random as r
 import locale
 import gettext
 
-from .grammar import Grammar
+from .contextbase import ContextBase
+from ..core.state.context import ContextState
+from ..core.state.nodebox import NodeBotContextDefaults
+from ..core.state.stateful import Stateful
 
 SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = "shoebot"
@@ -86,7 +89,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "nodebox-lib"))
 sys.path.append(".")  # ximport can work from current dir
 
 
-class NodeBot(Grammar):
+class NodeBotContext(ContextBase, Stateful):
     NORMAL = "1"
     FORTYFIVE = "2"
 
@@ -162,7 +165,10 @@ class NodeBot(Grammar):
         """
         # from shoebot.core.chain_dataclass import ChainDataClass, Context, Defaults
         #self._state = ChainDataClass(Context(), Defaults())
-        Grammar.__init__(self, canvas, namespace=namespace, vars=vars)
+        ContextBase.__init__(self, canvas, namespace=namespace, vars=vars)
+        state = ContextState()
+        defaults = NodeBotContextDefaults()
+        Stateful.__init__(self, state, defaults)
 
         # self._autoclosepath = True
         # self._path = None
@@ -181,7 +187,7 @@ class NodeBot(Grammar):
                 raise ValueError("Frame must be an integer.")
         else:
             self._frame = 1
-        self._set_initial_defaults()  ### TODO Look at these
+        #self._set_initial_defaults()  ### TODO Look at these
 
         canvas.mode = CORNER
 
@@ -200,7 +206,7 @@ class NodeBot(Grammar):
         if "WIDTH" in self._namespace or "HEIGHT" in self._namespace:
             self.size(self._namespace.get("WIDTH"), self._namespace.get("HEIGHT"))
 
-        self._transformmode = NodeBot.CENTER
+        #self._transformmode = NodeBot.CENTER
 
         # TODO implement canvas settings (check Nodebox, these will probably be attributes)
         # self._canvas.settings(
