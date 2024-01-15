@@ -21,6 +21,9 @@ from shoebot.core.events import (
 from shoebot.core.var_listener import VarListener
 from shoebot.grammar.format_traceback import simple_traceback
 from shoebot.util import UnbufferedFile
+from ..core.state.context import ContextState
+from ..core.state.nodebox import NodeBotContextDefaults
+from ..core.state.stateful import Stateful
 
 sys.stdout = UnbufferedFile(sys.stdout)
 sys.stderr = UnbufferedFile(sys.stderr)
@@ -30,7 +33,7 @@ DEFAULT_GUI_UPDATE_SPEED = 30.0
 DEFAULT_ANIMATION_SPEED = 60.0
 
 
-class ContextBase:
+class ContextBase(Stateful):
     """A Bot is an interface to receive user commands (through scripts or
     direct calls) and pass them to a canvas for drawing.
 
@@ -39,7 +42,7 @@ class ContextBase:
     for run which is called to actually run the Bot.
     """
 
-    def __init__(self, canvas, namespace=None, vars=None):
+    def __init__(self, canvas, defaults: ContextState, namespace=None, vars=None):
         self._canvas = canvas
         self._dynamic = True
         self._speed = None
@@ -59,6 +62,9 @@ class ContextBase:
         #         mouse_pointer_moved=self._mouse_pointer_moved,
         #     )
         # self._input_device = input_device
+
+        state = ContextState()
+        Stateful.__init__(self, state, defaults)
 
     def _update_animation_variables(self, iteration, frame):
         """

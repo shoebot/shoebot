@@ -28,17 +28,17 @@ STATES = {
 #     """
 #     Metaclass for Grob.
 #
-#     Checks for a ._state_attributes class attribute on the class and it's bases, and adds
+#     Checks for a .__state___attributes class attribute on the class and it's bases, and adds
 #     a .state_attributes set to the class with the union of all of them.
 #     """
 #
 #     def __new__(cls, name, bases, attrs):
 #         state_attributes = set()
 #         for base in bases:
-#             if hasattr(base, "_state_attributes"):
-#                 state_attributes.update(base._state_attributes)
-#         if "_state_attributes" in attrs:
-#             state_attributes.update(attrs["_state_attributes"])
+#             if hasattr(base, "__state___attributes"):
+#                 state_attributes.update(base.__state___attributes)
+#         if "__state___attributes" in attrs:
+#             state_attributes.update(attrs["__state___attributes"])
 #         attrs["state_attributes"] = state_attributes
 #         # Map between the state attributes and the _underscored names used to store them.
 #         attrs["state_attribute_names"] = {f"_{attr}": attr for attr in state_attributes}
@@ -47,19 +47,19 @@ STATES = {
 #
 # class StateMixin:
 #     def __init__(self, **kwargs):
-#         self._initialize_state(**kwargs)
+#         self._initialize__state__(**kwargs)
 #
-# def _initialize_state(self, **kwargs):
+# def _initialize__state__(self, **kwargs):
 #     """
 #     Initializes the state attributes of the object (e.g. self._fillcolor) from the kwargs.
 #     """
-#     print("StateMixin._initialize_state")
+#     print("StateMixin._initialize__state__")
 #     for _name, name in self.state_attribute_names.items():
 #         print(f"  >  {type(self).__name__}  {_name}={kwargs.get(name, None)}")
 #         setattr(self, _name, kwargs.get(name, None))
 #         print("  >>", getattr(self, _name))
 #
-# def frozen_state(self):
+# def frozen__state__(self):
 #     """
 #     Returns a dict of the state attributes of the object.
 #
@@ -83,12 +83,12 @@ class Grob:
     """
     A GRaphic OBject is the base class for all DrawingPrimitives.
 
-    Base classes should provide a _state_attributes class attribute.
+    Base classes should provide a __state___attributes class attribute.
     attributes named there will be added to an .state_attributes
     and automatically initialized in the constructor.
     """
 
-    # _state_attributes = set()
+    # __state___attributes = set()
     """Names of attributes that track drawing state."""
 
     def __init__(self, context, **kwargs):

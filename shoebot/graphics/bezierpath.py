@@ -68,21 +68,18 @@ class BezierPath(Stateful):
             # Copy constructor
             # TODO - check compatibility
             other: BezierPath = args[0]
-            state = other._state.copy()
+            state = other.__state__.copy()
             self._elements = list(other._elements)
         else:
-            state = BezierPathState.from_kwargs(context._state, **kwargs)
+            state = BezierPathState.from_kwargs(**kwargs)
             self._elements = []
 
-        super().__init__(state, context._stacked_state)  # noqa
+        super().__init__(state, context.__state_stack__)  # noqa
 
     # We need a way of specifying that the thing doing the reading/writing is a Stateful
     # object - and handle sorting out state with it.
     fill: Color = BezierPathState.readwrite_state_value_property(Color)
     stroke: Color = BezierPathState.readwrite_state_value_property(Color)
-
-    #fill: Color = BezierPathState.readwrite_property(writer=Color)
-    #stroke: Color = BezierPathState.readwrite_property(writer=Color)
 
     # pen: Color = BezierPathState.readwrite_property()
     closed: bool = BezierPathState.readonly_property()
@@ -125,8 +122,8 @@ class BezierPath(Stateful):
         if self._elements:
             pt = self[0]
             self.append(PathElement(PathElementTypes.CLOSE))
-            self._state.closed = True
-        # TODO - do we want PathElement.CLOSE, we have _state.closed as well.
+            self.__state__.closed = True
+        # TODO - do we want PathElement.CLOSE, we have __state__.closed as well.
         # TODO - is this right, if we have no elements ?
         # TODO - this should check the last element isn't a CLOSE
         # TODO - should we moveto the first point ?

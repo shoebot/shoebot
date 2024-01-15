@@ -32,11 +32,25 @@ from shoebot.core.state.context import ContextState
 #         self._noImagesHint = False
 #         self._oldvars = self._vars
 #         self._vars = []
-@dataclass
-class NodeBotContextDefaults(ContextState):
-    """Default values for the NodebotContext"""
-    # TODO - review the types, we may need less.
 
-    def __init__(self):
-        self.fill = RGBData(0, 0, 1)
-        self.stroke = RGBAData(0, 0, 0, 0)
+class DefaultValuesMixin:
+    def __post_init__(self):
+        # Iterate list of fields on the parent datafield class
+        missing_fields = []
+        for field in self.__dataclass_fields__.values():
+            try:
+                class_value = getattr(self.__class__, field.name)
+            except AttributeError:
+                missing_fields.append(field.name)
+            setattr(self, field.name, class_value)
+
+        if missing_fields:
+            raise AttributeError(f"Missing defaults for fields: {missing_fields}")
+
+
+@dataclass
+class NodeBotContextDefaults(ContextState, DefaultValuesMixin):
+    """Default values for the NodebotContext"""
+
+    fill = RGBData(0, 1, 1)
+    stroke = RGBAData(0, 0, 0, 0)

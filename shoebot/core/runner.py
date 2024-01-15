@@ -168,9 +168,10 @@ class ShoebotRunner:
                     pass
 
             # TODO - sort out exactly destroy_renderer is called.
-            # Hack to ensure renderer is created if size wasn't called yet:
-            if self.canvas.size is None:
-                self.canvas.set_size(400, 400)
+            if not hasattr(self.output, "renderer"):
+                print("Create renderer with default size")
+                # TODO - do this somewhere appropriate.
+                self.output.create_renderer(400, 400)
             self.output.renderer.render_canvas(self.canvas)
             self.output.destroy_renderer()
             return # TODO - for now exit after 1 frame

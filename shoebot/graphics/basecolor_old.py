@@ -523,7 +523,7 @@
 #     allowing them to be specfied in other ways, such as   fill="#123456"
 #     """
 #
-#     _state_attributes = {
+#     __state___attributes = {
 #         "blendmode",
 #         "dashoffset",
 #         "fill",

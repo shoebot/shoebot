@@ -1,6 +1,6 @@
 """
 Graphics state, such as the colour and size of of objects is
-delegated to a dataclass in a _state attribute.
+delegated to a dataclass in a __state__ attribute.
 
 This separates the more complex APIs the users use from a simpler
 intermediate representation that Renderers can use.
@@ -25,7 +25,7 @@ class ReadOnlyDescriptor:
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
-        return getattr(obj._state, self.field_name)
+        return getattr(obj.__state__, self.field_name)
 
 
 class ReadWriteDescriptor:
@@ -44,13 +44,13 @@ class ReadWriteDescriptor:
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
-        return getattr(obj._state, self.field_name)
+        return getattr(obj.__state__, self.field_name)
 
     def __set__(self, obj, value):
         if self.writer is not None:
-            setattr(obj._state, self.field_name, self.writer(value))
+            setattr(obj.__state__, self.field_name, self.writer(value))
         else:
-            setattr(obj._state, self.field_name, value)
+            setattr(obj.__state__, self.field_name, value)
 
 
 class ReadWriteStateValueDescriptor:
@@ -68,14 +68,14 @@ class ReadWriteStateValueDescriptor:
     @staticmethod
     def ensure_state_storage(obj):
         """
-        Ensure that the object has a __state_values__ attribute to store state values in.
+        Ensure that the object has a ___state___values__ attribute to store state values in.
         """
         if not hasattr(obj, '__state_values__'):
             obj.__state_values__ = {}
 
     def __get__(self, obj, objtype=None):
         """
-        Get the value of the state value stored in the __state_values__ attribute.
+        Get the value of the state value stored in the ___state___values__ attribute.
         """
         if obj is None:
             return self
@@ -89,19 +89,19 @@ class ReadWriteStateValueDescriptor:
         """
         self.ensure_state_storage(obj)
         state_value = self.state_value_type(value).__state_value__
-        setattr(obj._state, self.field_name, state_value)
+        setattr(obj.__state__, self.field_name, state_value)
         obj.__state_values__[self.field_name] = value
 
 
     def __set__(self, obj, value):
         state_value = self.state_value_type(value).__state_value__
-        setattr(obj._state, self.field_name, state_value)
+        setattr(obj.__state__, self.field_name, state_value)
         self.value = value
 
 class State(metaclass=abc.ABCMeta):
     """
     In Shoebot Stateful objects such as Grobs delegate state storage to
-    dataclasses that extend the State class in their _state attribute.
+    dataclasses that extend the State class in their __state__ attribute.
 
     Fields in the State dataclasses contain information needed by the Renderer
     to draw the object, such as the colour and size of the object.
@@ -114,7 +114,7 @@ class State(metaclass=abc.ABCMeta):
     dataclass.
     """
     @classmethod
-    def from_kwargs(cls, _state=None, **kwargs):
+    def from_kwargs(cls, __state__=None, **kwargs):
         """
         Create an instance of the dataclass using provided keyword arguments.
 
@@ -122,12 +122,12 @@ class State(metaclass=abc.ABCMeta):
 
         Extra arguments are omitted.
 
-        :param _state: An instance of the dataclass
+        :param __state__: An instance of the dataclass
         :param kwargs: Arbitrary keyword arguments.
         :return: An instance of the dataclass.
         """
-        if _state is not None:
-            return _state
+        if __state__ is not None:
+            return __state__
         
         # Create a set of field names for efficient lookup
         field_names = {field.name for field in fields(cls)}
@@ -144,12 +144,6 @@ class State(metaclass=abc.ABCMeta):
     @classmethod
     def readonly_property(cls, field_name=None):
         return ReadOnlyDescriptor(field_name)
-
-    # def readonly_subproperty(self, container_type=None, field_name=None, writer=None):
-    #     if writer:
-    #         raise NotImplementedError("writer not implemented for subproperty")
-    #     return ReadOnlySubDescriptor(container_type, field_name)
-
 
     @classmethod
     def readwrite_state_value_property(self, stateful_type, field_name=None):

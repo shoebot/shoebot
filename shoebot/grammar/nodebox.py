@@ -59,7 +59,7 @@ import gettext
 from .contextbase import ContextBase
 from ..core.state.context import ContextState
 from ..core.state.nodebox import NodeBotContextDefaults
-from ..core.state.stateful import Stateful
+from ..core.state.stateful import Stateful, get_state, get_state_value
 
 SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = "shoebot"
@@ -89,7 +89,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "nodebox-lib"))
 sys.path.append(".")  # ximport can work from current dir
 
 
-class NodeBotContext(ContextBase, Stateful):
+class NodeBotContext(ContextBase):
     NORMAL = "1"
     FORTYFIVE = "2"
 
@@ -151,11 +151,6 @@ class NodeBotContext(ContextBase, Stateful):
     color_mode = RGB
     color_range = 1
 
-    # TODO remove
-    # _state_attributes = {
-    #     *BezierPath.state_attributes,
-    # }
-
     def __init__(self, canvas=None, namespace=None, vars=None):
         """Nodebot grammar constructor.
 
@@ -163,12 +158,8 @@ class NodeBotContext(ContextBase, Stateful):
         :param namespace: Optionally specify a dict to inject as namespace
         :param vars: Optional dict containing initial values for variables
         """
-        # from shoebot.core.chain_dataclass import ChainDataClass, Context, Defaults
-        #self._state = ChainDataClass(Context(), Defaults())
-        ContextBase.__init__(self, canvas, namespace=namespace, vars=vars)
-        state = ContextState()
         defaults = NodeBotContextDefaults()
-        Stateful.__init__(self, state, defaults)
+        ContextBase.__init__(self, canvas, defaults, namespace=namespace, vars=vars)
 
         # self._autoclosepath = True
         # self._path = None
@@ -1097,8 +1088,12 @@ class NodeBotContext(ContextBase, Stateful):
         :param args: color in supported format
         """
         if args is not None:
-            self._canvas.fillcolor = self.color(*args)
-        return self._canvas.fillcolor
+            color = self.color(*args)
+            get_state(self).fill = get_state_value(color)
+        else:
+            # TODO - color from state needed
+            color = self.color(get_state(self).fill)
+        return color
 
     def nofill(self):
         """Stop applying fills to new paths.

@@ -18,7 +18,7 @@ CORNER = "corner"
 class Image(Grob):
     def __init__(self, context, **kwargs):
         self._context = context
-        self._state = ImageState.from_kwargs(**kwargs)
+        self.__state__ = ImageState.from_kwargs(**kwargs)
 
     x = ImageState.readwrite_property()
     y = ImageState.readwrite_property()

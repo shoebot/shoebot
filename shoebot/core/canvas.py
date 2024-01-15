@@ -85,20 +85,24 @@ class Canvas:
         if self.realised_size is None:
             print("create renderer", self.output)
             self.output.create_renderer(*dimensions)
+            self.realised_size = dimensions
+        else:
+            print("resize renderer - not supported")
+            raise NotImplementedError("Resize not supported")
+
         self.width, self.height = dimensions
         return self.width, self.height  # TODO - is this correct?
 
     def draw_image(self, image):
-        # TODO need way of passing state of image.
-        print("draw_image", image, image._state)
-        # TODO - need to grab relevant bits of ctx
-        self.commands.append((image, image._state))
+        # TODO - do we need to freeze the state?
+        self.commands.append((image, image.__state_stack__))
 
     def draw_path(self, path: BezierPath):
-        # TODO need way of passing state of path.
-        print("draw_path ", self.output, self.output.renderer)
-        # TODO - need to grab relevant bits of ctx
-        self.commands.append((path, path._stacked_state))
+        # TODO - do we need to freeze the state?
+        self.commands.append((path, path.__state_stack__))
+
+    def translate(self, x, y):
+        self.position = (x, y)  # TODO - this is not used by the renderer yet.
 
     def push_clip(self, path):
         # TODO

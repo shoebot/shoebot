@@ -13,18 +13,25 @@ class Stateful:
     place, and for the state to be shared between multiple objects.
     """
     def __init__(self, state: State, parent_state: Optional[State] = None):
-        self._state = state
+        self.__state__ = state
         if parent_state is None:
-            self._stacked_state = ChainDataClass(state)
+            self.__state_stack__ = ChainDataClass(state)
         else:
-            self._stacked_state = ChainDataClass(state, parent_state)
+            self.__state_stack__ = ChainDataClass(state, parent_state)
 
     def __repr__(self):
-        return f"<{type(self)}: {self._state}>"
+        return f"<{type(self)}: {self.__state__}>"
+
+def get_state(obj: Stateful):
+    return obj.__state__
 
 class StateValueContainer:
     def __init__(self, attribute_name: str):
-        self._state_attribute_name = attribute_name
+        self.__state_attribute_name__ = attribute_name
     @property
     def __state_value__(self):
-        return getattr(self, self._state_attribute_name)
+        return getattr(self, self.__state_attribute_name__)
+
+
+def get_state_value(container: StateValueContainer):
+    return container.__state_value__

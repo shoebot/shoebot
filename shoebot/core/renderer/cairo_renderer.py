@@ -14,6 +14,8 @@ class CairoRenderer(Renderer):
     def __init__(self, ctx: cairo.Context):
         """
         Create a CairoRenderer that will draw on the given cairo Context.
+
+        :param ctx: a cairo Context to draw on.
         """
         super().__init__(ctx)
 
@@ -52,51 +54,45 @@ class CairoRenderer(Renderer):
             self.render_pathelement(element)
 
         strokewidth = 1.0  # TODO
-        # TODO: fill/stroke expect Color that have .rgba, .rgb and .alhpha,
-        # could formalise this better or improve color support somehow.
-        #stroke = path.stroke._stacked_state.as_rgba()
-        #fill = path.fill._stacked_state.as_rgba()
 
-        stacked_state = path._stacked_state
-        import ipdb
-        with ipdb.launch_ipdb_on_exception():
-            stroke = RGBAData(*stacked_state.stroke.as_rgba())
-            fill = RGBAData(*stacked_state.fill.as_rgba())
+        # TODO - currently only supports rendering to RGBA
+        stacked_state = path.__state_stack__
+        stroke = RGBAData(*stacked_state.stroke.as_rgba())
+        fill = RGBAData(*stacked_state.fill.as_rgba())
 
-            if fill.a > 0.0 or stroke.a > 0.0:
-                if stroke.a == 1.0:
-                    # Fast path if no alpha in stroke
-                    # TODO:  Probably need color handling that knows about things other than rgba
-                    ctx.set_source_rgba(*fill.channels)
-                    ctx.fill_preserve()
-
-                    ctx.set_source_rgba(*stroke.channels)
-                    ctx.set_line_width(strokewidth)
-                    ctx.stroke()
-
-                else:
-                    # Draw fill onto intermediate surface so stroke does not overlay fill
-                    ctx.push_group()
-
-                    ctx.set_source_rgba(*fill.channels)
-                    ctx.fill_preserve()
-
-                    ctx.set_source_rgba(*stroke.channels)
-                    ctx.set_operator(cairo.OPERATOR_SOURCE)
-                    ctx.set_line_width(strokewidth)
-                    ctx.stroke()
-
-                    ctx.pop_group_to_source()
-                    ctx.paint()
-            elif fill.a:
-                # Stroke has no alpha but fill does.
+        if fill.a > 0.0 or stroke.a > 0.0:
+            if stroke.a == 1.0:
+                # Fast path if no alpha in stroke
+                # TODO:  Probably need color handling that knows about things other than rgba
                 ctx.set_source_rgba(*fill.channels)
-                ctx.fill()
-            elif stroke.a:
-                # Fill has no alpha but stroke does.
+                ctx.fill_preserve()
+
                 ctx.set_source_rgba(*stroke.channels)
                 ctx.set_line_width(strokewidth)
                 ctx.stroke()
+            else:
+                # Draw fill onto intermediate surface so stroke does not overlay fill
+                ctx.push_group()
+
+                ctx.set_source_rgba(*fill.channels)
+                ctx.fill_preserve()
+
+                ctx.set_source_rgba(*stroke.channels)
+                ctx.set_operator(cairo.OPERATOR_SOURCE)
+                ctx.set_line_width(strokewidth)
+                ctx.stroke()
+
+                ctx.pop_group_to_source()
+                ctx.paint()
+        elif fill.a:
+            # Stroke has no alpha but fill does.
+            ctx.set_source_rgba(*fill.channels)
+            ctx.fill()
+        elif stroke.a:
+            # Fill has no alpha but stroke does.
+            ctx.set_source_rgba(*stroke.channels)
+            ctx.set_line_width(strokewidth)
+            ctx.stroke()
 
     def render_clippingpath(self, path):
         # TODO test
@@ -106,7 +102,7 @@ class CairoRenderer(Renderer):
         ctx.clip()
 
     def render_canvas(self, canvas):
-        print("render_canvas", canvas.commands)
+        print(f"render_canvas [{len(canvas.commands)} commands]")
         for command, state in canvas.commands:
             if isinstance(command, ClippingPath):
                 self.render_clippingpath(command, state)
