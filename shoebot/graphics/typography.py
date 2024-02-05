@@ -40,7 +40,7 @@ from cairo import PATH_CLOSE_PATH, PATH_CURVE_TO, PATH_LINE_TO, PATH_MOVE_TO
 from shoebot.core.backend import cairo, driver, gi
 from shoebot.util import ShoebotInstallError, _copy_attrs
 
-from .basecolor import ColorMixin
+## from .color import ColorMixin
 from .bezierpath import BezierPath
 from .grob import Grob
 
@@ -127,7 +127,7 @@ Text Bounds in pixels.
 :param height: Height in pixels."""
 
 
-class Text(ColorMixin, Grob):
+class Text(Grob):
     """Changes from Nodebox 1: font in Nodebox is a native Cocoa font, here it
     is the font name. _fontsize, _fontsize, _lineheight, _align in Nodebox are
     public fields.

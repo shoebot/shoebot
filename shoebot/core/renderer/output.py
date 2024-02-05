@@ -17,6 +17,9 @@ class Output:
     to a file, the Output implementation handles this.
     """
 
+    TARGET_IS_FILE = False
+    TARGET_IS_WINDOW = False
+
     def __init__(self):
         self.renderer = None
 
@@ -44,23 +47,41 @@ class FileOutput(Output):
 
     @classmethod
     def outputs_for_format(cls, file_format):
+        """
+        Given a file format, return all FileOutputs that support it.
+        """
         for output_class in FileOutput.__subclasses__():
             if output_class.SUPPORTED_FILE_FORMATS and file_format in output_class.SUPPORTED_FILE_FORMATS:
                 yield output_class
 
 
+class WindowOutput(Output):
+    TARGET_IS_WINDOW = True
 
 
 
 def get_matching_outputs(windowed=None, file_format=None):
     pass
 
-def get_output(args):
-    if args.outputfile:
-        file_format = Path(args.outputfile).suffix[1:]
+def get_output(**kwargs):
+    """
+    Parse args and return the first matching `Output`.
+
+    If `window` is True, return a matching WindowOutput [TODO]
+
+    If `outputfile` is set, return a matching FileOutput for the requested file format.
+
+    See `outputs_for_format` for more information on how FileOutputs are matched.
+    """
+    if kwargs.pop("window", False):
+        raise NotImplementedError("Windowed output not implemented yet")
+
+    output_file = kwargs.pop("outputfile", None)
+    if output_file:
+        file_format = Path(output_file).suffix[1:]
         for output_type in FileOutput.outputs_for_format(file_format):
-            return output_type(args.outputfile)
-        raise ValueError(f"Unsupported output file format: {args.outputfile}")
+            return output_type(output_file)
+        raise ValueError(f"Unsupported output file format: {output_file}")
 
 def get_first_working_output():
     for k, w in prefs or DEFAULT_PREFS.items():

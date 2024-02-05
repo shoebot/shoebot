@@ -1,7 +1,7 @@
 import cairo
 
 from shoebot.core.renderer.renderer import Renderer
-from shoebot.core.state.color_data import RGBAData
+from shoebot.core.state.stateful import get_state_stack
 from shoebot.graphics import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, CLOSE, BezierPath, ClippingPath
 
 
@@ -56,9 +56,10 @@ class CairoRenderer(Renderer):
         strokewidth = 1.0  # TODO
 
         # TODO - currently only supports rendering to RGBA
-        stacked_state = path.__state_stack__
-        stroke = RGBAData(*stacked_state.stroke.as_rgba())
-        fill = RGBAData(*stacked_state.fill.as_rgba())
+        state_stack = get_state_stack(path)
+
+        stroke = state_stack.stroke.as_rgba()
+        fill = state_stack.fill.as_rgba()
 
         if fill.a > 0.0 or stroke.a > 0.0:
             if stroke.a == 1.0:

@@ -1,9 +1,24 @@
+import functools
 from dataclasses import dataclass
 from textwrap import dedent
-from typing import Tuple
+from typing import Tuple, Dict
 
 from shoebot.core.color.conversion import COLOR_CONVERSIONS
 
+# Lookup color types by their name.
+COLOR_TYPES: Dict[str, "ColorData"] = {}
+
+@functools.cache
+def get_color_type(format: str) -> "ColorData":  # noqa
+    """
+    Get the color type for a color format.
+
+    :param name: Name of the color type
+    """
+    try:
+        return COLOR_TYPES[format]
+    except KeyError:
+        raise ValueError(f"No ColorData for format: {format}")
 
 def as_format_docstring(cls_name, src, dest):
     """
@@ -42,31 +57,33 @@ class ColorMeta(type):
     def __new__(cls, name, bases, dct):
         if bases:
             format = dct.get('format')
-            # For each conversion function in the conversion module that can
-            # convert from the current format, create a method that converts
-            # the color to the destination format.
-            null_conversion_method = lambda self: self.channels
-            null_conversion_method.__name__ = f'as_{format}'
-            null_conversion_method.__doc__ = as_format_docstring(cls.__name__, format, format)
-            dct[f'as_{format}'] = null_conversion_method
+            def create_as_format_method(f, destination_format):
+                def as_format_method(self):
+                    dest_color_type = get_color_type(destination_format)
+                    return dest_color_type(*f(self.channels))
+
+                as_format_method.__name__ = f'as_{destination_format}'
+                as_format_method.__doc__ = as_format_docstring(name, src, dest)
+                return as_format_method
+
+            def add_as_format_method(f, destination_format):
+                as_format_method = create_as_format_method(f, destination_format)
+                dct[as_format_method.__name__] = as_format_method
 
             for (src, dest), func in COLOR_CONVERSIONS.items():
+                # Create as_FORMAT methods to convert to each format,
+                # e.g. as_hsv, as_rgb, as_cmyk, etc.
+                #
+                # If the source format is the same as the current format
+                # then it is ignored here, as a null conversion method
+                # will be created later.
                 if src == format:
-                    method_name = f'as_{dest}'
+                    add_as_format_method(func, dest)
 
-                    def create_conversion_method(f):
-                        def conversion_method(self):
-                            return f(self.channels)
-
-                        return conversion_method
-
-                    conversion_method = create_conversion_method(func)
-                    conversion_method.__name__ = method_name
-                    conversion_method.__doc__ = as_format_docstring(name, src, dest)
-                    dct[method_name] = conversion_method
+            dct[f"as_{format}"] = lambda self: self
 
             # For the component channels, create named properties with getters and setters
-            for i, channel in enumerate(dct.get('format', '')):
+            for i, channel in enumerate(format):
                 def create_channel_accessor(idx):
                     def get_channel(self):
                         return self.channels[idx]
@@ -85,7 +102,12 @@ class ColorMeta(type):
 
             if 'channel_names' not in dct:
                 dct['channel_names'] = tuple(format.upper())
-        return type.__new__(cls, name, bases, dct)
+
+        new_class = type.__new__(cls, name, bases, dct)
+        if bases:
+            COLOR_TYPES[format] = new_class
+
+        return new_class
 
 
 @dataclass(init=False)
@@ -104,6 +126,7 @@ class ColorData(metaclass=ColorMeta):
     """
     format: str
     channels: Tuple
+    scale: float = 1.0
 
     def __init__(self, *channels):
         """
@@ -114,7 +137,7 @@ class ColorData(metaclass=ColorMeta):
         if not channels:
             channels = (0.0,) * len(self.format)
         else:
-            assert len(channels) == len(self.format), f"Expected {len(self.format)} channels, got {len(channels)}"
+            assert len(channels) == len(self.format), f"{type(self).__name__} Expected {len(self.format)} channels, got {len(channels)}"
         self.channels = channels
 
     def as_long_dict(self):
@@ -204,6 +227,32 @@ class HSLData(ColorData):
     """
     format = 'hsl'
     channel_names = 'Hue Saturation Lightness'.split()
+
+class HSVData(ColorData):
+    """
+    Represents a color in HSV format.
+
+    HSV is a cylindrical-coordinate representation of points in an RGB color model.
+
+    HSV stands for hue, saturation, and value.
+
+    The HSV model was created in 1978 by Alvy Ray Smith.
+
+    The HSV color space has the same geometry as the RGB color space, but with the hexcone
+    extended outwards from the center perpendicular to the hexcone base.
+
+    The conversion calculations for HSV are the same as for HSL, except that the lightness component is replaced by value.
+    """
+    format = 'hsv'
+    channel_names = 'Hue Saturation Value'.split()
+
+    @property
+    def rgb(self):
+        return self.as_rgb().channels
+
+    @property
+    def rgba(self):
+        return self.as_rgba().channels
 
 # TODO - is "V" the right name ?
 @dataclass(init=False)

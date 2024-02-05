@@ -4,6 +4,7 @@ import queue
 import sys
 import traceback
 from pathlib import Path
+from typing import Optional, Dict
 
 from shoebot.core.canvas import Canvas
 from shoebot.core.events import (
@@ -80,16 +81,17 @@ class ShoebotRunner:
     the output and does event handling.
     """
 
-    def __init__(self, output):
+    def __init__(self, output, namespace: Optional[Dict] = None):
         """
         :param output: Output object to render to.
+        :param namespace: Initial namespace.
 
         Output
         """
         assert output is not None, "Output must be provided."
         self.output = output
         self.canvas = Canvas(output)
-        self.context = NodeBotContext(self.canvas)
+        self.context = NodeBotContext(self.canvas, namespace)
         self.event_queue = queue.Queue()
 
         route_events_to_queue(self.event_queue, "shoebot")
@@ -102,7 +104,8 @@ class ShoebotRunner:
         with self.canvas.new_page(self.context):
             exec(code, ns, ns)
 
-    def run(self, code, max_iterations=None, run_forever=False, frame_limiter=False, verbose=False):
+    def run(self, code):
+        #  max_iterations=None, run_forever=False, frame_limiter=False, verbose=False):
         # TODO - port this from shoebot/grammar/bot.py
         # TODO - params
 

@@ -1,6 +1,8 @@
 from textwrap import dedent
+from typing import Dict, Tuple, Callable
 
-COLOR_CONVERSIONS = {}
+# Dict of source format, dest format -> conversion function
+COLOR_CONVERSIONS: Dict[Tuple[str, str], Callable] = {}
 
 
 def format_to_format_docstring(src, dest):
@@ -117,11 +119,13 @@ def hsv_to_rgb(hsv):
 @register_converter
 def rgb_to_rgba(rgb):
     """Convert RGB to RGBA adding an alpha channel set to 1.0."""
+    assert len(rgb) == 3, "RGB color must have 3 components"
     return rgb + (1.0,)
 
 
 @register_converter
 def rgba_to_rgb(rgba):
+    assert len(rgba) == 4, "RGBA color must have 4 components"
     return rgba[:3]
 
 
@@ -293,10 +297,10 @@ def rgb_to_v(rgb):
 def rgba_to_va(rgba):
     return *rgb_to_v(rgba[:3]), rgba[3]
 
-@register_converter
-def rgb_to_hex(rgba, prefixed=True):
-    if prefixed:
-        prefix = '#'
-    else:
-        prefix = ''
-    return (prefix + '%02x%02x%02x') % tuple(int(c*255) for c in rgba[:3])
+# @register_converter
+# def rgb_to_hex(rgba, prefixed=True):
+#     if prefixed:
+#         prefix = '#'
+#     else:
+#         prefix = ''
+#     return (prefix + '%02x%02x%02x') % tuple(int(c*255) for c in rgba[:3])

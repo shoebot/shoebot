@@ -6,7 +6,7 @@ from .color import Color
 from enum import Enum, auto
 
 from ..core.state.bezierpath import BezierPathState
-from ..core.state.stateful import Stateful
+from ..core.state.stateful import Stateful, get_state, get_state_stack
 
 
 class Alignments(Enum):
@@ -68,13 +68,13 @@ class BezierPath(Stateful):
             # Copy constructor
             # TODO - check compatibility
             other: BezierPath = args[0]
-            state = other.__state__.copy()
             self._elements = list(other._elements)
+            state = get_state(other).copy()
         else:
             state = BezierPathState.from_kwargs(**kwargs)
             self._elements = []
 
-        super().__init__(state, context.__state_stack__)  # noqa
+        super().__init__(state, get_state_stack(context))  # noqa
 
     # We need a way of specifying that the thing doing the reading/writing is a Stateful
     # object - and handle sorting out state with it.

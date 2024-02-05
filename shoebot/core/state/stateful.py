@@ -25,13 +25,5 @@ class Stateful:
 def get_state(obj: Stateful):
     return obj.__state__
 
-class StateValueContainer:
-    def __init__(self, attribute_name: str):
-        self.__state_attribute_name__ = attribute_name
-    @property
-    def __state_value__(self):
-        return getattr(self, self.__state_attribute_name__)
-
-
-def get_state_value(container: StateValueContainer):
-    return container.__state_value__
+def get_state_stack(obj: Stateful):
+    return obj.__state_stack__
