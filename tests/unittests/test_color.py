@@ -3,7 +3,7 @@ import unittest
 
 from parameterized import parameterized
 
-from shoebot.graphics.basecolor import Color
+from shoebot.graphics.color import Color
 
 
 class TestBaseColor(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestBaseColor(unittest.TestCase):
         tricky things and behave a bit weird when comparing directly
         """
         almost_equal = True
-        for actual_channel, expected_channel in zip(actual_color, expected_rgba):
+        for actual_channel, expected_channel in zip(c, expected_rgba):
             if not math.isclose(actual_channel, expected_channel, rel_tol=0.0001):
                 almost_equal = False
 

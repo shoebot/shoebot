@@ -12,7 +12,18 @@ from PIL import Image
 from PIL import ImageChops
 from wrapt import decorator
 
-from shoebot import create_bot
+from shoebot.core.renderer.output import get_output
+from shoebot.core.runner import ShoebotRunner
+
+
+def create_runner(window=False, outputfile=None, verbose=False, namespace=None, **kwargs):
+    """
+    TODO - remove this: this is a temporary workaround to avoid get tests running.
+    """
+    output = get_output(window=window, outputfile=outputfile, verbose=verbose)
+    runner = ShoebotRunner(output, namespace=namespace)
+    return runner
+
 from shoebot.graphics.typography import TextBounds
 
 TEST_DIR = Path(__file__).absolute().parent
@@ -102,19 +113,27 @@ def test_as_bot(outputfile=NotSet, windowed=None, verbose=True):
         inject the bot namespace.
         """        
         # TODO, need to get window from the test class again!!!
-        bot = create_bot(window=windowed, outputfile=outputfile)
+        ns = {
+            "args": args,
+            "kwargs": kwargs,
+            "outputfile": outputfile,
+        }
+        runner = create_runner(window=windowed, outputfile=outputfile, namespace=ns)
+        # runner.run(code=script,
+        #            max_iterations=repeat or None,
+        #            verbose=verbose)
 
         # Inject the test into the namespace.
-        test_name = wrapped.__name__
-        bot._namespace[test_name] = wrapped
-        bot._namespace["args"] = args
-        bot._namespace["kwargs"] = kwargs
-        # Inject the bot globals into the test method namespace
-        bot._load_namespace(wrapped.__globals__)
+        # test_name = wrapped.__name__
+        # bot._namespace[test_name] = wrapped
+        # bot._namespace["args"] = args
+        # bot._namespace["kwargs"] = kwargs
+        # # Inject the bot globals into the test method namespace
+        # bot._load_namespace(wrapped.__globals__)
         # Inject outputfile as it may be need for image assertions.
-        wrapped.__globals__["outputfile"] = outputfile
+        #wrapped.__globals__["outputfile"] = outputfile
         # Hack!  Create a function to allow flushing the output file.
-        wrapped.__globals__["flush_outputfile"] = lambda: bot._canvas.flush(bot._frame)
+        #wrapped.__globals__["flush_outputfile"] = lambda: bot._canvas.flush(bot._frame)
 
         seed(0)
         # should be equivalent to bot.run:  bot.run(f"{test_name}(*args, **kwargs)", verbose=verbose)
@@ -265,12 +284,13 @@ class ShoebotTestCase(TestCase):
         else:
             title = None
 
-        bot = create_bot(
+        runner = create_runner(
             window=windowed, outputfile=outputfile, namespace=namespace, title=title,
         )
 
         seed(0)
-        bot.run(code, verbose=verbose, run_forever=run_forever)
+        runner.run(code)
+        # , verbose=verbose, run_forever=run_forever)
 
     def run_filename(
         self, filename, outputfile, windowed=False, namespace=None, verbose=True,

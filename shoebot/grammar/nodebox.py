@@ -59,7 +59,8 @@ import gettext
 from .contextbase import ContextBase
 from ..core.state.context import ContextState
 from ..core.state.nodebox import NodeBotContextDefaults
-from ..core.state.stateful import Stateful, get_state, get_state_value
+from ..core.state.state_value import get_state_value
+from ..core.state.stateful import get_state
 
 SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = "shoebot"
@@ -324,7 +325,8 @@ class NodeBotContext(ContextBase):
 
         :return: Color object containing the color.
         """
-        return self.Color(mode=self.color_mode, color_range=self.color_range, *args)
+        #return self.Color(mode=self.color_mode, color_range=self.color_range, *args)
+        return self.Color(*args)
 
     choice = r.choice
 
@@ -1087,12 +1089,14 @@ class NodeBotContext(ContextBase):
 
         :param args: color in supported format
         """
-        if args is not None:
-            color = self.color(*args)
-            get_state(self).fill = get_state_value(color)
-        else:
-            # TODO - color from state needed
-            color = self.color(get_state(self).fill)
+        if args is None:
+            # Return current fill color
+            color_data = get_state(self).fill.copy()
+            return self.Color(state_value=color_data)
+
+        # Set new fill color and return it
+        color = self.Color(*args)
+        get_state(self).fill = get_state_value(color)
         return color
 
     def nofill(self):
