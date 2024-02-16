@@ -1104,9 +1104,12 @@ class NodeBotContext(ContextBase):
 
         :return: fill color before nofill() was called
         """
-        c = self._canvas.fillcolor
-        self._canvas.fillcolor = None
-        return c
+        # c = self._canvas.fillcolor
+        # self._canvas.fillcolor = None
+        #
+        color = get_state(self).fill
+        get_state(self).fill = None
+        return color
 
     def fillrule(self, r=None):
         """Set the fill rule to use in new paths.

@@ -115,6 +115,46 @@ def hsv_to_rgb(hsv):
     # Considering the possibility of floating-point imprecision
     return v, t, p
 
+@register_converter
+def hsb_to_rgb(hsb):
+    """
+    Convert an HSB color to RGB.
+
+    Parameters:
+    hsb (tuple): A tuple of (h, s, b) where h (hue) is in the range [0, 1],
+    and s (saturation) and b (brightness) are in the range [0, 1].
+
+    Returns:
+    tuple: Corresponding RGB values as (r, g, b), each in the range [0, 1].
+    """
+    h, s, b = hsb
+    if not (0.0 <= h <= 1.0 and 0.0 <= s <= 1.0 and 0.0 <= b <= 1.0):
+        raise ValueError("HSB components must be in the range [0, 1]")
+
+    if s == 0.0:
+        return b, b, b
+
+    h_i = int(h * 6)
+    f = (h * 6) - h_i
+    p = b * (1 - s)
+    q = b * (1 - f * s)
+    t = b * (1 - (1 - f) * s)
+
+    if h_i == 0:
+        return b, t, p
+    if h_i == 1:
+        return q, b, p
+    if h_i == 2:
+        return p, b, t
+    if h_i == 3:
+        return p, q, b
+    if h_i == 4:
+        return t, p, b
+    if h_i == 5:
+        return b, p, q
+    # Considering the possibility of floating-point imprecision
+    return b, t, p
+
 
 @register_converter
 def rgb_to_rgba(rgb):
@@ -165,6 +205,10 @@ def hsv_to_rgba(hsv):
 
 
 @register_converter
+def hsb_to_rgba(hsb):
+    return rgb_to_rgba(hsb_to_rgb(hsb))
+
+@register_converter
 def rgb_to_hsl(rgb):
     """
     Convert an RGB color to HSL.
@@ -175,6 +219,7 @@ def rgb_to_hsl(rgb):
     Returns:
     tuple: Corresponding HSL values as (h, s, l), each in the range [0, 1].
     """
+    print("rgb_to_hsl", rgb)
     if any(not (0.0 <= component <= 1.0) for component in rgb):
         raise ValueError("RGB components must be in the range [0, 1]")
 
@@ -280,7 +325,7 @@ def hsl_to_rgb(hsl):
 
 @register_converter_to_rgb
 def v_to_rgb(v):
-    return v, v, v
+    return v[0], v[0], v[0]
 
 
 @register_converter
@@ -297,10 +342,20 @@ def rgb_to_v(rgb):
 def rgba_to_va(rgba):
     return *rgb_to_v(rgba[:3]), rgba[3]
 
-# @register_converter
-# def rgb_to_hex(rgba, prefixed=True):
-#     if prefixed:
-#         prefix = '#'
-#     else:
-#         prefix = ''
-#     return (prefix + '%02x%02x%02x') % tuple(int(c*255) for c in rgba[:3])
+@register_converter
+def rgb_to_hex(rgb, prefixed=True):
+    if prefixed:
+        prefix = '#'
+    else:
+        prefix = ''
+
+    return (prefix + '%02x%02x%02x') % tuple(int(c*255) for c in rgb)
+
+@register_converter
+def rgba_to_hex(rgba, prefixed=True):
+    if prefixed:
+        prefix = '#'
+    else:
+        prefix = ''
+
+    return (prefix + '%02x%02x%02x%02x') % tuple(int(c * 255) for c in rgba)

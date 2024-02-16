@@ -69,7 +69,7 @@ class RunAllExampleBots(ShoebotTestCase):
     """Abusing the testing infrastructure to generate images of every bot."""
     EXAMPLE_BOT_FILTER = []
 
-    __unittest_skip__ = True
+    __unittest_skip__ = os.getenv("RUN_EXAMPLE_BOTS", "N").lower() not in (*"yt1", "yes", "true")
     __unittest_skip_why__ = "Generating example images should only be run manually."
 
     # Customise the output directory

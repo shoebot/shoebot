@@ -1,5 +1,6 @@
 from enum import Enum
 
+from shoebot.core.color.hex_colors import hex_to_floats, normalize
 from shoebot.core.state.color_data import RGBData, RGBAData, VData, get_color_type
 from shoebot.core.state.state_value import StateValueContainer, get_state_value
 
@@ -42,12 +43,15 @@ class Color(StateValueContainer):
         if isinstance(mode, Enum):
             mode = mode.value
 
+        args = self.parse_args(*args)
+        # TODO - we really need to store the color_range in some extra state (not the graphics state)
+        args = normalize(self._color_range, *args)
+
         if mode:
             color_data = get_color_type(mode)(*args)
         else:
             if len(args) == 1:
-                # TODO - this is wrong, we need a grayscale color data class
-                color_data = RGBData(args[0], args[0], args[0])
+                color_data = VData(*args)
             elif len(args) == 3:
                 color_data = RGBData(*args)  # TODO - probably
             elif len(args) == 4:
@@ -56,8 +60,29 @@ class Color(StateValueContainer):
                 raise NotImplemented("TODO")
         super().__init__("_color_data", value = color_data)
 
+    @staticmethod
+    def parse_args(*args):
+        """
+        Flatten args tuple and convert to floats.
+        """
+        if len(args) == 1 and isinstance(args[0], tuple):
+            # Shoebot supports passing args in a tuple - of that is the case, flatten it.
+            args = args[0]
+        else:
+            args = args
+
+        if len(args) == 1 and isinstance(args[0], str):
+            args = hex_to_floats(args[0])
+        return args
+
+
     def __iter__(self):
         # TODO - check against nodebox API
         return iter(self._color_data.as_rgba().channels)
     def __repr__(self):
         return f"<Color: {get_state_value(self)}>"
+
+    @property
+    def rgba(self):
+        # TODO - check if this is right against real Color
+        return self._color_data.as_rgba().channels

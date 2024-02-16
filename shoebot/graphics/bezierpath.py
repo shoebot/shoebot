@@ -197,12 +197,12 @@ class PathElement:
                 PathElementTypes.LINETO,
                 PathElementTypes.RLINETO
         ):
-            verify_len(cmd.name, "pts", 1, pts)
+            verify_len(cmd.name, "pt", 1, pts)
             self.x, self.y = pts[0]
             self.ctrl1 = Point(pts[0])
             self.ctrl2 = Point(pts[0])
         elif cmd in (PathElementTypes.CURVETO, PathElementTypes.RCURVETO):
-            verify_len(cmd.name, "pts", 3, pts)
+            verify_len(cmd.name, "pt", 3, pts)
             self.x, self.y = pts[2]
             self.ctrl1 = Point(pts[0])
             self.ctrl2 = Point(pts[1])

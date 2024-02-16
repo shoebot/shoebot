@@ -13,7 +13,7 @@ from PIL import ImageChops
 from wrapt import decorator
 
 from shoebot.core.renderer.output import get_output
-from shoebot.core.runner import ShoebotRunner
+from shoebot.core.runner import ShoebotRunner, context_as_dict
 
 
 def create_runner(window=False, outputfile=None, verbose=False, namespace=None, **kwargs):
@@ -93,7 +93,7 @@ def shoebot_named_testclass(cls, num, params_dict):
     return f"{cls.__name__}{suffix}"
 
 
-def test_as_bot(outputfile=NotSet, windowed=None, verbose=True):
+def shoebot_script_test(outputfile=NotSet, windowed=None, verbose=True):
     if outputfile is NotSet:
         # if outputfile is None it defaults to output.svg, by using
         # a sentinel value it can be checked and set to /tmp/output.svg
@@ -113,35 +113,22 @@ def test_as_bot(outputfile=NotSet, windowed=None, verbose=True):
         inject the bot namespace.
         """        
         # TODO, need to get window from the test class again!!!
+        # TODO - are these extra params needed ?
         ns = {
-            "args": args,
-            "kwargs": kwargs,
+            # "args": args,
+            #"kwargs": kwargs,
             "outputfile": outputfile,
         }
-        runner = create_runner(window=windowed, outputfile=outputfile, namespace=ns)
-        # runner.run(code=script,
-        #            max_iterations=repeat or None,
-        #            verbose=verbose)
 
-        # Inject the test into the namespace.
-        # test_name = wrapped.__name__
-        # bot._namespace[test_name] = wrapped
-        # bot._namespace["args"] = args
-        # bot._namespace["kwargs"] = kwargs
-        # # Inject the bot globals into the test method namespace
-        # bot._load_namespace(wrapped.__globals__)
-        # Inject outputfile as it may be need for image assertions.
-        #wrapped.__globals__["outputfile"] = outputfile
-        # Hack!  Create a function to allow flushing the output file.
-        #wrapped.__globals__["flush_outputfile"] = lambda: bot._canvas.flush(bot._frame)
+        runner = create_runner(window=windowed, outputfile=outputfile, namespace=ns)
 
         seed(0)
-        # should be equivalent to bot.run:  bot.run(f"{test_name}(*args, **kwargs)", verbose=verbose)
-        # TODO - This isn't quite the same as bot.run :-\
-        result = wrapped(*args, **kwargs)
-        # cleanup.
-        # del wrapped.__globals__["outputfile"]
-        return result
+        # extra_ns = {"FRAME": 1,
+        #             "ITERATION": 1,
+        #             "PAGE_NUM": 1,
+        #             }
+        extra_ns = {}
+        runner.run_test_once(wrapped, args, kwargs, extra_ns)
 
     return wrapper
 

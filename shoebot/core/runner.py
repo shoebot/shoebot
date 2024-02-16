@@ -47,17 +47,20 @@ from shoebot.grammar.nodebox import NodeBotContext
 # Move _even_queue from Grammar to here
 # Consider porting GUI events to _event_queue
 
-def context_as_dict(context):
+def context_as_dict(context, **overrides):
     """
     :param context: Shoebot Context.
     :return: dict of all public members.
     """
     # TODO - move this somewhere sane
-    return {
+
+    api = {
         name: getattr(context, name)
         for name in dir(context)
         if not name.startswith('_')
     }
+
+    return {**api, **context._namespace, **overrides}
 
 @functools.lru_cache(maxsize=2)
 def is_animation(code):
@@ -97,12 +100,24 @@ class ShoebotRunner:
         route_events_to_queue(self.event_queue, "shoebot")
 
     def run_once(self, code, extra_ns):
-        ns = context_as_dict(self.context)
-        ns.update(extra_ns)
+        """
+        exec the passed in str or code object in the Shoebot namespace.
+        """
+        ns = context_as_dict(self.context, **extra_ns)
 
         # TODO - new_page may not be the right abstraction
         with self.canvas.new_page(self.context):
-            exec(code, ns, ns)
+            exec(code, ns)
+
+    def run_test_once(self, test_function, test_args, test_kwargs, extra_ns):
+        """
+        Variant of run_once that takes a function and adds the Shoebot API to
+        it's namespace, for use in unit tests via shoebot_script_test decorator.
+        """
+        ns = context_as_dict(self.context, **extra_ns)
+        with self.canvas.new_page(self.context):
+            test_function.__globals__.update({**ns, **extra_ns})
+            test_function(*test_args, **test_kwargs)
 
     def run(self, code):
         #  max_iterations=None, run_forever=False, frame_limiter=False, verbose=False):
