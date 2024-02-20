@@ -24,6 +24,8 @@ class ReadWriteStateValueDescriptor:
         self.field_name = field_name
 
     def __set_name__(self, owner, name):
+        print("__set_name__", owner, name, self.field_name, self.state_container_type)
+        owner._state_container_fields[name] = self.state_container_type
         if self.field_name is None:
             self.field_name = name
 

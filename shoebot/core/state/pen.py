@@ -1,8 +1,9 @@
+from dataclasses import dataclass
+
 from shoebot.core.state.chain_dataclass import MISSING
+from shoebot.core.state.state import State
 
 
-class PenState:
-    thickness: float = MISSING
-
-class PenDefaults:
-    thickness: float = 1.0
+@dataclass
+class PenState(State):
+    stroke_width: float = MISSING

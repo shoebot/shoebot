@@ -23,6 +23,8 @@ class ReadOnlyDescriptor:
         if self.field_name is None:
             self.field_name = name
 
+        owner._state_fields[name] = self.field_name
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
@@ -42,12 +44,15 @@ class ReadWriteDescriptor:
         if self.field_name is None:
             self.field_name = name
 
+        owner._state_fields[name] = self.field_name
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return getattr(obj.__state__, self.field_name)
 
     def __set__(self, obj, value):
+        print("__set__", self, obj, value)
         if self.writer is not None:
             setattr(obj.__state__, self.field_name, self.writer(value))
         else:
@@ -108,6 +113,4 @@ class State(metaclass=abc.ABCMeta):
         """
         Create a property that is a stateful object itself.
         """
-        # state_ref = StateRef(stateful_type)
-
         return ReadWriteStateValueDescriptor(state_container_type, field_name)

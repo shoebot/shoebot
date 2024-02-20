@@ -151,7 +151,6 @@ class ColorData(metaclass=ColorMeta):
 
         :param channels: A tuple of floats representing the color in its native format.
         """
-        print(type(self), channels, len(channels))
         if not len(channels):
             channels = (0.0,) * len(self.format)
         else:
@@ -175,7 +174,6 @@ class ColorData(metaclass=ColorMeta):
         """
         return dict(zip(self.format, self.channels))
 
-
 @dataclass(init=False)
 class RGBData(ColorData):
     """
@@ -191,6 +189,10 @@ class RGBData(ColorData):
     @property
     def rgb(self):
         return self.as_rgb()
+
+    @property
+    def a(self):
+        return 1.0
 
 
 @dataclass(init=False)

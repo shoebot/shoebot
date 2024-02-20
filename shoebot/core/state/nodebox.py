@@ -3,7 +3,7 @@ from enum import Enum
 
 from shoebot.core.state.color_data import RGBData, RGBAData
 from shoebot.core.state.context import ContextState
-
+from shoebot.core.state.state import State
 
 
 # NodeBox Context._resetContext:
@@ -49,8 +49,17 @@ class DefaultValuesMixin:
 
 
 @dataclass
-class NodeBotContextDefaults(ContextState, DefaultValuesMixin):
+class PenDefaults(State):
+    stroke_width: float = 1.0
+    cap_style: str = "butt"
+
+
+@dataclass
+class NodeBotContextDefaults(ContextState, DefaultValuesMixin, PenDefaults):
     """Default values for the NodebotContext"""
 
+    background = RGBData(1, 1, 1)
     fill = RGBData(0, 1, 1)
     stroke = RGBAData(0, 0, 0, 0)
+
+    stroke_width = 1.0

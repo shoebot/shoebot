@@ -41,6 +41,7 @@ class Canvas:
         :param resizable: If True, the surface will be resizable.
         """
 
+        # TODO - maybe some of these will move into the Context State too
         self.commands: typing.List[typing.Tuple[typing.Grob, typing.Dict]] = []
         self.clip_stack  = []
         self.clip_path = None

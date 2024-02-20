@@ -15,6 +15,7 @@ from shoebot.core.events import (
     QUIT_EVENT,
     route_events_to_queue,
 )
+from shoebot.core.state.stateful import get_state, get_state_stack
 from shoebot.grammar.nodebox import NodeBotContext
 
 
@@ -103,11 +104,13 @@ class ShoebotRunner:
         """
         exec the passed in str or code object in the Shoebot namespace.
         """
-        ns = context_as_dict(self.context, **extra_ns)
+        import ipdb
+        with ipdb.launch_ipdb_on_exception():
+            ns = context_as_dict(self.context, **extra_ns)
 
-        # TODO - new_page may not be the right abstraction
-        with self.canvas.new_page(self.context):
-            exec(code, ns)
+            # TODO - new_page may not be the right abstraction
+            with self.canvas.new_page(self.context):
+                exec(code, ns)
 
     def run_test_once(self, test_function, test_args, test_kwargs, extra_ns):
         """
@@ -125,7 +128,9 @@ class ShoebotRunner:
         # TODO - params
 
         # TODO: move this next block out of here to the caller.
-        if Path(code).is_file():
+        #if Path(code).is_file():
+        import os
+        if os.path.isfile(code):
             source = Path(code).read_text()
             filename = code
         elif isinstance(code, str):
@@ -190,6 +195,7 @@ class ShoebotRunner:
                 print("Create renderer with default size")
                 # TODO - do this somewhere appropriate.
                 self.output.create_renderer(400, 400)
+            self.output.renderer.render_context(get_state_stack(self.context))
             self.output.renderer.render_canvas(self.canvas)
             self.output.destroy_renderer()
             return # TODO - for now exit after 1 frame

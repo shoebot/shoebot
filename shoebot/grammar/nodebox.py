@@ -152,6 +152,9 @@ class NodeBotContext(ContextBase):
     color_mode = RGB
     color_range = 1
 
+    WIDTH = 800
+    HEIGHT = 800
+
     def __init__(self, canvas=None, namespace=None, vars=None):
         """Nodebot grammar constructor.
 
@@ -162,8 +165,8 @@ class NodeBotContext(ContextBase):
         defaults = NodeBotContextDefaults()
         ContextBase.__init__(self, canvas, defaults, namespace=namespace, vars=vars)
 
-        # self._autoclosepath = True
-        # self._path = None
+        self._autoclosepath = True
+        self._path = None
         #
         # if self._input_device:
         #     # Get constants like KEY_DOWN, KEY_LEFT
@@ -1107,9 +1110,10 @@ class NodeBotContext(ContextBase):
         # c = self._canvas.fillcolor
         # self._canvas.fillcolor = None
         #
-        color = get_state(self).fill
-        get_state(self).fill = None
-        return color
+        old_color = get_state(self).fill
+        new_color = self.Color(0, 0, 0, 0)
+        get_state(self).fill = get_state_value(new_color)
+        return old_color
 
     def fillrule(self, r=None):
         """Set the fill rule to use in new paths.
@@ -1190,8 +1194,9 @@ class NodeBotContext(ContextBase):
         :param color: background color to apply
         :return: new background color
         """
-        self._canvas.background = self.color(*args)
-        return self._canvas.background
+        color = self.color(*args)
+        get_state(self).background = get_state_value(color)
+        return color
 
     def blendmode(self, mode=None):
         """Set the current blending mode.

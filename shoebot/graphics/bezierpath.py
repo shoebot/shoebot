@@ -49,7 +49,9 @@ class BlendModes(Enum):
 
 class PathElementTypes(Enum):
     # TODO - review the types, we may need less.
+
     ARC = auto()
+    """Arc element:  A segment of an ellipse or circle."""
     CLOSE = auto()
     CURVETO = auto()
     ELLIPSE = auto()
@@ -71,17 +73,19 @@ class BezierPath(Stateful):
             self._elements = list(other._elements)
             state = get_state(other).copy()
         else:
-            state = BezierPathState.from_kwargs(**kwargs)
+            state = BezierPathState.from_kwargs(**self._state_kwargs(**kwargs))
             self._elements = []
 
         super().__init__(state, get_state_stack(context))  # noqa
+        # TODO - consider setting args, here so that descriptors are called
+        #        and possibly avoid the need for _state_kwargs
 
     # We need a way of specifying that the thing doing the reading/writing is a Stateful
     # object - and handle sorting out state with it.
     fill: Color = BezierPathState.readwrite_state_value_property(Color)
     stroke: Color = BezierPathState.readwrite_state_value_property(Color)
+    strokewidth: float = BezierPathState.readwrite_property("stroke_width")
 
-    # pen: Color = BezierPathState.readwrite_property()
     closed: bool = BezierPathState.readonly_property()
 
     # TODO _ check these:
@@ -109,8 +113,11 @@ class BezierPath(Stateful):
         self.moveto(x1, y1)
         self.lineto(x2, y2)
 
+    def arc(self, x, y, radius, start, end, clockwise=True):
+        self.append(PathElement(PathElementTypes.ARC, ((x, y),), radius, start, end, clockwise))
+
     def curveto(self, x1, y1, x2, y2, x3, y3):
-        self.append(PathElement(PathElementTypes.CURVETO, (x1, y1), (x2, y2), (x3, y3)))
+        self.append(PathElement(PathElementTypes.CURVETO, ((x1, y1), (x2, y2), (x3, y3))))
 
     def relcurveto(self, x1, y1, x2, y2, x3, y3):
         self.append(PathElement(PathElementTypes.RCURVETO, (x1, y1), (x2, y2), (x3, y3)))
@@ -139,6 +146,15 @@ class BezierPath(Stateful):
     #         h = h - y
     #     self.append(PathElement(ELLIPSE, x, y, w, h))
     #     self.closed = True
+
+    def ellipse(self, x, y, w, h, ellipsemode=Alignments.CORNER):
+        if w != 0.0 and h != 0.0:
+            _pi = 3.14159265358979323846
+            # TODO - verify the output of this vs the old ellipse.
+            self.moveto(x + w / 2, y + h / 2)
+            self.arc(x + w / 2, y + h / 2, w / 2, 0, 2 * _pi)
+            self.closed = True
+
     def rect(self, x, y, w, h, roundness=0.0, rectmode=Alignments.CORNER):
         # convert values if rectmode is not CORNER
         if rectmode == Alignments.CENTER:
@@ -182,11 +198,13 @@ class EndClip:
 
 def verify_len(what, argname, expected_len, arg):
     # TODO - move somewhere sensible.
-    if expected_len != len(arg):
-        raise ValueError(f"{what} requires {expected_len} {argname}s, got {arg}")
+    import ipdb
+    with ipdb.launch_ipdb_on_exception():
+        if expected_len != len(arg):
+            raise ValueError(f"{what} requires {expected_len} {argname}s, got {arg}")
 
 class PathElement:
-    def __init__(self, cmd: PathElementTypes, pts: Optional[List[Point]] = None):
+    def __init__(self, cmd: PathElementTypes, pts: Optional[List[Point]] = None, *args):
         # TODO - this has all the relative versions - it may be better to have
         # store something like a "mode" for relative/absolute - and possibly
         # that may not even live in here.
@@ -199,18 +217,40 @@ class PathElement:
         ):
             verify_len(cmd.name, "pt", 1, pts)
             self.x, self.y = pts[0]
-            self.ctrl1 = Point(pts[0])
-            self.ctrl2 = Point(pts[0])
+            # TODO, this only needs one control point, what does nodebox do ?
+            self.ctrl1 = Point(*pts[0])
+            self.ctrl2 = Point(*pts[0])
         elif cmd in (PathElementTypes.CURVETO, PathElementTypes.RCURVETO):
             verify_len(cmd.name, "pt", 3, pts)
             self.x, self.y = pts[2]
-            self.ctrl1 = Point(pts[0])
-            self.ctrl2 = Point(pts[1])
+            self.ctrl1 = Point(*pts[0])
+            self.ctrl2 = Point(*pts[1])
         elif cmd == PathElementTypes.CLOSE:
             assert pts is None, "CLOSE command should not have any points"
             self.x = self.y = 0.0
+            # TODO should the control points be None ?
             self.ctrl1 = Point()
             self.ctrl2 = Point()
+        elif cmd == PathElementTypes.ARC:
+            # TODO, verify these args make sense.
+            self.x, self.y = Point(*pts[0])
+            # Control point is to control the radius of the arc (start, end)
+            self.radius = args[0]
+            self.start = args[1]
+            self.end = args[2]
+            # TODO - how should control points of an arc really work ?
+            #        need them to be constrained.
+            self.ctrl1 = Point(*pts[0])
+            self.ctrl2 = Point(*pts[0])
         else:
             # TODO - Nodebox actually lets you have an unknown command here - should we ?
             raise ValueError(f"Unknown PathElement type: {cmd}")
+
+        # TODO - remove these asserts once everything is working, or only enable during testing.
+        assert isinstance(self.x, (int, float)), f"Expected x to be a number, got {self.x}"
+        assert isinstance(self.y, (int, float)), f"Expected y to be a number, got {self.y}"
+        assert isinstance(self.ctrl1, Point), f"Expected ctrl1 to be a Point, got {self.ctrl1}"
+        assert isinstance(self.ctrl2, Point), f"Expected ctrl2 to be a Point, got {self.ctrl2}"
+
+    def __repr__(self):
+        return f"<PathElement {self.cmd.name} {self.x}, {self.y}>"

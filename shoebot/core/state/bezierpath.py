@@ -10,9 +10,8 @@ from .color_data import ColorData
 from .pen import PenState
 
 @dataclass
-class BezierPathState(State):
+class BezierPathState(PenState):
     # TODO this should really extend the relevant base dataclasses
     fill: ColorData = MISSING
     stroke: ColorData = MISSING
-    pen: PenState = MISSING
     closed: bool = False

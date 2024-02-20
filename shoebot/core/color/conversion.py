@@ -219,7 +219,6 @@ def rgb_to_hsl(rgb):
     Returns:
     tuple: Corresponding HSL values as (h, s, l), each in the range [0, 1].
     """
-    print("rgb_to_hsl", rgb)
     if any(not (0.0 <= component <= 1.0) for component in rgb):
         raise ValueError("RGB components must be in the range [0, 1]")
 

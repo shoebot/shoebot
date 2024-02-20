@@ -1,5 +1,6 @@
 # TODO, Move 'bot' out of here, push responsibility back to 'Nodebox' and other grammars,
 #       Enabling seperation of BezierPath etc
+from shoebot.core.state.stateful import Stateful
 
 # Alignments
 CENTER = "center"
@@ -78,7 +79,7 @@ STATES = {
 
 
 #class Grob(StateMixin, metaclass=StateMeta):
-class Grob:
+class Grob(Stateful):
 
     """
     A GRaphic OBject is the base class for all DrawingPrimitives.
