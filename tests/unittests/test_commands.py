@@ -17,7 +17,7 @@ from tests.unittests.stubs.nodebox import text  # noqa
 from tests.unittests.helpers import EXAMPLE_INPUT_DIR
 from tests.unittests.helpers import EXAMPLE_OUTPUT_DIR
 from tests.unittests.helpers import ShoebotTestCase
-from tests.unittests.helpers import test_as_bot
+from tests.unittests.helpers import shoebot_script_test
 from tests.unittests.helpers import TEST_INPUT_DIR
 
 from shoebot.graphics import CLOSE
@@ -79,7 +79,7 @@ class TestPath(ShoebotTestCase):
             ),
         ],
     )
-    @test_as_bot()
+    @shoebot_script_test()
     def test_path_commands(self, cmd, expected_elements):
         """Run a command that should create a one element path.
 
@@ -98,7 +98,7 @@ class TestPath(ShoebotTestCase):
 
 
 class TestImage(ShoebotTestCase):
-    @test_as_bot(outputfile=f"{EXAMPLE_OUTPUT_DIR}/image-svg-actual.png")
+    @shoebot_script_test(outputfile=f"{EXAMPLE_OUTPUT_DIR}/image-svg-actual.png")
     def test_svg_image(self):
         """Regression test to check that opening an image doesn't raise an
         exception."""
@@ -113,7 +113,7 @@ class TestImage(ShoebotTestCase):
 
 
 class TestText(ShoebotTestCase):
-    @test_as_bot()
+    @shoebot_script_test()
     def test_text_saves_params(self):
         """Verify parameters are saved and returned by the expected
         properties."""
@@ -148,7 +148,7 @@ class TestText(ShoebotTestCase):
             ),
         ],
     )
-    @test_as_bot()
+    @shoebot_script_test()
     def test_text_bounds(self, fontname, expected_bounds):
         """Check text.bounds() against expected values.
 
@@ -181,7 +181,7 @@ class TestText(ShoebotTestCase):
         ],
     )
     @patch("shoebot.graphics.typography.PangoCairo")
-    @test_as_bot()
+    @shoebot_script_test()
     def test_text_outputs_pango_text_spans(
         self, text_args, text_kwargs, expected_pango_text_span, pango_cairo,
     ):
@@ -204,7 +204,7 @@ class TestText(ShoebotTestCase):
         pango_cairo.show_layout.assert_called()
         pango_cairo.reset_mock()
 
-    @test_as_bot()
+    @shoebot_script_test()
     def test_fontname_with_variants(self):
         """Verify that font() reads variable font values correctly."""
         font("Inconsolata", var_wdth=100, var_wght=200)
@@ -217,7 +217,7 @@ class TestText(ShoebotTestCase):
 
 
 class TestFontUtils(ShoebotTestCase):
-    @test_as_bot()
+    @shoebot_script_test()
     def test_fontnames_gives_output(self):
         """Verify that fontnames() gives a list as output."""
         output = fontnames()

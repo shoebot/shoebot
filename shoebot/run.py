@@ -35,6 +35,9 @@ import locale
 import shlex
 import sys
 
+from shoebot.core.runner import ShoebotRunner
+from shoebot.core.renderer.output import get_output
+
 DEFAULT_SERVERPORT = 7777
 
 OUTPUT_EXTENSIONS = (".png", ".svg", ".ps", ".pdf")
@@ -96,129 +99,127 @@ def main():
         ),
         metavar="FILE",
     )
-
-    # Shoebot IO - Sockets
-    group.add_argument(
-        "-s",
-        "--socketserver",
-        action="store_true",
-        dest="socketserver",
-        default=False,
-        help=_(
-            "run a socket server for external control (will run the script in windowed mode)",
-        ),
-    )
-    group.add_argument(
-        "-p",
-        "--serverport",
-        type=int,
-        dest="serverport",
-        default=DEFAULT_SERVERPORT,
-        help=_("set socketserver port to listen for connections (default is 7777)"),
-    )
-
-    # IO - Variables
-    group.add_argument(
-        "-v",
-        "--vars",
-        dest="vars",
-        default=False,
-        help=_(
-            "Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'",
-        ),
-    )
-    # IO - Namespace
-    group.add_argument(
-        "-ns",
-        "--namespace",
-        dest="namespace",
-        default=None,
-        help=_(
-            "Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'",
-        ),
-    )
-    # IO - IDE integration Shell
-    group.add_argument(
-        "-l",
-        "--l",
-        dest="shell",
-        action="store_true",
-        default=False,
-        help=_("Simple shell - for IDE interaction"),
-    )
+    #
+    # # Shoebot IO - Sockets
+    # group.add_argument(
+    #     "-s",
+    #     "--socketserver",
+    #     action="store_true",
+    #     dest="socketserver",
+    #     default=False,
+    #     help=_(
+    #         "run a socket server for external control (will run the script in windowed mode)",
+    #     ),
+    # )
+    # group.add_argument(
+    #     "-p",
+    #     "--serverport",
+    #     type=int,
+    #     dest="serverport",
+    #     default=DEFAULT_SERVERPORT,
+    #     help=_("set socketserver port to listen for connections (default is 7777)"),
+    # )
+    # IO - Variables - TODO or deprecate
+    # group.add_argument(
+    #     "-v",
+    #     "--vars",
+    #     dest="vars",
+    #     default=False,
+    #     help=_(
+    #         "Initial variables, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --vars='{\"variable1\": 1}'",
+    #     ),
+    # )
+    # IO - Namespace - TODO or deprecate
+    # group.add_argument(
+    #     "-ns",
+    #     "--namespace",
+    #     dest="namespace",
+    #     default=None,
+    #     help=_(
+    #         "Initial namespace, in JSON (Note: Single quotes OUTSIDE, double INSIDE) --namespace='{\"variable1\": 1}'",
+    #     ),
+    # )
+    # IO - IDE integration Shell - TODO or deprecate
+    # group.add_argument(
+    #     "-l",
+    #     "--l",
+    #     dest="shell",
+    #     action="store_true",
+    #     default=False,
+    #     help=_("Simple shell - for IDE interaction"),
+    # )
 
     # IO - Passing args to the bot
     group.add_argument("-a", "--args", dest="script_args", help=_("Pass to the bot"))
     group.add_argument("script_args", nargs="?")
 
-    group = parser.add_argument_group("Bot Lifecycle")
+    #group = parser.add_argument_group("Bot Lifecycle")
     # Bot Lifecycle
-    group.add_argument(
-        "-r",
-        "--repeat",
-        type=int,
-        dest="repeat",
-        default=False,
-        help=_("set number of iteration, multiple images will be produced"),
-    )
+    # group.add_argument(
+    #     "-r",
+    #     "--repeat",
+    #     type=int,
+    #     dest="repeat",
+    #     default=False,
+    #     help=_("set number of iteration, multiple images will be produced"),
+    # )
+    # group = parser.add_argument_group("Window Management")
+    # group.add_argument(
+    #     "-w",
+    #     "--window",
+    #     action="store_true",
+    #     dest="window",
+    #     help=_("Run script in a GTK window (default to True unless -o is used)"),
+    # )
+    # group.add_argument(
+    #     "-f",
+    #     "--fullscreen",
+    #     action="store_true",
+    #     dest="fullscreen",
+    #     default=False,
+    #     help=_("run in fullscreen mode"),
+    # )
+    # group.add_argument(
+    #     "-t",
+    #     "--title",
+    #     action="store",
+    #     dest="title",
+    #     default=None,
+    #     help=_("Set window title"),
+    # )
+    # group.add_argument(
+    #     "-c",
+    #     "--close",
+    #     action="store_true",
+    #     dest="close",
+    #     default=False,
+    #     help=_("Close window after running bot (use with -r for benchmarking)"),
+    # )
+    # group.add_argument(
+    #     "-dv",
+    #     "--disable-vars",
+    #     action="store_true",
+    #     dest="disable_vars",
+    #     default=False,
+    #     help=_("disable the variables pane when in windowed mode."),
+    # )
 
-    group = parser.add_argument_group("Window Management")
-    group.add_argument(
-        "-w",
-        "--window",
-        action="store_true",
-        dest="window",
-        help=_("Run script in a GTK window (default to True unless -o is used)"),
-    )
-    group.add_argument(
-        "-f",
-        "--fullscreen",
-        action="store_true",
-        dest="fullscreen",
-        default=False,
-        help=_("run in fullscreen mode"),
-    )
-    group.add_argument(
-        "-t",
-        "--title",
-        action="store",
-        dest="title",
-        default=None,
-        help=_("Set window title"),
-    )
-    group.add_argument(
-        "-c",
-        "--close",
-        action="store_true",
-        dest="close",
-        default=False,
-        help=_("Close window after running bot (use with -r for benchmarking)"),
-    )
-    group.add_argument(
-        "-dv",
-        "--disable-vars",
-        action="store_true",
-        dest="disable_vars",
-        default=False,
-        help=_("disable the variables pane when in windowed mode."),
-    )
-
-    group = parser.add_argument_group("Debugging / Dev flags")
-    group.add_argument(
-        "-dn",
-        "--diagnose",
-        action="store_true",
-        default=False,
-        help=_("Output information for debugging installation / graphics issues."),
-    )
-    group.add_argument(
-        "-dt",
-        "--disable-background-thread",
-        action="store_true",
-        dest="disable_background_thread",
-        default=sys.platform == "darwin",
-        help=_("disable running bot code in background thread (default on OSX)."),
-    )
+    # group = parser.add_argument_group("Debugging / Dev flags")
+    # group.add_argument(
+    #     "-dn",
+    #     "--diagnose",
+    #     action="store_true",
+    #     default=False,
+    #     help=_("Output information for debugging installation / graphics issues."),
+    # )
+    # group.add_argument(
+    #     "-dt",
+    #     "--disable-background-thread",
+    #     action="store_true",
+    #     dest="disable_background_thread",
+    #     default=sys.platform == "darwin",
+    #     help=_("disable running bot code in background thread (default on OSX)."),
+    # )
     group.add_argument(
         "-V",
         "--verbose",
@@ -231,11 +232,11 @@ def main():
     # get argparse arguments and check for sanity
     args, extra = parser.parse_known_args()
 
-    if args.diagnose:
-        from .diagnose import diagnose
-
-        diagnose()
-        sys.exit()
+    # if args.diagnose:
+    #     from .diagnose import diagnose
+    #
+    #     diagnose()
+    #     sys.exit()
 
     if not args.script:
         error(
@@ -244,44 +245,14 @@ def main():
             ),
         )
 
-    if args.vars:
-        vars = json_arg(args.vars)
-    else:
-        vars = None
+    output = get_output(**vars(args))
+    runner = ShoebotRunner(output)
+    runner.run(code=args.script)
+    # runner.run(code=script,
+    #            max_iterations=repeat or None,
+    #            verbose=verbose)
 
-    if args.namespace:
-        namespace = json_arg(args.namespace)
-    else:
-        namespace = None
-
-    if args.window:
-        window = args.window
-    else:
-        window = not args.outputfile
-
-    from shoebot.__init__ import run  # https://github.com/shoebot/shoebot/issues/206
-
-    success = run(
-        src=args.script,
-        outputfile=args.outputfile,
-        max_iterations=args.repeat or None,
-        window=window,
-        fullscreen=args.fullscreen,
-        title=args.title,
-        close_window=args.close,
-        server=args.socketserver,
-        port=args.serverport,
-        show_vars=args.window and args.disable_vars is False,
-        vars=vars or None,
-        namespace=namespace,
-        run_shell=args.shell,
-        args=shlex.split(args.script_args or ""),
-        verbose=args.verbose,
-        background_thread=not args.disable_background_thread,
-    )
-
-    # Return errorcode
-    return 0 if success else 1
+    # TODO - return error code on failure
 
 
 if __name__ == "__main__":

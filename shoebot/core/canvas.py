@@ -27,142 +27,107 @@
 #   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Abstract canvas class."""
 
-from collections import deque
-import abc
-import sys
-import locale
-import gettext
-from pathlib import Path
+import typing
+from contextlib import contextmanager
 
-from shoebot.core.drawqueue import DrawQueue
-
-APP = "shoebot"
-DIR = sys.prefix + "/share/shoebot/locale"
-locale.setlocale(locale.LC_ALL, "")
-gettext.bindtextdomain(APP, DIR)
-# gettext.bindtextdomain(APP)
-gettext.textdomain(APP)
-_ = gettext.gettext
-
-CENTER = "center"
-CORNER = "corner"
-
-TOP_LEFT = 1
-BOTTOM_LEFT = 2
+from shoebot.graphics import BezierPath
 
 
-class Canvas(metaclass=abc.ABCMeta):
-    DEFAULT_SIZE = 400, 400
-    DEFAULT_MODE = CENTER
-
-    """ Abstract canvas class """
-
-    def __init__(self, sink):
-        # Construct sink class:
-        self.sink = sink
-
-        self.finished = False
-        self.color_range = 1
-        self.color_mode = 1
-        self.path_mode = CORNER
-        self.size = None
-        self.reset_canvas()
-
-    def set_bot(self, bot):
-        """Bot must be set before running."""
-        self.bot = bot
-        self.sink.set_bot(bot)
-
-    def get_input_device(self):
-        """Overrides can return actual input device."""
-        return None
-
-    def initial_drawqueue(self):
-        """Override to create use special kinds of draw queue."""
-        return DrawQueue()
-
-    def initial_transform(self):
-        """Must be overriden to create initial transform matrix."""
-        pass
-
-    @abc.abstractproperty
-    def reset_drawqueue(self):
-        pass
-
-    @abc.abstractproperty
-    def reset_transform(self):
-        pass
-
-    def reset_canvas(self):
-        self.reset_transform()
-        self.reset_drawqueue()
-        self.matrix_stack = deque()
-
-    def settings(self, **kwargs):
-        """Pass a load of settings into the canvas."""
-        for k, v in list(kwargs.items()):
-            setattr(self, k, v)
-
-    def size_or_default(self):
-        """If size is not set, otherwise set size to DEFAULT_SIZE and return
-        it.
-
-        This means, only the first call to size() is valid.
+class Canvas:
+    def __init__(self, output, extents: typing.Optional[typing.Tuple[float, float, float, float]] = None, resizable=None, speed=None, **kwargs):
         """
-        if not self.size:
-            self.size = self.DEFAULT_SIZE
-        return self.size
-
-    def set_size(self, size):
-        """Size is only set the first time it is called.
-
-        Size that is set is returned
+        :param extents: Extents of recording surface, or None for unbounded.
+        :param resizable: If True, the surface will be resizable.
         """
-        if self.size is None:
-            self.size = size
-        return self.size
 
-    def get_width(self):
-        if self.size is not None:
-            return self.size[0]
-        return self.DEFAULT_SIZE[0]
+        # TODO - maybe some of these will move into the Context State too
+        self.commands: typing.List[typing.Tuple[typing.Grob, typing.Dict]] = []
+        self.clip_stack  = []
+        self.clip_path = None
 
-    def get_height(self):
-        if self.size is not None:
-            return self.size[1]
-        return self.DEFAULT_SIZE[1]
+        # TODO - are these parameters correct (not exactly - separate these into categories of what they are)
+        self.resizable = resizable or extents is None
+        self.output = output
+        self.realised_size = None
 
-    def _filename_with_framenumber(self, basename, frame):
-        extension = Path(basename).suffix
-        return f"{basename}_{frame:04}.{extension}"
+        self.position = (0, 0)
+        self.speed = speed
 
-    def snapshot(self, target, defer=True, file_number=None):
-        """Ask the drawqueue to output to target.
+        # TODO fixup these state variables
+        # State temporarily here to get to "first rectangle" - this needs moving into the context
+        # (e.g. Grammar)
+        # self.width = None
+        # self.height = None
+        #
+        # self.font = None
+        # self.fontsize = None
+        # self.fontweight = None
+        # self.fontslant = None
+        # self.fontvariant = None
+        #
+        # self.fillcolor = None
+        # self.fillrule = None
+        # self.strokerule = None
+        # self.strokecolor = None
+        # self.strokewidth = 1
+        # self.strokecap = None
+        # self.strokejoin = None
+        # self.strokedash = None
+        # self.dashoffset = None
+        #
+        # self.blendmode = None
+        #
+        # self.transform = None
 
-        target can be anything supported by the combination
-        of canvas implementation and drawqueue implmentation.
-
-        If target is not supported then an exception is thrown.
-        """
-        if file_number is not None:
-            target = self._filename_with_framenumber(target, file_number)
-
-        output_func = self.output_closure(target)
-        if defer:
-            self._drawqueue.append(output_func)
+    def set_size(self, *dimensions):
+        # Size is known, so setup renderers if have not been already and render everything up to this point.
+        print("set_size", dimensions)
+        if self.realised_size is None:
+            print("create renderer", self.output)
+            self.output.create_renderer(*dimensions)
+            self.realised_size = dimensions
         else:
-            self._drawqueue.append_immediate(output_func)
+            print("resize renderer - not supported")
+            raise NotImplementedError("Resize not supported")
 
-    def flush(self, frame):
-        """Passes the drawqueue to the sink for rendering."""
-        self.sink.render(self.size_or_default(), frame, self._drawqueue)
-        self.reset_drawqueue()
+        self.width, self.height = dimensions
+        return self.width, self.height  # TODO - is this correct?
 
-    def deferred_render(self, render_func):
-        """Add a render function to the queue for rendering later."""
-        self._drawqueue.append(render_func)
+    def draw_image(self, image):
+        # TODO - do we need to freeze the state?
+        self.commands.append((image, image.__state_stack__))
 
-    width = property(get_width)
-    height = property(get_height)
+    def draw_path(self, path: BezierPath):
+        # TODO - do we need to freeze the state?
+        self.commands.append((path, path.__state_stack__))
+
+    def translate(self, x, y):
+        self.position = (x, y)  # TODO - this is not used by the renderer yet.
+
+    def push_clip(self, path):
+        # TODO
+        self.clip_path = path
+        self.clip_stack.push(path)
+
+    def pop_clip(self):
+        if self.clip_path is None:
+            raise ValueError("No clip to pop")
+        if len(self.clip_stack) == 0:
+            self.clip_path = None
+        else:
+            self.clip_path = self.clip_stack.pop()
+
+    @contextmanager
+    def revertible(self):
+        # TODO in future you may have multiple renderers
+        with self.output.revertible():
+            yield self
+
+    @contextmanager
+    def new_page(self, context):
+        # TODO
+        yield self
+
+
+
