@@ -885,7 +885,7 @@ class NodeBot(Grammar):
             x = image.x
         if y is None:
             y = image.y
-        self.image(image.path, image.x, image.y, data=image.data)
+        return self.image(image.path, x, y, data=image.data)
 
     def autoclosepath(self, close=True):
         self._autoclosepath = close
