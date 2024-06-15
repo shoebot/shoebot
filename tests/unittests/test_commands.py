@@ -38,43 +38,43 @@ class TestPath(ShoebotTestCase):
         [
             (
                 "moveto(40, 40)",
-                [PathElement(MOVETO, 40, 40), PathElement(CLOSE, 40, 40)],
+                [PathElement(MOVETO, ((40, 40),),), PathElement(CLOSE)],
             ),
             (
                 "relmoveto(40, 40)",
-                [PathElement(RMOVETO, 40, 40), PathElement(CLOSE, 40, 40)],
+                [PathElement(RMOVETO, ((40, 40),),), PathElement(CLOSE)],
             ),
             (
                 "relmoveto(40, 40)",
-                [PathElement(RMOVETO, 40, 40), PathElement(CLOSE, 40, 40)],
+                [PathElement(RMOVETO, ((40, 40),),), PathElement(CLOSE)],
             ),
             (
                 "lineto(40, 40)",
-                [PathElement(LINETO, 40, 40), PathElement(CLOSE, 40, 40)],
+                [PathElement(LINETO, ((40, 40),),), PathElement(CLOSE)],
             ),
             (
                 "rellineto(40, 40)",
-                [PathElement(RLINETO, 40, 40), PathElement(CLOSE, 40, 40)],
+                [PathElement(RLINETO, ((40, 40),),), PathElement(CLOSE)],
             ),
             (
                 "curveto(40, 40, 60, 60, 80, 80)",
                 [
-                    PathElement(CURVETO, 40, 40, 60, 60, 80, 80),
-                    PathElement(CLOSE, 80, 80),
+                    PathElement(CURVETO, ((40, 40), (60, 60), (80, 80),),),
+                    PathElement(CLOSE),
                 ],
             ),
             (
                 "relcurveto(40, 40, 60, 60, 80, 80)",
                 [
-                    PathElement(RCURVETO, 40, 40, 60, 60, 80, 80),
-                    PathElement(CLOSE, 80, 80),
+                    PathElement(RCURVETO, ((40, 40), (60, 60), (80, 80),),),
+                    PathElement(CLOSE),
                 ],
             ),
             (
                 "arcto(40, 40, 23, 90, 180)",
                 [
-                    PathElement(ARC, 40, 40, 23, radians(90), radians(180)),
-                    PathElement(CLOSE, 40, 40),
+                    PathElement(ARC, ((40, 40),), 23, radians(90), radians(180)),
+                    PathElement(CLOSE),
                 ],
             ),
         ],

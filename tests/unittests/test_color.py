@@ -81,9 +81,7 @@ class TestBaseColor(unittest.TestCase):
         # TODO - the original test did not * the input_color
         actual_color = Color(input_color, color_range=255)
 
-        import ipdb
-        with ipdb.launch_ipdb_on_exception():
-            actual_color._color_data.as_hsl()
+        actual_color._color_data.as_hsl()
         self.assertColorAlmostEqualsRGBA(actual_color.rgba, expected_rgba)
 
     def test_hsb_color_mode(self):

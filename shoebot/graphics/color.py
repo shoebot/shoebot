@@ -33,7 +33,7 @@ class Color(StateValueContainer):
         color_data = kwargs.pop("state_value", None)
         if color_data:
             assert len(args) == 0
-            super().__init__("_color_data", state_value = color_data)
+            super().__init__(self,"_color_data",  color_data)
             return
 
         # TODO - the state creation needs to be at least partially handled elsewhere

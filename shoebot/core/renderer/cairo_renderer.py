@@ -1,10 +1,20 @@
 import cairo
+from affine import Affine
 
 from shoebot.core.renderer.renderer import Renderer
 from shoebot.core.state.color_data import ColorData
 from shoebot.core.state.context import ContextState
 from shoebot.core.state.stateful import get_state_stack
 from shoebot.graphics import ARC, MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, CLOSE, BezierPath, ClippingPath
+
+def affine_to_cairo_matrix(affine):
+    """Return a transformation matrix compatible with PyCairo.
+
+    >>> cairo.Matrix(*affine.to_cairo())
+
+    :rtype: tuple
+    """
+    return affine.a, affine.d, affine.b, affine.e, affine.c, affine.f
 
 
 class CairoRenderer(Renderer):
@@ -53,23 +63,32 @@ class CairoRenderer(Renderer):
             raise ValueError("Unknown command: %s" % element.cmd)
 
     def render_bezierpath(self, path, state):
+        print("render_bezierpath")
         ctx = self.target
+
+        ctx.set_source_rgb(1, 1, 1)
+        origin = ctx.get_matrix()
+
+        ctx.save()
+        path_matrix = affine_to_cairo_matrix(state.affine_transform)
+        ctx.transform(origin * cairo.Matrix(*path_matrix))
+
         for element in path._elements:
             self.render_pathelement(element)
 
+        ctx.restore()
+
         stroke_width = state.stroke_width
 
-        # TODO - currently only supports rendering to RGBA
         state_stack = get_state_stack(path)
 
         stroke = state_stack.stroke.as_rgba()
         fill = state_stack.fill.as_rgba()
 
+        # Only RGBA output currently supported
         if fill.a > 0.0 and stroke.a > 0.0:
             if stroke.a == 1.0:
-                print("DRAW - fill and solid stroke")
                 # Fast path if no alpha in stroke
-                # TODO:  Probably need color handling that knows about things other than rgba
                 ctx.set_source_rgba(*fill.channels)
                 ctx.fill_preserve()
 
@@ -77,7 +96,6 @@ class CairoRenderer(Renderer):
                 ctx.set_line_width(stroke_width)
                 ctx.stroke()
             else:
-                print("DRAW - fill an stroke")
                 # Draw fill onto intermediate surface so stroke does not overlay fill
                 ctx.push_group()
 
@@ -92,30 +110,30 @@ class CairoRenderer(Renderer):
                 ctx.pop_group_to_source()
                 ctx.paint()
         elif fill.a:
-            print("nostroke, fill")
-            # Stroke has no alpha but fill does.
+            # No stroke, fill with an alpha channel
             ctx.set_source_rgba(*fill.channels)
             ctx.fill()
         elif stroke.a:
-            # Fill has no alpha but stroke does.
-            print("stroke, nofill")
+            # No fill, stroke with an alpha channel
             ctx.set_source_rgba(*stroke.channels)
             ctx.set_line_width(stroke_width)
             ctx.stroke()
 
     def render_clippingpath(self, path):
         # TODO test
+        print("render_clippingpath")
         ctx = self.target
         for element in path._elements:
             self.render_pathelement(element)
         ctx.clip()
 
     def render_background(self, color: ColorData):
+        print("render_background")
         # TODO - other kinds of backgrounds, and preserving the current background.
         ctx = self.target
         if color.channel_names == "rgb":
             ctx.set_source_rgb(*color.channels)
-            ctx.paint()
+            ## ctx.paint()
             return
 
         rgba = color.as_rgba()
@@ -123,7 +141,7 @@ class CairoRenderer(Renderer):
             return
 
         ctx.set_source_rgba(*rgba.channels)
-        ctx.paint()
+        ## ctx.paint()
 
     def render_canvas(self, canvas):
         print(f"render_canvas [{len(canvas.commands)} commands]")

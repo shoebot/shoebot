@@ -69,7 +69,6 @@ class ColorMeta(type):
                 :param f: conversion function e.g. hsv_to_rgb
                 :param destination_format: destination format, e.g. "rgb"
                 """
-                print(name, f, destination_format)
                 assert f.__name__.endswith(destination_format)
 
                 def as_format_method(self):

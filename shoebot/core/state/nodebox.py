@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from shoebot.core.state.color_data import RGBData, RGBAData
+from affine import Affine
+
+from shoebot.core.state.color_data import RGBData, RGBAData, VData
 from shoebot.core.state.context import ContextState
 from shoebot.core.state.state import State
 
@@ -54,12 +56,18 @@ class PenDefaults(State):
     cap_style: str = "butt"
 
 
+class TransformDefaults(State):
+    affine_transform = Affine.identity()
+
+
 @dataclass
-class NodeBotContextDefaults(ContextState, DefaultValuesMixin, PenDefaults):
+class NodeBotContextDefaults(ContextState, DefaultValuesMixin, PenDefaults, TransformDefaults):
     """Default values for the NodebotContext"""
 
     background = RGBData(1, 1, 1)
-    fill = RGBData(0, 1, 1)
-    stroke = RGBAData(0, 0, 0, 0)
+    fill = VData(0.2)
+    stroke = RGBAData(0, 0, 0, 0)  # stroke=None
 
     stroke_width = 1.0
+
+    affine_transform = Affine.identity()

@@ -3,6 +3,7 @@
 ChainDataClass provides a chain of dataclasses, providing attribute lookup in order of the chain.
 """
 import dataclasses
+from functools import lru_cache
 
 
 class MissingState:
@@ -11,11 +12,6 @@ class MissingState:
 
 MISSING = MissingState()
 
-
-## TODO - move these out and actually implement state using this
-
-
-# Defaults
 
 
 
@@ -35,23 +31,61 @@ class ChainDataClass:
 
             elif not dataclasses.is_dataclass(arg):
                 raise ValueError(f"Expected a dataclass instance, got {type(arg)}")
-        self._dataclasses = args
+
+        # Avoid custom setattr to avoid infinite recursion
+        super().__setattr__("_dataclasses", args)
+
+    @lru_cache(maxsize=1)
+    def _get_fieldnames(self):
+        # Each dataclass may have less fields than the lower one, so
+        # the top level dataclass is the reference.
+        toplevel_dataclass = self._dataclasses[0]
+        return {field.name for field in dataclasses.fields(toplevel_dataclass)}
 
     def __getattr__(self, attr):
-        for obj in self._dataclasses:
-            if hasattr(obj, attr):
-                value = getattr(obj, attr)
+        if attr in self._get_fieldnames():
+            for i, obj in enumerate(self._dataclasses):
+                value = getattr(obj, attr, MISSING)
                 if value is not MISSING:
                     return value
-        raise AttributeError(f"No such attribute {attr} found in the chain of objects.")
 
-    def __setitem__(self, key, value):
+            raise AttributeError(f"AttributeError: attribute {attr} unset on chain of objects.")
+
+        raise AttributeError(f"AttributeError: type object '{type(self)}' has no attribute '{attr}'")
+
+    def __iter__(self):
+        return iter(self._dataclasses)
+
+    def __setattr__(self, key, value):
         setattr(self._dataclasses[0], key, value)
+
     def __repr__(self):
         return f"<{type(self).__name__} {self._dataclasses}>"
 
+    def freeze(self):
+        """
+        Freeze the first dataclass in the chain.
+
+        Any missing values are replaced by non missing values
+        further up the chain.
+        """
+        # TODO - matrices need a way of special casing themselves...
+        #        as they combine with the underlying matrix.
+        obj = self._dataclasses[0]
+        for field in dataclasses.fields(obj):
+            value = getattr(obj, field.name)
+            if value is MISSING:
+                new_value = getattr(self, field.name)
+                setattr(obj, field.name, new_value)
+
+        return obj
+
     def new_child(self, *args):
         return ChainDataClass(*args, *self._dataclasses)
+
+    def parent(self):
+        return ChainDataClass(*self._dataclasses[1:])
+
 # Usage
 ## default_settings = Defaults()
 ## context_settings = Context()

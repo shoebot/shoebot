@@ -65,6 +65,12 @@ class PathElementTypes(Enum):
 class BezierPath(Stateful):
     def __init__(self, context, *args, **kwargs):
         self._context = context
+        #self._transform = context._transform.copy()
+        from .transform import Transform
+        self._transform = Transform()
+
+        # Ovals and shapes like them use scaling as part of
+        self._is_oval = None
 
         if args and isinstance(args[0], BezierPath):
             # Copy constructor
@@ -171,16 +177,39 @@ class BezierPath(Stateful):
             self.rellineto(-w, 0)
             self.closepath()
         else:
-            curve = min(w * roundness, h * roundness)
-            self.moveto(x, y + curve)
-            self.curveto(x, y, x, y, x + curve, y)
-            self.lineto(x + w - curve, y)
-            self.curveto(x + w, y, x + w, y, x + w, y + curve)
-            self.lineto(x + w, y + h - curve)
-            self.curveto(x + w, y + h, x + w, y + h, x + w - curve, y + h)
-            self.lineto(x + curve, y + h)
-            self.curveto(x, y + h, x, y + h, x, y + h - curve)
+            # Calculate the radius based on the roundness and the size of the rectangle
+            radius = min(w, h) * roundness / 2.0
+            degrees = 3.14159 / 180.0
+
+            # Top-right corner
+            self.arc(x + w - radius, y + radius, radius, -90 * degrees, 0 * degrees)
+
+            # Bottom-right corner
+            self.arc(x + w - radius, y + h - radius, radius, 0 * degrees, 90 * degrees)
+
+            # Bottom-left corner
+            self.arc(x + radius, y + h - radius, radius, 90 * degrees, 180 * degrees)
+
+            # Top-left corner
+            self.arc(x + radius, y + radius, radius, 180 * degrees, 270 * degrees)
+
             self.closepath()
+
+
+
+
+
+
+            # curve = min(w * roundness, h * roundness)
+            # self.moveto(x, y + curve)
+            # self.curveto(x, y, x, y, x + curve, y)
+            # self.lineto(x + w - curve, y)
+            # self.curveto(x + w, y, x + w, y, x + w, y + curve)
+            # self.lineto(x + w, y + h - curve)
+            # self.curveto(x + w, y + h, x + w, y + h, x + w - curve, y + h)
+            # self.lineto(x + curve, y + h)
+            # self.curveto(x, y + h, x, y + h, x, y + h - curve)
+            # self.closepath()
 
     def draw(self):
         self._context.canvas.draw_path(self)
@@ -198,10 +227,8 @@ class EndClip:
 
 def verify_len(what, argname, expected_len, arg):
     # TODO - move somewhere sensible.
-    import ipdb
-    with ipdb.launch_ipdb_on_exception():
-        if expected_len != len(arg):
-            raise ValueError(f"{what} requires {expected_len} {argname}s, got {arg}")
+    if expected_len != len(arg):
+        raise ValueError(f"{what} requires {expected_len} {argname}s, got {arg}")
 
 class PathElement:
     def __init__(self, cmd: PathElementTypes, pts: Optional[List[Point]] = None, *args):

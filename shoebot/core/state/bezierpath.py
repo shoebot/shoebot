@@ -8,9 +8,11 @@ from .chain_dataclass import MISSING
 from .state import State
 from .color_data import ColorData
 from .pen import PenState
+from .transform import TransformState
+
 
 @dataclass
-class BezierPathState(PenState):
+class BezierPathState(PenState, TransformState):
     # TODO this should really extend the relevant base dataclasses
     fill: ColorData = MISSING
     stroke: ColorData = MISSING

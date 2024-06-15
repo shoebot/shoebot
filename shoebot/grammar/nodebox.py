@@ -1,5 +1,6 @@
 import os.path
 import sys
+from glob import glob
 
 from pkg_resources import resource_filename, Requirement
 
@@ -163,10 +164,12 @@ class NodeBotContext(ContextBase):
         :param vars: Optional dict containing initial values for variables
         """
         defaults = NodeBotContextDefaults()
-        ContextBase.__init__(self, canvas, defaults, namespace=namespace, vars=vars)
+        super().__init__(canvas, defaults, namespace=namespace, vars=vars)
 
         self._autoclosepath = True
         self._path = None
+
+        # TODO - this area looks a bit clumsy
         #
         # if self._input_device:
         #     # Get constants like KEY_DOWN, KEY_LEFT
@@ -182,6 +185,8 @@ class NodeBotContext(ContextBase):
                 raise ValueError("Frame must be an integer.")
         else:
             self._frame = 1
+
+        self._transform = Transform()
         #self._set_initial_defaults()  ### TODO Look at these
 
         canvas.mode = CORNER
@@ -361,8 +366,8 @@ class NodeBotContext(ContextBase):
 
         .. code-block:: python
 
-            for x, y in grid(10,10,12,12):
-                rect(x,y, 10,10)
+            for x, y in grid(10, 10, 12, 12):
+                rect(x, y, 10, 10)
         """
         from random import shuffle
 
@@ -373,7 +378,7 @@ class NodeBotContext(ContextBase):
             shuffle(colRange)
         for y in rowRange:
             for x in colRange:
-                yield (x * colSize, y * rowSize)
+                yield x * colSize, y * rowSize
 
     def files(self, path="*"):
         """Returns a list of files.
@@ -404,12 +409,13 @@ class NodeBotContext(ContextBase):
             if defer is None:
                 self._canvas.snapshot(target, defer)
                 defer = False
-            ctx = cairo.Context(target)
+            ctx = cairo._Context(target)
             # this used to be self._canvas.snapshot, but I couldn't make it work.
             # self._canvas.snapshot(target, defer)
             # TODO: check if this breaks when taking more than 1 snapshot
             self._canvas._drawqueue.render(ctx)
             return
+
         elif target is None:
             # If nothing specified, use a default filename from the script name
             script_file = self._namespace.get("__file__")
@@ -908,11 +914,13 @@ class NodeBotContext(ContextBase):
 
         if len(points) == 0:
             return None
-        if len(points) == 1:
+
+        elif len(points) == 1:
             path = self.BezierPath(None)
             path.moveto(points[0].x, points[0].y)
             return path
-        if len(points) == 2:
+
+        elif len(points) == 2:
             path = self.BezierPath(None)
             path.moveto(points[0].x, points[0].y)
             path.lineto(points[1].x, points[1].y)
@@ -987,17 +995,18 @@ class NodeBotContext(ContextBase):
         :param mode: the mode to base new transformations on
         :type mode: CORNER or CENTER
         """
+        raise NotImplementedError()
         if mode:
             self._canvas.mode = mode
         return self._canvas.mode
 
-    def translate(self, xt, yt):
-        """Translate the canvas origin point by (xt, yt).
+    def translate(self, x=0, y=0):
+        """Translate the canvas origin point by (x, y).
 
-        :param xt: Amount to move horizontally
-        :param yt: Amount to move vertically
+        :param x: Amount to move horizontally
+        :param y: Amount to move vertically
         """
-        self._canvas.translate(xt, yt)
+        self._transform.translate(x, y)
 
     def rotate(self, degrees=0, radians=0):
         """Set the current rotation in degrees or radians.
@@ -1005,12 +1014,7 @@ class NodeBotContext(ContextBase):
         :param degrees: Degrees to rotate
         :param radians: Radians to rotate
         """
-        # TODO change canvas to use radians
-        if radians:
-            angle = radians
-        else:
-            angle = deg2rad(degrees)
-        self._canvas.rotate(-angle)
+        self._transform.rotate(-degrees, -radians)
 
     def scale(self, x=1, y=None):
         """Set a scale at which to draw objects.
@@ -1020,30 +1024,19 @@ class NodeBotContext(ContextBase):
         :param x: Scale on the horizontal plane
         :param y: Scale on the vertical plane
         """
-        if not y:
-            y = x
-        if x == 0:
-            # Cairo borks on zero values
-            x = 1
-        if y == 0:
-            y = 1
-        self._canvas.scale(x, y)
+        self._transform.scale(x, y)
 
     def skew(self, x=1, y=0):
-        # TODO bring back transform mixin
-        t = self._canvas.transform
-        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
-        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
-        self._canvas.transform = t
+        self._transform.skew(x, y)
 
     def push(self):
-        self._canvas.push_matrix()
+        self._transform.push()
 
     def pop(self):
-        self._canvas.pop_matrix()
+        self._transform.pop()
 
     def reset(self):
-        self._canvas.reset_transform()
+        self._transform = Transform()
 
     # Color
 
@@ -1107,9 +1100,6 @@ class NodeBotContext(ContextBase):
 
         :return: fill color before nofill() was called
         """
-        # c = self._canvas.fillcolor
-        # self._canvas.fillcolor = None
-        #
         old_color = get_state(self).fill
         new_color = self.Color(0, 0, 0, 0)
         get_state(self).fill = get_state_value(new_color)
@@ -1141,9 +1131,10 @@ class NodeBotContext(ContextBase):
 
         :return: stroke color before nostroke() was called
         """
-        c = self._canvas.strokecolor
-        self._canvas.strokecolor = None
-        return c
+        old_color = get_state(self).stroke
+        new_color = self.Color(0, 0, 0, 0)
+        get_state(self).stroke = get_state_value(new_color)
+        return old_color
 
     def strokewidth(self, w=None):
         """Set the stroke width to be used by stroke().
@@ -1268,13 +1259,13 @@ class NodeBotContext(ContextBase):
         :param draw: Set to False to inhibit immediate drawing (defaults to True)
         :return: Path object representing the text.
         """
-        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
+        text = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
-            path = txt.path
+            path = text.path
             if draw:
                 path.draw()
             return path
-        return txt
+        return text
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         """Generates an outlined path of the input text.
@@ -1287,8 +1278,8 @@ class NodeBotContext(ContextBase):
         :param draw: Set to False to inhibit immediate drawing (defaults to False)
         :return: BezierPath representing the text
         """
-        txt = self.Text(txt, x, y, width, height, draw=False, **kwargs)
-        path = txt.path
+        text = self.Text(txt, x, y, width, height, draw=False, **kwargs)
+        path = text.path
         if draw:
             path.draw()
         return path
@@ -1301,8 +1292,8 @@ class NodeBotContext(ContextBase):
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
-        return txt.metrics
+        text = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
+        return text.metrics
 
     def textbounds(self, txt, width=None, height=None, **kwargs):
         """Returns the dimensions of the actual shapes (inked part) of a string
@@ -1310,8 +1301,8 @@ class NodeBotContext(ContextBase):
 
         :return: (width, height) tuple
         """
-        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
-        return txt.bounds
+        text = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
+        return text.bounds
 
     def textwidth(self, txt, width=None, **kwargs):
         """Returns the width of a string of text according to the current font
@@ -1319,8 +1310,7 @@ class NodeBotContext(ContextBase):
 
         :return:
         """
-        w = width
-        return self.textmetrics(txt, width=w, **kwargs)[0]
+        return self.textmetrics(txt, width=width, **kwargs)[0]
 
     def textheight(self, txt, width=None, **kwargs):
         """Returns the height of a string of text according to the current font
@@ -1329,8 +1319,7 @@ class NodeBotContext(ContextBase):
         :param txt: string to measure
         :param width: width of a line of text in a block
         """
-        w = width
-        return self.textmetrics(txt, width=w, **kwargs)[1]
+        return self.textmetrics(txt, width=width, **kwargs)[1]
 
     def lineheight(self, height=None):
         """Set text lineheight.

@@ -31,6 +31,7 @@
 import typing
 from contextlib import contextmanager
 
+from shoebot.core.state.stateful import get_state
 from shoebot.graphics import BezierPath
 
 
@@ -100,7 +101,23 @@ class Canvas:
 
     def draw_path(self, path: BezierPath):
         # TODO - do we need to freeze the state?
-        self.commands.append((path, path.__state_stack__))
+        #
+        # What do we know...
+        # - We want to be able to change the color of the object later
+        # - We (may) want to change the size or location of the object
+        #
+        # Global state has to be usable by the next thing.
+        path_t = get_state(path).affine_transform
+        context_t = get_state(path._context).affine_transform
+
+        import ipdb; ipdb.set_trace()
+        state = path.__state_stack__.freeze()
+        # The transform is special
+
+        self.commands.append((path, state))
+
+    def draw_text(self, text):
+        raise NotImplementedError("draw_text")
 
     def translate(self, x, y):
         self.position = (x, y)  # TODO - this is not used by the renderer yet.

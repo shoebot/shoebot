@@ -43,6 +43,7 @@ class ReadWriteStateValueDescriptor:
         """
         if obj is None:
             return self
+
         self.ensure_state_storage(obj)
         return obj.__state_values__.get(self.field_name, None)
 
