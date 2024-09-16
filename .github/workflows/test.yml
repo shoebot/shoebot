@@ -24,12 +24,12 @@ jobs:
         sudo apt-get install --no-install-recommends -y python3-pip python3-pep8 python3-setuptools xvfb
         ./install/install_dependencies.sh
         python -mpip freeze
-        python -mpip install .
+        python -mpip install .[test]
 
     - name: Run tests
       run: |
         xvfb-run --auto-servernum python setup.py diagnose
-        xvfb-run --auto-servernum python setup.py test
+        xvfb-run --auto-servernum python -m unittest test
 
   macos:
     runs-on: macos-latest
@@ -53,10 +53,10 @@ jobs:
         pip install wheel
         pip install --upgrade pip setuptools
         python -mpip freeze
-        python -mpip install .
+        python -mpip install .[test]
 
     - name: Run tests
       run: |
         source ../venv/bin/activate
         python setup.py diagnose
-        python setup.py test
+        python -munittest
