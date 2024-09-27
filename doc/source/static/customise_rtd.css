@@ -121,7 +121,7 @@ a {
   color: #FC7753;
 }
 
-ul, .wy-plain-list-disc li, .rst-content .section ul li, .rst-content .toctree-wrapper ul li, article ul li {
+.rst-content .section ul li, .rst-content .toctree-wrapper ul li, .rst-content section ul li, .wy-plain-list-disc li, article ul li {
   list-style-type: none !important;
 }
 
@@ -148,7 +148,7 @@ ul li:before {
   background: none !important;
   font-size: 22px !important;
 }
-.rst-content dl:not(.docutils) code.descname {
+.rst-content dl:not(.docutils) .descname {
   font-family: "HKGrotesk","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
   font-weight: 900;
   margin-right: 4px;
