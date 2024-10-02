@@ -18,12 +18,25 @@ class Stateful:
 
     def __init__(self, state: State, parent_state: Optional[State] = None):
         self.__state__ = state
+        print(type(self), "__init__ has parent state", parent_state is not None)
         if parent_state is None:
             self.__state_stack__ = ChainDataClass(state)
         else:
             self.__state_stack__ = ChainDataClass(state, parent_state)
 
     def _state_kwargs(self, **kwargs):
+        """
+        Map from the field names on the Stateful class to those required by the inner
+        State.
+
+        class MyStateful(Stateful):
+            name = readonlyproperty()
+            x = readonlyproperty("row")
+            y = readonlyproperty("column")
+            ...
+
+        MyStateful(x=10, y=20, name="test")._state_kwargs(x=10, y=20, name="test") -> {"row": 10, "column": 20}
+        """
         if not self._state_container_fields:
             return kwargs
 

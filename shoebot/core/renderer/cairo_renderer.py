@@ -63,14 +63,15 @@ class CairoRenderer(Renderer):
             raise ValueError("Unknown command: %s" % element.cmd)
 
     def render_bezierpath(self, path, state):
-        print("render_bezierpath")
         ctx = self.target
 
         ctx.set_source_rgb(1, 1, 1)
         origin = ctx.get_matrix()
 
         ctx.save()
-        path_matrix = affine_to_cairo_matrix(state.affine_transform)
+        import ipdb
+        with ipdb.launch_ipdb_on_exception():
+            path_matrix = affine_to_cairo_matrix(state.affine_transform)
         ctx.transform(origin * cairo.Matrix(*path_matrix))
 
         for element in path._elements:

@@ -127,7 +127,9 @@ def shoebot_script_test(outputfile=NotSet, windowed=None, verbose=True):
         #             "ITERATION": 1,
         #             "PAGE_NUM": 1,
         #             }
-        extra_ns = {}
+
+        extra_ns = {"flush_outputfile": lambda: print("STUB: flush_outputfile")}
+
         runner.run_test_once(wrapped, args, kwargs, extra_ns)
 
     return wrapper

@@ -7,7 +7,11 @@ from functools import lru_cache
 
 
 class MissingState:
-    pass
+    def __str__(self):
+        return "Missing State"
+
+    def __repr__(self):
+        return "MissingState"
 
 
 MISSING = MissingState()
@@ -24,23 +28,27 @@ class ChainDataClass:
         # TODO - this arg checking is temporary
         for arg in args:
             if isinstance(arg, ChainDataClass):
-                for _arg in arg._dataclasses:
-                    if not dataclasses.is_dataclass(_arg):
-                        raise ValueError(f"Expected a dataclass instance, got {type(_arg)} from passed in ChainDataclass")
                 _dataclasses.extend(arg._dataclasses)
-
-            elif not dataclasses.is_dataclass(arg):
+            elif dataclasses.is_dataclass(arg):
+                _dataclasses.append(arg)
+            else:
                 raise ValueError(f"Expected a dataclass instance, got {type(arg)}")
 
-        # Avoid custom setattr to avoid infinite recursion
-        super().__setattr__("_dataclasses", args)
+        # Avoid recursion
+        super().__setattr__("_dataclasses", _dataclasses)
 
     @lru_cache(maxsize=1)
     def _get_fieldnames(self):
         # Each dataclass may have less fields than the lower one, so
         # the top level dataclass is the reference.
+        if not self._dataclasses:
+            raise ValueError(f"{self} No dataclasses in the chain.")
         toplevel_dataclass = self._dataclasses[0]
         return {field.name for field in dataclasses.fields(toplevel_dataclass)}
+
+    def __getitem__(self, index):
+        # Mostly just used in debugging
+        return self._dataclasses[index]
 
     def __getattr__(self, attr):
         if attr in self._get_fieldnames():
@@ -55,6 +63,9 @@ class ChainDataClass:
 
     def __iter__(self):
         return iter(self._dataclasses)
+
+    def __len__(self):
+        return len(self._dataclasses)
 
     def __setattr__(self, key, value):
         setattr(self._dataclasses[0], key, value)

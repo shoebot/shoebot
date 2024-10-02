@@ -35,7 +35,10 @@ from shoebot.core.state.state import State
 #         self._oldvars = self._vars
 #         self._vars = []
 
-class DefaultValuesMixin:
+class EnforceFieldsHaveValues:
+    """
+    Ensure all fields are set.
+    """
     def __post_init__(self):
         # Iterate list of fields on the parent datafield class
         missing_fields = []
@@ -56,18 +59,29 @@ class PenDefaults(State):
     cap_style: str = "butt"
 
 
+@dataclass
 class TransformDefaults(State):
     affine_transform = Affine.identity()
 
 
 @dataclass
-class NodeBotContextDefaults(ContextState, DefaultValuesMixin, PenDefaults, TransformDefaults):
-    """Default values for the NodebotContext"""
+class NodeBotContextDefaults(PenDefaults,
+                             TransformDefaults,
+                             ContextState,
+                             EnforceFieldsHaveValues):
+    # TODO - EnforceFieldsHaveValues is a bit strange to have here, we should check this,
+    #        buy maybe another way.
+    """Default values for the NodebotContext
+
+    Made up of ContextState: Defines the fields needed.
+    EnforceFieldValues:  Enforces this.
+
+    Default values from: PenDefaults, TransformDefaults.
+    """
 
     background = RGBData(1, 1, 1)
     fill = VData(0.2)
     stroke = RGBAData(0, 0, 0, 0)  # stroke=None
 
-    stroke_width = 1.0
-
-    affine_transform = Affine.identity()
+    #stroke_width = 1.0
+    #affine_transform = Affine.identity()

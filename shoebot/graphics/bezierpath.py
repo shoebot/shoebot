@@ -69,7 +69,7 @@ class BezierPath(Stateful):
         from .transform import Transform
         self._transform = Transform()
 
-        # Ovals and shapes like them use scaling as part of
+        # Ovals and are special cased as they use scaling as part of their drawing
         self._is_oval = None
 
         if args and isinstance(args[0], BezierPath):
@@ -126,7 +126,7 @@ class BezierPath(Stateful):
         self.append(PathElement(PathElementTypes.CURVETO, ((x1, y1), (x2, y2), (x3, y3))))
 
     def relcurveto(self, x1, y1, x2, y2, x3, y3):
-        self.append(PathElement(PathElementTypes.RCURVETO, (x1, y1), (x2, y2), (x3, y3)))
+        self.append(PathElement(PathElementTypes.RCURVETO, ((x1, y1), (x2, y2), (x3, y3))))
     #
     # def arc(self, x, y, radius, angle1, angle2):
     #     self.append(PathElement(PathElementTypes.ARC, x, y, radius, angle1, angle2))

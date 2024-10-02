@@ -31,7 +31,7 @@
 import typing
 from contextlib import contextmanager
 
-from shoebot.core.state.stateful import get_state
+from shoebot.core.state.stateful import get_state, get_state_stack
 from shoebot.graphics import BezierPath
 
 
@@ -107,13 +107,10 @@ class Canvas:
         # - We (may) want to change the size or location of the object
         #
         # Global state has to be usable by the next thing.
-        path_t = get_state(path).affine_transform
-        context_t = get_state(path._context).affine_transform
+        ## path_t = get_state(path).affine_transform
+        ## context_t = get_state(path._context).affine_transform
 
-        import ipdb; ipdb.set_trace()
-        state = path.__state_stack__.freeze()
-        # The transform is special
-
+        state = get_state_stack(path)
         self.commands.append((path, state))
 
     def draw_text(self, text):
