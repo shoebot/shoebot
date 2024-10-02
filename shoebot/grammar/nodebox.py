@@ -1,5 +1,6 @@
 import os.path
 import sys
+from glob import glob
 
 from pkg_resources import resource_filename, Requirement
 
@@ -56,7 +57,11 @@ import random as r
 import locale
 import gettext
 
-from .grammar import Grammar
+from .contextbase import ContextBase
+from ..core.state.context import ContextState
+from ..core.state.nodebox import NodeBotContextDefaults
+from ..core.state.state_value import get_state_value
+from ..core.state.stateful import get_state
 
 SBOT_ROOT = resource_filename(Requirement.parse("shoebot"), "")
 APP = "shoebot"
@@ -86,7 +91,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "nodebox-lib"))
 sys.path.append(".")  # ximport can work from current dir
 
 
-class NodeBot(Grammar):
+class NodeBotContext(ContextBase):
     NORMAL = "1"
     FORTYFIVE = "2"
 
@@ -148,6 +153,9 @@ class NodeBot(Grammar):
     color_mode = RGB
     color_range = 1
 
+    WIDTH = 800
+    HEIGHT = 800
+
     def __init__(self, canvas=None, namespace=None, vars=None):
         """Nodebot grammar constructor.
 
@@ -155,19 +163,20 @@ class NodeBot(Grammar):
         :param namespace: Optionally specify a dict to inject as namespace
         :param vars: Optional dict containing initial values for variables
         """
-
-        Grammar.__init__(self, canvas, namespace=namespace, vars=vars)
-        canvas.set_bot(self)
+        defaults = NodeBotContextDefaults()
+        super().__init__(canvas, defaults, namespace=namespace, vars=vars)
 
         self._autoclosepath = True
         self._path = None
 
-        if self._input_device:
-            # Get constants like KEY_DOWN, KEY_LEFT
-            for key_name, value in list(self._input_device.get_key_map().items()):
-                self._namespace[key_name] = value
-                setattr(self, key_name, value)
-
+        # TODO - this area looks a bit clumsy
+        #
+        # if self._input_device:
+        #     # Get constants like KEY_DOWN, KEY_LEFT
+        #     for key_name, value in list(self._input_device.get_key_map().items()):
+        #         self._namespace[key_name] = value
+        #         setattr(self, key_name, value)
+        #
         self._canvas.size = None
         if isinstance(namespace, dict) and "FRAME" in namespace:
             try:
@@ -176,7 +185,9 @@ class NodeBot(Grammar):
                 raise ValueError("Frame must be an integer.")
         else:
             self._frame = 1
-        self._set_initial_defaults()  ### TODO Look at these
+
+        self._transform = Transform()
+        #self._set_initial_defaults()  ### TODO Look at these
 
         canvas.mode = CORNER
 
@@ -187,39 +198,42 @@ class NodeBot(Grammar):
         loop iterations don't take up values left over by the previous
         one.
         """
-        DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
+        # TODO DEFAULT_WIDTH, DEFAULT_HEIGHT
+        DEFAULT_WIDTH, DEFAULT_HEIGHT = 800, 800
+        # DEFAULT_WIDTH, DEFAULT_HEIGHT = self._canvas.DEFAULT_SIZE
         self.WIDTH = self._namespace.get("WIDTH", DEFAULT_WIDTH)
         self.HEIGHT = self._namespace.get("HEIGHT", DEFAULT_WIDTH)
         if "WIDTH" in self._namespace or "HEIGHT" in self._namespace:
-            self.size(w=self._namespace.get("WIDTH"), h=self._namespace.get("HEIGHT"))
+            self.size(self._namespace.get("WIDTH"), self._namespace.get("HEIGHT"))
 
-        self._transformmode = NodeBot.CENTER
+        #self._transformmode = NodeBot.CENTER
 
-        self._canvas.settings(
-            fillcolor=self.color(0.2),
-            fillrule=None,
-            strokecolor=None,
-            strokewidth=1.0,
-            strokecap=None,
-            strokejoin=None,
-            strokedash=None,
-            dashoffset=0,
-            blendmode=None,
-            background=self.color(1, 1, 1),
-            fontfile="Sans",
-            fontsize=16,
-            align=NodeBot.LEFT,
-            lineheight=1,
-            tracking=0,
-            underline=None,
-            overline=None,
-            underlinecolor=None,
-            overlinecolor=None,
-            hintstyle=None,
-            hintmetrics=None,
-            antialias=None,
-            subpixelorder=None,
-        )
+        # TODO implement canvas settings (check Nodebox, these will probably be attributes)
+        # self._canvas.settings(
+        #     fillcolor=self.color(0.2),
+        #     fillrule=None,
+        #     strokecolor=None,
+        #     strokewidth=1.0,
+        #     strokecap=None,
+        #     strokejoin=None,
+        #     strokedash=None,
+        #     dashoffset=0,
+        #     blendmode=None,
+        #     background=self.color(1, 1, 1),
+        #     fontfile="Sans",
+        #     fontsize=16,
+        #     align=Bot.LEFT,
+        #     lineheight=1,
+        #     tracking=0,
+        #     underline=None,
+        #     overline=None,
+        #     underlinecolor=None,
+        #     overlinecolor=None,
+        #     hintstyle=None,
+        #     hintmetrics=None,
+        #     antialias=None,
+        #     subpixelorder=None,
+        # )
 
     # Input GUI callbacks
 
@@ -259,63 +273,32 @@ class NodeBot(Grammar):
         inst = clazz(self, *args, **kwargs)
         return inst
 
-    def _makeColorableInstance(self, clazz, args, kwargs):
-        """Create an object, if fill, stroke or strokewidth is not specified,
-        get them from the _canvas.
-
-        :param clazz:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        kwargs = dict(kwargs)
-
-        fill = kwargs.get("fill", self._canvas.fillcolor)
-        if not isinstance(fill, Color):
-            fill = Color(fill, mode="rgb", color_range=1)
-        kwargs["fill"] = fill
-
-        stroke = kwargs.get("stroke", self._canvas.strokecolor)
-        if not isinstance(stroke, Color):
-            stroke = Color(stroke, mode="rgb", color_range=1)
-        kwargs["stroke"] = stroke
-
-        kwargs["fillrule"] = kwargs.get("fillrule", self._canvas.fillrule)
-        kwargs["strokewidth"] = kwargs.get("strokewidth", self._canvas.strokewidth)
-        kwargs["strokecap"] = kwargs.get("strokecap", self._canvas.strokecap)
-        kwargs["strokejoin"] = kwargs.get("strokejoin", self._canvas.strokejoin)
-        kwargs["strokedash"] = kwargs.get("strokedash", self._canvas.strokedash)
-        kwargs["dashoffset"] = kwargs.get("dashoffset", self._canvas.dashoffset)
-        kwargs["blendmode"] = kwargs.get("blendmode", self._canvas.blendmode)
-        inst = clazz(self, *args, **kwargs)
-        return inst
-
     def EndClip(self, *args, **kwargs):
-        return self._makeColorableInstance(EndClip, args, kwargs)
+        return self._makeInstance(EndClip, args, kwargs)
 
     def BezierPath(self, *args, **kwargs):
-        return self._makeColorableInstance(BezierPath, args, kwargs)
+        return self._makeInstance(BezierPath, args, kwargs)
 
     def ClippingPath(self, *args, **kwargs):
-        return self._makeColorableInstance(ClippingPath, args, kwargs)
+        return self._makeInstance(ClippingPath, args, kwargs)
 
     def Rect(self, *args, **kwargs):
-        return self._makeColorableInstance(Rect, args, kwargs)
+        return self._makeInstance(Rect, args, kwargs)
 
     def Oval(self, *args, **kwargs):
-        return self._makeColorableInstance(Oval, args, kwargs)
+        return self._makeInstance(Oval, args, kwargs)
 
     def Ellipse(self, *args, **kwargs):
-        return self._makeColorableInstance(Ellipse, args, kwargs)
+        return self._makeInstance(Ellipse, args, kwargs)
 
     def Color(self, *args, **kwargs):
         return Color(*args, **kwargs)
 
     def Image(self, *args, **kwargs):
-        return self._makeColorableInstance(Image, args, kwargs)
+        return self._makeInstance(Image, args, kwargs)
 
     def Text(self, *args, **kwargs):
-        return self._makeColorableInstance(Text, args, kwargs)
+        return self._makeInstance(Text, args, kwargs)
 
     # Variables #####
 
@@ -350,7 +333,8 @@ class NodeBot(Grammar):
 
         :return: Color object containing the color.
         """
-        return self.Color(mode=self.color_mode, color_range=self.color_range, *args)
+        #return self.Color(mode=self.color_mode, color_range=self.color_range, *args)
+        return self.Color(*args)
 
     choice = r.choice
 
@@ -382,8 +366,8 @@ class NodeBot(Grammar):
 
         .. code-block:: python
 
-            for x, y in grid(10,10,12,12):
-                rect(x,y, 10,10)
+            for x, y in grid(10, 10, 12, 12):
+                rect(x, y, 10, 10)
         """
         from random import shuffle
 
@@ -394,7 +378,7 @@ class NodeBot(Grammar):
             shuffle(colRange)
         for y in rowRange:
             for x in colRange:
-                yield (x * colSize, y * rowSize)
+                yield x * colSize, y * rowSize
 
     def files(self, path="*"):
         """Returns a list of files.
@@ -425,12 +409,13 @@ class NodeBot(Grammar):
             if defer is None:
                 self._canvas.snapshot(target, defer)
                 defer = False
-            ctx = cairo.Context(target)
+            ctx = cairo._Context(target)
             # this used to be self._canvas.snapshot, but I couldn't make it work.
             # self._canvas.snapshot(target, defer)
             # TODO: check if this breaks when taking more than 1 snapshot
             self._canvas._drawqueue.render(ctx)
             return
+
         elif target is None:
             # If nothing specified, use a default filename from the script name
             script_file = self._namespace.get("__file__")
@@ -517,7 +502,7 @@ class NodeBot(Grammar):
             return self._canvas.width, self._canvas.height
 
         # FIXME: Updating in all these places seems a bit hacky
-        w, h = self._canvas.set_size((w, h))
+        w, h = self._canvas.set_size(w, h)
         self._namespace["WIDTH"] = w
         self._namespace["HEIGHT"] = h
         self.WIDTH = w  # Added to make evolution example work
@@ -812,7 +797,6 @@ class NodeBot(Grammar):
         :type y: float
         """
         if self._path is None:
-            # self.beginpath()
             raise ShoebotError(_("No current path. Use beginpath() first."))
         self._path.moveto(x, y)
 
@@ -871,7 +855,7 @@ class NodeBot(Grammar):
         elif hasattr(path, "__iter__"):
             p = self.BezierPath()
             for point in path:
-                p.addpoint(point)
+                p.append(point)
             p.draw()
 
     def drawimage(self, image, x=None, y=None):
@@ -930,11 +914,13 @@ class NodeBot(Grammar):
 
         if len(points) == 0:
             return None
-        if len(points) == 1:
+
+        elif len(points) == 1:
             path = self.BezierPath(None)
             path.moveto(points[0].x, points[0].y)
             return path
-        if len(points) == 2:
+
+        elif len(points) == 2:
             path = self.BezierPath(None)
             path.moveto(points[0].x, points[0].y)
             path.lineto(points[1].x, points[1].y)
@@ -1009,17 +995,18 @@ class NodeBot(Grammar):
         :param mode: the mode to base new transformations on
         :type mode: CORNER or CENTER
         """
+        raise NotImplementedError()
         if mode:
             self._canvas.mode = mode
         return self._canvas.mode
 
-    def translate(self, xt, yt):
-        """Translate the canvas origin point by (xt, yt).
+    def translate(self, x=0, y=0):
+        """Translate the canvas origin point by (x, y).
 
-        :param xt: Amount to move horizontally
-        :param yt: Amount to move vertically
+        :param x: Amount to move horizontally
+        :param y: Amount to move vertically
         """
-        self._canvas.translate(xt, yt)
+        self._transform.translate(x, y)
 
     def rotate(self, degrees=0, radians=0):
         """Set the current rotation in degrees or radians.
@@ -1027,12 +1014,7 @@ class NodeBot(Grammar):
         :param degrees: Degrees to rotate
         :param radians: Radians to rotate
         """
-        # TODO change canvas to use radians
-        if radians:
-            angle = radians
-        else:
-            angle = deg2rad(degrees)
-        self._canvas.rotate(-angle)
+        self._transform.rotate(-degrees, -radians)
 
     def scale(self, x=1, y=None):
         """Set a scale at which to draw objects.
@@ -1042,30 +1024,19 @@ class NodeBot(Grammar):
         :param x: Scale on the horizontal plane
         :param y: Scale on the vertical plane
         """
-        if not y:
-            y = x
-        if x == 0:
-            # Cairo borks on zero values
-            x = 1
-        if y == 0:
-            y = 1
-        self._canvas.scale(x, y)
+        self._transform.scale(x, y)
 
     def skew(self, x=1, y=0):
-        # TODO bring back transform mixin
-        t = self._canvas.transform
-        t *= cairo.Matrix(1, 0, x, 1, 0, 0)
-        t *= cairo.Matrix(1, y, 0, 1, 0, 0)
-        self._canvas.transform = t
+        self._transform.skew(x, y)
 
     def push(self):
-        self._canvas.push_matrix()
+        self._transform.push()
 
     def pop(self):
-        self._canvas.pop_matrix()
+        self._transform.pop()
 
     def reset(self):
-        self._canvas.reset_transform()
+        self._transform = Transform()
 
     # Color
 
@@ -1114,18 +1085,25 @@ class NodeBot(Grammar):
 
         :param args: color in supported format
         """
-        if args is not None:
-            self._canvas.fillcolor = self.color(*args)
-        return self._canvas.fillcolor
+        if args is None:
+            # Return current fill color
+            color_data = get_state(self).fill.copy()
+            return self.Color(state_value=color_data)
+
+        # Set new fill color and return it
+        color = self.Color(*args)
+        get_state(self).fill = get_state_value(color)
+        return color
 
     def nofill(self):
         """Stop applying fills to new paths.
 
         :return: fill color before nofill() was called
         """
-        c = self._canvas.fillcolor
-        self._canvas.fillcolor = None
-        return c
+        old_color = get_state(self).fill
+        new_color = self.Color(0, 0, 0, 0)
+        get_state(self).fill = get_state_value(new_color)
+        return old_color
 
     def fillrule(self, r=None):
         """Set the fill rule to use in new paths.
@@ -1153,9 +1131,10 @@ class NodeBot(Grammar):
 
         :return: stroke color before nostroke() was called
         """
-        c = self._canvas.strokecolor
-        self._canvas.strokecolor = None
-        return c
+        old_color = get_state(self).stroke
+        new_color = self.Color(0, 0, 0, 0)
+        get_state(self).stroke = get_state_value(new_color)
+        return old_color
 
     def strokewidth(self, w=None):
         """Set the stroke width to be used by stroke().
@@ -1178,7 +1157,7 @@ class NodeBot(Grammar):
             self._canvas.strokedash = dashes
         if offset:
             self._canvas.dashoffset = offset
-        return (self._canvas.strokedash, self._canvas.dashoffset)
+        return self._canvas.strokedash, self._canvas.dashoffset
 
     def strokecap(self, cap=None):
         """Set the stroke cap.
@@ -1206,8 +1185,9 @@ class NodeBot(Grammar):
         :param color: background color to apply
         :return: new background color
         """
-        self._canvas.background = self.color(*args)
-        return self._canvas.background
+        color = self.color(*args)
+        get_state(self).background = get_state_value(color)
+        return color
 
     def blendmode(self, mode=None):
         """Set the current blending mode.
@@ -1279,13 +1259,13 @@ class NodeBot(Grammar):
         :param draw: Set to False to inhibit immediate drawing (defaults to True)
         :return: Path object representing the text.
         """
-        txt = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
+        text = self.Text(txt, x, y, width, height, outline=outline, ctx=None, **kwargs)
         if outline:
-            path = txt.path
+            path = text.path
             if draw:
                 path.draw()
             return path
-        return txt
+        return text
 
     def textpath(self, txt, x, y, width=None, height=1000000, draw=False, **kwargs):
         """Generates an outlined path of the input text.
@@ -1298,8 +1278,8 @@ class NodeBot(Grammar):
         :param draw: Set to False to inhibit immediate drawing (defaults to False)
         :return: BezierPath representing the text
         """
-        txt = self.Text(txt, x, y, width, height, draw=False, **kwargs)
-        path = txt.path
+        text = self.Text(txt, x, y, width, height, draw=False, **kwargs)
+        path = text.path
         if draw:
             path.draw()
         return path
@@ -1312,8 +1292,8 @@ class NodeBot(Grammar):
         """
         # for now only returns width and height (as per Nodebox behaviour)
         # but maybe we could use the other data from cairo
-        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
-        return txt.metrics
+        text = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
+        return text.metrics
 
     def textbounds(self, txt, width=None, height=None, **kwargs):
         """Returns the dimensions of the actual shapes (inked part) of a string
@@ -1321,8 +1301,8 @@ class NodeBot(Grammar):
 
         :return: (width, height) tuple
         """
-        txt = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
-        return txt.bounds
+        text = self.Text(txt, 0, 0, width, height, draw=False, **kwargs)
+        return text.bounds
 
     def textwidth(self, txt, width=None, **kwargs):
         """Returns the width of a string of text according to the current font
@@ -1330,8 +1310,7 @@ class NodeBot(Grammar):
 
         :return:
         """
-        w = width
-        return self.textmetrics(txt, width=w, **kwargs)[0]
+        return self.textmetrics(txt, width=width, **kwargs)[0]
 
     def textheight(self, txt, width=None, **kwargs):
         """Returns the height of a string of text according to the current font
@@ -1340,8 +1319,7 @@ class NodeBot(Grammar):
         :param txt: string to measure
         :param width: width of a line of text in a block
         """
-        w = width
-        return self.textmetrics(txt, width=w, **kwargs)[1]
+        return self.textmetrics(txt, width=width, **kwargs)[1]
 
     def lineheight(self, height=None):
         """Set text lineheight.

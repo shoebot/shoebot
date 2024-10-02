@@ -2,6 +2,8 @@
 and the commandline shell."""
 
 import collections
+import queue
+
 from pubsub import pub
 
 
@@ -24,8 +26,7 @@ VARIABLE_CHANGED_EVENT = "variable-updated"
 SET_WINDOW_TITLE_EVENT = "set-window-title"
 REDRAW_EVENT = "redraw"
 
-
-def publish_event(event_t, data=None):
+def publish_event(event_t, data=None, **kwargs):
     """Publish an event ot any subscribers.
 
     :param event_t:  event type
@@ -34,6 +35,21 @@ def publish_event(event_t, data=None):
     :param wait:
     :return:
     """
-    event = Event(event_t, data)
-    pub.sendMessage('shoebot', event=event)
+    event = Event(event_t, data, **kwargs)
+    pub.sendMessage('shoebot', event=event, **kwargs)
 
+
+def route_events_to_queue(event_queue: queue.Queue, channel:str):
+    """
+    Adapter to route pubsub events for a particular channel to a queue.
+    """
+    def add_incoming_event_to_queue(event=None):
+        """Shoebot uses a pub/sub architecture to communicate between the
+        different components such as the bot, GUI and command interface.
+
+        This function is called when a message is received, it is
+        put on a queue.
+        """
+        event_queue.put_nowait(event)
+
+    pub.subscribe(add_incoming_event_to_queue, channel)

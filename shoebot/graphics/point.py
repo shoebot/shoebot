@@ -1,32 +1,23 @@
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
 class Point:
     """Taken from Nodebox and modified."""
+    x: float = 0.0
+    y: Optional[float] = None
+    def __post_init__(self):
+        if self.y is None:
+            self.y = self.x
 
-    def __init__(self, *args):
-        self.cmd = args[0]
-        if len(args) == 3:
-            self.x, self.y, self.z = args
-        if len(args) == 2:
-            self.x, self.y = args
-        elif len(args) == 1:
-            self.x, self.y = args[0]
-        elif len(args) == 0:
-            self.x = self.y = 0.0
-        else:
-            raise ValueError(_("Wrong initializer for Point object"))
+        # TODO - remove these asserts, or only enable during testing somehow.
+        assert isinstance(self.x, (int, float)), f"Expected x to be a number, got {self.x}"
+        assert isinstance(self.y, (int, float)), f"Expected y to be a number, got {self.y}"
+    def __iter__(self):
+        return iter((self.x, self.y))
 
-    def __repr__(self):
-        return (self.x, self.y)
-
-    def __str__(self):
-        return f"Point({self.x:.3f}, {self.y:.3f})"
-
-    def __getitem__(self, key):
-        return (float(self.x), float(self.y))[key]
-
-    def __eq__(self, other):
-        if other is None:
-            return False
-        return self.x == other.x and self.y == other.y
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    @property
+    def xy(self):
+        # Taken from Nodebox-GL
+        return self.x, self.y

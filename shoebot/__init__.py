@@ -33,9 +33,6 @@ import signal
 import sys
 import threading
 
-from shoebot.core.backend import cairo
-from shoebot.grammar import NodeBot
-
 # TODO - Check if this needs importing here:
 # from shoebot.data import MOVETO, RMOVETO, LINETO, RLINETO, CURVETO, RCURVETO, ARC, ELLIPSE, CLOSE, LEFT, RIGHT, ShoebotError, ShoebotScriptError
 from time import sleep
@@ -65,182 +62,182 @@ def _restore():
 # Convenience functions to create a bot, its canvas and sink
 
 
-def create_canvas(
-    src,
-    format=None,
-    outputfile=None,
-    multifile=False,
-    buff=None,
-    window=False,
-    title=None,
-    fullscreen=None,
-    show_vars=False,
-):
-    """Create canvas and sink for attachment to a bot.
-
-    canvas is what draws images, 'sink' is the final consumer of the images
-
-    :param src: Defaults for title or outputfile if not specified.
-
-    :param format: CairoImageSink image format, if using buff instead of outputfile
-    :param buff: CairoImageSink buffer object to send output to
-
-    :param outputfile: CairoImageSink output filename e.g. "hello.svg"
-    :param multifile: CairoImageSink if True,
-
-    :param title: ShoebotWindow - set window title
-    :param fullscreen: ShoebotWindow - set window title
-    :param show_vars: ShoebotWindow - display variable window
-
-    Two kinds of sink are provided: CairoImageSink and ShoebotWindow
-
-    ShoebotWindow
-
-    Displays a window to draw shoebot inside.
-
-
-    CairoImageSink
-
-    Output to a filename (or files if multifile is set), or a buffer object.
-    """
-    from shoebot.core import (
-        CairoCanvas,
-        CairoImageSink,
-    )  # https://github.com/shoebot/shoebot/issues/206
-
-    if window or show_vars:
-        from shoebot.gui import ShoebotWindow
-
-        if not title:
-            if src and os.path.isfile(src):
-                title = os.path.splitext(os.path.basename(src))[0] + " - Shoebot"
-            else:
-                title = "Untitled - Shoebot"
-        sink = ShoebotWindow(
-            title, show_vars, fullscreen=fullscreen, outputfile=outputfile,
-        )
-    elif outputfile:
-        sink = CairoImageSink(outputfile, format, multifile, buff)
-    else:
-        if src and isinstance(src, cairo.Surface):
-            outputfile = src
-            format = "surface"
-        elif src and os.path.isfile(src):
-            outputfile = (
-                os.path.splitext(os.path.basename(src))[0] + "." + (format or "svg")
-            )
-        else:
-            outputfile = "output.svg"
-        sink = CairoImageSink(outputfile, format, multifile, buff)
-    canvas = CairoCanvas(sink)
-
-    return canvas
-
-
-def create_bot(
-    src=None,
-    format=None,
-    outputfile=None,
-    iterations=1,
-    buff=None,
-    window=False,
-    title=None,
-    fullscreen=None,
-    server=False,
-    port=7777,
-    show_vars=False,
-    vars=None,
-    namespace=None,
-):
-    """Create a canvas and a bot with the same canvas attached to it.
-
-    bot parameters
-    :param vars: preset dictionary of vars from the called
-
-    canvas parameters:
-    ... everything else ...
-
-    See create_canvas for details on those parameters.
-    """
-    multifile = True if iterations and iterations > 1 else False
-    canvas = create_canvas(
-        src=src,
-        format=format,
-        outputfile=outputfile,
-        multifile=multifile,
-        buff=buff,
-        window=window,
-        title=title,
-        fullscreen=fullscreen,
-        show_vars=show_vars,
-    )
-
-    bot = NodeBot(canvas, namespace=namespace, vars=vars)
-
-    if server:
-        from shoebot.sbio import SocketServer
-
-        socket_server = SocketServer(bot, "", port=port)
-    return bot
-
-
-class ShoebotThread(threading.Thread):
-    """Run shoebot in an alternate thread.
-
-    This way the commandline shell can run on the main thread and the
-    GUI in a seperate thread without readline blocking it.
-    """
-
-    def __init__(
-        self, create_args, create_kwargs, run_args, run_kwargs, send_sigint=False,
-    ):
-        """
-        :param create_args: passed to create_bot
-        :param create_kwargs: passed to create_bot
-        :param run_args: passed to bot.run
-        :param run_kwargs: passed to bot.run
-        :param send_sigint: if True then SIGINT will be sent on bot completion
-                            so the main thread can terminate
-        """
-        super(ShoebotThread, self).__init__(daemon=True)
-        # isSet() will return True once the bot has been created
-        self.bot_ready = threading.Event()
-
-        self.create_args = create_args
-        self.create_kwargs = create_kwargs
-
-        self.run_args = run_args
-        self.run_kwargs = run_kwargs
-
-        self.success = None  # TODO: fix naming, should probably be thread Event so it can be waited on (and have another name)
-
-        self.send_sigint = send_sigint
-        self._sbot = None
-
-    def run(self):
-        try:
-            sbot = create_bot(*self.create_args, **self.create_kwargs)
-
-            self._sbot = sbot
-            self.bot_ready.set()
-            success = sbot.run(*self.run_args, **self.run_kwargs)
-            self.success = success
-        except Exception:
-            self.success = False
-            print("Exception in shoebot code")
-            raise
-        finally:
-            self.bot_ready.set()  # Stop waiting
-            if self.send_sigint:
-                os.kill(os.getpid(), signal.SIGINT)
-
-    @property
-    def sbot(self):
-        """
-        :return: bot instance for communication
-        """
-        self.bot_ready.wait()
-        return self._sbot
+# def create_canvas(
+#     src,
+#     format=None,
+#     outputfile=None,
+#     multifile=False,
+#     buff=None,
+#     window=False,
+#     title=None,
+#     fullscreen=None,
+#     show_vars=False,
+# ):
+#     """Create canvas and sink for attachment to a bot.
+#
+#     canvas is what draws images, 'sink' is the final consumer of the images
+#
+#     :param src: Defaults for title or outputfile if not specified.
+#
+#     :param format: CairoImageSink image format, if using buff instead of outputfile
+#     :param buff: CairoImageSink buffer object to send output to
+#
+#     :param outputfile: CairoImageSink output filename e.g. "hello.svg"
+#     :param multifile: CairoImageSink if True,
+#
+#     :param title: ShoebotWindow - set window title
+#     :param fullscreen: ShoebotWindow - set window title
+#     :param show_vars: ShoebotWindow - display variable window
+#
+#     Two kinds of sink are provided: CairoImageSink and ShoebotWindow
+#
+#     ShoebotWindow
+#
+#     Displays a window to draw shoebot inside.
+#
+#
+#     CairoImageSink
+#
+#     Output to a filename (or files if multifile is set), or a buffer object.
+#     """
+#     from shoebot.core import (
+#         CairoCanvas,
+#         CairoImageSink,
+#     )  # https://github.com/shoebot/shoebot/issues/206
+#
+#     if window or show_vars:
+#         from shoebot.gui import ShoebotWindow
+#
+#         if not title:
+#             if src and os.path.isfile(src):
+#                 title = os.path.splitext(os.path.basename(src))[0] + " - Shoebot"
+#             else:
+#                 title = "Untitled - Shoebot"
+#         sink = ShoebotWindow(
+#             title, show_vars, fullscreen=fullscreen, outputfile=outputfile,
+#         )
+#     elif outputfile:
+#         sink = CairoImageSink(outputfile, format, multifile, buff)
+#     else:
+#         if src and isinstance(src, cairo.Surface):
+#             outputfile = src
+#             format = "surface"
+#         elif src and os.path.isfile(src):
+#             outputfile = (
+#                 os.path.splitext(os.path.basename(src))[0] + "." + (format or "svg")
+#             )
+#         else:
+#             outputfile = "output.svg"
+#         sink = CairoImageSink(outputfile, format, multifile, buff)
+#     canvas = CairoCanvas(sink)
+#
+#     return canvas
+#
+#
+# def create_bot(
+#     src=None,
+#     format=None,
+#     outputfile=None,
+#     iterations=1,
+#     buff=None,
+#     window=False,
+#     title=None,
+#     fullscreen=None,
+#     server=False,
+#     port=7777,
+#     show_vars=False,
+#     vars=None,
+#     namespace=None,
+# ):
+#     """Create a canvas and a bot with the same canvas attached to it.
+#
+#     bot parameters
+#     :param vars: preset dictionary of vars from the called
+#
+#     canvas parameters:
+#     ... everything else ...
+#
+#     See create_canvas for details on those parameters.
+#     """
+#     multifile = True if iterations and iterations > 1 else False
+#     canvas = create_canvas(
+#         src=src,
+#         format=format,
+#         outputfile=outputfile,
+#         multifile=multifile,
+#         buff=buff,
+#         window=window,
+#         title=title,
+#         fullscreen=fullscreen,
+#         show_vars=show_vars,
+#     )
+#
+#     bot = NodeBot(canvas, namespace=namespace, vars=vars)
+#
+#     if server:
+#         from shoebot.sbio import SocketServer
+#
+#         socket_server = SocketServer(bot, "", port=port)
+#     return bot
+#
+#
+# class ShoebotThread(threading.Thread):
+#     """Run shoebot in an alternate thread.
+#
+#     This way the commandline shell can run on the main thread and the
+#     GUI in a seperate thread without readline blocking it.
+#     """
+#
+#     def __init__(
+#         self, create_args, create_kwargs, run_args, run_kwargs, send_sigint=False,
+#     ):
+#         """
+#         :param create_args: passed to create_bot
+#         :param create_kwargs: passed to create_bot
+#         :param run_args: passed to bot.run
+#         :param run_kwargs: passed to bot.run
+#         :param send_sigint: if True then SIGINT will be sent on bot completion
+#                             so the main thread can terminate
+#         """
+#         super(ShoebotThread, self).__init__(daemon=True)
+#         # isSet() will return True once the bot has been created
+#         self.bot_ready = threading.Event()
+#
+#         self.create_args = create_args
+#         self.create_kwargs = create_kwargs
+#
+#         self.run_args = run_args
+#         self.run_kwargs = run_kwargs
+#
+#         self.success = None  # TODO: fix naming, should probably be thread Event so it can be waited on (and have another name)
+#
+#         self.send_sigint = send_sigint
+#         self._sbot = None
+#
+#     def run(self):
+#         try:
+#             sbot = create_bot(*self.create_args, **self.create_kwargs)
+#
+#             self._sbot = sbot
+#             self.bot_ready.set()
+#             success = sbot.run(*self.run_args, **self.run_kwargs)
+#             self.success = success
+#         except Exception:
+#             self.success = False
+#             print("Exception in shoebot code")
+#             raise
+#         finally:
+#             self.bot_ready.set()  # Stop waiting
+#             if self.send_sigint:
+#                 os.kill(os.getpid(), signal.SIGINT)
+#
+#     @property
+#     def sbot(self):
+#         """
+#         :return: bot instance for communication
+#         """
+#         self.bot_ready.wait()
+#         return self._sbot
 
 
 def run(

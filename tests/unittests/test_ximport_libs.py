@@ -6,7 +6,7 @@ from unittest.mock import patch
 from parameterized import parameterized
 
 from tests.unittests.helpers import ShoebotTestCase
-from tests.unittests.helpers import test_as_bot
+from tests.unittests.helpers import shoebot_script_test
 
 class TestXImportLibs(ShoebotTestCase):
     @parameterized.expand(
@@ -27,7 +27,7 @@ class TestXImportLibs(ShoebotTestCase):
            ("tuio",),
         ],
     )
-    @test_as_bot()
+    @shoebot_script_test()
     def test_path_commands(self, lib, *requires):
         """Attempt to ximport each of the libraries shoebot provides."""
         for required in requires:

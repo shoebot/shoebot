@@ -108,7 +108,7 @@ class CairoGIBackend(BackendMixin):
         :param ctx:
         :return:
         """
-        if self.cairocffi and isinstance(ctx, self.cairocffi.Context):
+        if self.cairocffi and isinstance(ctx, self.cairocffi._Context):
             from shoebot.util.cairocffi.cairocffi_to_pycairo import (
                 _UNSAFE_cairocffi_context_to_pycairo,
             )
